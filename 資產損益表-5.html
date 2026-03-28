@@ -2,6 +2,7 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>2026 資產損益表</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
@@ -198,34 +199,37 @@ select.form-input { cursor:pointer; }
     <div class="section"><table class="section-table"><tbody id="summary-body"></tbody></table></div>
 
     <div class="section">
-      <table class="section-table">
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+      <table class="section-table" style="min-width:700px">
         <thead><tr>
           <td class="section-label" rowspan="99">投<br>資<br>標<br>的</td>
           <th class="col-header">標的</th>
           <th class="col-header">持有張數</th>
+          <th class="col-header">均買價</th>
+          <th class="col-header">總成本</th>
+          <th class="col-header">現價</th>
+          <th class="col-header">市值</th>
           <th class="col-header">損益</th>
           <th class="col-header">報酬率</th>
-          <th class="col-header">現價</th>
-          <th class="col-header">均成本</th>
-          <th class="col-header">總成本</th>
-          <th class="col-header">市值</th>
-          <th class="col-header">配息/股/年</th>
-          <th class="col-header">每月股息</th>
+          <th class="col-header">月股息</th>
           <th class="col-header">比率</th>
-          <th class="col-header" style="min-width:115px">操作</th>
         </tr></thead>
         <tbody id="invest-body"></tbody>
         <tfoot><tr class="row-total">
-          <td colspan="5" style="text-align:right;padding-right:14px">總結</td>
-          <td></td>
+          <td colspan="3" style="text-align:right;padding-right:14px">總結</td>
           <td class="mono bold" id="t-cost">—</td>
-          <td class="mono bold" id="t-mktval">—</td>
           <td></td>
+          <td class="mono bold" id="t-mktval">—</td>
+          <td class="mono bold" id="t-pnl">—</td>
+          <td class="mono bold" id="t-roi">—</td>
           <td class="mono bold pink-bg" id="t-div">$0</td>
           <td class="mono bold">100%</td>
-          <td><button class="act-btn add" onclick="openInvestModal()">＋ 新增</button></td>
         </tr></tfoot>
       </table>
+      </div>
+      <div style="padding:8px 12px;border-top:1px solid var(--border);background:#f7faff;text-align:right">
+        <button class="act-btn add" onclick="openInvestModal()">＋ 新增股票</button>
+      </div>
     </div>
 
     <div class="section">
@@ -424,52 +428,24 @@ function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(
 
 // ===== PRICE =====
 async function fetchPrice(code){
-  // 嘗試多個來源
-  // 1. 台灣證交所 (上市, TWSE)
-  // 2. 台灣櫃買中心 (上櫃, TPEx) — 債券ETF如00985B, 00864B
-  // 3. Yahoo Finance fallback
-
   const isTW=/^\d+[A-Za-z]?$/.test(code);
-  if(!isTW) return fetchYahoo(code); // 美股直接用Yahoo
-
-  // 先試 TWSE (上市)
-  try{
-    const r=await fetch(`https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=tse_${code}.tw&json=1&delay=0`);
-    const d=await r.json();
-    const item=d?.msgArray?.[0];
-    if(item&&item.z&&item.z!=='-'){
-      const price=parseFloat(item.z);
-      const prev=parseFloat(item.y||item.z);
-      return{price,change:price-prev,changePct:((price-prev)/prev)*100,ts:Date.now(),src:'TWSE'};
-    }
-  }catch(e){}
-
-  // 再試 TPEx (上櫃) — 00985B, 00864B 等債券ETF
-  try{
-    const r=await fetch(`https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=otc_${code}.tw&json=1&delay=0`);
-    const d=await r.json();
-    const item=d?.msgArray?.[0];
-    if(item&&item.z&&item.z!=='-'){
-      const price=parseFloat(item.z);
-      const prev=parseFloat(item.y||item.z);
-      return{price,change:price-prev,changePct:((price-prev)/prev)*100,ts:Date.now(),src:'TPEx'};
-    }
-  }catch(e){}
-
-  // Fallback: Yahoo Finance
-  return fetchYahoo(code+'.TWO') || fetchYahoo(code+'.TW');
-}
-
-async function fetchYahoo(sym){
-  try{
-    const r=await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=1d&range=1d`);
-    const d=await r.json();
-    const meta=d?.chart?.result?.[0]?.meta;
-    if(!meta||!meta.regularMarketPrice)return null;
-    const price=meta.regularMarketPrice;
-    const prev=meta.previousClose??price;
-    return{price,change:price-prev,changePct:((price-prev)/prev)*100,ts:Date.now(),src:'Yahoo'};
-  }catch(e){return null;}
+  // 用 allorigins proxy 繞過 CORS，抓 Yahoo Finance
+  const symbols=isTW?[code+'.TWO',code+'.TW']:[code];
+  for(const sym of symbols){
+    try{
+      const yUrl=`https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=1d&range=2d`;
+      const proxy=`https://api.allorigins.win/raw?url=${encodeURIComponent(yUrl)}`;
+      const r=await fetch(proxy);
+      const d=await r.json();
+      const meta=d?.chart?.result?.[0]?.meta;
+      if(!meta||!meta.regularMarketPrice)continue;
+      const price=parseFloat(meta.regularMarketPrice);
+      const prev=parseFloat(meta.previousClose??meta.chartPreviousClose??price);
+      if(isNaN(price)||price<=0)continue;
+      return{price,change:price-prev,changePct:((price-prev)/prev)*100,ts:Date.now(),src:sym};
+    }catch(e){continue;}
+  }
+  return null;
 }
 
 async function refreshPrices(){
@@ -540,24 +516,28 @@ function renderInvestments(){
     tr.innerHTML=`
       <td class="accent-link bold">${inv.code}${inv.name?`<br><span style="font-size:10px;color:var(--muted);font-weight:400">${inv.name}</span>`:''}${inv.note?`<br><span style="font-size:10px;color:var(--teal)">${inv.note}</span>`:''}</td>
       <td class="mono bold" style="color:var(--accent)">${c.totalLots} 張</td>
-      <td class="mono ${pnC}">${c.pnl!=null?(c.pnl>=0?'+':'-')+fmt(c.pnl):'—'}</td>
-      <td class="mono ${pnC}">${c.pnlPct!=null?(c.pnlPct>=0?'+':'-')+Math.abs(c.pnlPct).toFixed(2)+'%':'—'}</td>
-      <td class="mono ${prC}">${c.currentPrice!=null?'$'+c.currentPrice.toFixed(2):'<span style="color:var(--muted)">—</span>'}</td>
-      <td class="mono">$${fmtF(c.avgCost)}</td>
+      <td class="mono">$${fmtF(c.avgCost,2)}</td>
       <td class="mono">${fmt(c.totalCost)}</td>
-      <td class="mono">${c.marketValue!=null?fmt(c.marketValue):'—'}</td>
-      <td class="mono">$${fmtF(inv.divPerShare||0,4)}</td>
+      <td class="mono ${prC}">${c.currentPrice!=null?'$'+c.currentPrice.toFixed(2):'<span style="color:var(--muted)">—</span>'}</td>
+      <td class="mono">${c.marketValue!=null?fmt(c.marketValue):'<span style="color:var(--muted)">—</span>'}</td>
+      <td class="mono ${pnC}">${c.pnl!=null?(c.pnl>=0?'+':'-')+fmt(c.pnl):'<span style="color:var(--muted)">—</span>'}</td>
+      <td class="mono ${pnC}">${c.pnlPct!=null?(c.pnlPct>=0?'+':'-')+Math.abs(c.pnlPct).toFixed(2)+'%':'<span style="color:var(--muted)">—</span>'}</td>
       <td class="mono gain bold">${c.monthlyDiv>0?fmt(c.monthlyDiv):'—'}</td>
-      <td class="mono">${pct}</td>
-      <td style="white-space:nowrap;line-height:1.8">
-        <button class="act-btn add" onclick="openBuyModal('${inv.id}')">買入</button>
-        <button class="act-btn" style="color:var(--loss);border-color:#e8b4b8" onclick="openSellModal('${inv.id}')">賣出</button>
-        <button class="act-btn" style="color:var(--accent);border-color:#8ab4d8" onclick="toggleHistory('${inv.id}')" id="hist-btn-${inv.id}">記錄${ho?'▲':'▼'}</button>
-        <br>
-        <button class="act-btn" onclick="openInvestModal('${inv.id}')">編輯</button>
-        <button class="act-btn del" onclick="deleteInvest('${inv.id}')">刪除</button>
-      </td>`;
+      <td class="mono">${pct}</td>`;
     tbody.appendChild(tr);
+
+    // Action bar row
+    const ar=document.createElement('tr');
+    ar.innerHTML=`<td colspan="10" style="padding:4px 10px;background:#f0f6ff;border-top:none">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+        <button class="act-btn add" onclick="openBuyModal('${inv.id}')">▲ 買入</button>
+        <button class="act-btn" style="color:var(--loss);border-color:#e8b4b8" onclick="openSellModal('${inv.id}')">▼ 賣出</button>
+        <button class="act-btn" style="color:var(--accent);border-color:#8ab4d8" onclick="toggleHistory('${inv.id}')" id="hist-btn-${inv.id}">📋 交易記錄${ho?'▲':'▼'}</button>
+        <button class="act-btn" onclick="openInvestModal('${inv.id}')">✏️ 編輯</button>
+        <button class="act-btn del" onclick="deleteInvest('${inv.id}')">🗑 刪除</button>
+      </div>
+    </td>`;
+    tbody.appendChild(ar);
 
     // History row
     const hr=document.createElement('tr');
@@ -581,7 +561,7 @@ function renderInvestments(){
           <td><button class="act-btn del" onclick="deleteTxn('${inv.id}','${t.id}')">刪</button></td>
         </tr>`;
       }).join('');
-    hr.innerHTML=`<td colspan="13" style="padding:0"><div class="history-panel">
+    hr.innerHTML=`<td colspan="10" style="padding:0"><div class="history-panel">
       <div class="hist-title">📋 ${inv.code} 完整交易記錄（${(inv.transactions||[]).length} 筆）</div>
       <table class="hist-table"><thead><tr>
         <th>類型</th><th>日期</th><th>張數</th><th>價格</th><th>金額</th><th>手續費</th><th>批次說明</th><th></th>
@@ -590,8 +570,13 @@ function renderInvestments(){
     tbody.appendChild(hr);
   });
 
+  const tPnl=tMkt-tCost;
+  const tRoi=tCost>0?tPnl/tCost*100:0;
   document.getElementById('t-cost').textContent=fmt(tCost);
-  document.getElementById('t-mktval').textContent=fmt(tMkt);
+  document.getElementById('t-mktval').textContent=tMkt>0?fmt(tMkt):'—';
+  document.getElementById('t-pnl').textContent=tMkt>0?(tPnl>=0?'+':'-')+fmt(tPnl):'—';
+  document.getElementById('t-pnl').className='mono bold '+(tPnl>=0?'gain':'loss');
+  document.getElementById('t-roi').textContent=tMkt>0?(tRoi>=0?'+':'')+tRoi.toFixed(2)+'%':'—';
   document.getElementById('t-div').textContent=fmt(tDiv);
 }
 
