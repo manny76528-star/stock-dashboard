@@ -436,15 +436,19 @@ select.form-input { cursor:pointer; }
 <!-- 不限用途 -->
 <div class="modal-overlay" id="flexModal">
   <div class="modal">
-    <div class="modal-title">新增不限用途額度</div>
+    <div class="modal-title" id="flexModalTitle">新增不限用途額度</div>
     <div class="form-row">
       <div class="form-group"><label class="form-label">機構</label><input class="form-input" id="f-name" placeholder="例：永豐銀行"></div>
-      <div class="form-group"><label class="form-label">利率（%）</label><input class="form-input" id="f-rate" placeholder="例：2.89" type="number" step="0.01"></div>
+      <div class="form-group"><label class="form-label">利率（% 年利率）</label><input class="form-input" id="f-rate" placeholder="例：2.89" type="number" step="0.01" oninput="calcFlexMonthly()"></div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label class="form-label">尚餘金額</label><input class="form-input" id="f-remain-val" placeholder="例：2634805" type="number"></div>
-      <div class="form-group"><label class="form-label">每月支出</label><input class="form-input" id="f-monthly-val" placeholder="例：6345" type="number"></div>
+      <div class="form-group"><label class="form-label">尚餘金額</label><input class="form-input" id="f-remain-val" placeholder="例：2634805" type="number" oninput="calcFlexMonthly()"></div>
+      <div class="form-group">
+        <label class="form-label">每月利息支出 <span style="color:var(--teal);font-size:10px">（自動換算）</span></label>
+        <input class="form-input" id="f-monthly-val" placeholder="自動計算" type="number" style="background:#f0f9f4;border-color:#aad4bc">
+      </div>
     </div>
+    <div id="flex-calc-preview" style="display:none;background:var(--teal-light);border:1px solid #7dcec8;border-radius:7px;padding:9px 14px;font-size:12px;margin-bottom:4px;color:var(--teal)"></div>
     <div class="form-group"><label class="form-label">備註</label><input class="form-input" id="f-note" placeholder="例：一年一簽"></div>
     <div class="btn-row">
       <button class="btn btn-secondary" onclick="closeModal('flexModal')">取消</button>
@@ -1106,9 +1110,13 @@ function deleteLoan(id){ if(!confirm('確定刪除？'))return; db.loans=db.loan
 // ===== FLEX =====
 function openFlexModal(id=null){
   editingId=id; const f=id?db.flexLoans.find(x=>x.id===id):null;
+  document.getElementById('flexModalTitle').textContent = id ? '編輯不限用途額度' : '新增不限用途額度';
   document.getElementById('f-name').value=f?.name||''; document.getElementById('f-rate').value=f?.rate||'';
   document.getElementById('f-remain-val').value=f?.remain||''; document.getElementById('f-monthly-val').value=f?.monthly||'';
-  document.getElementById('f-note').value=f?.note||''; openModal('flexModal');
+  document.getElementById('f-note').value=f?.note||'';
+  document.getElementById('flex-calc-preview').style.display='none';
+  openModal('flexModal');
+  if(f?.rate && f?.remain) setTimeout(calcFlexMonthly, 100);
 }
 function editFlex(id){ openFlexModal(id); }
 function saveFlexLoan(){
@@ -1369,6 +1377,22 @@ function toggleCustomBank(sel){
     custom.style.display='block'; custom.focus();
   } else {
     custom.style.display='none'; custom.value='';
+  }
+}
+
+// ===== FLEX LOAN AUTO CALC =====
+function calcFlexMonthly(){
+  const rate = parseFloat(document.getElementById('f-rate').value) || 0;
+  const remain = parseFloat(document.getElementById('f-remain-val').value) || 0;
+  const monthly = remain * (rate / 100) / 12;
+  const preview = document.getElementById('flex-calc-preview');
+  if(rate > 0 && remain > 0){
+    document.getElementById('f-monthly-val').value = Math.round(monthly);
+    preview.style.display = 'block';
+    preview.innerHTML = `💡 $${remain.toLocaleString()} × ${rate}% ÷ 12 = <strong>每月利息 $${Math.round(monthly).toLocaleString()}</strong>`;
+  } else {
+    document.getElementById('f-monthly-val').value = '';
+    preview.style.display = 'none';
   }
 }
 
