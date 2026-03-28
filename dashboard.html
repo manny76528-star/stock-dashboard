@@ -193,6 +193,10 @@ select.form-input { cursor:pointer; }
   <div class="topbar">
     <span class="price-status" id="priceStatus">—</span>
     <button class="refresh-btn" onclick="refreshPrices()">↻ 更新股價</button>
+    <button class="refresh-btn" style="background:#0d8a4e" onclick="exportData()">📤 備份</button>
+    <label class="refresh-btn" style="background:#6b7e96;cursor:pointer">
+      📥 還原<input type="file" accept=".json" style="display:none" onchange="importData(event)">
+    </label>
   </div>
   <h1 class="main-title">２０２６　資產損益表</h1>
   <div class="dashboard">
@@ -1366,6 +1370,47 @@ function toggleCustomBank(sel){
   } else {
     custom.style.display='none'; custom.value='';
   }
+}
+
+// ===== EXPORT / IMPORT =====
+function exportData(){
+  const data = JSON.stringify(db, null, 2);
+  const blob = new Blob([data], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const today = new Date().toISOString().split('T')[0];
+  a.href = url;
+  a.download = `資產備份_${today}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('✅ 備份成功！請存到 Google 雲端或 LINE 傳給自己');
+}
+
+function importData(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const imported = JSON.parse(e.target.result);
+      // 驗證資料格式
+      if(!imported.investments && !imported.loans && !imported.cashAccounts){
+        toast('❌ 檔案格式不正確'); return;
+      }
+      if(!confirm(`確定要還原備份？\n這會覆蓋目前所有資料！\n\n備份內容：\n投資標的 ${(imported.investments||[]).length} 筆\n信貸 ${(imported.loans||[]).length} 筆\n現金帳戶 ${(imported.cashAccounts||[]).length} 筆\n股息記錄 ${(imported.dividends||[]).length} 筆`)) return;
+      db = imported;
+      if(!db.dividends) db.dividends = [];
+      if(!db.prices) db.prices = {};
+      save(); render(); renderDividends();
+      toast('✅ 還原成功！');
+      refreshPrices();
+    } catch(err){
+      toast('❌ 讀取失敗，請確認是正確的備份檔案');
+    }
+  };
+  reader.readAsText(file);
+  // Reset input so same file can be selected again
+  event.target.value = '';
 }
 
 // ===== INIT =====
