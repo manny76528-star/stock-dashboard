@@ -11,8 +11,8 @@
 :root{
   --bg:#f0f4f8;--white:#fff;--border:#d0dce8;
   --text:#1a2535;--muted:#6b7e96;
-  --gain:#0d8a4e;--loss:#c0392b;
-  --gain-bg:#e8f5ee;--loss-bg:#fdecea;
+  --gain:#c0392b;--loss:#0d8a4e;
+  --gain-bg:#fdecea;--loss-bg:#e8f5ee;
   --accent:#1a5fa8;--accent-lt:#ddeaf8;
   --yellow:#fffbe6;--teal:#00b4a0;--teal-lt:#e0f7f5;
   --pink:#f06292;--pink-lt:#fce4ec;--sh:#e8edf5;
@@ -276,9 +276,9 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
       <tbody id="loan-body"></tbody>
       <tfoot><tr class="row-total">
         <td colspan="2" style="text-align:right">小計</td>
-        <td class="mono bold" id="l-amt">—</td>
-        <td class="mono teal-bg" id="l-rem">—</td>
-        <td class="mono bold" id="l-mo">—</td>
+        <td class="mono bold loss" id="l-amt">—</td>
+        <td class="mono loss bold" id="l-rem" style="background:var(--loss-bg)">—</td>
+        <td class="mono bold loss" id="l-mo">—</td>
         <td colspan="5"></td>
         <td><button class="act-btn add" onclick="openLoanModal()">＋ 新增</button></td>
       </tr></tfoot>
@@ -663,19 +663,34 @@ async function refreshTicker(){
     setTick('jpy',_fxd.rates.JPY,2,false);
   }
   // Stooq
-  const sm={'dxy':'dxy.us','us2y':'irx.us','us10y':'tnx.us'};
-  for(const [id,sym] of Object.entries(sm)){
-    try{
-      const r=await fetchWithTimeout(`https://stooq.com/q/d/l/?s=${sym}&i=d`,8000);
-      if(!r.ok)continue;
-      const txt=await r.text();
-      const lines=txt.trim().split('\n').filter(l=>l.length>5);
-      if(lines.length<2)continue;
-      const last=lines[lines.length-1].split(',');
-      const prev2=lines.length>2?lines[lines.length-2].split(','):last;
-      const price=parseFloat(last[4]),prevP=parseFloat(prev2[4]);
-      if(!isNaN(price)&&price>0)setTick(id,price,id==='dxy'?2:3,true,price-prevP,prevP);
-    }catch(e){console.log('Stooq err:',id,e.message);}
+  // 美債利率 + DXY：用 stooq，嘗試多種格式
+  const stooqItems=[
+    {id:'us2y', syms:['irx.us','^irx','irx'], digits:3, isRate:true},
+    {id:'us10y', syms:['tnx.us','^tnx','tnx'], digits:3, isRate:true},
+    {id:'dxy',   syms:['dxy.us','^dxy','dxy'], digits:2, isRate:false},
+  ];
+  for(const item of stooqItems){
+    let done=false;
+    for(const sym of item.syms){
+      if(done)break;
+      try{
+        const r=await fetchWithTimeout(`https://stooq.com/q/d/l/?s=${encodeURIComponent(sym)}&i=d`,8000);
+        if(!r.ok)continue;
+        const txt=await r.text();
+        if(!txt||txt.includes('No data')||txt.includes('Brak'))continue;
+        const lines=txt.trim().split('\n').filter(l=>l.length>5&&!l.startsWith('Date'));
+        if(lines.length<1)continue;
+        const last=lines[lines.length-1].split(',');
+        const prev2=lines.length>1?lines[lines.length-2].split(','):last;
+        const price=parseFloat(last[4]),prevP=parseFloat(prev2[4]);
+        if(!isNaN(price)&&price>0){
+          setTick(item.id,price,item.digits,item.isRate,price-prevP,prevP);
+          console.log(`Stooq ${item.id} OK via ${sym}:`,price);
+          done=true;
+        }
+      }catch(e){console.log('Stooq err:',item.id,sym,e.message);}
+    }
+    if(!done)console.log('Stooq failed:',item.id);
   }
   _tkLoaded=true;
   document.getElementById('tick-time').textContent=` ${new Date().toLocaleTimeString('zh-TW')}`;
@@ -878,15 +893,17 @@ function renderLoans(){
         const after=bal-(l.monthly||0);
         afterBal=(after>=0?'$':'-$')+Math.abs(Math.round(after)).toLocaleString();
         afterSt=after>=0?'color:var(--gain);font-weight:700':'color:var(--loss);font-weight:700';
-        balSt=after>=0?`<span style="color:var(--gain);font-weight:700">✅ 足夠<br><small>餘${fmt(after)}</small></span>`:`<span style="color:var(--loss);font-weight:700">⚠️ 不足<br><small>缺${fmt(-after)}</small></span>`;
+        balSt=after>=0
+          ?`<span style="color:var(--gain);font-weight:700">✅ 足夠<br><small style="color:var(--gain)">餘${fmt(after)}</small></span>`
+          :`<span style="color:var(--loss);font-weight:700">⚠️ 不足<br><small style="color:var(--loss)">缺${fmt(-after)}</small></span>`;
       }
     }
     tbody.innerHTML+=`<tr style="${urgent?'background:rgba(192,57,43,0.04)':''}">
       <td class="left bold">${l.bank}${l.deductBank?`<br><small style="color:var(--muted)">${l.deductBank}</small>`:''}</td>
       <td class="mono">${(l.rate||0).toFixed(2)}%</td>
       <td class="mono">$${(l.amount||0).toLocaleString()}</td>
-      <td class="mono teal-bg" title="等額本息自動計算">$${calcRem.toLocaleString()}</td>
-      <td class="mono loss">$${(l.monthly||0).toLocaleString()}</td>
+      <td class="mono bold" style="color:var(--loss)" title="等額本息自動計算（剩餘負債）">$${calcRem.toLocaleString()}</td>
+      <td class="mono" style="color:var(--loss)">$${(l.monthly||0).toLocaleString()}</td>
       <td class="mono bold">${dDay?dDay+'號':'—'}</td>
       <td class="mono" style="${dC}">${dDays!==null?(urgent?'🔴 '+dDays+'天':dDays+'天'):'—'}</td>
       <td style="font-size:11px">${balSt}</td>
@@ -909,7 +926,7 @@ function renderFlex(){
       <td class="left bold">${f.name}</td>
       <td class="mono">${(f.rate||0).toFixed(2)}%</td>
       <td class="mono teal-bg">$${(f.remain||0).toLocaleString()}</td>
-      <td class="mono loss">$${(f.monthly||0).toLocaleString()}</td>
+      <td class="mono" style="color:var(--loss)">$${(f.monthly||0).toLocaleString()}</td>
       <td>${f.note||''}</td>
       <td><button class="act-btn" onclick="editFlex('${f.id}')">編輯</button> <button class="act-btn del" onclick="delFlex('${f.id}')">刪</button></td>
     </tr>`;
