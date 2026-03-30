@@ -379,7 +379,16 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
       <div class="fg"><label class="fl">初始均成本（元/股）</label><input class="fi" id="i-avg" type="number" step="0.01" placeholder="例：10.24"></div>
     </div>
     <div class="fg"><label class="fl">配息（元/股/年）</label><input class="fi" id="i-div" type="number" step="0.0001" placeholder="例：0.048"></div>
-    <div class="fg"><label class="fl">備註（選填）</label><input class="fi" id="i-note" placeholder="例：質押中"></div>
+    <div class="fg">
+      <label class="fl">備註（選填）</label>
+      <select class="fi" id="i-note-sel" onchange="toggleNoteInput(this)">
+        <option value="">— 不填 —</option>
+        <option value="現股">現股</option>
+        <option value="質押中">質押中</option>
+        <option value="__custom__">自行輸入...</option>
+      </select>
+      <input class="fi" id="i-note" placeholder="輸入備註" style="margin-top:6px;display:none">
+    </div>
     <div class="br"><button class="btn btn-s" onclick="closeModal('invModal')">取消</button><button class="btn btn-p" onclick="saveInv()">儲存</button></div>
   </div>
 </div>
@@ -591,42 +600,55 @@ let _pm={};let _pmTime=0;
 
 async function loadPrices(){
   if(Date.now()-_pmTime<240000)return;
-  // TWSE 上市
+
+  // TWSE 上市：用 openapi.twse.com.tw（有 CORS header）
+  // STOCK_DAY_ALL 回傳今日所有股票收盤資料
   try{
-    const r=await fetchWithTimeout('https://www.twse.com.tw/exchangeReport/STOCK_DAY_ALL?response=open_data',8000);
+    const r=await fetchWithTimeout('https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL',8000);
     if(r.ok){
-      const txt=await r.text();
-      txt.split('\n').forEach((line,i)=>{
-        if(i===0)return;
-        const c=line.split(',').map(s=>s.replace(/"/g,'').trim());
-        const code=c[0],price=parseFloat(c[7]),chg=parseFloat(c[8]);
-        if(code&&!isNaN(price)&&price>0){
-          const prev=price-chg;
-          _pm[code]={price,change:chg,changePct:prev>0?chg/prev*100:0};
-        }
-      });
-      console.log('TWSE loaded:',Object.keys(_pm).length,'stocks');
+      const d=await r.json();
+      if(Array.isArray(d)){
+        d.forEach(item=>{
+          // 欄位：Code, StockName, TradeVolume, TradeValue, OpeningPrice, HighestPrice, LowestPrice, ClosingPrice, Change, Transaction
+          const code=item.Code||item['證券代號']||'';
+          const priceRaw=item.ClosingPrice||item['收盤價']||'';
+          const chgRaw=item.Change||item['漲跌價差']||'0';
+          const price=parseFloat(String(priceRaw).replace(/,/g,''));
+          const chg=parseFloat(String(chgRaw).replace(/,/g,'').replace(/X/g,'0'));
+          if(code&&!isNaN(price)&&price>0){
+            const prev=price-chg;
+            _pm[code]={price,change:chg,changePct:prev>0?chg/prev*100:0};
+          }
+        });
+        console.log('TWSE openapi loaded:',Object.keys(_pm).length,'stocks');
+      }
     }
-  }catch(e){console.log('TWSE err:',e.message);}
-  // TPEx 上櫃
+  }catch(e){console.log('TWSE openapi err:',e.message);}
+
+  // TPEx 上櫃：用 tpex.org.tw openapi（有 CORS header）
   try{
     const r=await fetchWithTimeout('https://www.tpex.org.tw/openapi/v1/tpex_mainboard_daily_close_quotes',8000);
     if(r.ok){
       const d=await r.json();
-      if(Array.isArray(d))d.forEach(item=>{
-        const code=(item['代號']||item['Code']||'').toUpperCase();
-        const close=item['收盤']||item['Close']||'';
-        const chgRaw=item['漲跌']||item['Change']||'0';
-        const price=parseFloat(String(close).replace(/,/g,''));
-        const chg=parseFloat(String(chgRaw).replace(/[,▲▼+]/g,''))*((String(chgRaw).includes('▼')||String(chgRaw).startsWith('-'))?-1:1);
-        if(code&&!isNaN(price)&&price>0){
-          const prev=price-chg;
-          _pm[code]={price,change:chg,changePct:prev>0?chg/prev*100:0};
-        }
-      });
-      console.log('Price map total:',Object.keys(_pm).length,'stocks');
+      if(Array.isArray(d)){
+        d.forEach(item=>{
+          const code=(item['代號']||item.Code||item.SecuritiesCompanyCode||'').toString().toUpperCase().trim();
+          const priceRaw=item['收盤']||item.Close||item.ClosingPrice||'';
+          const chgRaw=String(item['漲跌']||item.Change||'0');
+          const price=parseFloat(String(priceRaw).replace(/,/g,''));
+          // TPEx 漲跌有時帶正負號，有時用▲▼
+          const isNeg=chgRaw.includes('▼')||chgRaw.startsWith('-');
+          const chg=parseFloat(chgRaw.replace(/[▲▼+,]/g,''))*(isNeg?-1:1);
+          if(code&&!isNaN(price)&&price>0){
+            const prev=price-chg;
+            _pm[code]={price,change:chg,changePct:prev>0?chg/prev*100:0};
+          }
+        });
+        console.log('Price map total:',Object.keys(_pm).length,'stocks');
+      }
     }
   }catch(e){console.log('TPEx err:',e.message);}
+
   _pmTime=Date.now();
 }
 
@@ -1050,7 +1072,13 @@ function openInvModal(id=null){
   document.getElementById('i-lots').value=inv?.lots||'';
   document.getElementById('i-avg').value=inv?.avgPrice||'';
   document.getElementById('i-div').value=inv?.divPerShare||'';
-  document.getElementById('i-note').value=inv?.note||'';
+  const note=inv?.note||'';
+  const knownNotes=['','現股','質押中'];
+  const sel=document.getElementById('i-note-sel');
+  const inp=document.getElementById('i-note');
+  if(knownNotes.includes(note)){sel.value=note;inp.style.display='none';inp.value='';}
+  else if(note){sel.value='__custom__';inp.style.display='block';inp.value=note;}
+  else{sel.value='';inp.style.display='none';inp.value='';}
   openModal('invModal');setTimeout(()=>document.getElementById('i-code').focus(),100);
 }
 function saveInv(){
@@ -1060,12 +1088,16 @@ function saveInv(){
   const avg=parseFloat(document.getElementById('i-avg').value)||0;
   if(editId){
     const inv=db.investments.find(i=>i.id===editId);
+    const noteSel=document.getElementById('i-note-sel').value;
+    const noteVal=noteSel==='__custom__'?document.getElementById('i-note').value.trim():noteSel===''?'':noteSel;
     Object.assign(inv,{code,name:document.getElementById('i-name').value.trim(),lots,avgPrice:avg,
-      divPerShare:parseFloat(document.getElementById('i-div').value)||0,note:document.getElementById('i-note').value.trim()});
+      divPerShare:parseFloat(document.getElementById('i-div').value)||0,note:noteVal});
   }else{
     if(db.investments.find(i=>i.code===code))return toast(code+' 已存在');
+    const noteSel2=document.getElementById('i-note-sel').value;
+    const noteVal2=noteSel2==='__custom__'?document.getElementById('i-note').value.trim():noteSel2===''?'':noteSel2;
     db.investments.push({id:uid(),code,name:document.getElementById('i-name').value.trim(),lots,avgPrice:avg,
-      divPerShare:parseFloat(document.getElementById('i-div').value)||0,note:document.getElementById('i-note').value.trim(),transactions:[]});
+      divPerShare:parseFloat(document.getElementById('i-div').value)||0,note:noteVal2,transactions:[]});
   }
   save();closeModal('invModal');render();toast(editId?'已更新':'已新增 '+code);
   fetchPrice(code).then(p=>{if(p){db.prices[code]=p;localStorage.setItem(STORE,JSON.stringify(db));renderInv();}});
@@ -1430,6 +1462,12 @@ function confirmQ(){
 
 // TOAST
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
+
+function toggleNoteInput(sel){
+  const inp=document.getElementById('i-note');
+  if(sel.value==='__custom__'){inp.style.display='block';inp.focus();}
+  else{inp.style.display='none';inp.value=sel.value==='—'?'':sel.value;}
+}
 
 // INIT
 undoStack=[JSON.stringify(db)];
