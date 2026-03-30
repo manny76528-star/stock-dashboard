@@ -1,91 +1,106 @@
-<!DOCTYPE html><!-- v20260330-1 -->
+<!DOCTYPE html><!-- v20260331 -->
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate">
 <title>2026 資產損益表</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{
-  --bg:#f0f4f8;--white:#fff;--surface:#fafbfc;--border:#d0dce8;
-  --text:#1a2535;--muted:#6b7e96;--gain:#0d8a4e;--loss:#c0392b;
-  --gain-bg:#e8f5ee;--loss-bg:#fdecea;--accent:#1a5fa8;--accent-light:#ddeaf8;
-  --yellow:#fffbe6;--teal:#00b4a0;--teal-light:#e0f7f5;
-  --pink:#f06292;--pink-light:#fce4ec;--section-h:#e8edf5;
+  --bg:#f0f4f8;--white:#fff;--border:#d0dce8;
+  --text:#1a2535;--muted:#6b7e96;
+  --gain:#0d8a4e;--loss:#c0392b;
+  --gain-bg:#e8f5ee;--loss-bg:#fdecea;
+  --accent:#1a5fa8;--accent-lt:#ddeaf8;
+  --yellow:#fffbe6;--teal:#00b4a0;--teal-lt:#e0f7f5;
+  --pink:#f06292;--pink-lt:#fce4ec;--sh:#e8edf5;
 }
-body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;font-size:13px;padding:12px;min-height:100vh;}
-/* ── TOPBAR ── */
-.topbar{max-width:1200px;margin:0 auto 8px;display:flex;align-items:center;justify-content:flex-end;gap:6px;flex-wrap:wrap;}
-.tbtn{border:none;border-radius:7px;padding:7px 13px;font-size:11px;font-family:'Noto Sans TC',sans-serif;cursor:pointer;font-weight:600;transition:opacity .2s;color:#fff;}
-.tbtn:hover{opacity:.85;}
-.price-status{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-right:4px;}
-/* ── TITLE ── */
-h1.main-title{text-align:center;font-size:20px;font-weight:900;letter-spacing:3px;padding:16px;background:linear-gradient(135deg,#c8ddf5,#ddeaf8);border:2px solid #8ab4d8;border-radius:10px 10px 0 0;color:var(--accent);}
-/* ── DASHBOARD WRAPPER ── */
-.dashboard{max-width:1200px;margin:0 auto;background:var(--white);border:2px solid #8ab4d8;border-top:none;border-radius:0 0 10px 10px;overflow:hidden;}
-/* ── SECTIONS ── */
-.section{border-bottom:2px solid #8ab4d8;}
-.sec-row{display:flex;align-items:stretch;}
-.sec-label{background:var(--yellow);font-weight:700;font-size:11px;writing-mode:vertical-lr;text-orientation:mixed;transform:rotate(0deg);width:30px;min-width:30px;text-align:center;border-right:2px solid #8ab4d8;display:flex;align-items:center;justify-content:center;padding:8px 0;color:var(--text);letter-spacing:2px;}
-.sec-label.blue{color:#1a5fa8;}.sec-label.green{color:#0d8a4e;}.sec-label.red{color:#c0392b;}
-.sec-content{flex:1;overflow-x:auto;-webkit-overflow-scrolling:touch;min-width:0;}
-.section:last-child{border-bottom:none;}
-/* ── TABLE BASE ── */
-.sec-table{width:100%;border-collapse:collapse;min-width:600px;}
-.sec-table th,.sec-table td{border:1px solid var(--border);padding:6px 8px;text-align:center;vertical-align:middle;white-space:nowrap;}
-/* ── SECTION LABEL (vertical) ── */
-.sl{background:var(--yellow);font-weight:700;font-size:12px;width:34px;min-width:34px;max-width:34px;text-align:center;border-right:2px solid #8ab4d8!important;padding:6px 4px;line-height:1.6;}
-/* ── COL HEADER ── */
-.ch{background:var(--section-h);font-weight:700;font-size:11px;color:var(--accent);border-bottom:2px solid #8ab4d8!important;}
-/* ── SUMMARY TABLE (2-col) ── */
-.sum-table{width:100%;border-collapse:collapse;}
-.sum-table td{border:1px solid var(--border);padding:8px 14px;}
-.sum-lbl{background:var(--yellow);font-weight:500;width:130px;text-align:center;}
-.sum-val{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:15px;background:var(--surface);}
-/* ── UTILS ── */
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;font-size:13px;padding:10px;min-height:100vh;}
 .mono{font-family:'JetBrains Mono',monospace;}
 .gain{color:var(--gain);}.loss{color:var(--loss);}.bold{font-weight:700;}
-.teal-bg{background:var(--teal-light)!important;color:var(--teal);font-weight:700;}
-.pink-bg{background:var(--pink-light)!important;color:var(--pink);font-weight:700;}
+.teal-bg{background:var(--teal-lt)!important;color:var(--teal);font-weight:700;}
+.pink-bg{background:var(--pink-lt)!important;color:var(--pink);font-weight:700;}
 .row-total{background:#e8f0fb;font-weight:700;}
-/* ── ACTION BAR ── */
-.act-btn{background:none;border:1px solid var(--border);color:var(--muted);border-radius:5px;padding:3px 8px;cursor:pointer;font-size:11px;transition:all .15s;font-family:'Noto Sans TC',sans-serif;margin:1px;}
+
+/* TOPBAR */
+.topbar{max-width:1200px;margin:0 auto 8px;display:flex;align-items:center;justify-content:flex-end;gap:6px;flex-wrap:wrap;}
+.tbtn{border:none;border-radius:7px;padding:7px 13px;font-size:11px;font-family:'Noto Sans TC',sans-serif;cursor:pointer;font-weight:600;color:#fff;transition:opacity .2s;}
+.tbtn:hover{opacity:.85;}
+.pstat{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-right:4px;}
+
+/* TITLE */
+.main-title{text-align:center;font-size:20px;font-weight:900;letter-spacing:3px;padding:16px;background:linear-gradient(135deg,#c8ddf5,#ddeaf8);border:2px solid #8ab4d8;border-radius:10px 10px 0 0;color:var(--accent);}
+
+/* DASHBOARD */
+.dash{max-width:1200px;margin:0 auto;background:var(--white);border:2px solid #8ab4d8;border-top:none;border-radius:0 0 10px 10px;overflow:hidden;}
+
+/* SECTION — flex layout, label on left */
+.sec{border-bottom:2px solid #8ab4d8;display:flex;}
+.sec:last-child{border-bottom:none;}
+.sec-lbl{background:var(--yellow);font-weight:700;font-size:11px;writing-mode:vertical-lr;width:30px;min-width:30px;display:flex;align-items:center;justify-content:center;border-right:2px solid #8ab4d8;padding:8px 0;letter-spacing:2px;color:var(--text);}
+.sec-lbl.blue{color:#1a5fa8;}.sec-lbl.green{color:#0d8a4e;}.sec-lbl.red{color:#c0392b;}
+.sec-content{flex:1;overflow-x:auto;-webkit-overflow-scrolling:touch;min-width:0;}
+
+/* SUMMARY — plain 2-col table, no sec-label */
+.sum-sec{border-bottom:2px solid #8ab4d8;}
+.sum-table{width:100%;border-collapse:collapse;}
+.sum-table td{border:1px solid var(--border);padding:9px 14px;}
+.sum-lbl{background:var(--yellow);font-weight:500;width:140px;text-align:center;}
+.sum-val{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:15px;background:#fafbfc;}
+
+/* DATA TABLE */
+.dt{width:100%;border-collapse:collapse;min-width:500px;}
+.dt th,.dt td{border:1px solid var(--border);padding:6px 8px;text-align:center;vertical-align:middle;white-space:nowrap;}
+.dt th{background:var(--sh);font-weight:700;font-size:11px;color:var(--accent);border-bottom:2px solid #8ab4d8;}
+.dt td.left{text-align:left;padding-left:10px;}
+
+/* ACTION ROW */
+.act-row td{padding:3px 8px!important;background:#f0f6ff;border-top:none!important;}
+.act-btn{background:none;border:1px solid var(--border);color:var(--muted);border-radius:5px;padding:3px 8px;cursor:pointer;font-size:11px;font-family:'Noto Sans TC',sans-serif;margin:1px;transition:all .15s;}
 .act-btn:hover{border-color:var(--accent);color:var(--accent);}
 .act-btn.del:hover{border-color:var(--loss);color:var(--loss);}
 .act-btn.add{color:var(--gain);border-color:#aad4bc;}
-.act-btn.add:hover{background:var(--gain-bg);}
-/* ── HISTORY ── */
+.act-btn.buy-btn{color:var(--gain);border-color:#aad4bc;background:var(--gain-bg);}
+.act-btn.sell-btn{color:var(--loss);border-color:#e8b4b8;background:var(--loss-bg);}
+.act-btn.div-btn{color:#0d8a4e;border-color:#aad4bc;background:#e8f5ee;}
+.act-btn.hist-btn{color:var(--accent);border-color:#8ab4d8;}
+
+/* HISTORY */
 .hist-row{display:none;}.hist-row.open{display:table-row;}
 .hist-panel{background:#f7faff;padding:10px 14px;border-top:1px dashed #aac4e0;}
 .ht{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;font-weight:600;}
-.htable{width:100%;border-collapse:collapse;font-size:11px;}
-.htable th{background:#e8edf5;color:var(--accent);padding:4px 7px;font-weight:600;border:1px solid var(--border);}
-.htable td{padding:5px 7px;border:1px solid #e0e8f0;}
-.htable tr:nth-child(even) td{background:#f0f5fb;}
-.txn-buy{color:var(--gain);font-weight:700;}.txn-sell{color:var(--loss);font-weight:700;}
-.lot-tag{display:inline-block;background:#e8f0fb;border:1px solid #c0d4ec;border-radius:3px;padding:1px 5px;font-size:9px;margin:1px;font-family:'JetBrains Mono',monospace;color:var(--accent);}
-/* ── MODAL ── */
+.htbl{width:100%;border-collapse:collapse;font-size:11px;}
+.htbl th{background:#e8edf5;color:var(--accent);padding:4px 7px;font-weight:600;border:1px solid var(--border);}
+.htbl td{padding:5px 7px;border:1px solid #e0e8f0;}
+.htbl tr:nth-child(even) td{background:#f0f5fb;}
+.txnbuy{color:var(--gain);font-weight:700;}.txnsell{color:var(--loss);font-weight:700;}
+.ltag{display:inline-block;background:#e8f0fb;border:1px solid #c0d4ec;border-radius:3px;padding:1px 5px;font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--accent);}
+
+/* ADD STOCK BAR */
+.add-bar{padding:7px 10px;border-top:1px solid var(--border);background:#f7faff;text-align:right;}
+
+/* MODAL */
 .mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);z-index:999;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto;}
 .mo.open{display:flex;}
-.modal{background:var(--white);border-radius:14px;padding:24px 20px;width:100%;max-width:520px;box-shadow:0 20px 60px rgba(0,0,0,.25);animation:popIn .25s ease;margin:auto;}
+.modal{background:var(--white);border-radius:14px;padding:22px 18px;width:100%;max-width:520px;box-shadow:0 20px 60px rgba(0,0,0,.25);animation:popIn .25s ease;margin:auto;}
 @keyframes popIn{from{transform:scale(.94);opacity:0}to{transform:scale(1);opacity:1}}
-.mt{font-size:15px;font-weight:800;color:var(--accent);margin-bottom:14px;border-bottom:2px solid var(--accent-light);padding-bottom:9px;}
+.mt{font-size:15px;font-weight:800;color:var(--accent);margin-bottom:14px;border-bottom:2px solid var(--accent-lt);padding-bottom:9px;}
 .fg{margin-bottom:12px;}
-.fl{display:block;font-size:11px;color:var(--muted);margin-bottom:4px;letter-spacing:.4px;font-weight:500;}
+.fl{display:block;font-size:11px;color:var(--muted);margin-bottom:4px;font-weight:500;}
 .fi{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:7px;padding:8px 11px;color:var(--text);font-size:13px;font-family:'JetBrains Mono',monospace;transition:border-color .2s;}
 .fi:focus{outline:none;border-color:var(--accent);}
-select.fi{cursor:pointer;}
+select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 .fr{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .fr3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
 .br{display:flex;gap:8px;margin-top:16px;}
-.btn{flex:1;padding:10px;border-radius:8px;font-size:13px;font-family:'Noto Sans TC',sans-serif;cursor:pointer;transition:all .2s;border:none;font-weight:600;}
+.btn{flex:1;padding:10px;border-radius:8px;font-size:13px;font-family:'Noto Sans TC',sans-serif;cursor:pointer;border:none;font-weight:600;transition:all .2s;}
 .btn-p{background:var(--accent);color:#fff;}.btn-p:hover{opacity:.85;}
 .btn-s{background:var(--bg);color:var(--muted);border:1.5px solid var(--border);}
-/* ── SELL LOT PICKER ── */
+.preview-box{border-radius:7px;padding:9px 12px;font-size:12px;border:1px solid;margin-bottom:4px;display:none;}
+
+/* SELL LOT PICKER */
 .lot-picker{border:1.5px solid var(--border);border-radius:8px;max-height:220px;overflow-y:auto;background:var(--bg);}
 .lot-item{display:flex;align-items:center;gap:8px;padding:8px 11px;border-bottom:1px solid #e8edf5;}
 .lot-item:last-child{border-bottom:none;}
@@ -93,76 +108,77 @@ select.fi{cursor:pointer;}
 .lot-item input[type=checkbox]{width:16px;height:16px;accent-color:var(--accent);cursor:pointer;flex-shrink:0;}
 .li-info{flex:1;min-width:0;}
 .li-date{font-size:12px;font-weight:600;color:var(--accent);font-family:'JetBrains Mono',monospace;}
-.li-detail{font-size:10px;color:var(--muted);}
+.li-det{font-size:10px;color:var(--muted);}
 .lqin{width:60px;background:var(--white);border:1.5px solid var(--border);border-radius:4px;padding:3px 6px;font-family:'JetBrains Mono',monospace;font-size:11px;text-align:center;flex-shrink:0;}
 .lqin:focus{outline:none;border-color:var(--accent);}
 .lqin:disabled{opacity:.3;}
-.sell-sum{border-radius:7px;padding:9px 12px;margin-top:8px;font-size:12px;border:1px solid;}
-/* ── QUICK INPUT ── */
+
+/* QUICK INPUT */
 .qbox{max-width:1200px;margin:0 auto 10px;background:var(--white);border:2px solid #8ab4d8;border-radius:12px;overflow:hidden;}
 .qhdr{background:linear-gradient(90deg,#1a5fa8,#2176c7);color:#fff;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;}
-.qhdr-t{font-weight:700;font-size:13px;}
-.qhdr-h{font-size:11px;opacity:.8;}
-.qbody{display:none;padding:12px 14px;}
-.qbody.open{display:block;}
+.qbody{display:none;padding:12px 14px;}.qbody.open{display:block;}
 .qfmt{background:#f0f6ff;border:1px solid #c0d8f0;border-radius:7px;padding:9px 12px;margin-bottom:10px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent);line-height:1.9;}
 .qfmt strong{color:var(--text);display:block;font-size:10px;margin-bottom:3px;font-family:'Noto Sans TC',sans-serif;}
 .qrow{display:flex;gap:7px;}
 .qta{flex:1;min-height:70px;background:var(--bg);border:1.5px solid var(--border);border-radius:7px;padding:9px 11px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text);resize:vertical;line-height:1.6;}
 .qta:focus{outline:none;border-color:var(--accent);}
 .qbtn{background:var(--accent);color:#fff;border:none;border-radius:7px;padding:0 14px;font-size:12px;font-family:'Noto Sans TC',sans-serif;cursor:pointer;font-weight:700;white-space:nowrap;align-self:stretch;}
-.qpreview{margin-top:10px;border:1.5px solid var(--border);border-radius:7px;overflow:hidden;display:none;}
-.qpreview.show{display:block;}
-.qph{background:var(--section-h);padding:6px 11px;font-size:10px;font-weight:700;color:var(--accent);}
+.qprev{margin-top:10px;border:1.5px solid var(--border);border-radius:7px;overflow:hidden;display:none;}
+.qprev.show{display:block;}
+.qph{background:var(--sh);padding:6px 11px;font-size:10px;font-weight:700;color:var(--accent);}
 .qpi{display:flex;align-items:center;gap:8px;padding:7px 11px;border-bottom:1px solid #e8edf5;font-size:11px;}
 .qpi:last-child{border-bottom:none;}
-.qi-type{font-weight:700;min-width:40px;}
-.qi-code{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--accent);min-width:65px;}
-.qi-detail{flex:1;color:var(--muted);font-family:'JetBrains Mono',monospace;}
-.qi-err{color:var(--loss);font-size:11px;flex:1;}
+.qi-t{font-weight:700;min-width:40px;}
+.qi-c{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--accent);min-width:65px;}
+.qi-d{flex:1;color:var(--muted);font-family:'JetBrains Mono',monospace;}
+.qi-e{color:var(--loss);font-size:11px;flex:1;}
 .qconfirm{width:100%;padding:10px;background:var(--gain);color:#fff;border:none;font-size:12px;font-family:'Noto Sans TC',sans-serif;font-weight:700;cursor:pointer;margin-top:8px;border-radius:7px;}
-/* ── MARKET TICKER ── */
-.ticker{max-width:1200px;margin:0 auto 10px;background:linear-gradient(135deg,#0f2544,#1a3a6b);border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(26,95,168,0.3);}
-.ticker-hdr{padding:10px 16px;font-size:12px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.1);}
-.ticker-hdr-title{display:flex;align-items:center;gap:8px;font-size:13px;letter-spacing:0.5px;}
-.ticker-pulse{width:8px;height:8px;border-radius:50%;background:#00e5a0;box-shadow:0 0 8px #00e5a0;animation:pulse 2s infinite;}
-.ticker-body{display:none;padding:12px 16px;gap:10px;flex-wrap:wrap;background:transparent;}
+
+/* TICKER */
+.ticker{max-width:1200px;margin:0 auto 10px;background:linear-gradient(135deg,#0f2544,#1a3a6b);border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(26,95,168,.3);}
+.ticker-hdr{padding:10px 16px;font-size:12px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:space-between;}
+.ticker-body{display:none;padding:12px 16px;gap:10px;flex-wrap:wrap;}
 .ticker-body.open{display:flex;}
-.tick-card{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:10px 16px;min-width:140px;flex:1;transition:background 0.2s;}
-.tick-card:hover{background:rgba(255,255,255,0.13);}
-.tick-label{font-size:10px;color:rgba(255,255,255,0.5);margin-bottom:4px;letter-spacing:0.5px;}
+.tick-card{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:10px 16px;min-width:130px;flex:1;}
+.tick-lbl{font-size:10px;color:rgba(255,255,255,.5);margin-bottom:4px;}
 .tick-price{font-size:18px;font-weight:700;font-family:'JetBrains Mono',monospace;color:#fff;}
 .tick-chg{font-size:11px;font-family:'JetBrains Mono',monospace;margin-top:3px;}
-.tick-loading{color:rgba(255,255,255,0.4);font-size:12px;}
-/* ── SPINNER / DOT ── */
-.dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--gain);margin-right:4px;animation:pulse 2s infinite;}
+.tpulse{width:8px;height:8px;border-radius:50%;background:#00e5a0;box-shadow:0 0 8px #00e5a0;animation:pulse 2s infinite;display:inline-block;margin-right:6px;}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-.spinner{display:inline-block;width:10px;height:10px;border:2px solid rgba(26,95,168,.2);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;vertical-align:middle;}
+
+/* DIVIDEND */
+.div-cards{display:flex;flex-wrap:wrap;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border);background:#f7fdf9;align-items:center;}
+.div-card{background:var(--white);border:1.5px solid #aad4bc;border-radius:9px;padding:8px 14px;cursor:pointer;min-width:110px;}
+.div-yr-bar{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#f0faf4;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px;}
+.div-section-hdr{padding:6px 12px;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:space-between;cursor:pointer;}
+
+/* BACKUP WARNING */
+.bkwarn{max-width:1200px;margin:0 auto 8px;background:#fdecea;border:2px solid #f5c6c2;border-radius:8px;padding:10px 14px;font-size:12px;color:var(--loss);display:none;align-items:center;gap:8px;}
+.bkwarn.show{display:flex;}
+
+/* SPINNERS */
+.dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--gain);margin-right:4px;animation:pulse 2s infinite;}
+.spin{display:inline-block;width:10px;height:10px;border:2px solid rgba(26,95,168,.2);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;vertical-align:middle;}
 @keyframes spin{to{transform:rotate(360deg)}}
-/* ── TOAST ── */
+
+/* TOAST */
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a2535;color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;z-index:9999;transition:transform .3s;white-space:nowrap;max-width:90vw;}
 .toast.show{transform:translateX(-50%) translateY(0);}
-/* ── BACKUP WARNING ── */
-.backup-warn{max-width:1200px;margin:0 auto 8px;background:#fdecea;border:2px solid #f5c6c2;border-radius:8px;padding:10px 14px;font-size:12px;color:var(--loss);display:none;align-items:center;gap:8px;}
-.backup-warn.show{display:flex;}
+
 @media(max-width:680px){
   body{padding:6px;}
-  .sec-table th,.sec-table td{padding:4px 5px;font-size:10px;}
-  h1.main-title{font-size:15px;letter-spacing:2px;}
+  .dt th,.dt td{padding:4px 5px;font-size:10px;}
+  .main-title{font-size:15px;letter-spacing:2px;}
   .modal{padding:14px 10px;}
-  .ticker-body{gap:6px;}
-  .tick-card{min-width:100px;}
 }
 </style>
 </head>
 <body>
 
-<!-- BACKUP WARNING -->
-<div class="backup-warn" id="backupWarn">⚠️ 距上次備份已超過 3 天，請記得備份！<button class="act-btn" style="margin-left:auto" onclick="exportData()">📤 立即備份</button></div>
+<div class="bkwarn" id="bkwarn">⚠️ 距上次備份已超過 3 天，請記得備份！<button class="act-btn" style="margin-left:auto" onclick="exportData()">📤 立即備份</button></div>
 
-<!-- TOPBAR -->
 <div class="topbar">
-  <span class="price-status" id="priceStatus">—</span>
+  <span class="pstat" id="pstat">—</span>
   <button class="tbtn" style="background:var(--accent)" onclick="refreshPrices()">↻ 更新股價</button>
   <button class="tbtn" style="background:#0d8a4e" onclick="exportData()">📤 備份</button>
   <label class="tbtn" style="background:#6b7e96;cursor:pointer">📥 還原<input type="file" accept=".json" style="display:none" onchange="importData(event)"></label>
@@ -171,9 +187,9 @@ select.fi{cursor:pointer;}
 
 <!-- QUICK INPUT -->
 <div class="qbox">
-  <div class="qhdr" onclick="toggleQuick()">
-    <span class="qhdr-t">⚡ LINE 快速輸入</span>
-    <span class="qhdr-h" id="qhint">▼ 展開 — 從 LINE 貼上交易指令</span>
+  <div class="qhdr" onclick="toggleQ()">
+    <span style="font-weight:700;font-size:13px">⚡ LINE 快速輸入</span>
+    <span id="qhint" style="font-size:11px;opacity:.8">▼ 展開</span>
   </div>
   <div class="qbody" id="qbody">
     <div class="qfmt">
@@ -182,375 +198,286 @@ select.fi{cursor:pointer;}
     </div>
     <div class="qrow">
       <textarea class="qta" id="qinput" placeholder="從 LINE 複製後貼在這裡"></textarea>
-      <button class="qbtn" onclick="parseQuick()">解析<br>預覽</button>
+      <button class="qbtn" onclick="parseQ()">解析<br>預覽</button>
     </div>
-    <div class="qpreview" id="qpreview">
+    <div class="qprev" id="qprev">
       <div class="qph">📋 解析結果預覽</div>
-      <div id="qpreview-items"></div>
-      <button class="qconfirm" id="qconfirm-btn" onclick="confirmQuick()">✅ 確認全部新增</button>
+      <div id="qprev-items"></div>
+      <button class="qconfirm" id="qconfirm" onclick="confirmQ()">✅ 確認全部新增</button>
     </div>
   </div>
 </div>
 
-<!-- MARKET TICKER -->
+<!-- TICKER -->
 <div class="ticker">
   <div class="ticker-hdr" onclick="toggleTicker()">
-    <div class="ticker-hdr-title">
-      <div class="ticker-pulse"></div>
-      📊 市場行情
-      <span id="ticker-time" style="font-size:10px;opacity:.5;font-weight:400;font-family:monospace"></span>
-    </div>
-    <div style="display:flex;align-items:center;gap:8px">
-      <button onclick="event.stopPropagation();refreshTicker()" style="background:rgba(0,229,160,0.2);border:1px solid rgba(0,229,160,0.5);color:#00e5a0;border-radius:6px;padding:4px 12px;font-size:11px;cursor:pointer;font-weight:600">↻ 更新</button>
-      <span id="ticker-hint" style="font-size:11px;opacity:.6;color:#fff">▼ 展開</span>
+    <div style="display:flex;align-items:center"><span class="tpulse"></span>📊 市場行情 <span id="tick-time" style="font-size:10px;opacity:.5;font-weight:400;margin-left:6px;font-family:monospace"></span></div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button onclick="event.stopPropagation();refreshTicker()" style="background:rgba(0,229,160,.2);border:1px solid rgba(0,229,160,.5);color:#00e5a0;border-radius:6px;padding:4px 12px;font-size:11px;cursor:pointer;font-weight:600">↻ 更新</button>
+      <span id="tick-hint" style="font-size:11px;opacity:.6">▼ 展開</span>
     </div>
   </div>
   <div class="ticker-body" id="ticker-body">
-    <div class="tick-card">
-      <div class="tick-label">🇺🇸 USD/TWD 台幣</div>
-      <div class="tick-price" id="t-usdtwd"><span class="tick-loading">載入中...</span></div>
-      <div class="tick-chg" id="tc-usdtwd" style="color:rgba(255,255,255,0.4)">—</div>
-    </div>
-    <div class="tick-card">
-      <div class="tick-label">🇯🇵 USD/JPY 日圓</div>
-      <div class="tick-price" id="t-usdjpy"><span class="tick-loading">載入中...</span></div>
-      <div class="tick-chg" id="tc-usdjpy" style="color:rgba(255,255,255,0.4)">—</div>
-    </div>
-    <div class="tick-card">
-      <div class="tick-label">💵 美元指數 DXY</div>
-      <div class="tick-price" id="t-dxy"><span class="tick-loading">載入中...</span></div>
-      <div class="tick-chg" id="tc-dxy" style="color:rgba(255,255,255,0.4)">—</div>
-    </div>
-    <div class="tick-card">
-      <div class="tick-label">📈 美2年債利率</div>
-      <div class="tick-price" id="t-us2y"><span class="tick-loading">載入中...</span></div>
-      <div class="tick-chg" id="tc-us2y" style="color:rgba(255,255,255,0.4)">—</div>
-    </div>
-    <div class="tick-card">
-      <div class="tick-label">📈 美10年債利率</div>
-      <div class="tick-price" id="t-us10y"><span class="tick-loading">載入中...</span></div>
-      <div class="tick-chg" id="tc-us10y" style="color:rgba(255,255,255,0.4)">—</div>
-    </div>
+    <div class="tick-card"><div class="tick-lbl">🇺🇸 USD/TWD</div><div class="tick-price" id="t-twd">—</div><div class="tick-chg" id="tc-twd" style="color:rgba(255,255,255,.4)">—</div></div>
+    <div class="tick-card"><div class="tick-lbl">🇯🇵 USD/JPY</div><div class="tick-price" id="t-jpy">—</div><div class="tick-chg" id="tc-jpy" style="color:rgba(255,255,255,.4)">—</div></div>
+    <div class="tick-card"><div class="tick-lbl">💵 DXY</div><div class="tick-price" id="t-dxy">—</div><div class="tick-chg" id="tc-dxy" style="color:rgba(255,255,255,.4)">—</div></div>
+    <div class="tick-card"><div class="tick-lbl">📈 美2年債</div><div class="tick-price" id="t-us2y">—</div><div class="tick-chg" id="tc-us2y" style="color:rgba(255,255,255,.4)">—</div></div>
+    <div class="tick-card"><div class="tick-lbl">📈 美10年債</div><div class="tick-price" id="t-us10y">—</div><div class="tick-chg" id="tc-us10y" style="color:rgba(255,255,255,.4)">—</div></div>
   </div>
 </div>
 
-<!-- MAIN DASHBOARD -->
-<div style="max-width:1200px;margin:0 auto;">
+<div style="max-width:1200px;margin:0 auto">
 <h1 class="main-title">２０２６　資產損益表</h1>
-<div class="dashboard">
+<div class="dash">
 
 <!-- SUMMARY -->
-<div class="section" style="overflow-x:visible;padding:0;">
-  <table class="sum-table" id="sum-table"></table>
+<div class="sum-sec">
+  <table class="sum-table" id="sum-tbl"></table>
 </div>
 
 <!-- INVESTMENTS -->
-<div class="section">
-  <div class="sec-row">
-  <div class="sec-label">投資標的</div>
+<div class="sec">
+  <div class="sec-lbl">投資標的</div>
   <div class="sec-content">
-  <table class="sec-table" id="inv-table">
-    <thead><tr>
-      <th class="ch">標的</th>
-      <th class="ch">持有張數</th>
-      <th class="ch">均買價</th>
-      <th class="ch">總成本</th>
-      <th class="ch">現價</th>
-      <th class="ch">市值</th>
-      <th class="ch">未實現損益</th>
-      <th class="ch">報酬率</th>
-      <th class="ch">已實現損益</th>
-      <th class="ch">月股息</th>
-      <th class="ch">比率</th>
-    </tr></thead>
-    <tbody id="inv-body"></tbody>
-    <tfoot><tr class="row-total">
-      <td colspan="3" style="text-align:right;padding-right:10px">總結</td>
-      <td class="mono bold" id="t-cost">—</td>
-      <td></td>
-      <td class="mono bold" id="t-mktval">—</td>
-      <td class="mono bold" id="t-pnl">—</td>
-      <td class="mono bold" id="t-roi">—</td>
-      <td class="mono bold" id="t-realized">—</td>
-      <td class="mono bold pink-bg" id="t-div">$0</td>
-      <td class="mono bold">100%</td>
-    </tr></tfoot>
-  </table>
-  <div style="padding:7px 10px;border-top:1px solid var(--border);background:#f7faff;text-align:right">
-    <button class="act-btn add" onclick="openInvModal()">＋ 新增股票</button>
+    <table class="dt" id="inv-tbl">
+      <thead><tr>
+        <th>標的</th><th>持有張數</th><th>均買價</th><th>總成本</th>
+        <th>現價</th><th>市值</th><th>未實現損益</th><th>報酬率</th>
+        <th>已實現損益</th><th>月股息</th><th>比率</th>
+      </tr></thead>
+      <tbody id="inv-body"></tbody>
+      <tfoot><tr class="row-total">
+        <td colspan="3" style="text-align:right;padding-right:10px">總結</td>
+        <td class="mono bold" id="t-cost">—</td>
+        <td></td>
+        <td class="mono bold" id="t-mkt">—</td>
+        <td class="mono bold" id="t-pnl">—</td>
+        <td class="mono bold" id="t-roi">—</td>
+        <td class="mono bold" id="t-real">—</td>
+        <td class="mono bold pink-bg" id="t-div">$0</td>
+        <td class="mono bold">100%</td>
+      </tr></tfoot>
+    </table>
+    <div class="add-bar"><button class="act-btn add" onclick="openInvModal()">＋ 新增股票</button></div>
   </div>
-  </div></div></div>
+</div>
 
 <!-- LOANS -->
-<div class="section">
-  <div class="sec-row">
-  <div class="sec-label blue">信貸</div>
+<div class="sec">
+  <div class="sec-lbl blue">信貸</div>
   <div class="sec-content">
-  <table class="sec-table" id="loan-table">
-    <thead><tr>
-      <th class="ch">借貸銀行</th><th class="ch">利率</th>
-      <th class="ch">借貸金額</th><th class="ch">尚餘金額</th>
-      <th class="ch">每月還款</th><th class="ch">扣款日</th>
-      <th class="ch">距扣款</th><th class="ch">餘額狀態</th>
-      <th class="ch">扣完後餘額</th><th class="ch">到期日</th>
-      <th class="ch" style="min-width:80px">操作</th>
-    </tr></thead>
-    <tbody id="loan-body"></tbody>
-    <tfoot><tr class="row-total">
-      <td colspan="2" style="text-align:right">小計</td>
-      <td class="mono bold" id="l-total-amt">—</td>
-      <td class="mono teal-bg" id="l-remain" title="根據等額本息公式計算">—</td>
-      <td class="mono bold" id="l-monthly">—</td>
-      <td colspan="5"></td>
-      <td><button class="act-btn add" onclick="openLoanModal()">＋ 新增</button></td>
-    </tr></tfoot>
-  </table>
-  </div></div></div>
+    <table class="dt" id="loan-tbl">
+      <thead><tr>
+        <th>借貸銀行</th><th>利率</th><th>借貸金額</th>
+        <th>尚餘本金</th><th>每月還款</th><th>扣款日</th>
+        <th>距扣款</th><th>餘額狀態</th><th>扣完後餘額</th>
+        <th>到期日</th><th style="min-width:80px">操作</th>
+      </tr></thead>
+      <tbody id="loan-body"></tbody>
+      <tfoot><tr class="row-total">
+        <td colspan="2" style="text-align:right">小計</td>
+        <td class="mono bold" id="l-amt">—</td>
+        <td class="mono teal-bg" id="l-rem">—</td>
+        <td class="mono bold" id="l-mo">—</td>
+        <td colspan="5"></td>
+        <td><button class="act-btn add" onclick="openLoanModal()">＋ 新增</button></td>
+      </tr></tfoot>
+    </table>
+  </div>
+</div>
 
-<!-- FLEX LOANS -->
-<div class="section">
-  <div class="sec-row">
-  <div class="sec-label green">不限用途</div>
+<!-- FLEX -->
+<div class="sec">
+  <div class="sec-lbl green">不限用途</div>
   <div class="sec-content">
-  <table class="sec-table" id="flex-table">
-    <thead><tr>
-      <th class="ch">機構</th><th class="ch">利率</th>
-      <th class="ch">尚餘金額</th><th class="ch">每月利息</th>
-      <th class="ch">備註</th><th class="ch" style="min-width:80px">操作</th>
-    </tr></thead>
-    <tbody id="flex-body"></tbody>
-    <tfoot><tr class="row-total">
-      <td colspan="2" style="text-align:right">總結</td>
-      <td class="mono teal-bg" id="f-remain">—</td>
-      <td class="mono bold" id="f-monthly">—</td>
-      <td class="mono bold pink-bg">每月總支出：<span id="total-monthly-out">—</span></td>
-      <td><button class="act-btn add" onclick="openFlexModal()">＋ 新增</button></td>
-    </tr></tfoot>
-  </table>
-  </div></div></div>
+    <table class="dt" id="flex-tbl">
+      <thead><tr>
+        <th>機構</th><th>利率</th><th>尚餘金額</th><th>每月利息</th><th>備註</th><th style="min-width:80px">操作</th>
+      </tr></thead>
+      <tbody id="flex-body"></tbody>
+      <tfoot><tr class="row-total">
+        <td colspan="2" style="text-align:right">總結</td>
+        <td class="mono teal-bg" id="f-rem">—</td>
+        <td class="mono bold" id="f-mo">—</td>
+        <td class="mono bold pink-bg">每月總支出：<span id="tot-mo-out">—</span></td>
+        <td><button class="act-btn add" onclick="openFlexModal()">＋ 新增</button></td>
+      </tr></tfoot>
+    </table>
+  </div>
+</div>
 
 <!-- CASH -->
-<div class="section">
-  <div class="sec-row">
-  <div class="sec-label red">現金流量表</div>
+<div class="sec">
+  <div class="sec-lbl red">現金流量表</div>
   <div class="sec-content">
-  <table class="sec-table" id="cash-table">
-    <thead><tr>
-      <th class="ch">銀行/帳戶</th><th class="ch">現金</th>
-      <th class="ch">交割 DAY1</th><th class="ch">交割 DAY2</th>
-      <th class="ch">現金餘額</th><th class="ch">每月套利金額</th>
-      <th class="ch" style="min-width:80px">操作</th>
-    </tr></thead>
-    <tbody id="cash-body"></tbody>
-    <tfoot><tr class="row-total">
-      <td style="text-align:right">總結</td><td></td><td></td><td></td>
-      <td class="mono pink-bg bold" id="c-total">—</td>
-      <td class="mono bold" id="c-arb">—</td>
-      <td><button class="act-btn add" onclick="openCashModal()">＋ 新增</button></td>
-    </tr></tfoot>
-  </table>
-  </div></div></div>
+    <table class="dt" id="cash-tbl">
+      <thead><tr>
+        <th>銀行/帳戶</th><th>現金</th><th>交割 DAY1</th><th>交割 DAY2</th>
+        <th>現金餘額</th><th>每月套利金額</th><th style="min-width:80px">操作</th>
+      </tr></thead>
+      <tbody id="cash-body"></tbody>
+      <tfoot><tr class="row-total">
+        <td style="text-align:right">總結</td><td></td><td></td><td></td>
+        <td class="mono pink-bg bold" id="c-tot">—</td>
+        <td class="mono bold" id="c-arb">—</td>
+        <td><button class="act-btn add" onclick="openCashModal()">＋ 新增</button></td>
+      </tr></tfoot>
+    </table>
+  </div>
+</div>
 
 <!-- DIVIDENDS -->
-<div class="section">
-  <div class="sec-row">
-  <div class="sec-label green">股息記錄</div>
+<div class="sec">
+  <div class="sec-lbl green">股息記錄</div>
   <div class="sec-content">
-    <!-- 各標的今年統計卡片 -->
-    <div id="div-cards" style="display:flex;flex-wrap:wrap;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border);background:#f7fdf9;align-items:center">
-      <div style="font-size:12px;color:var(--muted)">載入中...</div>
-    </div>
-    <!-- 今年總和 + 控制列 -->
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#f0faf4;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px">
+    <div class="div-cards" id="div-cards"><span style="color:var(--muted);font-size:11px">尚無領息記錄</span></div>
+    <div class="div-yr-bar">
       <div style="font-size:13px;font-weight:700">
-        📅 今年股息：<span class="gain mono" id="d-thisyear" style="font-size:16px">$0</span>
-        &nbsp;｜&nbsp;
-        🏆 累積總計：<span class="gain mono" id="d-total" style="font-size:15px">$0</span>
+        📅 今年：<span class="gain mono" id="d-yr" style="font-size:16px">$0</span>
+        &nbsp;｜&nbsp;🏆 累積：<span class="gain mono" id="d-tot" style="font-size:15px">$0</span>
       </div>
       <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;color:var(--muted)">
-        <input type="checkbox" id="div-show-history" onchange="renderDivs()" style="accent-color:var(--accent);width:15px;height:15px">
-        顯示歷史記錄
+        <input type="checkbox" id="div-hist-chk" onchange="renderDivs()" style="accent-color:var(--accent);width:15px;height:15px"> 顯示歷史記錄
       </label>
     </div>
-    <!-- 今年明細（預設展開） -->
-    <div id="div-thisyear-section">
-      <div style="padding:6px 12px;background:#e8f5ee;font-size:11px;font-weight:700;color:var(--gain);display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="toggleDivYear()">
-        <span>📋 今年明細</span>
-        <span id="div-year-hint">▼ 展開</span>
-      </div>
-      <div id="div-thisyear-body" style="display:none">
-        <table class="sec-table" id="div-table-thisyear">
-          <thead><tr>
-            <th class="ch">標的</th><th class="ch">領息日期</th>
-            <th class="ch">張數</th><th class="ch">每股配息</th>
-            <th class="ch">本次金額</th><th class="ch" style="min-width:80px">操作</th>
-          </tr></thead>
-          <tbody id="div-body-thisyear"></tbody>
+    <div class="div-section-hdr" style="background:#e8f5ee;color:var(--gain)" onclick="toggleDivYear()">
+      <span>📋 今年明細</span><span id="div-yr-hint">▼ 展開</span>
+    </div>
+    <div id="div-yr-body" style="display:none;overflow-x:auto">
+      <table class="dt" style="min-width:400px">
+        <thead><tr><th>標的</th><th>領息日期</th><th>張數</th><th>每股配息</th><th>本次金額</th><th>操作</th></tr></thead>
+        <tbody id="div-body-yr"></tbody>
+      </table>
+    </div>
+    <div id="div-hist-sec" style="display:none">
+      <div style="padding:6px 12px;background:#e8edf5;font-size:11px;font-weight:700;color:var(--accent)">📚 歷史記錄</div>
+      <div style="overflow-x:auto">
+        <table class="dt" style="min-width:400px">
+          <thead><tr><th>標的</th><th>領息日期</th><th>張數</th><th>每股配息</th><th>本次金額</th><th>操作</th></tr></thead>
+          <tbody id="div-body-hist"></tbody>
         </table>
       </div>
     </div>
-    <!-- 歷史記錄（勾選才顯示） -->
-    <div id="div-history-section" style="display:none">
-      <div style="padding:6px 12px;background:#e8edf5;font-size:11px;font-weight:700;color:var(--accent)">📚 歷史記錄</div>
-      <table class="sec-table" id="div-table-history">
-        <thead><tr>
-          <th class="ch">標的</th><th class="ch">領息日期</th>
-          <th class="ch">張數</th><th class="ch">每股配息</th>
-          <th class="ch">本次金額</th><th class="ch" style="min-width:80px">操作</th>
-        </tr></thead>
-        <tbody id="div-body-history"></tbody>
-      </table>
-    </div>
-
-  </div></div></div>
-
-</div><!-- /dashboard -->
+  </div>
 </div>
 
-<!-- ══════════════ MODALS ══════════════ -->
+</div><!-- /dash -->
+</div>
 
-<!-- INVEST MODAL -->
+<!-- ======= MODALS ======= -->
+
+<!-- INVEST -->
 <div class="mo" id="invModal">
   <div class="modal">
-    <div class="mt" id="invModalTitle">新增投資標的</div>
+    <div class="mt" id="invMT">新增投資標的</div>
     <div class="fr">
       <div class="fg"><label class="fl">股票代號</label><input class="fi" id="i-code" placeholder="例：00985B"></div>
       <div class="fg"><label class="fl">名稱（選填）</label><input class="fi" id="i-name" placeholder="例：中信美債"></div>
     </div>
     <div class="fr">
-      <div class="fg"><label class="fl">初始持有張數</label><input class="fi" id="i-lots" placeholder="例：800" type="number" step="0.001" min="0"></div>
-      <div class="fg"><label class="fl">初始均成本（元/股）</label><input class="fi" id="i-avg" placeholder="例：10.24" type="number" step="0.01"></div>
+      <div class="fg"><label class="fl">初始持有張數</label><input class="fi" id="i-lots" type="number" step="0.001" min="0" placeholder="例：800"></div>
+      <div class="fg"><label class="fl">初始均成本（元/股）</label><input class="fi" id="i-avg" type="number" step="0.01" placeholder="例：10.24"></div>
     </div>
-    <div class="fg"><label class="fl">配息（元/股/年）</label><input class="fi" id="i-div" placeholder="例：0.048" type="number" step="0.0001"></div>
+    <div class="fg"><label class="fl">配息（元/股/年）</label><input class="fi" id="i-div" type="number" step="0.0001" placeholder="例：0.048"></div>
     <div class="fg"><label class="fl">備註（選填）</label><input class="fi" id="i-note" placeholder="例：質押中"></div>
-    <div class="br">
-      <button class="btn btn-s" onclick="closeModal('invModal')">取消</button>
-      <button class="btn btn-p" onclick="saveInv()">儲存</button>
-    </div>
+    <div class="br"><button class="btn btn-s" onclick="closeModal('invModal')">取消</button><button class="btn btn-p" onclick="saveInv()">儲存</button></div>
   </div>
 </div>
 
-<!-- BUY MODAL -->
+<!-- BUY -->
 <div class="mo" id="buyModal">
   <div class="modal">
-    <div class="mt" id="buyModalTitle">買入</div>
+    <div class="mt" id="buyMT">買入</div>
     <div class="fr">
-      <div class="fg"><label class="fl">張數</label><input class="fi" id="b-lots" placeholder="例：50" type="number" step="0.001" min="0.001"></div>
-      <div class="fg"><label class="fl">成交價（元/股）</label><input class="fi" id="b-price" placeholder="例：10.35" type="number" step="0.01" oninput="calcBuyCost()"></div>
+      <div class="fg"><label class="fl">張數</label><input class="fi" id="b-lots" type="number" step="0.001" min="0.001" placeholder="例：50" oninput="calcBuy()"></div>
+      <div class="fg"><label class="fl">成交價（元/股）</label><input class="fi" id="b-price" type="number" step="0.01" placeholder="例：10.35" oninput="calcBuy()"></div>
     </div>
     <div class="fr">
       <div class="fg"><label class="fl">交易日期</label><input class="fi" id="b-date" type="date"></div>
-      <div class="fg"><label class="fl">手續費（自動計算 2.8折）</label><input class="fi" id="b-fee" placeholder="自動" type="number" step="1" min="0" style="background:#f0f9f4;border-color:#aad4bc"></div>
+      <div class="fg"><label class="fl">手續費（2.8折自動算）</label><input class="fi" id="b-fee" type="number" step="1" placeholder="自動" style="background:#f0f9f4;border-color:#aad4bc"></div>
     </div>
-    <div id="buy-preview" style="display:none;background:var(--gain-bg);border:1px solid #aad4bc;border-radius:6px;padding:8px 12px;font-size:12px;margin-bottom:4px"></div>
-    <div class="br">
-      <button class="btn btn-s" onclick="closeModal('buyModal')">取消</button>
-      <button class="btn btn-p" onclick="saveBuy()">確認買入</button>
-    </div>
+    <div class="preview-box" id="buy-prev" style="background:var(--gain-bg);border-color:#aad4bc;color:var(--gain)"></div>
+    <div class="br"><button class="btn btn-s" onclick="closeModal('buyModal')">取消</button><button class="btn btn-p" onclick="saveBuy()">確認買入</button></div>
   </div>
 </div>
 
-<!-- SELL MODAL -->
+<!-- SELL -->
 <div class="mo" id="sellModal">
   <div class="modal" style="max-width:540px">
-    <div class="mt" id="sellModalTitle">賣出 — 指定批次</div>
-    <div style="font-size:11px;color:var(--muted);margin-bottom:10px">勾選要賣出的批次並填入張數，可跨批次</div>
+    <div class="mt" id="sellMT">賣出 — 指定批次</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:10px">勾選要賣出的批次並填入張數</div>
     <div class="fr">
       <div class="fg"><label class="fl">賣出日期</label><input class="fi" id="s-date" type="date"></div>
-      <div class="fg"><label class="fl">賣出價格（元/股）</label><input class="fi" id="s-price" placeholder="例：10.50" type="number" step="0.01" oninput="updateSellSum()"></div>
+      <div class="fg"><label class="fl">賣出價格（元/股）</label><input class="fi" id="s-price" type="number" step="0.01" placeholder="例：10.50" oninput="updateSellSum()"></div>
     </div>
-    <div class="fg"><label class="fl">選擇買入批次</label><div class="lot-picker" id="lot-picker"></div></div>
-    <div class="sell-sum" id="sell-sum" style="display:none"></div>
-    <div class="br">
-      <button class="btn btn-s" onclick="closeModal('sellModal')">取消</button>
-      <button class="btn btn-p" onclick="saveSell()" style="background:var(--loss)">確認賣出</button>
-    </div>
+    <div class="fg"><label class="fl">選擇批次</label><div class="lot-picker" id="lot-picker"></div></div>
+    <div class="preview-box" id="sell-sum"></div>
+    <div class="br"><button class="btn btn-s" onclick="closeModal('sellModal')">取消</button><button class="btn btn-p" onclick="saveSell()" style="background:var(--loss)">確認賣出</button></div>
   </div>
 </div>
 
-<!-- LOAN MODAL -->
+<!-- LOAN -->
 <div class="mo" id="loanModal">
   <div class="modal">
-    <div class="mt" id="loanModalTitle">新增信貸</div>
+    <div class="mt" id="loanMT">新增信貸</div>
     <div class="fr">
       <div class="fg"><label class="fl">借貸銀行</label><input class="fi" id="l-bank" placeholder="例：Line Bank"></div>
-      <div class="fg"><label class="fl">年利率（%）</label><input class="fi" id="l-rate" placeholder="例：3.80" type="number" step="0.01" oninput="calcLoanPayment()"></div>
+      <div class="fg"><label class="fl">年利率（%）</label><input class="fi" id="l-rate" type="number" step="0.01" placeholder="例：3.80" oninput="calcLoan()"></div>
     </div>
     <div class="fr">
-      <div class="fg"><label class="fl">借貸金額（元）</label><input class="fi" id="l-amt" placeholder="例：330000" type="number" oninput="calcLoanPayment()"></div>
-      <div class="fg"><label class="fl">尚餘金額（元）</label><input class="fi" id="l-remain-val" placeholder="例：311776" type="number"></div>
+      <div class="fg"><label class="fl">借貸金額（元）</label><input class="fi" id="l-amt" type="number" placeholder="例：800000" oninput="calcLoan()"></div>
+      <div class="fg"><label class="fl">起始日</label><input class="fi" id="l-start" type="date" oninput="calcLoan()"></div>
     </div>
     <div class="fr">
-      <div class="fg"><label class="fl">起始日</label><input class="fi" id="l-start" type="date" oninput="calcLoanPayment()"></div>
-      <div class="fg"><label class="fl">到期日</label><input class="fi" id="l-due" type="date" oninput="calcLoanPayment()"></div>
+      <div class="fg"><label class="fl">到期日</label><input class="fi" id="l-due" type="date" oninput="calcLoan()"></div>
+      <div class="fg"><label class="fl">每月還款額 <span style="color:var(--teal);font-size:9px">（自動換算）</span></label><input class="fi" id="l-mo" type="number" placeholder="自動計算" style="background:#f0f9f4;border-color:#aad4bc"></div>
     </div>
     <div class="fr">
-      <div class="fg">
-        <label class="fl">每月還款額 <span style="color:var(--teal);font-size:9px">（自動換算）</span></label>
-        <input class="fi" id="l-monthly-val" placeholder="自動計算" type="number" style="background:#f0f9f4;border-color:#aad4bc">
-      </div>
       <div class="fg">
         <label class="fl">每月扣款日</label>
-        <select class="fi" id="l-deduct-day">
+        <select class="fi" id="l-dday">
           <option value="">— 請選擇 —</option>
-          <option value="1">1 號</option><option value="2">2 號</option><option value="3">3 號</option>
-          <option value="4">4 號</option><option value="5">5 號</option><option value="6">6 號</option>
-          <option value="7">7 號</option><option value="8">8 號</option><option value="9">9 號</option>
-          <option value="10">10 號</option><option value="11">11 號</option><option value="12">12 號</option>
-          <option value="13">13 號</option><option value="14">14 號</option><option value="15">15 號</option>
-          <option value="16">16 號</option><option value="17">17 號</option><option value="18">18 號</option>
-          <option value="19">19 號</option><option value="20">20 號</option><option value="21">21 號</option>
-          <option value="22">22 號</option><option value="23">23 號</option><option value="24">24 號</option>
-          <option value="25">25 號</option><option value="26">26 號</option><option value="27">27 號</option>
-          <option value="28">28 號</option>
+          <option>1號</option><option>2號</option><option>3號</option><option>4號</option><option>5號</option>
+          <option>6號</option><option>7號</option><option>8號</option><option>9號</option><option>10號</option>
+          <option>11號</option><option>12號</option><option>13號</option><option>14號</option><option>15號</option>
+          <option>16號</option><option>17號</option><option>18號</option><option>19號</option><option>20號</option>
+          <option>21號</option><option>22號</option><option>23號</option><option>24號</option><option>25號</option>
+          <option>26號</option><option>27號</option><option>28號</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label class="fl">扣款帳戶</label>
+        <select class="fi" id="l-dbank">
+          <option value="">— 請選擇 —</option>
+          <option>Line Bank</option><option>台灣銀行</option><option>國泰銀行</option>
+          <option>凱基銀行</option><option>永豐銀行</option><option>統一券商</option>
         </select>
       </div>
     </div>
-    <div class="fg">
-      <label class="fl">扣款帳戶</label>
-      <select class="fi" id="l-deduct-bank">
-        <option value="">— 請選擇 —</option>
-        <option value="Line Bank">Line Bank</option>
-        <option value="台灣銀行">台灣銀行</option>
-        <option value="國泰銀行">國泰銀行</option>
-        <option value="凱基銀行">凱基銀行</option>
-        <option value="永豐銀行">永豐銀行</option>
-        <option value="統一券商">統一券商</option>
-      </select>
-    </div>
-    <div id="loan-calc-preview" style="display:none;background:var(--teal-light);border:1px solid #7dcec8;border-radius:6px;padding:8px 12px;font-size:11px;color:var(--teal);margin-bottom:4px"></div>
-    <div class="br">
-      <button class="btn btn-s" onclick="closeModal('loanModal')">取消</button>
-      <button class="btn btn-p" onclick="saveLoan()">儲存</button>
-    </div>
+    <div class="preview-box" id="loan-prev" style="background:var(--teal-lt);border-color:#7dcec8;color:var(--teal)"></div>
+    <div class="br"><button class="btn btn-s" onclick="closeModal('loanModal')">取消</button><button class="btn btn-p" onclick="saveLoan()">儲存</button></div>
   </div>
 </div>
 
-<!-- FLEX MODAL -->
+<!-- FLEX -->
 <div class="mo" id="flexModal">
   <div class="modal">
-    <div class="mt" id="flexModalTitle">新增不限用途額度</div>
+    <div class="mt" id="flexMT">新增不限用途額度</div>
     <div class="fr">
       <div class="fg"><label class="fl">機構</label><input class="fi" id="f-name" placeholder="例：永豐銀行"></div>
-      <div class="fg"><label class="fl">年利率（%）</label><input class="fi" id="f-rate" placeholder="例：2.89" type="number" step="0.01" oninput="calcFlexMonthly()"></div>
+      <div class="fg"><label class="fl">年利率（%）</label><input class="fi" id="f-rate" type="number" step="0.01" placeholder="例：2.89" oninput="calcFlex()"></div>
     </div>
     <div class="fr">
-      <div class="fg"><label class="fl">尚餘金額</label><input class="fi" id="f-remain-val" placeholder="例：2634805" type="number" oninput="calcFlexMonthly()"></div>
-      <div class="fg">
-        <label class="fl">每月利息 <span style="color:var(--teal);font-size:9px">（自動換算）</span></label>
-        <input class="fi" id="f-monthly-val" placeholder="自動計算" type="number" style="background:#f0f9f4;border-color:#aad4bc">
-      </div>
+      <div class="fg"><label class="fl">尚餘金額</label><input class="fi" id="f-rem" type="number" placeholder="例：2634805" oninput="calcFlex()"></div>
+      <div class="fg"><label class="fl">每月利息 <span style="color:var(--teal);font-size:9px">（自動換算）</span></label><input class="fi" id="f-mo" type="number" placeholder="自動計算" style="background:#f0f9f4;border-color:#aad4bc"></div>
     </div>
-    <div id="flex-calc-preview" style="display:none;background:var(--teal-light);border:1px solid #7dcec8;border-radius:6px;padding:8px 12px;font-size:11px;color:var(--teal);margin-bottom:4px"></div>
+    <div class="preview-box" id="flex-prev" style="background:var(--teal-lt);border-color:#7dcec8;color:var(--teal)"></div>
     <div class="fg"><label class="fl">備註</label><input class="fi" id="f-note" placeholder="例：一年一簽"></div>
-    <div class="br">
-      <button class="btn btn-s" onclick="closeModal('flexModal')">取消</button>
-      <button class="btn btn-p" onclick="saveFlexLoan()">儲存</button>
-    </div>
+    <div class="br"><button class="btn btn-s" onclick="closeModal('flexModal')">取消</button><button class="btn btn-p" onclick="saveFlex()">儲存</button></div>
   </div>
 </div>
 
-<!-- CASH MODAL -->
+<!-- CASH -->
 <div class="mo" id="cashModal">
   <div class="modal">
     <div class="mt">新增現金帳戶</div>
@@ -558,299 +485,232 @@ select.fi{cursor:pointer;}
       <label class="fl">銀行/帳戶名稱</label>
       <select class="fi" id="c-bank" onchange="toggleCustomBank(this)">
         <option value="">— 請選擇 —</option>
-        <option value="台灣銀行">台灣銀行</option>
-        <option value="Line Bank">Line Bank</option>
-        <option value="國泰銀行">國泰銀行</option>
-        <option value="凱基銀行">凱基銀行</option>
-        <option value="統一券商">統一券商</option>
-        <option value="期貨">期貨</option>
-        <option value="永豐銀行">永豐銀行</option>
-        <option value="凱基券商">凱基券商</option>
-        <option value="__custom__">＋ 自行輸入...</option>
+        <option>台灣銀行</option><option>Line Bank</option><option>國泰銀行</option>
+        <option>凱基銀行</option><option>統一券商</option><option>期貨</option>
+        <option>永豐銀行</option><option>凱基券商</option><option value="__custom__">＋ 自行輸入...</option>
       </select>
       <input class="fi" id="c-bank-custom" placeholder="輸入帳戶名稱" style="margin-top:7px;display:none">
     </div>
     <div class="fr3">
-      <div class="fg"><label class="fl">現金</label><input class="fi" id="c-cash" placeholder="例：5000" type="number"></div>
-      <div class="fg"><label class="fl">交割 DAY1</label><input class="fi" id="c-d1" placeholder="例：-999093" type="number"></div>
-      <div class="fg"><label class="fl">交割 DAY2</label><input class="fi" id="c-d2" placeholder="例：-266175" type="number"></div>
+      <div class="fg"><label class="fl">現金</label><input class="fi" id="c-cash" type="number" placeholder="例：5000"></div>
+      <div class="fg"><label class="fl">交割 DAY1</label><input class="fi" id="c-d1" type="number" placeholder="例：-999093"></div>
+      <div class="fg"><label class="fl">交割 DAY2</label><input class="fi" id="c-d2" type="number" placeholder="例：-266175"></div>
     </div>
-    <div class="fg"><label class="fl">每月套利金額（負數填負）</label><input class="fi" id="c-arb" placeholder="例：-13245" type="number"></div>
-    <div class="br">
-      <button class="btn btn-s" onclick="closeModal('cashModal')">取消</button>
-      <button class="btn btn-p" onclick="saveCash()">儲存</button>
-    </div>
+    <div class="fg"><label class="fl">每月套利金額（負數填負）</label><input class="fi" id="c-arb" type="number" placeholder="例：-13245"></div>
+    <div class="br"><button class="btn btn-s" onclick="closeModal('cashModal')">取消</button><button class="btn btn-p" onclick="saveCash()">儲存</button></div>
   </div>
 </div>
 
-<!-- DIV MODAL -->
+<!-- DIV -->
 <div class="mo" id="divModal">
   <div class="modal">
     <div class="mt">新增領息記錄</div>
-    <div class="fg">
-      <label class="fl">股票代號</label>
-      <select class="fi" id="d-code"></select>
-    </div>
+    <div class="fg"><label class="fl">股票代號</label><select class="fi" id="d-code"></select></div>
     <div class="fr">
       <div class="fg"><label class="fl">領息日期</label><input class="fi" id="d-date" type="date"></div>
-      <div class="fg"><label class="fl">張數</label><input class="fi" id="d-lots" placeholder="例：800" type="number" step="0.001" min="0" oninput="updateDivPreview()"></div>
+      <div class="fg"><label class="fl">張數</label><input class="fi" id="d-lots" type="number" step="0.001" min="0" placeholder="例：800" oninput="updateDivPrev()"></div>
     </div>
-    <div class="fg"><label class="fl">每股配息（元）</label><input class="fi" id="d-pershare" placeholder="例：0.048" type="number" step="0.0001" oninput="updateDivPreview()"></div>
-    <div id="div-preview" style="display:none;background:var(--gain-bg);border:1px solid #aad4bc;border-radius:6px;padding:8px 12px;font-size:12px;margin-bottom:4px">本次領息：<strong id="div-preview-amt" class="gain"></strong></div>
-    <div class="br">
-      <button class="btn btn-s" onclick="closeModal('divModal')">取消</button>
-      <button class="btn btn-p" onclick="saveDiv()" style="background:var(--gain)">確認領息</button>
-    </div>
+    <div class="fg"><label class="fl">每股配息（元/年）</label><input class="fi" id="d-ps" type="number" step="0.0001" placeholder="例：0.048" oninput="updateDivPrev()"></div>
+    <div class="preview-box" id="div-prev" style="background:var(--gain-bg);border-color:#aad4bc;color:var(--gain)"></div>
+    <div class="br"><button class="btn btn-s" onclick="closeModal('divModal')">取消</button><button class="btn btn-p" onclick="saveDiv()" style="background:var(--gain)">確認領息</button></div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-// ═══════════════ DATA ═══════════════
-const STORE='assetDB_v5';
+// ═══════ DATA ═══════
+const STORE='assetDB_v6';
 let db=JSON.parse(localStorage.getItem(STORE)||'null')||{investments:[],loans:[],flexLoans:[],cashAccounts:[],prices:{},dividends:[]};
-if(!db.dividends)db.dividends=[];
-if(!db.prices)db.prices={};
+['dividends','prices'].forEach(k=>{if(!db[k])db[k]=k==='prices'?{}:[];});
 
-let editingId=null, activeSellId=null, activeBuyId=null;
-let undoStack=[]; // store last 10 states
+let editId=null, sellInvId=null, buyInvId=null;
+let undoStack=[];
 
 function save(){
   undoStack.push(JSON.stringify(db));
   if(undoStack.length>10)undoStack.shift();
   localStorage.setItem(STORE,JSON.stringify(db));
   document.getElementById('undoBtn').disabled=undoStack.length<=1;
-  checkBackupWarn();
+  checkBkWarn();
 }
-
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
 
-// ═══════════════ UNDO ═══════════════
+// ═══════ UNDO ═══════
 function undoLast(){
   if(undoStack.length<=1)return toast('沒有可復原的動作');
   undoStack.pop();
   db=JSON.parse(undoStack[undoStack.length-1]);
   localStorage.setItem(STORE,JSON.stringify(db));
-  render();toast('↩ 已復原上一步');
+  render();toast('↩ 已復原');
   document.getElementById('undoBtn').disabled=undoStack.length<=1;
 }
 
-// ═══════════════ BACKUP ═══════════════
-function checkBackupWarn(){
-  const last=parseInt(localStorage.getItem('lastBackup')||'0');
+// ═══════ BACKUP ═══════
+function checkBkWarn(){
+  const last=parseInt(localStorage.getItem('lastBk')||'0');
   const days=(Date.now()-last)/86400000;
-  document.getElementById('backupWarn').classList.toggle('show',days>3&&last>0);
+  document.getElementById('bkwarn').classList.toggle('show',last>0&&days>3);
 }
-
 function exportData(){
   const now=new Date();
-  const ts=now.getFullYear().toString()+
-    String(now.getMonth()+1).padStart(2,'0')+
-    String(now.getDate()).padStart(2,'0')+
-    String(now.getHours()).padStart(2,'0')+
-    String(now.getMinutes()).padStart(2,'0')+
-    String(now.getSeconds()).padStart(2,'0');
-  const blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'});
-  const url=URL.createObjectURL(blob);
+  const ts=[now.getFullYear(),String(now.getMonth()+1).padStart(2,'0'),String(now.getDate()).padStart(2,'0'),
+    String(now.getHours()).padStart(2,'0'),String(now.getMinutes()).padStart(2,'0'),String(now.getSeconds()).padStart(2,'0')].join('');
   const a=document.createElement('a');
-  a.href=url; a.download=`資產備份_${ts}.json`; a.click();
-  URL.revokeObjectURL(url);
-  localStorage.setItem('lastBackup',Date.now().toString());
-  document.getElementById('backupWarn').classList.remove('show');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(db,null,2)],{type:'application/json'}));
+  a.download=`資產備份_${ts}.json`;a.click();
+  localStorage.setItem('lastBk',Date.now());
+  document.getElementById('bkwarn').classList.remove('show');
   toast('✅ 備份成功！');
 }
-
 function importData(e){
-  const file=e.target.files[0]; if(!file)return;
-  const reader=new FileReader();
-  reader.onload=ev=>{
+  const file=e.target.files[0];if(!file)return;
+  const r=new FileReader();
+  r.onload=ev=>{
     try{
       const d=JSON.parse(ev.target.result);
       if(!d.investments&&!d.loans&&!d.cashAccounts){toast('❌ 格式不正確');return;}
-      if(!confirm(`確定還原備份？\n投資 ${(d.investments||[]).length} 筆 · 信貸 ${(d.loans||[]).length} 筆\n股息 ${(d.dividends||[]).length} 筆`))return;
-      db=d; if(!db.dividends)db.dividends=[]; if(!db.prices)db.prices={};
+      if(!confirm(`確定還原？\n投資 ${(d.investments||[]).length} 筆 · 信貸 ${(d.loans||[]).length} 筆`))return;
+      db=d;['dividends','prices'].forEach(k=>{if(!db[k])db[k]=k==='prices'?{}:[];});
       localStorage.setItem(STORE,JSON.stringify(db));
       render();toast('✅ 還原成功！');refreshPrices();
     }catch{toast('❌ 讀取失敗');}
   };
-  reader.readAsText(file); e.target.value='';
+  r.readAsText(file);e.target.value='';
 }
 
-// ═══════════════ FETCH HELPER ═══════════════
-function fetchWithTimeout(url, ms=8000){
-  const controller = new AbortController();
-  const timer = setTimeout(()=>controller.abort(), ms);
-  return fetch(url, {signal: controller.signal}).finally(()=>clearTimeout(timer));
+// ═══════ FETCH HELPER ═══════
+function fetchWithTimeout(url,ms=8000){
+  const c=new AbortController();
+  const t=setTimeout(()=>c.abort(),ms);
+  return fetch(url,{signal:c.signal}).finally(()=>clearTimeout(t));
 }
 
-// ═══════════════ PRICE ═══════════════
-// 用政府開放資料 CSV（有CORS） + 上市證交所CSV
-let _priceMap = {}; // code -> {price, change, changePct}
-let _priceCacheTime = 0;
+// ═══════ PRICE ═══════
+let _pm={};let _pmTime=0;
 
-async function loadAllTWSEPrices(){
-  if(Date.now() - _priceCacheTime < 240000) return; // 4分鐘快取
+async function loadPrices(){
+  if(Date.now()-_pmTime<240000)return;
+  // TWSE 上市
   try{
-    // TWSE 上市：CSV 格式，欄位：證券代號,證券名稱,成交股數,成交金額,開盤價,最高價,最低價,收盤價,漲跌價差,成交筆數
-    const r = await fetchWithTimeout('https://www.twse.com.tw/exchangeReport/STOCK_DAY_ALL?response=open_data', 8000);
+    const r=await fetchWithTimeout('https://www.twse.com.tw/exchangeReport/STOCK_DAY_ALL?response=open_data',8000);
     if(r.ok){
-      const text = await r.text();
-      const lines = text.trim().split('\n');
-      lines.forEach((line,i)=>{
-        if(i===0) return; // skip header
-        const cols = line.split(',').map(s=>s.replace(/"/g,'').trim());
-        const code = cols[0];
-        const price = parseFloat(cols[7]);
-        const change = parseFloat(cols[8]);
-        if(code && !isNaN(price) && price>0){
-          const prev = price - change;
-          _priceMap[code] = {price, change, changePct: prev>0? change/prev*100:0};
+      const txt=await r.text();
+      txt.split('\n').forEach((line,i)=>{
+        if(i===0)return;
+        const c=line.split(',').map(s=>s.replace(/"/g,'').trim());
+        const code=c[0],price=parseFloat(c[7]),chg=parseFloat(c[8]);
+        if(code&&!isNaN(price)&&price>0){
+          const prev=price-chg;
+          _pm[code]={price,change:chg,changePct:prev>0?chg/prev*100:0};
         }
       });
+      console.log('TWSE loaded:',Object.keys(_pm).length,'stocks');
     }
-  } catch(e){ console.log('TWSE load error:', e); }
-
+  }catch(e){console.log('TWSE err:',e.message);}
+  // TPEx 上櫃
   try{
-    // TPEx 上櫃：CSV 格式
-    
-    // TPEx 格式不穩定，改用 openapi JSON
-    const r3 = await fetchWithTimeout('https://www.tpex.org.tw/openapi/v1/tpex_mainboard_daily_close_quotes', 8000);
-    if(r3.ok){
-      const d = await r3.json();
-      if(Array.isArray(d)){
-        d.forEach(item=>{
-          // 嘗試各種可能的欄位名稱
-          const code = item['代號'] || item['Code'] || item['code'] || item['SecuritiesCompanyCode'] || '';
-          const closeRaw = item['收盤'] || item['Close'] || item['close'] || item['ClosingPrice'] || '';
-          const changeRaw = item['漲跌'] || item['Change'] || item['change'] || '0';
-          const price = parseFloat(String(closeRaw).replace(/,/g,''));
-          const change = parseFloat(String(changeRaw).replace(/,/g,'').replace(/▲/g,'').replace(/▼/g,x=>'-'));
-          if(code && !isNaN(price) && price>0){
-            const prev = price - change;
-            _priceMap[code.toUpperCase()] = {price, change, changePct: prev>0? change/prev*100:0};
-          }
-        });
-      }
+    const r=await fetchWithTimeout('https://www.tpex.org.tw/openapi/v1/tpex_mainboard_daily_close_quotes',8000);
+    if(r.ok){
+      const d=await r.json();
+      if(Array.isArray(d))d.forEach(item=>{
+        const code=(item['代號']||item['Code']||'').toUpperCase();
+        const close=item['收盤']||item['Close']||'';
+        const chgRaw=item['漲跌']||item['Change']||'0';
+        const price=parseFloat(String(close).replace(/,/g,''));
+        const chg=parseFloat(String(chgRaw).replace(/[,▲▼+]/g,''))*((String(chgRaw).includes('▼')||String(chgRaw).startsWith('-'))?-1:1);
+        if(code&&!isNaN(price)&&price>0){
+          const prev=price-chg;
+          _pm[code]={price,change:chg,changePct:prev>0?chg/prev*100:0};
+        }
+      });
+      console.log('Price map total:',Object.keys(_pm).length,'stocks');
     }
-  } catch(e){ console.log('TPEx load error:', e); }
-
-  _priceCacheTime = Date.now();
-  console.log('Price map loaded:', Object.keys(_priceMap).length, 'stocks');
+  }catch(e){console.log('TPEx err:',e.message);}
+  _pmTime=Date.now();
 }
 
 async function fetchPrice(code){
-  const isTW = /^\d+[A-Za-z]?$/.test(code);
-  if(!isTW) return null;
-  await loadAllTWSEPrices();
-  const data = _priceMap[code.toUpperCase()] || _priceMap[code];
-  if(data) return {...data, ts:Date.now()};
-  return null;
+  if(!/^\d+[A-Za-z]?$/.test(code))return null;
+  await loadPrices();
+  return _pm[code.toUpperCase()]?{..._pm[code.toUpperCase()],ts:Date.now()}:null;
 }
-
 
 async function refreshPrices(){
-  document.getElementById('priceStatus').innerHTML='<span class="spinner"></span> 更新中...';
-  // 清除快取，強制重抓最新資料
-  _priceCacheTime = 0;
-  _fxData = null;
-  await loadAllTWSEPrices(); // 先一次抓全市場
+  document.getElementById('pstat').innerHTML='<span class="spin"></span> 更新中...';
+  _pmTime=0;
+  await loadPrices();
   await Promise.all([...new Set(db.investments.map(i=>i.code))].map(async c=>{
-    const p=await fetchPrice(c); if(p)db.prices[c]=p;
+    const p=await fetchPrice(c);if(p)db.prices[c]=p;
   }));
-  localStorage.setItem(STORE,JSON.stringify(db)); render();
+  localStorage.setItem(STORE,JSON.stringify(db));render();
   const n=new Date();
-  document.getElementById('priceStatus').innerHTML=`<span class="dot"></span>${n.toLocaleTimeString('zh-TW')} 更新`;
+  document.getElementById('pstat').innerHTML=`<span class="dot"></span>${n.toLocaleTimeString('zh-TW')} 更新`;
 }
 
-let tickerCache={};
-
-// 市場行情
-let _fxData = null;
-
-async function fetchTickerPrice(sym){
-  // 匯率用 exchangerate-api.com（免費、有CORS、每日更新）
-  if(sym === 'TWD=X' || sym === 'JPY=X'){
-    if(!_fxData){
-      try{
-        const r = await fetchWithTimeout('https://open.er-api.com/v6/latest/USD', 7000);
-        if(r.ok) _fxData = await r.json();
-      } catch(e){ console.log('FX error:', e); }
-    }
-    if(_fxData?.rates){
-      const key = sym === 'TWD=X' ? 'TWD' : 'JPY';
-      const price = _fxData.rates[key];
-      if(price>0) return {price, change:0, changePct:0};
-    }
-    return null;
-  }
-
-  // 美債利率 + DXY 用 stooq CSV（公開、有CORS）
-  const stooqMap = {'^TNX':'tnx.us', '^IRX':'irx.us', 'DX-Y.NYB':'dxy.us'};
-  const sym2 = stooqMap[sym];
-  if(!sym2) return null;
-  try{
-    const r = await fetchWithTimeout(`https://stooq.com/q/d/l/?s=${sym2}&i=d`, 7000);
-    if(!r.ok) return null;
-    const text = await r.text();
-    const lines = text.trim().split('\n').filter(l=>l.length>5);
-    if(lines.length < 2) return null;
-    // CSV: Date,Open,High,Low,Close,Volume
-    const last  = lines[lines.length-1].split(',');
-    const prev2 = lines.length>2 ? lines[lines.length-2].split(',') : last;
-    const price = parseFloat(last[4]);
-    const prevP = parseFloat(prev2[4]);
-    if(isNaN(price)||price<=0) return null;
-    return {price, change:price-prevP, changePct:prevP>0?(price-prevP)/prevP*100:0};
-  } catch(e){ return null; }
-}
-
+// ═══════ TICKER ═══════
+let _tc={};let _fxd=null;let _tkLoaded=false;
 
 async function refreshTicker(){
-  document.getElementById('ticker-time').textContent=' ⟳';
-  const items=[
-    {id:'usdtwd',sym:'TWD=X',label:'USD/TWD',digits:3,isRate:false},
-    {id:'usdjpy',sym:'JPY=X',label:'USD/JPY',digits:2,isRate:false},
-    {id:'dxy',sym:'DX-Y.NYB',label:'DXY',digits:2,isRate:false},
-    {id:'us2y',sym:'^IRX',label:'美2Y債',digits:3,isRate:true},
-    {id:'us10y',sym:'^TNX',label:'美10Y債',digits:3,isRate:true}
-  ];
-  await Promise.all(items.map(async it=>{
-    const data=await fetchTickerPrice(it.sym);
-    if(data){
-      tickerCache[it.id]=data;
-      const suffix=it.isRate?'%':'';
-      document.getElementById('t-'+it.id).textContent=data.price.toFixed(it.digits)+suffix;
-      const chgEl=document.getElementById('tc-'+it.id);
-      const sign=data.change>=0?'+':'';
-      const d3=it.isRate?data.change.toFixed(3):data.change.toFixed(it.digits);
-      chgEl.textContent=`${sign}${d3} (${sign}${data.changePct.toFixed(2)}%)`;
-      chgEl.style.color=data.change>=0?'var(--gain)':'var(--loss)';
-    } else if(tickerCache[it.id]){
-      // Show cached
-      const data=tickerCache[it.id];
-      const suffix=it.isRate?'%':'';
-      document.getElementById('t-'+it.id).textContent=data.price.toFixed(it.digits)+suffix+' *';
-    }
-  }));
-  tickerLoaded=true;
-  const n=new Date();
-  document.getElementById('ticker-time').textContent=` ${n.toLocaleTimeString('zh-TW')}`;
+  document.getElementById('tick-time').textContent=' ⟳';
+  // FX
+  try{
+    const r=await fetchWithTimeout('https://open.er-api.com/v6/latest/USD',8000);
+    if(r.ok){_fxd=await r.json();}
+  }catch(e){console.log('FX err:',e.message);}
+  if(_fxd?.rates){
+    setTick('twd',_fxd.rates.TWD,3,false);
+    setTick('jpy',_fxd.rates.JPY,2,false);
+  }
+  // Stooq
+  const sm={'dxy':'dxy.us','us2y':'irx.us','us10y':'tnx.us'};
+  for(const [id,sym] of Object.entries(sm)){
+    try{
+      const r=await fetchWithTimeout(`https://stooq.com/q/d/l/?s=${sym}&i=d`,8000);
+      if(!r.ok)continue;
+      const txt=await r.text();
+      const lines=txt.trim().split('\n').filter(l=>l.length>5);
+      if(lines.length<2)continue;
+      const last=lines[lines.length-1].split(',');
+      const prev2=lines.length>2?lines[lines.length-2].split(','):last;
+      const price=parseFloat(last[4]),prevP=parseFloat(prev2[4]);
+      if(!isNaN(price)&&price>0)setTick(id,price,id==='dxy'?2:3,true,price-prevP,prevP);
+    }catch(e){console.log('Stooq err:',id,e.message);}
+  }
+  _tkLoaded=true;
+  document.getElementById('tick-time').textContent=` ${new Date().toLocaleTimeString('zh-TW')}`;
 }
 
-// ═══════════════ CALC ═══════════════
+function setTick(id,price,digits,isRate,chg=0,prev=price){
+  _tc[id]={price,chg,prev};
+  const suf=isRate?'%':'';
+  const el=document.getElementById('t-'+id);
+  const ce=document.getElementById('tc-'+id);
+  if(el)el.textContent=price.toFixed(digits)+suf;
+  if(ce){
+    const sign=chg>=0?'+':'';
+    ce.textContent=`${sign}${chg.toFixed(digits)} (${sign}${prev>0?(chg/prev*100).toFixed(2):0}%)`;
+    ce.style.color=chg>=0?'#00e5a0':'#ff6b6b';
+  }
+}
+
+function toggleTicker(){
+  const b=document.getElementById('ticker-body');
+  const h=document.getElementById('tick-hint');
+  const open=b.classList.toggle('open');
+  h.textContent=open?'▲ 收起':'▼ 展開';
+  if(open&&!_tkLoaded)refreshTicker();
+}
+
+// ═══════ CALC ═══════
 function buildLots(inv){
   const lots=[];
   (inv.transactions||[]).forEach(t=>{
-    if(t.type==='buy'){
-      lots.push({txnId:t.id,date:t.date,price:t.price,original:t.lots,remaining:t.lots,fee:t.fee||0});
-    } else {
-      if(t.lotRefs&&t.lotRefs.length){
-        t.lotRefs.forEach(ref=>{const l=lots.find(x=>x.txnId===ref.txnId);if(l)l.remaining=Math.max(0,l.remaining-ref.lots);});
-      } else {
-        let s=t.lots;
-        for(const l of lots){if(s<=0)break;const tk=Math.min(l.remaining,s);l.remaining-=tk;s-=tk;}
-      }
+    if(t.type==='buy')lots.push({txnId:t.id,date:t.date,price:t.price,original:t.lots,remaining:t.lots,fee:t.fee||0});
+    else{
+      const refs=t.lotRefs;
+      if(refs&&refs.length){refs.forEach(ref=>{const l=lots.find(x=>x.txnId===ref.txnId);if(l)l.remaining=Math.max(0,l.remaining-ref.lots);});}
+      else{let s=t.lots;for(const l of lots){if(s<=0)break;const tk=Math.min(l.remaining,s);l.remaining-=tk;s-=tk;}}
     }
   });
   return lots;
@@ -859,181 +719,141 @@ function buildLots(inv){
 function calcInv(inv){
   const lots=buildLots(inv);
   const active=lots.filter(l=>l.remaining>0);
-  let totalLots=0,totalCost=0;
-  active.forEach(l=>{totalLots+=l.remaining;totalCost+=l.remaining*1000*l.price+(l.fee*(l.remaining/l.original));});
-  if((inv.transactions||[]).length===0){totalLots=inv.lots||0;totalCost=totalLots*1000*(inv.avgPrice||0);}
-  const avgCost=totalLots>0?totalCost/(totalLots*1000):(inv.avgPrice||0);
-
-  // Realized PnL
-  let realizedPnl=0;
+  let tLots=0,tCost=0;
+  active.forEach(l=>{tLots+=l.remaining;tCost+=l.remaining*1000*l.price+(l.fee*(l.remaining/l.original));});
+  if(!(inv.transactions||[]).length){tLots=inv.lots||0;tCost=tLots*1000*(inv.avgPrice||0);}
+  const avgCost=tLots>0?tCost/(tLots*1000):(inv.avgPrice||0);
+  // realized
+  let realized=0;
   const rLots=[];
   (inv.transactions||[]).forEach(t=>{
-    if(t.type==='buy'){
-      rLots.push({txnId:t.id,price:t.price,original:t.lots,remaining:t.lots,fee:t.fee||0});
-    } else {
+    if(t.type==='buy')rLots.push({txnId:t.id,price:t.price,original:t.lots,remaining:t.lots,fee:t.fee||0});
+    else{
       const rev=t.lots*1000*t.price-(t.fee||0);
       let cost=0;
-      if(t.lotRefs&&t.lotRefs.length){
-        t.lotRefs.forEach(ref=>{const l=rLots.find(x=>x.txnId===ref.txnId);if(l){cost+=ref.lots*1000*l.price+(l.fee*(ref.lots/l.original));l.remaining=Math.max(0,l.remaining-ref.lots);}});
-      } else {
-        let s=t.lots;
-        for(const l of rLots){if(s<=0)break;const tk=Math.min(l.remaining,s);cost+=tk*1000*l.price+(l.fee*(tk/l.original));l.remaining-=tk;s-=tk;}
-      }
-      realizedPnl+=rev-cost;
+      if(t.lotRefs&&t.lotRefs.length){t.lotRefs.forEach(ref=>{const l=rLots.find(x=>x.txnId===ref.txnId);if(l){cost+=ref.lots*1000*l.price+(l.fee*(ref.lots/l.original));l.remaining=Math.max(0,l.remaining-ref.lots);}});}
+      else{let s=t.lots;for(const l of rLots){if(s<=0)break;const tk=Math.min(l.remaining,s);cost+=tk*1000*l.price+(l.fee*(tk/l.original));l.remaining-=tk;s-=tk;}}
+      realized+=rev-cost;
     }
   });
-
   const cp=db.prices[inv.code];
-  const currentPrice=cp?cp.price:null;
-  const marketValue=currentPrice?totalLots*1000*currentPrice:null;
-  const pnl=marketValue!==null?marketValue-totalCost:null;
-  const pnlPct=totalCost>0&&pnl!==null?pnl/totalCost*100:null;
-  // Dividend PnL
-  const divTotal=(db.dividends||[]).filter(d=>d.code===inv.code).reduce((s,d)=>s+d.amount,0);
-  const monthlyDiv=totalLots>0&&inv.divPerShare?(totalLots*1000*inv.divPerShare/12):0;
-  return{totalLots,totalCost,avgCost,currentPrice,marketValue,pnl,pnlPct,realizedPnl,divTotal,monthlyDiv,activeLots:active};
+  const curPrice=cp?cp.price:null;
+  const mktVal=curPrice?tLots*1000*curPrice:null;
+  const pnl=mktVal!==null?mktVal-tCost:null;
+  const pnlPct=tCost>0&&pnl!==null?pnl/tCost*100:null;
+  const divTot=(db.dividends||[]).filter(d=>d.code===inv.code).reduce((s,d)=>s+d.amount,0);
+  const moDivAmt=tLots>0&&inv.divPerShare?(tLots*1000*inv.divPerShare/12):0;
+  return{tLots,tCost,avgCost,curPrice,mktVal,pnl,pnlPct,realized,divTot,moDivAmt,activeLots:active};
 }
 
-// Equal-payment loan formula
-function calcLoanPayment(){
-  const rate=parseFloat(document.getElementById('l-rate').value)||0;
-  const amt=parseFloat(document.getElementById('l-amt').value)||0;
-  const start=document.getElementById('l-start').value;
-  const due=document.getElementById('l-due').value;
-  const preview=document.getElementById('loan-calc-preview');
-  if(rate>0&&amt>0&&start&&due){
-    const months=Math.round((new Date(due)-new Date(start))/(1000*60*60*24*30.44));
-    if(months>0){
-      const mr=rate/100/12;
-      const payment=mr===0?amt/months:amt*mr*Math.pow(1+mr,months)/(Math.pow(1+mr,months)-1);
-      document.getElementById('l-monthly-val').value=Math.round(payment);
-      preview.style.display='block';
-      preview.innerHTML=`💡 貸款 $${amt.toLocaleString()} · ${rate}% · ${months}期 → 每月還款 <strong>$${Math.round(payment).toLocaleString()}</strong>（含本金＋利息）`;
-    }
-  } else {
-    preview.style.display='none';
+function calcLoanRemain(l){
+  if(!l.amount||!l.rate||!l.start||!l.monthly)return l.remain||0;
+  const start=new Date(l.start);
+  const today=new Date();
+  const paid=Math.max(0,(today.getFullYear()-start.getFullYear())*12+(today.getMonth()-start.getMonth()));
+  const mr=l.rate/100/12;
+  if(mr>0){
+    const rem=l.amount*Math.pow(1+mr,paid)-l.monthly*(Math.pow(1+mr,paid)-1)/mr;
+    return Math.max(0,Math.round(rem));
   }
+  return Math.max(0,l.amount-l.monthly*paid);
 }
 
-function calcFlexMonthly(){
-  const rate=parseFloat(document.getElementById('f-rate').value)||0;
-  const remain=parseFloat(document.getElementById('f-remain-val').value)||0;
-  const monthly=remain*(rate/100)/12;
-  const preview=document.getElementById('flex-calc-preview');
-  if(rate>0&&remain>0){
-    document.getElementById('f-monthly-val').value=Math.round(monthly);
-    preview.style.display='block';
-    preview.innerHTML=`💡 $${remain.toLocaleString()} × ${rate}% ÷ 12 = 每月利息 <strong>$${Math.round(monthly).toLocaleString()}</strong>`;
-  } else {
-    preview.style.display='none';
-  }
-}
-
-function daysLeft(d){if(!d)return'—';return Math.max(0,Math.round((new Date(d)-new Date())/86400000));}
 function daysUntilDeduct(day){
   if(!day)return null;
+  const d=parseInt(day);if(isNaN(d))return null;
   const now=new Date();
-  const y=now.getFullYear(),m=now.getMonth();
-  let next=new Date(y,m,day);
-  if(next<=now)next=new Date(y,m+1,day);
+  let next=new Date(now.getFullYear(),now.getMonth(),d);
+  if(next<=now)next=new Date(now.getFullYear(),now.getMonth()+1,d);
   return Math.ceil((next-now)/86400000);
 }
-function fmt(n){return isNaN(n)?'—':'$'+Math.abs(Math.round(n)).toLocaleString('zh-TW');}
+function daysLeft(ds){if(!ds)return'—';return Math.max(0,Math.round((new Date(ds)-new Date())/86400000));}
+function fmt(n){return isNaN(n)?'—':'$'+Math.abs(Math.round(n)).toLocaleString();}
 function fmtF(n,d=2){return isNaN(n)?'—':n.toFixed(d);}
 
-// ═══════════════ RENDER ═══════════════
-let showDivInRoi=false;
+// ═══════ RENDER ═══════
+let showDivRoi=false;
 
-function render(){renderInv();renderLoans();renderFlex();renderCash();renderDivs();renderSummary();}
+function render(){renderInv();renderLoans();renderFlex();renderCash();renderDivs();renderSum();}
 
 function renderInv(){
   const tbody=document.getElementById('inv-body');
-  const openIds=[];
-  tbody.querySelectorAll('.hist-row.open').forEach(r=>openIds.push(r.dataset.id));
+  const openIds=[];tbody.querySelectorAll('.hist-row.open').forEach(r=>openIds.push(r.dataset.id));
   tbody.innerHTML='';
-  let tC=0,tM=0,tD=0,tReal=0;
+  let tC=0,tM=0,tD=0,tR=0;
   const calcs=db.investments.map(inv=>({inv,c:calcInv(inv)}));
-  calcs.forEach(({c})=>{tC+=c.totalCost;if(c.marketValue)tM+=c.marketValue;tD+=c.monthlyDiv;tReal+=c.realizedPnl;});
+  calcs.forEach(({c})=>{tC+=c.tCost;if(c.mktVal)tM+=c.mktVal;tD+=c.moDivAmt;tR+=c.realized;});
 
   calcs.forEach(({inv,c})=>{
-    const prC=c.currentPrice==null?'':db.prices[inv.code]?.change>=0?'gain':'loss';
+    const prC=c.curPrice==null?'':db.prices[inv.code]?.change>=0?'gain':'loss';
     const pnC=c.pnl==null?'':c.pnl>=0?'gain':'loss';
-    const pct=tC>0?(c.totalCost/tC*100).toFixed(1)+'%':'—';
+    const pct=tC>0?(c.tCost/tC*100).toFixed(1)+'%':'—';
     const ho=openIds.includes(inv.id);
-    const tr=document.createElement('tr');tr.dataset.id=inv.id;
+    const tr=document.createElement('tr');
     tr.innerHTML=`
-      <td style="color:var(--accent);font-weight:700;text-align:left;padding-left:8px">${inv.code}${inv.name?`<br><span style="font-size:10px;color:var(--muted);font-weight:400">${inv.name}</span>`:''}${inv.note?`<br><span style="font-size:10px;color:var(--teal)">${inv.note}</span>`:''}</td>
-      <td class="mono bold" style="color:var(--accent)">${c.totalLots} 張</td>
-      <td class="mono">$${fmtF(c.avgCost,2)}</td>
-      <td class="mono">${fmt(c.totalCost)}</td>
-      <td class="mono ${prC}">${c.currentPrice!=null?'$'+c.currentPrice.toFixed(2):'<span style="color:var(--muted)">—</span>'}</td>
-      <td class="mono">${c.marketValue!=null?fmt(c.marketValue):'<span style="color:var(--muted)">—</span>'}</td>
+      <td class="left bold" style="color:var(--accent)">${inv.code}${inv.name?`<br><small style="color:var(--muted);font-weight:400">${inv.name}</small>`:''}${inv.note?`<br><small style="color:var(--teal)">${inv.note}</small>`:''}</td>
+      <td class="mono bold" style="color:var(--accent)">${c.tLots} 張</td>
+      <td class="mono">$${fmtF(c.avgCost)}</td>
+      <td class="mono">${fmt(c.tCost)}</td>
+      <td class="mono ${prC}">${c.curPrice!=null?'$'+c.curPrice.toFixed(2):'<span style="color:var(--muted)">—</span>'}</td>
+      <td class="mono">${c.mktVal!=null?fmt(c.mktVal):'<span style="color:var(--muted)">—</span>'}</td>
       <td class="mono ${pnC}">${c.pnl!=null?(c.pnl>=0?'+':'-')+fmt(c.pnl):'<span style="color:var(--muted)">—</span>'}</td>
       <td class="mono ${pnC}">${c.pnlPct!=null?(c.pnlPct>=0?'+':'-')+Math.abs(c.pnlPct).toFixed(2)+'%':'<span style="color:var(--muted)">—</span>'}</td>
-      <td class="mono ${c.realizedPnl>0?'gain':c.realizedPnl<0?'loss':''}">${c.realizedPnl!==0?(c.realizedPnl>0?'+':'-')+fmt(c.realizedPnl):'—'}</td>
-      <td class="mono gain bold">${c.monthlyDiv>0?fmt(c.monthlyDiv):'—'}</td>
+      <td class="mono ${c.realized>0?'gain':c.realized<0?'loss':''}">${c.realized!==0?(c.realized>0?'+':'-')+fmt(c.realized):'—'}</td>
+      <td class="mono gain bold">${c.moDivAmt>0?fmt(c.moDivAmt):'—'}</td>
       <td class="mono">${pct}</td>`;
     tbody.appendChild(tr);
 
-    // Action bar
-    const ar=document.createElement('tr');
-    ar.innerHTML=`<td colspan="10" style="padding:3px 8px;background:#f0f6ff;border-top:none">
-      <div style="display:flex;gap:4px;flex-wrap:wrap">
-        <button class="act-btn add" onclick="openBuyModal('${inv.id}')">▲ 買入</button>
-        <button class="act-btn" style="color:var(--loss);border-color:#e8b4b8" onclick="openSellModal('${inv.id}')">▼ 賣出</button>
-        <button class="act-btn" style="color:var(--gain);border-color:#aad4bc;background:var(--gain-bg)" onclick="openDivModalFor('${inv.code}')">💰 領息</button>
-        <button class="act-btn" style="color:var(--accent);border-color:#8ab4d8" onclick="toggleHist('${inv.id}')" id="hbtn-${inv.id}">📋 記錄${ho?'▲':'▼'}</button>
-        <button class="act-btn" onclick="openInvModal('${inv.id}')">✏️ 編輯</button>
-        <button class="act-btn del" onclick="deleteInv('${inv.id}')">🗑 刪除</button>
-      </div>
-    </td>`;
+    const ar=document.createElement('tr');ar.className='act-row';
+    ar.innerHTML=`<td colspan="11"><div style="display:flex;gap:4px;flex-wrap:wrap">
+      <button class="act-btn buy-btn" onclick="openBuyModal('${inv.id}')">▲ 買入</button>
+      <button class="act-btn sell-btn" onclick="openSellModal('${inv.id}')">▼ 賣出</button>
+      <button class="act-btn div-btn" onclick="openDivFor('${inv.code}')">💰 領息</button>
+      <button class="act-btn hist-btn" onclick="toggleHist('${inv.id}')" id="hb-${inv.id}">📋 記錄${ho?'▲':'▼'}</button>
+      <button class="act-btn" onclick="openInvModal('${inv.id}')">✏️ 編輯</button>
+      <button class="act-btn del" onclick="delInv('${inv.id}')">🗑 刪除</button>
+    </div></td>`;
     tbody.appendChild(ar);
 
-    // History row
-    const hr=document.createElement('tr');
-    hr.className='hist-row'+(ho?' open':'');
-    hr.dataset.id=inv.id;hr.id='hr-'+inv.id;
+    const hr=document.createElement('tr');hr.className='hist-row'+(ho?' open':'');hr.dataset.id=inv.id;hr.id='hr-'+inv.id;
     const txns=(inv.transactions||[]).slice().reverse();
-    const txnHTML=txns.length===0?'<tr><td colspan="8" style="color:var(--muted);padding:10px;text-align:center">尚無交易記錄</td></tr>':
+    const tHTML=txns.length===0?'<tr><td colspan="8" style="color:var(--muted);text-align:center;padding:10px">尚無交易記錄</td></tr>':
       txns.map(t=>{
         const isB=t.type==='buy';
-        const refs=t.lotRefs?t.lotRefs.map(r=>`<span class="lot-tag">${r.lots}張 ${r.date}</span>`).join(''):'';
+        const refs=t.lotRefs?t.lotRefs.map(r=>`<span class="ltag">${r.lots}張 ${r.date}</span>`).join(''):'';
         return`<tr>
-          <td class="${isB?'txn-buy':'txn-sell'}">${isB?'▲ 買入':'▼ 賣出'}</td>
-          <td class="mono">${t.date}</td>
-          <td class="mono bold">${t.lots} 張</td>
+          <td class="${isB?'txnbuy':'txnsell'}">${isB?'▲ 買入':'▼ 賣出'}</td>
+          <td class="mono">${t.date}</td><td class="mono bold">${t.lots} 張</td>
           <td class="mono">$${t.price.toFixed(2)}</td>
           <td class="mono">${fmt(t.lots*1000*t.price)}</td>
           <td class="mono">${t.fee?'$'+Math.round(t.fee).toLocaleString():'—'}</td>
-          <td style="font-size:10px">${isB?`<span class="lot-tag" style="background:#e8f5ee;border-color:#aad4bc;color:var(--gain)">批次${t.id.slice(-4)}</span>`:refs||'FIFO'}</td>
+          <td style="font-size:10px">${isB?`<span class="ltag" style="background:#e8f5ee;border-color:#aad4bc;color:var(--gain)">批次${t.id.slice(-4)}</span>`:refs||'FIFO'}</td>
           <td><button class="act-btn del" onclick="delTxn('${inv.id}','${t.id}')">刪</button></td>
         </tr>`;
       }).join('');
-    hr.innerHTML=`<td colspan="10" style="padding:0"><div class="hist-panel">
+    hr.innerHTML=`<td colspan="11" style="padding:0"><div class="hist-panel">
       <div class="ht">📋 ${inv.code} 完整交易記錄（${(inv.transactions||[]).length} 筆）</div>
-      <table class="htable"><thead><tr><th>類型</th><th>日期</th><th>張數</th><th>價格</th><th>金額</th><th>手續費</th><th>批次</th><th></th></tr></thead>
-      <tbody>${txnHTML}</tbody></table>
+      <div style="overflow-x:auto"><table class="htbl"><thead><tr><th>類型</th><th>日期</th><th>張數</th><th>價格</th><th>金額</th><th>手續費</th><th>批次</th><th></th></tr></thead>
+      <tbody>${tHTML}</tbody></table></div>
     </div></td>`;
     tbody.appendChild(hr);
   });
 
-  // Update totals
   const tPnl=tM-tC,tRoi=tC>0?tPnl/tC*100:0;
   document.getElementById('t-cost').textContent=fmt(tC);
-  document.getElementById('t-mktval').textContent=tM>0?fmt(tM):'—';
+  document.getElementById('t-mkt').textContent=tM>0?fmt(tM):'—';
   document.getElementById('t-pnl').textContent=tM>0?(tPnl>=0?'+':'-')+fmt(tPnl):'—';
   document.getElementById('t-pnl').className='mono bold '+(tPnl>=0?'gain':'loss');
   document.getElementById('t-roi').textContent=tM>0?(tRoi>=0?'+':'')+tRoi.toFixed(2)+'%':'—';
   document.getElementById('t-roi').className='mono bold '+(tRoi>=0?'gain':'loss');
-  document.getElementById('t-realized').textContent=tReal!==0?(tReal>0?'+':'-')+fmt(tReal):'—';
-  document.getElementById('t-realized').className='mono bold '+(tReal>=0?'gain':'loss');
+  document.getElementById('t-real').textContent=tR!==0?(tR>=0?'+':'-')+fmt(tR):'—';
+  document.getElementById('t-real').className='mono bold '+(tR>=0?'gain':'loss');
   document.getElementById('t-div').textContent=fmt(tD);
 }
 
 function toggleHist(id){
   const hr=document.getElementById('hr-'+id);
-  const btn=document.getElementById('hbtn-'+id);
-  if(!hr)return;
+  const btn=document.getElementById('hb-'+id);
   const open=hr.classList.toggle('open');
   btn.textContent='📋 記錄'+(open?'▲':'▼');
 }
@@ -1041,71 +861,43 @@ function toggleHist(id){
 function renderLoans(){
   const tbody=document.getElementById('loan-body');tbody.innerHTML='';
   let tA=0,tR=0,tM=0;
-  // Auto-calc remain based on amortization schedule
   db.loans.forEach(l=>{
-    if(l.amount>0 && l.rate>0 && l.start && l.due && l.monthly>0){
-      const startD = new Date(l.start);
-      const today  = new Date();
-      // how many payments have been made
-      const monthsPaid = Math.max(0,
-        (today.getFullYear()-startD.getFullYear())*12 +
-        (today.getMonth()-startD.getMonth())
-      );
-      // equal-payment amortization: remaining balance after n payments
-      const mr = l.rate/100/12;
-      if(mr > 0){
-        const remain = l.amount * Math.pow(1+mr, monthsPaid) -
-          l.monthly * (Math.pow(1+mr, monthsPaid)-1) / mr;
-        l._calcRemain = Math.max(0, Math.round(remain));
-      } else {
-        l._calcRemain = Math.max(0, l.amount - l.monthly * monthsPaid);
-      }
-    } else {
-      l._calcRemain = l.remain || 0;
-    }
-  });
-  db.loans.forEach(l=>{
-    tA+=l.amount||0;tR+=l._calcRemain||l.remain||0;tM+=l.monthly||0;
+    const calcRem=calcLoanRemain(l);
+    tA+=l.amount||0;tR+=calcRem;tM+=l.monthly||0;
     const days=daysLeft(l.due);
     const dueC=typeof days==='number'&&days<180?'color:var(--loss);font-weight:700':'';
-    const dDays=daysUntilDeduct(l.deductDay);
+    const dDay=parseInt(l.deductDay)||0;
+    const dDays=daysUntilDeduct(dDay||null);
     const urgent=dDays!==null&&dDays<=5;
     const dC=urgent?'color:var(--loss);font-weight:800':'color:var(--muted)';
-    // Balance check
-    let balStatus='—',afterBal='—',afterStyle='color:var(--muted)';
+    let balSt='—',afterBal='—',afterSt='color:var(--muted)';
     if(l.deductBank){
       const acc=db.cashAccounts.find(c=>c.bank===l.deductBank);
       if(acc){
         const bal=(acc.cash||0)+(acc.d1||0)+(acc.d2||0);
         const after=bal-(l.monthly||0);
         afterBal=(after>=0?'$':'-$')+Math.abs(Math.round(after)).toLocaleString();
-        afterStyle=after>=0?'color:var(--gain);font-weight:700':'color:var(--loss);font-weight:700';
-        if(urgent){
-          balStatus=after>=0?`<span style="color:var(--gain);font-weight:700">✅ 足夠<br><small>餘${fmt(after)}</small></span>`:`<span style="color:var(--loss);font-weight:700">⚠️ 不足<br><small>缺${fmt(-after)}</small></span>`;
-        } else {
-          balStatus=after>=0?`<span style="color:var(--gain);font-size:11px">✅ ${fmt(bal)}</span>`:`<span style="color:var(--loss);font-size:11px">⚠️ ${fmt(bal)}</span>`;
-        }
+        afterSt=after>=0?'color:var(--gain);font-weight:700':'color:var(--loss);font-weight:700';
+        balSt=after>=0?`<span style="color:var(--gain);font-weight:700">✅ 足夠<br><small>餘${fmt(after)}</small></span>`:`<span style="color:var(--loss);font-weight:700">⚠️ 不足<br><small>缺${fmt(-after)}</small></span>`;
       }
     }
-    const rowBg=urgent?'background:rgba(192,57,43,0.04)':'';
-    tbody.innerHTML+=`<tr style="${rowBg}">
-      <td style="text-align:left;padding-left:8px" class="bold">${l.bank}${l.deductBank?`<br><span style="font-size:10px;color:var(--muted)">${l.deductBank}</span>`:''}
-      </td>
+    tbody.innerHTML+=`<tr style="${urgent?'background:rgba(192,57,43,0.04)':''}">
+      <td class="left bold">${l.bank}${l.deductBank?`<br><small style="color:var(--muted)">${l.deductBank}</small>`:''}</td>
       <td class="mono">${(l.rate||0).toFixed(2)}%</td>
       <td class="mono">$${(l.amount||0).toLocaleString()}</td>
-      <td class="mono teal-bg" title="自動計算剩餘本金">$${((l._calcRemain||l.remain)||0).toLocaleString()}</td>
+      <td class="mono teal-bg" title="等額本息自動計算">$${calcRem.toLocaleString()}</td>
       <td class="mono loss">$${(l.monthly||0).toLocaleString()}</td>
-      <td class="mono bold">${l.deductDay?l.deductDay+'號':'—'}</td>
+      <td class="mono bold">${dDay?dDay+'號':'—'}</td>
       <td class="mono" style="${dC}">${dDays!==null?(urgent?'🔴 '+dDays+'天':dDays+'天'):'—'}</td>
-      <td style="font-size:11px">${balStatus}</td>
-      <td class="mono" style="${afterStyle}">${afterBal}</td>
+      <td style="font-size:11px">${balSt}</td>
+      <td class="mono" style="${afterSt}">${afterBal}</td>
       <td class="mono" style="${dueC}">${l.due||'—'}</td>
-      <td><button class="act-btn" onclick="editLoan('${l.id}')">編輯</button> <button class="act-btn del" onclick="deleteLoan('${l.id}')">刪</button></td>
+      <td><button class="act-btn" onclick="editLoan('${l.id}')">編輯</button> <button class="act-btn del" onclick="delLoan('${l.id}')">刪</button></td>
     </tr>`;
   });
-  document.getElementById('l-total-amt').textContent='$'+tA.toLocaleString();
-  document.getElementById('l-remain').textContent='$'+tR.toLocaleString();
-  document.getElementById('l-monthly').textContent='$'+tM.toLocaleString();
+  document.getElementById('l-amt').textContent='$'+(tA).toLocaleString();
+  document.getElementById('l-rem').textContent='$'+tR.toLocaleString();
+  document.getElementById('l-mo').textContent='$'+tM.toLocaleString();
 }
 
 function renderFlex(){
@@ -1114,18 +906,18 @@ function renderFlex(){
   db.flexLoans.forEach(f=>{
     tR+=f.remain||0;tM+=f.monthly||0;
     tbody.innerHTML+=`<tr>
-      <td class="bold" style="text-align:left;padding-left:8px">${f.name}</td>
+      <td class="left bold">${f.name}</td>
       <td class="mono">${(f.rate||0).toFixed(2)}%</td>
       <td class="mono teal-bg">$${(f.remain||0).toLocaleString()}</td>
       <td class="mono loss">$${(f.monthly||0).toLocaleString()}</td>
       <td>${f.note||''}</td>
-      <td><button class="act-btn" onclick="editFlex('${f.id}')">編輯</button> <button class="act-btn del" onclick="deleteFlex('${f.id}')">刪</button></td>
+      <td><button class="act-btn" onclick="editFlex('${f.id}')">編輯</button> <button class="act-btn del" onclick="delFlex('${f.id}')">刪</button></td>
     </tr>`;
   });
   const lM=db.loans.reduce((s,l)=>s+(l.monthly||0),0);
-  document.getElementById('f-remain').textContent='$'+tR.toLocaleString();
-  document.getElementById('f-monthly').textContent='$'+tM.toLocaleString();
-  document.getElementById('total-monthly-out').textContent='$'+(lM+tM).toLocaleString();
+  document.getElementById('f-rem').textContent='$'+tR.toLocaleString();
+  document.getElementById('f-mo').textContent='$'+tM.toLocaleString();
+  document.getElementById('tot-mo-out').textContent='$'+(lM+tM).toLocaleString();
 }
 
 function renderCash(){
@@ -1134,139 +926,108 @@ function renderCash(){
   db.cashAccounts.forEach(c=>{
     const bal=(c.cash||0)+(c.d1||0)+(c.d2||0);tB+=bal;tA+=c.arb||0;
     tbody.innerHTML+=`<tr>
-      <td class="bold" style="text-align:left;padding-left:8px">${c.bank}</td>
+      <td class="left bold">${c.bank}</td>
       <td class="mono">$${(c.cash||0).toLocaleString()}</td>
       <td class="mono ${(c.d1||0)<0?'loss':''}">${c.d1?(c.d1>=0?'$':'-$')+Math.abs(c.d1).toLocaleString():'—'}</td>
       <td class="mono ${(c.d2||0)<0?'loss':''}">${c.d2?(c.d2>=0?'$':'-$')+Math.abs(c.d2).toLocaleString():'—'}</td>
       <td class="mono ${bal>=0?'gain':'loss'} bold pink-bg">$${bal.toLocaleString()}</td>
       <td class="mono ${(c.arb||0)>=0?'gain':'loss'}">${c.arb?(c.arb>=0?'$':'-$')+Math.abs(c.arb).toLocaleString():'—'}</td>
-      <td><button class="act-btn" onclick="editCash('${c.id}')">編輯</button> <button class="act-btn del" onclick="deleteCash('${c.id}')">刪</button></td>
+      <td><button class="act-btn" onclick="editCash('${c.id}')">編輯</button> <button class="act-btn del" onclick="delCash('${c.id}')">刪</button></td>
     </tr>`;
   });
-  document.getElementById('c-total').className=`mono pink-bg bold ${tB>=0?'gain':'loss'}`;
-  document.getElementById('c-total').textContent='$'+tB.toLocaleString();
+  document.getElementById('c-tot').className=`mono pink-bg bold ${tB>=0?'gain':'loss'}`;
+  document.getElementById('c-tot').textContent='$'+tB.toLocaleString();
   document.getElementById('c-arb').className=`mono bold ${tA>=0?'gain':'loss'}`;
   document.getElementById('c-arb').textContent=(tA>=0?'$':'-$')+Math.abs(tA).toLocaleString();
 }
 
-function toggleDivYear(){
-  const body=document.getElementById('div-thisyear-body');
-  const hint=document.getElementById('div-year-hint');
-  const open=body.style.display==='none';
-  body.style.display=open?'block':'none';
-  hint.textContent=open?'▲ 收起':'▼ 展開';
-}
-
 function renderDivs(){
-  if(!db.dividends)db.dividends=[];
-  const thisYear=new Date().getFullYear().toString();
-  const showHistory=document.getElementById('div-show-history')?.checked||false;
+  const yr=new Date().getFullYear().toString();
+  const yrDivs=db.dividends.filter(d=>d.date.startsWith(yr));
+  const histDivs=db.dividends.filter(d=>!d.date.startsWith(yr));
+  const showHist=document.getElementById('div-hist-chk')?.checked||false;
 
-  const thisYearDivs=db.dividends.filter(d=>d.date.startsWith(thisYear));
-  const historyDivs=db.dividends.filter(d=>!d.date.startsWith(thisYear));
-
-  // Cards: show THIS YEAR total per code
-  const byCodeThisYear={};
-  thisYearDivs.forEach(d=>{
-    if(!byCodeThisYear[d.code])byCodeThisYear[d.code]={total:0,count:0};
-    byCodeThisYear[d.code].total+=d.amount;
-    byCodeThisYear[d.code].count++;
-  });
-
+  // Cards
+  const byCode={};
+  yrDivs.forEach(d=>{if(!byCode[d.code])byCode[d.code]={tot:0,cnt:0};byCode[d.code].tot+=d.amount;byCode[d.code].cnt++;});
   const cards=document.getElementById('div-cards');
-  if(cards){
-    const entries=Object.entries(byCodeThisYear);
-    cards.innerHTML=entries.length===0
-      ?'<span style="color:var(--muted);font-size:11px">今年尚無領息記錄</span>'
-      :entries.map(([code,d])=>`
-        <div style="background:var(--white);border:1.5px solid #aad4bc;border-radius:9px;padding:8px 14px;cursor:pointer;min-width:110px" onclick="openDivModalFor('${code}')">
-          <div style="font-size:10px;color:var(--muted)">${code} 今年</div>
-          <div style="font-size:17px;font-weight:800;color:var(--gain);font-family:'JetBrains Mono',monospace">$${Math.round(d.total).toLocaleString()}</div>
-          <div style="font-size:9px;color:var(--muted)">${d.count} 筆 · 點擊新增</div>
-        </div>`).join('')
-      +'<button class="act-btn add" style="height:56px;padding:0 14px" onclick="openDivModal()">＋ 新增</button>';
-  }
+  cards.innerHTML=Object.keys(byCode).length===0?'<span style="color:var(--muted);font-size:11px">今年尚無領息記錄</span>':
+    Object.entries(byCode).map(([code,d])=>`<div class="div-card" onclick="openDivFor('${code}')">
+      <div style="font-size:10px;color:var(--muted)">${code} 今年</div>
+      <div style="font-size:17px;font-weight:800;color:var(--gain);font-family:'JetBrains Mono',monospace">$${Math.round(d.tot).toLocaleString()}</div>
+      <div style="font-size:9px;color:var(--muted)">${d.cnt} 筆</div>
+    </div>`).join('')+'<button class="act-btn add" style="height:56px;padding:0 14px" onclick="openDivModal()">＋ 新增</button>';
 
-  // This year total
-  const thisYearTotal=thisYearDivs.reduce((s,d)=>s+d.amount,0);
-  const grandTotal=db.dividends.reduce((s,d)=>s+d.amount,0);
-  document.getElementById('d-thisyear').textContent='$'+Math.round(thisYearTotal).toLocaleString();
-  document.getElementById('d-total').textContent='$'+Math.round(grandTotal).toLocaleString();
+  const yrTot=yrDivs.reduce((s,d)=>s+d.amount,0);
+  const allTot=db.dividends.reduce((s,d)=>s+d.amount,0);
+  document.getElementById('d-yr').textContent='$'+Math.round(yrTot).toLocaleString();
+  document.getElementById('d-tot').textContent='$'+Math.round(allTot).toLocaleString();
 
-  // This year detail table
-  function renderRows(divs, tbodyId){
-    const tbody=document.getElementById(tbodyId);
-    if(!tbody)return;
+  function renderRows(divs,tbodyId){
+    const tbody=document.getElementById(tbodyId);if(!tbody)return;
     tbody.innerHTML='';
-    const sorted=[...divs].sort((a,b)=>b.date.localeCompare(a.date));
-    sorted.forEach(d=>{
+    [...divs].sort((a,b)=>b.date.localeCompare(a.date)).forEach(d=>{
       const inv=db.investments.find(i=>i.code===d.code);
       tbody.innerHTML+=`<tr>
-        <td class="bold" style="color:var(--accent);text-align:left;padding-left:8px">${d.code}${inv?.name?`<br><span style="font-size:10px;color:var(--muted)">${inv.name}</span>`:''}</td>
+        <td class="left bold" style="color:var(--accent)">${d.code}${inv?.name?`<br><small style="color:var(--muted)">${inv.name}</small>`:''}</td>
         <td class="mono">${d.date}</td>
         <td class="mono">${d.lots} 張</td>
         <td class="mono">$${d.perShare.toFixed(4)}</td>
         <td class="mono gain bold">$${Math.round(d.amount).toLocaleString()}</td>
-        <td><button class="act-btn del" onclick="deleteDiv('${d.id}')">刪</button></td>
+        <td><button class="act-btn del" onclick="delDiv('${d.id}')">刪</button></td>
       </tr>`;
     });
-    if(sorted.length===0){
-      tbody.innerHTML='<tr><td colspan="6" style="color:var(--muted);text-align:center;padding:12px">無記錄</td></tr>';
-    }
+    if(!divs.length)tbody.innerHTML='<tr><td colspan="6" style="color:var(--muted);text-align:center;padding:10px">無記錄</td></tr>';
   }
-
-  renderRows(thisYearDivs, 'div-body-thisyear');
-
-  // History section
-  const histSec=document.getElementById('div-history-section');
-  if(histSec){
-    histSec.style.display=showHistory?'block':'none';
-    if(showHistory) renderRows(historyDivs, 'div-body-history');
-  }
+  renderRows(yrDivs,'div-body-yr');
+  document.getElementById('div-hist-sec').style.display=showHist?'block':'none';
+  if(showHist)renderRows(histDivs,'div-body-hist');
 }
 
-function renderSummary(){
-  let tC=0,tM=0,tD=0,tReal=0,tDivTotal=0;
-  db.investments.forEach(inv=>{const c=calcInv(inv);tC+=c.totalCost;if(c.marketValue)tM+=c.marketValue;tD+=c.monthlyDiv;tReal+=c.realizedPnl;tDivTotal+=c.divTotal;});
-  const lR=db.loans.reduce((s,l)=>s+(l.remain||0),0)+db.flexLoans.reduce((s,f)=>s+(f.remain||0),0);
+function toggleDivYear(){
+  const b=document.getElementById('div-yr-body');
+  const h=document.getElementById('div-yr-hint');
+  const open=b.style.display==='none';
+  b.style.display=open?'block':'none';
+  h.textContent=open?'▲ 收起':'▼ 展開';
+}
+
+function renderSum(){
+  let tC=0,tM=0,tD=0,tDivTot=0;
+  db.investments.forEach(inv=>{const c=calcInv(inv);tC+=c.tCost;if(c.mktVal)tM+=c.mktVal;tD+=c.moDivAmt;tDivTot+=c.divTot;});
+  const lR=db.loans.reduce((s,l)=>s+calcLoanRemain(l),0)+db.flexLoans.reduce((s,f)=>s+(f.remain||0),0);
   const mO=db.loans.reduce((s,l)=>s+(l.monthly||0),0)+db.flexLoans.reduce((s,f)=>s+(f.monthly||0),0);
   const cT=db.cashAccounts.reduce((s,c)=>s+(c.cash||0)+(c.d1||0)+(c.d2||0),0);
   const tot=tM+cT,pnl=tM-tC,roi=tC>0?pnl/tC*100:0;
-  const roiWithDiv=tC>0?(pnl+tDivTotal)/tC*100:0;
+  const roiInc=tC>0?(pnl+tDivTot)/tC*100:0;
   const dR=tot>0?lR/tot*100:0,net=tot-lR,fl=tD-mO;
-
   const rows=[
     {l:'資金總額',v:'$'+Math.round(tot).toLocaleString(),c:''},
     {l:'股票市值',v:'$'+Math.round(tM).toLocaleString(),c:'teal-bg'},
     {l:'股票損益',v:(pnl>=0?'+':'-')+fmt(pnl),c:pnl>=0?'gain':'loss'},
-    {l:`報酬率 <label style="font-size:10px;cursor:pointer"><input type="checkbox" id="roi-toggle" onchange="renderSummary()" ${showDivInRoi?'checked':''}> 含息</label>`,
-     v:(showDivInRoi?roiWithDiv:roi)>=0?'+'+(showDivInRoi?roiWithDiv:roi).toFixed(2)+'%':(showDivInRoi?roiWithDiv:roi).toFixed(2)+'%',
-     c:(showDivInRoi?roiWithDiv:roi)>=0?'gain':'loss'},
+    {l:`報酬率 <label style="font-size:10px;cursor:pointer"><input type="checkbox" id="roi-chk" ${showDivRoi?'checked':''} onchange="showDivRoi=this.checked;renderSum();renderInv()"> 含息</label>`,
+     v:(showDivRoi?roiInc:roi)>=0?'+'+(showDivRoi?roiInc:roi).toFixed(2)+'%':(showDivRoi?roiInc:roi).toFixed(2)+'%',
+     c:(showDivRoi?roiInc:roi)>=0?'gain':'loss'},
     {l:'負債比',v:dR.toFixed(2)+'%',c:''},
     {l:'淨資產',v:'$'+Math.round(net).toLocaleString(),c:'bold'},
     {l:'每月股息',v:fmt(tD),c:'gain bold'},
     {l:'每月支出',v:fmt(mO),c:'loss'},
     {l:'每月淨現金流',v:(fl>=0?'+':'-')+fmt(fl),c:fl>=0?'gain bold':'loss bold'},
   ];
-  document.getElementById('sum-table').innerHTML=rows.map(r=>`<tr>
-    <td class="sum-lbl">${r.l}</td>
-    <td class="sum-val mono ${r.c}">${r.v}</td>
+  document.getElementById('sum-tbl').innerHTML=rows.map(r=>`<tr>
+    <td class="sum-lbl">${r.l}</td><td class="sum-val mono ${r.c}">${r.v}</td>
   </tr>`).join('');
-  // Re-attach toggle listener
-  const tog=document.getElementById('roi-toggle');
-  if(tog)tog.addEventListener('change',()=>{showDivInRoi=tog.checked;renderSummary();renderInv();});
 }
 
-// ═══════════════ MODALS ═══════════════
+// ═══════ MODALS ═══════
 function openModal(id){document.getElementById(id).classList.add('open');}
-function closeModal(id){document.getElementById(id).classList.remove('open');editingId=null;}
-document.querySelectorAll('.mo').forEach(el=>{el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open');});});
+function closeModal(id){document.getElementById(id).classList.remove('open');editId=null;}
+document.querySelectorAll('.mo').forEach(el=>el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open');}));
 
-// ── INVEST ──
+// INVEST
 function openInvModal(id=null){
-  editingId=id;
-  const inv=id?db.investments.find(i=>i.id===id):null;
-  document.getElementById('invModalTitle').textContent=id?'編輯投資標的':'新增投資標的';
+  editId=id;const inv=id?db.investments.find(i=>i.id===id):null;
+  document.getElementById('invMT').textContent=id?'編輯投資標的':'新增投資標的';
   document.getElementById('i-code').value=inv?.code||'';
   document.getElementById('i-name').value=inv?.name||'';
   document.getElementById('i-lots').value=inv?.lots||'';
@@ -1280,47 +1041,40 @@ function saveInv(){
   if(!code)return toast('請輸入股票代號');
   const lots=parseFloat(document.getElementById('i-lots').value)||0;
   const avg=parseFloat(document.getElementById('i-avg').value)||0;
-  if(editingId){
-    const inv=db.investments.find(i=>i.id===editingId);
-    inv.code=code;inv.name=document.getElementById('i-name').value.trim();
-    inv.lots=lots;inv.avgPrice=avg;
-    inv.divPerShare=parseFloat(document.getElementById('i-div').value)||0;
-    inv.note=document.getElementById('i-note').value.trim();
-  } else {
+  if(editId){
+    const inv=db.investments.find(i=>i.id===editId);
+    Object.assign(inv,{code,name:document.getElementById('i-name').value.trim(),lots,avgPrice:avg,
+      divPerShare:parseFloat(document.getElementById('i-div').value)||0,note:document.getElementById('i-note').value.trim()});
+  }else{
     if(db.investments.find(i=>i.code===code))return toast(code+' 已存在');
-    db.investments.push({id:uid(),code,name:document.getElementById('i-name').value.trim(),
-      lots,avgPrice:avg,divPerShare:parseFloat(document.getElementById('i-div').value)||0,
-      note:document.getElementById('i-note').value.trim(),transactions:[]});
+    db.investments.push({id:uid(),code,name:document.getElementById('i-name').value.trim(),lots,avgPrice:avg,
+      divPerShare:parseFloat(document.getElementById('i-div').value)||0,note:document.getElementById('i-note').value.trim(),transactions:[]});
   }
-  save();closeModal('invModal');render();toast(editingId?'已更新':'已新增 '+code);
+  save();closeModal('invModal');render();toast(editId?'已更新':'已新增 '+code);
   fetchPrice(code).then(p=>{if(p){db.prices[code]=p;localStorage.setItem(STORE,JSON.stringify(db));renderInv();}});
 }
-function deleteInv(id){
-  const inv=db.investments.find(i=>i.id===id);
-  if(!confirm(`確定刪除 ${inv.code}？`))return;
-  db.investments=db.investments.filter(i=>i.id!==id);
-  save();render();toast('已刪除');
+function delInv(id){
+  if(!confirm('確定刪除？'))return;
+  db.investments=db.investments.filter(i=>i.id!==id);save();render();toast('已刪除');
 }
 
-// ── BUY ──
-function calcBuyCost(){
+// BUY
+function calcBuy(){
   const lots=parseFloat(document.getElementById('b-lots').value)||0;
   const price=parseFloat(document.getElementById('b-price').value)||0;
   if(lots>0&&price>0){
-    // 手續費 2.8折 (正常0.1425% × 0.28 = 0.0399%)，最低1元
     const fee=Math.max(1,Math.round(lots*1000*price*0.001425*0.28));
     document.getElementById('b-fee').value=fee;
-    document.getElementById('buy-preview').style.display='block';
-    document.getElementById('buy-preview').innerHTML=
-      `買入 ${lots}張 × $${price} = $${Math.round(lots*1000*price).toLocaleString()} ＋ 手續費 $${fee.toLocaleString()}`;
+    const p=document.getElementById('buy-prev');
+    p.style.display='block';
+    p.textContent=`${lots}張 × $${price} = $${Math.round(lots*1000*price).toLocaleString()} ＋ 手續費 $${fee.toLocaleString()}`;
   }
 }
 function openBuyModal(invId){
-  activeBuyId=invId;
-  const inv=db.investments.find(i=>i.id===invId);
-  document.getElementById('buyModalTitle').textContent=`買入 · ${inv.code} ${inv.name||''}`;
-  document.getElementById('b-lots').value='';document.getElementById('b-price').value='';
-  document.getElementById('b-fee').value='';document.getElementById('buy-preview').style.display='none';
+  buyInvId=invId;const inv=db.investments.find(i=>i.id===invId);
+  document.getElementById('buyMT').textContent=`買入 · ${inv.code} ${inv.name||''}`;
+  ['b-lots','b-price','b-fee'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('buy-prev').style.display='none';
   document.getElementById('b-date').value=new Date().toISOString().split('T')[0];
   openModal('buyModal');setTimeout(()=>document.getElementById('b-lots').focus(),100);
 }
@@ -1333,44 +1087,39 @@ function saveBuy(){
   if(!date)return toast('請選擇日期');
   const feeIn=document.getElementById('b-fee').value;
   const fee=feeIn!==''?parseFloat(feeIn):Math.max(1,Math.round(lots*1000*price*0.001425*0.28));
-  const inv=db.investments.find(i=>i.id===activeBuyId);
-  if(!inv.transactions)inv.transactions=[];
+  const inv=db.investments.find(i=>i.id===buyInvId);
   inv.transactions.push({id:uid(),type:'buy',lots,price,date,fee});
   inv.transactions.sort((a,b)=>a.date.localeCompare(b.date));
   save();closeModal('buyModal');render();toast(`買入 ${lots} 張已記錄`);
 }
 
-// ── SELL ──
+// SELL
 function openSellModal(invId){
-  activeSellId=invId;
-  const inv=db.investments.find(i=>i.id===invId);
-  document.getElementById('sellModalTitle').textContent=`賣出 · ${inv.code} ${inv.name||''}`;
+  sellInvId=invId;const inv=db.investments.find(i=>i.id===invId);
+  document.getElementById('sellMT').textContent=`賣出 · ${inv.code} ${inv.name||''}`;
   document.getElementById('s-date').value=new Date().toISOString().split('T')[0];
   document.getElementById('s-price').value='';
   document.getElementById('sell-sum').style.display='none';
   const active=buildLots(inv).filter(l=>l.remaining>0);
-  const picker=document.getElementById('lot-picker');
-  if(active.length===0){
-    picker.innerHTML='<div style="padding:14px;text-align:center;color:var(--muted)">無可賣出批次</div>';
-  } else {
-    picker.innerHTML=active.map(lot=>`
-      <div class="lot-item">
-        <input type="checkbox" id="lot-${lot.txnId}" data-txn="${lot.txnId}" data-max="${lot.remaining}" data-price="${lot.price}">
-        <div class="li-info">
-          <div class="li-date">${lot.date} · $${lot.price.toFixed(2)}</div>
-          <div class="li-detail">可賣 ${lot.remaining} 張（原 ${lot.original} 張）</div>
-        </div>
-        <input type="number" class="lqin" id="qty-${lot.txnId}" value="${lot.remaining}" min="0.001" step="0.001" max="${lot.remaining}" disabled>
-        <span style="font-size:10px;color:var(--muted)">張</span>
-      </div>`).join('');
-    picker.querySelectorAll('input[type=checkbox]').forEach(cb=>{
-      cb.addEventListener('change',()=>{
-        const q=document.getElementById('qty-'+cb.dataset.txn);
-        q.disabled=!cb.checked;if(cb.checked)q.focus();updateSellSum();
-      });
+  const pk=document.getElementById('lot-picker');
+  if(!active.length){pk.innerHTML='<div style="padding:14px;text-align:center;color:var(--muted)">無可賣批次</div>';openModal('sellModal');return;}
+  pk.innerHTML=active.map(lot=>`
+    <div class="lot-item">
+      <input type="checkbox" id="lot-${lot.txnId}" data-txn="${lot.txnId}" data-max="${lot.remaining}" data-price="${lot.price}">
+      <div class="li-info">
+        <div class="li-date">${lot.date} · $${lot.price.toFixed(2)}</div>
+        <div class="li-det">可賣 ${lot.remaining} 張（原 ${lot.original} 張）</div>
+      </div>
+      <input type="number" class="lqin" id="qty-${lot.txnId}" value="${lot.remaining}" min="0.001" step="0.001" max="${lot.remaining}" disabled>
+      <span style="font-size:10px;color:var(--muted)">張</span>
+    </div>`).join('');
+  pk.querySelectorAll('input[type=checkbox]').forEach(cb=>{
+    cb.addEventListener('change',()=>{
+      const q=document.getElementById('qty-'+cb.dataset.txn);
+      q.disabled=!cb.checked;if(cb.checked)q.focus();updateSellSum();
     });
-    picker.querySelectorAll('.lqin').forEach(q=>q.addEventListener('input',updateSellSum));
-  }
+  });
+  pk.querySelectorAll('.lqin').forEach(q=>q.addEventListener('input',updateSellSum));
   openModal('sellModal');
 }
 function updateSellSum(){
@@ -1382,8 +1131,7 @@ function updateSellSum(){
     sLots+=q;sCost+=q*1000*parseFloat(cb.dataset.price);
   });
   const el=document.getElementById('sell-sum');
-  if(sLots===0){el.style.display='none';return;}
-  // 交易稅 0.3% + 手續費 2.8折
+  if(!sLots){el.style.display='none';return;}
   const fee=Math.max(1,Math.round(sLots*1000*sp*0.001425*0.28));
   const tax=Math.round(sLots*1000*sp*0.003);
   const rev=sLots*1000*sp-fee-tax;
@@ -1391,16 +1139,15 @@ function updateSellSum(){
   el.style.display='block';
   el.style.background=pnl>=0?'var(--gain-bg)':'var(--loss-bg)';
   el.style.borderColor=pnl>=0?'#aad4bc':'#f5c6c2';
-  el.innerHTML=`賣出預覽：${sLots}張 · 手續費$${fee.toLocaleString()} · 交易稅$${tax.toLocaleString()}<br>
+  el.innerHTML=`${sLots}張 · 手續費$${fee.toLocaleString()} · 交易稅$${tax.toLocaleString()}<br>
     淨收入：$${Math.round(rev).toLocaleString()} ｜損益：<strong class="${pnl>=0?'gain':'loss'}">${pnl>=0?'+':'-'}${fmt(Math.abs(pnl))} (${pnl>=0?'+':''}${pct.toFixed(2)}%)</strong>`;
 }
 function saveSell(){
   const date=document.getElementById('s-date').value;
   const price=parseFloat(document.getElementById('s-price').value);
-  if(!date)return toast('請選擇賣出日期');
-  if(!price||price<=0)return toast('請輸入賣出價格');
+  if(!date)return toast('請選擇日期');if(!price||price<=0)return toast('請輸入賣出價格');
   const checked=document.querySelectorAll('#lot-picker input[type=checkbox]:checked');
-  if(checked.length===0)return toast('請至少勾選一個批次');
+  if(!checked.length)return toast('請勾選批次');
   const lotRefs=[];let tLots=0;let ok=true;
   checked.forEach(cb=>{
     const q=parseFloat(document.getElementById('qty-'+cb.dataset.txn).value);
@@ -1413,96 +1160,120 @@ function saveSell(){
   if(!ok)return;
   const fee=Math.max(1,Math.round(tLots*1000*price*0.001425*0.28));
   const tax=Math.round(tLots*1000*price*0.003);
-  const inv=db.investments.find(i=>i.id===activeSellId);
+  const inv=db.investments.find(i=>i.id===sellInvId);
   inv.transactions.push({id:uid(),type:'sell',lots:tLots,price,date,fee:fee+tax,lotRefs});
   inv.transactions.sort((a,b)=>a.date.localeCompare(b.date));
   save();closeModal('sellModal');render();toast(`賣出 ${tLots} 張已記錄`);
 }
 function delTxn(invId,txnId){
-  if(!confirm('確定刪除這筆交易？'))return;
+  if(!confirm('確定刪除？'))return;
   const inv=db.investments.find(i=>i.id===invId);
   inv.transactions=inv.transactions.filter(t=>t.id!==txnId);
   save();render();
-  setTimeout(()=>{const hr=document.getElementById('hr-'+invId);if(hr){hr.classList.add('open');document.getElementById('hbtn-'+invId).textContent='📋 記錄▲';}},50);
+  setTimeout(()=>{const hr=document.getElementById('hr-'+invId);if(hr){hr.classList.add('open');document.getElementById('hb-'+invId).textContent='📋 記錄▲';}},50);
   toast('已刪除');
 }
 
-// ── LOAN ──
+// LOAN
+function calcLoan(){
+  const rate=parseFloat(document.getElementById('l-rate').value)||0;
+  const amt=parseFloat(document.getElementById('l-amt').value)||0;
+  const start=document.getElementById('l-start').value;
+  const due=document.getElementById('l-due').value;
+  const prev=document.getElementById('loan-prev');
+  if(rate>0&&amt>0&&start&&due){
+    const months=Math.round((new Date(due)-new Date(start))/(1000*60*60*24*30.44));
+    if(months>0){
+      const mr=rate/100/12;
+      const pay=mr===0?amt/months:amt*mr*Math.pow(1+mr,months)/(Math.pow(1+mr,months)-1);
+      document.getElementById('l-mo').value=Math.round(pay);
+      prev.style.display='block';
+      prev.textContent=`$${amt.toLocaleString()} · ${rate}% · ${months}期 → 每月 $${Math.round(pay).toLocaleString()}`;
+    }
+  }else{prev.style.display='none';}
+}
 function openLoanModal(id=null){
-  editingId=id;const l=id?db.loans.find(x=>x.id===id):null;
-  document.getElementById('loanModalTitle').textContent=id?'編輯信貸':'新增信貸';
+  editId=id;const l=id?db.loans.find(x=>x.id===id):null;
+  document.getElementById('loanMT').textContent=id?'編輯信貸':'新增信貸';
   document.getElementById('l-bank').value=l?.bank||'';
   document.getElementById('l-rate').value=l?.rate||'';
   document.getElementById('l-amt').value=l?.amount||'';
-  document.getElementById('l-remain-val').value=l?.remain||'';
   document.getElementById('l-start').value=l?.start||'';
   document.getElementById('l-due').value=l?.due||'';
-  document.getElementById('l-monthly-val').value=l?.monthly||'';
-  document.getElementById('l-deduct-day').value=l?.deductDay||'';
-  document.getElementById('l-deduct-bank').value=l?.deductBank||'';
-  document.getElementById('loan-calc-preview').style.display='none';
+  document.getElementById('l-mo').value=l?.monthly||'';
+  document.getElementById('l-dday').value=l?.deductDay||'';
+  document.getElementById('l-dbank').value=l?.deductBank||'';
+  document.getElementById('loan-prev').style.display='none';
   openModal('loanModal');
 }
 function editLoan(id){openLoanModal(id);}
 function saveLoan(){
   const bank=document.getElementById('l-bank').value.trim();if(!bank)return toast('請輸入銀行');
-  const obj={id:editingId||uid(),bank,
+  const obj={id:editId||uid(),bank,
     rate:parseFloat(document.getElementById('l-rate').value)||0,
     amount:parseFloat(document.getElementById('l-amt').value)||0,
-    remain:parseFloat(document.getElementById('l-remain-val').value)||0,
-    monthly:parseFloat(document.getElementById('l-monthly-val').value)||0,
     start:document.getElementById('l-start').value,
     due:document.getElementById('l-due').value,
-    deductDay:parseInt(document.getElementById('l-deduct-day').value)||0,
-    deductBank:document.getElementById('l-deduct-bank').value};
-  if(editingId){const i=db.loans.findIndex(x=>x.id===editingId);db.loans[i]=obj;}
+    monthly:parseFloat(document.getElementById('l-mo').value)||0,
+    deductDay:document.getElementById('l-dday').value,
+    deductBank:document.getElementById('l-dbank').value};
+  if(editId){const i=db.loans.findIndex(x=>x.id===editId);db.loans[i]=obj;}
   else db.loans.push(obj);
   save();closeModal('loanModal');render();toast('已儲存');
 }
-function deleteLoan(id){if(!confirm('確定刪除？'))return;db.loans=db.loans.filter(x=>x.id!==id);save();render();toast('已刪除');}
+function delLoan(id){if(!confirm('確定刪除？'))return;db.loans=db.loans.filter(x=>x.id!==id);save();render();toast('已刪除');}
 
-// ── FLEX ──
+// FLEX
+function calcFlex(){
+  const rate=parseFloat(document.getElementById('f-rate').value)||0;
+  const remain=parseFloat(document.getElementById('f-rem').value)||0;
+  const p=document.getElementById('flex-prev');
+  if(rate>0&&remain>0){
+    const mo=remain*(rate/100)/12;
+    document.getElementById('f-mo').value=Math.round(mo);
+    p.style.display='block';
+    p.textContent=`$${remain.toLocaleString()} × ${rate}% ÷ 12 = 每月利息 $${Math.round(mo).toLocaleString()}`;
+  }else p.style.display='none';
+}
 function openFlexModal(id=null){
-  editingId=id;const f=id?db.flexLoans.find(x=>x.id===id):null;
-  document.getElementById('flexModalTitle').textContent=id?'編輯不限用途':'新增不限用途額度';
+  editId=id;const f=id?db.flexLoans.find(x=>x.id===id):null;
+  document.getElementById('flexMT').textContent=id?'編輯不限用途':'新增不限用途額度';
   document.getElementById('f-name').value=f?.name||'';
   document.getElementById('f-rate').value=f?.rate||'';
-  document.getElementById('f-remain-val').value=f?.remain||'';
-  document.getElementById('f-monthly-val').value=f?.monthly||'';
+  document.getElementById('f-rem').value=f?.remain||'';
+  document.getElementById('f-mo').value=f?.monthly||'';
   document.getElementById('f-note').value=f?.note||'';
-  document.getElementById('flex-calc-preview').style.display='none';
-  openModal('flexModal');
-  if(f?.rate&&f?.remain)setTimeout(calcFlexMonthly,100);
+  document.getElementById('flex-prev').style.display='none';
+  openModal('flexModal');if(f?.rate&&f?.remain)setTimeout(calcFlex,100);
 }
 function editFlex(id){openFlexModal(id);}
-function saveFlexLoan(){
+function saveFlex(){
   const name=document.getElementById('f-name').value.trim();if(!name)return toast('請輸入機構');
-  const obj={id:editingId||uid(),name,
+  const obj={id:editId||uid(),name,
     rate:parseFloat(document.getElementById('f-rate').value)||0,
-    remain:parseFloat(document.getElementById('f-remain-val').value)||0,
-    monthly:parseFloat(document.getElementById('f-monthly-val').value)||0,
+    remain:parseFloat(document.getElementById('f-rem').value)||0,
+    monthly:parseFloat(document.getElementById('f-mo').value)||0,
     note:document.getElementById('f-note').value.trim()};
-  if(editingId){const i=db.flexLoans.findIndex(x=>x.id===editingId);db.flexLoans[i]=obj;}
+  if(editId){const i=db.flexLoans.findIndex(x=>x.id===editId);db.flexLoans[i]=obj;}
   else db.flexLoans.push(obj);
   save();closeModal('flexModal');render();toast('已儲存');
 }
-function deleteFlex(id){if(!confirm('確定？'))return;db.flexLoans=db.flexLoans.filter(x=>x.id!==id);save();render();toast('已刪除');}
+function delFlex(id){if(!confirm('確定？'))return;db.flexLoans=db.flexLoans.filter(x=>x.id!==id);save();render();toast('已刪除');}
 
-// ── CASH ──
+// CASH
 function toggleCustomBank(sel){
   const c=document.getElementById('c-bank-custom');
   c.style.display=sel.value==='__custom__'?'block':'none';
   if(sel.value==='__custom__')c.focus();else c.value='';
 }
 function openCashModal(id=null){
-  editingId=id;const c=id?db.cashAccounts.find(x=>x.id===id):null;
-  const bankVal=c?.bank||'';
-  const knownBanks=['台灣銀行','Line Bank','國泰銀行','凱基銀行','統一券商','期貨','永豐銀行','凱基券商'];
-  const sel=document.getElementById('c-bank');
-  const custom=document.getElementById('c-bank-custom');
-  if(knownBanks.includes(bankVal)){sel.value=bankVal;custom.style.display='none';}
-  else if(bankVal){sel.value='__custom__';custom.style.display='block';custom.value=bankVal;}
-  else{sel.value='';custom.style.display='none';}
+  editId=id;const c=id?db.cashAccounts.find(x=>x.id===id):null;
+  const known=['台灣銀行','Line Bank','國泰銀行','凱基銀行','統一券商','期貨','永豐銀行','凱基券商'];
+  const sel=document.getElementById('c-bank'),cus=document.getElementById('c-bank-custom');
+  const bv=c?.bank||'';
+  if(known.includes(bv)){sel.value=bv;cus.style.display='none';}
+  else if(bv){sel.value='__custom__';cus.style.display='block';cus.value=bv;}
+  else{sel.value='';cus.style.display='none';}
   document.getElementById('c-cash').value=c?.cash||'';
   document.getElementById('c-d1').value=c?.d1||'';
   document.getElementById('c-d2').value=c?.d2||'';
@@ -1514,18 +1285,18 @@ function saveCash(){
   const sel=document.getElementById('c-bank').value;
   const bank=(sel==='__custom__'?document.getElementById('c-bank-custom').value.trim():sel).trim();
   if(!bank)return toast('請選擇帳戶');
-  const obj={id:editingId||uid(),bank,
+  const obj={id:editId||uid(),bank,
     cash:parseFloat(document.getElementById('c-cash').value)||0,
     d1:parseFloat(document.getElementById('c-d1').value)||0,
     d2:parseFloat(document.getElementById('c-d2').value)||0,
     arb:parseFloat(document.getElementById('c-arb').value)||0};
-  if(editingId){const i=db.cashAccounts.findIndex(x=>x.id===editingId);db.cashAccounts[i]=obj;}
+  if(editId){const i=db.cashAccounts.findIndex(x=>x.id===editId);db.cashAccounts[i]=obj;}
   else db.cashAccounts.push(obj);
   save();closeModal('cashModal');render();toast('已儲存');
 }
-function deleteCash(id){if(!confirm('確定？'))return;db.cashAccounts=db.cashAccounts.filter(x=>x.id!==id);save();render();toast('已刪除');}
+function delCash(id){if(!confirm('確定？'))return;db.cashAccounts=db.cashAccounts.filter(x=>x.id!==id);save();render();toast('已刪除');}
 
-// ── DIVIDEND ──
+// DIV
 function openDivModal(preCode=null){
   const sel=document.getElementById('d-code');
   sel.innerHTML='<option value="">— 請選擇 —</option>';
@@ -1533,137 +1304,102 @@ function openDivModal(preCode=null){
     const c=calcInv(inv);
     const opt=document.createElement('option');
     opt.value=inv.code;opt.textContent=inv.code+(inv.name?' · '+inv.name:'');
-    opt.dataset.div=inv.divPerShare||0;opt.dataset.lots=c.totalLots||0;
+    opt.dataset.div=inv.divPerShare||0;opt.dataset.lots=c.tLots||0;
     sel.appendChild(opt);
   });
   sel.onchange=()=>{
     const opt=sel.options[sel.selectedIndex];
-    if(opt?.dataset.div&&parseFloat(opt.dataset.div)>0)document.getElementById('d-pershare').value=opt.dataset.div;
+    if(opt?.dataset.div&&parseFloat(opt.dataset.div)>0)document.getElementById('d-ps').value=opt.dataset.div;
     if(opt?.dataset.lots&&parseFloat(opt.dataset.lots)>0)document.getElementById('d-lots').value=opt.dataset.lots;
-    updateDivPreview();
+    updateDivPrev();
   };
   if(preCode){sel.value=preCode;sel.dispatchEvent(new Event('change'));}
   document.getElementById('d-date').value=new Date().toISOString().split('T')[0];
-  if(!preCode){document.getElementById('d-lots').value='';document.getElementById('d-pershare').value='';}
-  document.getElementById('div-preview').style.display='none';
-  openModal('divModal');
-  if(preCode)setTimeout(updateDivPreview,150);
+  if(!preCode){document.getElementById('d-lots').value='';document.getElementById('d-ps').value='';}
+  document.getElementById('div-prev').style.display='none';
+  openModal('divModal');if(preCode)setTimeout(updateDivPrev,150);
 }
-function openDivModalFor(code){openDivModal(code);}
-function updateDivPreview(){
+function openDivFor(code){openDivModal(code);}
+function updateDivPrev(){
   const lots=parseFloat(document.getElementById('d-lots').value)||0;
-  const ps=parseFloat(document.getElementById('d-pershare').value)||0;
-  const amt=lots*1000*ps;
-  const el=document.getElementById('div-preview');
-  if(lots>0&&ps>0){el.style.display='block';document.getElementById('div-preview-amt').textContent='$'+Math.round(amt).toLocaleString();}
+  const ps=parseFloat(document.getElementById('d-ps').value)||0;
+  const el=document.getElementById('div-prev');
+  if(lots>0&&ps>0){el.style.display='block';el.textContent='本次領息：$'+Math.round(lots*1000*ps).toLocaleString();}
   else el.style.display='none';
 }
 function saveDiv(){
   const code=document.getElementById('d-code').value;
   const date=document.getElementById('d-date').value;
   const lots=parseFloat(document.getElementById('d-lots').value);
-  const ps=parseFloat(document.getElementById('d-pershare').value);
-  if(!code)return toast('請選擇股票');
-  if(!date)return toast('請選擇日期');
-  if(!lots||lots<=0)return toast('請輸入張數');
-  if(!ps||ps<=0)return toast('請輸入每股配息');
+  const ps=parseFloat(document.getElementById('d-ps').value);
+  if(!code)return toast('請選擇股票');if(!date)return toast('請選擇日期');
+  if(!lots||lots<=0)return toast('請輸入張數');if(!ps||ps<=0)return toast('請輸入每股配息');
   db.dividends.push({id:uid(),code,date,lots,perShare:ps,amount:lots*1000*ps});
   save();closeModal('divModal');renderDivs();toast(`領息 $${Math.round(lots*1000*ps).toLocaleString()} 已記錄`);
 }
-function deleteDiv(id){
+function delDiv(id){
   if(!confirm('確定刪除？'))return;
   db.dividends=db.dividends.filter(d=>d.id!==id);save();renderDivs();toast('已刪除');
 }
 
-// ═══════════════ QUICK INPUT ═══════════════
+// QUICK INPUT
 let parsedItems=[];
-function toggleQuick(){
+function toggleQ(){
   const b=document.getElementById('qbody');const h=document.getElementById('qhint');
   const open=b.classList.toggle('open');
-  h.textContent=open?'▲ 收起':'▼ 展開 — 從 LINE 貼上交易指令';
-}
-function toggleTicker(){
-  const b=document.getElementById('ticker-body');const h=document.getElementById('ticker-hint');
-  const open=b.classList.toggle('open');
   h.textContent=open?'▲ 收起':'▼ 展開';
-  if(open && !tickerLoaded) refreshTicker();
 }
-let tickerLoaded=false;
-
-function parseQuick(){
+function parseQ(){
   const raw=document.getElementById('qinput').value.trim();
   if(!raw)return toast('請先貼上交易指令');
-  const lines=raw.split('\n').map(l=>l.trim()).filter(l=>l.length>0);
-  parsedItems=[];
   const today=new Date().toISOString().split('T')[0];
-  lines.forEach(line=>{
-    const buyM=line.match(/^(買入|買)\s+([A-Za-z0-9]+)\s+([\d.]+)張?\s+([\d.]+)(?:\s+([\d/\-]+))?/);
-    const sellM=line.match(/^(賣出|賣)\s+([A-Za-z0-9]+)\s+([\d.]+)張?\s+([\d.]+)(?:\s+([\d/\-]+))?/);
-    const divM=line.match(/^(領息|配息)\s+([A-Za-z0-9]+)\s+([\d.]+)(張|股)?\s+([\d.]+)/);
-    if(buyM){
-      const code=buyM[2].toUpperCase(),lots=parseFloat(buyM[3]),price=parseFloat(buyM[4]);
-      const date=(buyM[5]||today).replace(/\//g,'-');
-      const fee=Math.max(1,Math.round(lots*1000*price*0.001425*0.28));
-      parsedItems.push({type:'buy',code,lots,price,date,fee,raw:line,ok:true});
-    } else if(sellM){
-      const code=sellM[2].toUpperCase(),lots=parseFloat(sellM[3]),price=parseFloat(sellM[4]);
-      const date=(sellM[5]||today).replace(/\//g,'-');
-      // Check inventory
+  parsedItems=[];
+  raw.split('\n').map(l=>l.trim()).filter(l=>l).forEach(line=>{
+    const bM=line.match(/^(買入|買)\s+([A-Za-z0-9]+)\s+([\d.]+)張?\s+([\d.]+)(?:\s+([\d/\-]+))?/);
+    const sM=line.match(/^(賣出|賣)\s+([A-Za-z0-9]+)\s+([\d.]+)張?\s+([\d.]+)(?:\s+([\d/\-]+))?/);
+    const dM=line.match(/^(領息|配息)\s+([A-Za-z0-9]+)\s+([\d.]+)(張|股)?\s+([\d.]+)/);
+    if(bM){
+      const code=bM[2].toUpperCase(),lots=parseFloat(bM[3]),price=parseFloat(bM[4]);
+      const date=(bM[5]||today).replace(/\//g,'-');
+      parsedItems.push({type:'buy',code,lots,price,date,fee:Math.max(1,Math.round(lots*1000*price*0.001425*0.28)),raw:line,ok:true});
+    }else if(sM){
+      const code=sM[2].toUpperCase(),lots=parseFloat(sM[3]),price=parseFloat(sM[4]);
+      const date=(sM[5]||today).replace(/\//g,'-');
       const inv=db.investments.find(i=>i.code===code);
       const avail=inv?buildLots(inv).filter(l=>l.remaining>0).reduce((s,l)=>s+l.remaining,0):0;
-      if(lots>avail){
-        parsedItems.push({type:'error',raw:line,ok:false,msg:`❌ ${code} 庫存不足（可賣 ${avail} 張，嘗試賣 ${lots} 張）`});
-      } else {
-        parsedItems.push({type:'sell',code,lots,price,date,raw:line,ok:true});
-      }
-    } else if(divM){
-      const code=divM[2].toUpperCase(),qty=parseFloat(divM[3]),unit=divM[4]||'張';
-      const lots=unit==='股'?qty/1000:qty,ps=parseFloat(divM[5]);
+      if(lots>avail)parsedItems.push({type:'error',raw:line,ok:false,msg:`❌ ${code} 庫存不足（可賣${avail}張，嘗試賣${lots}張）`});
+      else parsedItems.push({type:'sell',code,lots,price,date,raw:line,ok:true});
+    }else if(dM){
+      const code=dM[2].toUpperCase(),qty=parseFloat(dM[3]),unit=dM[4]||'張';
+      const lots=unit==='股'?qty/1000:qty,ps=parseFloat(dM[5]);
       parsedItems.push({type:'div',code,lots,perShare:ps,amount:lots*1000*ps,raw:line,ok:true});
-    } else {
-      parsedItems.push({type:'error',raw:line,ok:false,msg:'❌ 無法解析：'+line});
-    }
+    }else parsedItems.push({type:'error',raw:line,ok:false,msg:'❌ 無法解析：'+line});
   });
-  const container=document.getElementById('qpreview-items');
-  const okCount=parsedItems.filter(i=>i.ok).length;
-  container.innerHTML=parsedItems.map(item=>{
-    if(!item.ok)return`<div class="qpi"><span class="qi-err">${item.msg||'❌ 無法解析：'+item.raw}</span></div>`;
-    if(item.type==='div')return`<div class="qpi">
-      <span class="qi-type" style="color:var(--gain)">💰 領息</span>
-      <span class="qi-code">${item.code}</span>
-      <span class="qi-detail">${item.lots}張 × $${item.perShare} = <strong style="color:var(--gain)">$${Math.round(item.amount).toLocaleString()}</strong></span>
-    </div>`;
+  const cont=document.getElementById('qprev-items');
+  cont.innerHTML=parsedItems.map(item=>{
+    if(!item.ok)return`<div class="qpi"><span class="qi-e">${item.msg||'❌ 無法解析：'+item.raw}</span></div>`;
+    if(item.type==='div')return`<div class="qpi"><span class="qi-t" style="color:var(--gain)">💰 領息</span><span class="qi-c">${item.code}</span><span class="qi-d">${item.lots}張 × $${item.perShare} = <strong style="color:var(--gain)">$${Math.round(item.amount).toLocaleString()}</strong></span></div>`;
     const tL=item.type==='buy'?'▲ 買入':'▼ 賣出';
     const tC=item.type==='buy'?'var(--gain)':'var(--loss)';
     const inv=db.investments.find(i=>i.code===item.code);
-    const exist=inv?'✅':'⚠️ 新代號';
-    return`<div class="qpi">
-      <span class="qi-type" style="color:${tC}">${tL}</span>
-      <span class="qi-code">${item.code}</span>
-      <span class="qi-detail">${item.lots}張 @ $${item.price} · ${item.date} · 手續費$${item.fee||0}</span>
-      <span style="font-size:10px">${exist}</span>
-    </div>`;
+    return`<div class="qpi"><span class="qi-t" style="color:${tC}">${tL}</span><span class="qi-c">${item.code}</span><span class="qi-d">${item.lots}張 @ $${item.price} · ${item.date}</span><span style="font-size:10px">${inv?'✅':'⚠️新代號'}</span></div>`;
   }).join('');
-  document.getElementById('qconfirm-btn').textContent=`✅ 確認新增 ${okCount} 筆`;
-  document.getElementById('qpreview').classList.add('show');
+  const ok=parsedItems.filter(i=>i.ok).length;
+  document.getElementById('qconfirm').textContent=`✅ 確認新增 ${ok} 筆`;
+  document.getElementById('qprev').classList.add('show');
 }
-
-function confirmQuick(){
+function confirmQ(){
   const today=new Date().toISOString().split('T')[0];
   let added=0,skipped=0;
   parsedItems.forEach(item=>{
     if(!item.ok){skipped++;return;}
-    if(item.type==='div'){
-      db.dividends.push({id:uid(),code:item.code,date:today,lots:item.lots,perShare:item.perShare,amount:item.amount});
-      added++;return;
-    }
+    if(item.type==='div'){db.dividends.push({id:uid(),code:item.code,date:today,lots:item.lots,perShare:item.perShare,amount:item.amount});added++;return;}
     let inv=db.investments.find(i=>i.code===item.code);
     if(!inv){inv={id:uid(),code:item.code,name:'',lots:0,avgPrice:0,divPerShare:0,note:'',transactions:[]};db.investments.push(inv);}
-    if(!inv.transactions)inv.transactions=[];
     if(item.type==='buy'){
       inv.transactions.push({id:uid(),type:'buy',lots:item.lots,price:item.price,date:item.date,fee:item.fee||0});
       inv.transactions.sort((a,b)=>a.date.localeCompare(b.date));added++;
-    } else {
+    }else{
       inv.transactions.push({id:uid(),type:'sell',lots:item.lots,price:item.price,date:item.date,
         fee:Math.max(1,Math.round(item.lots*1000*item.price*(0.001425*0.28+0.003)))});
       inv.transactions.sort((a,b)=>a.date.localeCompare(b.date));added++;
@@ -1671,26 +1407,17 @@ function confirmQuick(){
   });
   save();render();
   parsedItems.filter(i=>i.ok).forEach(item=>{fetchPrice(item.code).then(p=>{if(p){db.prices[item.code]=p;localStorage.setItem(STORE,JSON.stringify(db));renderInv();}});});
-  document.getElementById('qinput').value='';
-  document.getElementById('qpreview').classList.remove('show');
-  parsedItems=[];
-  toast(`✅ 已新增 ${added} 筆${skipped>0?' · '+skipped+' 筆跳過':''}`);
+  document.getElementById('qinput').value='';document.getElementById('qprev').classList.remove('show');parsedItems=[];
+  toast(`✅ 已新增 ${added} 筆${skipped?` · ${skipped} 筆跳過`:''}`);
 }
 
-// ═══════════════ TOAST ═══════════════
-function toast(msg){
-  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2800);
-}
+// TOAST
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
 
-// ═══════════════ INIT ═══════════════
-// Load undo stack initial state
+// INIT
 undoStack=[JSON.stringify(db)];
 document.getElementById('undoBtn').disabled=true;
-
-render();
-checkBackupWarn();
-refreshPrices();
+render();checkBkWarn();refreshPrices();
 setInterval(()=>{const h=new Date().getHours(),m=new Date().getMinutes();if(h*60+m>=540&&h*60+m<=810)refreshPrices();},300000);
 </script>
 </body>
