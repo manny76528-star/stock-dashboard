@@ -1,0 +1,89 @@
+name: Update Stock Prices
+
+on:
+  schedule:
+    - cron: '30 6 * * 1-5'  # 每個交易日台灣時間 14:30 (UTC 06:30)
+  workflow_dispatch:          # 也可手動觸發
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Fetch Taiwan Stock Prices
+        run: |
+          python3 << 'PYTHON'
+          import urllib.request, json, time
+
+          # TWSE 上市
+          url = 'https://www.twse.com.tw/exchangeReport/STOCK_DAY_ALL?response=open_data'
+          req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+          with urllib.request.urlopen(req, timeout=15) as r:
+              raw = r.read().decode('utf-8')
+          
+          prices = {}
+          for i, line in enumerate(raw.strip().split('\n')):
+              if i == 0: continue
+              cols = [c.strip().strip('"') for c in line.split(',')]
+              if len(cols) < 9: continue
+              code = cols[0]
+              try:
+                  price = float(cols[7].replace(',',''))
+                  chg   = float(cols[8].replace(',','').replace('X','0'))
+                  if price > 0:
+                      prev = price - chg
+                      prices[code] = {
+                          'price': price,
+                          'change': chg,
+                          'changePct': round(chg/prev*100, 2) if prev > 0 else 0
+                      }
+              except: pass
+          
+          print(f'TWSE loaded: {len(prices)} stocks')
+          
+          # TPEx 上櫃
+          url2 = 'https://www.tpex.org.tw/openapi/v1/tpex_mainboard_daily_close_quotes'
+          req2 = urllib.request.Request(url2, headers={'User-Agent': 'Mozilla/5.0'})
+          try:
+              with urllib.request.urlopen(req2, timeout=15) as r2:
+                  data2 = json.loads(r2.read().decode('utf-8'))
+              for item in data2:
+                  code = str(item.get('代號') or item.get('Code') or '').upper().strip()
+                  close = str(item.get('收盤') or item.get('Close') or '')
+                  chg_raw = str(item.get('漲跌') or item.get('Change') or '0')
+                  try:
+                      price = float(close.replace(',',''))
+                      is_neg = '▼' in chg_raw or chg_raw.startswith('-')
+                      chg = float(chg_raw.replace('▲','').replace('▼','').replace('+','').replace(',','').strip())
+                      if is_neg: chg = -abs(chg)
+                      if code and price > 0:
+                          prev = price - chg
+                          prices[code] = {
+                              'price': price,
+                              'change': chg,
+                              'changePct': round(chg/prev*100, 2) if prev > 0 else 0
+                          }
+                  except: pass
+              print(f'TPEx loaded, total: {len(prices)} stocks')
+          except Exception as e:
+              print(f'TPEx error: {e}')
+          
+          # Write to prices.json
+          import os, datetime
+          output = {
+              'updated': datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ'),
+              'prices': prices
+          }
+          with open('prices.json', 'w') as f:
+              json.dump(output, f)
+          print(f'Written prices.json with {len(prices)} stocks')
+          PYTHON
+
+      - name: Commit prices.json
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add prices.json
+          git diff --staged --quiet || git commit -m "Update stock prices $(date -u +%Y-%m-%d)"
+          git push
