@@ -596,59 +596,25 @@ function fetchWithTimeout(url,ms=8000){
 }
 
 // ═══════ PRICE ═══════
-let _pm={};let _pmTime=0;
+let _pm={};let _pmTime=0;let _lastPriceDate='';
 
 async function loadPrices(){
   if(Date.now()-_pmTime<240000)return;
-
-  // TWSE 上市：用 openapi.twse.com.tw（有 CORS header）
-  // STOCK_DAY_ALL 回傳今日所有股票收盤資料
+  // 從同一個 GitHub repo 的 prices.json 讀取（由 GitHub Actions 每日更新，無 CORS 問題）
   try{
-    const r=await fetchWithTimeout('https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL',8000);
+    const r=await fetchWithTimeout('./prices.json?t='+Date.now(),8000);
     if(r.ok){
       const d=await r.json();
-      if(Array.isArray(d)){
-        d.forEach(item=>{
-          // 欄位：Code, StockName, TradeVolume, TradeValue, OpeningPrice, HighestPrice, LowestPrice, ClosingPrice, Change, Transaction
-          const code=item.Code||item['證券代號']||'';
-          const priceRaw=item.ClosingPrice||item['收盤價']||'';
-          const chgRaw=item.Change||item['漲跌價差']||'0';
-          const price=parseFloat(String(priceRaw).replace(/,/g,''));
-          const chg=parseFloat(String(chgRaw).replace(/,/g,'').replace(/X/g,'0'));
-          if(code&&!isNaN(price)&&price>0){
-            const prev=price-chg;
-            _pm[code]={price,change:chg,changePct:prev>0?chg/prev*100:0};
-          }
-        });
-        console.log('TWSE openapi loaded:',Object.keys(_pm).length,'stocks');
+      if(d.prices){
+        Object.assign(_pm, d.prices);
+        _lastPriceDate=d.updated||'';
+        console.log('prices.json loaded:',Object.keys(_pm).length,'stocks, updated:',_lastPriceDate);
+        _pmTime=Date.now();
+        return;
       }
     }
-  }catch(e){console.log('TWSE openapi err:',e.message);}
-
-  // TPEx 上櫃：用 tpex.org.tw openapi（有 CORS header）
-  try{
-    const r=await fetchWithTimeout('https://www.tpex.org.tw/openapi/v1/tpex_mainboard_daily_close_quotes',8000);
-    if(r.ok){
-      const d=await r.json();
-      if(Array.isArray(d)){
-        d.forEach(item=>{
-          const code=(item['代號']||item.Code||item.SecuritiesCompanyCode||'').toString().toUpperCase().trim();
-          const priceRaw=item['收盤']||item.Close||item.ClosingPrice||'';
-          const chgRaw=String(item['漲跌']||item.Change||'0');
-          const price=parseFloat(String(priceRaw).replace(/,/g,''));
-          // TPEx 漲跌有時帶正負號，有時用▲▼
-          const isNeg=chgRaw.includes('▼')||chgRaw.startsWith('-');
-          const chg=parseFloat(chgRaw.replace(/[▲▼+,]/g,''))*(isNeg?-1:1);
-          if(code&&!isNaN(price)&&price>0){
-            const prev=price-chg;
-            _pm[code]={price,change:chg,changePct:prev>0?chg/prev*100:0};
-          }
-        });
-        console.log('Price map total:',Object.keys(_pm).length,'stocks');
-      }
-    }
-  }catch(e){console.log('TPEx err:',e.message);}
-
+  }catch(e){console.log('prices.json err:',e.message);}
+  console.log('prices.json not available yet');
   _pmTime=Date.now();
 }
 
@@ -667,7 +633,7 @@ async function refreshPrices(){
   }));
   localStorage.setItem(STORE,JSON.stringify(db));render();
   const n=new Date();
-  document.getElementById('pstat').innerHTML=`<span class="dot"></span>${n.toLocaleTimeString('zh-TW')} 更新`;
+  document.getElementById('pstat').innerHTML=`<span class="dot"></span>${n.toLocaleTimeString('zh-TW')} 更新${_lastPriceDate?' (收盤'+_lastPriceDate.slice(0,10)+')':''}`;
 }
 
 // ═══════ TICKER ═══════
