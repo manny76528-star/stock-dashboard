@@ -183,6 +183,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
   <button class="tbtn" style="background:#0d8a4e" onclick="exportData()">📤 備份</button>
   <label class="tbtn" style="background:#6b7e96;cursor:pointer">📥 還原<input type="file" accept=".json" style="display:none" onchange="importData(event)"></label>
   <button class="tbtn" style="background:#8b5cf6" onclick="undoLast()" id="undoBtn" disabled>↩ 復原</button>
+  <button class="tbtn" style="background:#0891b2" onclick="openSearchModal()">🔍 查詢</button>
 </div>
 
 <!-- QUICK INPUT -->
@@ -243,7 +244,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
       <thead><tr>
         <th>標的</th><th>持有張數</th><th>均買價</th><th>總成本</th>
         <th>現價</th><th>市值</th><th>未實現損益</th><th>報酬率</th>
-        <th>已實現損益</th><th>月股息</th><th>比率</th>
+        <th>已實現損益</th><th>月股息<br><small style='font-weight:400;color:var(--muted)'>滑鼠看年息</small></th><th>比率</th>
       </tr></thead>
       <tbody id="inv-body"></tbody>
       <tfoot><tr class="row-total">
@@ -280,7 +281,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
         <td class="mono loss bold" id="l-rem" style="background:var(--loss-bg)">—</td>
         <td class="mono bold loss" id="l-mo">—</td>
         <td colspan="5"></td>
-        <td><button class="act-btn add" onclick="openLoanModal()">＋ 新增</button></td>
+        <td><button class="act-btn add" onclick="openLoanModal()">＋ 新增</button> <button class="act-btn hist-btn" onclick="openLoanHist()">📚 結清記錄</button></td>
       </tr></tfoot>
     </table>
   </div>
@@ -477,7 +478,11 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
       <div class="fg"><label class="fl">年利率（%）</label><input class="fi" id="f-rate" type="number" step="0.01" placeholder="例：2.89" oninput="calcFlex()"></div>
     </div>
     <div class="fr">
-      <div class="fg"><label class="fl">尚餘金額</label><input class="fi" id="f-rem" type="number" placeholder="例：2634805" oninput="calcFlex()"></div>
+      <div class="fg"><label class="fl">可借款額度（元）</label><input class="fi" id="f-limit" type="number" placeholder="例：6880000" oninput="calcFlex()"></div>
+      <div class="fg"><label class="fl">目前使用額度（元）</label><input class="fi" id="f-rem" type="number" placeholder="例：5000000" oninput="calcFlex()"></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">剩餘額度 <span style="color:var(--teal);font-size:9px">（自動換算）</span></label><input class="fi" id="f-avail" type="number" placeholder="自動計算" style="background:#f0f9f4;border-color:#aad4bc" readonly></div>
       <div class="fg"><label class="fl">每月利息 <span style="color:var(--teal);font-size:9px">（自動換算）</span></label><input class="fi" id="f-mo" type="number" placeholder="自動計算" style="background:#f0f9f4;border-color:#aad4bc"></div>
     </div>
     <div class="preview-box" id="flex-prev" style="background:var(--teal-lt);border-color:#7dcec8;color:var(--teal)"></div>
@@ -522,6 +527,30 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
     <div class="fg"><label class="fl">每股配息（元/年）</label><input class="fi" id="d-ps" type="number" step="0.0001" placeholder="例：0.048" oninput="updateDivPrev()"></div>
     <div class="preview-box" id="div-prev" style="background:var(--gain-bg);border-color:#aad4bc;color:var(--gain)"></div>
     <div class="br"><button class="btn btn-s" onclick="closeModal('divModal')">取消</button><button class="btn btn-p" onclick="saveDiv()" style="background:var(--gain)">確認領息</button></div>
+  </div>
+</div>
+
+<!-- SEARCH / HISTORY MODAL -->
+<div class="mo" id="searchModal">
+  <div class="modal" style="max-width:700px">
+    <div class="mt">🔍 交易記錄查詢</div>
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <input class="fi" id="search-code" placeholder="輸入股票代號，例：00985B（留空顯示全部）" style="flex:1" oninput="runSearch()">
+      <button class="btn btn-p" onclick="runSearch()" style="flex:0;padding:8px 16px">查詢</button>
+    </div>
+    <div id="search-results" style="max-height:450px;overflow-y:auto"></div>
+    <div class="br"><button class="btn btn-s" onclick="closeModal('searchModal')">關閉</button></div>
+  </div>
+</div>
+
+<!-- LOAN HISTORY MODAL -->
+<div class="mo" id="loanHistModal">
+  <div class="modal" style="max-width:600px">
+    <div class="mt">📚 已結清信貸記錄</div>
+    <div id="loan-hist-results" style="max-height:450px;overflow-y:auto"></div>
+    <div class="br">
+      <button class="btn btn-s" onclick="closeModal('loanHistModal')">關閉</button>
+    </div>
   </div>
 </div>
 
@@ -767,7 +796,10 @@ function calcInv(inv){
   const pnlPct=tCost>0&&pnl!==null?pnl/tCost*100:null;
   const divTot=(db.dividends||[]).filter(d=>d.code===inv.code).reduce((s,d)=>s+d.amount,0);
   const moDivAmt=tLots>0&&inv.divPerShare?(tLots*1000*inv.divPerShare/12):0;
-  return{tLots,tCost,avgCost,curPrice,mktVal,pnl,pnlPct,realized,divTot,moDivAmt,activeLots:active};
+  // 含息損益 = 未實現損益 + 累積股息
+  const pnlWithDiv = pnl !== null ? pnl + divTot : (divTot > 0 ? divTot : null);
+  const pnlPctWithDiv = tCost > 0 && pnlWithDiv !== null ? pnlWithDiv / tCost * 100 : null;
+  return{tLots,tCost,avgCost,curPrice,mktVal,pnl,pnlPct,pnlWithDiv,pnlPctWithDiv,realized,divTot,moDivAmt,activeLots:active};
 }
 
 function calcLoanRemain(l){
@@ -805,24 +837,28 @@ function renderInv(){
   const openIds=[];tbody.querySelectorAll('.hist-row.open').forEach(r=>openIds.push(r.dataset.id));
   tbody.innerHTML='';
   let tC=0,tM=0,tD=0,tR=0;
-  const calcs=db.investments.map(inv=>({inv,c:calcInv(inv)}));
+  // Sort by user-defined order
+  const sortedInvs=[...db.investments].sort((a,b)=>(a.order||999)-(b.order||999));
+  const calcs=sortedInvs.map(inv=>({inv,c:calcInv(inv)}));
   calcs.forEach(({c})=>{tC+=c.tCost;if(c.mktVal)tM+=c.mktVal;tD+=c.moDivAmt;tR+=c.realized;});
 
   calcs.forEach(({inv,c})=>{
     const prC=c.curPrice==null?'':db.prices[inv.code]?.change>=0?'gain':'loss';
-    const pnC=c.pnl==null?'':c.pnl>=0?'gain':'loss';
+    const displayPnl = showDivRoi ? c.pnlWithDiv : c.pnl;
+    const displayPnlPct = showDivRoi ? c.pnlPctWithDiv : c.pnlPct;
+    const pnC=displayPnl==null?'':displayPnl>=0?'gain':'loss';
     const pct=tC>0?(c.tCost/tC*100).toFixed(1)+'%':'—';
     const ho=openIds.includes(inv.id);
     const tr=document.createElement('tr');
     tr.innerHTML=`
-      <td class="left bold" style="color:var(--accent)">${inv.code}${inv.name?`<br><small style="color:var(--muted);font-weight:400">${inv.name}</small>`:''}${inv.note?`<br><small style="color:var(--teal)">${inv.note}</small>`:''}</td>
+      <td class="left bold" style="color:var(--accent)">${inv.code}${inv.name?`<br><small style="color:var(--muted);font-weight:400">${inv.name}</small>`:''}${inv.note?`<br><small style="color:${inv.note==='現股'?'var(--gain)':inv.note==='質押中'?'#1a5fa8':'var(--teal)'}">${inv.note}</small>`:''}</td>
       <td class="mono bold" style="color:var(--accent)">${c.tLots} 張</td>
       <td class="mono">$${fmtF(c.avgCost)}</td>
       <td class="mono">${fmt(c.tCost)}</td>
       <td class="mono ${prC}">${c.curPrice!=null?'$'+c.curPrice.toFixed(2):'<span style="color:var(--muted)">—</span>'}</td>
       <td class="mono">${c.mktVal!=null?fmt(c.mktVal):'<span style="color:var(--muted)">—</span>'}</td>
-      <td class="mono ${pnC}">${c.pnl!=null?(c.pnl>=0?'+':'-')+fmt(c.pnl):'<span style="color:var(--muted)">—</span>'}</td>
-      <td class="mono ${pnC}">${c.pnlPct!=null?(c.pnlPct>=0?'+':'-')+Math.abs(c.pnlPct).toFixed(2)+'%':'<span style="color:var(--muted)">—</span>'}</td>
+      <td class="mono ${pnC}">${displayPnl!=null?(displayPnl>=0?'+':'-')+fmt(displayPnl):'<span style="color:var(--muted)">—</span>'}</td>
+      <td class="mono ${pnC}">${displayPnlPct!=null?(displayPnlPct>=0?'+':'-')+Math.abs(displayPnlPct).toFixed(2)+'%':'<span style="color:var(--muted)">—</span>'}</td>
       <td class="mono ${c.realized>0?'gain':c.realized<0?'loss':''}">${c.realized!==0?(c.realized>0?'+':'-')+fmt(c.realized):'—'}</td>
       <td class="mono gain bold">${c.moDivAmt>0?fmt(c.moDivAmt):'—'}</td>
       <td class="mono">${pct}</td>`;
@@ -834,6 +870,8 @@ function renderInv(){
       <button class="act-btn sell-btn" onclick="openSellModal('${inv.id}')">▼ 賣出</button>
       <button class="act-btn div-btn" onclick="openDivFor('${inv.code}')">💰 領息</button>
       <button class="act-btn hist-btn" onclick="toggleHist('${inv.id}')" id="hb-${inv.id}">📋 記錄${ho?'▲':'▼'}</button>
+      <button class="act-btn" style="color:var(--muted)" onclick="moveInv('${inv.id}',-1)" title="上移">↑</button>
+      <button class="act-btn" style="color:var(--muted)" onclick="moveInv('${inv.id}',1)" title="下移">↓</button>
       <button class="act-btn" onclick="openInvModal('${inv.id}')">✏️ 編輯</button>
       <button class="act-btn del" onclick="delInv('${inv.id}')">🗑 刪除</button>
     </div></td>`;
@@ -918,7 +956,7 @@ function renderLoans(){
       <td style="font-size:11px">${balSt}</td>
       <td class="mono" style="${afterSt}">${afterBal}</td>
       <td class="mono" style="${dueC}">${l.due||'—'}</td>
-      <td><button class="act-btn" onclick="editLoan('${l.id}')">編輯</button> <button class="act-btn del" onclick="delLoan('${l.id}')">刪</button></td>
+      <td><button class="act-btn" onclick="editLoan('${l.id}')">編輯</button> <button class="act-btn" style="color:var(--gain);border-color:#aad4bc" onclick="clearLoan('${l.id}')">結清</button> <button class="act-btn del" onclick="delLoan('${l.id}')">刪</button></td>
     </tr>`;
   });
   document.getElementById('l-amt').textContent='$'+(tA).toLocaleString();
@@ -931,10 +969,13 @@ function renderFlex(){
   let tR=0,tM=0;
   db.flexLoans.forEach(f=>{
     tR+=f.remain||0;tM+=f.monthly||0;
+    const fUsed=f.used||f.remain||0;
+    const fLimit=f.limit||fUsed;
+    const fAvail=fLimit-fUsed;
     tbody.innerHTML+=`<tr>
-      <td class="left bold">${f.name}</td>
+      <td class="left bold">${f.name}${f.limit?`<br><small style="color:var(--muted)">額度$${fLimit.toLocaleString()}</small>`:''}</td>
       <td class="mono">${(f.rate||0).toFixed(2)}%</td>
-      <td class="mono teal-bg">$${(f.remain||0).toLocaleString()}</td>
+      <td class="mono"><span style="color:var(--loss)">使用$${fUsed.toLocaleString()}</span><br><small style="color:var(--gain)">剩$${fAvail.toLocaleString()}</small></td>
       <td class="mono" style="color:var(--loss)">$${(f.monthly||0).toLocaleString()}</td>
       <td>${f.note||''}</td>
       <td><button class="act-btn" onclick="editFlex('${f.id}')">編輯</button> <button class="act-btn del" onclick="delFlex('${f.id}')">刪</button></td>
@@ -1026,16 +1067,22 @@ function renderSum(){
   const cT=db.cashAccounts.reduce((s,c)=>s+(c.cash||0)+(c.d1||0)+(c.d2||0),0);
   const tot=tM+cT,pnl=tM-tC,roi=tC>0?pnl/tC*100:0;
   const roiInc=tC>0?(pnl+tDivTot)/tC*100:0;
-  const dR=tot>0?lR/tot*100:0,net=tot-lR,fl=tD-mO;
+  const dR=tot>0?lR/tot*100:0;
+  // 含息時淨資產也加入累積股息
+  const net=(tot-lR)+(showDivRoi?tDivTot:0);
+  const fl=tD-mO;
+  // 含息時顯示的損益
+  const displayPnlSum = showDivRoi ? pnl+tDivTot : pnl;
+  const displayRoi = showDivRoi ? roiInc : roi;
   const rows=[
     {l:'資金總額',v:'$'+Math.round(tot).toLocaleString(),c:''},
     {l:'股票市值',v:'$'+Math.round(tM).toLocaleString(),c:'teal-bg'},
-    {l:'股票損益',v:(pnl>=0?'+':'-')+fmt(pnl),c:pnl>=0?'gain':'loss'},
+    {l:'股票損益',v:(displayPnlSum>=0?'+':'-')+fmt(displayPnlSum),c:displayPnlSum>=0?'gain':'loss'},
     {l:`報酬率 <label style="font-size:10px;cursor:pointer"><input type="checkbox" id="roi-chk" ${showDivRoi?'checked':''} onchange="showDivRoi=this.checked;renderSum();renderInv()"> 含息</label>`,
-     v:(showDivRoi?roiInc:roi)>=0?'+'+(showDivRoi?roiInc:roi).toFixed(2)+'%':(showDivRoi?roiInc:roi).toFixed(2)+'%',
-     c:(showDivRoi?roiInc:roi)>=0?'gain':'loss'},
+     v:displayRoi>=0?'+'+displayRoi.toFixed(2)+'%':displayRoi.toFixed(2)+'%',
+     c:displayRoi>=0?'gain':'loss'},
     {l:'負債比',v:dR.toFixed(2)+'%',c:''},
-    {l:'淨資產',v:'$'+Math.round(net).toLocaleString(),c:'bold'},
+    {l:'淨資產'+(showDivRoi?' (含息)':''),v:'$'+Math.round(net).toLocaleString(),c:'bold'},
     {l:'每月股息',v:fmt(tD),c:'gain bold'},
     {l:'每月支出',v:fmt(mO),c:'loss'},
     {l:'每月淨現金流',v:(fl>=0?'+':'-')+fmt(fl),c:fl>=0?'gain bold':'loss bold'},
@@ -1083,15 +1130,22 @@ function saveInv(){
     if(db.investments.find(i=>i.code===code))return toast(code+' 已存在');
     const noteSel2=document.getElementById('i-note-sel').value;
     const noteVal2=noteSel2==='__custom__'?document.getElementById('i-note').value.trim():noteSel2===''?'':noteSel2;
+    const maxOrder=db.investments.reduce((m,x)=>Math.max(m,x.order||0),0);
     db.investments.push({id:uid(),code,name:document.getElementById('i-name').value.trim(),lots,avgPrice:avg,
-      divPerShare:parseFloat(document.getElementById('i-div').value)||0,note:noteVal2,transactions:[]});
+      divPerShare:parseFloat(document.getElementById('i-div').value)||0,note:noteVal2,transactions:[],order:maxOrder+1});
   }
   save();closeModal('invModal');render();toast(editId?'已更新':'已新增 '+code);
   fetchPrice(code).then(p=>{if(p){db.prices[code]=p;localStorage.setItem(STORE,JSON.stringify(db));renderInv();}});
 }
 function delInv(id){
-  if(!confirm('確定刪除？'))return;
-  db.investments=db.investments.filter(i=>i.id!==id);save();render();toast('已刪除');
+  if(!doubleConfirm('確定要刪除這支股票及所有交易記錄？此操作無法復原！'))return;
+  const inv=db.investments.find(i=>i.id===id);
+  if(inv&&(inv.transactions||[]).length>0){
+    // Archive transactions so they can be searched later
+    if(!db.archivedTxns)db.archivedTxns=[];
+    inv.transactions.forEach(t=>db.archivedTxns.push({...t,code:inv.code,name:inv.name||'',archivedDate:new Date().toISOString().split('T')[0]}));
+  }
+  db.investments=db.investments.filter(i=>i.id!==id);save();render();toast('已刪除（交易記錄已存檔，可用🔍查詢）');
 }
 
 // BUY
@@ -1257,18 +1311,32 @@ function saveLoan(){
   else db.loans.push(obj);
   save();closeModal('loanModal');render();toast('已儲存');
 }
-function delLoan(id){if(!confirm('確定刪除？'))return;db.loans=db.loans.filter(x=>x.id!==id);save();render();toast('已刪除');}
+function clearLoan(id){
+  const l=db.loans.find(x=>x.id===id);
+  if(!l)return;
+  if(!confirm(`確定將「${l.bank}」標記為結清？\n將移至歷史記錄，不再顯示在信貸列表。`))return;
+  if(!db.clearedLoans)db.clearedLoans=[];
+  db.clearedLoans.push({...l,clearedDate:new Date().toISOString().split('T')[0]});
+  db.loans=db.loans.filter(x=>x.id!==id);
+  save();render();toast('✅ 已標記結清，可在「結清記錄」查詢');
+}
+
+function delLoan(id){if(!doubleConfirm('確定要刪除這筆信貸？'))return;db.loans=db.loans.filter(x=>x.id!==id);save();render();toast('已刪除');}
 
 // FLEX
 function calcFlex(){
   const rate=parseFloat(document.getElementById('f-rate').value)||0;
-  const remain=parseFloat(document.getElementById('f-rem').value)||0;
+  const limit=parseFloat(document.getElementById('f-limit')?.value)||0;
+  const used=parseFloat(document.getElementById('f-rem').value)||0;
+  const avail=limit-used;
+  const availEl=document.getElementById('f-avail');
+  if(availEl&&limit>0) availEl.value=Math.round(avail);
   const p=document.getElementById('flex-prev');
-  if(rate>0&&remain>0){
-    const mo=remain*(rate/100)/12;
+  if(rate>0&&used>0){
+    const mo=used*(rate/100)/12;
     document.getElementById('f-mo').value=Math.round(mo);
     p.style.display='block';
-    p.textContent=`$${remain.toLocaleString()} × ${rate}% ÷ 12 = 每月利息 $${Math.round(mo).toLocaleString()}`;
+    p.textContent=`使用 $${used.toLocaleString()} × ${rate}% ÷ 12 = 每月利息 $${Math.round(mo).toLocaleString()} | 剩餘額度 $${Math.round(avail).toLocaleString()}`;
   }else p.style.display='none';
 }
 function openFlexModal(id=null){
@@ -1276,7 +1344,8 @@ function openFlexModal(id=null){
   document.getElementById('flexMT').textContent=id?'編輯不限用途':'新增不限用途額度';
   document.getElementById('f-name').value=f?.name||'';
   document.getElementById('f-rate').value=f?.rate||'';
-  document.getElementById('f-rem').value=f?.remain||'';
+  if(document.getElementById('f-limit'))document.getElementById('f-limit').value=f?.limit||'';
+  document.getElementById('f-rem').value=f?.used||f?.remain||'';
   document.getElementById('f-mo').value=f?.monthly||'';
   document.getElementById('f-note').value=f?.note||'';
   document.getElementById('flex-prev').style.display='none';
@@ -1285,9 +1354,13 @@ function openFlexModal(id=null){
 function editFlex(id){openFlexModal(id);}
 function saveFlex(){
   const name=document.getElementById('f-name').value.trim();if(!name)return toast('請輸入機構');
+  const fLimit=parseFloat(document.getElementById('f-limit')?.value)||0;
+  const fUsed=parseFloat(document.getElementById('f-rem').value)||0;
   const obj={id:editId||uid(),name,
     rate:parseFloat(document.getElementById('f-rate').value)||0,
-    remain:parseFloat(document.getElementById('f-rem').value)||0,
+    limit:fLimit,
+    used:fUsed,
+    remain:fLimit-fUsed, // 剩餘額度
     monthly:parseFloat(document.getElementById('f-mo').value)||0,
     note:document.getElementById('f-note').value.trim()};
   if(editId){const i=db.flexLoans.findIndex(x=>x.id===editId);db.flexLoans[i]=obj;}
@@ -1374,7 +1447,7 @@ function saveDiv(){
   save();closeModal('divModal');renderDivs();toast(`領息 $${Math.round(lots*1000*ps).toLocaleString()} 已記錄`);
 }
 function delDiv(id){
-  if(!confirm('確定刪除？'))return;
+  if(!doubleConfirm('確定要刪除此筆領息記錄？'))return;
   db.dividends=db.dividends.filter(d=>d.id!==id);save();renderDivs();toast('已刪除');
 }
 
@@ -1431,7 +1504,7 @@ function confirmQ(){
     if(!item.ok){skipped++;return;}
     if(item.type==='div'){db.dividends.push({id:uid(),code:item.code,date:today,lots:item.lots,perShare:item.perShare,amount:item.amount});added++;return;}
     let inv=db.investments.find(i=>i.code===item.code);
-    if(!inv){inv={id:uid(),code:item.code,name:'',lots:0,avgPrice:0,divPerShare:0,note:'',transactions:[]};db.investments.push(inv);}
+    if(!inv){inv={id:uid(),code:item.code,name:'',lots:0,avgPrice:item.price||0,divPerShare:0,note:'',transactions:[]};db.investments.push(inv);}
     if(item.type==='buy'){
       inv.transactions.push({id:uid(),type:'buy',lots:item.lots,price:item.price,date:item.date,fee:item.fee||0});
       inv.transactions.sort((a,b)=>a.date.localeCompare(b.date));added++;
@@ -1448,6 +1521,117 @@ function confirmQ(){
 }
 
 // TOAST
+function moveInv(id,dir){
+  const sorted=[...db.investments].sort((a,b)=>(a.order||999)-(b.order||999));
+  const idx=sorted.findIndex(i=>i.id===id);
+  const newIdx=idx+dir;
+  if(newIdx<0||newIdx>=sorted.length)return;
+  // Swap order values
+  const a=sorted[idx],b=sorted[newIdx];
+  const tmpOrder=a.order||idx+1;
+  a.order=b.order||newIdx+1;
+  b.order=tmpOrder;
+  save();renderInv();
+}
+
+function doubleConfirm(msg){
+  if(!confirm(msg)) return false;
+  return confirm('⚠️ 再次確認：確定要刪除？刪除後無法復原！');
+}
+
+// ═══ SEARCH / HISTORY ═══
+function openSearchModal(){
+  document.getElementById('search-code').value='';
+  runSearch();
+  openModal('searchModal');
+}
+
+function runSearch(){
+  const q=document.getElementById('search-code').value.trim().toUpperCase();
+  const container=document.getElementById('search-results');
+  
+  // Collect ALL transactions from ALL investments (including deleted ones via archived)
+  const allTxns=[];
+  db.investments.forEach(inv=>{
+    (inv.transactions||[]).forEach(t=>{
+      allTxns.push({...t, code:inv.code, name:inv.name||''});
+    });
+  });
+  // Also search archived
+  (db.archivedTxns||[]).forEach(t=>{
+    allTxns.push({...t, archived:true});
+  });
+  
+  const filtered=q ? allTxns.filter(t=>t.code.includes(q)) : allTxns;
+  filtered.sort((a,b)=>b.date.localeCompare(a.date));
+  
+  if(!filtered.length){
+    container.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted)">無符合的交易記錄</div>';
+    return;
+  }
+  
+  // Group by code
+  const byCode={};
+  filtered.forEach(t=>{
+    if(!byCode[t.code])byCode[t.code]={name:t.name,txns:[]};
+    byCode[t.code].txns.push(t);
+  });
+  
+  container.innerHTML=Object.entries(byCode).map(([code,{name,txns}])=>`
+    <div style="margin-bottom:16px">
+      <div style="font-weight:700;color:var(--accent);font-size:13px;padding:6px 0;border-bottom:2px solid var(--accent-lt)">
+        ${code} ${name} <span style="font-size:11px;color:var(--muted)">${txns.length} 筆</span>
+      </div>
+      <table style="width:100%;border-collapse:collapse;font-size:11px;margin-top:4px">
+        <thead><tr style="background:var(--sh)">
+          <th style="padding:4px 8px;text-align:left">類型</th>
+          <th style="padding:4px 8px">日期</th>
+          <th style="padding:4px 8px">張數</th>
+          <th style="padding:4px 8px">價格</th>
+          <th style="padding:4px 8px">金額</th>
+          <th style="padding:4px 8px">手續費</th>
+        </tr></thead>
+        <tbody>
+          ${txns.map(t=>`<tr style="border-bottom:1px solid var(--border)${t.archived?' background:#fffbe6':''}">
+            <td style="padding:4px 8px;font-weight:700;color:${t.type==='buy'?'var(--gain)':'var(--loss)'}">
+              ${t.type==='buy'?'▲ 買入':'▼ 賣出'}${t.archived?' (已刪)':''}
+            </td>
+            <td style="padding:4px 8px;font-family:monospace">${t.date}</td>
+            <td style="padding:4px 8px;font-family:monospace">${t.lots} 張</td>
+            <td style="padding:4px 8px;font-family:monospace">$${t.price.toFixed(2)}</td>
+            <td style="padding:4px 8px;font-family:monospace">$${Math.round(t.lots*1000*t.price).toLocaleString()}</td>
+            <td style="padding:4px 8px;font-family:monospace">${t.fee?'$'+Math.round(t.fee).toLocaleString():'—'}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+  `).join('');
+}
+
+// ═══ LOAN HISTORY ═══
+function openLoanHist(){
+  const cleared=(db.clearedLoans||[]);
+  const container=document.getElementById('loan-hist-results');
+  if(!cleared.length){
+    container.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted)">尚無已結清的信貸記錄</div>';
+  }else{
+    container.innerHTML=cleared.map(l=>`
+      <div style="background:var(--gain-bg);border:1px solid #aad4bc;border-radius:8px;padding:12px;margin-bottom:10px">
+        <div style="font-weight:700;font-size:13px">${l.bank} <span style="font-size:11px;color:var(--gain)">✅ 已結清</span></div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;display:grid;grid-template-columns:1fr 1fr;gap:4px">
+          <span>借款：$${(l.amount||0).toLocaleString()}</span>
+          <span>利率：${(l.rate||0).toFixed(2)}%</span>
+          <span>起始：${l.start||'—'}</span>
+          <span>結清：${l.clearedDate||l.due||'—'}</span>
+          <span>每月還款：$${(l.monthly||0).toLocaleString()}</span>
+          <span>結清日期：${l.clearedDate||'—'}</span>
+        </div>
+      </div>
+    `).join('');
+  }
+  openModal('loanHistModal');
+}
+
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
 
 function toggleNoteInput(sel){
