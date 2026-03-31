@@ -602,13 +602,20 @@ async function loadPrices(){
   if(Date.now()-_pmTime<240000)return;
   // 從同一個 GitHub repo 的 prices.json 讀取（由 GitHub Actions 每日更新，無 CORS 問題）
   try{
-    const r=await fetchWithTimeout('./prices.json?t='+Date.now(),8000);
+    // Try both relative and absolute URL
+  const baseUrl=window.location.href.replace(/dashboard\.html.*$/,'');
+  const pricesUrl=baseUrl+'prices.json?t='+Date.now();
+  console.log('Fetching:',pricesUrl);
+  const r=await fetchWithTimeout(pricesUrl,8000);
     if(r.ok){
       const d=await r.json();
       if(d.prices){
         Object.assign(_pm, d.prices);
         _lastPriceDate=d.updated||'';
         console.log('prices.json loaded:',Object.keys(_pm).length,'stocks, updated:',_lastPriceDate);
+        // Sample first few codes for debug
+        const sample=Object.keys(_pm).slice(0,5);
+        console.log('Sample codes:',sample);
         _pmTime=Date.now();
         return;
       }
@@ -628,12 +635,26 @@ async function refreshPrices(){
   document.getElementById('pstat').innerHTML='<span class="spin"></span> 更新中...';
   _pmTime=0;
   await loadPrices();
-  await Promise.all([...new Set(db.investments.map(i=>i.code))].map(async c=>{
-    const p=await fetchPrice(c);if(p)db.prices[c]=p;
+  
+  const totalLoaded=Object.keys(_pm).length;
+  const codes=[...new Set(db.investments.map(i=>i.code))];
+  const found=[], notFound=[];
+  
+  await Promise.all(codes.map(async c=>{
+    const p=await fetchPrice(c);
+    if(p){db.prices[c]=p;found.push(c+':$'+p.price);}
+    else notFound.push(c);
   }));
+  
   localStorage.setItem(STORE,JSON.stringify(db));render();
   const n=new Date();
-  document.getElementById('pstat').innerHTML=`<span class="dot"></span>${n.toLocaleTimeString('zh-TW')} 更新${_lastPriceDate?' (收盤'+_lastPriceDate.slice(0,10)+')':''}`;
+  
+  // Show debug info
+  let msg=`prices.json: ${totalLoaded}支股票`;
+  if(found.length) msg+=` | 找到: ${found.join(', ')}`;
+  if(notFound.length) msg+=` | 找不到: ${notFound.join(', ')}`;
+  
+  document.getElementById('pstat').innerHTML=`<span class="dot"></span>${n.toLocaleTimeString('zh-TW')} ${msg}`;
 }
 
 // ═══════ TICKER ═══════
