@@ -416,6 +416,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
       <div class="fg"><label class="fl">手續費（2.8折自動算）</label><input class="fi" id="b-fee" type="number" step="1" placeholder="自動" style="background:#f0f9f4;border-color:#aad4bc"></div>
     </div>
     <div class="preview-box" id="buy-prev" style="background:var(--gain-bg);border-color:#aad4bc;color:var(--gain)"></div>
+    <div class="fg"><label class="fl">買入備註（選填，記錄買入原因）</label><input class="fi" id="b-remark" placeholder="例：看好升息循環結束，布局債券ETF"></div>
     <div class="br"><button class="btn btn-s" onclick="closeModal('buyModal')">取消</button><button class="btn btn-p" onclick="saveBuy()">確認買入</button></div>
   </div>
 </div>
@@ -856,7 +857,7 @@ function renderInv(){
           <td class="mono">$${t.price.toFixed(2)}</td>
           <td class="mono">${fmt(t.lots*1000*t.price)}</td>
           <td class="mono">${t.fee?'$'+Math.round(t.fee).toLocaleString():'—'}</td>
-          <td style="font-size:10px">${isB?`<span class="ltag" style="background:#e8f5ee;border-color:#aad4bc;color:var(--gain)">批次${t.id.slice(-4)}</span>`:refs||'FIFO'}</td>
+          <td style="font-size:10px">${isB?`<span class="ltag" style="background:#e8f5ee;border-color:#aad4bc;color:var(--gain)">批次${t.id.slice(-4)}</span>${t.remark?`<br><span style="color:var(--muted);font-size:9px">📝${t.remark}</span>`:''}`:refs||'FIFO'}</td>
           <td><button class="act-btn del" onclick="delTxn('${inv.id}','${t.id}')">刪</button></td>
         </tr>`;
       }).join('');
@@ -912,26 +913,44 @@ function renderLoans(){
       const acc=db.cashAccounts.find(c=>c.bank===l.deductBank);
       if(acc){
         const accBal=(acc.cash||0)+(acc.d1||0)+(acc.d2||0);
-        // 計算未來30天內，所有扣款帳戶為此銀行的信貸扣款總額
+        // 累積模擬：按扣款日順序逐筆扣，計算到這筆扣完後的餘額
         const today=new Date();
         const in30=new Date(today.getTime()+30*86400000);
-        let totalDeduct30=0;
+        // 收集未來30天內同帳戶所有扣款，按日期排序
+        const upcoming=[];
         db.loans.forEach(loan=>{
           if(loan.deductBank!==l.deductBank||!loan.deductDay)return;
           const d=parseInt(loan.deductDay)||0;if(!d)return;
-          // 找未來30天內的扣款日
           for(let mo=0;mo<=1;mo++){
             const dt=new Date(today.getFullYear(),today.getMonth()+mo,d);
-            if(dt>=today&&dt<=in30) totalDeduct30+=(loan.monthly||0);
+            if(dt>today&&dt<=in30){
+              upcoming.push({loanId:loan.id,date:dt,monthly:loan.monthly||0});
+            }
           }
         });
-        const after=accBal-totalDeduct30;
-        afterBal=(after>=0?'$':'-$')+Math.abs(Math.round(after)).toLocaleString();
-        afterSt=after>=0?'color:var(--gain);font-weight:700':'color:var(--loss);font-weight:700';
-        const near5=dDays!==null&&dDays<=5;
-        balSt=after>=0
-          ?`<span style="color:var(--gain);font-weight:700">${near5?'✅ 足夠':`餘$${Math.round(accBal).toLocaleString()}`}<br><small style="color:var(--muted)">30天扣$${Math.round(totalDeduct30).toLocaleString()}</small></span>`
-          :`<span style="color:var(--loss);font-weight:700">⚠️ 不足<br><small style="color:var(--loss)">缺$${Math.round(-after).toLocaleString()}</small></span>`;
+        upcoming.sort((a,b)=>a.date-b.date);
+        // 逐筆模擬扣款
+        let runBal=accBal;
+        let cumShortfall=0;
+        let thisLoanAfter=accBal; // 這筆信貸扣完後的餘額
+        let thisLoanShort=0;
+        upcoming.forEach(item=>{
+          const before=runBal;
+          runBal-=item.monthly;
+          if(runBal<0){
+            cumShortfall+=Math.abs(runBal);
+            runBal=0;
+          }
+          if(item.loanId===l.id){
+            thisLoanAfter=runBal;
+            thisLoanShort=before<item.monthly?item.monthly-before:0;
+          }
+        });
+        afterBal=(thisLoanAfter>=0?'$':'-$')+Math.abs(Math.round(thisLoanAfter)).toLocaleString();
+        afterSt=thisLoanAfter>=0?'color:var(--gain);font-weight:700':'color:var(--loss);font-weight:700';
+        balSt=thisLoanShort<=0
+          ?`<span style="color:var(--gain);font-weight:700">✅ 足夠<br><small style="color:var(--muted)">餘$${Math.round(accBal).toLocaleString()}</small></span>`
+          :`<span style="color:var(--loss);font-weight:700">⚠️ 不足<br><small style="color:var(--loss)">缺$${Math.round(thisLoanShort).toLocaleString()}</small></span>`;
       }
     }
     tbody.innerHTML+=`<tr style="${urgent?'background:rgba(192,57,43,0.04)':''}">
@@ -1162,7 +1181,7 @@ function calcBuy(){
 function openBuyModal(invId){
   buyInvId=invId;const inv=db.investments.find(i=>i.id===invId);
   document.getElementById('buyMT').textContent=`買入 · ${inv.code} ${inv.name||''}`;
-  ['b-lots','b-price','b-fee'].forEach(id=>document.getElementById(id).value='');
+  ['b-lots','b-price','b-fee','b-remark'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('buy-prev').style.display='none';
   document.getElementById('b-date').value=new Date().toISOString().split('T')[0];
   openModal('buyModal');setTimeout(()=>document.getElementById('b-lots').focus(),100);
@@ -1177,7 +1196,8 @@ function saveBuy(){
   const feeIn=document.getElementById('b-fee').value;
   const fee=feeIn!==''?parseFloat(feeIn):Math.max(1,Math.round(lots*1000*price*0.001425*0.28));
   const inv=db.investments.find(i=>i.id===buyInvId);
-  inv.transactions.push({id:uid(),type:'buy',lots,price,date,fee});
+  const remark=document.getElementById('b-remark')?.value.trim()||'';
+  inv.transactions.push({id:uid(),type:'buy',lots,price,date,fee,remark});
   inv.transactions.sort((a,b)=>a.date.localeCompare(b.date));
   save();closeModal('buyModal');render();toast(`買入 ${lots} 張已記錄`);
 }
@@ -1610,19 +1630,50 @@ function runSearch(){
     byCode[t.code].txns.push(t);
   });
   
-  // Calculate realized P&L per code
+  // Calculate realized P&L per code (正確算法：賣出淨收入 - 買入成本含手續費)
   const realizedByCode={};
+  // Also compute per-sell breakdown for detail view
+  const sellBreakdown={};
   Object.entries(byCode).forEach(([code,{txns}])=>{
     const invTxns=[...txns].sort((a,b)=>a.date.localeCompare(b.date));
     const lots=[];let realized=0;
     invTxns.forEach(t=>{
-      if(t.type==='buy') lots.push({price:t.price,remaining:t.lots,fee:t.fee||0,original:t.lots});
-      else{
-        let rev=t.lots*1000*t.price-(t.fee||0),cost=0,s=t.lots;
+      if(t.type==='buy'){
+        lots.push({txnId:t.id,date:t.date,price:t.price,remaining:t.lots,fee:t.fee||0,original:t.lots,remark:t.remark||''});
+      } else {
+        // 賣出淨收入 = 張數×1000×賣價 - 所有費用(手續費+交易稅已含在fee)
+        const sellRev=t.lots*1000*t.price-(t.fee||0);
+        let cost=0,costLots=[];
         const refs=t.lotRefs;
-        if(refs&&refs.length){refs.forEach(r=>{const l=lots.find(x=>x.txnId===r.txnId);if(l){cost+=r.lots*1000*l.price;l.remaining=Math.max(0,l.remaining-r.lots);}});}
-        else{for(const l of lots){if(s<=0)break;const tk=Math.min(l.remaining,s);cost+=tk*1000*l.price;l.remaining-=tk;s-=tk;}}
-        realized+=rev-cost;
+        if(refs&&refs.length){
+          refs.forEach(r=>{
+            const l=lots.find(x=>x.txnId===r.txnId);
+            if(l){
+              const lotFeeShare=l.original>0?l.fee*(r.lots/l.original):0;
+              cost+=r.lots*1000*l.price+lotFeeShare;
+              costLots.push({date:l.date,lots:r.lots,buyPrice:l.price,remark:l.remark});
+              l.remaining=Math.max(0,l.remaining-r.lots);
+            }
+          });
+        } else {
+          let s=t.lots;
+          for(const l of lots){
+            if(s<=0)break;
+            const tk=Math.min(l.remaining,s);
+            const lotFeeShare=l.original>0?l.fee*(tk/l.original):0;
+            cost+=tk*1000*l.price+lotFeeShare;
+            costLots.push({date:l.date,lots:tk,buyPrice:l.price,remark:l.remark});
+            l.remaining-=tk;s-=tk;
+          }
+        }
+        const pnl=sellRev-cost;
+        const roi=cost>0?pnl/cost*100:0;
+        realized+=pnl;
+        if(!sellBreakdown[code])sellBreakdown[code]=[];
+        sellBreakdown[code].push({
+          sellDate:t.date,sellPrice:t.price,sellLots:t.lots,
+          sellRev,cost,pnl,roi,costLots,fee:t.fee||0,txnId:t.id
+        });
       }
     });
     realizedByCode[code]=realized;
@@ -1645,17 +1696,60 @@ function runSearch(){
           <th style="padding:4px 8px"></th>
         </tr></thead>
         <tbody>
-          ${txns.map(t=>`<tr style="border-bottom:1px solid var(--border)${t.archived?' background:#fffbe6':''}">
-            <td style="padding:4px 8px;font-weight:700;color:${t.type==='buy'?'var(--gain)':'var(--loss)'}">
-              ${t.type==='buy'?'▲ 買入':'▼ 賣出'}${t.archived?' (已刪)':''}
-            </td>
-            <td style="padding:4px 8px;font-family:monospace">${t.date}</td>
-            <td style="padding:4px 8px;font-family:monospace">${t.lots} 張</td>
-            <td style="padding:4px 8px;font-family:monospace">$${t.price.toFixed(2)}</td>
-            <td style="padding:4px 8px;font-family:monospace">$${Math.round(t.lots*1000*t.price).toLocaleString()}</td>
-            <td style="padding:4px 8px;font-family:monospace">${t.fee?'$'+Math.round(t.fee).toLocaleString():'—'}</td>
-            <td style="padding:4px 8px">${!t.archived?`<button onclick="delTxnFromSearch('${t.code||code}','${t.id}')" style="background:none;border:1px solid var(--loss);color:var(--loss);border-radius:4px;padding:2px 6px;font-size:10px;cursor:pointer">刪</button>`:''}</td>
-          </tr>`).join('')}
+          ${txns.map(t=>{
+            const isB=t.type==='buy';
+            const breakdown=!isB&&sellBreakdown[code]?sellBreakdown[code].find(b=>b.txnId===t.id):null;
+            const pnlColor=breakdown?(breakdown.pnl>=0?'var(--gain)':'var(--loss)'):'';
+            const bdHTML=breakdown?`
+              <tr style="background:#f8f4ff;border-bottom:1px solid #e0d4f8">
+                <td colspan="7" style="padding:6px 12px">
+                  <div style="font-size:11px;color:#7c3aed;font-weight:700;margin-bottom:4px">📊 這筆賣出的組成明細</div>
+                  <table style="width:100%;border-collapse:collapse;font-size:10px">
+                    <thead><tr style="background:#ede9fe">
+                      <th style="padding:3px 6px;text-align:left">買入日</th>
+                      <th style="padding:3px 6px">張數</th>
+                      <th style="padding:3px 6px">買入價</th>
+                      <th style="padding:3px 6px">賣出價</th>
+                      <th style="padding:3px 6px">單筆損益</th>
+                      <th style="padding:3px 6px">報酬率</th>
+                      <th style="padding:3px 6px;text-align:left">買入備註</th>
+                    </tr></thead>
+                    <tbody>
+                    ${breakdown.costLots.map(cl=>{
+                      const clCost=cl.lots*1000*cl.buyPrice;
+                      const clRev=cl.lots*1000*breakdown.sellPrice;
+                      const clPnl=clRev-clCost;
+                      const clRoi=clCost>0?clPnl/clCost*100:0;
+                      return `<tr style="border-bottom:1px solid #e0d4f8">
+                        <td style="padding:3px 6px;font-family:monospace">${cl.date}</td>
+                        <td style="padding:3px 6px;font-family:monospace">${cl.lots}張</td>
+                        <td style="padding:3px 6px;font-family:monospace">$${cl.buyPrice.toFixed(2)}</td>
+                        <td style="padding:3px 6px;font-family:monospace">$${breakdown.sellPrice.toFixed(2)}</td>
+                        <td style="padding:3px 6px;font-family:monospace;font-weight:700;color:${clPnl>=0?'var(--gain)':'var(--loss)'}">${clPnl>=0?'+':'-'}$${Math.abs(Math.round(clPnl)).toLocaleString()}</td>
+                        <td style="padding:3px 6px;font-family:monospace;color:${clRoi>=0?'var(--gain)':'var(--loss)'}">${clRoi>=0?'+':''}${clRoi.toFixed(2)}%</td>
+                        <td style="padding:3px 6px;color:var(--muted)">${cl.remark||'—'}</td>
+                      </tr>`;
+                    }).join('')}
+                    </tbody>
+                  </table>
+                  <div style="margin-top:4px;font-size:11px;font-weight:700;color:${breakdown.pnl>=0?'var(--gain)':'var(--loss)'}">
+                    合計損益：${breakdown.pnl>=0?'+':'-'}$${Math.abs(Math.round(breakdown.pnl)).toLocaleString()} (${breakdown.roi>=0?'+':''}${breakdown.roi.toFixed(2)}%)
+                  </div>
+                </td>
+              </tr>`:''
+            ;
+            return `<tr style="border-bottom:1px solid var(--border)${t.archived?' background:#fffbe6':''}">
+              <td style="padding:4px 8px;font-weight:700;color:${isB?'var(--gain)':'var(--loss)'}">
+                ${isB?'▲ 買入':'▼ 賣出'}${t.archived?' (已刪)':''}
+              </td>
+              <td style="padding:4px 8px;font-family:monospace">${t.date}</td>
+              <td style="padding:4px 8px;font-family:monospace">${t.lots} 張</td>
+              <td style="padding:4px 8px;font-family:monospace">$${t.price.toFixed(2)}</td>
+              <td style="padding:4px 8px;font-family:monospace">$${Math.round(t.lots*1000*t.price).toLocaleString()}</td>
+              <td style="padding:4px 8px;font-family:monospace">${t.fee?'$'+Math.round(t.fee).toLocaleString():'—'}${!isB&&breakdown?`<br><span style="color:${pnlColor};font-size:10px;font-weight:700">${breakdown.pnl>=0?'+':'-'}$${Math.abs(Math.round(breakdown.pnl)).toLocaleString()} (${breakdown.roi>=0?'+':''}${breakdown.roi.toFixed(2)}%)</span>`:''}${isB&&t.remark?`<br><span style="color:var(--muted);font-size:10px">📝${t.remark}</span>`:''}</td>
+              <td style="padding:4px 8px">${!t.archived?`<button onclick="delTxnFromSearch('${t.code||code}','${t.id}')" style="background:none;border:1px solid var(--loss);color:var(--loss);border-radius:4px;padding:2px 6px;font-size:10px;cursor:pointer">刪</button>`:''}</td>
+            </tr>${bdHTML}`;
+          }).join('')}
         </tbody>
       </table>
     </div>
