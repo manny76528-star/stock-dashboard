@@ -134,16 +134,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 .qi-e{color:var(--loss);font-size:11px;flex:1;}
 .qconfirm{width:100%;padding:10px;background:var(--gain);color:#fff;border:none;font-size:12px;font-family:'Noto Sans TC',sans-serif;font-weight:700;cursor:pointer;margin-top:8px;border-radius:7px;}
 
-/* TICKER */
-.ticker{max-width:1200px;margin:0 auto 10px;background:linear-gradient(135deg,#0f2544,#1a3a6b);border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(26,95,168,.3);}
-.ticker-hdr{padding:10px 16px;font-size:12px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:space-between;}
-.ticker-body{display:none;padding:12px 16px;gap:10px;flex-wrap:wrap;}
-.ticker-body.open{display:flex;}
-.tick-card{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:10px 16px;min-width:130px;flex:1;}
-.tick-lbl{font-size:10px;color:rgba(255,255,255,.5);margin-bottom:4px;}
-.tick-price{font-size:18px;font-weight:700;font-family:'JetBrains Mono',monospace;color:#fff;}
-.tick-chg{font-size:11px;font-family:'JetBrains Mono',monospace;margin-top:3px;}
-.tpulse{width:8px;height:8px;border-radius:50%;background:#00e5a0;box-shadow:0 0 8px #00e5a0;animation:pulse 2s infinite;display:inline-block;margin-right:6px;}
+
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 
 /* DIVIDEND */
@@ -218,23 +209,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
   </div>
 </div>
 
-<!-- TICKER -->
-<div class="ticker">
-  <div class="ticker-hdr" onclick="toggleTicker()">
-    <div style="display:flex;align-items:center"><span class="tpulse"></span>📊 市場行情 <span id="tick-time" style="font-size:10px;opacity:.5;font-weight:400;margin-left:6px;font-family:monospace"></span></div>
-    <div style="display:flex;gap:8px;align-items:center">
-      <button onclick="event.stopPropagation();refreshTicker()" style="background:rgba(0,229,160,.2);border:1px solid rgba(0,229,160,.5);color:#00e5a0;border-radius:6px;padding:4px 12px;font-size:11px;cursor:pointer;font-weight:600">↻ 更新</button>
-      <span id="tick-hint" style="font-size:11px;opacity:.6">▼ 展開</span>
-    </div>
-  </div>
-  <div class="ticker-body" id="ticker-body">
-    <div class="tick-card"><div class="tick-lbl">🇺🇸 USD/TWD</div><div class="tick-price" id="t-twd">—</div><div class="tick-chg" id="tc-twd" style="color:rgba(255,255,255,.4)">—</div></div>
-    <div class="tick-card"><div class="tick-lbl">🇯🇵 USD/JPY</div><div class="tick-price" id="t-jpy">—</div><div class="tick-chg" id="tc-jpy" style="color:rgba(255,255,255,.4)">—</div></div>
-    <div class="tick-card"><div class="tick-lbl">💵 DXY</div><div class="tick-price" id="t-dxy">—</div><div class="tick-chg" id="tc-dxy" style="color:rgba(255,255,255,.4)">—</div></div>
-    <div class="tick-card"><div class="tick-lbl">📈 美2年債</div><div class="tick-price" id="t-us2y">—</div><div class="tick-chg" id="tc-us2y" style="color:rgba(255,255,255,.4)">—</div></div>
-    <div class="tick-card"><div class="tick-lbl">📈 美10年債</div><div class="tick-price" id="t-us10y">—</div><div class="tick-chg" id="tc-us10y" style="color:rgba(255,255,255,.4)">—</div></div>
-  </div>
-</div>
+
 
 <!-- TREND CHART -->
 <div class="trend-section">
@@ -721,52 +696,8 @@ async function refreshPrices(){
 }
 
 // ═══════ TICKER ═══════
-let _tc={};let _fxd=null;let _tkLoaded=false;
 
-async function refreshTicker(){
-  document.getElementById('tick-time').textContent=' ⟳';
-  // FX
-  try{
-    const r=await fetchWithTimeout('https://open.er-api.com/v6/latest/USD',8000);
-    if(r.ok){_fxd=await r.json();}
-  }catch(e){console.log('FX err:',e.message);}
-  if(_fxd?.rates){
-    setTick('twd',_fxd.rates.TWD,3,false);
-    setTick('jpy',_fxd.rates.JPY,2,false);
-  }
-  // Stooq
-  // 美債利率 + DXY：用 stooq，嘗試多種格式
-  const stooqItems=[
-    {id:'us2y', syms:['irx.us','^irx','irx'], digits:3, isRate:true},
-    {id:'us10y', syms:['tnx.us','^tnx','tnx'], digits:3, isRate:true},
-    {id:'dxy',   syms:['dxy.us','^dxy','dxy'], digits:2, isRate:false},
-  ];
-  for(const item of stooqItems){
-    let done=false;
-    for(const sym of item.syms){
-      if(done)break;
-      try{
-        const r=await fetchWithTimeout(`https://stooq.com/q/d/l/?s=${encodeURIComponent(sym)}&i=d`,8000);
-        if(!r.ok)continue;
-        const txt=await r.text();
-        if(!txt||txt.includes('No data')||txt.includes('Brak'))continue;
-        const lines=txt.trim().split('\n').filter(l=>l.length>5&&!l.startsWith('Date'));
-        if(lines.length<1)continue;
-        const last=lines[lines.length-1].split(',');
-        const prev2=lines.length>1?lines[lines.length-2].split(','):last;
-        const price=parseFloat(last[4]),prevP=parseFloat(prev2[4]);
-        if(!isNaN(price)&&price>0){
-          setTick(item.id,price,item.digits,item.isRate,price-prevP,prevP);
-          console.log(`Stooq ${item.id} OK via ${sym}:`,price);
-          done=true;
-        }
-      }catch(e){console.log('Stooq err:',item.id,sym,e.message);}
-    }
-    if(!done)console.log('Stooq failed:',item.id);
-  }
-  _tkLoaded=true;
-  document.getElementById('tick-time').textContent=` ${new Date().toLocaleTimeString('zh-TW')}`;
-}
+
 
 function setTick(id,price,digits,isRate,chg=0,prev=price){
   _tc[id]={price,chg,prev};
@@ -781,13 +712,6 @@ function setTick(id,price,digits,isRate,chg=0,prev=price){
   }
 }
 
-function toggleTicker(){
-  const b=document.getElementById('ticker-body');
-  const h=document.getElementById('tick-hint');
-  const open=b.classList.toggle('open');
-  h.textContent=open?'▲ 收起':'▼ 展開';
-  if(open&&!_tkLoaded)refreshTicker();
-}
 
 // ═══════ CALC ═══════
 function buildLots(inv){
@@ -800,8 +724,11 @@ function buildLots(inv){
       else{let s=t.lots;for(const l of lots){if(s<=0)break;const tk=Math.min(l.remaining,s);l.remaining-=tk;s-=tk;}}
     }
   });
-  // If no transactions but has initial lots, synthesize a virtual lot so it can be sold
-  if(lots.length===0 && (inv.lots||0)>0){
+  // If no buy transactions but has initial lots, create virtual buy lot
+  // But only if there are no sell transactions either (otherwise all sold)
+  const hasSell=(inv.transactions||[]).some(t=>t.type==='sell');
+  const hasBuy=(inv.transactions||[]).some(t=>t.type==='buy');
+  if(lots.length===0 && !hasBuy && !hasSell && (inv.lots||0)>0){
     lots.push({txnId:'init-'+inv.id,date:inv.initDate||'2020-01-01',price:inv.avgPrice||0,original:inv.lots,remaining:inv.lots,fee:0,isInit:true});
   }
   return lots;
@@ -882,8 +809,8 @@ function renderInv(){
   calcs.forEach(({c})=>{tC+=c.tCost;if(c.mktVal)tM+=c.mktVal;tD+=c.moDivAmt;tR+=c.realized;});
 
   calcs.forEach(({inv,c})=>{
-    // Skip completely sold-out stocks (has transactions, lots = 0)
-    if(c.tLots===0 && (inv.transactions||[]).length>0) return;
+    // Skip completely sold-out stocks OR empty stocks with no lots
+    if(c.tLots===0) return;
     const prC=c.curPrice==null?'':db.prices[inv.code]?.change>=0?'gain':'loss';
     const displayPnl = showDivRoi ? c.pnlWithDiv : c.pnl;
     const displayPnlPct = showDivRoi ? c.pnlPctWithDiv : c.pnlPct;
@@ -1131,8 +1058,8 @@ function toggleDivYear(){
 }
 
 function renderSum(){
-  let tC=0,tM=0,tD=0,tDivTot=0;
-  db.investments.forEach(inv=>{const c=calcInv(inv);tC+=c.tCost;if(c.mktVal)tM+=c.mktVal;tD+=c.moDivAmt;tDivTot+=c.divTot;});
+  let tC=0,tM=0,tD=0,tDivTot=0,tR=0;
+  db.investments.forEach(inv=>{const c=calcInv(inv);tC+=c.tCost;if(c.mktVal)tM+=c.mktVal;tD+=c.moDivAmt;tDivTot+=c.divTot;tR+=c.realized;});
   const lR=db.loans.reduce((s,l)=>s+calcLoanRemain(l),0)+db.flexLoans.reduce((s,f)=>s+(f.remain||0),0);
   const mO=db.loans.reduce((s,l)=>s+(l.monthly||0),0)+db.flexLoans.reduce((s,f)=>s+(f.monthly||0),0);
   const cT=db.cashAccounts.reduce((s,c)=>s+(c.cash||0)+(c.d1||0)+(c.d2||0),0);
@@ -1630,6 +1557,22 @@ function doubleConfirm(msg){
 }
 
 // ═══ SEARCH / HISTORY ═══
+function delTxnFromSearch(code, txnId){
+  if(!doubleConfirm('確定要刪除這筆交易記錄？'))return;
+  const inv=db.investments.find(i=>i.code===code);
+  if(inv){
+    inv.transactions=inv.transactions.filter(t=>t.id!==txnId);
+    save();render();
+  }
+  // Also check archived
+  if(db.archivedTxns){
+    db.archivedTxns=db.archivedTxns.filter(t=>!(t.code===code&&t.id===txnId));
+    save();
+  }
+  runSearch();
+  toast('已刪除');
+}
+
 function openSearchModal(){
   document.getElementById('search-code').value='';
   runSearch();
@@ -1699,6 +1642,7 @@ function runSearch(){
           <th style="padding:4px 8px">價格</th>
           <th style="padding:4px 8px">金額</th>
           <th style="padding:4px 8px">手續費</th>
+          <th style="padding:4px 8px"></th>
         </tr></thead>
         <tbody>
           ${txns.map(t=>`<tr style="border-bottom:1px solid var(--border)${t.archived?' background:#fffbe6':''}">
@@ -1710,6 +1654,7 @@ function runSearch(){
             <td style="padding:4px 8px;font-family:monospace">$${t.price.toFixed(2)}</td>
             <td style="padding:4px 8px;font-family:monospace">$${Math.round(t.lots*1000*t.price).toLocaleString()}</td>
             <td style="padding:4px 8px;font-family:monospace">${t.fee?'$'+Math.round(t.fee).toLocaleString():'—'}</td>
+            <td style="padding:4px 8px">${!t.archived?`<button onclick="delTxnFromSearch('${t.code||code}','${t.id}')" style="background:none;border:1px solid var(--loss);color:var(--loss);border-radius:4px;padding:2px 6px;font-size:10px;cursor:pointer">刪</button>`:''}</td>
           </tr>`).join('')}
         </tbody>
       </table>
