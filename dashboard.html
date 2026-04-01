@@ -244,7 +244,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
       <thead><tr>
         <th>標的</th><th>持有張數</th><th>均買價</th><th>總成本</th>
         <th>現價</th><th>市值</th><th>未實現損益</th><th>報酬率</th>
-        <th>已實現損益</th><th>月股息<br><small style='font-weight:400;color:var(--muted)'>滑鼠看年息</small></th><th>比率</th>
+        <th>已實現損益</th><th>月配息</th><th>比率</th>
       </tr></thead>
       <tbody id="inv-body"></tbody>
       <tfoot><tr class="row-total">
@@ -259,7 +259,10 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
         <td class="mono bold">100%</td>
       </tr></tfoot>
     </table>
-    <div class="add-bar"><button class="act-btn add" onclick="openInvModal()">＋ 新增股票</button></div>
+    <div class="add-bar">
+      <button class="act-btn add" onclick="openInvModal()">＋ 新增股票</button>
+      <button class="act-btn hist-btn" style="margin-left:8px" onclick="openSearchModal()">🔍 查詢交易記錄</button>
+    </div>
   </div>
 </div>
 
@@ -298,7 +301,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
       <tbody id="flex-body"></tbody>
       <tfoot><tr class="row-total">
         <td colspan="2" style="text-align:right">總結</td>
-        <td class="mono teal-bg" id="f-rem">—</td>
+        <td class="mono" id="f-rem" style="color:var(--loss)">—</td>
         <td class="mono bold" id="f-mo">—</td>
         <td class="mono bold pink-bg">每月總支出：<span id="tot-mo-out">—</span></td>
         <td><button class="act-btn add" onclick="openFlexModal()">＋ 新增</button></td>
@@ -379,7 +382,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
       <div class="fg"><label class="fl">初始持有張數</label><input class="fi" id="i-lots" type="number" step="0.001" min="0" placeholder="例：800"></div>
       <div class="fg"><label class="fl">初始均成本（元/股）</label><input class="fi" id="i-avg" type="number" step="0.01" placeholder="例：10.24"></div>
     </div>
-    <div class="fg"><label class="fl">配息（元/股/年）</label><input class="fi" id="i-div" type="number" step="0.0001" placeholder="例：0.048"></div>
+    <div class="fg"><label class="fl">每股月配息（元/股/月）</label><input class="fi" id="i-div" type="number" step="0.0001" placeholder="月配例：0.048，季配填月均"></div>
     <div class="fg">
       <label class="fl">備註（選填）</label>
       <select class="fi" id="i-note-sel" onchange="toggleNoteInput(this)">
@@ -766,6 +769,10 @@ function buildLots(inv){
       else{let s=t.lots;for(const l of lots){if(s<=0)break;const tk=Math.min(l.remaining,s);l.remaining-=tk;s-=tk;}}
     }
   });
+  // If no transactions but has initial lots, synthesize a virtual lot so it can be sold
+  if(lots.length===0 && (inv.lots||0)>0){
+    lots.push({txnId:'init-'+inv.id,date:inv.initDate||'2020-01-01',price:inv.avgPrice||0,original:inv.lots,remaining:inv.lots,fee:0,isInit:true});
+  }
   return lots;
 }
 
@@ -921,6 +928,15 @@ function toggleHist(id){
 }
 
 function renderLoans(){
+  // Auto-clear expired loans
+  const today=new Date().toISOString().split('T')[0];
+  const expired=db.loans.filter(l=>l.due&&l.due<=today&&calcLoanRemain(l)<=0);
+  if(expired.length){
+    if(!db.clearedLoans)db.clearedLoans=[];
+    expired.forEach(l=>{db.clearedLoans.push({...l,clearedDate:today});});
+    db.loans=db.loans.filter(l=>!(l.due&&l.due<=today&&calcLoanRemain(l)<=0));
+    if(expired.length>0)toast(`✅ ${expired.map(l=>l.bank).join('、')} 已到期，自動移入結清記錄`);
+  }
   const tbody=document.getElementById('loan-body');tbody.innerHTML='';
   let tA=0,tR=0,tM=0;
   db.loans.forEach(l=>{
@@ -956,7 +972,7 @@ function renderLoans(){
       <td style="font-size:11px">${balSt}</td>
       <td class="mono" style="${afterSt}">${afterBal}</td>
       <td class="mono" style="${dueC}">${l.due||'—'}</td>
-      <td><button class="act-btn" onclick="editLoan('${l.id}')">編輯</button> <button class="act-btn" style="color:var(--gain);border-color:#aad4bc" onclick="clearLoan('${l.id}')">結清</button> <button class="act-btn del" onclick="delLoan('${l.id}')">刪</button></td>
+      <td><button class="act-btn" onclick="editLoan('${l.id}')">編輯</button> <button class="act-btn del" onclick="delLoan('${l.id}')">刪</button></td>
     </tr>`;
   });
   document.getElementById('l-amt').textContent='$'+(tA).toLocaleString();
@@ -982,7 +998,7 @@ function renderFlex(){
     </tr>`;
   });
   const lM=db.loans.reduce((s,l)=>s+(l.monthly||0),0);
-  document.getElementById('f-rem').textContent='$'+tR.toLocaleString();
+  document.getElementById('f-rem').textContent='使用$'+tR.toLocaleString();
   document.getElementById('f-mo').textContent='$'+tM.toLocaleString();
   document.getElementById('tot-mo-out').textContent='$'+(lM+tM).toLocaleString();
 }
@@ -1006,6 +1022,14 @@ function renderCash(){
   document.getElementById('c-tot').textContent='$'+tB.toLocaleString();
   document.getElementById('c-arb').className=`mono bold ${tA>=0?'gain':'loss'}`;
   document.getElementById('c-arb').textContent=(tA>=0?'$':'-$')+Math.abs(tA).toLocaleString();
+}
+
+
+const DIV_COLORS=['#e74c3c','#3498db','#2ecc71','#f39c12','#9b59b6','#1abc9c','#e67e22','#34495e','#e91e63','#00bcd4'];
+function getDivColor(code){
+  const codes=[...new Set((db.dividends||[]).map(d=>d.code))].sort();
+  const idx=codes.indexOf(code);
+  return DIV_COLORS[idx%DIV_COLORS.length];
 }
 
 function renderDivs(){
@@ -1190,9 +1214,13 @@ function openSellModal(invId){
   document.getElementById('s-date').value=new Date().toISOString().split('T')[0];
   document.getElementById('s-price').value='';
   document.getElementById('sell-sum').style.display='none';
-  const active=buildLots(inv).filter(l=>l.remaining>0);
+  let active=buildLots(inv).filter(l=>l.remaining>0);
+  // If no transactions but stock has lots set directly, create a virtual lot
+  if(!active.length && (inv.lots||0)>0 && !(inv.transactions||[]).length){
+    active=[{txnId:'virtual-'+inv.id, date:inv.addedDate||'2020-01-01', price:inv.avgPrice||0, original:inv.lots, remaining:inv.lots, fee:0, isVirtual:true}];
+  }
   const pk=document.getElementById('lot-picker');
-  if(!active.length){pk.innerHTML='<div style="padding:14px;text-align:center;color:var(--muted)">無可賣批次</div>';openModal('sellModal');return;}
+  if(!active.length){pk.innerHTML='<div style="padding:14px;text-align:center;color:var(--muted)">無可賣批次<br><small style="color:var(--muted)">請先在投資標的輸入張數</small></div>';openModal('sellModal');return;}
   pk.innerHTML=active.map(lot=>`
     <div class="lot-item">
       <input type="checkbox" id="lot-${lot.txnId}" data-txn="${lot.txnId}" data-max="${lot.remaining}" data-price="${lot.price}">
@@ -1238,20 +1266,26 @@ function saveSell(){
   if(!date)return toast('請選擇日期');if(!price||price<=0)return toast('請輸入賣出價格');
   const checked=document.querySelectorAll('#lot-picker input[type=checkbox]:checked');
   if(!checked.length)return toast('請勾選批次');
-  const lotRefs=[];let tLots=0;let ok=true;
+  const lotRefs=[];let tLots=0;let ok=true;let hasVirtual=false;
   checked.forEach(cb=>{
     const q=parseFloat(document.getElementById('qty-'+cb.dataset.txn).value);
     const mx=parseFloat(cb.dataset.max);
     if(!q||q<=0){toast('請填寫張數');ok=false;return;}
     if(q>mx){toast(`批次最多可賣 ${mx} 張`);ok=false;return;}
     const dateText=document.getElementById('lot-'+cb.dataset.txn).closest('.lot-item').querySelector('.li-date').textContent.split('·')[0].trim();
-    lotRefs.push({txnId:cb.dataset.txn,lots:q,date:dateText});tLots+=q;
+    if(cb.dataset.txn.startsWith('virtual-'))hasVirtual=true;
+    lotRefs.push({txnId:cb.dataset.txn,lots:q,date:dateText,isVirtual:cb.dataset.txn.startsWith('virtual-')});tLots+=q;
   });
   if(!ok)return;
   const fee=Math.max(1,Math.round(tLots*1000*price*0.001425*0.28));
   const tax=Math.round(tLots*1000*price*0.003);
   const inv=db.investments.find(i=>i.id===sellInvId);
-  inv.transactions.push({id:uid(),type:'sell',lots:tLots,price,date,fee:fee+tax,lotRefs});
+  if(hasVirtual){
+    // Selling from virtual (no-transaction) lot: subtract from inv.lots
+    inv.lots=Math.max(0,(inv.lots||0)-tLots);
+    if(!inv.transactions)inv.transactions=[];
+  }
+  inv.transactions.push({id:uid(),type:'sell',lots:tLots,price,date,fee:fee+tax,lotRefs:lotRefs.filter(r=>!r.isVirtual)});
   inv.transactions.sort((a,b)=>a.date.localeCompare(b.date));
   save();closeModal('sellModal');render();toast(`賣出 ${tLots} 張已記錄`);
 }
@@ -1325,19 +1359,26 @@ function delLoan(id){if(!doubleConfirm('確定要刪除這筆信貸？'))return;
 
 // FLEX
 function calcFlex(){
-  const rate=parseFloat(document.getElementById('f-rate').value)||0;
-  const limit=parseFloat(document.getElementById('f-limit')?.value)||0;
-  const used=parseFloat(document.getElementById('f-rem').value)||0;
-  const avail=limit-used;
+  const rateEl=document.getElementById('f-rate');
+  const limitEl=document.getElementById('f-limit');
+  const usedEl=document.getElementById('f-rem');
   const availEl=document.getElementById('f-avail');
-  if(availEl&&limit>0) availEl.value=Math.round(avail);
-  const p=document.getElementById('flex-prev');
+  const moEl=document.getElementById('f-mo');
+  const prevEl=document.getElementById('flex-prev');
+  if(!rateEl||!usedEl)return;
+  const rate=parseFloat(rateEl.value)||0;
+  const limit=parseFloat(limitEl?.value)||0;
+  const used=parseFloat(usedEl.value)||0;
+  const avail=limit>0?limit-used:0;
+  if(availEl) availEl.value=limit>0?Math.round(avail):'';
   if(rate>0&&used>0){
-    const mo=used*(rate/100)/12;
-    document.getElementById('f-mo').value=Math.round(mo);
-    p.style.display='block';
-    p.textContent=`使用 $${used.toLocaleString()} × ${rate}% ÷ 12 = 每月利息 $${Math.round(mo).toLocaleString()} | 剩餘額度 $${Math.round(avail).toLocaleString()}`;
-  }else p.style.display='none';
+    const mo=Math.round(used*(rate/100)/12);
+    if(moEl) moEl.value=mo;
+    if(prevEl){
+      prevEl.style.display='block';
+      prevEl.textContent=`使用$${used.toLocaleString()} × ${rate}% ÷ 12 = 每月利息 $${mo.toLocaleString()}${limit>0?' | 剩餘額度 $'+Math.round(avail).toLocaleString():''}`;
+    }
+  }else if(prevEl) prevEl.style.display='none';
 }
 function openFlexModal(id=null){
   editId=id;const f=id?db.flexLoans.find(x=>x.id===id):null;
@@ -1577,10 +1618,29 @@ function runSearch(){
     byCode[t.code].txns.push(t);
   });
   
+  // Calculate realized P&L per code
+  const realizedByCode={};
+  Object.entries(byCode).forEach(([code,{txns}])=>{
+    const invTxns=[...txns].sort((a,b)=>a.date.localeCompare(b.date));
+    const lots=[];let realized=0;
+    invTxns.forEach(t=>{
+      if(t.type==='buy') lots.push({price:t.price,remaining:t.lots,fee:t.fee||0,original:t.lots});
+      else{
+        let rev=t.lots*1000*t.price-(t.fee||0),cost=0,s=t.lots;
+        const refs=t.lotRefs;
+        if(refs&&refs.length){refs.forEach(r=>{const l=lots.find(x=>x.txnId===r.txnId);if(l){cost+=r.lots*1000*l.price;l.remaining=Math.max(0,l.remaining-r.lots);}});}
+        else{for(const l of lots){if(s<=0)break;const tk=Math.min(l.remaining,s);cost+=tk*1000*l.price;l.remaining-=tk;s-=tk;}}
+        realized+=rev-cost;
+      }
+    });
+    realizedByCode[code]=realized;
+  });
+
   container.innerHTML=Object.entries(byCode).map(([code,{name,txns}])=>`
     <div style="margin-bottom:16px">
-      <div style="font-weight:700;color:var(--accent);font-size:13px;padding:6px 0;border-bottom:2px solid var(--accent-lt)">
-        ${code} ${name} <span style="font-size:11px;color:var(--muted)">${txns.length} 筆</span>
+      <div style="font-weight:700;color:var(--accent);font-size:13px;padding:6px 0;border-bottom:2px solid var(--accent-lt);display:flex;justify-content:space-between;align-items:center">
+        <span>${code} ${name} <span style="font-size:11px;color:var(--muted)">${txns.length} 筆</span></span>
+        ${realizedByCode[code]!==0?`<span style="font-size:12px;font-weight:700;color:${realizedByCode[code]>=0?'var(--gain)':'var(--loss)'}">已實現損益：${realizedByCode[code]>=0?'+':'-'}$${Math.abs(Math.round(realizedByCode[code])).toLocaleString()}</span>`:''}
       </div>
       <table style="width:100%;border-collapse:collapse;font-size:11px;margin-top:4px">
         <thead><tr style="background:var(--sh)">
@@ -1639,6 +1699,7 @@ function toggleNoteInput(sel){
   if(sel.value==='__custom__'){inp.style.display='block';inp.focus();}
   else{inp.style.display='none';inp.value=sel.value==='—'?'':sel.value;}
 }
+
 
 // INIT
 undoStack=[JSON.stringify(db)];
