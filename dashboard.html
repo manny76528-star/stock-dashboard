@@ -183,6 +183,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
   <button class="tbtn" style="background:#0d8a4e" onclick="exportData()">📤 備份</button>
   <label class="tbtn" style="background:#6b7e96;cursor:pointer">📥 還原<input type="file" accept=".json" style="display:none" onchange="importData(event)"></label>
   <button class="tbtn" style="background:#8b5cf6" onclick="undoLast()" id="undoBtn" disabled>↩ 復原</button>
+  <button class="tbtn" style="background:#6366f1" onclick="redoLast()" id="redoBtn" disabled>↪ 重做</button>
 </div>
 
 
@@ -315,6 +316,11 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
   <div class="sec-lbl green">股息記錄</div>
   <div class="sec-content">
     <div class="div-cards" id="div-cards"><span style="color:var(--muted);font-size:11px">尚無領息記錄</span></div>
+    <!-- 準備入帳（除息但未發放）-->
+    <div id="div-pending-bar" style="display:none;padding:8px 12px;background:#ebf4ff;border-bottom:1px solid #bee3f8;font-size:13px;font-weight:700">
+      ⏳ 準備入帳：<span style="color:#3498db;font-family:'JetBrains Mono',monospace;font-size:15px" id="d-pending">$0</span>
+      <span style="font-size:11px;font-weight:400;color:#5a9fd4;margin-left:8px" id="d-pending-detail"></span>
+    </div>
     <div class="div-yr-bar">
       <div style="font-size:13px;font-weight:700">
         📅 今年：<span class="gain mono" id="d-yr" style="font-size:16px">$0</span>
@@ -518,9 +524,19 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 <div class="mo" id="searchModal">
   <div class="modal" style="max-width:700px">
     <div class="mt">🔍 交易記錄查詢</div>
-    <div style="display:flex;gap:8px;margin-bottom:12px">
+    <div style="display:flex;gap:8px;margin-bottom:8px">
       <input class="fi" id="search-code" placeholder="輸入股票代號，例：00985B（留空顯示全部）" style="flex:1" oninput="runSearch()">
       <button class="btn btn-p" onclick="runSearch()" style="flex:0;padding:8px 16px">查詢</button>
+    </div>
+    <div style="display:flex;gap:12px;margin-bottom:12px;font-size:12px">
+      <label style="display:flex;align-items:center;gap:5px;cursor:pointer">
+        <input type="checkbox" id="sf-buy" checked onchange="runSearch()" style="accent-color:var(--gain);width:14px;height:14px">
+        <span style="color:var(--gain);font-weight:600">▲ 買入</span>
+      </label>
+      <label style="display:flex;align-items:center;gap:5px;cursor:pointer">
+        <input type="checkbox" id="sf-sell" checked onchange="runSearch()" style="accent-color:var(--loss);width:14px;height:14px">
+        <span style="color:var(--loss);font-weight:600">▼ 賣出</span>
+      </label>
     </div>
     <div id="search-results" style="max-height:450px;overflow-y:auto"></div>
     <div class="br"><button class="btn btn-s" onclick="closeModal('searchModal')">關閉</button></div>
@@ -558,12 +574,15 @@ let db=JSON.parse(localStorage.getItem(STORE)||'null')||{investments:[],loans:[]
 
 let editId=null, sellInvId=null, buyInvId=null;
 let undoStack=[];
+let redoStack=[];
 
 function save(){
+  redoStack=[]; // 新操作後清空 redo
   undoStack.push(JSON.stringify(db));
-  if(undoStack.length>10)undoStack.shift();
+  if(undoStack.length>15)undoStack.shift();
   localStorage.setItem(STORE,JSON.stringify(db));
   document.getElementById('undoBtn').disabled=undoStack.length<=1;
+  document.getElementById('redoBtn').disabled=true;
   checkBkWarn();
 }
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
@@ -571,11 +590,23 @@ function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2
 // ═══════ UNDO ═══════
 function undoLast(){
   if(undoStack.length<=1)return toast('沒有可復原的動作');
-  undoStack.pop();
+  redoStack.push(undoStack.pop()); // 移到 redo
   db=JSON.parse(undoStack[undoStack.length-1]);
   localStorage.setItem(STORE,JSON.stringify(db));
   render();toast('↩ 已復原');
   document.getElementById('undoBtn').disabled=undoStack.length<=1;
+  document.getElementById('redoBtn').disabled=redoStack.length===0;
+}
+
+function redoLast(){
+  if(redoStack.length===0)return toast('沒有可重做的動作');
+  const state=redoStack.pop();
+  undoStack.push(state);
+  db=JSON.parse(state);
+  localStorage.setItem(STORE,JSON.stringify(db));
+  render();toast('↪ 已重做');
+  document.getElementById('undoBtn').disabled=undoStack.length<=1;
+  document.getElementById('redoBtn').disabled=redoStack.length===0;
 }
 
 // ═══════ BACKUP ═══════
@@ -660,10 +691,13 @@ async function refreshPrices(){
   await loadPrices();
   
   const totalLoaded=Object.keys(_pm).length;
-  const codes=[...new Set(db.investments.map(i=>i.code))];
+  // Only fetch prices for stocks with remaining inventory
+  const activeCodes=[...new Set(db.investments
+    .filter(inv=>calcInv(inv).tLots>0)
+    .map(i=>i.code))];
   const found=[], notFound=[];
   
-  await Promise.all(codes.map(async c=>{
+  await Promise.all(activeCodes.map(async c=>{
     const p=await fetchPrice(c);
     if(p){db.prices[c]=p;found.push(c+':$'+p.price);}
     else notFound.push(c);
@@ -1014,13 +1048,28 @@ function getDivColor(code){
 
 function renderDivs(){
   const yr=new Date().getFullYear().toString();
-  const yrDivs=db.dividends.filter(d=>d.date.startsWith(yr));
-  const histDivs=db.dividends.filter(d=>!d.date.startsWith(yr));
+  const today=new Date().toISOString().split('T')[0];
+  // pending: 除息日已到但發放日未到
+  const pendingDivs=db.dividends.filter(d=>d.pending||(d.exDate&&d.exDate<=today&&d.date&&d.date>today));
+  const paidDivs=db.dividends.filter(d=>!d.pending&&(!d.exDate||(d.date&&d.date<=today)));
+  const yrDivs=paidDivs.filter(d=>d.date&&d.date.startsWith(yr));
+  const histDivs=paidDivs.filter(d=>!d.date||!d.date.startsWith(yr));
+  // Pending bar
+  const pendingTotal=pendingDivs.reduce((s,d)=>s+d.amount,0);
+  const pendingBar=document.getElementById('div-pending-bar');
+  if(pendingBar){
+    pendingBar.style.display=pendingTotal>0?'block':'none';
+    const pel=document.getElementById('d-pending');
+    if(pel)pel.textContent='$'+Math.round(pendingTotal).toLocaleString();
+    const pdet=document.getElementById('d-pending-detail');
+    if(pdet)pdet.textContent=pendingDivs.map(d=>`${d.code} 發放日${d.date}`).join(' · ');
+  }
   const showHist=document.getElementById('div-hist-chk')?.checked||false;
 
   // Cards
   const byCode={};
-  yrDivs.forEach(d=>{if(!byCode[d.code])byCode[d.code]={tot:0,cnt:0};byCode[d.code].tot+=d.amount;byCode[d.code].cnt++;});
+  yrDivs.forEach(d=>{if(!byCode[d.code])byCode[d.code]={tot:0,cnt:0,pending:0};byCode[d.code].tot+=d.amount;byCode[d.code].cnt++;});
+  pendingDivs.forEach(d=>{if(!byCode[d.code])byCode[d.code]={tot:0,cnt:0,pending:0};byCode[d.code].pending=(byCode[d.code].pending||0)+d.amount;});
   const cards=document.getElementById('div-cards');
   cards.innerHTML=Object.keys(byCode).length===0?'<span style="color:var(--muted);font-size:11px">今年尚無領息記錄</span>':
     Object.entries(byCode).map(([code,d])=>`<div class="div-card" onclick="openDivFor('${code}')">
@@ -1448,38 +1497,70 @@ function delCash(id){if(!doubleConfirm('確定要刪除此帳戶？'))return;db.
 
 // DIV
 function showDivDetail(code){
-  const divs=(db.dividends||[]).filter(d=>d.code===code).sort((a,b)=>b.date.localeCompare(a.date));
+  const today=new Date().toISOString().split('T')[0];
+  const divs=(db.dividends||[]).filter(d=>d.code===code).sort((a,b)=>{
+    const da=d=>d.exDate||d.date||'';
+    const db2=d=>d.exDate||d.date||'';
+    return da(b).localeCompare(da(a));
+  });
   const inv=db.investments.find(i=>i.code===code);
-  const total=divs.reduce((s,d)=>s+d.amount,0);
+  const paidDivs=divs.filter(d=>!d.pending&&(!d.date||d.date<=today));
+  const pendingDivs=divs.filter(d=>d.pending||(d.exDate&&d.date&&d.date>today));
+  const total=paidDivs.reduce((s,d)=>s+d.amount,0);
+  const pendingTotal=pendingDivs.reduce((s,d)=>s+d.amount,0);
   const dc=getDivColor(code);
-  const html=`
-    <div style="font-weight:700;font-size:14px;color:var(--accent);margin-bottom:10px;padding-bottom:8px;border-bottom:3px solid ${dc}">
-      ${code} ${inv?.name||''} — 股息明細
-    </div>
-    <div style="font-size:13px;margin-bottom:10px">累積領息：<strong style="color:var(--gain);font-size:16px">$${Math.round(total).toLocaleString()}</strong></div>
-    <table style="width:100%;border-collapse:collapse;font-size:12px">
-      <thead><tr style="background:var(--sh)">
-        <th style="padding:6px 10px;text-align:left">領息日期</th>
-        <th style="padding:6px 10px">張數</th>
-        <th style="padding:6px 10px">每月每股</th>
-        <th style="padding:6px 10px">本次金額</th>
-        <th style="padding:6px 10px">操作</th>
-      </tr></thead>
-      <tbody>
-        ${divs.map(d=>`<tr style="border-bottom:1px solid var(--border);border-left:4px solid ${dc}">
-          <td style="padding:6px 10px;font-family:monospace">${d.date}</td>
-          <td style="padding:6px 10px;font-family:monospace">${d.lots} 張</td>
-          <td style="padding:6px 10px;font-family:monospace">$${d.perShare.toFixed(4)}</td>
-          <td style="padding:6px 10px;font-family:monospace;color:var(--gain);font-weight:700">$${Math.round(d.amount).toLocaleString()}</td>
-          <td style="padding:6px 10px"><button onclick="if(doubleConfirm('確定刪除？')){delDiv('${d.id}');showDivDetail('${code}')}" style="background:none;border:1px solid var(--loss);color:var(--loss);border-radius:4px;padding:2px 6px;font-size:10px;cursor:pointer">刪</button></td>
-        </tr>`).join('')}
-      </tbody>
-    </table>
-    <div style="margin-top:12px;text-align:right">
-      <button onclick="openDivFor('${code}');closeModal('divDetailModal')" style="background:var(--gain);color:#fff;border:none;border-radius:6px;padding:8px 16px;cursor:pointer;font-size:12px;font-weight:600">＋ 新增領息</button>
-    </div>`;
+
+  function buildRows(list,isPending){
+    if(!list.length)return '<tr><td colspan="6" style="padding:10px;text-align:center;color:var(--muted)">無記錄</td></tr>';
+    return list.map(d=>{
+      const color=isPending?'#3498db':dc;
+      const amtColor=isPending?'#3498db':'var(--gain)';
+      const delFn='delDiv_detail("'+d.id+'","'+code+'")';
+      return '<tr style="border-bottom:1px solid var(--border);border-left:5px solid '+color+'">'
+        +'<td style="padding:5px 8px;font-family:monospace;font-size:11px">'+(d.exDate||'—')+'</td>'
+        +'<td style="padding:5px 8px;font-family:monospace;font-size:11px">'+d.date+'</td>'
+        +'<td style="padding:5px 8px;font-family:monospace">'+d.lots+'張</td>'
+        +'<td style="padding:5px 8px;font-family:monospace">$'+d.perShare.toFixed(4)+'</td>'
+        +'<td style="padding:5px 8px;font-family:monospace;font-weight:700;color:'+amtColor+'">$'+Math.round(d.amount).toLocaleString()+'</td>'
+        +'<td style="padding:5px 8px"><button onclick="'+delFn+'" style="background:none;border:1px solid var(--loss);color:var(--loss);border-radius:4px;padding:2px 6px;font-size:10px;cursor:pointer">刪</button></td>'
+        +'</tr>';
+    }).join('');
+  }
+
+  const theadHtml='<thead><tr style="background:var(--sh)">'
+    +'<th style="padding:5px 8px;text-align:left">除息日</th>'
+    +'<th style="padding:5px 8px;text-align:left">發放日</th>'
+    +'<th style="padding:5px 8px">張數</th>'
+    +'<th style="padding:5px 8px">每股</th>'
+    +'<th style="padding:5px 8px">金額</th>'
+    +'<th style="padding:5px 8px"></th>'
+    +'</tr></thead>';
+
+  let html='<div style="font-weight:700;font-size:14px;color:var(--accent);margin-bottom:10px;padding-bottom:8px;border-bottom:3px solid '+dc+'">'
+    +code+' '+(inv?.name||'')+' — 股息明細</div>';
+
+  if(pendingDivs.length){
+    html+='<div style="font-size:12px;font-weight:700;color:#3498db;margin-bottom:6px">⏳ 準備入帳 $'+Math.round(pendingTotal).toLocaleString()+'</div>'
+      +'<table style="width:100%;border-collapse:collapse;font-size:11px;margin-bottom:12px">'+theadHtml
+      +'<tbody>'+buildRows(pendingDivs,true)+'</tbody></table>';
+  }
+
+  html+='<div style="font-size:12px;font-weight:700;color:var(--gain);margin-bottom:6px">✅ 已領息 $'+Math.round(total).toLocaleString()+'</div>'
+    +'<table style="width:100%;border-collapse:collapse;font-size:11px">'+theadHtml
+    +'<tbody>'+buildRows(paidDivs,false)+'</tbody></table>'
+    +'<div style="margin-top:12px;text-align:right">'
+    +'<button onclick="openDivFor(\''+code+'\');closeModal(\'divDetailModal\')" '
+    +'style="background:var(--gain);color:#fff;border:none;border-radius:6px;padding:8px 16px;cursor:pointer;font-size:12px;font-weight:600">＋ 新增領息</button>'
+    +'</div>';
+
   document.getElementById('div-detail-body').innerHTML=html;
   openModal('divDetailModal');
+}
+
+function delDiv_detail(divId, code){
+  if(!doubleConfirm('確定刪除？'))return;
+  delDiv(divId);
+  showDivDetail(code);
 }
 
 function openDivModal(preCode=null){
@@ -1500,6 +1581,7 @@ function openDivModal(preCode=null){
   };
   if(preCode){sel.value=preCode;sel.dispatchEvent(new Event('change'));}
   document.getElementById('d-date').value=new Date().toISOString().split('T')[0];
+  const exEl=document.getElementById('d-exdate');if(exEl)exEl.value='';
   if(!preCode){document.getElementById('d-lots').value='';document.getElementById('d-ps').value='';}
   document.getElementById('div-prev').style.display='none';
   openModal('divModal');if(preCode)setTimeout(updateDivPrev,150);
@@ -1519,7 +1601,10 @@ function saveDiv(){
   const ps=parseFloat(document.getElementById('d-ps').value);
   if(!code)return toast('請選擇股票');if(!date)return toast('請選擇日期');
   if(!lots||lots<=0)return toast('請輸入張數');if(!ps||ps<=0)return toast('請輸入每股配息');
-  db.dividends.push({id:uid(),code,date,lots,perShare:ps,amount:lots*1000*ps});
+  const exDate=document.getElementById('d-exdate')?.value||'';
+  const today=new Date().toISOString().split('T')[0];
+  const isPending=exDate&&date&&date>today; // 發放日在未來 = 準備入帳
+  db.dividends.push({id:uid(),code,exDate,date,lots,perShare:ps,amount:lots*1000*ps,pending:isPending});
   save();closeModal('divModal');renderDivs();toast(`領息 $${Math.round(lots*1000*ps).toLocaleString()} 已記錄`);
 }
 function delDiv(id){
@@ -1591,7 +1676,10 @@ function runSearch(){
     allTxns.push({...t, archived:true});
   });
   
-  const filtered=q ? allTxns.filter(t=>t.code.includes(q)) : allTxns;
+  const showBuy=document.getElementById('sf-buy')?.checked!==false;
+  const showSell=document.getElementById('sf-sell')?.checked!==false;
+  const filtered=(q ? allTxns.filter(t=>t.code.includes(q)) : allTxns)
+    .filter(t=>(t.type==='buy'&&showBuy)||(t.type==='sell'&&showSell)||(t.type!=='buy'&&t.type!=='sell'));
   filtered.sort((a,b)=>b.date.localeCompare(a.date));
   
   if(!filtered.length){
@@ -1847,6 +1935,7 @@ function renderTrendChart(){
       <th style="padding:4px 8px">每月股息</th>
       <th style="padding:4px 8px">每月現金流</th>
       <th style="padding:4px 8px">負債比</th>
+      <th style="padding:4px 8px"></th>
     </tr></thead>
     <tbody>${snaps.slice().reverse().map(s=>`<tr style="border-bottom:1px solid var(--border)">
       <td style="padding:4px 8px;font-weight:600">${s.ym}</td>
@@ -1854,11 +1943,18 @@ function renderTrendChart(){
       <td style="padding:4px 8px;font-family:monospace;color:var(--gain)">$${s.div.toLocaleString()}</td>
       <td style="padding:4px 8px;font-family:monospace;color:${s.cf>=0?'var(--gain)':'var(--loss)'}">${s.cf>=0?'+':''}$${s.cf.toLocaleString()}</td>
       <td style="padding:4px 8px;font-family:monospace">${s.debtRatio}%</td>
+      <td style="padding:4px 8px"><button onclick="deleteSnapshot('${s.ym}')" style="background:none;border:1px solid var(--loss);color:var(--loss);border-radius:4px;padding:2px 6px;font-size:10px;cursor:pointer">刪</button></td>
     </tr>`).join('')}</tbody>
   </table>`;
 }
 
 // ═══ EDIT TITLE ═══
+function deleteSnapshot(ym){
+  if(!doubleConfirm(`確定要刪除 ${ym} 的快照記錄？`))return;
+  db.snapshots=(db.snapshots||[]).filter(s=>s.ym!==ym);
+  save();renderTrendChart();toast(`已刪除 ${ym} 快照`);
+}
+
 function editTitle(){
   const cur=document.getElementById('title-display').textContent.trim();
   const nw=prompt('修改標題：',cur);
@@ -1874,6 +1970,7 @@ function editTitle(){
 // INIT
 undoStack=[JSON.stringify(db)];
 document.getElementById('undoBtn').disabled=true;
+document.getElementById('redoBtn').disabled=true;
 render();checkBkWarn();refreshPrices();
 // Auto snapshot on 1st of each month
 (function autoSnapshot(){
