@@ -511,10 +511,19 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
     <div class="mt">新增領息記錄</div>
     <div class="fg"><label class="fl">股票代號</label><select class="fi" id="d-code"></select></div>
     <div class="fr">
-      <div class="fg"><label class="fl">領息日期</label><input class="fi" id="d-date" type="date"></div>
-      <div class="fg"><label class="fl">張數</label><input class="fi" id="d-lots" type="number" step="0.001" min="0" placeholder="例：800" oninput="updateDivPrev()"></div>
+      <div class="fg">
+        <label class="fl">除息日 <span style="font-size:10px;color:#3498db">（除息但未發放 → 藍色準備入帳）</span></label>
+        <input class="fi" id="d-exdate" type="date">
+      </div>
+      <div class="fg">
+        <label class="fl">發放日 <span style="font-size:10px;color:var(--gain)">（實際入帳 → 計入已領息）</span></label>
+        <input class="fi" id="d-date" type="date">
+      </div>
     </div>
-    <div class="fg"><label class="fl">每股配息（元/年）</label><input class="fi" id="d-ps" type="number" step="0.0001" placeholder="例：0.048" oninput="updateDivPrev()"></div>
+    <div class="fr">
+      <div class="fg"><label class="fl">張數</label><input class="fi" id="d-lots" type="number" step="0.001" min="0" placeholder="例：800" oninput="updateDivPrev()"></div>
+      <div class="fg"><label class="fl">每月每股配息（元）</label><input class="fi" id="d-ps" type="number" step="0.0001" placeholder="例：0.048" oninput="updateDivPrev()"></div>
+    </div>
     <div class="preview-box" id="div-prev" style="background:var(--gain-bg);border-color:#aad4bc;color:var(--gain)"></div>
     <div class="br"><button class="btn btn-s" onclick="closeModal('divModal')">取消</button><button class="btn btn-p" onclick="saveDiv()" style="background:var(--gain)">確認領息</button></div>
   </div>
@@ -1072,11 +1081,16 @@ function renderDivs(){
   pendingDivs.forEach(d=>{if(!byCode[d.code])byCode[d.code]={tot:0,cnt:0,pending:0};byCode[d.code].pending=(byCode[d.code].pending||0)+d.amount;});
   const cards=document.getElementById('div-cards');
   cards.innerHTML=Object.keys(byCode).length===0?'<span style="color:var(--muted);font-size:11px">今年尚無領息記錄</span>':
-    Object.entries(byCode).map(([code,d])=>`<div class="div-card" onclick="openDivFor('${code}')">
-      <div style="font-size:10px;color:var(--muted)">${code} 今年</div>
-      <div style="font-size:17px;font-weight:800;color:var(--gain);font-family:'JetBrains Mono',monospace">$${Math.round(d.tot).toLocaleString()}</div>
-      <div style="font-size:9px;color:var(--muted)">${d.cnt} 筆</div>
-    </div>`).join('')+'<button class="act-btn add" style="height:56px;padding:0 14px" onclick="openDivModal()">＋ 新增</button>';
+    Object.entries(byCode).map(([code,d])=>{
+      const dc=getDivColor(code);
+      const pendingHtml=(d.pending||0)>0?`<div style="font-size:11px;color:#3498db;font-family:'JetBrains Mono',monospace">+$${Math.round(d.pending).toLocaleString()} 待發</div>`:'';
+      return `<div class="div-card" data-code="${code}" style="border-left:6px solid ${dc};cursor:pointer" title="點擊查看明細" onclick="showDivDetail(this.dataset.code)">
+        <div style="font-size:10px;color:var(--muted)">${code} 今年 · 點擊明細</div>
+        <div style="font-size:17px;font-weight:800;color:var(--gain);font-family:'JetBrains Mono',monospace">$${Math.round(d.tot).toLocaleString()}</div>
+        ${pendingHtml}
+        <div style="font-size:9px;color:var(--muted)">${d.cnt} 筆已領</div>
+      </div>`;
+    }).join('')+'<button class="act-btn add" style="height:56px;padding:0 14px" onclick="openDivModal()">＋ 新增</button>';
 
   const yrTot=yrDivs.reduce((s,d)=>s+d.amount,0);
   const allTot=db.dividends.reduce((s,d)=>s+d.amount,0);
@@ -1119,7 +1133,10 @@ function renderSum(){
   const lR=db.loans.reduce((s,l)=>s+calcLoanRemain(l),0)+db.flexLoans.reduce((s,f)=>s+(f.used||f.remain||0),0);
   const mO=db.loans.reduce((s,l)=>s+(l.monthly||0),0)+db.flexLoans.reduce((s,f)=>s+(f.monthly||0),0);
   const cT=db.cashAccounts.reduce((s,c)=>s+(c.cash||0)+(c.d1||0)+(c.d2||0),0);
-  const tot=tM+cT,pnl=tM-tC,roi=tC>0?pnl/tC*100:0;
+  // 資金總額 = 已投入的股票成本 + 手上現金
+  const tot=tC+cT;
+  // 實際市值（用於損益計算）
+  const pnl=tM-tC,roi=tC>0?pnl/tC*100:0;
   const roiInc=tC>0?(pnl+tDivTot)/tC*100:0;
   const dR=tot>0?lR/tot*100:0;
   // 含息時淨資產也加入累積股息
