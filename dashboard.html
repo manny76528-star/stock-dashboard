@@ -183,32 +183,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
   <button class="tbtn" style="background:#0d8a4e" onclick="exportData()">📤 備份</button>
   <label class="tbtn" style="background:#6b7e96;cursor:pointer">📥 還原<input type="file" accept=".json" style="display:none" onchange="importData(event)"></label>
   <button class="tbtn" style="background:#8b5cf6" onclick="undoLast()" id="undoBtn" disabled>↩ 復原</button>
-  <button class="tbtn" style="background:#0891b2" onclick="openSearchModal()">🔍 查詢</button>
 </div>
-
-<!-- QUICK INPUT -->
-<div class="qbox">
-  <div class="qhdr" onclick="toggleQ()">
-    <span style="font-weight:700;font-size:13px">⚡ LINE 快速輸入</span>
-    <span id="qhint" style="font-size:11px;opacity:.8">▼ 展開</span>
-  </div>
-  <div class="qbody" id="qbody">
-    <div class="qfmt">
-      <strong>📋 支援格式（每行一筆）</strong>
-      買入 00985B 50張 10.35 2026/03/28 &nbsp;·&nbsp; 賣出 2330 2張 980 &nbsp;·&nbsp; 領息 00985B 800張 0.048
-    </div>
-    <div class="qrow">
-      <textarea class="qta" id="qinput" placeholder="從 LINE 複製後貼在這裡"></textarea>
-      <button class="qbtn" onclick="parseQ()">解析<br>預覽</button>
-    </div>
-    <div class="qprev" id="qprev">
-      <div class="qph">📋 解析結果預覽</div>
-      <div id="qprev-items"></div>
-      <button class="qconfirm" id="qconfirm" onclick="confirmQ()">✅ 確認全部新增</button>
-    </div>
-  </div>
-</div>
-
 
 
 <!-- TREND CHART -->
@@ -760,8 +735,22 @@ function calcInv(inv){
     else{
       const rev=t.lots*1000*t.price-(t.fee||0);
       let cost=0;
-      if(t.lotRefs&&t.lotRefs.length){t.lotRefs.forEach(ref=>{const l=rLots.find(x=>x.txnId===ref.txnId);if(l){cost+=ref.lots*1000*l.price+(l.fee*(ref.lots/l.original));l.remaining=Math.max(0,l.remaining-ref.lots);}});}
-      else{let s=t.lots;for(const l of rLots){if(s<=0)break;const tk=Math.min(l.remaining,s);cost+=tk*1000*l.price+(l.fee*(tk/l.original));l.remaining-=tk;s-=tk;}}
+      if(t.lotRefs&&t.lotRefs.length){
+        t.lotRefs.forEach(ref=>{
+          const l=rLots.find(x=>x.txnId===ref.txnId);
+          if(l){cost+=ref.lots*1000*l.price+(l.fee*(ref.lots/l.original));l.remaining=Math.max(0,l.remaining-ref.lots);}
+          else{
+            // 找不到批次，用均價估算
+            if(inv.avgPrice>0)cost+=ref.lots*1000*inv.avgPrice;
+          }
+        });
+      } else {
+        let s=t.lots;
+        for(const l of rLots){if(s<=0)break;const tk=Math.min(l.remaining,s);cost+=tk*1000*l.price+(l.fee*(tk/l.original));l.remaining-=tk;s-=tk;}
+        // FIFO 找不到足夠批次時，用均價補足
+        if(cost===0&&inv.avgPrice>0)cost=t.lots*1000*inv.avgPrice;
+      }
+      if(cost===0&&inv.avgPrice>0)cost=t.lots*1000*inv.avgPrice; // 最後保險
       realized+=rev-cost;
     }
   });
@@ -976,7 +965,7 @@ function renderFlex(){
   const tbody=document.getElementById('flex-body');tbody.innerHTML='';
   let tR=0,tM=0;
   db.flexLoans.forEach(f=>{
-    tR+=f.remain||0;tM+=f.monthly||0;
+    const fU=f.used||0;tR+=fU;tM+=f.monthly||0;
     const fUsed=f.used||f.remain||0;
     const fLimit=f.limit||fUsed;
     const fAvail=fLimit-fUsed;
@@ -991,6 +980,7 @@ function renderFlex(){
   });
   const lM=db.loans.reduce((s,l)=>s+(l.monthly||0),0);
   document.getElementById('f-rem').textContent='使用$'+tR.toLocaleString();
+  document.getElementById('f-rem').style.color='var(--loss)';
   document.getElementById('f-mo').textContent='$'+tM.toLocaleString();
   document.getElementById('tot-mo-out').textContent='$'+(lM+tM).toLocaleString();
 }
@@ -1077,7 +1067,7 @@ function toggleDivYear(){
 function renderSum(){
   let tC=0,tM=0,tD=0,tDivTot=0,tR=0;
   db.investments.forEach(inv=>{const c=calcInv(inv);tC+=c.tCost;if(c.mktVal)tM+=c.mktVal;tD+=c.moDivAmt;tDivTot+=c.divTot;tR+=c.realized;});
-  const lR=db.loans.reduce((s,l)=>s+calcLoanRemain(l),0)+db.flexLoans.reduce((s,f)=>s+(f.remain||0),0);
+  const lR=db.loans.reduce((s,l)=>s+calcLoanRemain(l),0)+db.flexLoans.reduce((s,f)=>s+(f.used||f.remain||0),0);
   const mO=db.loans.reduce((s,l)=>s+(l.monthly||0),0)+db.flexLoans.reduce((s,f)=>s+(f.monthly||0),0);
   const cT=db.cashAccounts.reduce((s,c)=>s+(c.cash||0)+(c.d1||0)+(c.d2||0),0);
   const tot=tM+cT,pnl=tM-tC,roi=tC>0?pnl/tC*100:0;
@@ -1130,6 +1120,7 @@ function openInvModal(id=null){
   if(knownNotes.includes(note)){sel.value=note;inp.style.display='none';inp.value='';}
   else if(note){sel.value='__custom__';inp.style.display='block';inp.value=note;}
   else{sel.value='';inp.style.display='none';inp.value='';}
+  const irEl=document.getElementById('i-remark');if(irEl)irEl.value=editId?'':'';
   openModal('invModal');setTimeout(()=>document.getElementById('i-code').focus(),100);
 }
 function saveInv(){
@@ -1151,8 +1142,10 @@ function saveInv(){
     const noteSel2=document.getElementById('i-note-sel').value;
     const noteVal2=noteSel2==='__custom__'?document.getElementById('i-note').value.trim():noteSel2===''?'':noteSel2;
     const maxOrder=db.investments.reduce((m,x)=>Math.max(m,x.order||0),0);
+    const initRemark=document.getElementById('i-remark')?.value.trim()||'';
+    const initTxns=lots>0&&avg>0?[{id:uid(),type:'buy',lots,price:avg,date:new Date().toISOString().split('T')[0],fee:0,remark:initRemark}]:[];
     db.investments.push({id:uid(),code,name:document.getElementById('i-name').value.trim(),lots,avgPrice:avg,
-      divPerShare:parseFloat(document.getElementById('i-div').value)||0,note:noteVal2,transactions:[],order:maxOrder+1});
+      divPerShare:parseFloat(document.getElementById('i-div').value)||0,note:noteVal2,transactions:initTxns,order:maxOrder+1});
   }
   save();closeModal('invModal');render();toast(editId?'已更新':'已新增 '+code);
   fetchPrice(code).then(p=>{if(p){db.prices[code]=p;localStorage.setItem(STORE,JSON.stringify(db));renderInv();}});
@@ -1198,6 +1191,12 @@ function saveBuy(){
   const feeIn=document.getElementById('b-fee').value;
   const fee=feeIn!==''?parseFloat(feeIn):Math.max(1,Math.round(lots*1000*price*0.001425*0.28));
   const inv=db.investments.find(i=>i.id===buyInvId);
+  // 若有初始張數但無交易記錄，先把初始張數轉為一筆買入記錄
+  if((inv.lots||0)>0 && !(inv.transactions||[]).length){
+    inv.transactions=inv.transactions||[];
+    inv.transactions.push({id:uid(),type:'buy',lots:inv.lots,price:inv.avgPrice||0,
+      date:inv.addedDate||'2020-01-01',fee:0,remark:'初始持倉'});
+  }
   const remark=document.getElementById('b-remark')?.value.trim()||'';
   inv.transactions.push({id:uid(),type:'buy',lots,price,date,fee,remark});
   inv.transactions.sort((a,b)=>a.date.localeCompare(b.date));
@@ -1419,15 +1418,17 @@ function toggleCustomBank(sel){
 function openCashModal(id=null){
   editId=id;const c=id?db.cashAccounts.find(x=>x.id===id):null;
   const known=['台灣銀行','Line Bank','國泰銀行','凱基銀行','統一券商','期貨','永豐銀行','凱基券商'];
-  const sel=document.getElementById('c-bank'),cus=document.getElementById('c-bank-custom');
+  const sel=document.getElementById('c-bank');
+  const cus=document.getElementById('c-bank-custom');
+  if(!sel)return;
   const bv=c?.bank||'';
-  if(known.includes(bv)){sel.value=bv;cus.style.display='none';}
-  else if(bv){sel.value='__custom__';cus.style.display='block';cus.value=bv;}
-  else{sel.value='';cus.style.display='none';}
-  document.getElementById('c-cash').value=c?.cash||'';
-  document.getElementById('c-d1').value=c?.d1||'';
-  document.getElementById('c-d2').value=c?.d2||'';
-  document.getElementById('c-arb').value=c?.arb||'';
+  if(known.includes(bv)){sel.value=bv;if(cus)cus.style.display='none';}
+  else if(bv){sel.value='__custom__';if(cus){cus.style.display='block';cus.value=bv;}}
+  else{sel.value='';if(cus)cus.style.display='none';}
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v;};
+  set('c-cash',c?.cash||'');
+  set('c-d1',c?.d1||'');
+  set('c-d2',c?.d2||'');
   openModal('cashModal');
 }
 function editCash(id){openCashModal(id);}
@@ -1438,8 +1439,7 @@ function saveCash(){
   const obj={id:editId||uid(),bank,
     cash:parseFloat(document.getElementById('c-cash').value)||0,
     d1:parseFloat(document.getElementById('c-d1').value)||0,
-    d2:parseFloat(document.getElementById('c-d2').value)||0,
-    arb:parseFloat(document.getElementById('c-arb').value)||0};
+    d2:parseFloat(document.getElementById('c-d2').value)||0};
   if(editId){const i=db.cashAccounts.findIndex(x=>x.id===editId);db.cashAccounts[i]=obj;}
   else db.cashAccounts.push(obj);
   save();closeModal('cashModal');render();toast('已儲存');
@@ -1471,7 +1471,7 @@ function showDivDetail(code){
           <td style="padding:6px 10px;font-family:monospace">${d.lots} 張</td>
           <td style="padding:6px 10px;font-family:monospace">$${d.perShare.toFixed(4)}</td>
           <td style="padding:6px 10px;font-family:monospace;color:var(--gain);font-weight:700">$${Math.round(d.amount).toLocaleString()}</td>
-          <td style="padding:6px 10px"><button onclick="delDiv('${d.id}');showDivDetail('${code}')" style="background:none;border:1px solid var(--loss);color:var(--loss);border-radius:4px;padding:2px 6px;font-size:10px;cursor:pointer">刪</button></td>
+          <td style="padding:6px 10px"><button onclick="if(doubleConfirm('確定刪除？')){delDiv('${d.id}');showDivDetail('${code}')}" style="background:none;border:1px solid var(--loss);color:var(--loss);border-radius:4px;padding:2px 6px;font-size:10px;cursor:pointer">刪</button></td>
         </tr>`).join('')}
       </tbody>
     </table>
@@ -1527,87 +1527,22 @@ function delDiv(id){
   db.dividends=db.dividends.filter(d=>d.id!==id);save();renderDivs();toast('已刪除');
 }
 
-// QUICK INPUT
-let parsedItems=[];
-function toggleQ(){
-  const b=document.getElementById('qbody');const h=document.getElementById('qhint');
-  const open=b.classList.toggle('open');
-  h.textContent=open?'▲ 收起':'▼ 展開';
-}
-function parseQ(){
-  const raw=document.getElementById('qinput').value.trim();
-  if(!raw)return toast('請先貼上交易指令');
-  const today=new Date().toISOString().split('T')[0];
-  parsedItems=[];
-  raw.split('\n').map(l=>l.trim()).filter(l=>l).forEach(line=>{
-    const bM=line.match(/^(買入|買)\s+([A-Za-z0-9]+)\s+([\d.]+)張?\s+([\d.]+)(?:\s+([\d/\-]+))?/);
-    const sM=line.match(/^(賣出|賣)\s+([A-Za-z0-9]+)\s+([\d.]+)張?\s+([\d.]+)(?:\s+([\d/\-]+))?/);
-    const dM=line.match(/^(領息|配息)\s+([A-Za-z0-9]+)\s+([\d.]+)(張|股)?\s+([\d.]+)/);
-    if(bM){
-      const code=bM[2].toUpperCase(),lots=parseFloat(bM[3]),price=parseFloat(bM[4]);
-      const date=(bM[5]||today).replace(/\//g,'-');
-      parsedItems.push({type:'buy',code,lots,price,date,fee:Math.max(1,Math.round(lots*1000*price*0.001425*0.28)),raw:line,ok:true});
-    }else if(sM){
-      const code=sM[2].toUpperCase(),lots=parseFloat(sM[3]),price=parseFloat(sM[4]);
-      const date=(sM[5]||today).replace(/\//g,'-');
-      const inv=db.investments.find(i=>i.code===code);
-      const avail=inv?buildLots(inv).filter(l=>l.remaining>0).reduce((s,l)=>s+l.remaining,0):0;
-      if(lots>avail)parsedItems.push({type:'error',raw:line,ok:false,msg:`❌ ${code} 庫存不足（可賣${avail}張，嘗試賣${lots}張）`});
-      else parsedItems.push({type:'sell',code,lots,price,date,raw:line,ok:true});
-    }else if(dM){
-      const code=dM[2].toUpperCase(),qty=parseFloat(dM[3]),unit=dM[4]||'張';
-      const lots=unit==='股'?qty/1000:qty,ps=parseFloat(dM[5]);
-      parsedItems.push({type:'div',code,lots,perShare:ps,amount:lots*1000*ps,raw:line,ok:true});
-    }else parsedItems.push({type:'error',raw:line,ok:false,msg:'❌ 無法解析：'+line});
-  });
-  const cont=document.getElementById('qprev-items');
-  cont.innerHTML=parsedItems.map(item=>{
-    if(!item.ok)return`<div class="qpi"><span class="qi-e">${item.msg||'❌ 無法解析：'+item.raw}</span></div>`;
-    if(item.type==='div')return`<div class="qpi"><span class="qi-t" style="color:var(--gain)">💰 領息</span><span class="qi-c">${item.code}</span><span class="qi-d">${item.lots}張 × $${item.perShare} = <strong style="color:var(--gain)">$${Math.round(item.amount).toLocaleString()}</strong></span></div>`;
-    const tL=item.type==='buy'?'▲ 買入':'▼ 賣出';
-    const tC=item.type==='buy'?'var(--gain)':'var(--loss)';
-    const inv=db.investments.find(i=>i.code===item.code);
-    return`<div class="qpi"><span class="qi-t" style="color:${tC}">${tL}</span><span class="qi-c">${item.code}</span><span class="qi-d">${item.lots}張 @ $${item.price} · ${item.date}</span><span style="font-size:10px">${inv?'✅':'⚠️新代號'}</span></div>`;
-  }).join('');
-  const ok=parsedItems.filter(i=>i.ok).length;
-  document.getElementById('qconfirm').textContent=`✅ 確認新增 ${ok} 筆`;
-  document.getElementById('qprev').classList.add('show');
-}
-function confirmQ(){
-  const today=new Date().toISOString().split('T')[0];
-  let added=0,skipped=0;
-  parsedItems.forEach(item=>{
-    if(!item.ok){skipped++;return;}
-    if(item.type==='div'){db.dividends.push({id:uid(),code:item.code,date:today,lots:item.lots,perShare:item.perShare,amount:item.amount});added++;return;}
-    let inv=db.investments.find(i=>i.code===item.code);
-    if(!inv){inv={id:uid(),code:item.code,name:'',lots:0,avgPrice:item.price||0,divPerShare:0,note:'',transactions:[]};db.investments.push(inv);}
-    if(item.type==='buy'){
-      inv.transactions.push({id:uid(),type:'buy',lots:item.lots,price:item.price,date:item.date,fee:item.fee||0});
-      inv.transactions.sort((a,b)=>a.date.localeCompare(b.date));added++;
-    }else{
-      inv.transactions.push({id:uid(),type:'sell',lots:item.lots,price:item.price,date:item.date,
-        fee:Math.max(1,Math.round(item.lots*1000*item.price*(0.001425*0.28+0.003)))});
-      inv.transactions.sort((a,b)=>a.date.localeCompare(b.date));added++;
-    }
-  });
-  save();render();
-  parsedItems.filter(i=>i.ok).forEach(item=>{fetchPrice(item.code).then(p=>{if(p){db.prices[item.code]=p;localStorage.setItem(STORE,JSON.stringify(db));renderInv();}});});
-  document.getElementById('qinput').value='';document.getElementById('qprev').classList.remove('show');parsedItems=[];
-  toast(`✅ 已新增 ${added} 筆${skipped?` · ${skipped} 筆跳過`:''}`);
-}
 
 // TOAST
 function moveInv(id,dir){
-  // First ensure all investments have order values
-  db.investments.forEach((inv,i)=>{if(!inv.order)inv.order=i+1;});
-  const sorted=[...db.investments].sort((a,b)=>a.order-b.order);
-  const idx=sorted.findIndex(i=>i.id===id);
+  // Ensure all have order
+  db.investments.forEach((inv,i)=>{if(inv.order==null||inv.order===undefined)inv.order=i+1;});
+  // Sort by order
+  db.investments.sort((a,b)=>a.order-b.order);
+  const idx=db.investments.findIndex(i=>i.id===id);
   const newIdx=idx+dir;
-  if(newIdx<0||newIdx>=sorted.length)return;
-  // Swap order values between these two
-  const tmpOrder=sorted[idx].order;
-  sorted[idx].order=sorted[newIdx].order;
-  sorted[newIdx].order=tmpOrder;
+  if(newIdx<0||newIdx>=db.investments.length)return;
+  // Swap positions in array directly and reassign order
+  const tmp=db.investments[idx];
+  db.investments[idx]=db.investments[newIdx];
+  db.investments[newIdx]=tmp;
+  // Reassign clean order values
+  db.investments.forEach((inv,i)=>inv.order=i+1);
   save();renderInv();
   toast(dir<0?'↑ 上移':'↓ 下移');
 }
