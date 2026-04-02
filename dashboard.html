@@ -379,6 +379,8 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
       </select>
       <input class="fi" id="i-note" placeholder="輸入備註" style="margin-top:6px;display:none">
     </div>
+    <div class="fg"><label class="fl">自定義連結（選填，點名稱可跳轉）</label><input class="fi" id="i-url" placeholder="例：https://www.moneydj.com/ETF/X/Basic/Basic0.xdjhtm?etfid=00985B"></div>
+    <div class="fg"><label class="fl">初始買入原因（選填）</label><input class="fi" id="i-remark" placeholder="例：看好升息循環結束，布局債券ETF"></div>
     <div class="br"><button class="btn btn-s" onclick="closeModal('invModal')">取消</button><button class="btn btn-p" onclick="saveInv()">儲存</button></div>
   </div>
 </div>
@@ -788,12 +790,27 @@ function calcInv(inv){
           }
         });
       } else {
+        // FIFO: match sell lots to buy lots
         let s=t.lots;
-        for(const l of rLots){if(s<=0)break;const tk=Math.min(l.remaining,s);cost+=tk*1000*l.price+(l.fee*(tk/l.original));l.remaining-=tk;s-=tk;}
-        // FIFO 找不到足夠批次時，用均價補足
-        if(cost===0&&inv.avgPrice>0)cost=t.lots*1000*inv.avgPrice;
+        for(const l of rLots){
+          if(s<=0)break;
+          const tk=Math.min(l.remaining,s);
+          const lotFee=l.original>0?l.fee*(tk/l.original):0;
+          cost+=tk*1000*l.price+lotFee;
+          l.remaining-=tk;s-=tk;
+        }
+        // If still have unmatched lots (s>0), use weighted avg of remaining rLots
+        if(s>0){
+          const remainLots=rLots.filter(l=>l.remaining>0);
+          if(remainLots.length>0){
+            const avgP=remainLots.reduce((sum,l)=>sum+l.price*l.remaining,0)/remainLots.reduce((sum,l)=>sum+l.remaining,0);
+            cost+=s*1000*avgP;
+          } else if(inv.avgPrice>0){
+            cost+=s*1000*inv.avgPrice;
+          }
+        }
       }
-      if(cost===0&&inv.avgPrice>0)cost=t.lots*1000*inv.avgPrice; // 最後保險
+      if(cost<=0&&t.lots>0&&inv.avgPrice>0)cost=t.lots*1000*inv.avgPrice;
       realized+=rev-cost;
     }
   });
@@ -802,7 +819,10 @@ function calcInv(inv){
   const mktVal=curPrice?tLots*1000*curPrice:null;
   const pnl=mktVal!==null?mktVal-tCost:null;
   const pnlPct=tCost>0&&pnl!==null?pnl/tCost*100:null;
-  const divTot=(db.dividends||[]).filter(d=>d.code===inv.code).reduce((s,d)=>s+d.amount,0);
+  const _td=new Date().toISOString().split('T')[0];
+  const divTot=(db.dividends||[])
+    .filter(d=>d.code===inv.code&&!d.pending&&(!d.date||d.date<=_td))
+    .reduce((s,d)=>s+d.amount,0);
   const moDivAmt=tLots>0&&inv.divPerShare?(tLots*1000*inv.divPerShare):0; // 月配息：張數×1000×每月配息
   // 含息損益 = 未實現損益 + 累積股息
   const pnlWithDiv = pnl !== null ? pnl + divTot : (divTot > 0 ? divTot : null);
@@ -861,7 +881,11 @@ function renderInv(){
     const ho=openIds.includes(inv.id);
     const tr=document.createElement('tr');
     tr.innerHTML=`
-      <td class="left bold" style="color:var(--accent)">${inv.code}${inv.name?`<br><small style="color:var(--muted);font-weight:400">${inv.name}</small>`:''}${inv.note?`<br><small style="color:${inv.note==='現股'?'var(--gain)':inv.note==='質押中'?'#1a5fa8':'var(--teal)'}">${inv.note}</small>`:''}</td>
+      <td class="left bold" style="color:var(--accent)">
+        ${inv.url?`<a href="${inv.url}" target="_blank" style="color:var(--accent);text-decoration:none" title="${inv.url}">${inv.code}</a>`:inv.code}
+        ${inv.name?`<br><small style="color:var(--muted);font-weight:400">${inv.name}</small>`:''}
+        ${inv.note?`<br><small style="color:${inv.note==='現股'?'var(--gain)':inv.note==='質押中'?'#1a5fa8':'var(--teal)'}">${inv.note}</small>`:''}
+      </td>
       <td class="mono bold" style="color:var(--accent)">${c.tLots} 張</td>
       <td class="mono">$${fmtF(c.avgCost)}</td>
       <td class="mono">${fmt(c.tCost)}</td>
@@ -1093,7 +1117,10 @@ function renderDivs(){
     }).join('')+'<button class="act-btn add" style="height:56px;padding:0 14px" onclick="openDivModal()">＋ 新增</button>';
 
   const yrTot=yrDivs.reduce((s,d)=>s+d.amount,0);
-  const allTot=db.dividends.reduce((s,d)=>s+d.amount,0);
+  const today2=new Date().toISOString().split('T')[0];
+  const allTot=db.dividends
+    .filter(d=>!d.pending&&(!d.date||d.date<=today2))
+    .reduce((s,d)=>s+d.amount,0);
   document.getElementById('d-yr').textContent='$'+Math.round(yrTot).toLocaleString();
   document.getElementById('d-tot').textContent='$'+Math.round(allTot).toLocaleString();
 
@@ -1186,7 +1213,8 @@ function openInvModal(id=null){
   if(knownNotes.includes(note)){sel.value=note;inp.style.display='none';inp.value='';}
   else if(note){sel.value='__custom__';inp.style.display='block';inp.value=note;}
   else{sel.value='';inp.style.display='none';inp.value='';}
-  const irEl=document.getElementById('i-remark');if(irEl)irEl.value=editId?'':'';
+  const irEl=document.getElementById('i-remark');if(irEl)irEl.value='';
+  const iuEl=document.getElementById('i-url');if(iuEl)iuEl.value=inv?.url||'';
   openModal('invModal');setTimeout(()=>document.getElementById('i-code').focus(),100);
 }
 function saveInv(){
@@ -1201,7 +1229,8 @@ function saveInv(){
     // 有交易記錄時，不更新初始張數和均價（由交易記錄計算）
     const hasTxns=(inv.transactions||[]).length>0;
     Object.assign(inv,{code,name:document.getElementById('i-name').value.trim(),
-      divPerShare:parseFloat(document.getElementById('i-div').value)||0,note:noteVal});
+      divPerShare:parseFloat(document.getElementById('i-div').value)||0,note:noteVal,
+      url:document.getElementById('i-url')?.value.trim()||''});
     if(!hasTxns){inv.lots=lots;inv.avgPrice=avg;} // 只有無交易記錄時才更新初始張數
   }else{
     if(db.investments.find(i=>i.code===code))return toast(code+' 已存在');
@@ -1211,7 +1240,9 @@ function saveInv(){
     const initRemark=document.getElementById('i-remark')?.value.trim()||'';
     const initTxns=lots>0&&avg>0?[{id:uid(),type:'buy',lots,price:avg,date:new Date().toISOString().split('T')[0],fee:0,remark:initRemark}]:[];
     db.investments.push({id:uid(),code,name:document.getElementById('i-name').value.trim(),lots,avgPrice:avg,
-      divPerShare:parseFloat(document.getElementById('i-div').value)||0,note:noteVal2,transactions:initTxns,order:maxOrder+1});
+      divPerShare:parseFloat(document.getElementById('i-div').value)||0,note:noteVal2,
+      url:document.getElementById('i-url')?.value.trim()||'',
+      transactions:initTxns,order:maxOrder+1});
   }
   save();closeModal('invModal');render();toast(editId?'已更新':'已新增 '+code);
   fetchPrice(code).then(p=>{if(p){db.prices[code]=p;localStorage.setItem(STORE,JSON.stringify(db));renderInv();}});
@@ -1898,7 +1929,8 @@ function recordSnapshot(manual=false){
   const lR=db.loans.reduce((s,l)=>s+calcLoanRemain(l),0)+db.flexLoans.reduce((s,f)=>s+(f.remain||0),0);
   const mO=db.loans.reduce((s,l)=>s+(l.monthly||0),0)+db.flexLoans.reduce((s,f)=>s+(f.monthly||0),0);
   const cT=db.cashAccounts.reduce((s,c)=>s+(c.cash||0)+(c.d1||0)+(c.d2||0),0);
-  const tot=tM+cT;
+  // 用成本計算淨資產，與資產損益表一致
+  const tot=tC+cT;
   const net=tot-lR;
   const dR=tot>0?Math.round(lR/tot*1000)/10:0;
   const cf=Math.round(tD-mO);
