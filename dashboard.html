@@ -193,6 +193,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
     <span>📈 資產趨勢圖</span>
     <div style="display:flex;gap:8px;align-items:center">
       <button onclick="event.stopPropagation();recordSnapshot(true)" style="background:var(--gain);color:#fff;border:none;border-radius:6px;padding:4px 12px;font-size:11px;cursor:pointer;font-weight:600">📷 手動記錄</button>
+      <button onclick="event.stopPropagation();clearAndReRecord()" style="background:#e67e22;color:#fff;border:none;border-radius:6px;padding:4px 12px;font-size:11px;cursor:pointer;font-weight:600" title="清除舊快照並以目前正確數值重算本月">🔄 重算本月</button>
       <span id="trend-hint" style="font-size:11px;color:var(--muted)">▼ 展開</span>
     </div>
   </div>
@@ -1998,6 +1999,16 @@ function renderTrendChart(){
 }
 
 // ═══ EDIT TITLE ═══
+function clearAndReRecord(){
+  if(!confirm('重算本月快照？\n這會用目前的正確數值覆蓋本月的快照。'))return;
+  const ym=new Date().toISOString().slice(0,7);
+  // Remove current month snapshot
+  db.snapshots=(db.snapshots||[]).filter(s=>s.ym!==ym);
+  // Force re-record with correct formula
+  recordSnapshot(false);
+  toast('✅ 本月快照已重算');
+}
+
 function deleteSnapshot(ym){
   if(!doubleConfirm(`確定要刪除 ${ym} 的快照記錄？`))return;
   db.snapshots=(db.snapshots||[]).filter(s=>s.ym!==ym);
