@@ -1133,7 +1133,7 @@ function renderDivs(){
   cards.innerHTML=Object.keys(byCode).length===0?'<span style="color:var(--muted);font-size:11px">今年尚無領息記錄</span>':
     Object.entries(byCode).map(([code,d])=>{
       const dc=getDivColor(code);
-      const pendingHtml=(d.pending||0)>0?`<div style="font-size:11px;color:#3498db;font-family:'JetBrains Mono',monospace">+$${Math.round(d.pending).toLocaleString()} 待發</div>`:'';
+      const pendingHtml=(d.pending||0)>0?`<div style="font-size:11px;color:#3498db;font-weight:700">+$${Math.round(d.pending).toLocaleString()} 待發</div>`:'';
       return `<div class="div-card" data-code="${code}" style="border-left:6px solid ${dc};cursor:pointer" title="點擊查看明細" onclick="showDivDetail(this.dataset.code)">
         <div style="font-size:10px;color:var(--muted)">${code} 今年 · 點擊明細</div>
         <div style="font-size:17px;font-weight:800;color:var(--gain);font-family:'JetBrains Mono',monospace">$${Math.round(d.tot).toLocaleString()}</div>
@@ -1183,33 +1183,33 @@ function toggleDivYear(){
 function renderSum(){
   let tC=0,tM=0,tD=0,tDivTot=0,tR=0;
   db.investments.forEach(inv=>{const c=calcInv(inv);tC+=c.tCost;if(c.mktVal)tM+=c.mktVal;tD+=c.moDivAmt;tDivTot+=c.divTot;tR+=c.realized;});
-  const lR=db.loans.reduce((s,l)=>s+calcLoanRemain(l),0)+db.flexLoans.reduce((s,f)=>s+(f.used||f.remain||0),0);
+  // 信貸餘額（只算信貸，不含不限用途）
+  const loanR=db.loans.reduce((s,l)=>s+calcLoanRemain(l),0);
+  // 全部負債（信貸+不限用途使用額）用於負債比計算
+  const lR=loanR+db.flexLoans.reduce((s,f)=>s+(f.used||f.remain||0),0);
   const mO=db.loans.reduce((s,l)=>s+(l.monthly||0),0)+db.flexLoans.reduce((s,f)=>s+(f.monthly||0),0);
   const cT=db.cashAccounts.reduce((s,c)=>s+(c.cash||0)+(c.d1||0)+(c.d2||0),0);
-  // 資金總額 = 已投入的股票成本 + 手上現金
   const tot=tC+cT;
-  // 實際市值（用於損益計算）
   const pnl=tM-tC,roi=tC>0?pnl/tC*100:0;
   const roiInc=tC>0?(pnl+tDivTot)/tC*100:0;
   const dR=tot>0?lR/tot*100:0;
-  // 含息時淨資產也加入累積股息
-  const net=(tot-lR)+(showDivRoi?tDivTot:0);
-  const tA=db.cashAccounts.reduce((s,c)=>s+(c.arb||0),0);
+  // 淨資產固定不含息（股息已花掉，不加回淨資產）
+  const net=tot-lR;
   const fl=tD-mO;
-  // 含息時顯示的損益
-  const displayPnlSum = showDivRoi ? pnl+tDivTot : pnl;
-  const displayRoi = showDivRoi ? roiInc : roi;
+  // 含息只改變報酬率和損益顯示，不影響淨資產
+  const displayPnlSum=showDivRoi?pnl+tDivTot:pnl;
+  const displayRoi=showDivRoi?roiInc:roi;
   const rows=[
     {l:'資金總額',v:'$'+Math.round(tot).toLocaleString(),c:''},
     {l:'股票市值',v:'$'+Math.round(tM).toLocaleString(),c:'teal-bg'},
     {l:'已實現損益',v:tR!==0?(tR>=0?'+':'-')+fmt(tR):'$0',c:tR>=0?'gain':'loss'},
-    {l:'股票損益',v:(displayPnlSum>=0?'+':'-')+fmt(displayPnlSum),c:displayPnlSum>=0?'gain':'loss'},
+    {l:'股票損益'+(showDivRoi?' (含息)':''),v:(displayPnlSum>=0?'+':'-')+fmt(displayPnlSum),c:displayPnlSum>=0?'gain':'loss'},
     {l:`報酬率 <label style="font-size:10px;cursor:pointer"><input type="checkbox" id="roi-chk" ${showDivRoi?'checked':''} onchange="showDivRoi=this.checked;renderSum();renderInv()"> 含息</label>`,
      v:displayRoi>=0?'+'+displayRoi.toFixed(2)+'%':displayRoi.toFixed(2)+'%',
      c:displayRoi>=0?'gain':'loss'},
     {l:'負債比',v:dR.toFixed(2)+'%',c:''},
-    {l:'目前信貸餘額',v:'$'+Math.round(lR).toLocaleString(),c:'loss'},
-    {l:'淨資產'+(showDivRoi?' (含息)':''),v:'$'+Math.round(net).toLocaleString(),c:'bold'},
+    {l:'信貸尚餘本金',v:'$'+Math.round(loanR).toLocaleString(),c:'loss'},
+    {l:'淨資產',v:'$'+Math.round(net).toLocaleString(),c:'bold'},
     {l:'每月股息',v:fmt(tD),c:'gain bold'},
     {l:'每月支出',v:fmt(mO),c:'loss'},
     {l:'每月淨現金流',v:(fl>=0?'+':'-')+fmt(fl),c:fl>=0?'gain bold':'loss bold'},
@@ -1915,8 +1915,9 @@ function openAddClearedLoan(){
 function saveClearedLoan(){
   const bank=document.getElementById('cl-bank')?.value.trim();
   if(!bank)return toast('請輸入借貸銀行');
-  const cleared={
-    id:uid(),bank,
+  const editId2=window._editingClearedId||null;
+  const obj={
+    id:editId2||uid(),bank,
     rate:parseFloat(document.getElementById('cl-rate')?.value)||0,
     amount:parseFloat(document.getElementById('cl-amount')?.value)||0,
     monthly:parseFloat(document.getElementById('cl-monthly')?.value)||0,
@@ -1926,32 +1927,71 @@ function saveClearedLoan(){
     manualCleared:true
   };
   if(!db.clearedLoans)db.clearedLoans=[];
-  db.clearedLoans.push(cleared);
+  if(editId2){
+    const idx=db.clearedLoans.findIndex(x=>x.id===editId2);
+    if(idx>=0)db.clearedLoans[idx]=obj;
+  } else {
+    db.clearedLoans.push(obj);
+  }
+  window._editingClearedId=null;
+  document.querySelector('#addClearedModal .mt').textContent='新增已結清信貸記錄';
   save();closeModal('addClearedModal');openLoanHist();
-  toast('✅ 已新增結清記錄');
+  toast(editId2?'✅ 已更新結清記錄':'✅ 已新增結清記錄');
 }
 
 function openLoanHist(){
-  const cleared=(db.clearedLoans||[]);
+  const cleared=(db.clearedLoans||[]).slice().sort((a,b)=>(b.clearedDate||'').localeCompare(a.clearedDate||''));
   const container=document.getElementById('loan-hist-results');
-  if(!cleared.length){
-    container.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted)">尚無已結清的信貸記錄</div>';
-  }else{
-    container.innerHTML=cleared.map(l=>`
-      <div style="background:var(--gain-bg);border:1px solid #aad4bc;border-radius:8px;padding:12px;margin-bottom:10px">
-        <div style="font-weight:700;font-size:13px">${l.bank} <span style="font-size:11px;color:var(--gain)">✅ 已結清</span></div>
-        <div style="font-size:12px;color:var(--muted);margin-top:4px;display:grid;grid-template-columns:1fr 1fr;gap:4px">
-          <span>借款：$${(l.amount||0).toLocaleString()}</span>
-          <span>利率：${(l.rate||0).toFixed(2)}%</span>
-          <span>起始：${l.start||'—'}</span>
-          <span>結清：${l.clearedDate||l.due||'—'}</span>
-          <span>每月還款：$${(l.monthly||0).toLocaleString()}</span>
-          <span>${l.note?'備註：'+l.note:''}</span>
-        </div>
-      </div>
-    `).join('');
+  const totalAmount=cleared.reduce((s,l)=>s+(l.amount||0),0);
+  let html='';
+  if(cleared.length){
+    html+='<div style="background:#e8f5ee;border:1.5px solid #aad4bc;border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:13px">'
+      +'<span style="font-weight:700">📊 累積清償總額：</span>'
+      +'<span style="color:var(--gain);font-weight:800;font-size:16px">$'+totalAmount.toLocaleString()+'</span>'
+      +' <span style="color:var(--muted);font-size:11px">（'+cleared.length+' 筆）</span>'
+      +'</div>';
+    html+=cleared.map(l=>{
+      const lid=l.id||uid();
+      if(!l.id)l.id=lid;
+      return '<div style="background:var(--gain-bg);border:1px solid #aad4bc;border-radius:8px;padding:12px;margin-bottom:10px">'
+        +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'
+        +'<div style="font-weight:700;font-size:13px">'+l.bank+' <span style="font-size:11px;color:var(--gain)">✅ 已結清</span></div>'
+        +'<div style="display:flex;gap:6px">'
+        +'<button data-id="'+lid+'" onclick="editClearedLoan(this.dataset.id)" style="background:none;border:1px solid var(--accent);color:var(--accent);border-radius:4px;padding:2px 8px;font-size:11px;cursor:pointer">編輯</button>'
+        +'<button data-id="'+lid+'" onclick="deleteClearedLoan(this.dataset.id)" style="background:none;border:1px solid var(--loss);color:var(--loss);border-radius:4px;padding:2px 8px;font-size:11px;cursor:pointer">刪除</button>'
+        +'</div></div>'
+        +'<div style="font-size:12px;color:var(--muted);display:grid;grid-template-columns:1fr 1fr;gap:4px">'
+        +'<span>借款：$'+(l.amount||0).toLocaleString()+'</span>'
+        +'<span>利率：'+(l.rate||0).toFixed(2)+'%</span>'
+        +'<span>起始：'+(l.start||'—')+'</span>'
+        +'<span>結清：'+(l.clearedDate||l.due||'—')+'</span>'
+        +'<span>每月還款：$'+(l.monthly||0).toLocaleString()+'</span>'
+        +(l.note?'<span style="grid-column:span 2">備註：'+l.note+'</span>':'')
+        +'</div></div>';
+    }).join('');
+  } else {
+    html='<div style="padding:20px;text-align:center;color:var(--muted)">尚無已結清的信貸記錄</div>';
   }
+  container.innerHTML=html;
   openModal('loanHistModal');
+}
+
+function editClearedLoan(id){
+  const l=db.clearedLoans.find(x=>x.id===id);
+  if(!l)return;
+  const setV=(eid,v)=>{const el=document.getElementById(eid);if(el)el.value=v||'';};
+  setV('cl-bank',l.bank);setV('cl-rate',l.rate);setV('cl-amount',l.amount);
+  setV('cl-monthly',l.monthly);setV('cl-start',l.start);setV('cl-cleared',l.clearedDate);setV('cl-note',l.note);
+  // Store editing id
+  window._editingClearedId=id;
+  openModal('addClearedModal');
+  document.querySelector('#addClearedModal .mt').textContent='編輯已結清信貸';
+}
+
+function deleteClearedLoan(id){
+  if(!doubleConfirm('確定要刪除這筆結清記錄？'))return;
+  db.clearedLoans=db.clearedLoans.filter(x=>x.id!==id);
+  save();openLoanHist();toast('已刪除');
 }
 
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
