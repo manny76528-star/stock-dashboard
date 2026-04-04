@@ -539,6 +539,28 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
   .loan-card-grid,.flex-card-grid,.cash-card-grid{grid-template-columns:1fr;}
   .loan-sum-strip,.flex-sum-strip{flex-direction:column;}
 }
+
+/* ═══ PENDING DIVIDEND CARDS ═══ */
+.pending-card-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:8px;padding:10px 14px;background:#f0f7ff;border-bottom:2px solid #bfdbfe;
+}
+.pending-div-card{
+  background:#fff;border-radius:10px;padding:10px 12px;
+  box-shadow:0 1px 3px rgba(37,99,235,.1);
+  border:1px solid #dbeafe;
+}
+.pending-div-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
+.pending-code{font-size:14px;font-weight:800;display:block;}
+.pending-name{font-size:10px;color:#94a3b8;display:block;margin-top:1px;}
+.pending-amt{font-size:18px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#2563eb;}
+.pending-div-bot{display:flex;flex-wrap:wrap;gap:5px;}
+.pending-tag{font-size:10px;background:#eff6ff;color:#3b82f6;padding:2px 7px;border-radius:20px;font-weight:600;}
+.pending-tag.pay{background:#f0fdf4;color:#16a34a;}
+.pending-lots{font-size:10px;color:#94a3b8;margin-left:auto;align-self:center;}
+
+/* ═══ 進度條寬度修正 ═══ */
+.loan-progress-wrap{height:8px;background:#f1f5f9;margin:0 16px 8px;}
 </style>
 <div class="bkwarn" id="bkwarn">⚠️ 距上次備份已超過 3 天，請記得備份！<button class="act-btn" style="margin-left:auto" onclick="exportData()">📤 立即備份</button></div>
 
@@ -714,9 +736,12 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
       <button class="db-btn-sm light" onclick="openDivModal()">＋ 新增</button>
     </div>
     <div class="div-cards" id="div-cards"><span style="padding:10px;display:block;color:var(--muted);font-size:11px">尚無領息記錄</span></div>
-    <div id="div-pending-bar" style="display:none;padding:10px 16px;background:linear-gradient(to right,#eff6ff,#dbeafe);border-bottom:2px solid #bfdbfe;font-size:13px;font-weight:700">
-      ⏳ 準備入帳：<span style="color:#3498db;font-size:15px" id="d-pending">$0</span>
-      <span style="font-size:11px;font-weight:400;color:#5a9fd4;margin-left:8px" id="d-pending-detail"></span>
+    <div id="div-pending-bar" style="display:none">
+      <div style="padding:8px 14px 4px;background:#eff6ff;border-bottom:1px solid #bfdbfe;display:flex;align-items:center;justify-content:space-between">
+        <span style="font-size:12px;font-weight:700;color:#1d4ed8">⏳ 準備入帳</span>
+        <span style="font-size:14px;font-weight:800;color:#2563eb;font-family:'JetBrains Mono',monospace" id="d-pending">$0</span>
+      </div>
+      <div class="pending-card-grid" id="d-pending-cards"></div>
     </div>
     <div class="div-yr-bar">
       <div style="font-size:13px;font-weight:700">
@@ -1001,6 +1026,22 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
     <div id="div-detail-body"></div>
     <div class="br" style="margin-top:12px">
       <button class="btn btn-s" onclick="closeModal('divDetailModal')">關閉</button>
+    </div>
+  </div>
+</div>
+
+<!-- QUICK DEPOSIT MODAL -->
+<div class="mo" id="depositModal">
+  <div class="modal" style="max-width:360px">
+    <div class="mt" id="depositMT">💵 入金</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:14px" id="depositSub">輸入入金金額，將加入現金餘額</div>
+    <div class="fg"><label class="fl">入金金額（元）</label>
+      <input class="fi" id="deposit-amt" type="number" placeholder="例：50000" style="font-size:18px;font-weight:700" oninput="updateDepositPreview()">
+    </div>
+    <div class="preview-box" id="deposit-prev" style="background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8;display:none"></div>
+    <div class="br">
+      <button class="btn btn-s" onclick="closeModal('depositModal')">取消</button>
+      <button class="btn btn-p" onclick="saveDeposit()" style="background:#2563eb">確認入金</button>
     </div>
   </div>
 </div>
@@ -1487,6 +1528,10 @@ function renderLoans(){
         </div>
       </div>
       <!-- Progress bar -->
+      <div style="padding:0 16px 4px;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:10px;color:#94a3b8">還款進度</span>
+        <span style="font-size:11px;font-weight:700;color:${paidPct>=80?'var(--gain)':'var(--accent)'}">${paidPct}%</span>
+      </div>
       <div class="loan-progress-wrap">
         <div class="loan-progress-bar" style="width:${paidPct}%"></div>
       </div>
@@ -1556,6 +1601,10 @@ function renderFlex(){
           <div style="font-size:10px;color:var(--muted)">額度 $${fLimit.toLocaleString()}</div>
         </div>
       </div>
+      <div style="padding:0 16px 4px;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:10px;color:#94a3b8">額度使用率</span>
+        <span style="font-size:11px;font-weight:700;color:${barColor}">${usedPct}%</span>
+      </div>
       <div class="loan-progress-wrap">
         <div class="loan-progress-bar" style="width:${usedPct}%;background:${barColor}"></div>
       </div>
@@ -1619,6 +1668,7 @@ function renderCash(){
         ${hasD2?'<div class="cash-item"><span class="cash-item-label">交割 DAY2</span><span class="cash-item-val '+(c.d2<0?'loss':'gain')+'">$'+c.d2.toLocaleString()+'</span></div>':''}
       </div>
       <div class="cash-card-footer">
+        ${c.bank==='Line Bank'?'<button class="card-act-btn" style="background:#eff6ff;color:#2563eb" onclick="quickDeposit(\''+c.id+'\',\''+c.bank+'\')">💵 入金</button>':''}
         <button class="card-act-btn edit" onclick="editCash('${c.id}')">✏️ 編輯</button>
         <button class="card-act-btn danger" onclick="delCash('${c.id}')">🗑</button>
       </div>`;
@@ -1654,8 +1704,28 @@ function renderDivs(){
     pendingBar.style.display=pendingTotal>0?'block':'none';
     const pel=document.getElementById('d-pending');
     if(pel)pel.textContent='$'+Math.round(pendingTotal).toLocaleString();
-    const pdet=document.getElementById('d-pending-detail');
-    if(pdet)pdet.textContent=pendingDivs.map(d=>`${d.code} 發放日${d.date}`).join(' · ');
+    // Render pending cards
+    const pendingGrid=document.getElementById('d-pending-cards');
+    if(pendingGrid){
+      pendingGrid.innerHTML=pendingDivs.map(d=>{
+        const inv=db.investments.find(i=>i.code===d.code);
+        const dc=getDivColor(d.code);
+        const daysLeft=d.date?Math.ceil((new Date(d.date)-new Date())/86400000):null;
+        return '<div class="pending-div-card" style="border-left:5px solid '+dc+'">'
+          +'<div class="pending-div-top">'
+          +'<div><span class="pending-code" style="color:'+dc+'">'+d.code+'</span>'
+          +(inv?.name?'<span class="pending-name">'+inv.name+'</span>':'')
+          +'</div>'
+          +'<div class="pending-amt">$'+Math.round(d.amount).toLocaleString()+'</div>'
+          +'</div>'
+          +'<div class="pending-div-bot">'
+          +(d.exDate?'<span class="pending-tag">除息 '+d.exDate+'</span>':'')
+          +(d.date?'<span class="pending-tag pay">發放 '+d.date+(daysLeft!==null?' ('+daysLeft+'天後)':'')+'</span>':'')
+          +'<span class="pending-lots">'+d.lots+'張 × $'+d.perShare.toFixed(4)+'</span>'
+          +'</div>'
+          +'</div>';
+      }).join('');
+    }
   }
   const showHist=document.getElementById('div-hist-chk')?.checked||false;
 
@@ -2542,6 +2612,43 @@ function deleteClearedLoan(id){
   if(!doubleConfirm('確定要刪除這筆結清記錄？'))return;
   db.clearedLoans=db.clearedLoans.filter(x=>x.id!==id);
   save();openLoanHist();toast('已刪除');
+}
+
+// ═══ QUICK DEPOSIT ═══
+let _depositId=null;
+function quickDeposit(id, bank){
+  _depositId=id;
+  const acc=db.cashAccounts.find(c=>c.id===id);
+  const cur=(acc?.cash||0);
+  document.getElementById('depositMT').textContent='💵 入金 · '+bank;
+  document.getElementById('depositSub').textContent='目前現金：$'+cur.toLocaleString()+'　入金後自動加總';
+  document.getElementById('deposit-amt').value='';
+  document.getElementById('deposit-prev').style.display='none';
+  openModal('depositModal');
+  setTimeout(()=>document.getElementById('deposit-amt').focus(),100);
+}
+function updateDepositPreview(){
+  const acc=db.cashAccounts.find(c=>c.id===_depositId);
+  const cur=acc?.cash||0;
+  const add=parseFloat(document.getElementById('deposit-amt')?.value)||0;
+  const prev=document.getElementById('deposit-prev');
+  if(!prev)return;
+  if(add>0){
+    prev.style.display='block';
+    prev.textContent='入金 $'+add.toLocaleString()+' → 現金餘額 $'+(cur+add).toLocaleString();
+  } else {
+    prev.style.display='none';
+  }
+}
+function saveDeposit(){
+  const add=parseFloat(document.getElementById('deposit-amt').value)||0;
+  if(!add||add<=0)return toast('請輸入入金金額');
+  const acc=db.cashAccounts.find(c=>c.id===_depositId);
+  if(!acc)return;
+  save(); // snapshot before
+  acc.cash=(acc.cash||0)+add;
+  save();closeModal('depositModal');render();
+  toast('✅ 已入金 $'+add.toLocaleString());
 }
 
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
