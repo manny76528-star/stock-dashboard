@@ -200,6 +200,102 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 .trend-checks{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:12px;font-size:12px;}
 .trend-checks label{display:flex;align-items:center;gap:5px;cursor:pointer;font-weight:500;}
 .trend-checks input{accent-color:var(--accent);width:14px;height:14px;}
+
+/* ========== INVESTMENT CARD GRID ========== */
+.inv-summary-strip{
+  display:grid;grid-template-columns:repeat(5,1fr);
+  gap:0;border-bottom:1px solid var(--border);
+  background:linear-gradient(135deg,#1e3a5f 0%,#2563eb 100%);
+}
+.inv-sum-item{
+  padding:14px 16px;border-right:1px solid rgba(255,255,255,.1);
+}
+.inv-sum-item:last-child{border-right:none;}
+.inv-sum-label{font-size:10px;color:rgba(255,255,255,.6);letter-spacing:.5px;margin-bottom:4px;text-transform:uppercase;}
+.inv-sum-value{font-size:16px;font-weight:700;color:#fff;}
+@media(max-width:700px){
+  .inv-summary-strip{grid-template-columns:repeat(3,1fr);}
+  .inv-sum-item:nth-child(4),.inv-sum-item:nth-child(5){border-top:1px solid rgba(255,255,255,.1);}
+}
+
+.inv-card-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:16px;padding:16px;
+  background:#f1f5f9;
+}
+@media(max-width:600px){.inv-card-grid{grid-template-columns:1fr;}}
+
+.inv-card{
+  background:#fff;border-radius:14px;padding:0;
+  box-shadow:0 2px 8px rgba(0,0,0,.08),0 1px 3px rgba(0,0,0,.06);
+  border:1px solid #e2e8f0;
+  transition:box-shadow .2s,transform .2s;
+  overflow:hidden;
+}
+.inv-card:hover{box-shadow:0 8px 24px rgba(0,0,0,.12);transform:translateY(-2px);}
+
+.inv-card-header{
+  display:flex;justify-content:space-between;align-items:flex-start;
+  padding:16px 16px 12px;
+  border-bottom:1px solid #f1f5f9;
+  background:linear-gradient(to bottom right,#fafbff,#f8fafc);
+}
+.inv-card-badge{
+  display:inline-block;font-size:10px;font-weight:600;
+  padding:2px 7px;border-radius:20px;margin-left:6px;
+  vertical-align:middle;
+}
+
+.inv-card-body{
+  padding:12px 16px;display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;
+}
+.inv-card-row{display:flex;flex-direction:column;gap:2px;}
+.inv-card-label{font-size:10px;color:#94a3b8;letter-spacing:.3px;text-transform:uppercase;}
+.inv-card-val{font-size:13px;font-weight:600;font-family:'JetBrains Mono',monospace;color:#1e293b;}
+
+.inv-card-actions{
+  display:flex;flex-wrap:wrap;gap:5px;padding:8px 12px;
+  border-top:1px solid #f1f5f9;background:#fafbfc;
+}
+.card-act-btn{
+  border:none;border-radius:7px;padding:5px 10px;font-size:11px;
+  cursor:pointer;font-weight:600;font-family:'Noto Sans TC',sans-serif;
+  transition:all .15s;
+}
+.card-act-btn.buy{background:#fef2f2;color:#dc2626;}
+.card-act-btn.buy:hover{background:#dc2626;color:#fff;}
+.card-act-btn.sell{background:#f0fdf4;color:#16a34a;}
+.card-act-btn.sell:hover{background:#16a34a;color:#fff;}
+.card-act-btn.div{background:#fffbeb;color:#d97706;}
+.card-act-btn.div:hover{background:#d97706;color:#fff;}
+.card-act-btn.edit{background:#eff6ff;color:#2563eb;}
+.card-act-btn.edit:hover{background:#2563eb;color:#fff;}
+.card-act-btn.move{background:#f8fafc;color:#94a3b8;padding:5px 7px;}
+.card-act-btn.move:hover{background:#e2e8f0;color:#475569;}
+.card-act-btn.hist-toggle{background:#f0f9ff;color:#0369a1;}
+.card-act-btn.hist-toggle:hover{background:#0369a1;color:#fff;}
+.card-act-btn.danger{background:#fef2f2;color:#dc2626;margin-left:auto;padding:5px 8px;}
+.card-act-btn.danger:hover{background:#dc2626;color:#fff;}
+
+.inv-card-hist{border-top:2px solid #eff6ff;background:#f8fafc;}
+.hist-panel-title{padding:8px 14px;font-size:11px;font-weight:700;color:#475569;background:#eff6ff;letter-spacing:.5px;}
+.hist-txn-list{max-height:220px;overflow-y:auto;}
+.hist-txn-row{
+  display:grid;
+  grid-template-columns:60px 90px 50px 70px 90px 1fr auto auto;
+  gap:6px;align-items:center;
+  padding:6px 12px;font-size:11px;font-family:'JetBrains Mono',monospace;
+  border-bottom:1px solid #f1f5f9;
+}
+.hist-txn-row:hover{background:#f0f9ff;}
+.hist-txn-row.hist-buy .hist-type{color:#dc2626;font-weight:700;}
+.hist-txn-row.hist-sell .hist-type{color:#16a34a;font-weight:700;}
+.hist-date{color:#94a3b8;}
+@media(max-width:600px){
+  .hist-txn-row{grid-template-columns:60px 1fr 1fr;gap:4px;font-size:10px;}
+  .hist-txn-row span:nth-child(n+5){display:none;}
+}
 </style>
 <div class="bkwarn" id="bkwarn">⚠️ 距上次備份已超過 3 天，請記得備份！<button class="act-btn" style="margin-left:auto" onclick="exportData()">📤 立即備份</button></div>
 
@@ -247,32 +343,45 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
   <table class="sum-table" id="sum-tbl"></table>
 </div>
 
-<!-- INVESTMENTS -->
-<div class="sec">
-  <div class="sec-header"><span class="sec-icon">📈</span>投資標的</div>
-  <div class="sec-content">
-    <table class="dt" id="inv-tbl">
-      <thead><tr>
-        <th>標的</th><th>持有張數</th><th>均買價</th><th>總成本</th>
-        <th>現價</th><th>市值</th><th>未實現損益</th><th>報酬率</th>
-        <th>月配息</th><th>比率</th>
-      </tr></thead>
-      <tbody id="inv-body"></tbody>
-      <tfoot><tr class="row-total">
-        <td colspan="3" style="text-align:right;padding-right:10px">總結</td>
-        <td class="mono bold" id="t-cost">—</td>
-        <td></td>
-        <td class="mono bold" id="t-mkt">—</td>
-        <td class="mono bold" id="t-pnl">—</td>
-        <td class="mono bold" id="t-roi">—</td>
-        <td class="mono bold pink-bg" id="t-div">$0</td>
-        <td class="mono bold">100%</td>
-      </tr></tfoot>
-    </table>
-    <div class="add-bar">
-      <button class="act-btn add" onclick="openInvModal()">＋ 新增股票</button>
-      <button class="act-btn hist-btn" style="margin-left:8px" onclick="openSearchModal()">🔍 查詢交易記錄</button>
+<!-- INVESTMENTS - Card Grid -->
+<div class="sec" id="inv-section">
+  <div class="sec-header" style="justify-content:space-between">
+    <div style="display:flex;align-items:center;gap:8px"><span class="sec-icon">📈</span>投資標的</div>
+    <div style="display:flex;align-items:center;gap:6px">
+      <label style="font-size:11px;display:flex;align-items:center;gap:5px;cursor:pointer;color:rgba(255,255,255,.85)">
+        <input type="checkbox" id="roi-chk-card" onchange="showDivRoi=this.checked;renderSum();renderInv()" style="accent-color:#60a5fa;width:13px;height:13px"> 含息
+      </label>
     </div>
+  </div>
+  <!-- Summary strip -->
+  <div class="inv-summary-strip">
+    <div class="inv-sum-item">
+      <div class="inv-sum-label">總成本</div>
+      <div class="inv-sum-value mono" id="t-cost">—</div>
+    </div>
+    <div class="inv-sum-item">
+      <div class="inv-sum-label">總市值</div>
+      <div class="inv-sum-value mono" id="t-mkt">—</div>
+    </div>
+    <div class="inv-sum-item">
+      <div class="inv-sum-label">總損益</div>
+      <div class="inv-sum-value mono bold" id="t-pnl">—</div>
+    </div>
+    <div class="inv-sum-item">
+      <div class="inv-sum-label">總報酬率</div>
+      <div class="inv-sum-value mono bold" id="t-roi">—</div>
+    </div>
+    <div class="inv-sum-item">
+      <div class="inv-sum-label">月配息</div>
+      <div class="inv-sum-value mono bold gain" id="t-div">—</div>
+    </div>
+  </div>
+  <!-- Card grid -->
+  <div class="inv-card-grid" id="inv-body"></div>
+  <!-- Actions -->
+  <div class="add-bar" style="border-top:1px solid var(--border)">
+    <button class="act-btn add" onclick="openInvModal()">＋ 新增股票</button>
+    <button class="act-btn hist-btn" style="margin-left:8px" onclick="openSearchModal()">🔍 查詢交易記錄</button>
   </div>
 </div>
 
@@ -914,95 +1023,135 @@ let showDivRoi=false;
 function render(){renderInv();renderLoans();renderFlex();renderCash();renderDivs();renderSum();}
 
 function renderInv(){
-  const tbody=document.getElementById('inv-body');
-  const openIds=[];tbody.querySelectorAll('.hist-row.open').forEach(r=>openIds.push(r.dataset.id));
-  tbody.innerHTML='';
+  const grid=document.getElementById('inv-body');
+  // Preserve open history panels
+  const openIds=[];
+  grid.querySelectorAll('.inv-card[data-open="1"]').forEach(c=>openIds.push(c.dataset.id));
+  grid.innerHTML='';
   let tC=0,tM=0,tD=0,tR=0;
-  // Sort by user-defined order
   const sortedInvs=[...db.investments].sort((a,b)=>(a.order||999)-(b.order||999));
   const calcs=sortedInvs.map(inv=>({inv,c:calcInv(inv)}));
   calcs.forEach(({c})=>{tC+=c.tCost;if(c.mktVal)tM+=c.mktVal;tD+=c.moDivAmt;tR+=c.realized;});
 
+  // Sync含息 checkbox in header
+  const chk=document.getElementById('roi-chk-card');
+  if(chk)chk.checked=showDivRoi;
+
   calcs.forEach(({inv,c})=>{
-    // Skip completely sold-out stocks OR empty stocks with no lots
     if(c.tLots===0) return;
-    const prC=c.curPrice==null?'':db.prices[inv.code]?.change>=0?'gain':'loss';
-    const displayPnl = showDivRoi ? c.pnlWithDiv : c.pnl;
-    const displayPnlPct = showDivRoi ? c.pnlPctWithDiv : c.pnlPct;
-    const pnC=displayPnl==null?'':displayPnl>=0?'gain':'loss';
-    const pct=tC>0?(c.tCost/tC*100).toFixed(1)+'%':'—';
-    const ho=openIds.includes(inv.id);
-    const tr=document.createElement('tr');
-    tr.innerHTML=`
-      <td class="left bold" style="color:var(--accent)">
-        ${inv.url?`<a href="${inv.url}" target="_blank" style="color:var(--accent);text-decoration:none" title="${inv.url}">${inv.code}</a>`:inv.code}
-        ${inv.name?`<br><small style="color:var(--muted);font-weight:400">${inv.name}</small>`:''}
-        ${inv.note?`<br><small style="color:${inv.note==='現股'?'var(--gain)':inv.note==='質押中'?'#1a5fa8':'var(--teal)'}">${inv.note}</small>`:''}
-      </td>
-      <td class="mono bold" style="color:var(--accent)">${c.tLots} 張</td>
-      <td class="mono">$${fmtF(c.avgCost)}</td>
-      <td class="mono">${fmt(c.tCost)}</td>
-      <td class="mono ${prC}">${c.curPrice!=null?'$'+c.curPrice.toFixed(2):'<span style="color:var(--muted)">—</span>'}</td>
-      <td class="mono">${c.mktVal!=null?fmt(c.mktVal):'<span style="color:var(--muted)">—</span>'}</td>
-      <td class="mono ${pnC}">${displayPnl!=null?(displayPnl>=0?'+':'-')+fmt(displayPnl):'<span style="color:var(--muted)">—</span>'}</td>
-      <td class="mono ${pnC}">${displayPnlPct!=null?(displayPnlPct>=0?'+':'-')+Math.abs(displayPnlPct).toFixed(2)+'%':'<span style="color:var(--muted)">—</span>'}</td>
-      <td class="mono gain bold">${c.moDivAmt>0?fmt(c.moDivAmt):'—'}</td>
-      <td class="mono">${pct}</td>`;
-    tbody.appendChild(tr);
+    const displayPnl=showDivRoi?c.pnlWithDiv:c.pnl;
+    const displayPct=showDivRoi?c.pnlPctWithDiv:c.pnlPct;
+    const pnColor=displayPnl==null?'var(--muted)':displayPnl>0?'var(--gain)':displayPnl<0?'var(--loss)':'var(--muted)';
+    const prColor=c.curPrice==null?'var(--text)':db.prices[inv.code]?.change>=0?'var(--gain)':'var(--loss)';
+    const portPct=tC>0?(c.tCost/tC*100).toFixed(1):'—';
+    const isOpen=openIds.includes(inv.id);
 
-    const ar=document.createElement('tr');ar.className='act-row';
-    ar.innerHTML=`<td colspan="11"><div style="display:flex;gap:4px;flex-wrap:wrap">
-      <button class="act-btn buy-btn" onclick="openBuyModal('${inv.id}')">▲ 買入</button>
-      <button class="act-btn sell-btn" onclick="openSellModal('${inv.id}')">▼ 賣出</button>
-      <button class="act-btn div-btn" onclick="openDivFor('${inv.code}')">💰 領息</button>
-      <button class="act-btn hist-btn" onclick="toggleHist('${inv.id}')" id="hb-${inv.id}">📋 記錄${ho?'▲':'▼'}</button>
-      <button class="act-btn" style="color:var(--muted)" onclick="moveInv('${inv.id}',-1)" title="上移">↑</button>
-      <button class="act-btn" style="color:var(--muted)" onclick="moveInv('${inv.id}',1)" title="下移">↓</button>
-      <button class="act-btn" onclick="openInvModal('${inv.id}')">✏️ 編輯</button>
-      <button class="act-btn del" onclick="delInv('${inv.id}')">🗑 刪除</button>
-    </div></td>`;
-    tbody.appendChild(ar);
-
-    const hr=document.createElement('tr');hr.className='hist-row'+(ho?' open':'');hr.dataset.id=inv.id;hr.id='hr-'+inv.id;
+    // Transaction history HTML
     const txns=(inv.transactions||[]).slice().reverse();
-    const tHTML=txns.length===0?'<tr><td colspan="8" style="color:var(--muted);text-align:center;padding:10px">尚無交易記錄</td></tr>':
-      txns.map(t=>{
+    const tHTML=txns.length===0
+      ?'<div style="padding:12px;text-align:center;color:var(--muted);font-size:12px">尚無交易記錄</div>'
+      :txns.map(t=>{
         const isB=t.type==='buy';
         const refs=t.lotRefs?t.lotRefs.map(r=>`<span class="ltag">${r.lots}張 ${r.date}</span>`).join(''):'';
-        return`<tr>
-          <td class="${isB?'txnbuy':'txnsell'}">${isB?'▲ 買入':'▼ 賣出'}</td>
-          <td class="mono">${t.date}</td><td class="mono bold">${t.lots} 張</td>
-          <td class="mono">$${t.price.toFixed(2)}</td>
-          <td class="mono">${fmt(t.lots*1000*t.price)}</td>
-          <td class="mono">${t.fee?'$'+Math.round(t.fee).toLocaleString():'—'}</td>
-          <td style="font-size:10px">${isB?`<span class="ltag" style="background:#e8f5ee;border-color:#aad4bc;color:var(--gain)">批次${t.id.slice(-4)}</span>${t.remark?`<br><span style="color:var(--muted);font-size:9px">📝${t.remark}</span>`:''}`:refs||'FIFO'}</td>
-          <td><button class="act-btn del" onclick="delTxn('${inv.id}','${t.id}')">刪</button></td>
-        </tr>`;
+        return `<div class="hist-txn-row ${isB?'hist-buy':'hist-sell'}">
+          <span class="hist-type">${isB?'▲ 買入':'▼ 賣出'}</span>
+          <span class="hist-date">${t.date}</span>
+          <span>${t.lots}張</span>
+          <span>$${t.price.toFixed(2)}</span>
+          <span>${fmt(t.lots*1000*t.price)}</span>
+          <span style="color:var(--muted);font-size:10px">${t.fee?'手續費$'+Math.round(t.fee).toLocaleString():''}</span>
+          <span style="font-size:10px">${isB?(t.remark?'📝'+t.remark:''):(refs||'FIFO')}</span>
+          <button class="act-btn del" style="padding:2px 6px;font-size:10px" onclick="delTxn('${inv.id}','${t.id}')">刪</button>
+        </div>`;
       }).join('');
-    hr.innerHTML=`<td colspan="10" style="padding:0"><div class="hist-panel">
-      <div class="ht">📋 ${inv.code} 完整交易記錄（${(inv.transactions||[]).length} 筆）</div>
-      <div style="overflow-x:auto"><table class="htbl"><thead><tr><th>類型</th><th>日期</th><th>張數</th><th>價格</th><th>金額</th><th>手續費</th><th>批次</th><th></th></tr></thead>
-      <tbody>${tHTML}</tbody></table></div>
-    </div></td>`;
-    tbody.appendChild(hr);
+
+    const noteColor=inv.note==='現股'?'#dc2626':inv.note==='質押中'?'#2563eb':'var(--teal)';
+    const noteHtml=inv.note?`<span class="inv-card-badge" style="background:${noteColor}20;color:${noteColor};border:1px solid ${noteColor}40">${inv.note}</span>`:'';
+    const nameHtml=inv.url
+      ?`<a href="${inv.url}" target="_blank" style="color:var(--accent);text-decoration:none;font-size:16px;font-weight:800">${inv.code}</a>`
+      :`<span style="font-size:16px;font-weight:800;color:var(--accent)">${inv.code}</span>`;
+
+    const card=document.createElement('div');
+    card.className='inv-card'+(isOpen?' inv-card-open':'');
+    card.dataset.id=inv.id;
+    if(isOpen)card.dataset.open='1';
+    card.innerHTML=`
+      <div class="inv-card-header">
+        <div>
+          ${nameHtml}
+          ${noteHtml}
+          ${inv.name?`<div style="font-size:11px;color:var(--muted);margin-top:2px">${inv.name}</div>`:''}
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:20px;font-weight:800;color:${pnColor}">${displayPnl!=null?(displayPnl>=0?'+':'')+fmt(displayPnl):'—'}</div>
+          <div style="font-size:12px;color:${pnColor};font-weight:600">${displayPct!=null?(displayPct>=0?'+':'')+Math.abs(displayPct).toFixed(2)+'%':'—'}</div>
+        </div>
+      </div>
+      <div class="inv-card-body">
+        <div class="inv-card-row">
+          <span class="inv-card-label">現價</span>
+          <span class="inv-card-val" style="color:${prColor};font-weight:700">${c.curPrice!=null?'$'+c.curPrice.toFixed(2):'—'}</span>
+        </div>
+        <div class="inv-card-row">
+          <span class="inv-card-label">持有</span>
+          <span class="inv-card-val">${c.tLots} 張</span>
+        </div>
+        <div class="inv-card-row">
+          <span class="inv-card-label">均買價</span>
+          <span class="inv-card-val">$${fmtF(c.avgCost)}</span>
+        </div>
+        <div class="inv-card-row">
+          <span class="inv-card-label">總成本</span>
+          <span class="inv-card-val">${fmt(c.tCost)}</span>
+        </div>
+        <div class="inv-card-row">
+          <span class="inv-card-label">市值</span>
+          <span class="inv-card-val">${c.mktVal!=null?fmt(c.mktVal):'—'}</span>
+        </div>
+        <div class="inv-card-row">
+          <span class="inv-card-label">月配息</span>
+          <span class="inv-card-val" style="color:var(--gain)">${c.moDivAmt>0?fmt(c.moDivAmt):'—'}</span>
+        </div>
+        <div class="inv-card-row">
+          <span class="inv-card-label">佔比</span>
+          <span class="inv-card-val">${portPct}%</span>
+        </div>
+      </div>
+      <div class="inv-card-actions">
+        <button class="card-act-btn buy" onclick="openBuyModal('${inv.id}')">▲ 買入</button>
+        <button class="card-act-btn sell" onclick="openSellModal('${inv.id}')">▼ 賣出</button>
+        <button class="card-act-btn div" onclick="openDivFor('${inv.code}')">💰 息</button>
+        <button class="card-act-btn edit" onclick="openInvModal('${inv.id}')">✏️</button>
+        <button class="card-act-btn move" onclick="moveInv('${inv.id}',-1)" title="上移">↑</button>
+        <button class="card-act-btn move" onclick="moveInv('${inv.id}',1)" title="下移">↓</button>
+        <button class="card-act-btn hist-toggle" id="hb-${inv.id}" onclick="toggleHist('${inv.id}')">📋 ${isOpen?'▲':'▼'}</button>
+        <button class="card-act-btn danger" onclick="delInv('${inv.id}')">🗑</button>
+      </div>
+      <div class="inv-card-hist" id="hr-${inv.id}" style="display:${isOpen?'block':'none'}">
+        <div class="hist-panel-title">📋 ${inv.code} 交易記錄（${(inv.transactions||[]).length} 筆）</div>
+        <div class="hist-txn-list">${tHTML}</div>
+      </div>`;
+    grid.appendChild(card);
   });
 
+  // Update summary strip
   const tPnl=tM-tC,tRoi=tC>0?tPnl/tC*100:0;
-  document.getElementById('t-cost').textContent=fmt(tC);
-  document.getElementById('t-mkt').textContent=tM>0?fmt(tM):'—';
-  document.getElementById('t-pnl').textContent=tM>0?(tPnl>=0?'+':'-')+fmt(tPnl):'—';
-  document.getElementById('t-pnl').className='mono bold '+(tPnl>=0?'gain':'loss');
-  document.getElementById('t-roi').textContent=tM>0?(tRoi>=0?'+':'')+tRoi.toFixed(2)+'%':'—';
-  document.getElementById('t-roi').className='mono bold '+(tRoi>=0?'gain':'loss');
-
+  const setCl=(id,val,pos)=>{const el=document.getElementById(id);if(el){el.textContent=val;if(pos!==undefined)el.style.color=pos?'var(--gain)':val==='—'?'var(--muted)':'var(--loss)';}};
+  setCl('t-cost',fmt(tC));
+  setCl('t-mkt',tM>0?fmt(tM):'—');
+  setCl('t-pnl',tM>0?(tPnl>=0?'+':'')+fmt(tPnl):'—',tPnl>=0);
+  setCl('t-roi',tM>0?(tRoi>=0?'+':'')+tRoi.toFixed(2)+'%':'—',tRoi>=0);
   document.getElementById('t-div').textContent=fmt(tD);
 }
-
 function toggleHist(id){
-  const hr=document.getElementById('hr-'+id);
+  const panel=document.getElementById('hr-'+id);
   const btn=document.getElementById('hb-'+id);
-  const open=hr.classList.toggle('open');
-  btn.textContent='📋 記錄'+(open?'▲':'▼');
+  const card=panel?.closest('.inv-card');
+  if(!panel)return;
+  const isOpen=panel.style.display==='block';
+  panel.style.display=isOpen?'none':'block';
+  if(card){card.dataset.open=isOpen?'0':'1';}
+  if(btn)btn.textContent='📋 '+(isOpen?'▼':'▲');
 }
 
 function renderLoans(){
