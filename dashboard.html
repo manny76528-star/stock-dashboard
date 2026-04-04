@@ -619,6 +619,29 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
   .inv-hero-card{padding:12px 14px;}
   .inv-hero-value{font-size:18px;}
 }
+
+/* ═══ CASH PENDING DIVIDENDS ═══ */
+.cash-pending-wrap{
+  border-top:1px solid #e5e7eb;
+  background:#f8fafc;
+}
+.cash-pending-header{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:10px 16px;cursor:pointer;
+  transition:background .15s;
+}
+.cash-pending-header:hover{background:#eff6ff;}
+.pending-arrow{font-size:11px;color:#94a3b8;transition:transform .2s;}
+.cash-pending-list{
+  border-top:1px solid #e5e7eb;
+  padding:6px 12px 10px;
+  display:flex;flex-direction:column;gap:4px;
+}
+.cash-pending-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:7px 4px;border-bottom:1px solid #f1f5f9;
+}
+.cash-pending-row:last-child{border-bottom:none;}
 </style>
 <div class="bkwarn" id="bkwarn">⚠️ 距上次備份已超過 3 天，請記得備份！<button class="act-btn" style="margin-left:auto" onclick="exportData()">📤 立即備份</button></div>
 
@@ -1476,6 +1499,53 @@ function renderInv(){
         <div class="hist-txn-list">${tHTML}</div>
       </div>`;
     grid.appendChild(card);
+    // Replace pending placeholder with real DOM
+    if(isLineBank && pendingDivs30.length>0){
+      const placeholder=card.querySelector('[data-pending-id]');
+      if(!placeholder){
+        const wrap=document.createElement('div');
+        wrap.className='cash-pending-wrap';
+        const header=document.createElement('div');
+        header.className='cash-pending-header';
+        header.onclick=()=>{
+          const list=wrap.querySelector('.cash-pending-list');
+          const arrow=wrap.querySelector('.pending-arrow');
+          const open=list.style.display==='none';
+          list.style.display=open?'block':'none';
+          if(arrow)arrow.textContent=open?'▲':'▼';
+        };
+        header.innerHTML='<div style="display:flex;align-items:center;gap:8px">'
+          +'<span style="font-size:12px">⏳ 待入帳股息（30天內）</span>'
+          +'<span style="font-size:13px;font-weight:800;color:#2563eb">$'+pendingTotal30.toLocaleString()+'</span>'
+          +'</div><span class="pending-arrow">▼</span>';
+        const list=document.createElement('div');
+        list.className='cash-pending-list';
+        list.style.display='none';
+        pendingDivs30.forEach(d=>{
+          const inv=db.investments.find(i=>i.code===d.code);
+          const dc=getDivColor(d.code);
+          const daysLeft=Math.ceil((new Date(d.date)-today)/86400000);
+          const row=document.createElement('div');
+          row.className='cash-pending-row';
+          row.innerHTML='<div style="display:flex;align-items:center;gap:6px">'
+            +'<span style="width:4px;height:32px;border-radius:2px;background:'+dc+';flex-shrink:0;display:inline-block"></span>'
+            +'<div>'
+            +'<div style="font-size:12px;font-weight:700;color:#1e293b">'+d.code
+            +(inv?.name?'<span style="font-size:10px;color:#94a3b8;margin-left:4px">'+inv.name+'</span>':'')+'</div>'
+            +'<div style="font-size:10px;color:#94a3b8">發放 '+d.date
+            +(daysLeft<=5?'<span style="color:#ef4444;font-weight:700;margin-left:4px">'+daysLeft+'天後</span>':'<span style="color:#94a3b8;margin-left:4px">'+daysLeft+'天後</span>')
+            +'</div></div></div>'
+            +'<div style="font-size:14px;font-weight:800;color:#2563eb">$'+Math.round(d.amount).toLocaleString()+'</div>';
+          list.appendChild(row);
+        });
+        wrap.appendChild(header);
+        wrap.appendChild(list);
+        // Insert before footer
+        const footer=card.querySelector('.cash-card-footer');
+        if(footer)card.insertBefore(wrap,footer);
+        else card.appendChild(wrap);
+      }
+    }
   });
 
   // Update summary strip
@@ -1688,12 +1758,36 @@ function renderCash(){
   grid.innerHTML='';
   let tB=0;
 
+  // 計算30天內待入帳股息（準備入帳）
+  const today=new Date();
+  const in30=new Date(today.getTime()+30*86400000);
+  const todayStr=today.toISOString().split('T')[0];
+  const in30Str=in30.toISOString().split('T')[0];
+  const pendingDivs30=(db.dividends||[])
+    .filter(d=>{
+      const isPending=d.pending||(d.exDate&&d.exDate<=todayStr&&d.date&&d.date>todayStr);
+      return isPending && d.date && d.date>=todayStr && d.date<=in30Str;
+    })
+    .sort((a,b)=>a.date.localeCompare(b.date)); // 越近越上面
+
+  const pendingTotal30=pendingDivs30.reduce((s,d)=>s+d.amount,0);
+
   db.cashAccounts.forEach(c=>{
     const bal=(c.cash||0)+(c.d1||0)+(c.d2||0);
     tB+=bal;
     const card=document.createElement('div');
     card.className='cash-card';
     const hasD1=c.d1&&c.d1!==0, hasD2=c.d2&&c.d2!==0;
+    const isLineBank=c.bank==='Line Bank';
+
+    // 待入帳區塊 HTML（只有 Line Bank 才顯示）
+        let pendingHtml='';
+    if(isLineBank && pendingDivs30.length>0){
+      // Build as DOM element to avoid quote hell
+      pendingHtml='__PENDING_PLACEHOLDER_'+c.id+'__';
+    }
+
+    
     card.innerHTML=`
       <div class="cash-card-top">
         <div class="cash-card-bank">${c.bank}</div>
@@ -1704,8 +1798,9 @@ function renderCash(){
         ${hasD1?'<div class="cash-item"><span class="cash-item-label">交割 DAY1</span><span class="cash-item-val '+(c.d1<0?'loss':'gain')+'">$'+c.d1.toLocaleString()+'</span></div>':''}
         ${hasD2?'<div class="cash-item"><span class="cash-item-label">交割 DAY2</span><span class="cash-item-val '+(c.d2<0?'loss':'gain')+'">$'+c.d2.toLocaleString()+'</span></div>':''}
       </div>
+      ${pendingHtml}
       <div class="cash-card-footer">
-        ${c.bank==='Line Bank'?'<button class="card-act-btn" style="background:#eff6ff;color:#2563eb" onclick="quickDeposit(\''+c.id+'\',\''+c.bank+'\')">💵 入金</button>':''}
+        ${isLineBank?'<button class="card-act-btn" style="background:#eff6ff;color:#2563eb" onclick="quickDeposit(\''+c.id+'\',\''+c.bank+'\')">💵 入金</button>':''}
         <button class="card-act-btn edit" onclick="editCash('${c.id}')">✏️ 編輯</button>
         <button class="card-act-btn danger" onclick="delCash('${c.id}')">🗑</button>
       </div>`;
@@ -1716,6 +1811,15 @@ function renderCash(){
   if(totEl)totEl.textContent='$'+tB.toLocaleString();
   const badge=document.getElementById('cash-tot-badge');
   if(badge){badge.textContent='$'+Math.abs(tB).toLocaleString();badge.style.color=tB>=0?'var(--gain)':'var(--loss)';}
+}
+
+function togglePending(cashId){
+  const list=document.getElementById('pending-list-'+cashId);
+  const arrow=document.getElementById('pending-arrow-'+cashId);
+  if(!list)return;
+  const open=list.style.display==='none';
+  list.style.display=open?'block':'none';
+  if(arrow)arrow.textContent=open?'▲':'▼';
 }
 
 
