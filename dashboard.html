@@ -296,17 +296,253 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
   .hist-txn-row{grid-template-columns:60px 1fr 1fr;gap:4px;font-size:10px;}
   .hist-txn-row span:nth-child(n+5){display:none;}
 }
+
+/* ═══════════════════════════════════════════
+   DASHBOARD ROOT LAYOUT
+═══════════════════════════════════════════ */
+.db-root{max-width:1300px;margin:0 auto;display:flex;flex-direction:column;gap:12px;padding:0 0 24px;}
+
+/* PAGE HEADER */
+.db-page-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 18px;
+  background:linear-gradient(135deg,#1e3a5f,#2563eb);
+  border-radius:14px;
+  box-shadow:0 4px 20px rgba(37,99,235,.25);
+}
+.db-page-title{
+  display:flex;align-items:center;gap:10px;
+  font-size:18px;font-weight:900;color:#fff;
+  letter-spacing:2px;cursor:pointer;
+}
+.db-title-icon{font-size:20px;}
+.db-topbar-actions{display:flex;gap:6px;flex-wrap:wrap;}
+
+/* PRICE BAR */
+.db-price-bar{
+  font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;
+  padding:6px 12px;background:#fff;border-radius:8px;
+  border:1px solid var(--border);
+  box-shadow:0 1px 3px rgba(0,0,0,.05);
+}
+
+/* BUTTONS */
+.db-btn{
+  border:none;border-radius:8px;padding:8px 14px;
+  font-size:11px;font-weight:600;cursor:pointer;
+  font-family:'Noto Sans TC',sans-serif;
+  transition:all .15s;color:#fff;
+}
+.db-btn.primary{background:#2563eb;}.db-btn.primary:hover{background:#1d4ed8;}
+.db-btn.success{background:#16a34a;}.db-btn.success:hover{background:#15803d;}
+.db-btn.neutral{background:#64748b;}.db-btn.neutral:hover{background:#475569;}
+.db-btn.purple{background:#7c3aed;}.db-btn.purple:hover{background:#6d28d9;}
+.db-btn.indigo{background:#4f46e5;}.db-btn.indigo:hover{background:#4338ca;}
+.db-btn:disabled{opacity:.4;cursor:not-allowed;}
+
+.db-btn-sm{
+  border:none;border-radius:6px;padding:5px 10px;
+  font-size:11px;font-weight:600;cursor:pointer;
+  font-family:'Noto Sans TC',sans-serif;transition:all .15s;
+}
+.db-btn-sm.primary{background:#2563eb;color:#fff;}
+.db-btn-sm.primary:hover{background:#1d4ed8;}
+.db-btn-sm.neutral{background:#f1f5f9;color:#475569;border:1px solid #e2e8f0;}
+.db-btn-sm.neutral:hover{background:#e2e8f0;}
+.db-btn-sm.light{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);}
+.db-btn-sm.light:hover{background:rgba(255,255,255,.28);}
+
+/* ROW LAYOUT */
+.db-row{display:flex;gap:12px;flex-wrap:wrap;}
+.db-row > *{min-width:0;}
+
+/* CARDS */
+.db-card{
+  background:#fff;border-radius:12px;
+  border:1px solid #e2e8f0;
+  box-shadow:0 1px 4px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.05);
+  overflow:hidden;
+}
+.db-card-header{
+  display:flex;align-items:center;
+  padding:11px 16px;
+  background:#1e293b;color:#fff;
+  font-size:13px;font-weight:700;letter-spacing:.5px;
+}
+.db-hdr-navy{background:#1e3a5f;}
+.db-hdr-green{background:#14532d;}
+.db-hdr-rust{background:#7c2d12;}
+.db-hdr-slate{background:#334155;}
+
+/* ROI CARDS */
+.db-roi-card{
+  background:#fff;border-radius:12px;border:1px solid #e2e8f0;
+  padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.07);
+  display:flex;flex-direction:column;gap:6px;
+}
+.db-roi-card.active{background:linear-gradient(135deg,#f0f9ff,#e0f2fe);border-color:#bae6fd;}
+.db-roi-label{font-size:11px;color:#64748b;font-weight:500;}
+.db-roi-value{font-size:24px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#1e293b;}
+.db-roi-value.accent{color:#2563eb;}
+.db-roi-sub{font-size:11px;color:#94a3b8;margin-top:4px;}
+
+/* SUM TABLE */
+.sum-table{width:100%;border-collapse:collapse;}
+.sum-table td{border:none;border-bottom:1px solid #f1f5f9;padding:10px 14px;}
+.sum-table tr:last-child td{border-bottom:none;}
+.sum-lbl{background:#f8fafc;font-weight:500;width:140px;text-align:left;color:#64748b;font-size:12px;padding-left:16px!important;}
+.sum-val{background:#fff;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:15px;}
+
+/* STATUS BAR */
+.db-status-bar{
+  display:flex;gap:24px;flex-wrap:wrap;
+  padding:12px 20px;
+  background:#1e293b;color:#94a3b8;
+  border-radius:10px;font-size:13px;
+}
+.db-status-bar strong{color:#fff;font-family:'JetBrains Mono',monospace;}
+
+@media(max-width:768px){
+  .db-row{flex-direction:column;}
+  .db-row>.db-card{flex:1!important;min-width:unset!important;}
+  .db-page-header{flex-direction:column;gap:10px;text-align:center;}
+  .db-status-bar{gap:12px;font-size:11px;}
+}
+
+/* ═══ SUM KPI CARDS ═══ */
+.sum-card-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+  gap:1px;background:#f1f5f9;
+  padding:1px;
+}
+.sum-kpi-card{
+  background:#fff;
+  padding:16px 18px;
+  display:flex;flex-direction:column;gap:4px;
+  transition:background .15s;
+}
+.sum-kpi-card:hover{background:#f8fafc;}
+.sum-kpi-big{background:linear-gradient(135deg,#eff6ff,#e0f2fe)!important;}
+.sum-kpi-big:hover{background:linear-gradient(135deg,#dbeafe,#bae6fd)!important;}
+.sum-kpi-icon{font-size:18px;margin-bottom:2px;}
+.sum-kpi-label{font-size:10px;color:#94a3b8;font-weight:600;letter-spacing:.5px;text-transform:uppercase;}
+.sum-kpi-value{font-size:20px;font-weight:800;font-family:'JetBrains Mono',monospace;line-height:1.1;}
+.sum-kpi-sub{font-size:10px;color:#cbd5e1;margin-top:2px;}
+@media(max-width:600px){
+  .sum-card-grid{grid-template-columns:repeat(2,1fr);}
+  .sum-kpi-value{font-size:16px;}
+}
+
+/* ═══ SECTION BADGES ═══ */
+.sec-summary-badge{font-size:11px;font-weight:600;color:rgba(255,255,255,.8);background:rgba(255,255,255,.12);padding:3px 10px;border-radius:20px;}
+.sec-summary-badge.green{background:rgba(255,255,255,.15);}
+.sec-summary-badge.rust{background:rgba(255,255,255,.15);}
+
+/* ═══ LOAN CARDS ═══ */
+.loan-sum-strip{display:flex;background:#f8fafc;border-bottom:1px solid var(--border);}
+.loan-sum-item{flex:1;padding:12px 16px;border-right:1px solid var(--border);}
+.loan-sum-item:last-child{border-right:none;}
+.loan-sum-label{font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
+.loan-sum-val{font-size:18px;font-weight:800;font-family:'JetBrains Mono',monospace;}
+.loan-sum-val.loss{color:var(--loss);}
+
+.loan-card-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+  gap:12px;padding:12px;background:#f8fafc;
+}
+.loan-card{
+  background:#fff;border-radius:12px;overflow:hidden;
+  border:1px solid #e2e8f0;
+  box-shadow:0 1px 4px rgba(0,0,0,.06);
+  transition:box-shadow .2s,transform .2s;
+}
+.loan-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.1);transform:translateY(-1px);}
+.loan-card-urgent{border-color:#fca5a5;background:#fff5f5;}
+.loan-card-urgent:hover{box-shadow:0 4px 16px rgba(220,38,38,.15);}
+
+.loan-card-top{display:flex;justify-content:space-between;align-items:flex-start;padding:14px 16px 10px;}
+.loan-card-bank{font-size:15px;font-weight:800;color:#1e293b;}
+.loan-card-sub{font-size:11px;color:#94a3b8;margin-top:2px;}
+.loan-card-rate{font-size:13px;font-weight:700;color:#64748b;text-align:right;}
+
+.loan-progress-wrap{height:6px;background:#f1f5f9;margin:0 16px;}
+.loan-progress-bar{height:6px;background:linear-gradient(to right,#16a34a,#86efac);border-radius:3px;transition:width .5s ease;}
+
+.loan-card-amounts{display:grid;grid-template-columns:1fr 1fr;gap:0;padding:12px 16px;border-top:1px solid #f8fafc;}
+.loan-amt-block{padding:6px 0;}
+.loan-amt-label{font-size:10px;color:#94a3b8;letter-spacing:.3px;margin-bottom:3px;}
+.loan-amt-val{font-size:14px;font-weight:700;font-family:'JetBrains Mono',monospace;color:#1e293b;}
+.loan-amt-val.loss{color:var(--loss);}
+.loan-amt-val.gain{color:var(--gain);}
+
+.loan-card-footer{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:8px 12px;background:#fafbfc;border-top:1px solid #f1f5f9;
+}
+.loan-badge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;}
+.loan-badge.ok{background:#f0fdf4;color:#16a34a;}
+.loan-badge.danger{background:#fef2f2;color:#dc2626;}
+.loan-due{font-size:11px;color:#94a3b8;}
+.loan-due-warn{color:#d97706;font-weight:600;}
+
+/* ═══ FLEX CARDS ═══ */
+.flex-sum-strip{display:flex;background:#f0fdf4;border-bottom:1px solid #bbf7d0;}
+.flex-card-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:12px;padding:12px;background:#f0fdf4;
+}
+.flex-card{
+  background:#fff;border-radius:12px;overflow:hidden;
+  border:1px solid #bbf7d0;
+  box-shadow:0 1px 4px rgba(0,0,0,.06);
+  transition:box-shadow .2s,transform .2s;
+}
+.flex-card:hover{box-shadow:0 4px 16px rgba(22,163,74,.1);transform:translateY(-1px);}
+
+/* ═══ CASH CARDS ═══ */
+.cash-card-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:12px;padding:12px;background:#fff7ed;
+}
+.cash-card{
+  background:#fff;border-radius:12px;overflow:hidden;
+  border:1px solid #fed7aa;
+  box-shadow:0 1px 4px rgba(0,0,0,.06);
+  transition:box-shadow .2s,transform .2s;
+}
+.cash-card:hover{box-shadow:0 4px 14px rgba(234,88,12,.12);transform:translateY(-1px);}
+.cash-card-top{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:14px 16px 10px;
+  background:linear-gradient(135deg,#fff7ed,#fff);
+  border-bottom:1px solid #fef3c7;
+}
+.cash-card-bank{font-size:15px;font-weight:800;color:#1e293b;}
+.cash-card-bal{font-size:20px;font-weight:800;font-family:'JetBrains Mono',monospace;}
+.cash-card-breakdown{padding:10px 16px;display:flex;flex-direction:column;gap:6px;}
+.cash-item{display:flex;justify-content:space-between;align-items:center;}
+.cash-item-label{font-size:11px;color:#94a3b8;}
+.cash-item-val{font-size:13px;font-weight:600;font-family:'JetBrains Mono',monospace;}
+.cash-card-footer{
+  display:flex;justify-content:flex-end;gap:5px;
+  padding:8px 12px;background:#fafbfc;border-top:1px solid #fef3c7;
+}
+.cash-total-bar{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:10px 16px;background:linear-gradient(to right,#7c2d12,#9a3412);color:#fff;
+  font-size:13px;font-weight:600;
+}
+.cash-total-bar .mono{font-size:18px;}
+
+@media(max-width:768px){
+  .loan-card-grid,.flex-card-grid,.cash-card-grid{grid-template-columns:1fr;}
+  .loan-sum-strip,.flex-sum-strip{flex-direction:column;}
+}
 </style>
 <div class="bkwarn" id="bkwarn">⚠️ 距上次備份已超過 3 天，請記得備份！<button class="act-btn" style="margin-left:auto" onclick="exportData()">📤 立即備份</button></div>
 
-<div class="topbar">
-  <span class="pstat" id="pstat">—</span>
-  <button class="tbtn" style="background:var(--accent)" onclick="refreshPrices()">↻ 更新股價</button>
-  <button class="tbtn" style="background:#0d8a4e" onclick="exportData()">📤 備份</button>
-  <label class="tbtn" style="background:#6b7e96;cursor:pointer">📥 還原<input type="file" accept=".json" style="display:none" onchange="importData(event)"></label>
-  <button class="tbtn" style="background:#8b5cf6" onclick="undoLast()" id="undoBtn" disabled>↩ 復原</button>
-  <button class="tbtn" style="background:#6366f1" onclick="redoLast()" id="redoBtn" disabled>↪ 重做</button>
-</div>
+
 
 
 <!-- TREND CHART -->
@@ -331,131 +567,155 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
   </div>
 </div>
 
-<div style="max-width:1200px;margin:0 auto">
-<h1 class="main-title" id="main-title-text" onclick="editTitle()" title="點擊修改標題" style="cursor:pointer">
-  <span id="title-display">２０２６　資產損益表</span>
-</h1>
-<div class="dash">
+<div class="db-root">
 
-<!-- SUMMARY -->
-<div class="sum-sec">
-  <div class="sec-header" style="border-radius:12px 12px 0 0"><span class="sec-icon">📊</span>資產損益表</div>
-  <table class="sum-table" id="sum-tbl"></table>
+<!-- ═══ PAGE HEADER ═══ -->
+<div class="db-page-header">
+  <div class="db-page-title" id="main-title-text" onclick="editTitle()" title="點擊修改標題">
+    <span class="db-title-icon">📊</span>
+    <span id="title-display">２０２６ 資產損益表</span>
+  </div>
+  <div class="db-topbar-actions">
+    <button class="db-btn primary" onclick="refreshPrices()">↻ 更新股價</button>
+    <button class="db-btn success" onclick="exportData()">📤 備份</button>
+    <label class="db-btn neutral" style="cursor:pointer">📥 還原<input type="file" accept=".json" style="display:none" onchange="importData(event)"></label>
+    <button class="db-btn purple" onclick="undoLast()" id="undoBtn" disabled>↩ 復原</button>
+    <button class="db-btn indigo" onclick="redoLast()" id="redoBtn" disabled>↪ 重做</button>
+  </div>
 </div>
 
-<!-- INVESTMENTS - Card Grid -->
-<div class="sec" id="inv-section">
-  <div class="sec-header" style="justify-content:space-between">
-    <div style="display:flex;align-items:center;gap:8px"><span class="sec-icon">📈</span>投資標的</div>
-    <div style="display:flex;align-items:center;gap:6px">
-      <label style="font-size:11px;display:flex;align-items:center;gap:5px;cursor:pointer;color:rgba(255,255,255,.85)">
-        <input type="checkbox" id="roi-chk-card" onchange="showDivRoi=this.checked;renderSum();renderInv()" style="accent-color:#60a5fa;width:13px;height:13px"> 含息
+<div class="db-price-bar" id="pstat">—</div>
+
+<!-- ═══ ROW 1: Summary + ROI ═══ -->
+<div class="db-row">
+
+  <!-- Summary as card grid - full width -->
+  <div class="db-card" style="width:100%">
+    <div class="db-card-header" style="justify-content:space-between">
+      <span>📊 資產總覽</span>
+      <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;color:rgba(255,255,255,.8);font-weight:500">
+        <input type="checkbox" id="roi-chk" onchange="showDivRoi=this.checked;renderSum();renderInv()" style="accent-color:#60a5fa;width:14px;height:14px"> 含息模式
       </label>
+    </div>
+    <div class="sum-card-grid" id="sum-tbl"></div>
+  </div>
+
+</div><!-- /ROW 1 -->
+
+<!-- ═══ ROW 2: Investments ═══ -->
+<div class="db-card" style="margin-bottom:12px">
+  <div class="db-card-header" style="justify-content:space-between">
+    <span>📈 投資標的</span>
+    <div style="display:flex;gap:6px">
+      <button class="db-btn-sm primary" onclick="openInvModal()">＋ 新增</button>
+      <button class="db-btn-sm neutral" onclick="openSearchModal()">🔍 查詢</button>
     </div>
   </div>
   <!-- Summary strip -->
   <div class="inv-summary-strip">
-    <div class="inv-sum-item">
-      <div class="inv-sum-label">總成本</div>
-      <div class="inv-sum-value mono" id="t-cost">—</div>
-    </div>
-    <div class="inv-sum-item">
-      <div class="inv-sum-label">總市值</div>
-      <div class="inv-sum-value mono" id="t-mkt">—</div>
-    </div>
-    <div class="inv-sum-item">
-      <div class="inv-sum-label">總損益</div>
-      <div class="inv-sum-value mono bold" id="t-pnl">—</div>
-    </div>
-    <div class="inv-sum-item">
-      <div class="inv-sum-label">總報酬率</div>
-      <div class="inv-sum-value mono bold" id="t-roi">—</div>
-    </div>
-    <div class="inv-sum-item">
-      <div class="inv-sum-label">月配息</div>
-      <div class="inv-sum-value mono bold gain" id="t-div">—</div>
-    </div>
+    <div class="inv-sum-item"><div class="inv-sum-label">總成本</div><div class="inv-sum-value" id="t-cost">—</div></div>
+    <div class="inv-sum-item"><div class="inv-sum-label">總市值</div><div class="inv-sum-value" id="t-mkt">—</div></div>
+    <div class="inv-sum-item"><div class="inv-sum-label">總損益</div><div class="inv-sum-value" id="t-pnl">—</div></div>
+    <div class="inv-sum-item"><div class="inv-sum-label">總報酬</div><div class="inv-sum-value" id="t-roi">—</div></div>
+    <div class="inv-sum-item"><div class="inv-sum-label">月配息</div><div class="inv-sum-value gain" id="t-div">—</div></div>
   </div>
-  <!-- Card grid -->
   <div class="inv-card-grid" id="inv-body"></div>
-  <!-- Actions -->
-  <div class="add-bar" style="border-top:1px solid var(--border)">
-    <button class="act-btn add" onclick="openInvModal()">＋ 新增股票</button>
-    <button class="act-btn hist-btn" style="margin-left:8px" onclick="openSearchModal()">🔍 查詢交易記錄</button>
-  </div>
 </div>
 
-<!-- LOANS -->
-<div class="sec">
-  <div class="sec-header" style="background:#1e3a5f"><span class="sec-icon">🏦</span>信貸管理</div>
-  <div class="sec-content">
-    <table class="dt" id="loan-tbl">
-      <thead><tr>
-        <th>借貸銀行</th><th>利率</th><th>借貸金額</th>
-        <th>尚餘本金</th><th>每月還款</th><th>扣款日</th>
-        <th>距扣款</th><th>餘額狀態</th><th>扣完後餘額</th>
-        <th>到期日</th><th style="min-width:80px">操作</th>
-      </tr></thead>
-      <tbody id="loan-body"></tbody>
-      <tfoot><tr class="row-total">
-        <td colspan="2" style="text-align:right">小計</td>
-        <td class="mono bold loss" id="l-amt">—</td>
-        <td class="mono loss bold" id="l-rem" style="background:var(--loss-bg)">—</td>
-        <td class="mono bold loss" id="l-mo">—</td>
-        <td colspan="5"></td>
-        <td><button class="act-btn add" onclick="openLoanModal()">＋ 新增</button> <button class="act-btn hist-btn" onclick="openLoanHist()">📚 結清記錄</button></td>
-      </tr></tfoot>
-    </table>
+<!-- ═══ ROW 3: Loans (full width card grid) ═══ -->
+<div class="db-card" style="margin-bottom:12px">
+  <div class="db-card-header db-hdr-navy" style="justify-content:space-between">
+    <span>🏦 信貸管理</span>
+    <div style="display:flex;gap:6px;align-items:center">
+      <span class="sec-summary-badge" id="l-mo-badge"></span>
+      <button class="db-btn-sm light" onclick="openLoanModal()">＋ 新增</button>
+      <button class="db-btn-sm light" onclick="openLoanHist()">📚 結清記錄</button>
+    </div>
   </div>
+  <!-- Loan summary strip -->
+  <div class="loan-sum-strip">
+    <div class="loan-sum-item">
+      <div class="loan-sum-label">總借款</div>
+      <div class="loan-sum-val loss" id="l-amt">—</div>
+    </div>
+    <div class="loan-sum-item">
+      <div class="loan-sum-label">尚餘本金</div>
+      <div class="loan-sum-val loss" id="l-rem">—</div>
+    </div>
+    <div class="loan-sum-item">
+      <div class="loan-sum-label">每月還款</div>
+      <div class="loan-sum-val loss" id="l-mo">—</div>
+    </div>
+  </div>
+  <!-- Loan card grid -->
+  <div class="loan-card-grid" id="loan-body"></div>
 </div>
 
-<!-- FLEX -->
-<div class="sec">
-  <div class="sec-header" style="background:#14532d"><span class="sec-icon">💳</span>不限用途額度</div>
-  <div class="sec-content">
-    <table class="dt" id="flex-tbl">
-      <thead><tr>
-        <th>機構</th><th>利率</th><th>尚餘金額</th><th>每月利息</th><th>備註</th><th style="min-width:80px">操作</th>
-      </tr></thead>
-      <tbody id="flex-body"></tbody>
-      <tfoot><tr class="row-total">
-        <td colspan="2" style="text-align:right">總結</td>
-        <td class="mono" id="f-rem" style="color:var(--loss)">—</td>
-        <td class="mono bold" id="f-mo">—</td>
-        <td class="mono bold pink-bg">每月總支出：<span id="tot-mo-out">—</span></td>
-        <td><button class="act-btn add" onclick="openFlexModal()">＋ 新增</button></td>
-      </tr></tfoot>
-    </table>
-  </div>
-</div>
+<!-- ═══ ROW 3b: Flex + Cash side by side ═══ -->
+<div class="db-row" style="margin-bottom:12px">
 
-<!-- CASH -->
-<div class="sec">
-  <div class="sec-header" style="background:#7c2d12"><span class="sec-icon">💰</span>現金流量表</div>
-  <div class="sec-content">
-    <table class="dt" id="cash-tbl">
-      <thead><tr>
-        <th>銀行/帳戶</th><th>現金</th><th>交割 DAY1</th><th>交割 DAY2</th>
-        <th>現金餘額</th><th style="min-width:80px">操作</th>
-      </tr></thead>
-      <tbody id="cash-body"></tbody>
-      <tfoot><tr class="row-total">
-        <td style="text-align:right">總結</td><td></td><td></td><td></td>
-        <td class="mono pink-bg bold" id="c-tot">—</td>
-        <td><button class="act-btn add" onclick="openCashModal()">＋ 新增</button></td>
-      </tr></tfoot>
-    </table>
+  <!-- FLEX LOANS -->
+  <div class="db-card" style="flex:1;overflow:hidden">
+    <div class="db-card-header db-hdr-green" style="justify-content:space-between">
+      <span>💳 不限用途額度</span>
+      <div style="display:flex;gap:6px;align-items:center">
+        <span class="sec-summary-badge green" id="flex-mo-badge"></span>
+        <button class="db-btn-sm light" onclick="openFlexModal()">＋ 新增</button>
+      </div>
+    </div>
+    <!-- Flex summary -->
+    <div class="flex-sum-strip">
+      <div class="loan-sum-item">
+        <div class="loan-sum-label">總使用額</div>
+        <div class="loan-sum-val loss" id="f-rem">—</div>
+      </div>
+      <div class="loan-sum-item">
+        <div class="loan-sum-label">每月利息</div>
+        <div class="loan-sum-val loss" id="f-mo">—</div>
+      </div>
+      <div class="loan-sum-item">
+        <div class="loan-sum-label">每月總支出</div>
+        <div class="loan-sum-val loss" id="tot-mo-out">—</div>
+      </div>
+    </div>
+    <div class="flex-card-grid" id="flex-body"></div>
   </div>
-</div>
 
-<!-- DIVIDENDS -->
-<div class="sec">
-  <div class="sec-header" style="background:#14532d"><span class="sec-icon">🎯</span>股息記錄</div>
-  <div class="sec-content">
-    <div class="div-cards" id="div-cards"><span style="color:var(--muted);font-size:11px">尚無領息記錄</span></div>
-    <!-- 準備入帳（除息但未發放）-->
+  <!-- CASH -->
+  <div class="db-card" style="flex:1;overflow:hidden">
+    <div class="db-card-header db-hdr-rust" style="justify-content:space-between">
+      <span>💰 現金帳戶</span>
+      <div style="display:flex;gap:6px;align-items:center">
+        <span class="sec-summary-badge rust" id="cash-tot-badge"></span>
+        <button class="db-btn-sm light" onclick="openCashModal()">＋ 新增</button>
+      </div>
+    </div>
+    <div class="cash-card-grid" id="cash-body"></div>
+    <div class="cash-total-bar">
+      <span>總現金餘額</span>
+      <span class="mono bold" id="c-tot">—</span>
+    </div>
+  </div>
+
+</div><!-- /ROW 3b -->
+
+<!-- ═══ ROW 4: Dividends (full width) ═══ -->
+<div class="db-row">
+
+  <!-- placeholder cash-tbl (hidden, keep for DOM compat) -->
+  <table id="cash-tbl" style="display:none"><tbody id="cash-body-compat"></tbody></table>
+  <table id="loan-tbl" style="display:none"><tbody></tbody></table>
+  <table id="flex-tbl" style="display:none"><tbody></tbody></table>
+
+  <!-- DIVIDENDS -->
+  <div class="db-card" style="flex:1;overflow:hidden">
+    <div class="db-card-header db-hdr-green" style="justify-content:space-between">
+      <span>🎯 股息記錄</span>
+      <button class="db-btn-sm light" onclick="openDivModal()">＋ 新增</button>
+    </div>
+    <div class="div-cards" id="div-cards"><span style="padding:10px;display:block;color:var(--muted);font-size:11px">尚無領息記錄</span></div>
     <div id="div-pending-bar" style="display:none;padding:10px 16px;background:linear-gradient(to right,#eff6ff,#dbeafe);border-bottom:2px solid #bfdbfe;font-size:13px;font-weight:700">
-      ⏳ 準備入帳：<span style="color:#3498db;font-family:'JetBrains Mono',monospace;font-size:15px" id="d-pending">$0</span>
+      ⏳ 準備入帳：<span style="color:#3498db;font-size:15px" id="d-pending">$0</span>
       <span style="font-size:11px;font-weight:400;color:#5a9fd4;margin-left:8px" id="d-pending-detail"></span>
     </div>
     <div class="div-yr-bar">
@@ -464,7 +724,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
         &nbsp;｜&nbsp;🏆 累積：<span class="gain mono" id="d-tot" style="font-size:15px">$0</span>
       </div>
       <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;color:var(--muted)">
-        <input type="checkbox" id="div-hist-chk" onchange="renderDivs()" style="accent-color:var(--accent);width:15px;height:15px"> 顯示歷史記錄
+        <input type="checkbox" id="div-hist-chk" onchange="renderDivs()" style="accent-color:var(--accent);width:15px;height:15px"> 顯示歷史
       </label>
     </div>
     <div class="div-section-hdr" style="background:#e8f5ee;color:var(--gain)" onclick="toggleDivYear()">
@@ -486,10 +746,18 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
       </div>
     </div>
   </div>
+
+</div><!-- /ROW 4 -->
+
+<!-- ═══ BOTTOM STATUS BAR ═══ -->
+<div class="db-status-bar">
+  <span>每月淨現金流：<strong id="sb-cf">—</strong></span>
+  <span>每月股息：<strong id="sb-div">—</strong></span>
+  <span>負債比：<strong id="sb-dr">—</strong></span>
+  <span>信貸尚餘：<strong id="sb-loan">—</strong></span>
 </div>
 
-</div><!-- /dash -->
-</div>
+</div><!-- /db-root -->
 
 <!-- ======= MODALS ======= -->
 
@@ -1155,122 +1423,212 @@ function toggleHist(id){
 }
 
 function renderLoans(){
-  // Auto-clear expired loans
   const today=new Date().toISOString().split('T')[0];
   const expired=db.loans.filter(l=>l.due&&l.due<=today&&calcLoanRemain(l)<=0);
   if(expired.length){
     if(!db.clearedLoans)db.clearedLoans=[];
     expired.forEach(l=>{db.clearedLoans.push({...l,clearedDate:today});});
     db.loans=db.loans.filter(l=>!(l.due&&l.due<=today&&calcLoanRemain(l)<=0));
-    if(expired.length>0)toast(`✅ ${expired.map(l=>l.bank).join('、')} 已到期，自動移入結清記錄`);
+    if(expired.length>0)toast('✅ '+expired.map(l=>l.bank).join('、')+' 已到期，自動移入結清記錄');
   }
-  const tbody=document.getElementById('loan-body');tbody.innerHTML='';
+  const grid=document.getElementById('loan-body');
+  if(!grid)return;
+  grid.innerHTML='';
   let tA=0,tR=0,tM=0;
+
   db.loans.forEach(l=>{
     const calcRem=calcLoanRemain(l);
     tA+=l.amount||0;tR+=calcRem;tM+=l.monthly||0;
-    const days=daysLeft(l.due);
-    const dueC=typeof days==='number'&&days<180?'color:var(--loss);font-weight:700':'';
+    const paidPct=l.amount>0?Math.round((1-calcRem/l.amount)*100):0;
     const dDay=parseInt(l.deductDay)||0;
     const dDays=daysUntilDeduct(dDay||null);
     const urgent=dDays!==null&&dDays<=5;
-    const dC=urgent?'color:var(--loss);font-weight:800':'color:var(--muted)';
-    let balSt='—',afterBal='—',afterSt='color:var(--muted)';
+    const days=daysLeft(l.due);
+    const nearDue=typeof days==='number'&&days<180;
+
+    // Balance status
+    let balHtml='',afterHtml='';
     if(l.deductBank){
       const acc=db.cashAccounts.find(c=>c.bank===l.deductBank);
       if(acc){
         const accBal=(acc.cash||0)+(acc.d1||0)+(acc.d2||0);
-        // 累積模擬：按扣款日順序逐筆扣，計算到這筆扣完後的餘額
-        const today=new Date();
-        const in30=new Date(today.getTime()+30*86400000);
-        // 收集未來30天內同帳戶所有扣款，按日期排序
+        const todayD=new Date(), in30=new Date(todayD.getTime()+30*86400000);
         const upcoming=[];
         db.loans.forEach(loan=>{
           if(loan.deductBank!==l.deductBank||!loan.deductDay)return;
           const d=parseInt(loan.deductDay)||0;if(!d)return;
           for(let mo=0;mo<=1;mo++){
-            const dt=new Date(today.getFullYear(),today.getMonth()+mo,d);
-            if(dt>today&&dt<=in30){
-              upcoming.push({loanId:loan.id,date:dt,monthly:loan.monthly||0});
-            }
+            const dt=new Date(todayD.getFullYear(),todayD.getMonth()+mo,d);
+            if(dt>todayD&&dt<=in30)upcoming.push({loanId:loan.id,date:dt,monthly:loan.monthly||0});
           }
         });
         upcoming.sort((a,b)=>a.date-b.date);
-        // 逐筆模擬扣款（允許負數累積）
-        let runBal=accBal;
-        let thisLoanAfter=accBal;
-        upcoming.forEach(item=>{
-          runBal=runBal-item.monthly; // 允許負數，不 clamp 到 0
-          if(item.loanId===l.id) thisLoanAfter=runBal;
-        });
-        const isShort=thisLoanAfter<0;
-        afterBal=(thisLoanAfter>=0?'$':'-$')+Math.abs(Math.round(thisLoanAfter)).toLocaleString();
-        afterSt=isShort?'color:var(--loss);font-weight:700':'color:var(--gain);font-weight:700';
-        balSt=!isShort
-          ?`<span style="color:var(--gain);font-weight:700">✅ 足夠<br><small style="color:var(--muted)">現餘$${Math.round(accBal).toLocaleString()}</small></span>`
-          :`<span style="color:var(--loss);font-weight:700">⚠️ 不足<br><small style="color:var(--loss)">-$${Math.abs(Math.round(thisLoanAfter)).toLocaleString()}</small></span>`;
+        let runBal=accBal,thisAfter=accBal;
+        upcoming.forEach(item=>{runBal-=item.monthly;if(item.loanId===l.id)thisAfter=runBal;});
+        const isShort=thisAfter<0;
+        balHtml=isShort
+          ?'<span class="loan-badge danger">⚠ 不足 $'+Math.abs(Math.round(thisAfter)).toLocaleString()+'</span>'
+          :'<span class="loan-badge ok">✓ 足夠</span>';
+        afterHtml='<span style="font-size:11px;color:'+(isShort?'var(--loss)':'var(--gain)')+'">扣後 '+(thisAfter>=0?'$':'-$')+Math.abs(Math.round(thisAfter)).toLocaleString()+'</span>';
       }
     }
-    tbody.innerHTML+=`<tr style="${urgent?'background:rgba(192,57,43,0.04)':''}">
-      <td class="left bold">${l.bank}${l.deductBank?`<br><small style="color:var(--muted)">${l.deductBank}</small>`:''}</td>
-      <td class="mono">${(l.rate||0).toFixed(2)}%</td>
-      <td class="mono">$${(l.amount||0).toLocaleString()}</td>
-      <td class="mono bold" style="color:var(--loss)" title="等額本息自動計算（剩餘負債）">$${calcRem.toLocaleString()}</td>
-      <td class="mono" style="color:var(--loss)">$${(l.monthly||0).toLocaleString()}</td>
-      <td class="mono bold">${dDay?dDay+'號':'—'}</td>
-      <td class="mono" style="${dC}">${dDays!==null?(urgent?'🔴 '+dDays+'天':dDays+'天'):'—'}</td>
-      <td style="font-size:11px">${balSt}</td>
-      <td class="mono" style="${afterSt}">${afterBal}</td>
-      <td class="mono" style="${dueC}">${l.due||'—'}${l.due?`<br><small style="color:var(--muted)">${Math.max(0,Math.round((new Date(l.due)-new Date())/86400000))}天</small>`:''}</td>
-      <td><button class="act-btn" onclick="editLoan('${l.id}')">編輯</button> <button class="act-btn del" onclick="delLoan('${l.id}')">刪</button></td>
-    </tr>`;
+
+    const card=document.createElement('div');
+    card.className='loan-card'+(urgent?' loan-card-urgent':'');
+    card.innerHTML=`
+      <div class="loan-card-top">
+        <div>
+          <div class="loan-card-bank">${l.bank}</div>
+          ${l.deductBank?'<div class="loan-card-sub">扣款：'+l.deductBank+'</div>':''}
+        </div>
+        <div style="text-align:right">
+          <div class="loan-card-rate">${(l.rate||0).toFixed(2)}%</div>
+          ${balHtml}
+        </div>
+      </div>
+      <!-- Progress bar -->
+      <div class="loan-progress-wrap">
+        <div class="loan-progress-bar" style="width:${paidPct}%"></div>
+      </div>
+      <div class="loan-card-amounts">
+        <div class="loan-amt-block">
+          <div class="loan-amt-label">已還清</div>
+          <div class="loan-amt-val gain">${paidPct}%</div>
+        </div>
+        <div class="loan-amt-block">
+          <div class="loan-amt-label">尚餘本金</div>
+          <div class="loan-amt-val loss">$${calcRem.toLocaleString()}</div>
+        </div>
+        <div class="loan-amt-block">
+          <div class="loan-amt-label">每月還款</div>
+          <div class="loan-amt-val loss">$${(l.monthly||0).toLocaleString()}</div>
+        </div>
+        <div class="loan-amt-block">
+          <div class="loan-amt-label">扣款日</div>
+          <div class="loan-amt-val ${urgent?'loss':''}">${dDay?dDay+'號':'—'}${dDays!==null?' · '+(urgent?'🔴 ':'')+dDays+'天':''}</div>
+        </div>
+      </div>
+      <div class="loan-card-footer">
+        <div style="display:flex;align-items:center;gap:8px">
+          ${afterHtml}
+          <span class="loan-due ${nearDue?'loan-due-warn':''}">到期 ${l.due||'—'}${l.due?' ('+Math.max(0,Math.round((new Date(l.due)-new Date())/86400000))+'天)':''}</span>
+        </div>
+        <div style="display:flex;gap:5px">
+          <button class="card-act-btn edit" onclick="editLoan('${l.id}')">✏️ 編輯</button>
+          <button class="card-act-btn danger" onclick="delLoan('${l.id}')">🗑</button>
+        </div>
+      </div>`;
+    grid.appendChild(card);
   });
-  document.getElementById('l-amt').textContent='$'+(tA).toLocaleString();
-  document.getElementById('l-rem').textContent='$'+tR.toLocaleString();
-  document.getElementById('l-mo').textContent='$'+tM.toLocaleString();
+
+  const setEl=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  setEl('l-amt','$'+tA.toLocaleString());
+  setEl('l-rem','$'+tR.toLocaleString());
+  setEl('l-mo','$'+tM.toLocaleString());
+  const badge=document.getElementById('l-mo-badge');
+  if(badge)badge.textContent='每月還款 $'+tM.toLocaleString();
 }
 
 function renderFlex(){
-  const tbody=document.getElementById('flex-body');tbody.innerHTML='';
-  let tR=0,tM=0;
+  const grid=document.getElementById('flex-body');
+  if(!grid){return;}
+  grid.innerHTML='';
+  let tUsed=0,tMo=0;
+
   db.flexLoans.forEach(f=>{
-    const fU=f.used||0;tR+=fU;tM+=f.monthly||0;
-    const fUsed=f.used||f.remain||0;
-    const fLimit=f.limit||fUsed;
-    const fAvail=fLimit-fUsed;
-    tbody.innerHTML+=`<tr>
-      <td class="left bold">${f.name}${f.limit?`<br><small style="color:var(--muted)">額度$${fLimit.toLocaleString()}</small>`:''}</td>
-      <td class="mono">${(f.rate||0).toFixed(2)}%</td>
-      <td class="mono"><span style="color:var(--loss)">使用$${fUsed.toLocaleString()}</span><br><small style="color:var(--gain)">剩$${fAvail.toLocaleString()}</small></td>
-      <td class="mono" style="color:var(--loss)">$${(f.monthly||0).toLocaleString()}</td>
-      <td>${f.note||''}</td>
-      <td><button class="act-btn" onclick="editFlex('${f.id}')">編輯</button> <button class="act-btn del" onclick="delFlex('${f.id}')">刪</button></td>
-    </tr>`;
+    const fUsed=f.used||0;
+    tUsed+=fUsed;tMo+=f.monthly||0;
+    const fLimit=f.limit||fUsed||1;
+    const fAvail=Math.max(0,fLimit-fUsed);
+    const usedPct=fLimit>0?Math.min(100,Math.round(fUsed/fLimit*100)):0;
+    const barColor=usedPct>90?'#dc2626':usedPct>70?'#d97706':'#16a34a';
+
+    const card=document.createElement('div');
+    card.className='flex-card';
+    card.innerHTML=`
+      <div class="loan-card-top">
+        <div>
+          <div class="loan-card-bank">${f.name}</div>
+          ${f.note?'<div class="loan-card-sub">'+f.note+'</div>':''}
+        </div>
+        <div style="text-align:right">
+          <div class="loan-card-rate">${(f.rate||0).toFixed(2)}%</div>
+          <div style="font-size:10px;color:var(--muted)">額度 $${fLimit.toLocaleString()}</div>
+        </div>
+      </div>
+      <div class="loan-progress-wrap">
+        <div class="loan-progress-bar" style="width:${usedPct}%;background:${barColor}"></div>
+      </div>
+      <div class="loan-card-amounts">
+        <div class="loan-amt-block">
+          <div class="loan-amt-label">使用額度</div>
+          <div class="loan-amt-val loss">$${fUsed.toLocaleString()}</div>
+        </div>
+        <div class="loan-amt-block">
+          <div class="loan-amt-label">剩餘額度</div>
+          <div class="loan-amt-val gain">$${fAvail.toLocaleString()}</div>
+        </div>
+        <div class="loan-amt-block">
+          <div class="loan-amt-label">使用率</div>
+          <div class="loan-amt-val" style="color:${barColor}">${usedPct}%</div>
+        </div>
+        <div class="loan-amt-block">
+          <div class="loan-amt-label">每月利息</div>
+          <div class="loan-amt-val loss">$${(f.monthly||0).toLocaleString()}</div>
+        </div>
+      </div>
+      <div class="loan-card-footer">
+        <div></div>
+        <div style="display:flex;gap:5px">
+          <button class="card-act-btn edit" onclick="editFlex('${f.id}')">✏️ 編輯</button>
+          <button class="card-act-btn danger" onclick="delFlex('${f.id}')">🗑</button>
+        </div>
+      </div>`;
+    grid.appendChild(card);
   });
+
   const lM=db.loans.reduce((s,l)=>s+(l.monthly||0),0);
-  document.getElementById('f-rem').textContent='使用$'+tR.toLocaleString();
-  document.getElementById('f-rem').style.color='var(--loss)';
-  document.getElementById('f-mo').textContent='$'+tM.toLocaleString();
-  document.getElementById('tot-mo-out').textContent='$'+(lM+tM).toLocaleString();
+  const setEl=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  setEl('f-rem','使用 $'+tUsed.toLocaleString());
+  setEl('f-mo','$'+tMo.toLocaleString());
+  setEl('tot-mo-out','$'+(lM+tMo).toLocaleString());
+  const badge=document.getElementById('flex-mo-badge');
+  if(badge)badge.textContent='每月利息 $'+tMo.toLocaleString();
 }
 
 function renderCash(){
-  const tbody=document.getElementById('cash-body');tbody.innerHTML='';
-  let tB=0,tA=0;
-  db.cashAccounts.forEach(c=>{
-    const bal=(c.cash||0)+(c.d1||0)+(c.d2||0);tB+=bal;tA+=c.arb||0;
-    tbody.innerHTML+=`<tr>
-      <td class="left bold">${c.bank}</td>
-      <td class="mono">$${(c.cash||0).toLocaleString()}</td>
-      <td class="mono ${(c.d1||0)<0?'loss':''}">${c.d1?(c.d1>=0?'$':'-$')+Math.abs(c.d1).toLocaleString():'—'}</td>
-      <td class="mono ${(c.d2||0)<0?'loss':''}">${c.d2?(c.d2>=0?'$':'-$')+Math.abs(c.d2).toLocaleString():'—'}</td>
-      <td class="mono ${bal>=0?'gain':'loss'} bold pink-bg">$${bal.toLocaleString()}</td>
-      <td><button class="act-btn" onclick="editCash('${c.id}')">編輯</button> <button class="act-btn del" onclick="delCash('${c.id}')">刪</button></td>
-    </tr>`;
-  });
-  document.getElementById('c-tot').className=`mono pink-bg bold ${tB>=0?'gain':'loss'}`;
-  document.getElementById('c-tot').textContent='$'+tB.toLocaleString();
+  const grid=document.getElementById('cash-body');
+  if(!grid)return;
+  grid.innerHTML='';
+  let tB=0;
 
+  db.cashAccounts.forEach(c=>{
+    const bal=(c.cash||0)+(c.d1||0)+(c.d2||0);
+    tB+=bal;
+    const card=document.createElement('div');
+    card.className='cash-card';
+    const hasD1=c.d1&&c.d1!==0, hasD2=c.d2&&c.d2!==0;
+    card.innerHTML=`
+      <div class="cash-card-top">
+        <div class="cash-card-bank">${c.bank}</div>
+        <div class="cash-card-bal ${bal>=0?'gain':'loss'}">$${Math.abs(bal).toLocaleString()}</div>
+      </div>
+      <div class="cash-card-breakdown">
+        <div class="cash-item"><span class="cash-item-label">現金</span><span class="cash-item-val">$${(c.cash||0).toLocaleString()}</span></div>
+        ${hasD1?'<div class="cash-item"><span class="cash-item-label">交割 DAY1</span><span class="cash-item-val '+(c.d1<0?'loss':'gain')+'">$'+c.d1.toLocaleString()+'</span></div>':''}
+        ${hasD2?'<div class="cash-item"><span class="cash-item-label">交割 DAY2</span><span class="cash-item-val '+(c.d2<0?'loss':'gain')+'">$'+c.d2.toLocaleString()+'</span></div>':''}
+      </div>
+      <div class="cash-card-footer">
+        <button class="card-act-btn edit" onclick="editCash('${c.id}')">✏️ 編輯</button>
+        <button class="card-act-btn danger" onclick="delCash('${c.id}')">🗑</button>
+      </div>`;
+    grid.appendChild(card);
+  });
+
+  const totEl=document.getElementById('c-tot');
+  if(totEl){totEl.textContent='$'+tB.toLocaleString();totEl.style.color=tB>=0?'var(--gain)':'var(--loss)';}
+  const badge=document.getElementById('cash-tot-badge');
+  if(badge){badge.textContent='總餘額 $'+tB.toLocaleString();badge.style.color=tB>=0?'#86efac':'#fca5a5';}
 }
 
 
@@ -1375,24 +1733,40 @@ function renderSum(){
   // 含息只改變報酬率和損益顯示，不影響淨資產
   const displayPnlSum=showDivRoi?pnl+tDivTot:pnl;
   const displayRoi=showDivRoi?roiInc:roi;
-  const rows=[
-    {l:'資金總額',v:'$'+Math.round(tot).toLocaleString(),c:''},
-    {l:'股票市值',v:'$'+Math.round(tM).toLocaleString(),c:'teal-bg'},
-    {l:'已實現損益',v:tR!==0?(tR>=0?'+':'-')+fmt(tR):'$0',c:tR>=0?'gain':'loss'},
-    {l:'股票損益'+(showDivRoi?' (含息)':''),v:(displayPnlSum>=0?'+':'-')+fmt(displayPnlSum),c:displayPnlSum>=0?'gain':'loss'},
-    {l:`報酬率 <label style="font-size:10px;cursor:pointer"><input type="checkbox" id="roi-chk" ${showDivRoi?'checked':''} onchange="showDivRoi=this.checked;renderSum();renderInv()"> 含息</label>`,
-     v:displayRoi>=0?'+'+displayRoi.toFixed(2)+'%':displayRoi.toFixed(2)+'%',
-     c:displayRoi>=0?'gain':'loss'},
-    {l:'負債比',v:dR.toFixed(2)+'%',c:''},
-    {l:'信貸尚餘本金',v:'$'+Math.round(loanR).toLocaleString(),c:'loss'},
-    {l:'淨資產',v:'$'+Math.round(net).toLocaleString(),c:'bold'},
-    {l:'每月股息',v:fmt(tD),c:'gain bold'},
-    {l:'每月支出',v:fmt(mO),c:'loss'},
-    {l:'每月淨現金流',v:(fl>=0?'+':'-')+fmt(fl),c:fl>=0?'gain bold':'loss bold'},
+  // 移除已在投資標的顯示的重複欄位（總成本、市值、損益、報酬率）
+  // 改用漂亮卡片呈現剩餘7個重要指標
+  const sumCards=[
+    {icon:'✅',label:'已實現損益',value:(tR>=0?'+':'-')+fmt(tR),color:tR>=0?'var(--gain)':'var(--loss)',sub:'含手續費、交易稅'},
+    {icon:'🏛️',label:'淨資產',value:'$'+Math.round(net).toLocaleString(),color:'var(--accent)',sub:'資金總額 - 全部負債',big:true},
+    {icon:'📊',label:'負債比',value:dR.toFixed(1)+'%',color:dR>80?'var(--loss)':dR>60?'#d97706':'var(--accent)',sub:'全部負債 / 資金總額'},
+    {icon:'🏦',label:'信貸尚餘本金',value:'$'+Math.round(loanR).toLocaleString(),color:'var(--loss)',sub:'等額本息計算'},
+    {icon:'🎯',label:'每月股息',value:fmt(tD),color:'var(--gain)',sub:'月配息合計'},
+    {icon:'💸',label:'每月支出',value:fmt(mO),color:'var(--loss)',sub:'信貸+利息還款'},
+    {icon:'💡',label:'每月淨現金流',value:(fl>=0?'+':'')+fmt(fl),color:fl>=0?'var(--gain)':'var(--loss)',sub:'股息 - 支出',big:fl!==0},
   ];
-  document.getElementById('sum-tbl').innerHTML=rows.map(r=>`<tr>
-    <td class="sum-lbl">${r.l}</td><td class="sum-val mono ${r.c}">${r.v}</td>
-  </tr>`).join('');
+  const sumEl=document.getElementById('sum-tbl');
+  if(sumEl){
+    sumEl.innerHTML=sumCards.map(c=>`
+      <div class="sum-kpi-card${c.big?' sum-kpi-big':''}">
+        <div class="sum-kpi-icon">${c.icon}</div>
+        <div class="sum-kpi-label">${c.label}</div>
+        <div class="sum-kpi-value" style="color:${c.color}">${c.value}</div>
+        <div class="sum-kpi-sub">${c.sub}</div>
+      </div>`).join('');
+  }
+  // Also update the roi-chk sync (checkbox now in header)
+  const rc2=document.getElementById('roi-chk');if(rc2)rc2.checked=showDivRoi;
+
+
+
+  // Update status bar
+  const setSB=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  setSB('sb-cf',(fl>=0?'+':'')+fmt(fl));
+  setSB('sb-div',fmt(tD));
+  setSB('sb-dr',dR.toFixed(1)+'%');
+  setSB('sb-loan','$'+Math.round(loanR).toLocaleString());
+  const cfEl=document.getElementById('sb-cf');
+  if(cfEl)cfEl.style.color=fl>=0?'var(--gain)':'var(--loss)';
 }
 
 // ═══════ MODALS ═══════
