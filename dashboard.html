@@ -143,9 +143,9 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 
 /* DIVIDEND */
-.div-cards{display:flex;flex-wrap:wrap;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border);background:#faf5ff;align-items:center;}
+.div-cards{display:flex;flex-wrap:wrap;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border);background:#f0fdfa;align-items:center;}
 .div-card{background:var(--white);border:1.5px solid #bbf7d0;border-radius:10px;padding:10px 14px;cursor:pointer;min-width:110px;box-shadow:var(--card-shadow);transition:transform .15s,box-shadow .15s;}.div-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.12);}
-.div-yr-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#faf5ff;border-bottom:1px solid #e9d5ff;flex-wrap:wrap;gap:8px;}
+.div-yr-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#f0fdfa;border-bottom:1px solid #99f6e4;flex-wrap:wrap;gap:8px;}
 .div-section-hdr{padding:6px 12px;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:space-between;cursor:pointer;}
 
 /* BACKUP WARNING */
@@ -503,7 +503,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 /* ═══ CASH CARDS ═══ */
 .cash-card-grid{
   display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-  gap:12px;padding:12px;background:#fafafa;
+  gap:12px;padding:12px;background:#f9f7f5;
 }
 .cash-card{
   background:#fff;border-radius:12px;overflow:hidden;
@@ -662,8 +662,8 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
     <button class="db-btn primary" onclick="refreshPrices()">↻ 更新股價</button>
     <button class="db-btn success" onclick="exportData()">📤 備份</button>
     <label class="db-btn neutral" style="cursor:pointer">📥 還原<input type="file" accept=".json" style="display:none" onchange="importData(event)"></label>
-    <button class="db-btn purple" onclick="undoLast()" id="undoBtn" disabled>↩ 復原</button>
-    <button class="db-btn indigo" onclick="redoLast()" id="redoBtn" disabled>↪ 重做</button>
+    <button class="db-btn purple" onclick="undoLast()" id="undoBtn" disabled>← 回上一步</button>
+    <button class="db-btn indigo" onclick="redoLast()" id="redoBtn" disabled>→ 回下一步</button>
   </div>
 </div>
 
@@ -738,7 +738,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 
   <!-- CASH -->
   <div class="db-card" style="flex:1;overflow:hidden">
-    <div class="db-card-header" style="background:#78350f;justify-content:space-between">
+    <div class="db-card-header" style="background:#b45309;justify-content:space-between">
       <span>💰 現金帳戶</span>
       <div style="display:flex;gap:8px;align-items:center">
         <span style="font-size:12px;color:rgba(255,255,255,.7)">總餘額</span>
@@ -762,7 +762,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 
   <!-- DIVIDENDS -->
   <div class="db-card" style="flex:1;overflow:hidden">
-    <div class="db-card-header" style="background:#4c1d95;justify-content:space-between">
+    <div class="db-card-header" style="background:#0f766e;justify-content:space-between">
       <span>🎯 股息記錄</span>
       <button class="db-btn-sm light" onclick="openDivModal()">＋ 新增</button>
     </div>
@@ -783,7 +783,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
         <input type="checkbox" id="div-hist-chk" onchange="renderDivs()" style="accent-color:var(--accent);width:15px;height:15px"> 顯示歷史
       </label>
     </div>
-    <div class="div-section-hdr" style="background:#f3e8ff;color:#7c3aed" onclick="toggleDivYear()">
+    <div class="div-section-hdr" style="background:#ccfbf1;color:#0f766e" onclick="toggleDivYear()">
       <span>📋 今年明細</span><span id="div-yr-hint">▼ 展開</span>
     </div>
     <div id="div-yr-body" style="display:none;overflow-x:auto">
@@ -1094,8 +1094,8 @@ function save(){
   undoStack.push(JSON.stringify(db));
   if(undoStack.length>15)undoStack.shift();
   localStorage.setItem(STORE,JSON.stringify(db));
-  document.getElementById('undoBtn').disabled=undoStack.length<=1;
-  document.getElementById('redoBtn').disabled=true;
+  const _ub=document.getElementById('undoBtn');if(_ub)_ub.disabled=undoStack.length<=1;
+  const _rb=document.getElementById('redoBtn');if(_rb)_rb.disabled=true;
   checkBkWarn();
 }
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
@@ -1106,9 +1106,9 @@ function undoLast(){
   redoStack.push(undoStack.pop()); // 移到 redo
   db=JSON.parse(undoStack[undoStack.length-1]);
   localStorage.setItem(STORE,JSON.stringify(db));
-  render();toast('↩ 已復原');
-  document.getElementById('undoBtn').disabled=undoStack.length<=1;
-  document.getElementById('redoBtn').disabled=redoStack.length===0;
+  render();toast('← 已回上一步');
+  const _ub2=document.getElementById('undoBtn');if(_ub2)_ub2.disabled=undoStack.length<=1;
+  const _rb2=document.getElementById('redoBtn');if(_rb2)_rb2.disabled=redoStack.length===0;
 }
 
 function redoLast(){
@@ -1117,9 +1117,9 @@ function redoLast(){
   undoStack.push(state);
   db=JSON.parse(state);
   localStorage.setItem(STORE,JSON.stringify(db));
-  render();toast('↪ 已重做');
-  document.getElementById('undoBtn').disabled=undoStack.length<=1;
-  document.getElementById('redoBtn').disabled=redoStack.length===0;
+  render();toast('→ 已回下一步');
+  const _ub3=document.getElementById('undoBtn');if(_ub3)_ub3.disabled=undoStack.length<=1;
+  const _rb3=document.getElementById('redoBtn');if(_rb3)_rb3.disabled=redoStack.length===0;
 }
 
 // ═══════ BACKUP ═══════
@@ -1382,7 +1382,7 @@ function renderInv(){
     const displayPnl=showDivRoi?c.pnlWithDiv:c.pnl;
     const displayPct=showDivRoi?c.pnlPctWithDiv:c.pnlPct;
     const pnColor=displayPnl==null?'var(--muted)':displayPnl>0?'var(--gain)':displayPnl<0?'var(--loss)':'var(--muted)';
-    const prColor=c.curPrice==null?'var(--text)':db.prices[inv.code]?.change>=0?'var(--gain)':'var(--loss)';
+    const prColor=c.curPrice==null?'var(--text)':(c.curPrice>c.avgCost?'var(--gain)':c.curPrice<c.avgCost?'var(--loss)':'var(--muted)');
     const portPct=tC>0?(c.tCost/tC*100).toFixed(1):'—';
     const isOpen=openIds.includes(inv.id);
 
@@ -1711,7 +1711,7 @@ function renderCash(){
   const totEl=document.getElementById('c-tot');
   if(totEl)totEl.textContent='$'+tB.toLocaleString();
   const badge=document.getElementById('cash-tot-badge');
-  if(badge){badge.textContent='$'+Math.abs(tB).toLocaleString();badge.style.color=tB>=0?'#fcd34d':'#fca5a5';}
+  if(badge){badge.textContent='$'+Math.abs(tB).toLocaleString();badge.style.color=tB>=0?'var(--gain)':'var(--loss)';}
 }
 
 
@@ -2819,8 +2819,8 @@ function editTitle(){
 
 // INIT
 undoStack=[JSON.stringify(db)];
-document.getElementById('undoBtn').disabled=true;
-document.getElementById('redoBtn').disabled=true;
+(function(){const u=document.getElementById('undoBtn');if(u)u.disabled=true;})();
+(function(){const r=document.getElementById('redoBtn');if(r)r.disabled=true;})();
 render();checkBkWarn();refreshPrices();
 // Auto snapshot on 1st of each month
 (function autoSnapshot(){
