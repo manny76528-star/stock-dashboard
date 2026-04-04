@@ -827,7 +827,11 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
     </div>
     <div class="fr">
       <div class="fg"><label class="fl">初始持有張數</label><input class="fi" id="i-lots" type="number" step="0.001" min="0" placeholder="例：800"></div>
-      <div class="fg"><label class="fl">初始均成本（元/股）</label><input class="fi" id="i-avg" type="number" step="0.01" placeholder="例：10.24"></div>
+      <div class="fg"><label class="fl">初始均成本（元/股）</label><input class="fi" id="i-avg" type="number" step="0.01" placeholder="例：10.24">
+      <div id="i-avg-note" style="display:none;margin-top:5px;font-size:11px;color:#f59e0b;background:#fffbeb;padding:6px 10px;border-radius:6px;border:1px solid #fde68a">
+        ⚠️ 此股票有交易記錄，修改均價後交易記錄的計算仍以原買入記錄為準。確認後將會覆蓋初始成本。
+      </div>
+    </div>
     </div>
     <div class="fg"><label class="fl">每股月配息（元/股/月）</label><input class="fi" id="i-div" type="number" step="0.0001" placeholder="月配例：0.048，季配填月均"></div>
     <div class="fg">
@@ -1715,7 +1719,7 @@ function renderCash(){
 }
 
 
-const DIV_COLORS=['#e74c3c','#3498db','#2ecc71','#f39c12','#9b59b6','#1abc9c','#e67e22','#34495e','#e91e63','#00bcd4'];
+const DIV_COLORS=['#e74c3c','#3498db','#607d8b','#f39c12','#9b59b6','#1abc9c','#e67e22','#34495e','#f06292','#00bcd4'];
 function getDivColor(code){
   const codes=[...new Set((db.dividends||[]).map(d=>d.code))].sort();
   const idx=codes.indexOf(code);
@@ -1904,6 +1908,12 @@ function openInvModal(id=null){
   else{sel.value='';inp.style.display='none';inp.value='';}
   const irEl=document.getElementById('i-remark');if(irEl)irEl.value='';
   const iuEl=document.getElementById('i-url');if(iuEl)iuEl.value=inv?.url||'';
+  // 有交易記錄時，顯示警告但仍可編輯均價
+  const hasTxns2=editId&&inv&&(inv.transactions||[]).length>0;
+  const avgEl=document.getElementById('i-avg');
+  if(avgEl){avgEl.readOnly=false;avgEl.style.background='';avgEl.style.color='';}
+  const avgNote=document.getElementById('i-avg-note');
+  if(avgNote){avgNote.style.display=hasTxns2?'block':'none';}
   openModal('invModal');setTimeout(()=>document.getElementById('i-code').focus(),100);
 }
 function saveInv(){
@@ -1915,8 +1925,15 @@ function saveInv(){
     const inv=db.investments.find(i=>i.id===editId);
     const noteSel=document.getElementById('i-note-sel').value;
     const noteVal=noteSel==='__custom__'?document.getElementById('i-note').value.trim():noteSel===''?'':noteSel;
-    // 有交易記錄時，不更新初始張數和均價（由交易記錄計算）
     const hasTxns=(inv.transactions||[]).length>0;
+    // 有交易記錄且均價有變動時，需確認
+    if(hasTxns&&avg>0&&avg!==inv.avgPrice){
+      if(!confirm(`⚠️ 確認修改均買價？\n\n原本：$${inv.avgPrice}\n修改後：$${avg}\n\n注意：這只會修改初始記錄的成本，已有的買入交易記錄價格不變。`))return;
+      // 同步更新初始買入記錄(isInit)的價格
+      const initTxn=inv.transactions.find(t=>t.isInit||t.remark==='初始持倉');
+      if(initTxn){initTxn.price=avg;initTxn.lots=lots||initTxn.lots;}
+      inv.avgPrice=avg;inv.lots=lots;
+    }
     Object.assign(inv,{code,name:document.getElementById('i-name').value.trim(),
       divPerShare:parseFloat(document.getElementById('i-div').value)||0,note:noteVal,
       url:document.getElementById('i-url')?.value.trim()||''});
