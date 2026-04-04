@@ -143,9 +143,9 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 
 /* DIVIDEND */
-.div-cards{display:flex;flex-wrap:wrap;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border);background:#f0fdf4;align-items:center;}
+.div-cards{display:flex;flex-wrap:wrap;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border);background:#faf5ff;align-items:center;}
 .div-card{background:var(--white);border:1.5px solid #bbf7d0;border-radius:10px;padding:10px 14px;cursor:pointer;min-width:110px;box-shadow:var(--card-shadow);transition:transform .15s,box-shadow .15s;}.div-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.12);}
-.div-yr-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#f0fdf4;border-bottom:1px solid #bbf7d0;flex-wrap:wrap;gap:8px;}
+.div-yr-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#faf5ff;border-bottom:1px solid #e9d5ff;flex-wrap:wrap;gap:8px;}
 .div-section-hdr{padding:6px 12px;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:space-between;cursor:pointer;}
 
 /* BACKUP WARNING */
@@ -204,15 +204,15 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 /* ========== INVESTMENT CARD GRID ========== */
 .inv-summary-strip{
   display:grid;grid-template-columns:repeat(5,1fr);
-  gap:0;border-bottom:1px solid var(--border);
-  background:linear-gradient(135deg,#1e3a5f 0%,#2563eb 100%);
+  gap:0;border-bottom:1px solid #e0e7ff;
+  background:#eff6ff;
 }
 .inv-sum-item{
   padding:14px 16px;border-right:1px solid rgba(255,255,255,.1);
 }
 .inv-sum-item:last-child{border-right:none;}
-.inv-sum-label{font-size:10px;color:rgba(255,255,255,.6);letter-spacing:.5px;margin-bottom:4px;text-transform:uppercase;}
-.inv-sum-value{font-size:16px;font-weight:700;color:#fff;}
+.inv-sum-label{font-size:10px;color:#6b7280;letter-spacing:.5px;margin-bottom:4px;text-transform:uppercase;font-weight:600;}
+.inv-sum-value{font-size:16px;font-weight:700;color:#1e293b;}
 @media(max-width:700px){
   .inv-summary-strip{grid-template-columns:repeat(3,1fr);}
   .inv-sum-item:nth-child(4),.inv-sum-item:nth-child(5){border-top:1px solid rgba(255,255,255,.1);}
@@ -222,7 +222,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
   gap:16px;padding:16px;
-  background:#f1f5f9;
+  background:#f8fafc;
 }
 @media(max-width:600px){.inv-card-grid{grid-template-columns:1fr;}}
 
@@ -487,14 +487,14 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 .loan-due-warn{color:#d97706;font-weight:600;}
 
 /* ═══ FLEX CARDS ═══ */
-.flex-sum-strip{display:flex;background:#f0fdf4;border-bottom:1px solid #bbf7d0;}
+.flex-sum-strip{display:flex;background:#e0f2fe;border-bottom:1px solid #bae6fd;}
 .flex-card-grid{
   display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
-  gap:12px;padding:12px;background:#f0fdf4;
+  gap:12px;padding:12px;background:#f0f9ff;
 }
 .flex-card{
   background:#fff;border-radius:12px;overflow:hidden;
-  border:1px solid #bbf7d0;
+  border:1px solid #bae6fd;
   box-shadow:0 1px 4px rgba(0,0,0,.06);
   transition:box-shadow .2s,transform .2s;
 }
@@ -503,11 +503,11 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 /* ═══ CASH CARDS ═══ */
 .cash-card-grid{
   display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-  gap:12px;padding:12px;background:#fff7ed;
+  gap:12px;padding:12px;background:#fafafa;
 }
 .cash-card{
   background:#fff;border-radius:12px;overflow:hidden;
-  border:1px solid #fed7aa;
+  border:1px solid #e2e8f0;
   box-shadow:0 1px 4px rgba(0,0,0,.06);
   transition:box-shadow .2s,transform .2s;
 }
@@ -515,8 +515,8 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 .cash-card-top{
   display:flex;justify-content:space-between;align-items:center;
   padding:14px 16px 10px;
-  background:linear-gradient(135deg,#fff7ed,#fff);
-  border-bottom:1px solid #fef3c7;
+  background:#fff;
+  border-bottom:1px solid #f1f5f9;
 }
 .cash-card-bank{font-size:15px;font-weight:800;color:#1e293b;}
 .cash-card-bal{font-size:20px;font-weight:800;font-family:'JetBrains Mono',monospace;}
@@ -526,7 +526,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 .cash-item-val{font-size:13px;font-weight:600;font-family:'JetBrains Mono',monospace;}
 .cash-card-footer{
   display:flex;justify-content:flex-end;gap:5px;
-  padding:8px 12px;background:#fafbfc;border-top:1px solid #fef3c7;
+  padding:8px 12px;background:#f8fafc;border-top:1px solid #f1f5f9;
 }
 .cash-total-bar{
   display:flex;justify-content:space-between;align-items:center;
@@ -574,9 +574,50 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 .sec-quick-bar span:last-child{border-right:none;}
 .sec-quick-bar strong{color:#fff;font-family:'JetBrains Mono',monospace;font-size:13px;margin-left:4px;}
 .sec-quick-navy{background:#1e3a5f;}
-.sec-quick-green{background:#14532d;}
+.sec-quick-green{background:#075985;}
+/* Investment hero quick bar */
+#inv-quick-bar{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:0;background:#fff;border-bottom:2px solid #e2e8f0;
+}
+#inv-quick-bar span{
+  padding:18px 20px;border-right:1px solid #f1f5f9;
+  display:flex;flex-direction:column;gap:4px;
+  color:#64748b;font-size:11px;letter-spacing:.5px;text-transform:uppercase;
+  background:#fff;
+}
+#inv-quick-bar span:hover{background:#f8fafc;}
+#inv-quick-bar strong{
+  display:block;font-size:22px;font-weight:800;
+  font-family:'JetBrains Mono',monospace;
+  color:#1e293b;margin-left:0;margin-top:2px;
+}
 @media(max-width:600px){
   .sec-quick-bar span{padding:6px 12px;font-size:11px;}
+}
+
+/* ═══ INV HERO STRIP ═══ */
+.inv-hero-strip{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:0;background:#fff;border-bottom:2px solid #e2e8f0;
+}
+.inv-hero-card{
+  padding:16px 20px;border-right:1px solid #e2e8f0;
+  display:flex;flex-direction:column;gap:6px;
+  transition:background .15s;
+}
+.inv-hero-card:last-child{border-right:none;}
+.inv-hero-card:hover{background:#f8fafc;}
+.inv-hero-card.blue{background:#eff6ff;}
+.inv-hero-card.blue:hover{background:#dbeafe;}
+.inv-hero-card.red{background:#fff1f2;}
+.inv-hero-card.red:hover{background:#ffe4e6;}
+.inv-hero-label{font-size:11px;color:#6b7280;font-weight:600;letter-spacing:.3px;}
+.inv-hero-value{font-size:24px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#1e293b;line-height:1.1;}
+@media(max-width:700px){
+  .inv-hero-strip{grid-template-columns:repeat(2,1fr);}
+  .inv-hero-card{padding:12px 14px;}
+  .inv-hero-value{font-size:18px;}
 }
 </style>
 <div class="bkwarn" id="bkwarn">⚠️ 距上次備份已超過 3 天，請記得備份！<button class="act-btn" style="margin-left:auto" onclick="exportData()">📤 立即備份</button></div>
@@ -642,11 +683,11 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
     </div>
   </div>
   <!-- 淨資產＋已實現 快速摘要 -->
-  <div class="sec-quick-bar" id="inv-quick-bar">
-    <span>🏛️ 淨資產：<strong id="qb-net">—</strong></span>
-    <span>✅ 已實現損益：<strong id="qb-real">—</strong></span>
-    <span>📊 負債比：<strong id="qb-dr">—</strong></span>
-    <span>🏦 信貸尚餘：<strong id="qb-loan">—</strong></span>
+  <div id="inv-quick-bar">
+    <span>🏛️ 淨資產<strong id="qb-net">—</strong></span>
+    <span>✅ 已實現損益<strong id="qb-real">—</strong></span>
+    <span>📊 負債比<strong id="qb-dr">—</strong></span>
+    <span>🏦 信貸尚餘本金<strong id="qb-loan">—</strong></span>
   </div>
   <!-- Summary strip -->
   <div class="inv-summary-strip">
@@ -683,32 +724,30 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 
   <!-- FLEX LOANS -->
   <div class="db-card" style="flex:1;overflow:hidden">
-    <div class="db-card-header db-hdr-green" style="justify-content:space-between">
+    <div class="db-card-header" style="background:#0c4a6e;justify-content:space-between">
       <span>💳 不限用途額度</span>
       <button class="db-btn-sm light" onclick="openFlexModal()">＋ 新增</button>
     </div>
-    <div class="sec-quick-bar sec-quick-green">
-      <span>總使用額：<strong id="f-rem">—</strong></span>
-      <span>每月利息：<strong id="f-mo">—</strong></span>
-      <span>每月總支出：<strong id="tot-mo-out">—</strong></span>
+    <div class="sec-quick-bar" style="background:#075985">
+      <span style="background:#075985">總使用額：<strong id="f-rem">—</strong></span>
+      <span style="background:#075985">每月利息：<strong id="f-mo">—</strong></span>
+      <span style="background:#075985">每月總支出：<strong id="tot-mo-out">—</strong></span>
     </div>
     <div class="flex-card-grid" id="flex-body"></div>
   </div>
 
   <!-- CASH -->
   <div class="db-card" style="flex:1;overflow:hidden">
-    <div class="db-card-header db-hdr-rust" style="justify-content:space-between">
+    <div class="db-card-header" style="background:#78350f;justify-content:space-between">
       <span>💰 現金帳戶</span>
-      <div style="display:flex;gap:6px;align-items:center">
-        <span class="sec-summary-badge rust" id="cash-tot-badge"></span>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span style="font-size:12px;color:rgba(255,255,255,.7)">總餘額</span>
+        <span style="font-size:16px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#fbbf24" id="cash-tot-badge">—</span>
         <button class="db-btn-sm light" onclick="openCashModal()">＋ 新增</button>
       </div>
     </div>
     <div class="cash-card-grid" id="cash-body"></div>
-    <div class="cash-total-bar">
-      <span>總現金餘額</span>
-      <span class="mono bold" id="c-tot">—</span>
-    </div>
+    <span id="c-tot" style="display:none">—</span>
   </div>
 
 </div><!-- /ROW 3b -->
@@ -723,7 +762,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 
   <!-- DIVIDENDS -->
   <div class="db-card" style="flex:1;overflow:hidden">
-    <div class="db-card-header db-hdr-green" style="justify-content:space-between">
+    <div class="db-card-header" style="background:#4c1d95;justify-content:space-between">
       <span>🎯 股息記錄</span>
       <button class="db-btn-sm light" onclick="openDivModal()">＋ 新增</button>
     </div>
@@ -744,7 +783,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
         <input type="checkbox" id="div-hist-chk" onchange="renderDivs()" style="accent-color:var(--accent);width:15px;height:15px"> 顯示歷史
       </label>
     </div>
-    <div class="div-section-hdr" style="background:#e8f5ee;color:var(--gain)" onclick="toggleDivYear()">
+    <div class="div-section-hdr" style="background:#f3e8ff;color:#7c3aed" onclick="toggleDivYear()">
       <span>📋 今年明細</span><span id="div-yr-hint">▼ 展開</span>
     </div>
     <div id="div-yr-body" style="display:none;overflow-x:auto">
@@ -1329,10 +1368,10 @@ function renderInv(){
   const openIds=[];
   grid.querySelectorAll('.inv-card[data-open="1"]').forEach(c=>openIds.push(c.dataset.id));
   grid.innerHTML='';
-  let tC=0,tM=0,tD=0,tR=0;
+  let tC=0,tM=0,tD=0,tR=0,tDivTot=0;
   const sortedInvs=[...db.investments].sort((a,b)=>(a.order||999)-(b.order||999));
   const calcs=sortedInvs.map(inv=>({inv,c:calcInv(inv)}));
-  calcs.forEach(({c})=>{tC+=c.tCost;if(c.mktVal)tM+=c.mktVal;tD+=c.moDivAmt;tR+=c.realized;});
+  calcs.forEach(({c})=>{tC+=c.tCost;if(c.mktVal)tM+=c.mktVal;tD+=c.moDivAmt;tR+=c.realized;tDivTot+=c.divTot;});
 
   // Sync含息 checkbox in header
   const chk=document.getElementById('roi-chk-card');
@@ -1438,10 +1477,12 @@ function renderInv(){
   // Update summary strip
   const tPnl=tM-tC,tRoi=tC>0?tPnl/tC*100:0;
   const setCl=(id,val,pos)=>{const el=document.getElementById(id);if(el){el.textContent=val;if(pos!==undefined)el.style.color=pos?'var(--gain)':val==='—'?'var(--muted)':'var(--loss)';}};
+  const dispPnl=showDivRoi?tPnl+tDivTot:tPnl;
+  const dispRoi=tC>0?dispPnl/tC*100:0;
   setCl('t-cost',fmt(tC));
   setCl('t-mkt',tM>0?fmt(tM):'—');
-  setCl('t-pnl',tM>0?(tPnl>=0?'+':'')+fmt(tPnl):'—',tPnl>=0);
-  setCl('t-roi',tM>0?(tRoi>=0?'+':'')+tRoi.toFixed(2)+'%':'—',tRoi>=0);
+  setCl('t-pnl',tM>0?(dispPnl>=0?'+':dispPnl<0?'-':'')+fmt(dispPnl):'—',dispPnl>=0);
+  setCl('t-roi',tM>0?(dispRoi>=0?'+':'')+dispRoi.toFixed(2)+'%':'—',dispRoi>=0);
   document.getElementById('t-div').textContent=fmt(tD);
 }
 function toggleHist(id){
@@ -1668,9 +1709,9 @@ function renderCash(){
   });
 
   const totEl=document.getElementById('c-tot');
-  if(totEl){totEl.textContent='$'+tB.toLocaleString();totEl.style.color=tB>=0?'var(--gain)':'var(--loss)';}
+  if(totEl)totEl.textContent='$'+tB.toLocaleString();
   const badge=document.getElementById('cash-tot-badge');
-  if(badge){badge.textContent='總餘額 $'+tB.toLocaleString();badge.style.color=tB>=0?'#86efac':'#fca5a5';}
+  if(badge){badge.textContent='$'+Math.abs(tB).toLocaleString();badge.style.color=tB>=0?'#fcd34d':'#fca5a5';}
 }
 
 
@@ -1829,10 +1870,15 @@ function renderSum(){
   setSB('sb-dr',dR.toFixed(1)+'%');
   setSB('sb-loan','$'+Math.round(loanR).toLocaleString());
   // Investment quick bar
-  setSB('qb-net','$'+Math.round(net).toLocaleString());
+  setSB('qb-net','$'+Math.round(net).toLocaleString(),'#1d4ed8');
   setSB('qb-real',(tR>=0?'+':'-')+fmt(tR), tR>=0?'var(--gain)':'var(--loss)');
-  setSB('qb-dr',dR.toFixed(1)+'%', dR>80?'var(--loss)':dR>60?'#f59e0b':'inherit');
+  setSB('qb-dr',dR.toFixed(1)+'%', dR>80?'var(--loss)':dR>60?'#f59e0b':'#1e293b');
   setSB('qb-loan','$'+Math.round(loanR).toLocaleString(),'var(--loss)');
+  // dynamic card bg for realized/dr
+  const realCard=document.getElementById('inv-hero-real');
+  if(realCard)realCard.style.background=tR>=0?'#fff1f2':'#f0fdf4';
+  const drCard=document.getElementById('inv-hero-dr');
+  if(drCard)drCard.style.background=dR>80?'#fff1f2':dR>60?'#fffbeb':'#f0fdf4';
 }
 
 // ═══════ MODALS ═══════
