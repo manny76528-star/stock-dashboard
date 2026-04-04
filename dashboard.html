@@ -561,6 +561,23 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 
 /* ═══ 進度條寬度修正 ═══ */
 .loan-progress-wrap{height:8px;background:#f1f5f9;margin:0 16px 8px;}
+
+/* ═══ SECTION QUICK BAR ═══ */
+.sec-quick-bar{
+  display:flex;flex-wrap:wrap;gap:0;
+  background:#1e293b;border-bottom:1px solid rgba(255,255,255,.08);
+}
+.sec-quick-bar span{
+  padding:8px 16px;font-size:12px;color:rgba(255,255,255,.6);
+  border-right:1px solid rgba(255,255,255,.08);
+}
+.sec-quick-bar span:last-child{border-right:none;}
+.sec-quick-bar strong{color:#fff;font-family:'JetBrains Mono',monospace;font-size:13px;margin-left:4px;}
+.sec-quick-navy{background:#1e3a5f;}
+.sec-quick-green{background:#14532d;}
+@media(max-width:600px){
+  .sec-quick-bar span{padding:6px 12px;font-size:11px;}
+}
 </style>
 <div class="bkwarn" id="bkwarn">⚠️ 距上次備份已超過 3 天，請記得備份！<button class="act-btn" style="margin-left:auto" onclick="exportData()">📤 立即備份</button></div>
 
@@ -598,6 +615,9 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
     <span id="title-display">２０２６ 資產損益表</span>
   </div>
   <div class="db-topbar-actions">
+    <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;color:rgba(255,255,255,.85);font-weight:600;background:rgba(255,255,255,.12);padding:6px 12px;border-radius:8px">
+      <input type="checkbox" id="roi-chk" onchange="showDivRoi=this.checked;renderSum();renderInv()" style="accent-color:#60a5fa;width:14px;height:14px"> 含息模式
+    </label>
     <button class="db-btn primary" onclick="refreshPrices()">↻ 更新股價</button>
     <button class="db-btn success" onclick="exportData()">📤 備份</button>
     <label class="db-btn neutral" style="cursor:pointer">📥 還原<input type="file" accept=".json" style="display:none" onchange="importData(event)"></label>
@@ -608,21 +628,9 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 
 <div class="db-price-bar" id="pstat">—</div>
 
-<!-- ═══ ROW 1: Summary + ROI ═══ -->
-<div class="db-row">
-
-  <!-- Summary as card grid - full width -->
-  <div class="db-card" style="width:100%">
-    <div class="db-card-header" style="justify-content:space-between">
-      <span>📊 資產總覽</span>
-      <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;color:rgba(255,255,255,.8);font-weight:500">
-        <input type="checkbox" id="roi-chk" onchange="showDivRoi=this.checked;renderSum();renderInv()" style="accent-color:#60a5fa;width:14px;height:14px"> 含息模式
-      </label>
-    </div>
-    <div class="sum-card-grid" id="sum-tbl"></div>
-  </div>
-
-</div><!-- /ROW 1 -->
+<!-- 資產總覽改為嵌入各區塊，sum-tbl 保留用於 JS 計算但不顯示 -->
+<div id="sum-tbl" style="display:none"></div>
+<!-- 含息模式 toggle 移至頁面標題列 -->
 
 <!-- ═══ ROW 2: Investments ═══ -->
 <div class="db-card" style="margin-bottom:12px">
@@ -632,6 +640,13 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
       <button class="db-btn-sm primary" onclick="openInvModal()">＋ 新增</button>
       <button class="db-btn-sm neutral" onclick="openSearchModal()">🔍 查詢</button>
     </div>
+  </div>
+  <!-- 淨資產＋已實現 快速摘要 -->
+  <div class="sec-quick-bar" id="inv-quick-bar">
+    <span>🏛️ 淨資產：<strong id="qb-net">—</strong></span>
+    <span>✅ 已實現損益：<strong id="qb-real">—</strong></span>
+    <span>📊 負債比：<strong id="qb-dr">—</strong></span>
+    <span>🏦 信貸尚餘：<strong id="qb-loan">—</strong></span>
   </div>
   <!-- Summary strip -->
   <div class="inv-summary-strip">
@@ -649,26 +664,16 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
   <div class="db-card-header db-hdr-navy" style="justify-content:space-between">
     <span>🏦 信貸管理</span>
     <div style="display:flex;gap:6px;align-items:center">
-      <span class="sec-summary-badge" id="l-mo-badge"></span>
       <button class="db-btn-sm light" onclick="openLoanModal()">＋ 新增</button>
       <button class="db-btn-sm light" onclick="openLoanHist()">📚 結清記錄</button>
     </div>
   </div>
-  <!-- Loan summary strip -->
-  <div class="loan-sum-strip">
-    <div class="loan-sum-item">
-      <div class="loan-sum-label">總借款</div>
-      <div class="loan-sum-val loss" id="l-amt">—</div>
-    </div>
-    <div class="loan-sum-item">
-      <div class="loan-sum-label">尚餘本金</div>
-      <div class="loan-sum-val loss" id="l-rem">—</div>
-    </div>
-    <div class="loan-sum-item">
-      <div class="loan-sum-label">每月還款</div>
-      <div class="loan-sum-val loss" id="l-mo">—</div>
-    </div>
+  <div class="sec-quick-bar sec-quick-navy">
+    <span>總借款：<strong id="l-amt">—</strong></span>
+    <span>尚餘本金：<strong id="l-rem">—</strong></span>
+    <span>每月還款：<strong id="l-mo">—</strong></span>
   </div>
+
   <!-- Loan card grid -->
   <div class="loan-card-grid" id="loan-body"></div>
 </div>
@@ -680,25 +685,12 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
   <div class="db-card" style="flex:1;overflow:hidden">
     <div class="db-card-header db-hdr-green" style="justify-content:space-between">
       <span>💳 不限用途額度</span>
-      <div style="display:flex;gap:6px;align-items:center">
-        <span class="sec-summary-badge green" id="flex-mo-badge"></span>
-        <button class="db-btn-sm light" onclick="openFlexModal()">＋ 新增</button>
-      </div>
+      <button class="db-btn-sm light" onclick="openFlexModal()">＋ 新增</button>
     </div>
-    <!-- Flex summary -->
-    <div class="flex-sum-strip">
-      <div class="loan-sum-item">
-        <div class="loan-sum-label">總使用額</div>
-        <div class="loan-sum-val loss" id="f-rem">—</div>
-      </div>
-      <div class="loan-sum-item">
-        <div class="loan-sum-label">每月利息</div>
-        <div class="loan-sum-val loss" id="f-mo">—</div>
-      </div>
-      <div class="loan-sum-item">
-        <div class="loan-sum-label">每月總支出</div>
-        <div class="loan-sum-val loss" id="tot-mo-out">—</div>
-      </div>
+    <div class="sec-quick-bar sec-quick-green">
+      <span>總使用額：<strong id="f-rem">—</strong></span>
+      <span>每月利息：<strong id="f-mo">—</strong></span>
+      <span>每月總支出：<strong id="tot-mo-out">—</strong></span>
     </div>
     <div class="flex-card-grid" id="flex-body"></div>
   </div>
@@ -1812,7 +1804,7 @@ function renderSum(){
     {icon:'🏦',label:'信貸尚餘本金',value:'$'+Math.round(loanR).toLocaleString(),color:'var(--loss)',sub:'等額本息計算'},
     {icon:'🎯',label:'每月股息',value:fmt(tD),color:'var(--gain)',sub:'月配息合計'},
     {icon:'💸',label:'每月支出',value:fmt(mO),color:'var(--loss)',sub:'信貸+利息還款'},
-    {icon:'💡',label:'每月淨現金流',value:(fl>=0?'+':'')+fmt(fl),color:fl>=0?'var(--gain)':'var(--loss)',sub:'股息 - 支出',big:fl!==0},
+    {icon:'💡',label:'每月淨現金流',value:(fl>=0?'+':fl<0?'-':'')+fmt(fl),color:fl>=0?'var(--gain)':'var(--loss)',sub:'股息 - 支出',big:fl!==0},
   ];
   const sumEl=document.getElementById('sum-tbl');
   if(sumEl){
@@ -1830,13 +1822,17 @@ function renderSum(){
 
 
   // Update status bar
-  const setSB=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
-  setSB('sb-cf',(fl>=0?'+':'')+fmt(fl));
+  const setSB=(id,v,col)=>{const el=document.getElementById(id);if(el){el.textContent=v;if(col)el.style.color=col;}};
+  // Bottom status bar
+  setSB('sb-cf',(fl>=0?'+':fl<0?'-':'')+fmt(fl), fl>=0?'var(--gain)':'var(--loss)');
   setSB('sb-div',fmt(tD));
   setSB('sb-dr',dR.toFixed(1)+'%');
   setSB('sb-loan','$'+Math.round(loanR).toLocaleString());
-  const cfEl=document.getElementById('sb-cf');
-  if(cfEl)cfEl.style.color=fl>=0?'var(--gain)':'var(--loss)';
+  // Investment quick bar
+  setSB('qb-net','$'+Math.round(net).toLocaleString());
+  setSB('qb-real',(tR>=0?'+':'-')+fmt(tR), tR>=0?'var(--gain)':'var(--loss)');
+  setSB('qb-dr',dR.toFixed(1)+'%', dR>80?'var(--loss)':dR>60?'#f59e0b':'inherit');
+  setSB('qb-loan','$'+Math.round(loanR).toLocaleString(),'var(--loss)');
 }
 
 // ═══════ MODALS ═══════
