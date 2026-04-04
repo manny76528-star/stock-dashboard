@@ -1736,8 +1736,8 @@ function renderSum(){
   // 移除已在投資標的顯示的重複欄位（總成本、市值、損益、報酬率）
   // 改用漂亮卡片呈現剩餘7個重要指標
   const sumCards=[
-    {icon:'✅',label:'已實現損益',value:(tR>=0?'+':'-')+fmt(tR),color:tR>=0?'var(--gain)':'var(--loss)',sub:'含手續費、交易稅'},
     {icon:'🏛️',label:'淨資產',value:'$'+Math.round(net).toLocaleString(),color:'var(--accent)',sub:'資金總額 - 全部負債',big:true},
+    {icon:'✅',label:'已實現損益',value:(tR>=0?'+':'-')+fmt(tR),color:tR>=0?'var(--gain)':'var(--loss)',sub:'含手續費、交易稅'},
     {icon:'📊',label:'負債比',value:dR.toFixed(1)+'%',color:dR>80?'var(--loss)':dR>60?'#d97706':'var(--accent)',sub:'全部負債 / 資金總額'},
     {icon:'🏦',label:'信貸尚餘本金',value:'$'+Math.round(loanR).toLocaleString(),color:'var(--loss)',sub:'等額本息計算'},
     {icon:'🎯',label:'每月股息',value:fmt(tD),color:'var(--gain)',sub:'月配息合計'},
@@ -2490,7 +2490,7 @@ function saveClearedLoan(){
 }
 
 function openLoanHist(){
-  const cleared=(db.clearedLoans||[]).slice().sort((a,b)=>(b.clearedDate||'').localeCompare(a.clearedDate||''));
+  const cleared=(db.clearedLoans||[]).slice().sort((a,b)=>(b.start||b.clearedDate||'').localeCompare(a.start||a.clearedDate||''));
   const container=document.getElementById('loan-hist-results');
   const totalAmount=cleared.reduce((s,l)=>s+(l.amount||0),0);
   let html='';
