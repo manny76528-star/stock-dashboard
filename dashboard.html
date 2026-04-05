@@ -1187,7 +1187,21 @@ function importData(e){
       if(!db.clearedLoans)db.clearedLoans=[];
       if(!db.archivedTxns)db.archivedTxns=[];
       localStorage.setItem(STORE,JSON.stringify(db));
-      undoStack=[JSON.stringify(db)];redoStack=[];
+      // RESTORE_BACKUP - 自動載入備份資料（僅在 localStorage 幾乎空白時執行）
+(function(){
+  const existing = JSON.parse(localStorage.getItem(STORE)||'null');
+  const hasData = existing && (existing.investments||[]).length > 1;
+  if(!hasData){
+    const backup = {"investments":[{"id":"mnd1koudtsl","code":"00985B","name":"群益ESG投等債0-5","lots":800,"avgPrice":10.25,"divPerShare":0.048,"note":"質押中","transactions":[],"order":1,"url":"https://www.wantgoo.com/stock/etf/00985B/dividend-policy/ex-dividend"},{"id":"mned3z8p5iy","code":"00950B","name":"","lots":750,"avgPrice":14,"divPerShare":0.054,"note":"現股","transactions":[{"id":"mngv3bkej3f","type":"sell","lots":750,"price":14.17,"date":"2026-03-18","fee":36123,"lotRefs":[{"txnId":"init-mned3z8p5iy","lots":750,"date":"2020-01-01"}],"remark":"中東戰爭 原油上漲50% 後續通膨必會失控"}],"order":2},{"id":"mng8dckf9ag","code":"00988A","name":"主動統一全球創新","lots":25,"avgPrice":12.45,"divPerShare":0,"note":"現股","transactions":[{"id":"mngv6k3wtuk","type":"sell","lots":25,"price":12.58,"date":"2026-04-02","fee":1069,"lotRefs":[{"txnId":"init-mng8dckf9ag","lots":25,"date":"2020-01-01"}],"remark":"川普談話後釋出持續轟炸 大盤翻黑"}],"order":3},{"id":"mnhmumjz649","code":"1219","name":"福壽","lots":10,"avgPrice":13.95,"divPerShare":0,"note":"現股","url":"","transactions":[{"id":"mnhmumjyvky","type":"buy","lots":10,"price":13.95,"date":"2026-04-02","fee":0,"remark":"美伊戰爭,看能否有食品題材,上漲後當沖出掉"},{"id":"mnhmwzol55y","type":"sell","lots":10,"price":14.15,"date":"2026-04-02","fee":481,"lotRefs":[{"txnId":"mnhmumjyvky","lots":10,"date":"2026-04-02"}],"remark":"美伊戰爭,看能否有食品題材,上漲後當沖出掉"}],"order":4},{"id":"mng7ni9zryt","code":"00864B","name":"中信美國公債0-1","lots":128,"avgPrice":46.82,"divPerShare":0.186,"note":"質押中","transactions":[],"order":5,"url":"https://www.wantgoo.com/stock/etf/00864b/dividend-policy/ex-dividend"},{"id":"mnhnakhire3","code":"00981D","name":"主動中信非投等債","lots":100,"avgPrice":10.53,"divPerShare":0.08,"note":"質押中","url":"https://www.wantgoo.com/stock/etf/00981d/dividend-policy/ex-dividend","transactions":[{"id":"mnhnakhi8bv","type":"buy","lots":100,"price":10.53,"date":"2026-04-02","fee":0,"remark":"可隨景氣調整公債,投等,非投比例 且目前有9%殖利率"}],"order":6},{"id":"mnhn02jiyo7","code":"00996A","name":"主動兆豐台灣豐收","lots":10,"avgPrice":9.94,"divPerShare":0,"note":"現股","url":"https://www.wantgoo.com/stock/etf/00996a/dividend-policy/ex-dividend","transactions":[{"id":"mnhn02jifo3","type":"buy","lots":10,"price":9.94,"date":"2026-04-02","fee":0,"remark":"趁跌破發行價,建倉主動式ETF"},{"id":"mnhn1jv4aam","type":"buy","lots":19,"price":9.94,"date":"2026-04-02","fee":75,"remark":"川普談話後大盤回跌開高走低,適合再建倉"}],"order":7}],"loans":[{"id":"mncue4nbehw","bank":"line Bank-1","rate":3.28,"amount":800000,"start":"2024-05-13","due":"2028-06-13","monthly":17467,"deductDay":"13號","deductBank":"Line Bank"},{"id":"mncug22msvu","bank":"line Bank-2","rate":3.8,"amount":350000,"start":"2024-08-14","due":"2029-09-14","monthly":6319,"deductDay":"14號","deductBank":"Line Bank"},{"id":"mncui6prd6f","bank":"line Bank-3","rate":3.8,"amount":250000,"start":"2024-09-02","due":"2026-09-02","monthly":10834,"deductDay":"2號","deductBank":"Line Bank"},{"id":"mncujjvii0z","bank":"line Bank-4","rate":4,"amount":420000,"start":"2025-07-01","due":"2028-07-01","monthly":12400,"deductDay":"1號","deductBank":"Line Bank"},{"id":"mncul5vdg0j","bank":"line Bank-5","rate":4,"amount":330000,"start":"2025-11-12","due":"2028-12-12","monthly":9495,"deductDay":"12號","deductBank":"Line Bank"}],"flexLoans":[{"id":"mnffyto5gnf","name":"永豐銀行","rate":2.89,"limit":3000000,"used":2744805,"remain":255195,"monthly":6610,"note":"每個月自動扣除利息 要注意餘額"},{"id":"mnffzewmdbd","name":"統一證券","rate":2.56,"limit":13000000,"used":8460000,"remain":4540000,"monthly":18048,"note":"一年一簽,賣出股票時還利息"}],"cashAccounts":[{"id":"mncull1439i","bank":"Line Bank","cash":3155,"d1":0,"d2":0},{"id":"mneeom9dzod","bank":"統一券商","cash":1698488,"d1":-1690205,"d2":293565}],"prices":{"1219":{"price":13.95,"change":0,"changePct":0,"ts":1775143961793},"1319":{"price":82,"change":1.4,"changePct":1.74,"ts":1775143927319},"00985B":{"price":10.29,"change":0,"changePct":0,"ts":1775324031573},"00950B":{"price":14.22,"change":0,"changePct":0,"ts":1775098699349},"00981D":{"price":10.35,"change":0.01,"changePct":0.1,"ts":1775324031573},"00988A":{"price":11.85,"change":-0.69,"changePct":-5.5,"ts":1775098699349},"00996A":{"price":9.72,"change":-0.19,"changePct":-1.92,"ts":1775324031573},"00864B":{"price":46.82,"change":0.09,"changePct":0.19,"ts":1775324031573},"00933B":{"price":16.08,"change":0.15,"changePct":0.94,"ts":1775038668857},"00984B":{"price":16.49,"change":0,"changePct":0,"ts":1775057916853}},"dividends":[{"id":"mned4chlfe4","code":"00950B","date":"2026-01-02","lots":750,"perShare":0.054,"amount":40500},{"id":"mned647hfso","code":"00950B","date":"2026-02-02","lots":750,"perShare":0.063,"amount":47250},{"id":"mnedb6brthz","code":"00985B","date":"2026-01-06","lots":505,"perShare":0.048,"amount":24240},{"id":"mnedc2fy052","code":"00985B","date":"2026-02-03","lots":534,"perShare":0.048,"amount":25632},{"id":"mnedg7hklxp","code":"00981D","date":"2026-01-19","lots":100,"perShare":0.08,"amount":8000},{"id":"mnedgwqn6fo","code":"00981D","date":"2026-02-26","lots":100,"perShare":0.08,"amount":8000},{"id":"mnedi6s413l","code":"00981D","date":"2025-12-16","lots":100,"perShare":0.08,"amount":8000},{"id":"mnhiz4ky761","code":"00985B","exDate":"2026-03-12","date":"2026-04-09","lots":535,"perShare":0.048,"amount":25680,"pending":true},{"id":"mnhj089sdem","code":"00950B","exDate":"2026-03-12","date":"2026-04-09","lots":750,"perShare":0.065,"amount":48750,"pending":true},{"id":"mnhj1bzbhtd","code":"00981D","exDate":"2026-04-17","date":"2026-04-14","lots":100,"perShare":0.08,"amount":8000,"pending":true},{"id":"mnho1i0yn7i","code":"00985B","exDate":"2026-04-02","date":"2026-04-30","lots":800,"perShare":0.048,"amount":38400,"pending":true}],"snapshots":[{"ym":"2026-04","net":3293048,"div":70208,"cf":-10965,"debtRatio":79.2}],"settings":{"title":"２０２６　資產損益表"},"archivedTxns":[{"id":"mngv82og6qb","type":"buy","lots":27,"price":9.94,"date":"2020-01-01","fee":0,"remark":"初始持倉","code":"00996A","name":"主動兆豐台灣豐收","archivedDate":"2026-04-02"},{"id":"mngv82ol6ol","type":"buy","lots":2,"price":9.87,"date":"2026-04-02","fee":8,"remark":"下跌時分批布局","code":"00996A","name":"主動兆豐台灣豐收","archivedDate":"2026-04-02"}],"clearedLoans":[{"id":"mnixzladzyo","bank":"台灣銀行-1","rate":1.5,"amount":100000,"monthly":3334,"start":"2020-11-03","clearedDate":"2023-05-03","note":"政府紓困信貸","manualCleared":true},{"id":"mniy18t1uaz","bank":"台灣銀行-2","rate":1.5,"amount":100000,"monthly":1.5,"start":"2021-12-03","clearedDate":"2024-06-03","note":"政府紓困信貸","manualCleared":true},{"id":"mniy4zb8cuc","bank":"元大銀行","rate":3.6,"amount":480000,"monthly":7200,"start":"2019-11-13","clearedDate":"2025-10-13","note":"元大銀行信貸","manualCleared":true},{"id":"mniy7ct1k2h","bank":"聯邦銀行","rate":3.2,"amount":450000,"monthly":5561,"start":"2018-03-26","clearedDate":"2025-02-26","note":"","manualCleared":true}]};
+    if(!backup.snapshots)backup.snapshots=[];
+    if(!backup.clearedLoans)backup.clearedLoans=[];
+    if(!backup.archivedTxns)backup.archivedTxns=[];
+    db = backup;
+    localStorage.setItem(STORE, JSON.stringify(db));
+    console.log('✅ 備份資料已自動還原');
+  }
+})();
+undoStack=[JSON.stringify(db)];redoStack=[];
       render();
       toast('✅ 還原成功！共 '+(db.investments||[]).length+' 筆投資');
       refreshPrices();
@@ -1517,66 +1531,19 @@ function renderInv(){
         <div class="hist-txn-list">${tHTML}</div>
       </div>`;
     grid.appendChild(card);
-    // Replace pending placeholder with real DOM
-    if(isLineBank && pendingDivs30.length>0){
-      const placeholder=card.querySelector('[data-pending-id]');
-      if(!placeholder){
-        const wrap=document.createElement('div');
-        wrap.className='cash-pending-wrap';
-        const header=document.createElement('div');
-        header.className='cash-pending-header';
-        header.onclick=()=>{
-          const list=wrap.querySelector('.cash-pending-list');
-          const arrow=wrap.querySelector('.pending-arrow');
-          const open=list.style.display==='none';
-          list.style.display=open?'block':'none';
-          if(arrow)arrow.textContent=open?'▲':'▼';
-        };
-        header.innerHTML='<div style="display:flex;align-items:center;gap:8px">'
-          +'<span style="font-size:12px">⏳ 待入帳股息（30天內）</span>'
-          +'<span style="font-size:13px;font-weight:800;color:#2563eb">$'+pendingTotal30.toLocaleString()+'</span>'
-          +'</div><span class="pending-arrow">▼</span>';
-        const list=document.createElement('div');
-        list.className='cash-pending-list';
-        list.style.display='none';
-        pendingDivs30.forEach(d=>{
-          const inv=db.investments.find(i=>i.code===d.code);
-          const dc=getDivColor(d.code);
-          const daysLeft=Math.ceil((new Date(d.date)-today)/86400000);
-          const row=document.createElement('div');
-          row.className='cash-pending-row';
-          row.innerHTML='<div style="display:flex;align-items:center;gap:6px">'
-            +'<span style="width:4px;height:32px;border-radius:2px;background:'+dc+';flex-shrink:0;display:inline-block"></span>'
-            +'<div>'
-            +'<div style="font-size:12px;font-weight:700;color:#1e293b">'+d.code
-            +(inv?.name?'<span style="font-size:10px;color:#94a3b8;margin-left:4px">'+inv.name+'</span>':'')+'</div>'
-            +'<div style="font-size:10px;color:#94a3b8">發放 '+d.date
-            +(daysLeft<=5?'<span style="color:#ef4444;font-weight:700;margin-left:4px">'+daysLeft+'天後</span>':'<span style="color:#94a3b8;margin-left:4px">'+daysLeft+'天後</span>')
-            +'</div></div></div>'
-            +'<div style="font-size:14px;font-weight:800;color:#2563eb">$'+Math.round(d.amount).toLocaleString()+'</div>';
-          list.appendChild(row);
-        });
-        wrap.appendChild(header);
-        wrap.appendChild(list);
-        // Insert before footer
-        const footer=card.querySelector('.cash-card-footer');
-        if(footer)card.insertBefore(wrap,footer);
-        else card.appendChild(wrap);
-      }
-    }
-  });
+  }); // end calcs.forEach
 
-  // Update summary strip
-  const tPnl=tM-tC,tRoi=tC>0?tPnl/tC*100:0;
-  const setCl=(id,val,pos)=>{const el=document.getElementById(id);if(el){el.textContent=val;if(pos!==undefined)el.style.color=pos?'var(--gain)':val==='—'?'var(--muted)':'var(--loss)';}};
-  const dispPnl=showDivRoi?tPnl+tDivTot:tPnl;
+  // Update investment summary strip
+  const dispPnl=showDivRoi&&tDivTot>0?tPnl+tDivTot:tPnl;
   const dispRoi=tC>0?dispPnl/tC*100:0;
+  const setCl=(id,val,col)=>{const el=document.getElementById(id);if(el){el.textContent=val;if(col!==undefined)el.style.color=col;}};
   setCl('t-cost',fmt(tC));
   setCl('t-mkt',tM>0?fmt(tM):'—');
-  setCl('t-pnl',tM>0?(dispPnl>=0?'+':dispPnl<0?'-':'')+fmt(dispPnl):'—',dispPnl>=0);
-  setCl('t-roi',tM>0?(dispRoi>=0?'+':'')+dispRoi.toFixed(2)+'%':'—',dispRoi>=0);
+  setCl('t-pnl',tM>0?(dispPnl>=0?'+':dispPnl<0?'-':'')+fmt(dispPnl):'—',dispPnl>=0?'var(--gain)':'var(--loss)');
+  setCl('t-roi',tM>0?(dispRoi>=0?'+':'')+dispRoi.toFixed(2)+'%':'—',dispRoi>=0?'var(--gain)':'var(--loss)');
   document.getElementById('t-div').textContent=fmt(tD);
-}
+} // end renderInv
+
 function toggleHist(id){
   const panel=document.getElementById('hr-'+id);
   const btn=document.getElementById('hb-'+id);
