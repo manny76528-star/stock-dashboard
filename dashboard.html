@@ -1171,18 +1171,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 .irow:last-child { border-bottom:none; }
 .irow-open .irow-l2 { background:#f0f7ff; }
 
-.irow-l2 {
-  display:grid;
-  grid-template-columns: 200px 1fr 90px 24px;
-  align-items:center;
-  gap:0 16px;
-  padding:14px 20px;
-  cursor:pointer;
-  transition:background .15s;
-  user-select:none;
-}
-.irow-l2:hover { background:#f8fafc; }
-.irow-open .irow-l2:hover { background:#e8f4ff; }
+
 
 .irow-l2-name { display:flex;flex-direction:column;gap:3px; }
 .irow-code { font-size:15px;font-weight:700;color:var(--accent);text-decoration:none;white-space:nowrap;flex-shrink:0; }
@@ -1271,7 +1260,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 .irow-sm-btn.del:hover { background:#fef2f2; }
 
 @media(max-width:768px){
-  .irow-l2 { grid-template-columns:80px 1fr 100px 80px 16px;gap:0 8px;padding:11px 12px; }
+  .irow-l2 { grid-template-columns:75px 100px 1fr 95px 55px 16px;gap:0 6px;padding:10px 12px; }
   .irow-l3-nums { flex-direction:column; }
   .irow-l3-kv { border-right:none;border-bottom:1px solid #f1f5f9; }
   .irow-txn { grid-template-columns:60px 80px 1fr auto; }
@@ -2725,10 +2714,7 @@ function renderDivs(){
           +'<span class="div-row-primary">$'+Math.round(d.tot).toLocaleString()+'</span>'
           +'<span class="div-row-label">今年股息</span>'
         +'</div>'
-        +(pend>0
-          ?'<div class="div-row-cell"><span class="div-row-primary" style="color:#2563eb">$'+Math.round(pend).toLocaleString()+'</span><span class="div-row-label">準備入帳</span></div>'
-          :'<div class="div-row-cell"><span class="div-row-primary" style="color:#cbd5e1">—</span><span class="div-row-label">準備入帳</span></div>')
-        +'<div class="div-row-arrow">›</div>'
+         +'<div class="div-row-arrow">›</div>'
         +'</div>';
     }).join('')+'<div style="padding:10px 16px"><button class="irow-btn" onclick="openDivModal()">＋ 新增股息記錄</button></div>';
   }
