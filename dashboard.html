@@ -1536,6 +1536,21 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
   0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.4);}
   50%{box-shadow:0 0 0 5px rgba(239,68,68,0);}
 }
+
+/* ═══ 信貸預估餘額 ═══ */
+.lc-ok {
+  background:#fff0f0;color:#dc2626;border-color:#fca5a5;
+}
+.lc-short {
+  background:#f0fdf4;color:#16a34a;border-color:#86efac;
+}
+.lc-after-detail {
+  display:flex;flex-direction:column;gap:2px;
+  font-family:var(--mono);
+}
+.lc-div-note {
+  font-size:10px;color:#2563eb;font-family:'Noto Sans TC',sans-serif;
+}
 </style>
 <div class="bkwarn" id="bkwarn">⚠️ 距上次備份已超過 3 天，請記得備份！<button class="act-btn" style="margin-left:auto" onclick="exportData()">📤 立即備份</button></div>
 
@@ -2592,7 +2607,29 @@ function renderLoans(){
       const acc=db.cashAccounts.find(c=>c.bank===l.deductBank);
       if(acc){
         const accBal=(acc.cash||0)+(acc.d1||0)+(acc.d2||0);
-        const todayD=new Date(),in30=new Date(todayD.getTime()+30*86400000);
+        const todayD=new Date();
+
+        // 計算扣款日期
+        const deductDayNum=parseInt(l.deductDay)||0;
+        let deductDate=null;
+        if(deductDayNum){
+          const thisMonth=new Date(todayD.getFullYear(),todayD.getMonth(),deductDayNum);
+          deductDate=thisMonth>todayD?thisMonth:new Date(todayD.getFullYear(),todayD.getMonth()+1,deductDayNum);
+        }
+        const deductDateStr=deductDate?deductDate.toISOString().split('T')[0]:null;
+
+        // 扣款前會入帳的股息（發放日 <= 扣款日）
+        const preDivs=(db.dividends||[]).filter(d=>{
+          if(!d.date||!deductDateStr)return false;
+          const todayStr=todayD.toISOString().split('T')[0];
+          // 發放日在今天之後、扣款日之前或當天
+          return d.date>todayStr && d.date<=deductDateStr;
+        });
+        const preDivTotal=preDivs.reduce((s,d)=>s+(d.amount||0),0);
+        const preDivRounded=Math.round(preDivTotal);
+
+        // 同帳戶其他貸款扣款（在本筆扣款前）
+        const in30=new Date(todayD.getTime()+30*86400000);
         const upcoming=[];
         db.loans.forEach(loan=>{
           if(loan.deductBank!==l.deductBank||!loan.deductDay)return;
@@ -2603,12 +2640,29 @@ function renderLoans(){
           }
         });
         upcoming.sort((a,b)=>a.date-b.date);
-        let runBal=accBal,thisAfter=accBal;
+        let runBal=accBal+preDivTotal,thisAfter=accBal+preDivTotal;
         upcoming.forEach(item=>{runBal-=item.monthly;if(item.loanId===l.id)thisAfter=runBal;});
         const isShort=thisAfter<0;
-        balHtml=isShort
-          ?'<span class="l3-badge danger">⚠ 不足 $'+Math.abs(Math.round(thisAfter)).toLocaleString()+'</span>'
-          :'<span class="l3-badge ok">✓ 足夠</span>';
+        const afterAmt=Math.round(thisAfter);
+
+        // 台灣習慣：紅=足夠、綠=不足
+        if(isShort){
+          balHtml='<span class="l3-badge lc-short">不足 $'+Math.abs(afterAmt).toLocaleString()+'</span>';
+        } else {
+          balHtml='<span class="l3-badge lc-ok">✓ 足夠</span>';
+        }
+
+        // 詳細說明（含股息資訊）
+        const divNote=preDivRounded>0
+          ?'<div class="lc-div-note">含入帳股息 +$'+preDivRounded.toLocaleString()+'</div>'
+          :'';
+        const afterColor=isShort?'var(--loss)':'var(--gain)';
+        afterHtml='<div class="lc-after-detail">'
+          +'<span style="font-size:11px;color:'+afterColor+';font-weight:700">'
+          +(isShort?'預估不足 -$'+Math.abs(afterAmt).toLocaleString():'預估足夠 +$'+afterAmt.toLocaleString())
+          +'</span>'
+          +divNote
+          +'</div>';
       }
     }
 
@@ -2643,9 +2697,8 @@ function renderLoans(){
         +'<div class="lc-row"><span class="lc-k">扣款日</span><span class="lc-v '+(urgent?'loss':'')+'">'+dTxt+'</span></div>'
         +'<div class="lc-row"><span class="lc-k">到期日</span><span class="lc-v '+(nearDue?'loss':'')+'">'+dueTxt+'</span></div>'
       +'</div>'
-      // 底部只留按鈕，移除重複的「扣後」資訊
       +'<div class="lc-footer">'
-        +'<span></span>'
+        +afterHtml
         +'<div style="display:flex;gap:4px">'
           +'<button class="irow-sm-btn" data-action="editLoan">✏️</button>'
           +'<button class="irow-sm-btn del" data-action="delLoan">🗑</button>'
