@@ -1758,52 +1758,134 @@ function renderCash(){
   grid.innerHTML='';
   let tB=0;
 
-  // 計算30天內待入帳股息（準備入帳）
+  // 計算30天內待入帳股息
   const today=new Date();
   const in30=new Date(today.getTime()+30*86400000);
   const todayStr=today.toISOString().split('T')[0];
   const in30Str=in30.toISOString().split('T')[0];
   const pendingDivs30=(db.dividends||[])
-    .filter(d=>{
-      const isPending=d.pending||(d.exDate&&d.exDate<=todayStr&&d.date&&d.date>todayStr);
-      return isPending && d.date && d.date>=todayStr && d.date<=in30Str;
-    })
-    .sort((a,b)=>a.date.localeCompare(b.date)); // 越近越上面
-
+    .filter(d=>(d.pending||(d.exDate&&d.exDate<=todayStr&&d.date&&d.date>todayStr))&&d.date&&d.date>=todayStr&&d.date<=in30Str)
+    .sort((a,b)=>a.date.localeCompare(b.date));
   const pendingTotal30=pendingDivs30.reduce((s,d)=>s+d.amount,0);
 
   db.cashAccounts.forEach(c=>{
     const bal=(c.cash||0)+(c.d1||0)+(c.d2||0);
     tB+=bal;
+    const isLineBank=c.bank==='Line Bank';
+    const hasD1=c.d1&&c.d1!==0, hasD2=c.d2&&c.d2!==0;
+
     const card=document.createElement('div');
     card.className='cash-card';
-    const hasD1=c.d1&&c.d1!==0, hasD2=c.d2&&c.d2!==0;
-    const isLineBank=c.bank==='Line Bank';
 
-    // 待入帳區塊 HTML（只有 Line Bank 才顯示）
-        let pendingHtml='';
+    // Top
+    const top=document.createElement('div');
+    top.className='cash-card-top';
+    top.innerHTML='<div class="cash-card-bank">'+c.bank+'</div>'
+      +'<div class="cash-card-bal '+(bal>=0?'gain':'loss')+'">$'+Math.abs(bal).toLocaleString()+'</div>';
+    card.appendChild(top);
+
+    // Breakdown
+    const breakdown=document.createElement('div');
+    breakdown.className='cash-card-breakdown';
+    breakdown.innerHTML='<div class="cash-item"><span class="cash-item-label">現金</span><span class="cash-item-val">$'+(c.cash||0).toLocaleString()+'</span></div>'
+      +(hasD1?'<div class="cash-item"><span class="cash-item-label">交割 DAY1</span><span class="cash-item-val '+(c.d1<0?'loss':'gain')+'">$'+c.d1.toLocaleString()+'</span></div>':'')
+      +(hasD2?'<div class="cash-item"><span class="cash-item-label">交割 DAY2</span><span class="cash-item-val '+(c.d2<0?'loss':'gain')+'">$'+c.d2.toLocaleString()+'</span></div>':'');
+    card.appendChild(breakdown);
+
+    // Pending dividends (Line Bank only)
     if(isLineBank && pendingDivs30.length>0){
-      // Build as DOM element to avoid quote hell
-      pendingHtml='__PENDING_PLACEHOLDER_'+c.id+'__';
+      const wrap=document.createElement('div');
+      wrap.className='cash-pending-wrap';
+
+      const hdr=document.createElement('div');
+      hdr.className='cash-pending-header';
+      const arrow=document.createElement('span');
+      arrow.className='pending-arrow';
+      arrow.textContent='▼';
+      const hdrLeft=document.createElement('div');
+      hdrLeft.style.cssText='display:flex;align-items:center;gap:8px';
+      const hdrLabel=document.createElement('span');
+      hdrLabel.style.fontSize='12px';
+      hdrLabel.textContent='⏳ 待入帳股息（30天內）';
+      const hdrAmt=document.createElement('span');
+      hdrAmt.style.cssText='font-size:13px;font-weight:800;color:#2563eb';
+      hdrAmt.textContent='$'+Math.round(pendingTotal30).toLocaleString();
+      hdrLeft.appendChild(hdrLabel);
+      hdrLeft.appendChild(hdrAmt);
+      hdr.appendChild(hdrLeft);
+      hdr.appendChild(arrow);
+
+      const list=document.createElement('div');
+      list.className='cash-pending-list';
+      list.style.display='none';
+
+      hdr.onclick=function(){
+        const open=list.style.display==='none';
+        list.style.display=open?'block':'none';
+        arrow.textContent=open?'▲':'▼';
+      };
+
+      pendingDivs30.forEach(function(d){
+        const inv=db.investments.find(i=>i.code===d.code);
+        const dc=getDivColor(d.code);
+        const daysLeft=Math.ceil((new Date(d.date)-today)/86400000);
+        const row=document.createElement('div');
+        row.className='cash-pending-row';
+
+        const left=document.createElement('div');
+        left.style.cssText='display:flex;align-items:center;gap:6px';
+        const bar=document.createElement('span');
+        bar.style.cssText='width:4px;height:32px;border-radius:2px;flex-shrink:0;display:inline-block;background:'+dc;
+        const info=document.createElement('div');
+        const name_el=document.createElement('div');
+        name_el.style.cssText='font-size:12px;font-weight:700;color:#1e293b';
+        name_el.textContent=d.code+(inv?.name?' · '+inv.name:'');
+        const date_el=document.createElement('div');
+        date_el.style.cssText='font-size:10px;color:#94a3b8';
+        date_el.textContent='發放 '+d.date+' ('+daysLeft+'天後)';
+        if(daysLeft<=5)date_el.style.color='#ef4444';
+        info.appendChild(name_el);
+        info.appendChild(date_el);
+        left.appendChild(bar);
+        left.appendChild(info);
+
+        const amt=document.createElement('div');
+        amt.style.cssText='font-size:14px;font-weight:800;color:#2563eb';
+        amt.textContent='$'+Math.round(d.amount).toLocaleString();
+
+        row.appendChild(left);
+        row.appendChild(amt);
+        list.appendChild(row);
+      });
+
+      wrap.appendChild(hdr);
+      wrap.appendChild(list);
+      card.appendChild(wrap);
     }
 
-    
-    card.innerHTML=`
-      <div class="cash-card-top">
-        <div class="cash-card-bank">${c.bank}</div>
-        <div class="cash-card-bal ${bal>=0?'gain':'loss'}">$${Math.abs(bal).toLocaleString()}</div>
-      </div>
-      <div class="cash-card-breakdown">
-        <div class="cash-item"><span class="cash-item-label">現金</span><span class="cash-item-val">$${(c.cash||0).toLocaleString()}</span></div>
-        ${hasD1?'<div class="cash-item"><span class="cash-item-label">交割 DAY1</span><span class="cash-item-val '+(c.d1<0?'loss':'gain')+'">$'+c.d1.toLocaleString()+'</span></div>':''}
-        ${hasD2?'<div class="cash-item"><span class="cash-item-label">交割 DAY2</span><span class="cash-item-val '+(c.d2<0?'loss':'gain')+'">$'+c.d2.toLocaleString()+'</span></div>':''}
-      </div>
-      ${pendingHtml}
-      <div class="cash-card-footer">
-        ${isLineBank?'<button class="card-act-btn" style="background:#eff6ff;color:#2563eb" onclick="quickDeposit(\''+c.id+'\',\''+c.bank+'\')">💵 入金</button>':''}
-        <button class="card-act-btn edit" onclick="editCash('${c.id}')">✏️ 編輯</button>
-        <button class="card-act-btn danger" onclick="delCash('${c.id}')">🗑</button>
-      </div>`;
+    // Footer
+    const footer=document.createElement('div');
+    footer.className='cash-card-footer';
+    if(isLineBank){
+      const depBtn=document.createElement('button');
+      depBtn.className='card-act-btn';
+      depBtn.style.cssText='background:#eff6ff;color:#2563eb';
+      depBtn.textContent='💵 入金';
+      depBtn.onclick=function(){quickDeposit(c.id,c.bank);};
+      footer.appendChild(depBtn);
+    }
+    const editBtn=document.createElement('button');
+    editBtn.className='card-act-btn edit';
+    editBtn.textContent='✏️ 編輯';
+    editBtn.onclick=function(){editCash(c.id);};
+    const delBtn=document.createElement('button');
+    delBtn.className='card-act-btn danger';
+    delBtn.textContent='🗑';
+    delBtn.onclick=function(){delCash(c.id);};
+    footer.appendChild(editBtn);
+    footer.appendChild(delBtn);
+    card.appendChild(footer);
+
     grid.appendChild(card);
   });
 
@@ -1812,16 +1894,6 @@ function renderCash(){
   const badge=document.getElementById('cash-tot-badge');
   if(badge){badge.textContent='$'+Math.abs(tB).toLocaleString();badge.style.color=tB>=0?'var(--gain)':'var(--loss)';}
 }
-
-function togglePending(cashId){
-  const list=document.getElementById('pending-list-'+cashId);
-  const arrow=document.getElementById('pending-arrow-'+cashId);
-  if(!list)return;
-  const open=list.style.display==='none';
-  list.style.display=open?'block':'none';
-  if(arrow)arrow.textContent=open?'▲':'▼';
-}
-
 
 const DIV_COLORS=['#e74c3c','#3498db','#607d8b','#f39c12','#9b59b6','#1abc9c','#e67e22','#34495e','#f06292','#00bcd4'];
 function getDivColor(code){
