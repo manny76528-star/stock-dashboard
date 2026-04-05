@@ -3004,11 +3004,13 @@ function renderSum(){
   const lR=loanR+db.flexLoans.reduce((s,f)=>s+(f.used||f.remain||0),0);
   const mO=db.loans.reduce((s,l)=>s+(l.monthly||0),0)+db.flexLoans.reduce((s,f)=>s+(f.monthly||0),0);
   const cT=db.cashAccounts.reduce((s,c)=>s+(c.cash||0)+(c.d1||0)+(c.d2||0),0);
-  const tot=tC+cT;
+  // 股票部位：有市值用市值，沒股價才 fallback 用成本
+  const invTot=tM>0?tM:tC;
+  const tot=invTot+cT;
   const pnl=tM-tC,roi=tC>0?pnl/tC*100:0;
   const roiInc=tC>0?(pnl+tDivTot)/tC*100:0;
   const dR=tot>0?lR/tot*100:0;
-  // 淨資產固定不含息（股息已花掉，不加回淨資產）
+  // 淨資產固定不含息
   const net=tot-lR;
   const fl=tD-mO;
   // 含息只改變報酬率和損益顯示，不影響淨資產
@@ -3918,8 +3920,9 @@ function recordSnapshot(manual=false){
   const lR=db.loans.reduce((s,l)=>s+calcLoanRemain(l),0)+db.flexLoans.reduce((s,f)=>s+(f.used||f.remain||0),0);
   const mO=db.loans.reduce((s,l)=>s+(l.monthly||0),0)+db.flexLoans.reduce((s,f)=>s+(f.monthly||0),0);
   const cT=db.cashAccounts.reduce((s,c)=>s+(c.cash||0)+(c.d1||0)+(c.d2||0),0);
-  const tot=tC+cT;           // 股票成本 + 現金，與資產損益表一致
-  const net=tot-lR;           // 不含息的淨資產（與表格裡的 net 一致）
+  const invTotS=tM>0?tM:tC;   // 有市值用市值，無股價才用成本
+  const tot=invTotS+cT;
+  const net=tot-lR;
   const dR=tot>0?Math.round(lR/tot*1000)/10:0;
   const fl=Math.round(tD-mO);
   const ym=new Date().toISOString().slice(0,7);
