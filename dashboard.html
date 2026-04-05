@@ -1179,7 +1179,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 .irow-badge { font-size:10px;font-weight:600;padding:1px 6px;border-radius:20px;margin-left:6px; }
 .irow-subname { font-size:11px;color:#94a3b8; }
 
-/* irow-l2-row1/row2 removed */
+
 .irow-l2-pnl-amt {
   font-size:16px;
   font-weight:700;
@@ -1260,7 +1260,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 .irow-sm-btn.del:hover { background:#fef2f2; }
 
 @media(max-width:768px){
-  .irow-l2 { grid-template-columns:75px 100px 1fr 95px 55px 16px;gap:0 6px;padding:10px 12px; }
+  
   .irow-l3-nums { flex-direction:column; }
   .irow-l3-kv { border-right:none;border-bottom:1px solid #f1f5f9; }
   .irow-txn { grid-template-columns:60px 80px 1fr auto; }
@@ -1389,6 +1389,61 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
   transition:background .2s;
   flex-shrink:0;
 }
+
+/* ═══ IROW-L2: 投資標的第二層單行 ═══ */
+.irow-l2 {
+  display:grid;
+  grid-template-columns: 75px 95px 1fr 62px 20px 100px;
+  align-items:center;
+  gap:0 8px;
+  padding:13px 16px;
+  cursor:pointer;
+  user-select:none;
+  transition:background .15s;
+}
+.irow-l2:hover { background:#f8fafc; }
+.irow-open .irow-l2 { background:#f0f7ff; }
+.irow-open .irow-l2:hover { background:#e8f4ff; }
+
+.irow-l2-name {
+  font-size:11px;
+  color:#94a3b8;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.irow-l2-pnl-amt {
+  font-size:15px;
+  font-weight:700;
+  font-family:var(--mono);
+  white-space:nowrap;
+  text-align:right;
+}
+.irow-l2-pnl-pct {
+  font-size:12px;
+  font-weight:600;
+  font-family:var(--mono);
+  white-space:nowrap;
+  text-align:right;
+}
+.irow-l2-arrow {
+  font-size:11px;
+  color:#94a3b8;
+  text-align:center;
+}
+.irow-note-bar {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  border-radius:20px;
+  padding:2px 10px;
+  min-width:0;
+}
+.irow-note-text { font-size:10px; font-weight:600; }
+.irow-note-lots { font-size:12px; font-weight:700; color:#475569; font-family:var(--mono); }
+.irow-code { font-size:14px; font-weight:700; color:var(--accent); text-decoration:none; white-space:nowrap; }
+.irow-code:hover { text-decoration:underline; }
+.irow-subname { font-size:11px; color:#94a3b8; }
 </style>
 <div class="bkwarn" id="bkwarn">⚠️ 距上次備份已超過 3 天，請記得備份！<button class="act-btn" style="margin-left:auto" onclick="exportData()">📤 立即備份</button></div>
 
@@ -2281,14 +2336,14 @@ function renderInv(){
       +'</div>';
 
     row.innerHTML=
-      // ── Layer 2: 單行橫排 ──
+      // ── Layer 2: 單行橫排（照上圖）──
       '<div class="irow-l2" onclick="toggleInvDetail(\''+inv.id+'\')">'
         +codeHtml
-        +(inv.name?'<span class="irow-l2-name">'+inv.name+'</span>':'')
-        +noteHtml
         +'<span class="irow-l2-pnl-amt" style="color:'+pnColor+'">'+pnlTxt+'</span>'
+        +noteHtml
         +'<span class="irow-l2-pnl-pct" style="color:'+pnColor+'">'+pctTxt+'</span>'
         +'<span class="irow-l2-arrow" id="iarr-'+inv.id+'">'+(isOpen?'▲':'▼')+'</span>'
+        +(inv.name?'<span class="irow-l2-name">'+inv.name+'</span>':'')
       +'</div>'
       // ── Layer 3: 詳細（預設隱藏）──
       +'<div class="irow-l3" id="idet-'+inv.id+'" style="display:'+(isOpen?'block':'none')+'">'
