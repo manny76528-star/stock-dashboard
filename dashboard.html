@@ -692,8 +692,36 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 
 <div class="db-price-bar" id="pstat">—</div>
 
-<!-- 資產總覽改為嵌入各區塊，sum-tbl 保留用於 JS 計算但不顯示 -->
-<div id="sum-tbl" style="display:none"></div>
+<!-- 資產總覽 KPI 卡片 -->
+<div class="db-card" style="margin-bottom:12px">
+  <div class="db-card-header" style="justify-content:space-between">
+    <span>📊 資產總覽</span>
+    <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;color:rgba(255,255,255,.8);font-weight:500">
+      <input type="checkbox" id="roi-chk-sum" onchange="showDivRoi=this.checked;renderSum();renderInv()" style="accent-color:#60a5fa;width:14px;height:14px"> 含息
+    </label>
+  </div>
+  <!-- 4張主角卡片 -->
+  <div class="inv-hero-strip">
+    <div class="inv-hero-card blue">
+      <div class="inv-hero-label">🏛️ 淨資產</div>
+      <div class="inv-hero-value" id="qb-net">—</div>
+    </div>
+    <div class="inv-hero-card" id="inv-hero-real">
+      <div class="inv-hero-label">✅ 已實現損益</div>
+      <div class="inv-hero-value" id="qb-real">—</div>
+    </div>
+    <div class="inv-hero-card" id="inv-hero-dr">
+      <div class="inv-hero-label">📊 負債比</div>
+      <div class="inv-hero-value" id="qb-dr">—</div>
+    </div>
+    <div class="inv-hero-card red">
+      <div class="inv-hero-label">🏦 信貸尚餘本金</div>
+      <div class="inv-hero-value" id="qb-loan">—</div>
+    </div>
+  </div>
+  <!-- 其餘 KPI -->
+  <div class="sum-card-grid" id="sum-tbl"></div>
+</div>
 <!-- 含息模式 toggle 移至頁面標題列 -->
 
 <!-- ═══ ROW 2: Investments ═══ -->
@@ -704,13 +732,6 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
       <button class="db-btn-sm primary" onclick="openInvModal()">＋ 新增</button>
       <button class="db-btn-sm neutral" onclick="openSearchModal()">🔍 查詢</button>
     </div>
-  </div>
-  <!-- 淨資產＋已實現 快速摘要 -->
-  <div id="inv-quick-bar">
-    <span>🏛️ 淨資產<strong id="qb-net">—</strong></span>
-    <span>✅ 已實現損益<strong id="qb-real">—</strong></span>
-    <span>📊 負債比<strong id="qb-dr">—</strong></span>
-    <span>🏦 信貸尚餘本金<strong id="qb-loan">—</strong></span>
   </div>
   <!-- Summary strip -->
   <div class="inv-summary-strip">
@@ -2034,6 +2055,7 @@ function renderSum(){
   }
   // Also update the roi-chk sync (checkbox now in header)
   const rc2=document.getElementById('roi-chk');if(rc2)rc2.checked=showDivRoi;
+  const rc3=document.getElementById('roi-chk-sum');if(rc3)rc3.checked=showDivRoi;
 
 
 
