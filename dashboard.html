@@ -1,4 +1,4 @@
-<!DOCTYPE html><!-- v20260331 -->
+<!DOCTYPE html><!-- v20260405 -->
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
@@ -1969,6 +1969,16 @@ function renderInv(){
   setCl('t-pnl',tM>0?(dispPnl>=0?'+':dispPnl<0?'-':'')+fmt(dispPnl):'—',dispPnl>=0?'var(--gain)':'var(--loss)');
   setCl('t-roi',tM>0?(dispRoi>=0?'+':'')+dispRoi.toFixed(2)+'%':'—',dispRoi>=0?'var(--gain)':'var(--loss)');
   const tdiv=document.getElementById('t-div');if(tdiv)tdiv.textContent=fmt(tD);
+}
+
+function toggleSection(id){
+  const detail=document.getElementById(id);
+  if(!detail)return;
+  const isOpen=detail.style.display!=='none';
+  detail.style.display=isOpen?'none':'block';
+  const card=detail.closest('.sec-collapsible')||detail.closest('.db-card');
+  const btn=card?.querySelector('.sec-toggle-btn');
+  if(btn)btn.textContent=isOpen?'展開 ▼':'收起 ▲';
 }
 
 function toggleHist(id){
