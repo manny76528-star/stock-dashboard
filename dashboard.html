@@ -642,6 +642,36 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
   padding:7px 4px;border-bottom:1px solid #f1f5f9;
 }
 .cash-pending-row:last-child{border-bottom:none;}
+
+/* ═══ COLLAPSIBLE SECTIONS ═══ */
+.sec-toggle-btn{
+  border:1px solid rgba(255,255,255,.3);
+  background:rgba(255,255,255,.12);
+  color:#fff;border-radius:6px;
+  padding:4px 10px;font-size:11px;font-weight:600;
+  cursor:pointer;white-space:nowrap;
+  transition:background .15s;font-family:'Noto Sans TC',sans-serif;
+}
+.sec-toggle-btn:hover{background:rgba(255,255,255,.25);}
+
+.sec-summary-inline{
+  display:flex;gap:12px;flex-wrap:wrap;align-items:center;
+}
+.sec-summary-inline span{
+  font-size:11px;color:rgba(255,255,255,.7);white-space:nowrap;
+}
+.sec-summary-inline strong{
+  color:#fff;font-family:'JetBrains Mono',monospace;font-size:12px;
+}
+
+.sec-detail{
+  animation:fadeIn .2s ease;
+}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:600px){
+  .sec-summary-inline{gap:6px;}
+  .sec-summary-inline span{font-size:10px;}
+}
 </style>
 <div class="bkwarn" id="bkwarn">⚠️ 距上次備份已超過 3 天，請記得備份！<button class="act-btn" style="margin-left:auto" onclick="exportData()">📤 立即備份</button></div>
 
@@ -724,72 +754,87 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 <!-- 含息模式 toggle 移至頁面標題列 -->
 
 <!-- ═══ ROW 2: Investments ═══ -->
-<div class="db-card" style="margin-bottom:12px">
+<div class="db-card sec-collapsible" style="margin-bottom:12px">
   <div class="db-card-header" style="justify-content:space-between">
     <span>📈 投資標的</span>
-    <div style="display:flex;gap:6px">
-      <button class="db-btn-sm primary" onclick="openInvModal()">＋ 新增</button>
-      <button class="db-btn-sm neutral" onclick="openSearchModal()">🔍 查詢</button>
+    <div style="display:flex;gap:6px;align-items:center">
+      <div class="sec-summary-inline">
+        <span style="display:none"><strong id="t-cost">—</strong></span>
+        <span style="display:none"><strong id="t-mkt">—</strong></span>
+        <span>損益 <strong id="t-pnl">—</strong></span>
+        <span>報酬 <strong id="t-roi">—</strong></span>
+        <span>月息 <strong id="t-div" style="color:var(--gain)">—</strong></span>
+      </div>
+      <button class="db-btn-sm light" onclick="openInvModal()">＋</button>
+      <button class="db-btn-sm light" onclick="openSearchModal()">🔍</button>
+      <button class="sec-toggle-btn" onclick="toggleSection('inv-detail')">展開 ▼</button>
     </div>
   </div>
-  <!-- Summary strip -->
-  <div class="inv-summary-strip">
-    <div class="inv-sum-item"><div class="inv-sum-label">總成本</div><div class="inv-sum-value" id="t-cost">—</div></div>
-    <div class="inv-sum-item"><div class="inv-sum-label">總市值</div><div class="inv-sum-value" id="t-mkt">—</div></div>
-    <div class="inv-sum-item"><div class="inv-sum-label">總損益</div><div class="inv-sum-value" id="t-pnl">—</div></div>
-    <div class="inv-sum-item"><div class="inv-sum-label">總報酬</div><div class="inv-sum-value" id="t-roi">—</div></div>
-    <div class="inv-sum-item"><div class="inv-sum-label">月配息</div><div class="inv-sum-value gain" id="t-div">—</div></div>
+  <div class="sec-detail" id="inv-detail" style="display:none">
+    <div class="inv-card-grid" id="inv-body"></div>
   </div>
-  <div class="inv-card-grid" id="inv-body"></div>
 </div>
 
-<!-- ═══ ROW 3: Loans (full width card grid) ═══ -->
-<div class="db-card" style="margin-bottom:12px">
+<!-- ═══ ROW 3: Loans ═══ -->
+<div class="db-card sec-collapsible" style="margin-bottom:12px">
   <div class="db-card-header db-hdr-navy" style="justify-content:space-between">
     <span>🏦 信貸管理</span>
     <div style="display:flex;gap:6px;align-items:center">
-      <button class="db-btn-sm light" onclick="openLoanModal()">＋ 新增</button>
-      <button class="db-btn-sm light" onclick="openLoanHist()">📚 結清記錄</button>
+      <div class="sec-summary-inline">
+        <span>尚餘本金 <strong id="l-rem">—</strong></span>
+        <span>月還款 <strong id="l-mo">—</strong></span>
+        <span>最近扣款 <strong id="l-next-deduct">—</strong></span>
+        <span style="display:none"><strong id="l-amt">—</strong></span>
+      </div>
+      <button class="db-btn-sm light" onclick="openLoanModal()">＋</button>
+      <button class="db-btn-sm light" onclick="openLoanHist()">📚</button>
+      <button class="sec-toggle-btn" onclick="toggleSection('loan-detail')">展開 ▼</button>
     </div>
   </div>
-  <div class="sec-quick-bar sec-quick-navy">
-    <span>總借款：<strong id="l-amt">—</strong></span>
-    <span>尚餘本金：<strong id="l-rem">—</strong></span>
-    <span>每月還款：<strong id="l-mo">—</strong></span>
+  <div class="sec-detail" id="loan-detail" style="display:none">
+    <div class="loan-card-grid" id="loan-body"></div>
   </div>
-
-  <!-- Loan card grid -->
-  <div class="loan-card-grid" id="loan-body"></div>
 </div>
 
 <!-- ═══ ROW 3b: Flex + Cash side by side ═══ -->
 <div class="db-row" style="margin-bottom:12px">
 
   <!-- FLEX LOANS -->
-  <div class="db-card" style="flex:1;overflow:hidden">
-    <div class="db-card-header" style="background:#0c4a6e;justify-content:space-between">
+  <div class="db-card sec-collapsible" style="flex:1;overflow:hidden">
+    <div class="db-card-header" style="background:#075985;justify-content:space-between">
       <span>💳 不限用途額度</span>
-      <button class="db-btn-sm light" onclick="openFlexModal()">＋ 新增</button>
+      <div style="display:flex;gap:6px;align-items:center">
+        <div class="sec-summary-inline">
+          <span>使用 <strong id="f-rem">—</strong></span>
+          <span>剩餘 <strong id="f-avail">—</strong></span>
+          <span>月息 <strong id="f-mo">—</strong></span>
+          <span style="display:none"><strong id="tot-mo-out">—</strong></span>
+        </div>
+        <button class="db-btn-sm light" onclick="openFlexModal()">＋</button>
+        <button class="sec-toggle-btn" onclick="toggleSection('flex-detail')">展開 ▼</button>
+      </div>
     </div>
-    <div class="sec-quick-bar" style="background:#075985">
-      <span style="background:#075985">總使用額：<strong id="f-rem">—</strong></span>
-      <span style="background:#075985">每月利息：<strong id="f-mo">—</strong></span>
-      <span style="background:#075985">每月總支出：<strong id="tot-mo-out">—</strong></span>
+    <div class="sec-detail" id="flex-detail" style="display:none">
+      <div class="flex-card-grid" id="flex-body"></div>
     </div>
-    <div class="flex-card-grid" id="flex-body"></div>
   </div>
 
   <!-- CASH -->
-  <div class="db-card" style="flex:1;overflow:hidden">
+  <div class="db-card sec-collapsible" style="flex:1;overflow:hidden">
     <div class="db-card-header" style="background:#374151;justify-content:space-between">
       <span>💰 現金帳戶</span>
       <div style="display:flex;gap:8px;align-items:center">
-        <span style="font-size:12px;color:rgba(255,255,255,.7)">總餘額</span>
-        <span style="font-size:16px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#fbbf24" id="cash-tot-badge">—</span>
-        <button class="db-btn-sm light" onclick="openCashModal()">＋ 新增</button>
+        <div class="sec-summary-inline">
+          <span>總餘額 <strong id="cash-tot-badge" style="color:var(--gain)">—</strong></span>
+          <span>待入帳 <strong id="cash-pending-badge" style="color:#60a5fa">—</strong></span>
+        </div>
+        <button class="db-btn-sm light" onclick="openCashModal()">＋</button>
+        <button class="sec-toggle-btn" onclick="toggleSection('cash-detail')">展開 ▼</button>
       </div>
     </div>
-    <div class="cash-card-grid" id="cash-body"></div>
+    <div class="sec-detail" id="cash-detail" style="display:none">
+      <div class="cash-card-grid" id="cash-body"></div>
+    </div>
     <span id="c-tot" style="display:none">—</span>
   </div>
 
@@ -804,11 +849,20 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
   <table id="flex-tbl" style="display:none"><tbody></tbody></table>
 
   <!-- DIVIDENDS -->
-  <div class="db-card" style="flex:1;overflow:hidden">
+  <div class="db-card sec-collapsible" style="flex:1;overflow:hidden">
     <div class="db-card-header" style="background:#0369a1;justify-content:space-between">
       <span>🎯 股息記錄</span>
-      <button class="db-btn-sm light" onclick="openDivModal()">＋ 新增</button>
+      <div style="display:flex;gap:6px;align-items:center">
+        <div class="sec-summary-inline">
+          <span>今年 <strong id="d-yr-badge" class="gain">—</strong></span>
+          <span>累積 <strong id="d-tot-badge" class="gain">—</strong></span>
+          <span>待入 <strong id="d-pend-badge" style="color:#3498db">—</strong></span>
+        </div>
+        <button class="db-btn-sm light" onclick="openDivModal()">＋</button>
+        <button class="sec-toggle-btn" onclick="toggleSection('div-detail')">展開 ▼</button>
+      </div>
     </div>
+    <div class="sec-detail" id="div-detail" style="display:none">
     <div class="div-cards" id="div-cards"><span style="padding:10px;display:block;color:var(--muted);font-size:11px">尚無領息記錄</span></div>
     <div id="div-pending-bar" style="display:none">
       <div style="padding:8px 14px 4px;background:#eff6ff;border-bottom:1px solid #bfdbfe;display:flex;align-items:center;justify-content:space-between">
@@ -846,7 +900,8 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
     </div>
   </div>
 
-</div><!-- /ROW 4 -->
+    </div><!-- /sec-detail -->
+  </div><!-- /ROW 4 -->
 
 <!-- ═══ BOTTOM STATUS BAR ═══ -->
 <div class="db-status-bar">
@@ -1565,6 +1620,17 @@ function renderInv(){
   document.getElementById('t-div').textContent=fmt(tD);
 } // end renderInv
 
+function toggleSection(id){
+  const detail=document.getElementById(id);
+  if(!detail)return;
+  const isOpen=detail.style.display!=='none';
+  detail.style.display=isOpen?'none':'block';
+  // Find the toggle button (parent card's sec-toggle-btn)
+  const card=detail.closest('.sec-collapsible');
+  const btn=card?.querySelector('.sec-toggle-btn');
+  if(btn)btn.textContent=isOpen?'展開 ▼':'收起 ▲';
+}
+
 function toggleHist(id){
   const panel=document.getElementById('hr-'+id);
   const btn=document.getElementById('hb-'+id);
@@ -1683,8 +1749,22 @@ function renderLoans(){
   setEl('l-amt','$'+tA.toLocaleString());
   setEl('l-rem','$'+tR.toLocaleString());
   setEl('l-mo','$'+tM.toLocaleString());
-  const badge=document.getElementById('l-mo-badge');
-  if(badge)badge.textContent='每月還款 $'+tM.toLocaleString();
+  // 最近扣款日
+  const nextDeducts=db.loans.filter(l=>l.deductDay).map(l=>{
+    const d=parseInt(l.deductDay)||0;
+    if(!d)return null;
+    const now=new Date();
+    const thisMonth=new Date(now.getFullYear(),now.getMonth(),d);
+    const nextMonth=new Date(now.getFullYear(),now.getMonth()+1,d);
+    const dt=thisMonth>now?thisMonth:nextMonth;
+    return {days:Math.ceil((dt-now)/86400000),bank:l.bank,day:d,dt};
+  }).filter(Boolean).sort((a,b)=>a.days-b.days);
+  const nd=document.getElementById('l-next-deduct');
+  if(nd&&nextDeducts.length>0){
+    const n=nextDeducts[0];
+    nd.textContent=n.day+'號 ('+n.days+'天後)';
+    nd.style.color=n.days<=5?'#ef4444':'';
+  }
 }
 
 function renderFlex(){
@@ -1751,11 +1831,12 @@ function renderFlex(){
 
   const lM=db.loans.reduce((s,l)=>s+(l.monthly||0),0);
   const setEl=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
-  setEl('f-rem','使用 $'+tUsed.toLocaleString());
+  const totalLimit=db.flexLoans.reduce((s,f)=>s+(f.limit||0),0);
+  const totalAvail=totalLimit-tUsed;
+  setEl('f-rem','$'+tUsed.toLocaleString());
+  setEl('f-avail','$'+Math.max(0,totalAvail).toLocaleString());
   setEl('f-mo','$'+tMo.toLocaleString());
   setEl('tot-mo-out','$'+(lM+tMo).toLocaleString());
-  const badge=document.getElementById('flex-mo-badge');
-  if(badge)badge.textContent='每月利息 $'+tMo.toLocaleString();
 }
 
 function renderCash(){
@@ -1908,6 +1989,14 @@ function renderCash(){
   if(totEl)totEl.textContent='$'+tB.toLocaleString();
   const badge=document.getElementById('cash-tot-badge');
   if(badge){badge.textContent='$'+Math.abs(tB).toLocaleString();badge.style.color=tB>=0?'var(--gain)':'var(--loss)';}
+  // 待入帳股息（30天內）
+  const todayS=new Date().toISOString().split('T')[0];
+  const in30S=new Date(Date.now()+30*86400000).toISOString().split('T')[0];
+  const pendAmt=(db.dividends||[])
+    .filter(d=>d.date&&d.date>todayS&&d.date<=in30S)
+    .reduce((s,d)=>s+d.amount,0);
+  const cpb=document.getElementById('cash-pending-badge');
+  if(cpb)cpb.textContent=pendAmt>0?'$'+Math.round(pendAmt).toLocaleString():'—';
 }
 
 const DIV_COLORS=['#e74c3c','#3498db','#607d8b','#f39c12','#9b59b6','#1abc9c','#e67e22','#34495e','#f06292','#00bcd4'];
@@ -1981,6 +2070,10 @@ function renderDivs(){
     .reduce((s,d)=>s+d.amount,0);
   document.getElementById('d-yr').textContent='$'+Math.round(yrTot).toLocaleString();
   document.getElementById('d-tot').textContent='$'+Math.round(allTot).toLocaleString();
+  // Update header badges
+  const dyb=document.getElementById('d-yr-badge');if(dyb)dyb.textContent='$'+Math.round(yrTot).toLocaleString();
+  const dtb=document.getElementById('d-tot-badge');if(dtb)dtb.textContent='$'+Math.round(allTot).toLocaleString();
+  const dpb=document.getElementById('d-pend-badge');if(dpb)dpb.textContent=pendingTotal>0?'$'+Math.round(pendingTotal).toLocaleString():'—';
 
   function renderRows(divs,tbodyId){
     const tbody=document.getElementById(tbodyId);if(!tbody)return;
