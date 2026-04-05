@@ -1672,6 +1672,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
           <span>尚餘本金 <b id="l-rem">—</b></span>
           <span>月還款 <b id="l-mo">—</b></span>
           <span>最近扣款 <b id="l-next-deduct">—</b></span>
+          <span id="l-bal-status"></span>
           <span style="display:none" id="l-amt">—</span>
         </div>
       </div>
@@ -2727,6 +2728,33 @@ function renderLoans(){
   }).filter(Boolean).sort((a,b)=>a.days-b.days);
   const nd=document.getElementById('l-next-deduct');
   if(nd&&nextDeducts.length>0){nd.textContent=nextDeducts[0].day+'號 ('+nextDeducts[0].days+'天後)';nd.style.color=nextDeducts[0].days<=5?'#ef4444':'';}
+
+  // 計算下一筆扣款的餘額狀態（含扣款前股息）
+  const balStatus=document.getElementById('l-bal-status');
+  if(balStatus&&nextDeducts.length>0){
+    const nextLoan=db.loans.find(l=>parseInt(l.deductDay)===nextDeducts[0].day);
+    if(nextLoan&&nextLoan.deductBank){
+      const acc=db.cashAccounts.find(c=>c.bank===nextLoan.deductBank);
+      if(acc){
+        const accBal=(acc.cash||0)+(acc.d1||0)+(acc.d2||0);
+        const deductDayNum=parseInt(nextLoan.deductDay)||0;
+        const now=new Date();
+        const thisMonth=new Date(now.getFullYear(),now.getMonth(),deductDayNum);
+        const deductDate=thisMonth>now?thisMonth:new Date(now.getFullYear(),now.getMonth()+1,deductDayNum);
+        const deductDateStr=deductDate.toISOString().split('T')[0];
+        const todayStr=now.toISOString().split('T')[0];
+        const preDivTotal=(db.dividends||[])
+          .filter(d=>d.date&&d.date>todayStr&&d.date<=deductDateStr)
+          .reduce((s,d)=>s+(d.amount||0),0);
+        const afterBal=accBal+preDivTotal-nextLoan.monthly;
+        const isShort=afterBal<0;
+        // 台灣習慣：紅=足夠 綠=不足
+        balStatus.innerHTML=isShort
+          ?'<span style="background:#f0fdf4;color:#16a34a;border:1px solid #86efac;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:700">不足 $'+Math.abs(Math.round(afterBal)).toLocaleString()+'</span>'
+          :'<span style="background:#fff0f0;color:#dc2626;border:1px solid #fca5a5;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:700">✓ 足夠</span>';
+      }
+    }
+  }
 }
 
 
