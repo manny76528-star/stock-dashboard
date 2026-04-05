@@ -203,7 +203,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 
 /* ========== INVESTMENT CARD GRID ========== */
 .inv-summary-strip{
-  display:grid;grid-template-columns:repeat(5,1fr);
+  display:grid;grid-template-columns:repeat(4,1fr);
   gap:0;border-bottom:1px solid #e0e7ff;
   background:#eff6ff;
 }
@@ -1621,17 +1621,14 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
       <div class="inv-hero-value" id="qb-real">—</div>
     </div>
     <div class="inv-hero-card">
-      <div class="inv-hero-label">💰 資金總額</div>
+      <div class="inv-hero-label">📈 股票總額</div>
       <div class="inv-hero-value" id="qb-tot">—</div>
     </div>
     <div class="inv-hero-card" id="inv-hero-dr">
       <div class="inv-hero-label">📊 負債比</div>
       <div class="inv-hero-value" id="qb-dr">—</div>
     </div>
-    <div class="inv-hero-card red">
-      <div class="inv-hero-label">🏦 信貸尚餘本金</div>
-      <div class="inv-hero-value" id="qb-loan">—</div>
-    </div>
+
   </div>
   <div id="sum-tbl" style="display:none"></div>
 </div>
@@ -3058,7 +3055,7 @@ function renderSum(){
   setSB('sb-dr',dR.toFixed(1)+'%');
   setSB('sb-loan','$'+Math.round(loanR).toLocaleString());
   // Investment quick bar
-  setSB('qb-tot','$'+Math.round(tot).toLocaleString(),'#0369a1');
+  setSB('qb-tot','$'+Math.round(tC).toLocaleString(),'#0369a1');
   setSB('qb-net','$'+Math.round(net).toLocaleString(),'#1d4ed8');
   setSB('qb-real',(tR>=0?'+':'-')+fmt(tR), tR>=0?'var(--gain)':'var(--loss)');
   setSB('qb-dr',dR.toFixed(1)+'%', dR>80?'var(--loss)':dR>60?'#f59e0b':'#1e293b');
