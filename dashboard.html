@@ -193,6 +193,26 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 </head>
 <body>
 
+<!-- ═══ 登入畫面 ═══ -->
+<div id="login-screen" style="display:none;position:fixed;inset:0;background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 100%);z-index:99999;display:flex;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:20px;padding:40px 36px;width:320px;box-shadow:0 20px 60px rgba(0,0,0,.4);text-align:center">
+    <div style="font-size:36px;margin-bottom:12px">📊</div>
+    <div style="font-size:20px;font-weight:800;color:#1e293b;margin-bottom:4px">資產損益表</div>
+    <div style="font-size:12px;color:#94a3b8;margin-bottom:28px">請輸入密碼以繼續</div>
+    <input id="pw-input" type="password" placeholder="輸入密碼"
+      style="width:100%;box-sizing:border-box;padding:12px 16px;border:2px solid #e2e8f0;border-radius:10px;font-size:16px;outline:none;text-align:center;letter-spacing:4px;margin-bottom:12px"
+      onkeydown="if(event.key==='Enter')checkPw()">
+    <button onclick="checkPw()"
+      style="width:100%;padding:12px;background:#1e3a5f;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;transition:background .2s"
+      onmouseover="this.style.background='#2563eb'" onmouseout="this.style.background='#1e3a5f'">
+      進入
+    </button>
+    <div id="pw-err" style="color:#ef4444;font-size:12px;margin-top:10px;display:none">密碼錯誤，請再試一次</div>
+  </div>
+</div>
+
+<div id="main-content" style="display:none">
+
 <style>
 .trend-section{max-width:1200px;margin:0 auto 10px;background:var(--white);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:var(--card-shadow);}
 .trend-hdr{background:var(--section-header);color:#fff;padding:10px 16px;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:space-between;}
@@ -4070,6 +4090,49 @@ if(db.settings?.title){
   document.title=db.settings.title;
 }
 setInterval(()=>{const h=new Date().getHours(),m=new Date().getMinutes();if(h*60+m>=540&&h*60+m<=810)refreshPrices();},300000);
+</script>
+</div><!-- /main-content -->
+
+<script>
+(function(){
+  const PW='113067';
+  const KEY='dash_auth_v1';
+  const ls=document.getElementById('login-screen');
+  const mc=document.getElementById('main-content');
+  const inp=document.getElementById('pw-input');
+
+  function show(){
+    ls.style.display='none';
+    mc.style.display='block';
+  }
+  function showLogin(){
+    ls.style.display='flex';
+    mc.style.display='none';
+    setTimeout(()=>inp&&inp.focus(),100);
+  }
+
+  // 已登入過（localStorage 記住）
+  if(localStorage.getItem(KEY)==='1'){
+    show();
+  } else {
+    showLogin();
+  }
+
+  window.checkPw=function(){
+    const val=inp.value.trim();
+    if(val===PW){
+      localStorage.setItem(KEY,'1');
+      document.getElementById('pw-err').style.display='none';
+      show();
+    } else {
+      inp.value='';
+      const err=document.getElementById('pw-err');
+      err.style.display='block';
+      inp.style.borderColor='#ef4444';
+      setTimeout(()=>{inp.style.borderColor='#e2e8f0';},1500);
+    }
+  };
+})();
 </script>
 </body>
 </html>
