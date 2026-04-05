@@ -1507,6 +1507,35 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
   padding:12px !important;
 }
 .loan-card { font-size:12px; }
+
+/* ═══ 信貸排名徽章 ═══ */
+.lc-rank {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:22px;height:22px;
+  border-radius:50%;
+  background:#e2e8f0;
+  color:#475569;
+  font-size:14px;
+  font-weight:700;
+  margin-right:6px;
+  flex-shrink:0;
+  vertical-align:middle;
+}
+.lc-rank-urgent {
+  background:#fef2f2;
+  color:#ef4444;
+  animation:pulse 1.5s infinite;
+}
+.lc-rank-soon {
+  background:#fffbeb;
+  color:#d97706;
+}
+@keyframes pulse {
+  0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.4);}
+  50%{box-shadow:0 0 0 5px rgba(239,68,68,0);}
+}
 </style>
 <div class="bkwarn" id="bkwarn">⚠️ 距上次備份已超過 3 天，請記得備份！<button class="act-btn" style="margin-left:auto" onclick="exportData()">📤 立即備份</button></div>
 
@@ -2528,15 +2557,35 @@ function renderLoans(){
   grid.innerHTML='';
   let tA=0,tR=0,tM=0;
 
-  db.loans.forEach(l=>{
+  // 排序：扣款日最近優先
+  const circleNums=['①','②','③','④','⑤','⑥','⑦','⑧','⑨','⑩'];
+  const sorted=[...db.loans].map(l=>({l,days:daysUntilDeduct(parseInt(l.deductDay)||null)}))
+    .sort((a,b)=>{
+      if(a.days===null&&b.days===null)return 0;
+      if(a.days===null)return 1;
+      if(b.days===null)return -1;
+      return a.days-b.days;
+    });
+
+  sorted.forEach(({l,days:sortDays},rankIdx)=>{
     const calcRem=calcLoanRemain(l);
     tA+=l.amount||0;tR+=calcRem;tM+=l.monthly||0;
     const paidPct=l.amount>0?Math.round((1-calcRem/l.amount)*100):0;
     const dDay=parseInt(l.deductDay)||0;
     const dDays=daysUntilDeduct(dDay||null);
     const urgent=dDays!==null&&dDays<=5;
-    const days=daysLeft(l.due);
-    const nearDue=typeof days==='number'&&days<180;
+    const soonish=dDays!==null&&dDays<=10;
+    const daysLeft2=daysLeft(l.due);
+    const nearDue=typeof daysLeft2==='number'&&daysLeft2<180;
+
+    // 卡片顏色：越緊急越醒目
+    let cardStyle='';
+    let cardClass='loan-card';
+    if(urgent){
+      cardStyle='border:2px solid #ef4444;background:#fff5f5;';
+    } else if(soonish){
+      cardStyle='border:2px solid #f59e0b;background:#fffbeb;';
+    }
 
     let balHtml='',afterHtml='';
     if(l.deductBank){
@@ -2560,19 +2609,23 @@ function renderLoans(){
         balHtml=isShort
           ?'<span class="l3-badge danger">⚠ 不足 $'+Math.abs(Math.round(thisAfter)).toLocaleString()+'</span>'
           :'<span class="l3-badge ok">✓ 足夠</span>';
-        afterHtml='扣後 '+(thisAfter>=0?'$':'-$')+Math.abs(Math.round(thisAfter)).toLocaleString();
       }
     }
 
+    const rankBadge=circleNums[rankIdx]||('('+(rankIdx+1)+')');
     const dTxt=(dDay?dDay+'號':'—')+(dDays!==null?' ('+dDays+'天'+(urgent?' 🔴':'')+')'  :'');
     const dueTxt=(l.due||'—')+(l.due?' ('+Math.max(0,Math.round((new Date(l.due)-new Date())/86400000))+'天)':'');
+
     const card=document.createElement('div');
-    card.className='loan-card'+(urgent?' loan-card-urgent':'');
+    card.className=cardClass;
     card.dataset.id=l.id;
+    if(cardStyle)card.style.cssText=cardStyle;
+
     card.innerHTML=
       '<div class="lc-top">'
         +'<div>'
-          +'<span class="lc-bank">'+(urgent?'🔴 ':'')+l.bank+'</span>'
+          +'<span class="lc-rank'+(urgent?' lc-rank-urgent':soonish?' lc-rank-soon':'')+'">'+rankBadge+'</span>'
+          +'<span class="lc-bank">'+l.bank+'</span>'
           +(l.deductBank?'<span class="lc-sub"> · '+l.deductBank+'</span>':'')
         +'</div>'
         +'<div style="display:flex;align-items:center;gap:6px">'
@@ -2590,14 +2643,15 @@ function renderLoans(){
         +'<div class="lc-row"><span class="lc-k">扣款日</span><span class="lc-v '+(urgent?'loss':'')+'">'+dTxt+'</span></div>'
         +'<div class="lc-row"><span class="lc-k">到期日</span><span class="lc-v '+(nearDue?'loss':'')+'">'+dueTxt+'</span></div>'
       +'</div>'
+      // 底部只留按鈕，移除重複的「扣後」資訊
       +'<div class="lc-footer">'
-        +'<span class="lc-after">'+afterHtml+'</span>'
+        +'<span></span>'
         +'<div style="display:flex;gap:4px">'
           +'<button class="irow-sm-btn" data-action="editLoan">✏️</button>'
           +'<button class="irow-sm-btn del" data-action="delLoan">🗑</button>'
         +'</div>'
       +'</div>';
-    // Add button events via DOM
+
     card.querySelectorAll('[data-action]').forEach(btn=>{
       const act=btn.dataset.action;
       btn.onclick=()=>{if(act==='editLoan')editLoan(l.id);else if(act==='delLoan')delLoan(l.id);};
