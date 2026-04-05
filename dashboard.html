@@ -1185,34 +1185,25 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 .irow-open .irow-l2:hover { background:#e8f4ff; }
 
 .irow-l2-name { display:flex;flex-direction:column;gap:3px; }
-.irow-code { font-size:15px;font-weight:700;color:var(--accent);text-decoration:none; }
+.irow-code { font-size:15px;font-weight:700;color:var(--accent);text-decoration:none;white-space:nowrap;flex-shrink:0; }
 .irow-code:hover { text-decoration:underline; }
 .irow-badge { font-size:10px;font-weight:600;padding:1px 6px;border-radius:20px;margin-left:6px; }
 .irow-subname { font-size:11px;color:#94a3b8; }
 
-.irow-l2-row1 {
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-}
-.irow-l2-row2 {
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
+/* irow-l2-row1/row2 removed */
 .irow-l2-pnl-amt {
-  font-size:18px;
+  font-size:16px;
   font-weight:700;
   font-family:var(--mono);
-  line-height:1.1;
   white-space:nowrap;
+  flex-shrink:0;
 }
 .irow-l2-pnl-pct {
   font-size:13px;
   font-weight:600;
   font-family:var(--mono);
-  margin-left:auto;
   white-space:nowrap;
+  flex-shrink:0;
 }
 .irow-l2-arrow { font-size:12px;color:#94a3b8;flex-shrink:0; }
 
@@ -1373,9 +1364,9 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
   align-items:center;
   justify-content:space-between;
   border-radius:20px;
-  padding:3px 10px;
+  padding:3px 12px;
   flex:1;
-  min-width:0;
+  min-width:80px;
 }
 .irow-note-text {
   font-size:11px;
@@ -2282,18 +2273,14 @@ function renderInv(){
       +'</div>';
 
     row.innerHTML=
-      // ── Layer 2: 簡易列 ──
+      // ── Layer 2: 單行橫排 ──
       '<div class="irow-l2" onclick="toggleInvDetail(\''+inv.id+'\')">'
-        +'<div class="irow-l2-row1">'
-          +codeHtml
-          +'<span class="irow-l2-pnl-amt" style="color:'+pnColor+'">'+pnlTxt+'</span>'
-        +'</div>'
-        +'<div class="irow-l2-row2">'
-          +noteHtml
-          +'<span class="irow-l2-pnl-pct" style="color:'+pnColor+'">'+pctTxt+'</span>'
-          +'<span class="irow-l2-arrow" id="iarr-'+inv.id+'">'+(isOpen?'▲':'▼')+'</span>'
-        +'</div>'
-        +(inv.name?'<div class="irow-subname" style="margin-top:2px">'+inv.name+'</div>':'')
+        +codeHtml
+        +(inv.name?'<span class="irow-l2-name">'+inv.name+'</span>':'')
+        +'<span class="irow-l2-pnl-amt" style="color:'+pnColor+'">'+pnlTxt+'</span>'
+        +noteHtml
+        +'<span class="irow-l2-pnl-pct" style="color:'+pnColor+'">'+pctTxt+'</span>'
+        +'<span class="irow-l2-arrow" id="iarr-'+inv.id+'">'+(isOpen?'▲':'▼')+'</span>'
       +'</div>'
       // ── Layer 3: 詳細（預設隱藏）──
       +'<div class="irow-l3" id="idet-'+inv.id+'" style="display:'+(isOpen?'block':'none')+'">'
