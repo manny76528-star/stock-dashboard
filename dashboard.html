@@ -1444,6 +1444,39 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 .irow-code { font-size:14px; font-weight:700; color:var(--accent); text-decoration:none; white-space:nowrap; }
 .irow-code:hover { text-decoration:underline; }
 .irow-subname { font-size:11px; color:#94a3b8; }
+
+/* ═══ 信貸緊湊卡片 ═══ */
+.lc-top {
+  display:flex;justify-content:space-between;align-items:center;
+  padding:10px 14px 6px;
+}
+.lc-bank { font-size:13px;font-weight:700;color:#1e293b; }
+.lc-sub { font-size:11px;color:#94a3b8; }
+.lc-rate { font-size:12px;font-weight:700;color:#64748b; }
+.lc-prog-row {
+  display:flex;align-items:center;gap:8px;
+  padding:0 14px 4px;
+}
+.lc-pct { font-size:11px;font-weight:700;color:var(--accent);flex-shrink:0; }
+.lc-nums {
+  display:grid;grid-template-columns:1fr 1fr 1fr 1fr;
+  padding:6px 14px;gap:6px;border-top:1px solid #f8fafc;
+}
+.lc-kv { display:flex;flex-direction:column;gap:2px; }
+.lc-k { font-size:10px;color:#94a3b8; }
+.lc-v { font-size:12px;font-weight:600;font-family:var(--mono);color:#1e293b; }
+.lc-footer {
+  display:flex;justify-content:space-between;align-items:center;
+  padding:6px 14px 8px;border-top:1px solid #f8fafc;
+}
+.lc-after { font-size:11px;color:#64748b; }
+
+/* 信貸 card grid 改小 */
+.loan-card-grid {
+  grid-template-columns:repeat(auto-fill,minmax(220px,1fr)) !important;
+  gap:10px !important;
+  padding:12px !important;
+}
 </style>
 <div class="bkwarn" id="bkwarn">⚠️ 距上次備份已超過 3 天，請記得備份！<button class="act-btn" style="margin-left:auto" onclick="exportData()">📤 立即備份</button></div>
 
@@ -2501,30 +2534,31 @@ function renderLoans(){
     card.className='loan-card'+(urgent?' loan-card-urgent':'');
     card.dataset.id=l.id;
     card.innerHTML=
-      '<div class="loan-card-top">'
-        +'<div><div class="loan-card-bank">'+(urgent?'🔴 ':'')+l.bank+'</div>'
-        +(l.deductBank?'<div class="loan-card-sub">扣款：'+l.deductBank+'</div>':'')+'</div>'
-        +'<div style="text-align:right">'
-          +'<div class="loan-card-rate">'+(l.rate||0).toFixed(2)+'%</div>'
+      '<div class="lc-top">'
+        +'<div>'
+          +'<span class="lc-bank">'+(urgent?'🔴 ':'')+l.bank+'</span>'
+          +(l.deductBank?'<span class="lc-sub"> · '+l.deductBank+'</span>':'')
+        +'</div>'
+        +'<div style="display:flex;align-items:center;gap:6px">'
+          +'<span class="lc-rate">'+(l.rate||0).toFixed(2)+'%</span>'
           +balHtml
         +'</div>'
       +'</div>'
-      +'<div style="padding:0 16px 4px;display:flex;justify-content:space-between;align-items:center">'
-        +'<span style="font-size:10px;color:#94a3b8">還款進度</span>'
-        +'<span style="font-size:11px;font-weight:700;color:'+(paidPct>=80?'var(--gain)':'var(--accent)')+'">'+paidPct+'%</span>'
+      +'<div class="lc-prog-row">'
+        +'<div class="loan-progress-wrap" style="flex:1;margin:0"><div class="loan-progress-bar" style="width:'+paidPct+'%"></div></div>'
+        +'<span class="lc-pct">'+(paidPct>=80?'✓ ':'')+paidPct+'%</span>'
       +'</div>'
-      +'<div class="loan-progress-wrap"><div class="loan-progress-bar" style="width:'+paidPct+'%"></div></div>'
-      +'<div class="loan-card-amounts">'
-        +'<div class="loan-amt-block"><div class="loan-amt-label">尚餘本金</div><div class="loan-amt-val loss">$'+calcRem.toLocaleString()+'</div></div>'
-        +'<div class="loan-amt-block"><div class="loan-amt-label">每月還款</div><div class="loan-amt-val loss">$'+(l.monthly||0).toLocaleString()+'</div></div>'
-        +'<div class="loan-amt-block"><div class="loan-amt-label">扣款日</div><div class="loan-amt-val '+(urgent?'loss':'')+'">'+( dDay?dDay+'號':'—')+(dDays!==null?' <span style="font-size:10px;color:'+(urgent?'#ef4444':'#94a3b8')+'">'+(urgent?'🔴 ':'')+dDays+'天</span>':'')+'</div></div>'
-        +'<div class="loan-amt-block"><div class="loan-amt-label">到期日</div><div class="loan-amt-val '+(nearDue?'loss':'')+'">'+( l.due||'—')+(l.due?' <span style="font-size:10px;color:#94a3b8">('+Math.max(0,Math.round((new Date(l.due)-new Date())/86400000))+'天)</span>':'')+'</div></div>'
+      +'<div class="lc-nums">'
+        +'<div class="lc-kv"><span class="lc-k">尚餘本金</span><span class="lc-v loss">$'+calcRem.toLocaleString()+'</span></div>'
+        +'<div class="lc-kv"><span class="lc-k">月還款</span><span class="lc-v loss">$'+(l.monthly||0).toLocaleString()+'</span></div>'
+        +'<div class="lc-kv"><span class="lc-k">扣款日</span><span class="lc-v '+(urgent?'loss':'')+'">'+(dDay?dDay+'號':'—')+(dDays!==null?' <small style="color:'+(urgent?'#ef4444':'#94a3b8')+'">'+(urgent?'🔴':'')+dDays+'天</small>':'')+'</span></div>'
+        +'<div class="lc-kv"><span class="lc-k">到期日</span><span class="lc-v '+(nearDue?'loss':'')+'">'+(l.due||'—')+(l.due?' <small style="color:#94a3b8">('+Math.max(0,Math.round((new Date(l.due)-new Date())/86400000))+'天)</small>':'')+'</span></div>'
       +'</div>'
-      +'<div class="loan-card-footer">'
-        +'<div style="display:flex;align-items:center;gap:8px"><span style="font-size:11px;color:#64748b">'+afterHtml+'</span></div>'
-        +'<div style="display:flex;gap:5px">'
-          +'<button class="card-act-btn edit" data-action="editLoan">✏️ 編輯</button>'
-          +'<button class="card-act-btn danger" data-action="delLoan">🗑</button>'
+      +'<div class="lc-footer">'
+        +'<span class="lc-after">'+afterHtml+'</span>'
+        +'<div style="display:flex;gap:4px">'
+          +'<button class="irow-sm-btn" data-action="editLoan">✏️</button>'
+          +'<button class="irow-sm-btn del" data-action="delLoan">🗑</button>'
         +'</div>'
       +'</div>';
     // Add button events via DOM
