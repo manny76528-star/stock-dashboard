@@ -1171,15 +1171,33 @@ function importData(e){
   const r=new FileReader();
   r.onload=ev=>{
     try{
-      const d=JSON.parse(ev.target.result);
-      if(!d.investments&&!d.loans&&!d.cashAccounts){toast('❌ 格式不正確');return;}
-      if(!confirm(`確定還原？\n投資 ${(d.investments||[]).length} 筆 · 信貸 ${(d.loans||[]).length} 筆`))return;
-      db=d;['dividends','prices'].forEach(k=>{if(!db[k])db[k]=k==='prices'?{}:[];});
+      const text=ev.target.result;
+      const d=JSON.parse(text);
+      if(!d.investments&&!d.loans&&!d.cashAccounts){toast('❌ 格式不正確，找不到必要欄位');return;}
+      if(!confirm('確定還原？\n投資 '+(d.investments||[]).length+' 筆 · 信貸 '+(d.loans||[]).length+' 筆\n(目前資料將被覆蓋)'))return;
+      // 確保所有必要欄位存在
+      db=d;
+      if(!db.investments)db.investments=[];
+      if(!db.loans)db.loans=[];
+      if(!db.flexLoans)db.flexLoans=[];
+      if(!db.cashAccounts)db.cashAccounts=[];
+      if(!db.prices)db.prices={};
+      if(!db.dividends)db.dividends=[];
+      if(!db.snapshots)db.snapshots=[];
+      if(!db.clearedLoans)db.clearedLoans=[];
+      if(!db.archivedTxns)db.archivedTxns=[];
       localStorage.setItem(STORE,JSON.stringify(db));
-      render();toast('✅ 還原成功！');refreshPrices();
-    }catch{toast('❌ 讀取失敗');}
+      undoStack=[JSON.stringify(db)];redoStack=[];
+      render();
+      toast('✅ 還原成功！共 '+(db.investments||[]).length+' 筆投資');
+      refreshPrices();
+    }catch(err){
+      console.error('還原失敗:',err);
+      toast('❌ 讀取失敗：'+err.message);
+    }
   };
-  r.readAsText(file);e.target.value='';
+  r.readAsText(file,'utf-8');
+  e.target.value='';
 }
 
 // ═══════ FETCH HELPER ═══════
@@ -1764,7 +1782,16 @@ function renderCash(){
   const todayStr=today.toISOString().split('T')[0];
   const in30Str=in30.toISOString().split('T')[0];
   const pendingDivs30=(db.dividends||[])
-    .filter(d=>(d.pending||(d.exDate&&d.exDate<=todayStr&&d.date&&d.date>todayStr))&&d.date&&d.date>=todayStr&&d.date<=in30Str)
+    .filter(d=>{
+      if(!d.date)return false;
+      // 發放日在今天到30天內
+      if(d.date<todayStr||d.date>in30Str)return false;
+      // 判斷是否為待入帳：有 exDate 且發放日未到，或有 pending 標記
+      const isPending=d.pending
+        ||(d.exDate&&d.exDate<=todayStr&&d.date>todayStr)
+        ||(!d.exDate&&d.date>todayStr); // 沒有除息日但發放日未到
+      return isPending;
+    })
     .sort((a,b)=>a.date.localeCompare(b.date));
   const pendingTotal30=pendingDivs30.reduce((s,d)=>s+d.amount,0);
 
