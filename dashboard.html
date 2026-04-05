@@ -1130,7 +1130,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 }
 .big5-add-btn:hover { background: rgba(255,255,255,.2); }
 
-.big5-toggle {
+.big5-toggle-btn {
   background: rgba(255,255,255,.12);
   border: 1px solid rgba(255,255,255,.2);
   color: #fff;
@@ -1143,7 +1143,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
   transition: background .15s;
   font-family: 'Noto Sans TC', sans-serif;
 }
-.big5-toggle:hover { background: rgba(255,255,255,.22); }
+.big5-toggle-btn:hover { background: rgba(255,255,255,.22); }
 
 .big5-detail {
   background: #fff;
@@ -1164,6 +1164,112 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
   .big5-title { font-size: 14px; }
   .big5-meta { gap: 10px; }
   .big5-meta b { font-size: 13px; }
+}
+
+/* ═══ LAYER 2: 簡易橫列 ═══ */
+.irow { border-bottom:1px solid #f1f5f9; background:#fff; }
+.irow:last-child { border-bottom:none; }
+.irow-open .irow-l2 { background:#f0f7ff; }
+
+.irow-l2 {
+  display:grid;
+  grid-template-columns: 180px 1fr 100px 90px 32px;
+  align-items:center;
+  gap:0 16px;
+  padding:14px 20px;
+  cursor:pointer;
+  transition:background .15s;
+  user-select:none;
+}
+.irow-l2:hover { background:#f8fafc; }
+.irow-open .irow-l2:hover { background:#e8f4ff; }
+
+.irow-l2-name { display:flex;flex-direction:column;gap:3px; }
+.irow-code { font-size:15px;font-weight:700;color:var(--accent);text-decoration:none; }
+.irow-code:hover { text-decoration:underline; }
+.irow-badge { font-size:10px;font-weight:600;padding:1px 6px;border-radius:20px;margin-left:6px; }
+.irow-subname { font-size:11px;color:#94a3b8; }
+
+.irow-l2-pnl { display:flex;flex-direction:column;gap:2px; }
+.irow-l2-primary { font-size:20px;font-weight:700;font-family:var(--mono);line-height:1.1; }
+.irow-l2-secondary { font-size:13px;font-weight:600;font-family:var(--mono); }
+
+.irow-l2-cell { display:flex;flex-direction:column;gap:2px;align-items:flex-end; }
+.irow-l2-val { font-size:14px;font-weight:600;font-family:var(--mono); }
+.irow-l2-label { font-size:10px;color:#94a3b8; }
+
+.irow-l2-arrow { font-size:12px;color:#94a3b8;text-align:center; }
+
+/* ═══ LAYER 3: 詳細展開 ═══ */
+.irow-l3 {
+  background:#f8fafc;
+  border-top:1px solid #e2e8f0;
+  animation:fadeIn .18s ease;
+}
+
+.irow-l3-nums {
+  display:flex;flex-wrap:wrap;gap:0;
+  padding:12px 20px;
+  border-bottom:1px solid #f1f5f9;
+}
+.irow-l3-kv {
+  flex:1;min-width:120px;
+  display:flex;flex-direction:column;gap:3px;
+  padding:8px 12px;
+  border-right:1px solid #f1f5f9;
+}
+.irow-l3-kv:last-child { border-right:none; }
+.irow-l3-k { font-size:11px;color:#94a3b8; }
+.irow-l3-v { font-size:15px;font-weight:600;font-family:var(--mono);color:#1e293b; }
+
+.irow-l3-btns {
+  display:flex;flex-wrap:wrap;gap:6px;
+  padding:10px 20px;
+  border-bottom:1px solid #f1f5f9;
+  background:#fff;
+}
+
+.irow-l3-hist { padding:0; }
+.irow-l3-hist-title {
+  padding:10px 20px;
+  font-size:12px;font-weight:700;color:#475569;
+  cursor:pointer;
+  background:#f1f5f9;
+  border-bottom:1px solid #e2e8f0;
+  user-select:none;
+}
+.irow-l3-hist-title:hover { background:#e2e8f0; }
+.irow-hist-body { max-height:240px;overflow-y:auto; }
+.irow-hist-empty { padding:12px 20px;font-size:12px;color:#94a3b8;text-align:center; }
+
+.irow-txn {
+  display:grid;
+  grid-template-columns:70px 90px 50px 70px 90px 1fr 1fr auto;
+  gap:8px;align-items:center;
+  padding:7px 20px;
+  font-size:11px;font-family:var(--mono);
+  border-bottom:1px solid #f8fafc;
+}
+.irow-txn:hover { background:#f0f9ff; }
+.irow-txn-buy .irow-txn-type { color:#dc2626;font-weight:700; }
+.irow-txn-sell .irow-txn-type { color:#16a34a;font-weight:700; }
+.irow-txn-note { color:#94a3b8;font-size:10px;font-family:"Noto Sans TC",sans-serif; }
+
+.irow-sm-btn {
+  border:1px solid #e5e7eb;background:#f9fafb;
+  border-radius:4px;padding:2px 7px;font-size:10px;
+  cursor:pointer;font-family:"Noto Sans TC",sans-serif;
+}
+.irow-sm-btn.del { color:#ef4444;border-color:transparent;background:transparent; }
+.irow-sm-btn.del:hover { background:#fef2f2; }
+
+@media(max-width:768px){
+  .irow-l2 { grid-template-columns:1fr auto 32px;gap:8px; }
+  .irow-l2-cell { display:none; }
+  .irow-l3-nums { flex-direction:column; }
+  .irow-l3-kv { border-right:none;border-bottom:1px solid #f1f5f9; }
+  .irow-txn { grid-template-columns:60px 80px 1fr auto; }
+  .irow-txn span:nth-child(n+5) { display:none; }
 }
 </style>
 <div class="bkwarn" id="bkwarn">⚠️ 距上次備份已超過 3 天，請記得備份！<button class="act-btn" style="margin-left:auto" onclick="exportData()">📤 立即備份</button></div>
@@ -1251,7 +1357,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 
   <!-- 1. 投資標的 -->
   <div class="big5-card" id="b5-inv">
-    <div class="big5-header" onclick="toggleSection('inv-detail')">
+    <div class="big5-header">
       <div class="big5-left">
         <span class="big5-icon">📈</span>
         <span class="big5-title">投資標的</span>
@@ -1266,7 +1372,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
       <div class="big5-right">
         <button class="big5-add-btn" onclick="event.stopPropagation();openInvModal()">＋</button>
         <button class="big5-add-btn" onclick="event.stopPropagation();openSearchModal()">🔍</button>
-        <span class="big5-toggle" id="tog-inv">展開 ▼</span>
+        <button class="big5-toggle-btn" id="tog-inv" onclick="toggleSection('inv-detail')">展開 ▼</button>
       </div>
     </div>
     <div class="big5-detail" id="inv-detail" style="display:none">
@@ -1276,7 +1382,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 
   <!-- 2. 信貸管理 -->
   <div class="big5-card" id="b5-loan">
-    <div class="big5-header" onclick="toggleSection('loan-detail')">
+    <div class="big5-header">
       <div class="big5-left">
         <span class="big5-icon">🏦</span>
         <span class="big5-title">信貸管理</span>
@@ -1290,7 +1396,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
       <div class="big5-right">
         <button class="big5-add-btn" onclick="event.stopPropagation();openLoanModal()">＋</button>
         <button class="big5-add-btn" onclick="event.stopPropagation();openLoanHist()">📚</button>
-        <span class="big5-toggle" id="tog-loan">展開 ▼</span>
+        <button class="big5-toggle-btn" id="tog-loan" onclick="toggleSection('loan-detail')">展開 ▼</button>
       </div>
     </div>
     <div class="big5-detail" id="loan-detail" style="display:none">
@@ -1300,7 +1406,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 
   <!-- 3. 不限用途 -->
   <div class="big5-card" id="b5-flex">
-    <div class="big5-header" onclick="toggleSection('flex-detail')">
+    <div class="big5-header">
       <div class="big5-left">
         <span class="big5-icon">💳</span>
         <span class="big5-title">不限用途額度</span>
@@ -1313,7 +1419,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
       </div>
       <div class="big5-right">
         <button class="big5-add-btn" onclick="event.stopPropagation();openFlexModal()">＋</button>
-        <span class="big5-toggle" id="tog-flex">展開 ▼</span>
+        <button class="big5-toggle-btn" id="tog-flex" onclick="toggleSection('flex-detail')">展開 ▼</button>
       </div>
     </div>
     <div class="big5-detail" id="flex-detail" style="display:none">
@@ -1323,7 +1429,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 
   <!-- 4. 現金帳戶 -->
   <div class="big5-card" id="b5-cash">
-    <div class="big5-header" onclick="toggleSection('cash-detail')">
+    <div class="big5-header">
       <div class="big5-left">
         <span class="big5-icon">💰</span>
         <span class="big5-title">現金帳戶</span>
@@ -1336,7 +1442,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
       </div>
       <div class="big5-right">
         <button class="big5-add-btn" onclick="event.stopPropagation();openCashModal()">＋</button>
-        <span class="big5-toggle" id="tog-cash">展開 ▼</span>
+        <button class="big5-toggle-btn" id="tog-cash" onclick="toggleSection('cash-detail')">展開 ▼</button>
       </div>
     </div>
     <div class="big5-detail" id="cash-detail" style="display:none">
@@ -1346,7 +1452,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 
   <!-- 5. 股息記錄 -->
   <div class="big5-card" id="b5-div">
-    <div class="big5-header" onclick="toggleSection('div-detail')">
+    <div class="big5-header">
       <div class="big5-left">
         <span class="big5-icon">🎯</span>
         <span class="big5-title">股息記錄</span>
@@ -1358,7 +1464,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
       </div>
       <div class="big5-right">
         <button class="big5-add-btn" onclick="event.stopPropagation();openDivModal()">＋</button>
-        <span class="big5-toggle" id="tog-div">展開 ▼</span>
+        <button class="big5-toggle-btn" id="tog-div" onclick="toggleSection('div-detail')">展開 ▼</button>
       </div>
     </div>
     <div class="big5-detail" id="div-detail" style="display:none">
@@ -2002,14 +2108,13 @@ function render(){renderInv();renderLoans();renderFlex();renderCash();renderDivs
 
 function renderInv(){
   const grid=document.getElementById('inv-body');
-  const openIds=[];
-  grid.querySelectorAll('.irow[data-open="1"]').forEach(c=>openIds.push(c.dataset.id));
+  const openIds=new Set();
+  grid.querySelectorAll('.irow[data-open="1"]').forEach(r=>openIds.add(r.dataset.id));
   grid.innerHTML='';
-  let tC=0,tM=0,tD=0,tR=0,tDivTot=0;
+  let tC=0,tM=0,tD=0,tDivTot=0;
   const sortedInvs=[...db.investments].sort((a,b)=>(a.order||999)-(b.order||999));
   const calcs=sortedInvs.map(inv=>({inv,c:calcInv(inv)}));
-  calcs.forEach(({c})=>{tC+=c.tCost;if(c.mktVal)tM+=c.mktVal;tD+=c.moDivAmt;tR+=c.realized;tDivTot+=c.divTot;});
-
+  calcs.forEach(({c})=>{tC+=c.tCost;if(c.mktVal)tM+=c.mktVal;tD+=c.moDivAmt;tDivTot+=c.divTot;});
   const chk=document.getElementById('roi-chk');if(chk)chk.checked=showDivRoi;
 
   calcs.forEach(({inv,c})=>{
@@ -2017,26 +2122,28 @@ function renderInv(){
     const displayPnl=showDivRoi?c.pnlWithDiv:c.pnl;
     const displayPct=showDivRoi?c.pnlPctWithDiv:c.pnlPct;
     const pnColor=displayPnl==null?'#94a3b8':displayPnl>0?'var(--gain)':displayPnl<0?'var(--loss)':'#94a3b8';
-    const prColor=c.curPrice==null?'#1e293b':(c.curPrice>c.avgCost?'var(--gain)':c.curPrice<c.avgCost?'var(--loss)':'#1e293b');
-    const isOpen=openIds.includes(inv.id);
+    const prColor=c.curPrice==null?'#64748b':(c.curPrice>c.avgCost?'var(--gain)':c.curPrice<c.avgCost?'var(--loss)':'#64748b');
     const noteColor=inv.note==='現股'?'#dc2626':inv.note==='質押中'?'#2563eb':'#0891b2';
+    const portPct=tC>0?(c.tCost/tC*100).toFixed(1):'—';
+    const isOpen=openIds.has(inv.id);
 
-    // txn history
+    // 交易記錄
     const txns=(inv.transactions||[]).slice().reverse();
     const tHTML=txns.length===0
       ?'<div class="irow-hist-empty">尚無交易記錄</div>'
       :txns.map(t=>{
         const isB=t.type==='buy';
-        const refs=t.lotRefs?t.lotRefs.map(r=>`<span class="ltag">${r.lots}張 ${r.date}</span>`).join(''):'' ;
-        return`<div class="irow-txn ${isB?'irow-txn-buy':'irow-txn-sell'}">
-          <span class="irow-txn-type">${isB?'▲ 買入':'▼ 賣出'}</span>
-          <span>${t.date}</span><span>${t.lots}張</span>
-          <span>$${t.price.toFixed(2)}</span>
-          <span>${fmt(t.lots*1000*t.price)}</span>
-          <span class="irow-txn-note">${t.fee?'手續費$'+Math.round(t.fee).toLocaleString():''}</span>
-          <span class="irow-txn-note">${isB?(t.remark||''):(refs||'FIFO')}</span>
-          <button class="irow-btn" onclick="delTxn('${inv.id}','${t.id}')">刪</button>
-        </div>`;
+        const refs=t.lotRefs?t.lotRefs.map(r=>'<span class="ltag">'+r.lots+'張 '+r.date+'</span>').join(''):'';
+        return '<div class="irow-txn '+(isB?'irow-txn-buy':'irow-txn-sell')+'">'
+          +'<span class="irow-txn-type">'+(isB?'▲ 買入':'▼ 賣出')+'</span>'
+          +'<span>'+t.date+'</span>'
+          +'<span>'+t.lots+'張</span>'
+          +'<span>$'+t.price.toFixed(2)+'</span>'
+          +'<span>'+fmt(t.lots*1000*t.price)+'</span>'
+          +'<span class="irow-txn-note">'+(t.fee?'手續費$'+Math.round(t.fee).toLocaleString():'')+'</span>'
+          +'<span class="irow-txn-note">'+(isB?(t.remark||''):(refs||'FIFO'))+'</span>'
+          +'<button class="irow-sm-btn del" onclick="delTxn(\''+inv.id+'\',\''+t.id+'\')">刪</button>'
+          +'</div>';
       }).join('');
 
     const row=document.createElement('div');
@@ -2044,47 +2151,63 @@ function renderInv(){
     row.dataset.id=inv.id;
     if(isOpen)row.dataset.open='1';
 
-    row.innerHTML=`
-      <div class="irow-main">
-        <!-- 左：標的 -->
-        <div class="irow-left">
-          <div class="irow-code-wrap">
-            ${inv.url?`<a href="${inv.url}" target="_blank" class="irow-code">${inv.code}</a>`:`<span class="irow-code">${inv.code}</span>`}
-            ${inv.note?`<span class="irow-badge" style="color:${noteColor};background:${noteColor}15;border:1px solid ${noteColor}30">${inv.note}</span>`:''}
-          </div>
-          ${inv.name?`<div class="irow-name">${inv.name}</div>`:''}
-          <div class="irow-price-row">
-            <span class="irow-meta">均 <b>$${fmtF(c.avgCost)}</b></span>
-            <span class="irow-meta">現 <b style="color:${prColor}">${c.curPrice!=null?'$'+c.curPrice.toFixed(2):'—'}</b></span>
-            <span class="irow-meta">${c.tLots}張</span>
-          </div>
-        </div>
-        <!-- 中：次要數字 -->
-        <div class="irow-mid">
-          <div class="irow-kv"><span class="irow-k">成本</span><span class="irow-v">${fmt(c.tCost)}</span></div>
-          <div class="irow-kv"><span class="irow-k">市值</span><span class="irow-v">${c.mktVal!=null?fmt(c.mktVal):'—'}</span></div>
-          <div class="irow-kv"><span class="irow-k">月息</span><span class="irow-v" style="color:var(--gain)">${c.moDivAmt>0?fmt(c.moDivAmt):'—'}</span></div>
-        </div>
-        <!-- 右：主數字 + 操作 -->
-        <div class="irow-right">
-          <div class="irow-pnl" style="color:${pnColor}">${displayPnl!=null?(displayPnl>=0?'+':'')+fmt(displayPnl):'—'}</div>
-          <div class="irow-roi" style="color:${pnColor}">${displayPct!=null?(displayPct>=0?'+':'')+Math.abs(displayPct).toFixed(2)+'%':'—'}</div>
-          <div class="irow-btns">
-            <button class="irow-btn buy" onclick="openBuyModal('${inv.id}')">買入</button>
-            <button class="irow-btn sell" onclick="openSellModal('${inv.id}')">賣出</button>
-            <button class="irow-btn" onclick="openDivFor('${inv.code}')">領息</button>
-            <button class="irow-btn" onclick="openInvModal('${inv.id}')">✏️</button>
-            <button class="irow-btn" onclick="moveInv('${inv.id}',-1)">↑</button>
-            <button class="irow-btn" onclick="moveInv('${inv.id}',1)">↓</button>
-            <button class="irow-btn hist" id="hb-${inv.id}" onclick="toggleHist('${inv.id}')">📋</button>
-            <button class="irow-btn del" onclick="delInv('${inv.id}')">🗑</button>
-          </div>
-        </div>
-      </div>
-      <div class="irow-hist-panel" id="hr-${inv.id}" style="display:${isOpen?'block':'none'}">
-        <div class="irow-hist-title">📋 ${inv.code} 交易記錄（${(inv.transactions||[]).length} 筆）</div>
-        <div class="irow-hist-body">${tHTML}</div>
-      </div>`;
+    // ── 第二層：簡易列（點擊展開第三層）──
+    const pnlTxt=displayPnl!=null?(displayPnl>=0?'+':'')+fmt(displayPnl):'—';
+    const pctTxt=displayPct!=null?(displayPct>=0?'+':'')+Math.abs(displayPct).toFixed(2)+'%':'—';
+    const priceTxt=c.curPrice!=null?'$'+c.curPrice.toFixed(2):'—';
+    const codeHtml=inv.url
+      ?'<a href="'+inv.url+'" target="_blank" class="irow-code" onclick="event.stopPropagation()">'+inv.code+'</a>'
+      :'<span class="irow-code">'+inv.code+'</span>';
+    const noteHtml=inv.note?'<span class="irow-badge" style="color:'+noteColor+';background:'+noteColor+'18;border:1px solid '+noteColor+'35">'+inv.note+'</span>':'';
+
+    row.innerHTML=
+      // ── Layer 2: 簡易列 ──
+      '<div class="irow-l2" onclick="toggleInvDetail(\''+inv.id+'\')">'
+        +'<div class="irow-l2-name">'
+          +codeHtml+noteHtml
+          +(inv.name?'<div class="irow-subname">'+inv.name+'</div>':'')
+        +'</div>'
+        +'<div class="irow-l2-pnl" style="color:'+pnColor+'">'
+          +'<span class="irow-l2-primary">'+pnlTxt+'</span>'
+          +'<span class="irow-l2-secondary">'+pctTxt+'</span>'
+        +'</div>'
+        +'<div class="irow-l2-cell">'
+          +'<span class="irow-l2-val" style="color:'+prColor+'">'+priceTxt+'</span>'
+          +'<span class="irow-l2-label">現價</span>'
+        +'</div>'
+        +'<div class="irow-l2-cell">'
+          +'<span class="irow-l2-val">'+c.tLots+' 張</span>'
+          +'<span class="irow-l2-label">持有</span>'
+        +'</div>'
+        +'<div class="irow-l2-arrow" id="iarr-'+inv.id+'">'+(isOpen?'▲':'▼')+'</div>'
+      +'</div>'
+      // ── Layer 3: 詳細（預設隱藏）──
+      +'<div class="irow-l3" id="idet-'+inv.id+'" style="display:'+(isOpen?'block':'none')+'">'
+        // 數字區
+        +'<div class="irow-l3-nums">'
+          +'<div class="irow-l3-kv"><span class="irow-l3-k">均買價</span><span class="irow-l3-v">$'+fmtF(c.avgCost)+'</span></div>'
+          +'<div class="irow-l3-kv"><span class="irow-l3-k">總成本</span><span class="irow-l3-v">'+fmt(c.tCost)+'</span></div>'
+          +'<div class="irow-l3-kv"><span class="irow-l3-k">市值</span><span class="irow-l3-v">'+(c.mktVal!=null?fmt(c.mktVal):'—')+'</span></div>'
+          +'<div class="irow-l3-kv"><span class="irow-l3-k">月配息</span><span class="irow-l3-v" style="color:var(--gain)">'+(c.moDivAmt>0?fmt(c.moDivAmt):'—')+'</span></div>'
+          +'<div class="irow-l3-kv"><span class="irow-l3-k">佔比</span><span class="irow-l3-v">'+portPct+'%</span></div>'
+        +'</div>'
+        // 操作按鈕
+        +'<div class="irow-l3-btns">'
+          +'<button class="irow-btn buy" onclick="openBuyModal(\''+inv.id+'\')">▲ 買入</button>'
+          +'<button class="irow-btn sell" onclick="openSellModal(\''+inv.id+'\')">▼ 賣出</button>'
+          +'<button class="irow-btn" onclick="openDivFor(\''+inv.code+'\')">💰 領息</button>'
+          +'<button class="irow-btn" onclick="openInvModal(\''+inv.id+'\')">✏️ 編輯</button>'
+          +'<button class="irow-btn" onclick="moveInv(\''+inv.id+'\',-1)">↑</button>'
+          +'<button class="irow-btn" onclick="moveInv(\''+inv.id+'\',1)">↓</button>'
+          +'<button class="irow-btn del" onclick="delInv(\''+inv.id+'\')">🗑 刪除</button>'
+        +'</div>'
+        // 交易記錄
+        +'<div class="irow-l3-hist">'
+          +'<div class="irow-l3-hist-title" onclick="toggleInvHist(\''+inv.id+'\')" id="hb-'+inv.id+'">📋 交易記錄（'+(inv.transactions||[]).length+' 筆）▼</div>'
+          +'<div class="irow-hist-body" id="hr-'+inv.id+'" style="display:none">'+tHTML+'</div>'
+        +'</div>'
+      +'</div>';
+
     grid.appendChild(row);
   });
 
@@ -2099,6 +2222,27 @@ function renderInv(){
   const tdiv=document.getElementById('t-div');if(tdiv)tdiv.textContent=fmt(tD);
 }
 
+function toggleInvDetail(id){
+  const det=document.getElementById('idet-'+id);
+  const arr=document.getElementById('iarr-'+id);
+  const row=det?.closest('.irow');
+  if(!det)return;
+  const isOpen=det.style.display!=='none';
+  det.style.display=isOpen?'none':'block';
+  if(arr)arr.textContent=isOpen?'▼':'▲';
+  if(row)row.dataset.open=isOpen?'0':'1';
+}
+
+function toggleInvHist(id){
+  const panel=document.getElementById('hr-'+id);
+  const btn=document.getElementById('hb-'+id);
+  if(!panel)return;
+  const isOpen=panel.style.display!=='none';
+  panel.style.display=isOpen?'none':'block';
+  if(btn)btn.textContent='📋 交易記錄（'+((document.querySelectorAll('#hr-'+id+' .irow-txn')||[]).length)+' 筆）'+(isOpen?'▼':'▲');
+}
+
+
 function toggleSection(id){
   const detail=document.getElementById(id);
   if(!detail)return;
@@ -2106,7 +2250,7 @@ function toggleSection(id){
   detail.style.display=isOpen?'none':'block';
   // Support both big5-toggle span and sec-toggle-btn
   const card=detail.closest('.big5-card')||detail.closest('.sec-collapsible')||detail.closest('.db-card');
-  const btn=card?.querySelector('.big5-toggle,.sec-toggle-btn');
+  const btn=card?.querySelector('.big5-toggle-btn,.sec-toggle-btn');
   if(btn)btn.textContent=isOpen?'展開 ▼':'收起 ▲';
 }
 
