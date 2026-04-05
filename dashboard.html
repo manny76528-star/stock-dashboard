@@ -4097,6 +4097,8 @@ setInterval(()=>{const h=new Date().getHours(),m=new Date().getMinutes();if(h*60
 (function(){
   const PW='113067';
   const KEY='dash_auth_v1';
+  const TS_KEY='dash_auth_ts';
+  const TIMEOUT=3*60*1000; // 3分鐘閒置登出
   const ls=document.getElementById('login-screen');
   const mc=document.getElementById('main-content');
   const inp=document.getElementById('pw-input');
@@ -4104,15 +4106,40 @@ setInterval(()=>{const h=new Date().getHours(),m=new Date().getMinutes();if(h*60
   function show(){
     ls.style.display='none';
     mc.style.display='block';
+    resetTimer();
   }
   function showLogin(){
     ls.style.display='flex';
     mc.style.display='none';
+    localStorage.removeItem(KEY);
+    localStorage.removeItem(TS_KEY);
     setTimeout(()=>inp&&inp.focus(),100);
   }
 
-  // 已登入過（localStorage 記住）
-  if(localStorage.getItem(KEY)==='1'){
+  // 重設閒置計時器
+  let timer=null;
+  function resetTimer(){
+    localStorage.setItem(TS_KEY, Date.now().toString());
+    clearTimeout(timer);
+    timer=setTimeout(()=>{
+      alert('閒置超過3分鐘，已自動登出');
+      showLogin();
+    }, TIMEOUT);
+  }
+
+  // 任何操作都重設計時器
+  ['click','keydown','touchstart','scroll'].forEach(ev=>{
+    document.addEventListener(ev, ()=>{
+      if(localStorage.getItem(KEY)==='1') resetTimer();
+    }, {passive:true});
+  });
+
+  // 檢查是否已登入且未超時
+  const isAuth=localStorage.getItem(KEY)==='1';
+  const lastTs=parseInt(localStorage.getItem(TS_KEY)||'0');
+  const elapsed=Date.now()-lastTs;
+
+  if(isAuth && elapsed < TIMEOUT){
     show();
   } else {
     showLogin();
