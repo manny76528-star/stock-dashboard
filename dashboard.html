@@ -2998,9 +2998,8 @@ function toggleDivYear(){
 function renderSum(){
   let tC=0,tM=0,tD=0,tDivTot=0,tR=0;
   db.investments.forEach(inv=>{const c=calcInv(inv);tC+=c.tCost;if(c.mktVal)tM+=c.mktVal;tD+=c.moDivAmt;tDivTot+=c.divTot;tR+=c.realized;});
-  // 信貸餘額（只算信貸，不含不限用途）
+  // 全部負債 = 信貸 + 不限用途使用額
   const loanR=db.loans.reduce((s,l)=>s+calcLoanRemain(l),0);
-  // 全部負債（信貸+不限用途使用額）用於負債比計算
   const lR=loanR+db.flexLoans.reduce((s,f)=>s+(f.used||f.remain||0),0);
   const mO=db.loans.reduce((s,l)=>s+(l.monthly||0),0)+db.flexLoans.reduce((s,f)=>s+(f.monthly||0),0);
   const cT=db.cashAccounts.reduce((s,c)=>s+(c.cash||0)+(c.d1||0)+(c.d2||0),0);
@@ -3010,7 +3009,7 @@ function renderSum(){
   const pnl=tM-tC,roi=tC>0?pnl/tC*100:0;
   const roiInc=tC>0?(pnl+tDivTot)/tC*100:0;
   const dR=tot>0?lR/tot*100:0;
-  // 淨資產固定不含息
+  // 淨資產 = 資金總額 - 信貸 - 不限用途使用額
   const net=tot-lR;
   const fl=tD-mO;
   // 含息只改變報酬率和損益顯示，不影響淨資產
