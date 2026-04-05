@@ -1608,6 +1608,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
     <span id="title-display">２０２６ 資產損益表</span>
   </div>
   <div class="db-topbar-actions">
+      <button onclick="manualLogout()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.8);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,.2)'" onmouseout="this.style.background='rgba(255,255,255,.1)'">🔒 登出</button>
 
     <button class="db-btn primary" onclick="refreshPrices()">↻ 更新股價</button>
     <button class="db-btn success" onclick="exportData()">📤 備份</button>
@@ -4144,6 +4145,12 @@ setInterval(()=>{const h=new Date().getHours(),m=new Date().getMinutes();if(h*60
   } else {
     showLogin();
   }
+
+  window.manualLogout=function(){
+    if(confirm('確定要登出嗎？')){
+      showLogin();
+    }
+  };
 
   window.checkPw=function(){
     const val=inp.value.trim();
