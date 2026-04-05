@@ -3004,8 +3004,9 @@ function renderSum(){
   const lR=loanR+db.flexLoans.reduce((s,f)=>s+(f.used||f.remain||0),0);
   const mO=db.loans.reduce((s,l)=>s+(l.monthly||0),0)+db.flexLoans.reduce((s,f)=>s+(f.monthly||0),0);
   const cT=db.cashAccounts.reduce((s,c)=>s+(c.cash||0)+(c.d1||0)+(c.d2||0),0);
-  // 資金總額 = 股票總成本 + 現金（成本代表實際投入資金）
-  const tot=tC+cT;
+  // 淨資產 = 股票市值（有報價）或成本（無報價）+ 現金 - 負債
+  const invVal=tM>0?tM:tC;
+  const tot=invVal+cT;
   const pnl=tM-tC,roi=tC>0?pnl/tC*100:0;
   const roiInc=tC>0?(pnl+tDivTot)/tC*100:0;
   const dR=tot>0?lR/tot*100:0;
@@ -3921,8 +3922,9 @@ function recordSnapshot(manual=false){
   const lR=db.loans.reduce((s,l)=>s+calcLoanRemain(l),0)+db.flexLoans.reduce((s,f)=>s+(f.used||f.remain||0),0);
   const mO=db.loans.reduce((s,l)=>s+(l.monthly||0),0)+db.flexLoans.reduce((s,f)=>s+(f.monthly||0),0);
   const cT=db.cashAccounts.reduce((s,c)=>s+(c.cash||0)+(c.d1||0)+(c.d2||0),0);
-  // 資金總額 = 股票總成本 + 現金
-  const tot=tC+cT;
+  // 淨資產用市值計算
+  const invValS=tM>0?tM:tC;
+  const tot=invValS+cT;
   const net=tot-lR;
   const dR=tot>0?Math.round(lR/tot*1000)/10:0;
   const fl=Math.round(tD-mO);
