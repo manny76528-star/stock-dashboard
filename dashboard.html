@@ -873,6 +873,181 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
   .inv-row, .loan-row { grid-template-columns: 1fr; padding: 14px; }
   .inv-row-name, .loan-row-name { margin-bottom: var(--sp1); }
 }
+
+/* ════════════════════════════════════════
+   INVESTMENT ROW (irow) - Polymarket style
+════════════════════════════════════════ */
+.irow-list {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+}
+.irow {
+  border-bottom: 1px solid #f1f5f9;
+  transition: background .15s;
+}
+.irow:last-child { border-bottom: none; }
+.irow:hover { background: #fafbff; }
+.irow-open { background: #f8fbff; }
+
+.irow-main {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 14px 16px;
+}
+
+/* 左側：標的資訊 */
+.irow-left {
+  flex: 0 0 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.irow-code-wrap { display: flex; align-items: center; gap: 6px; }
+.irow-code {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--accent);
+  text-decoration: none;
+}
+.irow-code:hover { text-decoration: underline; }
+.irow-badge {
+  font-size: 10px; font-weight: 600;
+  padding: 1px 6px; border-radius: 20px;
+}
+.irow-name { font-size: 11px; color: #94a3b8; }
+.irow-price-row { display: flex; gap: 10px; margin-top: 2px; }
+.irow-meta { font-size: 11px; color: #94a3b8; }
+.irow-meta b { font-weight: 600; color: #475569; }
+
+/* 中間：成本/市值/月息 */
+.irow-mid {
+  flex: 1;
+  display: flex;
+  gap: 0;
+  padding: 0 16px;
+  border-left: 1px solid #f1f5f9;
+  border-right: 1px solid #f1f5f9;
+  margin: 0 16px;
+}
+.irow-kv {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.irow-k { font-size: 11px; color: #94a3b8; }
+.irow-v { font-size: 14px; font-weight: 600; color: #1e293b; font-family: var(--mono); }
+
+/* 右側：損益 + 按鈕 */
+.irow-right {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  min-width: 180px;
+}
+.irow-pnl {
+  font-size: 22px;
+  font-weight: 700;
+  font-family: var(--mono);
+  line-height: 1.1;
+}
+.irow-roi {
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--mono);
+}
+.irow-btns {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.irow-btn {
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  border-radius: 6px;
+  padding: 4px 9px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .15s;
+  font-family: 'Noto Sans TC', sans-serif;
+  color: #374151;
+}
+.irow-btn:hover { background: #f3f4f6; border-color: #d1d5db; }
+.irow-btn.buy { color: #dc2626; border-color: #fca5a5; background: #fff5f5; }
+.irow-btn.buy:hover { background: #dc2626; color: #fff; border-color: #dc2626; }
+.irow-btn.sell { color: #16a34a; border-color: #86efac; background: #f0fdf4; }
+.irow-btn.sell:hover { background: #16a34a; color: #fff; border-color: #16a34a; }
+.irow-btn.hist { color: #0369a1; }
+.irow-btn.del { color: #ef4444; border-color: transparent; background: transparent; }
+.irow-btn.del:hover { background: #fef2f2; }
+
+/* 交易記錄展開 */
+.irow-hist-panel {
+  background: #f8fafc;
+  border-top: 1px dashed #e2e8f0;
+  padding: 10px 16px 12px;
+}
+.irow-hist-title { font-size: 11px; font-weight: 700; color: #475569; margin-bottom: 8px; letter-spacing: .3px; }
+.irow-hist-body { display: flex; flex-direction: column; gap: 4px; max-height: 200px; overflow-y: auto; }
+.irow-hist-empty { font-size: 12px; color: #94a3b8; padding: 8px 0; text-align: center; }
+.irow-txn {
+  display: grid;
+  grid-template-columns: 70px 90px 50px 70px 90px 1fr 1fr auto;
+  gap: 8px;
+  align-items: center;
+  font-size: 11px;
+  padding: 5px 8px;
+  border-radius: 6px;
+  background: #fff;
+  border: 1px solid #f1f5f9;
+  font-family: var(--mono);
+}
+.irow-txn-buy .irow-txn-type { color: #dc2626; font-weight: 700; }
+.irow-txn-sell .irow-txn-type { color: #16a34a; font-weight: 700; }
+.irow-txn-note { color: #94a3b8; font-size: 10px; font-family: 'Noto Sans TC', sans-serif; }
+
+/* ════════════════════════════════════════
+   五大區塊 - 卡片式外觀
+════════════════════════════════════════ */
+.sec-collapsible {
+  background: #fff;
+  border-radius: 16px !important;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 8px rgba(0,0,0,.06), 0 1px 3px rgba(0,0,0,.04);
+  overflow: hidden;
+  margin-bottom: 24px !important;
+  transition: box-shadow .2s;
+}
+.sec-collapsible:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,.09), 0 2px 4px rgba(0,0,0,.05);
+}
+.db-card {
+  border-radius: 16px !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,.06), 0 1px 3px rgba(0,0,0,.04) !important;
+}
+.db-card-header {
+  border-radius: 0 !important;
+  padding: 14px 20px !important;
+  font-size: 14px !important;
+  letter-spacing: .3px;
+}
+
+@media (max-width: 768px) {
+  .irow-main { flex-wrap: wrap; gap: 12px; }
+  .irow-left { flex: 0 0 100%; }
+  .irow-mid { flex: 1; border: none; margin: 0; padding: 0; }
+  .irow-right { flex: 0 0 100%; flex-direction: row; align-items: center; justify-content: space-between; }
+  .irow-btns { flex-wrap: wrap; }
+  .irow-txn { grid-template-columns: 60px 80px 1fr 1fr; }
+  .irow-txn span:nth-child(n+5) { display: none; }
+}
 </style>
 <div class="bkwarn" id="bkwarn">⚠️ 距上次備份已超過 3 天，請記得備份！<button class="act-btn" style="margin-left:auto" onclick="exportData()">📤 立即備份</button></div>
 
@@ -1699,107 +1874,92 @@ function render(){renderInv();renderLoans();renderFlex();renderCash();renderDivs
 
 function renderInv(){
   const grid=document.getElementById('inv-body');
-  // Preserve open history panels
   const openIds=[];
-  grid.querySelectorAll('.inv-card[data-open="1"]').forEach(c=>openIds.push(c.dataset.id));
+  grid.querySelectorAll('.irow[data-open="1"]').forEach(c=>openIds.push(c.dataset.id));
   grid.innerHTML='';
   let tC=0,tM=0,tD=0,tR=0,tDivTot=0;
   const sortedInvs=[...db.investments].sort((a,b)=>(a.order||999)-(b.order||999));
   const calcs=sortedInvs.map(inv=>({inv,c:calcInv(inv)}));
   calcs.forEach(({c})=>{tC+=c.tCost;if(c.mktVal)tM+=c.mktVal;tD+=c.moDivAmt;tR+=c.realized;tDivTot+=c.divTot;});
 
-  // Sync含息 checkbox in header
-  const chk=document.getElementById('roi-chk-card');
-  if(chk)chk.checked=showDivRoi;
+  const chk=document.getElementById('roi-chk');if(chk)chk.checked=showDivRoi;
 
   calcs.forEach(({inv,c})=>{
-    if(c.tLots===0) return;
+    if(c.tLots===0)return;
     const displayPnl=showDivRoi?c.pnlWithDiv:c.pnl;
     const displayPct=showDivRoi?c.pnlPctWithDiv:c.pnlPct;
-    const pnColor=displayPnl==null?'var(--muted)':displayPnl>0?'var(--gain)':displayPnl<0?'var(--loss)':'var(--muted)';
-    const prColor=c.curPrice==null?'var(--text)':(c.curPrice>c.avgCost?'var(--gain)':c.curPrice<c.avgCost?'var(--loss)':'var(--muted)');
-    const portPct=tC>0?(c.tCost/tC*100).toFixed(1):'—';
+    const pnColor=displayPnl==null?'#94a3b8':displayPnl>0?'var(--gain)':displayPnl<0?'var(--loss)':'#94a3b8';
+    const prColor=c.curPrice==null?'#1e293b':(c.curPrice>c.avgCost?'var(--gain)':c.curPrice<c.avgCost?'var(--loss)':'#1e293b');
     const isOpen=openIds.includes(inv.id);
+    const noteColor=inv.note==='現股'?'#dc2626':inv.note==='質押中'?'#2563eb':'#0891b2';
 
-    // Transaction history HTML
+    // txn history
     const txns=(inv.transactions||[]).slice().reverse();
     const tHTML=txns.length===0
-      ?'<div style="padding:12px;text-align:center;color:var(--muted);font-size:12px">尚無交易記錄</div>'
+      ?'<div class="irow-hist-empty">尚無交易記錄</div>'
       :txns.map(t=>{
         const isB=t.type==='buy';
-        const refs=t.lotRefs?t.lotRefs.map(r=>`<span class="ltag">${r.lots}張 ${r.date}</span>`).join(''):'';
-        return `<div class="hist-txn-row ${isB?'hist-buy':'hist-sell'}">
-          <span class="hist-type">${isB?'▲ 買入':'▼ 賣出'}</span>
-          <span class="hist-date">${t.date}</span>
-          <span>${t.lots}張</span>
+        const refs=t.lotRefs?t.lotRefs.map(r=>`<span class="ltag">${r.lots}張 ${r.date}</span>`).join(''):'' ;
+        return`<div class="irow-txn ${isB?'irow-txn-buy':'irow-txn-sell'}">
+          <span class="irow-txn-type">${isB?'▲ 買入':'▼ 賣出'}</span>
+          <span>${t.date}</span><span>${t.lots}張</span>
           <span>$${t.price.toFixed(2)}</span>
           <span>${fmt(t.lots*1000*t.price)}</span>
-          <span style="color:var(--muted);font-size:10px">${t.fee?'手續費$'+Math.round(t.fee).toLocaleString():''}</span>
-          <span style="font-size:10px">${isB?(t.remark?'📝'+t.remark:''):(refs||'FIFO')}</span>
-          <button class="act-btn del" style="padding:2px 6px;font-size:10px" onclick="delTxn('${inv.id}','${t.id}')">刪</button>
+          <span class="irow-txn-note">${t.fee?'手續費$'+Math.round(t.fee).toLocaleString():''}</span>
+          <span class="irow-txn-note">${isB?(t.remark||''):(refs||'FIFO')}</span>
+          <button class="irow-btn" onclick="delTxn('${inv.id}','${t.id}')">刪</button>
         </div>`;
       }).join('');
 
-    const noteColor=inv.note==='現股'?'#dc2626':inv.note==='質押中'?'#2563eb':'var(--teal)';
-    const noteHtml=inv.note?`<span class="inv-row-badge" style="background:${noteColor}15;color:${noteColor};border:1px solid ${noteColor}30">${inv.note}</span>`:'';
-    const codeHtml=inv.url
-      ?`<a href="${inv.url}" target="_blank" class="inv-row-code">${inv.code}</a>`
-      :`<span class="inv-row-code">${inv.code}</span>`;
-
     const row=document.createElement('div');
-    row.className='inv-row'+(isOpen?' inv-row-open':'');
+    row.className='irow'+(isOpen?' irow-open':'');
     row.dataset.id=inv.id;
     if(isOpen)row.dataset.open='1';
+
     row.innerHTML=`
-      <!-- Col 1: 標的 -->
-      <div class="inv-row-name">
-        <div style="display:flex;align-items:center;gap:8px">${codeHtml}${noteHtml}</div>
-        ${inv.name?`<div class="inv-row-subname">${inv.name}</div>`:''}
-        <div class="inv-row-detail-mini">
-          <span>均 <b style="color:${prColor}">$${fmtF(c.avgCost)}</b></span>
-          <span>現 <b style="color:${prColor}">${c.curPrice!=null?'$'+c.curPrice.toFixed(2):'—'}</b></span>
+      <div class="irow-main">
+        <!-- 左：標的 -->
+        <div class="irow-left">
+          <div class="irow-code-wrap">
+            ${inv.url?`<a href="${inv.url}" target="_blank" class="irow-code">${inv.code}</a>`:`<span class="irow-code">${inv.code}</span>`}
+            ${inv.note?`<span class="irow-badge" style="color:${noteColor};background:${noteColor}15;border:1px solid ${noteColor}30">${inv.note}</span>`:''}
+          </div>
+          ${inv.name?`<div class="irow-name">${inv.name}</div>`:''}
+          <div class="irow-price-row">
+            <span class="irow-meta">均 <b>$${fmtF(c.avgCost)}</b></span>
+            <span class="irow-meta">現 <b style="color:${prColor}">${c.curPrice!=null?'$'+c.curPrice.toFixed(2):'—'}</b></span>
+            <span class="irow-meta">${c.tLots}張</span>
+          </div>
+        </div>
+        <!-- 中：次要數字 -->
+        <div class="irow-mid">
+          <div class="irow-kv"><span class="irow-k">成本</span><span class="irow-v">${fmt(c.tCost)}</span></div>
+          <div class="irow-kv"><span class="irow-k">市值</span><span class="irow-v">${c.mktVal!=null?fmt(c.mktVal):'—'}</span></div>
+          <div class="irow-kv"><span class="irow-k">月息</span><span class="irow-v" style="color:var(--gain)">${c.moDivAmt>0?fmt(c.moDivAmt):'—'}</span></div>
+        </div>
+        <!-- 右：主數字 + 操作 -->
+        <div class="irow-right">
+          <div class="irow-pnl" style="color:${pnColor}">${displayPnl!=null?(displayPnl>=0?'+':'')+fmt(displayPnl):'—'}</div>
+          <div class="irow-roi" style="color:${pnColor}">${displayPct!=null?(displayPct>=0?'+':'')+Math.abs(displayPct).toFixed(2)+'%':'—'}</div>
+          <div class="irow-btns">
+            <button class="irow-btn buy" onclick="openBuyModal('${inv.id}')">買入</button>
+            <button class="irow-btn sell" onclick="openSellModal('${inv.id}')">賣出</button>
+            <button class="irow-btn" onclick="openDivFor('${inv.code}')">領息</button>
+            <button class="irow-btn" onclick="openInvModal('${inv.id}')">✏️</button>
+            <button class="irow-btn" onclick="moveInv('${inv.id}',-1)">↑</button>
+            <button class="irow-btn" onclick="moveInv('${inv.id}',1)">↓</button>
+            <button class="irow-btn hist" id="hb-${inv.id}" onclick="toggleHist('${inv.id}')">📋</button>
+            <button class="irow-btn del" onclick="delInv('${inv.id}')">🗑</button>
+          </div>
         </div>
       </div>
-      <!-- Col 2: 持有 -->
-      <div class="inv-row-cell">
-        <div class="inv-row-val">${c.tLots}<span class="inv-row-unit">張</span></div>
-        <div class="inv-row-label">${fmt(c.tCost)}</div>
-      </div>
-      <!-- Col 3: 市值 -->
-      <div class="inv-row-cell">
-        <div class="inv-row-val">${c.mktVal!=null?fmt(c.mktVal):'—'}</div>
-        <div class="inv-row-label">市值</div>
-      </div>
-      <!-- Col 4: 損益 (Primary Metric) -->
-      <div class="inv-row-cell inv-row-pnl">
-        <div class="inv-row-primary" style="color:${pnColor}">${displayPnl!=null?(displayPnl>=0?'+':'')+fmt(displayPnl):'—'}</div>
-        <div class="inv-row-secondary" style="color:${pnColor}">${displayPct!=null?(displayPct>=0?'+':'')+Math.abs(displayPct).toFixed(2)+'%':'—'}</div>
-      </div>
-      <!-- Col 5: 月配息 / 佔比 -->
-      <div class="inv-row-cell">
-        <div class="inv-row-val" style="color:var(--gain)">${c.moDivAmt>0?fmt(c.moDivAmt):'—'}</div>
-        <div class="inv-row-label">${portPct}% 佔比</div>
-      </div>
-      <!-- Col 6: 操作 -->
-      <div class="inv-row-actions">
-        <button class="row-act-btn buy" onclick="openBuyModal('${inv.id}')">買入</button>
-        <button class="row-act-btn sell" onclick="openSellModal('${inv.id}')">賣出</button>
-        <button class="row-act-btn" onclick="openDivFor('${inv.code}')">領息</button>
-        <button class="row-act-btn" onclick="openInvModal('${inv.id}')">✏️</button>
-        <button class="row-act-btn" onclick="moveInv('${inv.id}',-1)">↑</button>
-        <button class="row-act-btn" onclick="moveInv('${inv.id}',1)">↓</button>
-        <button class="row-act-btn" id="hb-${inv.id}" onclick="toggleHist('${inv.id}')" style="color:#0369a1">📋</button>
-        <button class="row-act-btn del" onclick="delInv('${inv.id}')">🗑</button>
-      </div>
-      <!-- 交易記錄（展開） -->
-      <div class="inv-row-hist" id="hr-${inv.id}" style="display:${isOpen?'block':'none'}">
-        <div class="hist-panel-title">📋 ${inv.code} 交易記錄（${(inv.transactions||[]).length} 筆）</div>
-        <div class="hist-txn-list">${tHTML}</div>
+      <div class="irow-hist-panel" id="hr-${inv.id}" style="display:${isOpen?'block':'none'}">
+        <div class="irow-hist-title">📋 ${inv.code} 交易記錄（${(inv.transactions||[]).length} 筆）</div>
+        <div class="irow-hist-body">${tHTML}</div>
       </div>`;
     grid.appendChild(row);
-  }); // end calcs.forEach
+  });
 
-  // Update investment summary strip
   const tPnl=tM-tC;
   const dispPnl=showDivRoi&&tDivTot>0?tPnl+tDivTot:tPnl;
   const dispRoi=tC>0?dispPnl/tC*100:0;
@@ -1808,29 +1968,16 @@ function renderInv(){
   setCl('t-mkt',tM>0?fmt(tM):'—');
   setCl('t-pnl',tM>0?(dispPnl>=0?'+':dispPnl<0?'-':'')+fmt(dispPnl):'—',dispPnl>=0?'var(--gain)':'var(--loss)');
   setCl('t-roi',tM>0?(dispRoi>=0?'+':'')+dispRoi.toFixed(2)+'%':'—',dispRoi>=0?'var(--gain)':'var(--loss)');
-  document.getElementById('t-div').textContent=fmt(tD);
-} // end renderInv
-
-function toggleSection(id){
-  const detail=document.getElementById(id);
-  if(!detail)return;
-  const isOpen=detail.style.display!=='none';
-  detail.style.display=isOpen?'none':'block';
-  // Find the toggle button (parent card's sec-toggle-btn)
-  const card=detail.closest('.sec-collapsible');
-  const btn=card?.querySelector('.sec-toggle-btn');
-  if(btn)btn.textContent=isOpen?'展開 ▼':'收起 ▲';
+  const tdiv=document.getElementById('t-div');if(tdiv)tdiv.textContent=fmt(tD);
 }
 
 function toggleHist(id){
   const panel=document.getElementById('hr-'+id);
-  const btn=document.getElementById('hb-'+id);
-  const card=panel?.closest('.inv-card');
+  const row=panel?.closest('.irow');
   if(!panel)return;
   const isOpen=panel.style.display==='block';
   panel.style.display=isOpen?'none':'block';
-  if(card){card.dataset.open=isOpen?'0':'1';}
-  if(btn)btn.textContent='📋 '+(isOpen?'▼':'▲');
+  if(row)row.dataset.open=isOpen?'0':'1';
 }
 
 function renderLoans(){
