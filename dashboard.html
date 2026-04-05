@@ -1431,24 +1431,43 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
   color:#94a3b8;
   text-align:center;
 }
-.irow-note-wrap {
+.inv-note-wrap {
   flex:1;
   min-width:0;
   display:flex;
-  align-items:center;
+  flex-direction:column;
+  justify-content:center;
+  gap:3px;
 }
-.irow-note-bar {
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
+.inv-note-badge {
+  font-size:10px;
+  font-weight:600;
+  padding:1px 8px;
   border-radius:20px;
-  padding:2px 10px;
-  min-width:60px;
-  max-width:100%;
-  transition:width .4s ease;
+  align-self:flex-start;
+  white-space:nowrap;
 }
-.irow-note-text { font-size:10px; font-weight:600; white-space:nowrap; }
-.irow-note-lots { font-size:12px; font-weight:700; color:#475569; font-family:var(--mono); white-space:nowrap; margin-left:8px; }
+.inv-prog-wrap {
+  height:5px;
+  background:#f1f5f9;
+  border-radius:3px;
+  overflow:hidden;
+  width:100%;
+}
+.inv-prog-bar {
+  height:5px;
+  border-radius:3px;
+  transition:width .5s ease;
+  opacity:.7;
+}
+.inv-note-lots {
+  font-size:11px;
+  font-weight:600;
+  color:#94a3b8;
+  font-family:var(--mono);
+  white-space:nowrap;
+  align-self:flex-end;
+}
 .irow-code { font-size:14px; font-weight:700; color:var(--accent); text-decoration:none; white-space:nowrap; }
 .irow-code:hover { text-decoration:underline; }
 .irow-subname { font-size:11px; color:#94a3b8; }
@@ -2376,13 +2395,14 @@ function renderInv(){
     const codeHtml=inv.url
       ?'<a href="'+inv.url+'" target="_blank" class="irow-code" onclick="event.stopPropagation()">'+inv.code+'</a>'
       :'<span class="irow-code">'+inv.code+'</span>';
-    // 備註標籤 + 佔比進度條 + 張數（用 data-pct 讓 DOM 設寬度）
-    const pctNum=Math.max(5,parseFloat(portPct)||5);
-    const noteHtml='<div class="irow-note-wrap">'
-      +'<div class="irow-note-bar" data-pct="'+pctNum+'" style="border:1px solid '+noteColor+'35;background:'+noteColor+'10">'
-      +(inv.note?'<span class="irow-note-text" style="color:'+noteColor+'">'+inv.note+'</span>':'<span class="irow-note-text" style="color:#94a3b8"></span>')
-      +'<span class="irow-note-lots">'+c.tLots+' 張</span>'
-      +'</div>'
+    // 備註 + 佔比進度條（仿信貸寫法）
+    const pctNum=Math.max(3,parseFloat(portPct)||3);
+    const noteColor2=noteColor||'#94a3b8';
+    const noteHtml=''
+      +'<div class="inv-note-wrap">'
+        +(inv.note?'<span class="inv-note-badge" style="color:'+noteColor2+';background:'+noteColor2+'15;border:1px solid '+noteColor2+'30">'+inv.note+'</span>':'')
+        +'<div class="inv-prog-wrap"><div class="inv-prog-bar" style="width:'+pctNum+'%;background:'+noteColor2+'"></div></div>'
+        +'<span class="inv-note-lots">'+c.tLots+' 張</span>'
       +'</div>';
 
     row.innerHTML=
@@ -2423,11 +2443,6 @@ function renderInv(){
       +'</div>';
 
     grid.appendChild(row);
-  });
-
-  // 批次設定所有進度條寬度
-  document.querySelectorAll('#inv-body .irow-note-bar[data-pct]').forEach(b=>{
-    b.style.width=b.dataset.pct+'%';
   });
 
   const tPnl=tM-tC;
