@@ -878,8 +878,12 @@ function saveCust(){
   save();closeModal('cust-modal');renderCustomers();
 }
 function delCust(id){
-  if(!confirm('確定刪除此客戶？'))return;
-  db.customers=db.customers.filter(c=>c.id!==id);save();renderCustomers();
+  const c=db.customers.find(x=>x.id===id);
+  if(!confirm('確定要刪除客戶「'+( c?.name||'')+'」？'))return;
+  if(!confirm('再次確認：刪除後無法復原，確定嗎？'))return;
+  db.customers=db.customers.filter(x=>x.id!==id);
+  save();renderCustomers();
+  toast('🗑 已刪除客戶：'+(c?.name||''));
 }
 
 // ── 應收帳款 ──
@@ -964,9 +968,15 @@ function renderWarranty(){
 
 // ── 備份/還原 ──
 function exportData(){
+  const now=new Date();
+  const ts=now.getFullYear()
+    +('0'+(now.getMonth()+1)).slice(-2)
+    +('0'+now.getDate()).slice(-2)
+    +('0'+now.getHours()).slice(-2)
+    +('0'+now.getMinutes()).slice(-2);
   const blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);
-  a.download='inventory_backup_'+today()+'.json';a.click();
+  a.download='進銷存備份_'+ts+'.json';a.click();
 }
 function importData(){document.getElementById('import-file').click();}
 function doImport(input){
