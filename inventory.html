@@ -449,6 +449,10 @@ let editOrderId=null,editCustId=null,overviewPeriod='all',orderFilter='all';
 
 function load(){
   try{const d=localStorage.getItem(STORE);if(d)db=JSON.parse(d);}catch(e){}
+  // 確保新欄位存在（舊資料可能沒有）
+  if(!db.products)db.products=[];
+  if(!db.orders)db.orders=[];
+  if(!db.customers)db.customers=[];
   // 若客戶清單是空的，自動載入預設客戶
   const defaultCusts=[
     '福寶水產','興業','泰茂陳明彥','河川企業社','基福',
@@ -1153,7 +1157,9 @@ function doImport(input){
 }
 
 // ── Init ──
-load();renderOverview();
+load();
+// 初始化各頁面
+renderOverview();
 document.querySelectorAll('.mo').forEach(el=>el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open');}));
 </script>
 </div><!-- /main-content -->
