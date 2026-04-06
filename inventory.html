@@ -440,7 +440,18 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
 </div>
 
 
-<input type="file" id="import-file" accept=".json" style="display:none" onchange="doImport(this)">
+<!-- ══ 客戶詳情 Modal ══ -->
+<div class="mo" id="cust-detail-modal">
+  <div class="modal" style="max-width:760px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div class="modal-title" id="cd-title" style="margin:0">👤 客戶詳情</div>
+      <button class="btn btn-secondary" onclick="closeModal('cust-detail-modal')">關閉</button>
+    </div>
+    <div id="cd-content"></div>
+  </div>
+</div>
+
+<input type="file" id="import-file"  accept=".json" style="display:none" onchange="doImport(this)">
 
 <script>
 const STORE='inv_db_v1';
@@ -590,17 +601,34 @@ function renderOverview(){
     }).join('');
 
   // Customer rank
+  // 客戶排行（用全部訂單）
   const custMap={};
   db.orders.forEach(o=>{
-    const n=o.custName||'未知';
-    if(!custMap[n])custMap[n]={cnt:0,profit:0,last:''};
+    const key=o.custId||o.custName||'未知';
+    const name=o.custName||'未知';
+    if(!custMap[key])custMap[key]={name,cnt:0,profit:0,revenue:0,last:'',custId:o.custId};
     const c=calcOrder(o);
-    custMap[n].cnt++;custMap[n].profit+=c.profit;
-    if(!custMap[n].last||o.date>custMap[n].last)custMap[n].last=o.date;
+    custMap[key].cnt++;custMap[key].profit+=c.profit;custMap[key].revenue+=c.revenue+c.tax;
+    if(!custMap[key].last||o.date>custMap[key].last)custMap[key].last=o.date;
   });
+  const nowStr=new Date().toISOString().split('T')[0];
   const ranked=Object.entries(custMap).sort((a,b)=>b[1].profit-a[1].profit);
-  document.getElementById('cust-rank-body').innerHTML=ranked.length===0?'<tr><td colspan="4" class="empty">尚無資料</td></tr>':
-    ranked.map(([name,d])=>`<tr><td><b>${name}</b></td><td>${d.cnt}</td><td class="mono gain">${fmt(d.profit)}</td><td class="muted">${fmtDate(d.last)}</td></tr>`).join('');
+  const rankHdr=document.querySelector('#tab-overview .sec-hdr:last-of-type');
+  document.getElementById('cust-rank-body').closest('table').querySelector('thead tr').innerHTML=
+    '<th>客戶名稱</th><th>訂單數</th><th>累積利潤</th><th>最後往來</th><th>距今</th>';
+  document.getElementById('cust-rank-body').innerHTML=ranked.length===0?'<tr><td colspan="5" class="empty">尚無資料</td></tr>':
+    ranked.map(([key,d])=>{
+      const daysSince=d.last?Math.floor((new Date(nowStr)-new Date(d.last))/86400000):null;
+      const daysColor=daysSince===null?'#94a3b8':daysSince>365?'#dc2626':daysSince>180?'#d97706':'#16a34a';
+      const daysStr=daysSince===null?'—':daysSince===0?'今天':daysSince+'天前';
+      return`<tr style="cursor:pointer" onclick="showCustDetail('${key}')">
+        <td><b>${d.name}</b></td>
+        <td>${d.cnt}</td>
+        <td class="mono gain">${fmt(d.profit)}</td>
+        <td class="muted">${fmtDate(d.last)}</td>
+        <td><span style="color:${daysColor};font-weight:600;font-size:12px">${daysStr}</span></td>
+      </tr>`;
+    }).join('');
 }
 
 // ── 訂單 ──
@@ -913,7 +941,16 @@ function showOrderDetail(id){
   paidBtn.textContent=o.paid?'取消收款':'標記已收款';
   paidBtn.onclick=()=>{o.paid=!o.paid;if(o.paid)o.paidDate=today();else o.paidDate='';save();showOrderDetail(id);renderOrders();renderReceivable();};
   document.getElementById('detail-del-btn').onclick=()=>{
-    if(confirm('確定刪除此訂單？')){db.orders=db.orders.filter(x=>x.id!==id);save();closeModal('detail-modal');renderOrders();renderOverview();}
+    if(!confirm('確定刪除此訂單？\n客戶：'+( o.custName||'—')+'\n出貨日：'+fmtDate(o.date)))return;
+    if(!confirm('再次確認：刪除後無法復原！'))return;
+    _history.push(JSON.stringify(db));
+    if(_history.length>_MAX_HIST)_history.shift();
+    _future=[];
+    db.orders=db.orders.filter(x=>x.id!==id);
+    localStorage.setItem(STORE,JSON.stringify(db));
+    updateUndoRedo();
+    closeModal('detail-modal');renderOrders();renderOverview();
+    toast('🗑 訂單已刪除');
   };
   document.getElementById('detail-modal').classList.add('open');
 }
@@ -1103,6 +1140,106 @@ function saveProduct(){
   }
   save();closeModal('product-modal');renderProducts();
   toast('✅ 商品已儲存：'+name);
+}
+
+function showCustDetail(custKey){
+  const orders=db.orders.filter(o=>(o.custId||o.custName||'未知')===custKey);
+  if(orders.length===0)return;
+  const name=orders[0].custName||custKey;
+  const cust=db.customers.find(c=>c.id===custKey)||{};
+  const now=new Date();
+
+  // 基本統計
+  let totRev=0,totProfit=0,totCost=0,paidCnt=0,unpaidAmt=0;
+  const itemMap={},yearMap={},monthMap={};
+  orders.forEach(o=>{
+    const c=calcOrder(o);
+    totRev+=c.revenue+c.tax;totProfit+=c.profit;totCost+=c.cost;
+    if(o.paid)paidCnt++;else unpaidAmt+=c.revenue+c.tax;
+    // 品項統計
+    (o.items||[]).forEach(it=>{
+      const k=it.subtype||it.name||'其他';
+      if(!itemMap[k])itemMap[k]={cnt:0,qty:0,revenue:0};
+      itemMap[k].cnt++;itemMap[k].qty+=(it.qty||1);itemMap[k].revenue+=(it.price||0)*(it.qty||1);
+    });
+    // 年度統計
+    if(o.date){
+      const yr=o.date.slice(0,4);
+      if(!yearMap[yr])yearMap[yr]={cnt:0,revenue:0,profit:0};
+      yearMap[yr].cnt++;yearMap[yr].revenue+=c.revenue+c.tax;yearMap[yr].profit+=c.profit;
+    }
+  });
+
+  // 最後往來距今
+  const lastDate=orders.map(o=>o.date).filter(Boolean).sort().pop();
+  const daysSince=lastDate?Math.floor((now-new Date(lastDate))/86400000):null;
+  const profitRate=totRev>0?Math.round(totProfit/totRev*100):0;
+  const avgOrder=orders.length?Math.round(totRev/orders.length):0;
+
+  // 最愛購買品項
+  const topItems=Object.entries(itemMap).sort((a,b)=>b[1].qty-a[1].qty).slice(0,5);
+  // 年度排行
+  const years=Object.entries(yearMap).sort((a,b)=>b[0].localeCompare(a[0]));
+
+  document.getElementById('cd-title').textContent='👤 '+name;
+  document.getElementById('cd-content').innerHTML=`
+    <!-- 基本資訊 -->
+    ${cust.phone||cust.contact?`<div style="background:#f8fafc;border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#475569;display:flex;gap:24px;flex-wrap:wrap">
+      ${cust.contact?'<span>👤 聯絡人：<b>'+cust.contact+'</b></span>':''}
+      ${cust.phone?'<span>📞 '+cust.phone+'</span>':''}
+      ${cust.email?'<span>✉️ '+cust.email+'</span>':''}
+    </div>`:''}
+
+    <!-- KPI 卡片 -->
+    <div class="stat-strip" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">
+      <div class="stat-card"><div class="stat-label">📦 總訂單</div><div class="stat-val blue">${orders.length}</div></div>
+      <div class="stat-card"><div class="stat-label">💵 累積營收</div><div class="stat-val">${fmt(totRev)}</div></div>
+      <div class="stat-card"><div class="stat-label">💰 累積利潤</div><div class="stat-val gain">${fmt(totProfit)}</div></div>
+      <div class="stat-card"><div class="stat-label">📊 利潤率</div><div class="stat-val blue">${profitRate}%</div></div>
+    </div>
+    <div class="stat-strip" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px">
+      <div class="stat-card"><div class="stat-label">✅ 已收款</div><div class="stat-val">${paidCnt} 筆</div></div>
+      <div class="stat-card"><div class="stat-label">⏳ 未收款</div><div class="stat-val loss">${fmt(unpaidAmt)}</div></div>
+      <div class="stat-card"><div class="stat-label">🛒 平均客單</div><div class="stat-val">${fmt(avgOrder)}</div></div>
+      <div class="stat-card"><div class="stat-label">📅 距今</div><div class="stat-val" style="font-size:16px;color:${daysSince>365?'#dc2626':daysSince>180?'#d97706':'#16a34a'}">${daysSince===null?'—':daysSince+'天'}</div></div>
+    </div>
+
+    <!-- 購買品項偏好 -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="sec" style="margin:0">
+        <div class="sec-hdr"><span class="sec-title">🛍️ 購買品項偏好</span></div>
+        <table class="tbl">
+          <thead><tr><th>品項</th><th>次數</th><th>總數量</th><th>貢獻營收</th></tr></thead>
+          <tbody>${topItems.map(([k,v])=>`<tr><td>${k}</td><td>${v.cnt}</td><td>${v.qty}</td><td class="mono">${fmt(v.revenue)}</td></tr>`).join('')}</tbody>
+        </table>
+      </div>
+      <div class="sec" style="margin:0">
+        <div class="sec-hdr"><span class="sec-title">📅 年度交易記錄</span></div>
+        <table class="tbl">
+          <thead><tr><th>年度</th><th>訂單數</th><th>年度營收</th><th>年度利潤</th></tr></thead>
+          <tbody>${years.map(([yr,v])=>`<tr><td>${yr}</td><td>${v.cnt}</td><td class="mono">${fmt(v.revenue)}</td><td class="mono gain">${fmt(v.profit)}</td></tr>`).join('')}</tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 最近訂單 -->
+    <div class="sec" style="margin:16px 0 0">
+      <div class="sec-hdr"><span class="sec-title">📋 訂單記錄（最近10筆）</span></div>
+      <table class="tbl">
+        <thead><tr><th>出貨日</th><th>品項</th><th>金額</th><th>利潤</th><th>收款</th></tr></thead>
+        <tbody>${[...orders].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,10).map(o=>{
+          const c=calcOrder(o);
+          const items=(o.items||[]).map(it=>(it.subtype||it.name||'')+(it.qty>1?' ×'+it.qty:'')).join('、');
+          return`<tr style="cursor:pointer" onclick="closeModal('cust-detail-modal');setTimeout(()=>showOrderDetail('${o.id}'),200)">
+            <td>${fmtDate(o.date)}</td><td class="muted">${items}</td>
+            <td class="mono">${fmt(c.revenue+c.tax)}</td>
+            <td class="mono gain">${fmt(c.profit)}</td>
+            <td>${o.paid?'<span class="badge badge-green">✓</span>':'<span class="badge badge-red">未收</span>'}</td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table>
+    </div>`;
+  document.getElementById('cust-detail-modal').classList.add('open');
 }
 
 function delProduct(id){
