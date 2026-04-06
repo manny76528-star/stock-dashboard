@@ -1054,18 +1054,14 @@ function renderWarranty(){
 }
 
 // ── 商品管理 ──
-const PROD_SUB_MAP={
-  device:['掃描器','條碼機'],
-  paper:['銅版紙','珠光紙'],
-  ribbon:['一般碳帶','抗刮碳帶']
-};
+
 const TYPE_NAME={device:'🖥️ 設備',paper:'📄 紙張',ribbon:'🎞️ 碳帶'};
 let editProductId=null;
 
 function updateProdSub(){
   const type=document.getElementById('p-type').value;
   const sub=document.getElementById('p-sub');
-  sub.innerHTML=(PROD_SUB_MAP[type]||[]).map(s=>'<option>'+s+'</option>').join('');
+  sub.innerHTML=(PROD_MAP_G[type]||[]).map(s=>'<option>'+s+'</option>').join('');
 }
 
 function openProductModal(id=null){
