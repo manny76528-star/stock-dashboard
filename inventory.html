@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>進銷存系統</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f0f4f8;--white:#fff;--accent:#1e3a5f;--accent2:#2563eb;
+  --gain:#dc2626;--loss:#16a34a;--muted:#94a3b8;--border:#e2e8f0;
+  --card-shadow:0 2px 8px rgba(0,0,0,.07);
+  --mono:'JetBrains Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;min-height:100vh;}
+
+/* ── Header ── */
+.hdr{background:linear-gradient(135deg,#0f172a,#1e3a5f);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.2);}
+.hdr-left{display:flex;align-items:center;gap:12px;}
+.hdr-logo{font-size:20px;}
+.hdr-title{font-size:17px;font-weight:800;color:#fff;}
+.hdr-back{color:rgba(255,255,255,.7);text-decoration:none;font-size:12px;border:1px solid rgba(255,255,255,.2);padding:5px 12px;border-radius:8px;transition:all .15s;}
+.hdr-back:hover{background:rgba(255,255,255,.1);color:#fff;}
+.hdr-actions{display:flex;gap:8px;}
+.hdr-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:background .15s;}
+.hdr-btn:hover{background:rgba(255,255,255,.2);}
+.hdr-btn.primary{background:#2563eb;border-color:#2563eb;}
+.hdr-btn.primary:hover{background:#1d4ed8;}
+
+/* ── Nav Tabs ── */
+.nav{background:#fff;border-bottom:1px solid var(--border);padding:0 20px;display:flex;gap:0;overflow-x:auto;}
+.nav-tab{padding:14px 20px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;transition:all .15s;}
+.nav-tab:hover{color:#1e293b;}
+.nav-tab.active{color:var(--accent2);border-bottom-color:var(--accent2);}
+
+/* ── Main ── */
+.main{max-width:1100px;margin:0 auto;padding:24px 16px;}
+
+/* ── Cards ── */
+.stat-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px;}
+.stat-card{background:#fff;border-radius:14px;padding:16px 18px;box-shadow:var(--card-shadow);border:1px solid var(--border);}
+.stat-label{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.3px;margin-bottom:6px;}
+.stat-val{font-size:22px;font-weight:800;font-family:var(--mono);color:#1e293b;}
+.stat-val.gain{color:var(--gain);}
+.stat-val.loss{color:var(--loss);}
+.stat-val.blue{color:var(--accent2);}
+
+/* ── Section ── */
+.sec{background:#fff;border-radius:14px;box-shadow:var(--card-shadow);border:1px solid var(--border);margin-bottom:20px;overflow:hidden;}
+.sec-hdr{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.sec-title{font-size:14px;font-weight:700;color:#1e293b;}
+.sec-body{padding:0;}
+
+/* ── Table ── */
+.tbl{width:100%;border-collapse:collapse;font-size:13px;}
+.tbl th{padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);background:#f8fafc;border-bottom:1px solid var(--border);white-space:nowrap;}
+.tbl td{padding:12px 14px;border-bottom:1px solid #f8fafc;vertical-align:middle;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tr:hover td{background:#fafbff;}
+.tbl .mono{font-family:var(--mono);font-weight:600;}
+.tbl .muted{color:var(--muted);font-size:12px;}
+
+/* ── Badge ── */
+.badge{display:inline-block;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:600;}
+.badge-green{background:#f0fdf4;color:#16a34a;border:1px solid #86efac;}
+.badge-red{background:#fff0f0;color:#dc2626;border:1px solid #fca5a5;}
+.badge-blue{background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe;}
+.badge-gray{background:#f8fafc;color:#64748b;border:1px solid var(--border);}
+.badge-orange{background:#fff7ed;color:#d97706;border:1px solid #fcd34d;}
+
+/* ── Modal ── */
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;padding:16px;}
+.mo.open{display:flex;}
+.modal{background:#fff;border-radius:16px;padding:28px;width:100%;max-width:700px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2);}
+.modal-title{font-size:17px;font-weight:800;margin-bottom:20px;color:#1e293b;}
+.fg{margin-bottom:14px;}
+.fl{font-size:12px;font-weight:600;color:#475569;margin-bottom:5px;display:block;}
+.fi{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:'Noto Sans TC',sans-serif;outline:none;transition:border-color .15s;}
+.fi:focus{border-color:var(--accent2);}
+.fi-sm{width:100%;padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:'Noto Sans TC',sans-serif;outline:none;}
+.fi-sm:focus{border-color:var(--accent2);}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.fr3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.fbr{display:flex;gap:8px;justify-content:flex-end;margin-top:20px;}
+.btn{padding:9px 20px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;border:none;transition:all .15s;}
+.btn-primary{background:#2563eb;color:#fff;}
+.btn-primary:hover{background:#1d4ed8;}
+.btn-secondary{background:#f1f5f9;color:#475569;}
+.btn-secondary:hover{background:#e2e8f0;}
+.btn-danger{background:#fef2f2;color:#dc2626;border:1px solid #fca5a5;}
+.btn-danger:hover{background:#dc2626;color:#fff;}
+
+/* ── Items table in modal ── */
+.items-hdr{display:grid;grid-template-columns:90px 1fr 110px 80px 80px 60px;gap:8px;font-size:11px;font-weight:700;color:var(--muted);padding:6px 0;border-bottom:1px solid var(--border);margin-bottom:8px;}
+.item-row{display:grid;grid-template-columns:90px 1fr 110px 80px 80px 60px auto;gap:8px;margin-bottom:8px;align-items:center;}
+.profit-row{background:#f8fafc;border-radius:8px;padding:10px 12px;margin:10px 0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+.profit-label{font-size:12px;color:var(--muted);}
+.profit-val{font-size:16px;font-weight:800;font-family:var(--mono);}
+
+/* ── Search ── */
+.search-bar{display:flex;gap:8px;margin-bottom:16px;}
+.search-input{flex:1;padding:9px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:'Noto Sans TC',sans-serif;outline:none;}
+.search-input:focus{border-color:var(--accent2);}
+.search-btn{padding:9px 18px;background:var(--accent2);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
+
+/* ── Warranty status ── */
+.warranty-result{background:#fff;border-radius:12px;padding:20px;border:1px solid var(--border);margin-top:16px;}
+.warranty-ok{border-left:4px solid #16a34a;}
+.warranty-expired{border-left:4px solid #dc2626;}
+.warranty-unknown{border-left:4px solid #94a3b8;}
+
+/* ── Empty state ── */
+.empty{text-align:center;padding:40px;color:var(--muted);font-size:13px;}
+.empty-icon{font-size:36px;margin-bottom:12px;}
+
+/* ── Filter bar ── */
+.filter-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.filter-btn{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:#fff;color:#475569;transition:all .15s;font-family:'Noto Sans TC',sans-serif;}
+.filter-btn.active{background:var(--accent2);color:#fff;border-color:var(--accent2);}
+
+/* ── RWD ── */
+@media(max-width:600px){
+  .fr,.fr3{grid-template-columns:1fr;}
+  .items-hdr,.item-row{grid-template-columns:1fr 70px 80px 80px;}
+  .item-row .sn-col,.items-hdr .sn-col{display:none;}
+  .stat-strip{grid-template-columns:1fr 1fr;}
+  .tbl th:nth-child(n+5),.tbl td:nth-child(n+5){display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="hdr">
+  <div class="hdr-left">
+    <span class="hdr-logo">🗂️</span>
+    <span class="hdr-title">進銷存系統</span>
+  </div>
+  <div class="hdr-actions">
+    <button class="hdr-btn primary" onclick="openOrderModal()">＋ 新增訂單</button>
+    <button class="hdr-btn" onclick="exportData()">備份</button>
+    <button class="hdr-btn" onclick="importData()">還原</button>
+    <a href="index.html" class="hdr-back">← 主目錄</a>
+  </div>
+</div>
+
+<!-- Nav Tabs -->
+<div class="nav">
+  <div class="nav-tab active" onclick="showTab('overview')">📊 業績總覽</div>
+  <div class="nav-tab" onclick="showTab('orders')">📋 訂單記錄</div>
+  <div class="nav-tab" onclick="showTab('customers')">👥 客戶管理</div>
+  <div class="nav-tab" onclick="showTab('receivable')">💰 應收帳款</div>
+  <div class="nav-tab" onclick="showTab('warranty')">🔍 序號查詢</div>
+</div>
+
+<div class="main">
+
+  <!-- ══ 業績總覽 ══ -->
+  <div id="tab-overview">
+    <div class="stat-strip">
+      <div class="stat-card"><div class="stat-label">📦 總訂單數</div><div class="stat-val blue" id="st-orders">0</div></div>
+      <div class="stat-card"><div class="stat-label">💵 總營收</div><div class="stat-val" id="st-revenue">$0</div></div>
+      <div class="stat-card"><div class="stat-label">💰 總利潤</div><div class="stat-val gain" id="st-profit">$0</div></div>
+      <div class="stat-card"><div class="stat-label">📬 未收款</div><div class="stat-val loss" id="st-unpaid">$0</div></div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-hdr">
+        <span class="sec-title">📅 月度業績</span>
+        <div class="filter-bar">
+          <button class="filter-btn active" onclick="setPeriod('year',this)">近一年</button>
+          <button class="filter-btn" onclick="setPeriod('all',this)">全部</button>
+        </div>
+      </div>
+      <div class="sec-body">
+        <table class="tbl" id="monthly-tbl">
+          <thead><tr><th>月份</th><th>訂單數</th><th>營收</th><th>利潤</th><th>利潤率</th><th>未收款</th></tr></thead>
+          <tbody id="monthly-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-hdr"><span class="sec-title">🏆 客戶利潤排行</span></div>
+      <div class="sec-body">
+        <table class="tbl">
+          <thead><tr><th>客戶名稱</th><th>訂單數</th><th>累積利潤</th><th>最後往來</th></tr></thead>
+          <tbody id="cust-rank-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 訂單記錄 ══ -->
+  <div id="tab-orders" style="display:none">
+    <div class="search-bar">
+      <input class="search-input" id="order-search" placeholder="搜尋客戶、品項、序號..." oninput="renderOrders()">
+      <div class="filter-bar">
+        <button class="filter-btn active" id="fo-all" onclick="setOrderFilter('all',this)">全部</button>
+        <button class="filter-btn" id="fo-unpaid" onclick="setOrderFilter('unpaid',this)">未收款</button>
+        <button class="filter-btn" id="fo-invoice" onclick="setOrderFilter('invoice',this)">有發票</button>
+      </div>
+    </div>
+    <div class="sec">
+      <div class="sec-body">
+        <table class="tbl">
+          <thead><tr><th>出貨日</th><th>客戶</th><th>品項</th><th>金額(含稅)</th><th>利潤</th><th>發票</th><th>收款</th><th>操作</th></tr></thead>
+          <tbody id="order-body"></tbody>
+        </table>
+        <div id="order-empty" class="empty" style="display:none"><div class="empty-icon">📋</div>尚無訂單記錄</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 客戶管理 ══ -->
+  <div id="tab-customers" style="display:none">
+    <div class="search-bar">
+      <input class="search-input" id="cust-search" placeholder="搜尋客戶名稱、聯絡人、電話..." oninput="renderCustomers()">
+      <button class="search-btn" onclick="openCustModal()">＋ 新增客戶</button>
+    </div>
+    <div class="sec">
+      <div class="sec-body">
+        <table class="tbl">
+          <thead><tr><th>客戶名稱</th><th>聯絡人</th><th>電話</th><th>累積訂單</th><th>累積利潤</th><th>最後往來</th><th>操作</th></tr></thead>
+          <tbody id="cust-body"></tbody>
+        </table>
+        <div id="cust-empty" class="empty" style="display:none"><div class="empty-icon">👥</div>尚無客戶資料</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 應收帳款 ══ -->
+  <div id="tab-receivable" style="display:none">
+    <div class="stat-strip" style="grid-template-columns:repeat(3,1fr)">
+      <div class="stat-card"><div class="stat-label">📬 未收款筆數</div><div class="stat-val blue" id="recv-cnt">0</div></div>
+      <div class="stat-card"><div class="stat-label">💸 未收款金額</div><div class="stat-val loss" id="recv-amt">$0</div></div>
+      <div class="stat-card"><div class="stat-label">⚠️ 超過30天</div><div class="stat-val loss" id="recv-old">0 筆</div></div>
+    </div>
+    <div class="sec">
+      <div class="sec-body">
+        <table class="tbl">
+          <thead><tr><th>出貨日</th><th>客戶</th><th>金額</th><th>未收天數</th><th>操作</th></tr></thead>
+          <tbody id="recv-body"></tbody>
+        </table>
+        <div id="recv-empty" class="empty" style="display:none"><div class="empty-icon">✅</div>目前無未收款項目</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 序號查詢 ══ -->
+  <div id="tab-warranty" style="display:none">
+    <div class="sec">
+      <div class="sec-hdr"><span class="sec-title">🔍 序號查詢 / 保固狀態</span></div>
+      <div style="padding:20px">
+        <div class="search-bar">
+          <input class="search-input" id="sn-input" placeholder="輸入序號查詢..." onkeydown="if(event.key==='Enter')searchSN()">
+          <button class="search-btn" onclick="searchSN()">查詢</button>
+        </div>
+        <div id="sn-result"></div>
+      </div>
+    </div>
+    <div class="sec">
+      <div class="sec-hdr"><span class="sec-title">📋 所有序號記錄</span></div>
+      <div class="sec-body">
+        <table class="tbl">
+          <thead><tr><th>序號</th><th>品項</th><th>保固期</th><th>客戶</th><th>出貨日</th><th>保固到期</th><th>狀態</th></tr></thead>
+          <tbody id="sn-list-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- ══ 訂單 Modal ══ -->
+<div class="mo" id="order-modal">
+  <div class="modal">
+    <div class="modal-title" id="order-modal-title">📋 新增訂單</div>
+    <div class="fr">
+      <div class="fg"><label class="fl">出貨日期 *</label><input class="fi" type="date" id="o-date"></div>
+      <div class="fg">
+        <label class="fl">客戶名稱 *</label>
+        <select class="fi" id="o-cust" onchange="fillCustInfo(this.value)">
+          <option value="">-- 選擇客戶 --</option>
+        </select>
+      </div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">聯絡人</label><input class="fi" type="text" id="o-contact" placeholder="聯絡人姓名"></div>
+      <div class="fg"><label class="fl">電話</label><input class="fi" type="text" id="o-phone" placeholder="聯絡電話"></div>
+    </div>
+    <div class="fg"><label class="fl">備註</label><input class="fi" type="text" id="o-note" placeholder="訂單備註"></div>
+
+    <!-- 品項 -->
+    <div style="margin:16px 0 8px;font-size:13px;font-weight:700;color:#1e293b">📦 品項明細</div>
+    <div class="items-hdr" style="grid-template-columns:2fr 80px 70px 90px 90px 60px 60px">
+      <span>品項名稱</span><span>序號</span><span>保固(月)</span><span>成本</span><span>售價</span><span>發票</span><span>小計利潤</span>
+    </div>
+    <div id="items-container"></div>
+    <button class="btn btn-secondary" onclick="addItemRow()" style="font-size:12px;padding:6px 14px;margin-bottom:12px">＋ 新增品項</button>
+
+    <!-- 合計 -->
+    <div class="profit-row">
+      <div>
+        <div class="profit-label">含稅總金額</div>
+        <div class="profit-val blue" id="o-total-price">$0</div>
+      </div>
+      <div>
+        <div class="profit-label">總成本</div>
+        <div class="profit-val" id="o-total-cost">$0</div>
+      </div>
+      <div>
+        <div class="profit-label">稅額(5%)</div>
+        <div class="profit-val" id="o-total-tax">$0</div>
+      </div>
+      <div>
+        <div class="profit-label" style="font-weight:700">淨利潤</div>
+        <div class="profit-val gain" id="o-total-profit">$0</div>
+      </div>
+    </div>
+
+    <div class="fr" style="margin-top:8px">
+      <div class="fg">
+        <label class="fl">收款狀態</label>
+        <select class="fi" id="o-paid">
+          <option value="0">未收款</option>
+          <option value="1">已收款</option>
+        </select>
+      </div>
+      <div class="fg"><label class="fl">收款日期</label><input class="fi" type="date" id="o-paid-date"></div>
+    </div>
+
+    <div class="fbr">
+      <button class="btn btn-secondary" onclick="closeModal('order-modal')">取消</button>
+      <button class="btn btn-primary" onclick="saveOrder()">儲存訂單</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 客戶 Modal ══ -->
+<div class="mo" id="cust-modal">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-title">👥 客戶資料</div>
+    <div class="fg"><label class="fl">客戶名稱 *</label><input class="fi" type="text" id="c-name" placeholder="公司或個人名稱"></div>
+    <div class="fr">
+      <div class="fg"><label class="fl">聯絡人</label><input class="fi" type="text" id="c-contact" placeholder="聯絡人姓名"></div>
+      <div class="fg"><label class="fl">電話</label><input class="fi" type="text" id="c-phone" placeholder="聯絡電話"></div>
+    </div>
+    <div class="fg"><label class="fl">Email</label><input class="fi" type="email" id="c-email" placeholder="email@example.com"></div>
+    <div class="fg"><label class="fl">地址</label><input class="fi" type="text" id="c-addr" placeholder="公司地址"></div>
+    <div class="fg"><label class="fl">備註</label><input class="fi" type="text" id="c-note" placeholder="備註"></div>
+    <div class="fbr">
+      <button class="btn btn-secondary" onclick="closeModal('cust-modal')">取消</button>
+      <button class="btn btn-primary" onclick="saveCust()">儲存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 訂單詳情 Modal ══ -->
+<div class="mo" id="detail-modal">
+  <div class="modal">
+    <div class="modal-title">📋 訂單詳情</div>
+    <div id="detail-content"></div>
+    <div class="fbr">
+      <button class="btn btn-danger" id="detail-del-btn">刪除</button>
+      <button class="btn btn-secondary" onclick="closeModal('detail-modal')">關閉</button>
+      <button class="btn btn-primary" id="detail-paid-btn">標記已收款</button>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="import-file" accept=".json" style="display:none" onchange="doImport(this)">
+
+<script>
+const STORE='inv_db_v1';
+let db={orders:[],customers:[]};
+let editOrderId=null,editCustId=null,overviewPeriod='year',orderFilter='all';
+
+function load(){try{const d=localStorage.getItem(STORE);if(d)db=JSON.parse(d);}catch(e){}}
+function save(){localStorage.setItem(STORE,JSON.stringify(db));}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+function fmt(n){return'$'+(Math.round(n)||0).toLocaleString();}
+function fmtDate(s){if(!s)return'—';const d=new Date(s);return d.getFullYear()+'/'+(d.getMonth()+1).toString().padStart(2,'0')+'/'+d.getDate().toString().padStart(2,'0');}
+function today(){return new Date().toISOString().split('T')[0];}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+
+// ── Tab ──
+function showTab(t){
+  ['overview','orders','customers','receivable','warranty'].forEach(id=>{
+    document.getElementById('tab-'+id).style.display=id===t?'':'none';
+  });
+  document.querySelectorAll('.nav-tab').forEach((el,i)=>{
+    el.classList.toggle('active',['overview','orders','customers','receivable','warranty'][i]===t);
+  });
+  if(t==='overview')renderOverview();
+  if(t==='orders')renderOrders();
+  if(t==='customers')renderCustomers();
+  if(t==='receivable')renderReceivable();
+  if(t==='warranty')renderWarranty();
+}
+
+// ── 計算訂單利潤 ──
+function calcOrder(order){
+  let revenue=0,cost=0,tax=0;
+  (order.items||[]).forEach(it=>{
+    const price=parseFloat(it.price)||0;
+    const c=parseFloat(it.cost)||0;
+    const qty=parseFloat(it.qty)||1;
+    const hasInv=it.invoice;
+    const taxAmt=hasInv?price*qty*0.05:0;
+    revenue+=price*qty;
+    cost+=c*qty;
+    tax+=taxAmt;
+  });
+  const profit=revenue-cost-tax;
+  return{revenue,cost,tax,profit};
+}
+
+// ── 業績總覽 ──
+function setPeriod(p,el){
+  overviewPeriod=p;
+  document.querySelectorAll('#tab-overview .filter-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderOverview();
+}
+function renderOverview(){
+  const now=new Date();
+  const oneYearAgo=new Date(now.getFullYear()-1,now.getMonth(),now.getDate()).toISOString().split('T')[0];
+  const orders=overviewPeriod==='year'?db.orders.filter(o=>o.date>=oneYearAgo):db.orders;
+
+  let totRev=0,totProfit=0,totUnpaid=0;
+  orders.forEach(o=>{const c=calcOrder(o);totRev+=c.revenue;totProfit+=c.profit;if(!o.paid)totUnpaid+=c.revenue;});
+  document.getElementById('st-orders').textContent=orders.length;
+  document.getElementById('st-revenue').textContent=fmt(totRev);
+  document.getElementById('st-profit').textContent=fmt(totProfit);
+  document.getElementById('st-unpaid').textContent=fmt(totUnpaid);
+
+  // Monthly breakdown
+  const monthly={};
+  orders.forEach(o=>{
+    if(!o.date)return;
+    const ym=o.date.slice(0,7);
+    if(!monthly[ym])monthly[ym]={orders:0,revenue:0,profit:0,unpaid:0};
+    const c=calcOrder(o);
+    monthly[ym].orders++;monthly[ym].revenue+=c.revenue;monthly[ym].profit+=c.profit;
+    if(!o.paid)monthly[ym].unpaid+=c.revenue;
+  });
+  const mons=Object.keys(monthly).sort().reverse();
+  const mb=document.getElementById('monthly-body');
+  mb.innerHTML=mons.length===0?'<tr><td colspan="6" class="empty">尚無資料</td></tr>':
+    mons.map(ym=>{const m=monthly[ym];const rate=m.revenue?Math.round(m.profit/m.revenue*100):0;
+      return`<tr><td>${ym}</td><td>${m.orders}</td><td class="mono">${fmt(m.revenue)}</td><td class="mono gain">${fmt(m.profit)}</td><td><span class="badge badge-blue">${rate}%</span></td><td class="mono loss">${m.unpaid>0?fmt(m.unpaid):'—'}</td></tr>`;
+    }).join('');
+
+  // Customer rank
+  const custMap={};
+  db.orders.forEach(o=>{
+    const n=o.custName||'未知';
+    if(!custMap[n])custMap[n]={cnt:0,profit:0,last:''};
+    const c=calcOrder(o);
+    custMap[n].cnt++;custMap[n].profit+=c.profit;
+    if(!custMap[n].last||o.date>custMap[n].last)custMap[n].last=o.date;
+  });
+  const ranked=Object.entries(custMap).sort((a,b)=>b[1].profit-a[1].profit);
+  document.getElementById('cust-rank-body').innerHTML=ranked.length===0?'<tr><td colspan="4" class="empty">尚無資料</td></tr>':
+    ranked.map(([name,d])=>`<tr><td><b>${name}</b></td><td>${d.cnt}</td><td class="mono gain">${fmt(d.profit)}</td><td class="muted">${fmtDate(d.last)}</td></tr>`).join('');
+}
+
+// ── 訂單 ──
+function setOrderFilter(f,el){
+  orderFilter=f;
+  document.querySelectorAll('.filter-bar .filter-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderOrders();
+}
+function renderOrders(){
+  const q=(document.getElementById('order-search')?.value||'').toLowerCase();
+  let orders=[...db.orders].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  if(orderFilter==='unpaid')orders=orders.filter(o=>!o.paid);
+  if(orderFilter==='invoice')orders=orders.filter(o=>(o.items||[]).some(it=>it.invoice));
+  if(q)orders=orders.filter(o=>
+    (o.custName||'').toLowerCase().includes(q)||
+    (o.items||[]).some(it=>(it.name||'').toLowerCase().includes(q)||(it.sn||'').toLowerCase().includes(q))
+  );
+  const body=document.getElementById('order-body');
+  const empty=document.getElementById('order-empty');
+  if(orders.length===0){body.innerHTML='';empty.style.display='';return;}
+  empty.style.display='none';
+  body.innerHTML=orders.map(o=>{
+    const c=calcOrder(o);
+    const hasInv=(o.items||[]).some(it=>it.invoice);
+    const itemNames=(o.items||[]).map(it=>it.name).filter(Boolean).join('、');
+    return`<tr style="cursor:pointer" onclick="showOrderDetail('${o.id}')">
+      <td>${fmtDate(o.date)}</td>
+      <td><b>${o.custName||'—'}</b></td>
+      <td class="muted">${itemNames||'—'}</td>
+      <td class="mono">${fmt(c.revenue+c.tax)}</td>
+      <td class="mono gain">${fmt(c.profit)}</td>
+      <td>${hasInv?'<span class="badge badge-blue">是</span>':'<span class="badge badge-gray">否</span>'}</td>
+      <td>${o.paid?'<span class="badge badge-green">已收款</span>':'<span class="badge badge-red">未收款</span>'}</td>
+      <td><button class="btn btn-secondary" style="padding:4px 10px;font-size:11px" onclick="event.stopPropagation();openOrderModal('${o.id}')">編輯</button></td>
+    </tr>`;
+  }).join('');
+}
+
+// ── 訂單 Modal ──
+function openOrderModal(id=null){
+  editOrderId=id;
+  const o=id?db.orders.find(x=>x.id===id):null;
+  document.getElementById('order-modal-title').textContent=id?'✏️ 編輯訂單':'📋 新增訂單';
+  document.getElementById('o-date').value=o?.date||today();
+  document.getElementById('o-note').value=o?.note||'';
+  document.getElementById('o-paid').value=o?.paid?'1':'0';
+  document.getElementById('o-paid-date').value=o?.paidDate||'';
+
+  // Populate customer dropdown
+  const sel=document.getElementById('o-cust');
+  sel.innerHTML='<option value="">-- 選擇客戶 --</option>';
+  db.customers.forEach(c=>{
+    const opt=document.createElement('option');
+    opt.value=c.id;opt.textContent=c.name;
+    if(o&&o.custId===c.id)opt.selected=true;
+    sel.appendChild(opt);
+  });
+  if(o){
+    document.getElementById('o-contact').value=o.contact||'';
+    document.getElementById('o-phone').value=o.phone||'';
+  } else {
+    document.getElementById('o-contact').value='';
+    document.getElementById('o-phone').value='';
+  }
+
+  // Items
+  const container=document.getElementById('items-container');
+  container.innerHTML='';
+  const items=o?.items||[{name:'',sn:'',cost:'',price:'',invoice:false,qty:1}];
+  items.forEach(it=>addItemRow(it));
+
+  document.getElementById('order-modal').classList.add('open');
+  calcTotal();
+}
+
+function addItemRow(it={name:'',sn:'',cost:'',price:'',invoice:false,qty:1}){
+  const container=document.getElementById('items-container');
+  const div=document.createElement('div');
+  div.className='item-row';
+  div.style.gridTemplateColumns='2fr 80px 70px 90px 90px 60px 60px';
+  div.innerHTML=`
+    <input class="fi-sm" type="text" placeholder="品項名稱" value="${it.name||''}" onchange="calcTotal()">
+    <input class="fi-sm sn-col" type="text" placeholder="序號" value="${it.sn||''}">
+    <input class="fi-sm" type="number" placeholder="12" value="${it.warranty||12}" min="1" title="保固月數">
+    <input class="fi-sm" type="number" placeholder="成本" value="${it.cost||''}" oninput="calcTotal()">
+    <input class="fi-sm" type="number" placeholder="售價" value="${it.price||''}" oninput="calcTotal()">
+    <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer">
+      <input type="checkbox" ${it.invoice?'checked':''} onchange="calcTotal()" style="accent-color:#2563eb;width:14px;height:14px">發票
+    </label>
+    <button onclick="this.closest('.item-row').remove();calcTotal()" style="background:#fef2f2;color:#dc2626;border:1px solid #fca5a5;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:12px">✕</button>`;
+  container.appendChild(div);
+}
+
+function toggleSN(sel){
+  const row=sel.closest('.item-row');
+  const snEl=row.querySelector('.sn-field');
+  const isDevice=sel.value==='device';
+  snEl.disabled=!isDevice;
+  snEl.placeholder=isDevice?'填序號':'—';
+  snEl.style.background=isDevice?'':'#f8fafc';
+  snEl.style.color=isDevice?'':'#94a3b8';
+  if(!isDevice)snEl.value='';
+}
+
+function calcTotal(){
+  let rev=0,cost=0,tax=0;
+  document.querySelectorAll('#items-container .item-row').forEach(row=>{
+    const inputs=row.querySelectorAll('input');
+    const price=parseFloat(inputs[2].value)||0; // cost
+    const sp=parseFloat(inputs[3].value)||0;    // sell price
+    const hasInv=inputs[4].checked;
+    const t=hasInv?sp*0.05:0;
+    rev+=sp;cost+=price;tax+=t;
+  });
+  const profit=rev-cost-tax;
+  document.getElementById('o-total-price').textContent=fmt(rev);
+  document.getElementById('o-total-cost').textContent=fmt(cost);
+  document.getElementById('o-total-tax').textContent=fmt(tax);
+  document.getElementById('o-total-profit').textContent=fmt(profit);
+  document.getElementById('o-total-profit').style.color=profit>=0?'var(--gain)':'var(--loss)';
+}
+
+function fillCustInfo(custId){
+  const c=db.customers.find(x=>x.id===custId);
+  if(!c)return;
+  document.getElementById('o-contact').value=c.contact||'';
+  document.getElementById('o-phone').value=c.phone||'';
+}
+
+function saveOrder(){
+  const custId=document.getElementById('o-cust').value;
+  const custName=custId?db.customers.find(c=>c.id===custId)?.name:document.getElementById('o-cust').options[document.getElementById('o-cust').selectedIndex]?.text;
+  const date=document.getElementById('o-date').value;
+  if(!date){alert('請填寫出貨日期');return;}
+
+  const items=[];
+  document.querySelectorAll('#items-container .item-row').forEach(row=>{
+    const inputs=row.querySelectorAll('input');
+    const name=inputs[0].value.trim();
+    if(!name)return;
+    items.push({name,sn:inputs[1].value.trim(),warranty:parseInt(inputs[2].value)||12,cost:parseFloat(inputs[3].value)||0,price:parseFloat(inputs[4].value)||0,invoice:inputs[5].checked,qty:1});
+  });
+  if(items.length===0){alert('請至少填寫一個品項');return;}
+
+  const order={
+    id:editOrderId||uid(),date,custId,custName,
+    contact:document.getElementById('o-contact').value,
+    phone:document.getElementById('o-phone').value,
+    note:document.getElementById('o-note').value,
+    items,paid:document.getElementById('o-paid').value==='1',
+    paidDate:document.getElementById('o-paid-date').value,
+    createdAt:editOrderId?undefined:new Date().toISOString()
+  };
+
+  if(editOrderId){
+    const idx=db.orders.findIndex(o=>o.id===editOrderId);
+    if(idx>=0)db.orders[idx]={...db.orders[idx],...order};
+  } else {
+    db.orders.push(order);
+  }
+  save();closeModal('order-modal');renderOrders();renderOverview();
+}
+
+// ── 訂單詳情 ──
+function showOrderDetail(id){
+  const o=db.orders.find(x=>x.id===id);if(!o)return;
+  const c=calcOrder(o);
+  document.getElementById('detail-content').innerHTML=`
+    <div class="fr" style="margin-bottom:12px">
+      <div><div class="profit-label">出貨日</div><div style="font-weight:700">${fmtDate(o.date)}</div></div>
+      <div><div class="profit-label">客戶</div><div style="font-weight:700">${o.custName||'—'}</div></div>
+      <div><div class="profit-label">聯絡人</div><div>${o.contact||'—'}</div></div>
+      <div><div class="profit-label">電話</div><div>${o.phone||'—'}</div></div>
+    </div>
+    <table class="tbl" style="margin-bottom:12px">
+      <thead><tr><th>品項</th><th>序號</th><th>成本</th><th>售價</th><th>發票</th><th>利潤</th></tr></thead>
+      <tbody>${(o.items||[]).map(it=>{
+        const t=it.invoice?it.price*0.05:0;
+        const p=it.price-it.cost-t;
+        const typeBadge=it.type==='consumable'?'<span class="badge badge-gray">🔧耗材</span>':'<span class="badge badge-blue">🖥️設備</span>';
+        return`<tr><td>${typeBadge}</td><td>${it.name}</td><td class="mono muted">${it.sn||'—'}</td><td class="mono">${fmt(it.cost)}</td><td class="mono">${fmt(it.price)}</td><td>${it.invoice?'<span class="badge badge-blue">有</span>':'<span class="badge badge-gray">無</span>'}</td><td class="mono gain">${fmt(p)}</td></tr>`;
+      }).join('')}</tbody>
+    </table>
+    <div class="profit-row">
+      <div><div class="profit-label">含稅營收</div><div class="profit-val blue">${fmt(c.revenue+c.tax)}</div></div>
+      <div><div class="profit-label">稅額</div><div class="profit-val">${fmt(c.tax)}</div></div>
+      <div><div class="profit-label">淨利潤</div><div class="profit-val gain">${fmt(c.profit)}</div></div>
+      <div><div class="profit-label">收款</div><div>${o.paid?'<span class="badge badge-green">✓ 已收款</span>':'<span class="badge badge-red">未收款</span>'}</div></div>
+    </div>
+    ${o.note?`<div style="margin-top:8px;font-size:12px;color:var(--muted)">備註：${o.note}</div>`:''}`;
+
+  const paidBtn=document.getElementById('detail-paid-btn');
+  paidBtn.textContent=o.paid?'取消收款':'標記已收款';
+  paidBtn.onclick=()=>{o.paid=!o.paid;if(o.paid)o.paidDate=today();else o.paidDate='';save();showOrderDetail(id);renderOrders();renderReceivable();};
+  document.getElementById('detail-del-btn').onclick=()=>{
+    if(confirm('確定刪除此訂單？')){db.orders=db.orders.filter(x=>x.id!==id);save();closeModal('detail-modal');renderOrders();renderOverview();}
+  };
+  document.getElementById('detail-modal').classList.add('open');
+}
+
+// ── 客戶 ──
+function renderCustomers(){
+  const q=(document.getElementById('cust-search')?.value||'').toLowerCase();
+  let custs=[...db.customers];
+  if(q)custs=custs.filter(c=>(c.name||'').toLowerCase().includes(q)||(c.contact||'').toLowerCase().includes(q)||(c.phone||'').includes(q));
+
+  const body=document.getElementById('cust-body');
+  const empty=document.getElementById('cust-empty');
+
+  const custStats={};
+  db.orders.forEach(o=>{
+    if(!o.custId)return;
+    if(!custStats[o.custId])custStats[o.custId]={cnt:0,profit:0,last:''};
+    const c=calcOrder(o);
+    custStats[o.custId].cnt++;custStats[o.custId].profit+=c.profit;
+    if(!custStats[o.custId].last||o.date>custStats[o.custId].last)custStats[o.custId].last=o.date;
+  });
+
+  if(custs.length===0){body.innerHTML='';empty.style.display='';return;}
+  empty.style.display='none';
+  body.innerHTML=custs.map(c=>{
+    const s=custStats[c.id]||{cnt:0,profit:0,last:''};
+    return`<tr>
+      <td><b>${c.name}</b></td><td>${c.contact||'—'}</td><td>${c.phone||'—'}</td>
+      <td>${s.cnt}</td><td class="mono gain">${fmt(s.profit)}</td>
+      <td class="muted">${fmtDate(s.last)||'—'}</td>
+      <td style="display:flex;gap:4px">
+        <button class="btn btn-secondary" style="padding:4px 10px;font-size:11px" onclick="openCustModal('${c.id}')">編輯</button>
+        <button class="btn btn-danger" style="padding:4px 10px;font-size:11px" onclick="delCust('${c.id}')">刪</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function openCustModal(id=null){
+  editCustId=id;
+  const c=id?db.customers.find(x=>x.id===id):null;
+  document.getElementById('c-name').value=c?.name||'';
+  document.getElementById('c-contact').value=c?.contact||'';
+  document.getElementById('c-phone').value=c?.phone||'';
+  document.getElementById('c-email').value=c?.email||'';
+  document.getElementById('c-addr').value=c?.addr||'';
+  document.getElementById('c-note').value=c?.note||'';
+  document.getElementById('cust-modal').classList.add('open');
+}
+function saveCust(){
+  const name=document.getElementById('c-name').value.trim();
+  if(!name){alert('請填寫客戶名稱');return;}
+  const cust={id:editCustId||uid(),name,contact:document.getElementById('c-contact').value,phone:document.getElementById('c-phone').value,email:document.getElementById('c-email').value,addr:document.getElementById('c-addr').value,note:document.getElementById('c-note').value};
+  if(editCustId){const idx=db.customers.findIndex(c=>c.id===editCustId);if(idx>=0)db.customers[idx]=cust;}
+  else db.customers.push(cust);
+  save();closeModal('cust-modal');renderCustomers();
+}
+function delCust(id){
+  if(!confirm('確定刪除此客戶？'))return;
+  db.customers=db.customers.filter(c=>c.id!==id);save();renderCustomers();
+}
+
+// ── 應收帳款 ──
+function renderReceivable(){
+  const unpaid=db.orders.filter(o=>!o.paid).sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  const now=new Date();
+  let amt=0,old=0;
+  unpaid.forEach(o=>{const c=calcOrder(o);amt+=c.revenue+c.tax;const days=Math.floor((now-new Date(o.date))/86400000);if(days>30)old++;});
+  document.getElementById('recv-cnt').textContent=unpaid.length;
+  document.getElementById('recv-amt').textContent=fmt(amt);
+  document.getElementById('recv-old').textContent=old+' 筆';
+  const body=document.getElementById('recv-body');
+  const empty=document.getElementById('recv-empty');
+  if(unpaid.length===0){body.innerHTML='';empty.style.display='';return;}
+  empty.style.display='none';
+  body.innerHTML=unpaid.map(o=>{
+    const c=calcOrder(o);
+    const days=Math.floor((now-new Date(o.date))/86400000);
+    return`<tr>
+      <td>${fmtDate(o.date)}</td>
+      <td><b>${o.custName||'—'}</b></td>
+      <td class="mono">${fmt(c.revenue+c.tax)}</td>
+      <td><span class="badge ${days>30?'badge-red':days>14?'badge-orange':'badge-gray'}">${days} 天</span></td>
+      <td><button class="btn btn-primary" style="padding:4px 12px;font-size:11px" onclick="markPaid('${o.id}')">標記已收款</button></td>
+    </tr>`;
+  }).join('');
+}
+function markPaid(id){
+  const o=db.orders.find(x=>x.id===id);if(!o)return;
+  o.paid=true;o.paidDate=today();save();renderReceivable();renderOverview();
+}
+
+// ── 序號查詢 ──
+function searchSN(){
+  const q=document.getElementById('sn-input').value.trim().toLowerCase();
+  const res=document.getElementById('sn-result');
+  if(!q){res.innerHTML='';return;}
+  const found=[];
+  db.orders.forEach(o=>{
+    (o.items||[]).forEach(it=>{
+      if(it.sn&&it.sn.toLowerCase().includes(q)&&it.type!=='consumable'){
+        found.push({order:o,item:it});
+      }
+    });
+  });
+  if(found.length===0){res.innerHTML='<div class="warranty-result warranty-unknown"><div style="font-weight:700;margin-bottom:8px">🔍 查無結果</div><div style="font-size:13px;color:var(--muted)">找不到序號：'+q+'</div></div>';return;}
+  res.innerHTML=found.map(({order,item})=>{
+    const shipDate=new Date(order.date);
+    const expDate=new Date(shipDate);
+    const wMonths=item.warranty||12;
+    expDate.setMonth(expDate.getMonth()+wMonths);
+    const now=new Date();
+    const inWarranty=now<=expDate;
+    const daysLeft=Math.floor((expDate-now)/86400000);
+    return`<div class="warranty-result ${inWarranty?'warranty-ok':'warranty-expired'}" style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div><div style="font-size:16px;font-weight:800">${item.name}</div><div style="font-size:12px;color:var(--muted);margin-top:2px">序號：${item.sn}</div></div>
+        <span class="badge ${inWarranty?'badge-green':'badge-red'}" style="font-size:13px;padding:4px 14px">${inWarranty?'✓ 保固中':'✗ 已過保'}</span>
+      </div>
+      <div class="fr">
+        <div><div class="profit-label">出貨日</div><div style="font-weight:600">${fmtDate(order.date)}</div></div>
+        <div><div class="profit-label">保固到期</div><div style="font-weight:600;color:${inWarranty?'var(--loss)':'var(--gain)'}">${fmtDate(expDate.toISOString().split('T')[0])}</div></div>
+        <div><div class="profit-label">${inWarranty?'剩餘天數':'超過天數'}</div><div style="font-weight:600">${Math.abs(daysLeft)} 天</div></div>
+        <div><div class="profit-label">客戶</div><div style="font-weight:600">${order.custName||'—'}</div></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function renderWarranty(){
+  const body=document.getElementById('sn-list-body');
+  const all=[];
+  db.orders.forEach(o=>{(o.items||[]).forEach(it=>{if(it.sn&&it.type!=='consumable')all.push({order:o,item:it});});});
+  if(all.length===0){body.innerHTML='<tr><td colspan="6" class="empty">尚無序號記錄</td></tr>';return;}
+  const now=new Date();
+  body.innerHTML=all.map(({order,item})=>{
+    const months=item.warranty||12;
+    const exp=new Date(order.date);exp.setMonth(exp.getMonth()+months);
+    const inW=now<=exp;
+    return`<tr><td class="mono">${item.sn}</td><td>${item.name}</td><td class="muted">${months}個月</td><td>${order.custName||'—'}</td><td>${fmtDate(order.date)}</td><td>${fmtDate(exp.toISOString().split('T')[0])}</td><td><span class="badge ${inW?'badge-green':'badge-red'}">${inW?'保固中':'已過保'}</span></td></tr>`;
+  }).join('');
+}
+
+// ── 備份/還原 ──
+function exportData(){
+  const blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='inventory_backup_'+today()+'.json';a.click();
+}
+function importData(){document.getElementById('import-file').click();}
+function doImport(input){
+  const file=input.files[0];if(!file)return;
+  const r=new FileReader();
+  r.onload=e=>{try{db=JSON.parse(e.target.result);save();renderOverview();alert('✅ 還原成功');} catch{alert('❌ 格式錯誤');}};
+  r.readAsText(file);input.value='';
+}
+
+// ── Init ──
+load();renderOverview();
+document.querySelectorAll('.mo').forEach(el=>el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open');}));
+</script>
+</body>
+</html>
