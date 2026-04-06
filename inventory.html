@@ -176,6 +176,7 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
   <div class="nav-tab" onclick="showTab('customers')">👥 客戶管理</div>
   <div class="nav-tab" onclick="showTab('receivable')">💰 應收帳款</div>
   <div class="nav-tab" onclick="showTab('warranty')">🔍 序號查詢</div>
+  <div class="nav-tab" onclick="showTab('products')">📦 商品管理</div>
 </div>
 
 <div class="main">
@@ -295,7 +296,52 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
     </div>
   </div>
 
+  <!-- ══ 商品管理 ══ -->
+  <div id="tab-products" style="display:none">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+      <button class="search-btn" onclick="openProductModal()">＋ 新增商品</button>
+    </div>
+    <div class="sec">
+      <div class="sec-body">
+        <table class="tbl">
+          <thead><tr><th>類型</th><th>子類別</th><th>商品名稱</th><th>規格</th><th>成本</th><th>售價</th><th>操作</th></tr></thead>
+          <tbody id="product-body"></tbody>
+        </table>
+        <div id="product-empty" class="empty" style="display:none"><div class="empty-icon">📦</div>尚無商品，請先建檔</div>
+      </div>
+    </div>
+  </div>
+
 </div><!-- /main -->
+
+<!-- ══ 商品 Modal ══ -->
+<div class="mo" id="product-modal">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-title">📦 商品建檔</div>
+    <div class="fg">
+      <label class="fl">類型 *</label>
+      <select class="fi" id="p-type" onchange="updateProdSub()">
+        <option value="device">🖥️ 設備</option>
+        <option value="paper">📄 紙張</option>
+        <option value="ribbon">🎞️ 碳帶</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label class="fl">子類別 *</label>
+      <select class="fi" id="p-sub"></select>
+    </div>
+    <div class="fg"><label class="fl">商品名稱 *</label><input class="fi" type="text" id="p-name" placeholder="例：LS2208、DS2208"></div>
+    <div class="fg"><label class="fl">規格說明</label><input class="fi" type="text" id="p-spec" placeholder="例：USB介面、黑色"></div>
+    <div class="fr">
+      <div class="fg"><label class="fl">成本</label><input class="fi" type="number" id="p-cost" placeholder="0"></div>
+      <div class="fg"><label class="fl">售價</label><input class="fi" type="number" id="p-price" placeholder="0"></div>
+    </div>
+    <div class="fbr">
+      <button class="btn btn-secondary" onclick="closeModal('product-modal')">取消</button>
+      <button class="btn btn-primary" onclick="saveProduct()">儲存</button>
+    </div>
+  </div>
+</div>
 
 <!-- ══ 訂單 Modal ══ -->
 <div class="mo" id="order-modal">
@@ -318,7 +364,7 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
 
     <!-- 品項 -->
     <div style="margin:16px 0 8px;font-size:13px;font-weight:700;color:#1e293b">📦 品項明細</div>
-    <div class="items-hdr" style="grid-template-columns:70px 80px 3fr 45px 80px 75px 75px 45px 28px">
+    <div class="items-hdr" style="grid-template-columns:70px 80px 3fr 60px 80px 75px 75px 45px 28px">
       <span>類型</span><span>品項</span><span>規格/備註</span><span>數量</span><span>序號</span><span>成本</span><span>售價</span><span>發票</span><span></span>
     </div>
     <div id="items-container"></div>
@@ -398,7 +444,7 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
 
 <script>
 const STORE='inv_db_v1';
-let db={orders:[],customers:[]};
+let db={orders:[],customers:[],products:[]};
 let editOrderId=null,editCustId=null,overviewPeriod='all',orderFilter='all';
 
 function load(){
@@ -451,8 +497,8 @@ function updateUndoRedo(){
 function refreshCurrentTab(){
   const active=document.querySelector('.nav-tab.active');
   if(!active)return;
-  const tabs=['overview','orders','customers','receivable','warranty'];
-  const labels=['📊 業績總覽','📋 訂單記錄','👥 客戶管理','💰 應收帳款','🔍 序號查詢'];
+  const tabs=['overview','orders','customers','receivable','warranty','products'];
+  const labels=['📊 業績總覽','📋 訂單記錄','👥 客戶管理','💰 應收帳款','🔍 序號查詢','📦 商品管理'];
   const idx=labels.indexOf(active.textContent.trim());
   if(idx>=0)showTab(tabs[idx]);
 }
@@ -472,7 +518,7 @@ function closeModal(id){document.getElementById(id).classList.remove('open');}
 
 // ── Tab ──
 function showTab(t){
-  ['overview','orders','customers','receivable','warranty'].forEach(id=>{
+  ['overview','orders','customers','receivable','warranty','products'].forEach(id=>{
     document.getElementById('tab-'+id).style.display=id===t?'':'none';
   });
   document.querySelectorAll('.nav-tab').forEach((el,i)=>{
@@ -483,6 +529,7 @@ function showTab(t){
   if(t==='customers')renderCustomers();
   if(t==='receivable')renderReceivable();
   if(t==='warranty')renderWarranty();
+  if(t==='products')renderProducts();
 }
 
 // ── 計算訂單利潤 ──
@@ -642,7 +689,7 @@ function addItemRow(it={}){
   const container=document.getElementById('items-container');
   const div=document.createElement('div');
   div.className='item-row';
-  div.style.gridTemplateColumns='70px 80px 3fr 45px 80px 75px 75px 45px 28px';
+  div.style.gridTemplateColumns='70px 80px 3fr 60px 80px 75px 75px 45px 28px';
   const curType=it.type||'device';
   const isDevice=curType==='device';
   const typeOpts=Object.keys(TYPE_LABELS_G).map(k=>
@@ -654,7 +701,10 @@ function addItemRow(it={}){
   div.innerHTML=
     '<select class="fi-sm type-sel" onchange="onTypeChange(this)">'+typeOpts+'</select>'
     +'<select class="fi-sm sub-sel">'+subOpts+'</select>'
-    +'<input class="fi-sm" type="text" placeholder="規格/備註" value="'+(it.spec||'')+'">'
+    +'<div style="display:flex;flex-direction:column;gap:3px">'
+    +'<select class="fi-sm prod-picker" onchange="onProdPick(this)" style="display:none"><option value="">-- 選商品 --</option></select>'
+    +'<input class="fi-sm spec-field" type="text" placeholder="規格/備註" value="'+(it.spec||'')+'">'
+    +'</div>'
     +'<input class="fi-sm qty-field" type="number" placeholder="1" min="1" value="'+(it.qty||1)+'" oninput="calcTotal()" style="text-align:center">'
     +'<input class="fi-sm sn-field" type="text" placeholder="'+(isDevice?'填序號':'—')+'" value="'+(it.sn||'')+'"'
       +(!isDevice?' disabled style="background:#f8fafc;color:#94a3b8"':'')+' >'
@@ -666,6 +716,9 @@ function addItemRow(it={}){
     +'<button class="del-item-btn" style="background:#fef2f2;color:#dc2626;border:1px solid #fca5a5;border-radius:6px;padding:4px 7px;cursor:pointer;font-size:12px">✕</button>';
   div.querySelector('.del-item-btn').onclick=function(){this.closest('.item-row').remove();calcTotal();};
   container.appendChild(div);
+  // 初始化商品選擇器
+  const subSel2=div.querySelector('.sub-sel');
+  if(subSel2)onSubChange(subSel2,div);
   calcTotal();
 }
 
@@ -681,6 +734,43 @@ function onTypeChange(sel){
   snEl.style.background=isDevice?'':'#f8fafc';
   snEl.style.color=isDevice?'':'#94a3b8';
   if(!isDevice)snEl.value='';
+  onSubChange(subSel,row);
+}
+
+function onSubChange(sel,row){
+  if(!row)row=sel.closest('.item-row');
+  const type=row.querySelector('.type-sel')?.value||'device';
+  const sub=sel.value;
+  // 找此類別商品
+  const prods=(db.products||[]).filter(p=>p.type===type&&p.sub===sub);
+  // 更新商品選擇下拉（第三欄：規格/備註 input 改為 select+input 組合）
+  updateProdPicker(row,prods);
+}
+
+function updateProdPicker(row,prods){
+  const specEl=row.querySelector('.spec-field');
+  if(!specEl)return;
+  const picker=row.querySelector('.prod-picker');
+  if(picker){
+    picker.innerHTML='<option value="">-- 選商品 --</option>'
+      +prods.map(p=>'<option value="'+p.id+'">'+(p.name+(p.spec?' ('+p.spec+')':''))+'</option>').join('');
+    picker.style.display=prods.length>0?'':'none';
+  }
+}
+
+function onProdPick(sel,row){
+  if(!row)row=sel.closest('.item-row');
+  const pid=sel.value;
+  if(!pid)return;
+  const p=db.products.find(x=>x.id===pid);
+  if(!p)return;
+  // 帶入規格、成本、售價
+  const specEl=row.querySelector('.spec-field');
+  const numInputs=row.querySelectorAll('input[type="number"]:not(.qty-field)');
+  if(specEl)specEl.value=p.spec||'';
+  if(numInputs[0])numInputs[0].value=p.cost||'';
+  if(numInputs[1])numInputs[1].value=p.price||'';
+  calcTotal();
 }
 
 function calcTotal(){
@@ -746,7 +836,7 @@ function saveOrder(){
   document.querySelectorAll('#items-container .item-row').forEach(row=>{
     const typeSel=row.querySelector('.type-sel');
     const subSel=row.querySelector('.sub-sel');
-    const specEl=row.querySelector('input[type="text"]:not(.sn-field)');
+    const specEl=row.querySelector('.spec-field');
     const snEl=row.querySelector('.sn-field');
     const qtyEl=row.querySelector('.qty-field');
     const numInputs=row.querySelectorAll('input[type="number"]:not(.qty-field)');
@@ -966,13 +1056,96 @@ function renderWarranty(){
   }).join('');
 }
 
+// ── 商品管理 ──
+const PROD_SUB_MAP={
+  device:['掃描器','條碼機'],
+  paper:['銅版紙','珠光紙'],
+  ribbon:['一般碳帶','抗刮碳帶']
+};
+const TYPE_NAME={device:'🖥️ 設備',paper:'📄 紙張',ribbon:'🎞️ 碳帶'};
+let editProductId=null;
+
+function updateProdSub(){
+  const type=document.getElementById('p-type').value;
+  const sub=document.getElementById('p-sub');
+  sub.innerHTML=(PROD_SUB_MAP[type]||[]).map(s=>'<option>'+s+'</option>').join('');
+}
+
+function openProductModal(id=null){
+  editProductId=id;
+  const p=id?db.products.find(x=>x.id===id):null;
+  const typeEl=document.getElementById('p-type');
+  typeEl.value=p?.type||'device';
+  updateProdSub();
+  if(p?.sub){document.getElementById('p-sub').value=p.sub;}
+  document.getElementById('p-name').value=p?.name||'';
+  document.getElementById('p-spec').value=p?.spec||'';
+  document.getElementById('p-cost').value=p?.cost||'';
+  document.getElementById('p-price').value=p?.price||'';
+  document.getElementById('product-modal').classList.add('open');
+}
+
+function saveProduct(){
+  const name=document.getElementById('p-name').value.trim();
+  if(!name){alert('請填寫商品名稱');return;}
+  const prod={
+    id:editProductId||uid(),
+    type:document.getElementById('p-type').value,
+    sub:document.getElementById('p-sub').value,
+    name,
+    spec:document.getElementById('p-spec').value.trim(),
+    cost:parseFloat(document.getElementById('p-cost').value)||0,
+    price:parseFloat(document.getElementById('p-price').value)||0
+  };
+  if(editProductId){
+    const idx=db.products.findIndex(x=>x.id===editProductId);
+    if(idx>=0)db.products[idx]=prod;
+  } else {
+    db.products.push(prod);
+  }
+  save();closeModal('product-modal');renderProducts();
+  toast('✅ 商品已儲存：'+name);
+}
+
+function delProduct(id){
+  const p=db.products.find(x=>x.id===id);
+  if(!confirm('確定刪除商品「'+(p?.name||'')+'」？'))return;
+  if(!confirm('再次確認刪除，無法復原？'))return;
+  db.products=db.products.filter(x=>x.id!==id);
+  save();renderProducts();
+  toast('🗑 已刪除：'+(p?.name||''));
+}
+
+function renderProducts(){
+  const body=document.getElementById('product-body');
+  const empty=document.getElementById('product-empty');
+  if(!db.products||db.products.length===0){
+    body.innerHTML='';empty.style.display='';return;
+  }
+  empty.style.display='none';
+  // 依類型、子類別排序
+  const sorted=[...db.products].sort((a,b)=>(a.type+a.sub+a.name).localeCompare(b.type+b.sub+b.name));
+  body.innerHTML=sorted.map(p=>`<tr>
+    <td>${TYPE_NAME[p.type]||p.type}</td>
+    <td>${p.sub}</td>
+    <td><b>${p.name}</b></td>
+    <td class="muted">${p.spec||'—'}</td>
+    <td class="mono">$${p.cost.toLocaleString()}</td>
+    <td class="mono">$${p.price.toLocaleString()}</td>
+    <td style="display:flex;gap:4px">
+      <button class="btn btn-secondary" style="padding:4px 10px;font-size:11px" onclick="openProductModal('${p.id}')">編輯</button>
+      <button class="btn btn-danger" style="padding:4px 10px;font-size:11px" onclick="delProduct('${p.id}')">刪</button>
+    </td>
+  </tr>`).join('');
+}
+
 // ── 備份/還原 ──
 function exportData(){
   const now=new Date();
-  const ts=now.getFullYear()
-    +('0'+(now.getMonth()+1)).slice(-2)
-    +('0'+now.getDate()).slice(-2)
-    +('0'+now.getHours()).slice(-2)
+  const ts=now.getFullYear()+'_'
+    +('0'+(now.getMonth()+1)).slice(-2)+'_'
+    +('0'+now.getDate()).slice(-2)+'_'
+    +('0'+now.getHours()).slice(-2)+'_'
     +('0'+now.getMinutes()).slice(-2);
   const blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);
