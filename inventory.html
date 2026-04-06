@@ -314,31 +314,7 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
 
 </div><!-- /main -->
 
-<!-- ══ 商品 Modal ══ -->
-<div class="mo" id="product-modal">
-  <div class="modal" style="max-width:440px">
-    <div class="modal-title">📦 商品建檔</div>
-    <div class="fg">
-      <label class="fl">類型 *</label>
-      <select class="fi" id="p-type" onchange="updateProdSub()">
-        <option value="device">🖥️ 設備</option>
-        <option value="paper">📄 紙張</option>
-        <option value="ribbon">🎞️ 碳帶</option>
-      </select>
-    </div>
-    <div class="fg">
-      <label class="fl">子類別 *</label>
-      <select class="fi" id="p-sub"></select>
-    </div>
-    <div class="fg"><label class="fl">商品名稱 *</label><input class="fi" type="text" id="p-name" placeholder="例：LS2208、DS2208"></div>
-    <div class="fg"><label class="fl">規格說明</label><input class="fi" type="text" id="p-spec" placeholder="例：USB介面、黑色"></div>
-    <div class="fg"><label class="fl">成本</label><input class="fi" type="number" id="p-cost" placeholder="0"></div>
-    <div class="fbr">
-      <button class="btn btn-secondary" onclick="closeModal('product-modal')">取消</button>
-      <button class="btn btn-primary" onclick="saveProduct()">儲存</button>
-    </div>
-  </div>
-</div>
+</div><!-- /main-content -->
 
 <!-- ══ 訂單 Modal ══ -->
 <div class="mo" id="order-modal">
@@ -436,6 +412,33 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
     </div>
   </div>
 </div>
+
+<!-- ══ 商品 Modal ══ -->
+<div class="mo" id="product-modal">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-title">📦 商品建檔</div>
+    <div class="fg">
+      <label class="fl">類型 *</label>
+      <select class="fi" id="p-type" onchange="updateProdSub()">
+        <option value="device">🖥️ 設備</option>
+        <option value="paper">📄 紙張</option>
+        <option value="ribbon">🎞️ 碳帶</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label class="fl">子類別 *</label>
+      <select class="fi" id="p-sub"></select>
+    </div>
+    <div class="fg"><label class="fl">商品名稱 *</label><input class="fi" type="text" id="p-name" placeholder="例：LS2208、DS2208"></div>
+    <div class="fg"><label class="fl">規格說明</label><input class="fi" type="text" id="p-spec" placeholder="例：USB介面、黑色"></div>
+    <div class="fg"><label class="fl">成本</label><input class="fi" type="number" id="p-cost" placeholder="0"></div>
+    <div class="fbr">
+      <button class="btn btn-secondary" onclick="closeModal('product-modal')">取消</button>
+      <button class="btn btn-primary" onclick="saveProduct()">儲存</button>
+    </div>
+  </div>
+</div>
+
 
 <input type="file" id="import-file" accept=".json" style="display:none" onchange="doImport(this)">
 
