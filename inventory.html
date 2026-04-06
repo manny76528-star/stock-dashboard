@@ -159,13 +159,12 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
     <span class="hdr-title">進銷存系統</span>
   </div>
   <div class="hdr-actions">
-      <button onclick="manualLogout()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.8);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Noto Sans TC',sans-serif" onmouseover="this.style.background='rgba(255,255,255,.2)'" onmouseout="this.style.background='rgba(255,255,255,.1)'">🔒 登出</button>
+    <button onclick="manualLogout()" class="hdr-btn">🔒 登出</button>
     <button class="hdr-btn primary" onclick="openOrderModal()">＋ 新增訂單</button>
-    <button class="hdr-btn" id="undo-btn" onclick="undo()" disabled style="opacity:.5">← 上一步</button>
-    <button class="hdr-btn" id="redo-btn" onclick="redo()" disabled style="opacity:.5">下一步 →</button>
+    <button class="hdr-btn" id="undo-btn" onclick="undo()" disabled>← 上一步</button>
+    <button class="hdr-btn" id="redo-btn" onclick="redo()" disabled>下一步 →</button>
     <button class="hdr-btn" onclick="exportData()">備份</button>
     <button class="hdr-btn" onclick="importData()">還原</button>
-    <button onclick="manualLogout()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.8);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Noto Sans TC',sans-serif" onmouseover="this.style.background='rgba(255,255,255,.2)'" onmouseout="this.style.background='rgba(255,255,255,.1)'">🔒 登出</button>
     <a href="index.html" class="hdr-back">← 主目錄</a>
   </div>
 </div>
@@ -319,8 +318,8 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
 
     <!-- 品項 -->
     <div style="margin:16px 0 8px;font-size:13px;font-weight:700;color:#1e293b">📦 品項明細</div>
-    <div class="items-hdr" style="grid-template-columns:2fr 80px 70px 90px 90px 60px 60px">
-      <span>品項名稱</span><span>序號</span><span>保固(月)</span><span>成本</span><span>售價</span><span>發票</span><span>小計利潤</span>
+    <div class="items-hdr" style="grid-template-columns:80px 90px 1fr 90px 80px 80px 50px 28px">
+      <span>類型</span><span>品項</span><span>規格/備註</span><span>序號</span><span>成本</span><span>售價</span><span>發票</span><span></span>
     </div>
     <div id="items-container"></div>
     <button class="btn btn-secondary" onclick="addItemRow()" style="font-size:12px;padding:6px 14px;margin-bottom:12px">＋ 新增品項</button>
@@ -627,38 +626,50 @@ function openOrderModal(id=null){
   calcTotal();
 }
 
-function addItemRow(it={name:'',sn:'',cost:'',price:'',invoice:false,qty:1}){
-  const container=document.getElementById('items-container');
-  const div=document.createElement('div');
-  div.className='item-row';
-  div.style.gridTemplateColumns='2fr 80px 70px 90px 90px 60px 60px';
-  div.innerHTML=`
-    <input class="fi-sm" type="text" placeholder="品項名稱" value="${it.name||''}" onchange="calcTotal()">
-    <input class="fi-sm sn-col" type="text" placeholder="序號" value="${it.sn||''}">
-    <input class="fi-sm" type="number" placeholder="12" value="${it.warranty||12}" min="1" title="保固月數">
-    <input class="fi-sm" type="number" placeholder="成本" value="${it.cost||''}" oninput="calcTotal()">
-    <input class="fi-sm" type="number" placeholder="售價" value="${it.price||''}" oninput="calcTotal()">
-    <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer">
-      <input type="checkbox" ${it.invoice?'checked':''} onchange="calcTotal()" style="accent-color:#2563eb;width:14px;height:14px">發票
-    </label>
-    <button onclick="this.closest('.item-row').remove();calcTotal()" style="background:#fef2f2;color:#dc2626;border:1px solid #fca5a5;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:12px">✕</button>`;
-  container.appendChild(div);
-}
-
 const PROD_MAP_G={
   device:['掃描器','條碼機'],
   paper:['銅版紙','珠光紙'],
   ribbon:['一般碳帶','抗刮碳帶']
 };
+const TYPE_LABELS_G={device:'🖥️ 設備',paper:'📄 紙張',ribbon:'🎞️ 碳帶'};
+
+function addItemRow(it={}){
+  const container=document.getElementById('items-container');
+  const div=document.createElement('div');
+  div.className='item-row';
+  div.style.gridTemplateColumns='80px 90px 1fr 90px 80px 80px 50px 28px';
+  const curType=it.type||'device';
+  const isDevice=curType==='device';
+  const typeOpts=Object.keys(TYPE_LABELS_G).map(k=>
+    '<option value="'+k+'"'+(k===curType?' selected':'')+'>'+TYPE_LABELS_G[k]+'</option>'
+  ).join('');
+  const subOpts=(PROD_MAP_G[curType]||[]).map(s=>
+    '<option value="'+s+'"'+(s===it.subtype?' selected':'')+'>'+s+'</option>'
+  ).join('');
+  div.innerHTML=
+    '<select class="fi-sm type-sel" onchange="onTypeChange(this)">'+typeOpts+'</select>'
+    +'<select class="fi-sm sub-sel">'+subOpts+'</select>'
+    +'<input class="fi-sm" type="text" placeholder="規格/備註" value="'+(it.spec||'')+'">'
+    +'<input class="fi-sm sn-field" type="text" placeholder="'+(isDevice?'填序號':'—')+'" value="'+(it.sn||'')+'"'
+      +(!isDevice?' disabled style="background:#f8fafc;color:#94a3b8"':'')+' >'
+    +'<input class="fi-sm" type="number" placeholder="成本" value="'+(it.cost||'')+'" oninput="calcTotal()">'
+    +'<input class="fi-sm" type="number" placeholder="售價" value="'+(it.price||'')+'" oninput="calcTotal()">'
+    +'<label style="display:flex;align-items:center;gap:3px;font-size:11px;cursor:pointer">'
+      +'<input type="checkbox"'+(it.invoice?' checked':'')+' onchange="calcTotal()" style="accent-color:#2563eb;width:13px;height:13px"> 發票'
+    +'</label>'
+    +'<button class="del-item-btn" style="background:#fef2f2;color:#dc2626;border:1px solid #fca5a5;border-radius:6px;padding:4px 7px;cursor:pointer;font-size:12px">✕</button>';
+  div.querySelector('.del-item-btn').onclick=function(){this.closest('.item-row').remove();calcTotal();};
+  container.appendChild(div);
+  calcTotal();
+}
+
 function onTypeChange(sel){
   const row=sel.closest('.item-row');
   const subSel=row.querySelector('.sub-sel');
   const snEl=row.querySelector('.sn-field');
   const type=sel.value;
   const isDevice=type==='device';
-  // 更新子品項選單
-  subSel.innerHTML=(PROD_MAP_G[type]||[]).map(s=>`<option>${s}</option>`).join('');
-  // SN 欄位
+  subSel.innerHTML=(PROD_MAP_G[type]||[]).map(s=>'<option>'+s+'</option>').join('');
   snEl.disabled=!isDevice;
   snEl.placeholder=isDevice?'填序號':'—';
   snEl.style.background=isDevice?'':'#f8fafc';
@@ -669,12 +680,12 @@ function onTypeChange(sel){
 function calcTotal(){
   let rev=0,cost=0,tax=0;
   document.querySelectorAll('#items-container .item-row').forEach(row=>{
-    const inputs=row.querySelectorAll('input');
-    const price=parseFloat(inputs[2].value)||0; // cost
-    const sp=parseFloat(inputs[3].value)||0;    // sell price
-    const hasInv=inputs[4].checked;
+    const numInputs=row.querySelectorAll('input[type="number"]');
+    const c=parseFloat(numInputs[0]?.value)||0;
+    const sp=parseFloat(numInputs[1]?.value)||0;
+    const hasInv=row.querySelector('input[type="checkbox"]')?.checked||false;
     const t=hasInv?sp*0.05:0;
-    rev+=sp;cost+=price;tax+=t;
+    rev+=sp;cost+=c;tax+=t;
   });
   const profit=rev-cost-tax;
   document.getElementById('o-total-price').textContent=fmt(rev);
