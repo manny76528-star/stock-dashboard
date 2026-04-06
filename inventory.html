@@ -318,7 +318,7 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
 
     <!-- 品項 -->
     <div style="margin:16px 0 8px;font-size:13px;font-weight:700;color:#1e293b">📦 品項明細</div>
-    <div class="items-hdr" style="grid-template-columns:80px 90px 1fr 50px 90px 80px 80px 50px 28px">
+    <div class="items-hdr" style="grid-template-columns:75px 85px 2fr 45px 85px 75px 75px 45px 28px">
       <span>類型</span><span>品項</span><span>規格/備註</span><span>數量</span><span>序號</span><span>成本</span><span>售價</span><span>發票</span><span></span>
     </div>
     <div id="items-container"></div>
@@ -637,7 +637,7 @@ function addItemRow(it={}){
   const container=document.getElementById('items-container');
   const div=document.createElement('div');
   div.className='item-row';
-  div.style.gridTemplateColumns='80px 90px 1fr 50px 90px 80px 80px 50px 28px';
+  div.style.gridTemplateColumns='75px 85px 2fr 45px 85px 75px 75px 45px 28px';
   const curType=it.type||'device';
   const isDevice=curType==='device';
   const typeOpts=Object.keys(TYPE_LABELS_G).map(k=>
@@ -713,10 +713,26 @@ function saveOrder(){
 
   const items=[];
   document.querySelectorAll('#items-container .item-row').forEach(row=>{
-    const inputs=row.querySelectorAll('input');
-    const name=inputs[0].value.trim();
-    if(!name)return;
-    items.push({name,sn:inputs[1].value.trim(),warranty:parseInt(inputs[2].value)||12,cost:parseFloat(inputs[3].value)||0,price:parseFloat(inputs[4].value)||0,invoice:inputs[5].checked,qty:1});
+    const typeSel=row.querySelector('.type-sel');
+    const subSel=row.querySelector('.sub-sel');
+    const specEl=row.querySelector('input[type="text"]:not(.sn-field)');
+    const snEl=row.querySelector('.sn-field');
+    const qtyEl=row.querySelector('.qty-field');
+    const numInputs=row.querySelectorAll('input[type="number"]:not(.qty-field)');
+    const invoiceEl=row.querySelector('input[type="checkbox"]');
+    const type=typeSel?.value||'device';
+    const subtype=subSel?.value||'';
+    const spec=specEl?.value.trim()||'';
+    if(!subtype)return;
+    const name=subtype+(spec?' '+spec:'');
+    const qty=parseFloat(qtyEl?.value)||1;
+    items.push({
+      name, type, subtype, spec, qty,
+      sn: type==='device'?(snEl?.value.trim()||''):'',
+      cost: parseFloat(numInputs[0]?.value)||0,
+      price: parseFloat(numInputs[1]?.value)||0,
+      invoice: invoiceEl?.checked||false
+    });
   });
   if(items.length===0){alert('請至少填寫一個品項');return;}
 
