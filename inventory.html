@@ -305,7 +305,7 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
       <div class="fg"><label class="fl">出貨日期 *</label><input class="fi" type="date" id="o-date"></div>
       <div class="fg">
         <label class="fl">客戶名稱 *</label>
-        <select class="fi" id="o-cust" onchange="fillCustInfo(this.value)">
+        <select class="fi" id="o-cust" onchange="onCustChange(this.value)">
           <option value="">-- 選擇客戶 --</option>
         </select>
       </div>
@@ -318,7 +318,7 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
 
     <!-- 品項 -->
     <div style="margin:16px 0 8px;font-size:13px;font-weight:700;color:#1e293b">📦 品項明細</div>
-    <div class="items-hdr" style="grid-template-columns:75px 85px 2fr 45px 85px 75px 75px 45px 28px">
+    <div class="items-hdr" style="grid-template-columns:70px 80px 3fr 45px 80px 75px 75px 45px 28px">
       <span>類型</span><span>品項</span><span>規格/備註</span><span>數量</span><span>序號</span><span>成本</span><span>售價</span><span>發票</span><span></span>
     </div>
     <div id="items-container"></div>
@@ -608,6 +608,11 @@ function openOrderModal(id=null){
     if(o&&o.custId===c.id)opt.selected=true;
     sel.appendChild(opt);
   });
+  // 新增客戶選項
+  const addOpt=document.createElement('option');
+  addOpt.value='__new__';addOpt.textContent='＋ 新增客戶...';
+  addOpt.style.color='#2563eb';addOpt.style.fontWeight='700';
+  sel.appendChild(addOpt);
   if(o){
     document.getElementById('o-contact').value=o.contact||'';
     document.getElementById('o-phone').value=o.phone||'';
@@ -637,7 +642,7 @@ function addItemRow(it={}){
   const container=document.getElementById('items-container');
   const div=document.createElement('div');
   div.className='item-row';
-  div.style.gridTemplateColumns='75px 85px 2fr 45px 85px 75px 75px 45px 28px';
+  div.style.gridTemplateColumns='70px 80px 3fr 45px 80px 75px 75px 45px 28px';
   const curType=it.type||'device';
   const isDevice=curType==='device';
   const typeOpts=Object.keys(TYPE_LABELS_G).map(k=>
@@ -696,6 +701,32 @@ function calcTotal(){
   document.getElementById('o-total-tax').textContent=fmt(tax);
   document.getElementById('o-total-profit').textContent=fmt(profit);
   document.getElementById('o-total-profit').style.color=profit>=0?'var(--gain)':'var(--loss)';
+}
+
+function onCustChange(val){
+  if(val==='__new__'){
+    const name=prompt('請輸入新客戶名稱：');
+    if(!name||!name.trim()){
+      document.getElementById('o-cust').value='';
+      return;
+    }
+    // 建立新客戶
+    const newCust={id:uid(),name:name.trim(),contact:'',phone:'',email:'',addr:'',note:''};
+    db.customers.push(newCust);
+    save();
+    // 重新建立選單並選中新客戶
+    const sel=document.getElementById('o-cust');
+    const opt=document.createElement('option');
+    opt.value=newCust.id;opt.textContent=newCust.name;opt.selected=true;
+    // 插入在「＋ 新增客戶」前
+    const addOpt=sel.querySelector('option[value="__new__"]');
+    sel.insertBefore(opt,addOpt);
+    sel.value=newCust.id;
+    fillCustInfo(newCust.id);
+    toast('✅ 已新增客戶：'+newCust.name);
+    return;
+  }
+  fillCustInfo(val);
 }
 
 function fillCustInfo(custId){
