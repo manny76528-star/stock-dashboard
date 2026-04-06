@@ -304,7 +304,7 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
     <div class="sec">
       <div class="sec-body">
         <table class="tbl">
-          <thead><tr><th>類型</th><th>子類別</th><th>商品名稱</th><th>規格</th><th>成本</th><th>售價</th><th>操作</th></tr></thead>
+          <thead><tr><th>類型</th><th>子類別</th><th>商品名稱</th><th>規格</th><th>成本</th><th>操作</th></tr></thead>
           <tbody id="product-body"></tbody>
         </table>
         <div id="product-empty" class="empty" style="display:none"><div class="empty-icon">📦</div>尚無商品，請先建檔</div>
@@ -332,10 +332,7 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
     </div>
     <div class="fg"><label class="fl">商品名稱 *</label><input class="fi" type="text" id="p-name" placeholder="例：LS2208、DS2208"></div>
     <div class="fg"><label class="fl">規格說明</label><input class="fi" type="text" id="p-spec" placeholder="例：USB介面、黑色"></div>
-    <div class="fr">
-      <div class="fg"><label class="fl">成本</label><input class="fi" type="number" id="p-cost" placeholder="0"></div>
-      <div class="fg"><label class="fl">售價</label><input class="fi" type="number" id="p-price" placeholder="0"></div>
-    </div>
+    <div class="fg"><label class="fl">成本</label><input class="fi" type="number" id="p-cost" placeholder="0"></div>
     <div class="fbr">
       <button class="btn btn-secondary" onclick="closeModal('product-modal')">取消</button>
       <button class="btn btn-primary" onclick="saveProduct()">儲存</button>
@@ -769,7 +766,7 @@ function onProdPick(sel,row){
   const numInputs=row.querySelectorAll('input[type="number"]:not(.qty-field)');
   if(specEl)specEl.value=p.spec||'';
   if(numInputs[0])numInputs[0].value=p.cost||'';
-  if(numInputs[1])numInputs[1].value=p.price||'';
+  // 售價由用戶自行填入（每個客戶終端價不同）
   calcTotal();
 }
 
@@ -1081,7 +1078,6 @@ function openProductModal(id=null){
   document.getElementById('p-name').value=p?.name||'';
   document.getElementById('p-spec').value=p?.spec||'';
   document.getElementById('p-cost').value=p?.cost||'';
-  document.getElementById('p-price').value=p?.price||'';
   document.getElementById('product-modal').classList.add('open');
 }
 
@@ -1094,8 +1090,7 @@ function saveProduct(){
     sub:document.getElementById('p-sub').value,
     name,
     spec:document.getElementById('p-spec').value.trim(),
-    cost:parseFloat(document.getElementById('p-cost').value)||0,
-    price:parseFloat(document.getElementById('p-price').value)||0
+    cost:parseFloat(document.getElementById('p-cost').value)||0
   };
   if(editProductId){
     const idx=db.products.findIndex(x=>x.id===editProductId);
@@ -1131,7 +1126,6 @@ function renderProducts(){
     <td><b>${p.name}</b></td>
     <td class="muted">${p.spec||'—'}</td>
     <td class="mono">$${p.cost.toLocaleString()}</td>
-    <td class="mono">$${p.price.toLocaleString()}</td>
     <td style="display:flex;gap:4px">
       <button class="btn btn-secondary" style="padding:4px 10px;font-size:11px" onclick="openProductModal('${p.id}')">編輯</button>
       <button class="btn btn-danger" style="padding:4px 10px;font-size:11px" onclick="delProduct('${p.id}')">刪</button>
