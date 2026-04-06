@@ -131,6 +131,26 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
 </head>
 <body>
 
+<!-- ═══ 登入畫面 ═══ -->
+<div id="login-screen" style="position:fixed;inset:0;background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 100%);z-index:99999;display:flex;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:20px;padding:40px 36px;width:320px;box-shadow:0 20px 60px rgba(0,0,0,.4);text-align:center">
+    <div style="font-size:36px;margin-bottom:12px">🗂️</div>
+    <div style="font-size:20px;font-weight:800;color:#1e293b;margin-bottom:4px">進銷存系統</div>
+    <div style="font-size:12px;color:#94a3b8;margin-bottom:28px">請輸入密碼以繼續</div>
+    <input id="pw-input" type="password" placeholder="輸入密碼"
+      style="width:100%;box-sizing:border-box;padding:12px 16px;border:2px solid #e2e8f0;border-radius:10px;font-size:16px;outline:none;text-align:center;letter-spacing:4px;margin-bottom:12px"
+      onkeydown="if(event.key==='Enter')checkPw()">
+    <button onclick="checkPw()"
+      style="width:100%;padding:12px;background:#1e3a5f;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer"
+      onmouseover="this.style.background='#2563eb'" onmouseout="this.style.background='#1e3a5f'">
+      進入
+    </button>
+    <div id="pw-err" style="color:#ef4444;font-size:12px;margin-top:10px;display:none">密碼錯誤，請再試一次</div>
+  </div>
+</div>
+
+<div id="main-content" style="display:none">
+
 <!-- Header -->
 <div class="hdr">
   <div class="hdr-left">
@@ -138,9 +158,11 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
     <span class="hdr-title">進銷存系統</span>
   </div>
   <div class="hdr-actions">
+      <button onclick="manualLogout()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.8);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Noto Sans TC',sans-serif" onmouseover="this.style.background='rgba(255,255,255,.2)'" onmouseout="this.style.background='rgba(255,255,255,.1)'">🔒 登出</button>
     <button class="hdr-btn primary" onclick="openOrderModal()">＋ 新增訂單</button>
     <button class="hdr-btn" onclick="exportData()">備份</button>
     <button class="hdr-btn" onclick="importData()">還原</button>
+    <button onclick="manualLogout()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.8);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Noto Sans TC',sans-serif" onmouseover="this.style.background='rgba(255,255,255,.2)'" onmouseout="this.style.background='rgba(255,255,255,.1)'">🔒 登出</button>
     <a href="index.html" class="hdr-back">← 主目錄</a>
   </div>
 </div>
@@ -821,6 +843,108 @@ function doImport(input){
 // ── Init ──
 load();renderOverview();
 document.querySelectorAll('.mo').forEach(el=>el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open');}));
+</script>
+</div><!-- /main-content -->
+
+<script>
+(function(){
+  const PW='113067';
+  const KEY='inv_auth_v1';
+  const TS_KEY='inv_auth_ts';
+  const TIMEOUT=3*60*1000;
+  const ls=document.getElementById('login-screen');
+  const mc=document.getElementById('main-content');
+  const inp=document.getElementById('pw-input');
+
+  function show(){ls.style.display='none';mc.style.display='block';resetTimer();}
+  function showLogin(){
+    ls.style.display='flex';mc.style.display='none';
+    localStorage.removeItem(KEY);localStorage.removeItem(TS_KEY);
+    setTimeout(()=>inp&&inp.focus(),100);
+  }
+
+  let timer=null;
+  function resetTimer(){
+    localStorage.setItem(TS_KEY,Date.now().toString());
+    clearTimeout(timer);
+    timer=setTimeout(()=>{alert('閒置超過3分鐘，已自動登出');showLogin();},TIMEOUT);
+  }
+  ['click','keydown','touchstart','scroll'].forEach(ev=>{
+    document.addEventListener(ev,()=>{if(localStorage.getItem(KEY)==='1')resetTimer();},{passive:true});
+  });
+
+  const isAuth=localStorage.getItem(KEY)==='1';
+  const elapsed=Date.now()-parseInt(localStorage.getItem(TS_KEY)||'0');
+  if(isAuth&&elapsed<TIMEOUT){show();}else{showLogin();}
+
+  window.checkPw=function(){
+    const val=inp.value.trim();
+    if(val===PW){
+      localStorage.setItem(KEY,'1');
+      document.getElementById('pw-err').style.display='none';
+      show();
+    } else {
+      inp.value='';
+      document.getElementById('pw-err').style.display='block';
+      inp.style.borderColor='#ef4444';
+      setTimeout(()=>{inp.style.borderColor='#e2e8f0';},1500);
+    }
+  };
+
+  window.manualLogout=function(){
+    if(confirm('確定要登出嗎？'))showLogin();
+  };
+})();
+</script>
+</div><!-- /main-content -->
+
+<script>
+(function(){
+  const PW='113067';
+  const KEY='inv_auth_v1';
+  const TS_KEY='inv_auth_ts';
+  const TIMEOUT=3*60*1000;
+  const ls=document.getElementById('login-screen');
+  const mc=document.getElementById('main-content');
+  const inp=document.getElementById('pw-input');
+
+  function show(){ls.style.display='none';mc.style.display='block';resetTimer();}
+  function showLogin(){
+    ls.style.display='flex';mc.style.display='none';
+    localStorage.removeItem(KEY);localStorage.removeItem(TS_KEY);
+    setTimeout(()=>inp&&inp.focus(),100);
+  }
+
+  let timer=null;
+  function resetTimer(){
+    localStorage.setItem(TS_KEY,Date.now().toString());
+    clearTimeout(timer);
+    timer=setTimeout(()=>{alert('閒置超過3分鐘，已自動登出');showLogin();},TIMEOUT);
+  }
+  ['click','keydown','touchstart','scroll'].forEach(ev=>{
+    document.addEventListener(ev,()=>{if(localStorage.getItem(KEY)==='1')resetTimer();},{passive:true});
+  });
+
+  const isAuth=localStorage.getItem(KEY)==='1';
+  const lastTs=parseInt(localStorage.getItem(TS_KEY)||'0');
+  if(isAuth&&(Date.now()-lastTs)<TIMEOUT){show();}else{showLogin();}
+
+  window.checkPw=function(){
+    const val=inp.value.trim();
+    if(val===PW){
+      localStorage.setItem(KEY,'1');
+      document.getElementById('pw-err').style.display='none';
+      show();
+    } else {
+      inp.value='';
+      document.getElementById('pw-err').style.display='block';
+      inp.style.borderColor='#ef4444';
+      setTimeout(()=>{inp.style.borderColor='#e2e8f0';},1500);
+    }
+  };
+
+  window.manualLogout=function(){if(confirm('確定要登出嗎？'))showLogin();};
+})();
 </script>
 </body>
 </html>
