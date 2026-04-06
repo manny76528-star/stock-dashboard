@@ -704,7 +704,7 @@ function addItemRow(it={}){
   ).join('');
   div.innerHTML=
     '<select class="fi-sm type-sel" onchange="onTypeChange(this)">'+typeOpts+'</select>'
-    +'<select class="fi-sm sub-sel">'+subOpts+'</select>'
+    +'<select class="fi-sm sub-sel" onchange="onSubChange(this)">'+subOpts+'</select>'
     +'<div style="display:flex;flex-direction:column;gap:3px">'
     +'<select class="fi-sm prod-picker" onchange="onProdPick(this)" style="display:none"><option value="">-- 選商品 --</option></select>'
     +'<input class="fi-sm spec-field" type="text" placeholder="規格/備註" value="'+(it.spec||'')+'">'
@@ -758,7 +758,7 @@ function updateProdPicker(row,prods){
   if(picker){
     picker.innerHTML='<option value="">-- 選商品 --</option>'
       +prods.map(p=>'<option value="'+p.id+'">'+(p.name+(p.spec?' ('+p.spec+')':''))+'</option>').join('');
-    picker.style.display=prods.length>0?'':'none';
+    picker.style.display=prods.length>0?'block':'none';
   }
 }
 
@@ -1109,8 +1109,13 @@ function delProduct(id){
   const p=db.products.find(x=>x.id===id);
   if(!confirm('確定刪除商品「'+(p?.name||'')+'」？'))return;
   if(!confirm('再次確認刪除，無法復原？'))return;
+  _history.push(JSON.stringify(db)); // 刪除前先記錄
+  if(_history.length>_MAX_HIST)_history.shift();
+  _future=[];
   db.products=db.products.filter(x=>x.id!==id);
-  save();renderProducts();
+  localStorage.setItem(STORE,JSON.stringify(db));
+  updateUndoRedo();
+  renderProducts();
   toast('🗑 已刪除：'+(p?.name||''));
 }
 
