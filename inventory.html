@@ -321,7 +321,7 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
   <div class="modal">
     <div class="modal-title" id="order-modal-title">📋 新增訂單</div>
     <div class="fr">
-      <div class="fg"><label class="fl">出貨日期 *</label><input class="fi" type="date" id="o-date"></div>
+      <div class="fg"><label class="fl">出貨日期 *</label><input class="fi" type="date" id="o-date" onchange="document.getElementById('o-paid-date').value=this.value"></div>
       <div class="fg">
         <label class="fl">客戶名稱 *</label>
         <select class="fi" id="o-cust" onchange="onCustChange(this.value)">
@@ -367,8 +367,8 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
       <div class="fg">
         <label class="fl">收款狀態</label>
         <select class="fi" id="o-paid">
-          <option value="0">未收款</option>
           <option value="1">已收款</option>
+          <option value="0">未收款</option>
         </select>
       </div>
       <div class="fg"><label class="fl">收款日期</label><input class="fi" type="date" id="o-paid-date"></div>
@@ -658,7 +658,7 @@ function renderOrders(){
     return`<tr style="cursor:pointer" onclick="showOrderDetail('${o.id}')">
       <td>${fmtDate(o.date)}</td>
       <td><b>${o.custName||'—'}</b></td>
-      <td class="muted">${itemNames||'—'}</td>
+      <td><div class="muted">${itemNames||'—'}</div>${o.note?'<div style="font-size:11px;color:#94a3b8;margin-top:2px">📝 '+o.note+'</div>':''}</td>
       <td class="mono">${fmt(c.revenue+c.tax)}</td>
       <td class="mono gain">${fmt(c.profit)}</td>
       <td>${hasInv?'<span class="badge badge-blue">是</span>':'<span class="badge badge-gray">否</span>'}</td>
@@ -673,10 +673,12 @@ function openOrderModal(id=null){
   editOrderId=id;
   const o=id?db.orders.find(x=>x.id===id):null;
   document.getElementById('order-modal-title').textContent=id?'✏️ 編輯訂單':'📋 新增訂單';
-  document.getElementById('o-date').value=o?.date||today();
+  const initDate=o?.date||today();
+  document.getElementById('o-date').value=initDate;
   document.getElementById('o-note').value=o?.note||'';
-  document.getElementById('o-paid').value=o?.paid?'1':'0';
-  document.getElementById('o-paid-date').value=o?.paidDate||'';
+  document.getElementById('o-paid').value=o?(o.paid?'1':'0'):'1'; // 新訂單預設已收款
+  // 新訂單：收款日預設同出貨日；編輯訂單：保留原收款日
+  document.getElementById('o-paid-date').value=o?.paidDate||initDate;
 
   // Populate customer dropdown
   const sel=document.getElementById('o-cust');
@@ -821,7 +823,7 @@ function onProdPick(sel,row){
 
     for(const order of custOrders){
       const matchItem=(order.items||[]).find(it=>
-        it.type===p.type && it.subtype===p.sub
+        (it.subtype===p.sub)||(it.name&&it.name.startsWith(p.sub))
       );
       if(matchItem&&matchItem.price){
         lastPrice=matchItem.price;
