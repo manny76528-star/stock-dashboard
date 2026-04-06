@@ -593,10 +593,20 @@ function addItemRow(it={name:'',sn:'',cost:'',price:'',invoice:false,qty:1}){
   container.appendChild(div);
 }
 
-function toggleSN(sel){
+const PROD_MAP_G={
+  device:['掃描器','條碼機'],
+  paper:['銅版紙','珠光紙'],
+  ribbon:['一般碳帶','抗刮碳帶']
+};
+function onTypeChange(sel){
   const row=sel.closest('.item-row');
+  const subSel=row.querySelector('.sub-sel');
   const snEl=row.querySelector('.sn-field');
-  const isDevice=sel.value==='device';
+  const type=sel.value;
+  const isDevice=type==='device';
+  // 更新子品項選單
+  subSel.innerHTML=(PROD_MAP_G[type]||[]).map(s=>`<option>${s}</option>`).join('');
+  // SN 欄位
   snEl.disabled=!isDevice;
   snEl.placeholder=isDevice?'填序號':'—';
   snEl.style.background=isDevice?'':'#f8fafc';
