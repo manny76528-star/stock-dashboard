@@ -740,8 +740,9 @@ function addItemRow(it={}){
     +'<input class="fi-sm spec-field" type="text" placeholder="規格/備註" value="'+(it.spec||'')+'">'
     +'</div>'
     +'<input class="fi-sm qty-field" type="number" placeholder="1" min="1" value="'+(it.qty||1)+'" oninput="calcTotal()" style="text-align:center">'
-    +'<input class="fi-sm sn-field" type="text" placeholder="'+(isDevice?'填序號':'—')+'" value="'+(it.sn||'')+'"'
-      +(!isDevice?' disabled style="background:#f8fafc;color:#94a3b8"':'')+' >'
+    +'<textarea class="fi-sm sn-field" rows="1" placeholder="'+(isDevice?'換行或空格分隔':'—')+'" style="resize:vertical;min-height:30px;font-family:var(--mono);font-size:12px"'
+      +(!isDevice?' disabled style="background:#f8fafc;color:#94a3b8;resize:none"':'')
+      +' oninput="syncSnQty(this)">'+(isDevice?(it.sns?it.sns.join('\n'):(it.sn||'')):'')+'</textarea>'
     +'<input class="fi-sm" type="number" placeholder="成本" value="'+(it.cost||'')+'" oninput="calcTotal()">'
     +'<input class="fi-sm" type="number" placeholder="售價" value="'+(it.price||'')+'" oninput="calcTotal()">'
     +'<label style="display:flex;align-items:center;gap:3px;font-size:11px;cursor:pointer">'
@@ -756,6 +757,17 @@ function addItemRow(it={}){
   calcTotal();
 }
 
+function syncSnQty(textarea){
+  const row=textarea.closest('.item-row');
+  const qtyEl=row.querySelector('.qty-field');
+  if(!qtyEl)return;
+  const lines=textarea.value.split(/[\n\s,]+/).map(s=>s.trim()).filter(Boolean);
+  if(lines.length>1){
+    qtyEl.value=lines.length;
+    calcTotal();
+  }
+}
+
 function onTypeChange(sel){
   const row=sel.closest('.item-row');
   const subSel=row.querySelector('.sub-sel');
@@ -764,9 +776,10 @@ function onTypeChange(sel){
   const isDevice=type==='device';
   subSel.innerHTML=(PROD_MAP_G[type]||[]).map(s=>'<option>'+s+'</option>').join('');
   snEl.disabled=!isDevice;
-  snEl.placeholder=isDevice?'填序號':'—';
+  snEl.placeholder=isDevice?'一行一個序號':'—';
   snEl.style.background=isDevice?'':'#f8fafc';
   snEl.style.color=isDevice?'':'#94a3b8';
+  snEl.style.resize=isDevice?'vertical':'none';
   if(!isDevice)snEl.value='';
   onSubChange(subSel,row);
 }
@@ -929,7 +942,8 @@ function saveOrder(){
     const qty=parseFloat(qtyEl?.value)||1;
     items.push({
       name, type, subtype, spec, qty,
-      sn: type==='device'?(snEl?.value.trim()||''):'',
+      sn: type==='device'?(snEl?.value.split(/[\n\s,]+/).map(s=>s.trim()).filter(Boolean)[0]||''):'',
+      sns: type==='device'?snEl?.value.split(/[\n\s,]+/).map(s=>s.trim()).filter(Boolean):[],
       cost: parseFloat(numInputs[0]?.value)||0,
       price: parseFloat(numInputs[1]?.value)||0,
       invoice: invoiceEl?.checked||false
