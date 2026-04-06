@@ -399,7 +399,19 @@ const STORE='inv_db_v1';
 let db={orders:[],customers:[]};
 let editOrderId=null,editCustId=null,overviewPeriod='year',orderFilter='all';
 
-function load(){try{const d=localStorage.getItem(STORE);if(d)db=JSON.parse(d);}catch(e){}}
+function load(){
+  try{const d=localStorage.getItem(STORE);if(d)db=JSON.parse(d);}catch(e){}
+  // 若客戶清單是空的，自動載入預設客戶
+  const defaultCusts=[
+    '福寶水產','興業','泰茂陳明彥','河川企業社','基福',
+    '王強','訊控','衣藝','騰亦資訊','聿展',
+    '汽車保養廠','宜茂陳靜宜','御富'
+  ];
+  if(!db.customers||db.customers.length===0){
+    db.customers=defaultCusts.map(name=>({id:uid(),name,contact:'',phone:'',email:'',addr:'',note:''}));
+    save();
+  }
+}
 function save(){localStorage.setItem(STORE,JSON.stringify(db));}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
 function fmt(n){return'$'+(Math.round(n)||0).toLocaleString();}
