@@ -193,8 +193,8 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
       <div class="sec-hdr">
         <span class="sec-title">📅 月度業績</span>
         <div class="filter-bar">
-          <button class="filter-btn active" onclick="setPeriod('year',this)">近一年</button>
-          <button class="filter-btn" onclick="setPeriod('all',this)">全部</button>
+          <button class="filter-btn" onclick="setPeriod('year',this)">近一年</button>
+          <button class="filter-btn active" onclick="setPeriod('all',this)">全部</button>
         </div>
       </div>
       <div class="sec-body">
@@ -399,7 +399,7 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
 <script>
 const STORE='inv_db_v1';
 let db={orders:[],customers:[]};
-let editOrderId=null,editCustId=null,overviewPeriod='year',orderFilter='all';
+let editOrderId=null,editCustId=null,overviewPeriod='all',orderFilter='all';
 
 function load(){
   try{const d=localStorage.getItem(STORE);if(d)db=JSON.parse(d);}catch(e){}
@@ -575,7 +575,7 @@ function renderOrders(){
   body.innerHTML=orders.map(o=>{
     const c=calcOrder(o);
     const hasInv=(o.items||[]).some(it=>it.invoice);
-    const itemNames=(o.items||[]).map(it=>it.name).filter(Boolean).join('、');
+    const itemNames=(o.items||[]).map(it=>(it.name||'')+(it.qty&&it.qty>1?' ×'+it.qty:'')).filter(Boolean).join('、');
     return`<tr style="cursor:pointer" onclick="showOrderDetail('${o.id}')">
       <td>${fmtDate(o.date)}</td>
       <td><b>${o.custName||'—'}</b></td>
