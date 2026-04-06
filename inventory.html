@@ -1375,7 +1375,10 @@ document.querySelectorAll('.mo').forEach(el=>el.addEventListener('click',e=>{if(
   function resetTimer(){
     localStorage.setItem(TS_KEY,Date.now().toString());
     clearTimeout(timer);
-    timer=setTimeout(()=>{alert('閒置超過3分鐘，已自動登出');showLogin();},TIMEOUT);
+    timer=setTimeout(()=>{
+      localStorage.removeItem(KEY);localStorage.removeItem(TS_KEY);
+      window.location.href='index.html';
+    },TIMEOUT);
   }
   ['click','keydown','touchstart','scroll'].forEach(ev=>{
     document.addEventListener(ev,()=>{if(localStorage.getItem(KEY)==='1')resetTimer();},{passive:true});
@@ -1451,7 +1454,12 @@ document.querySelectorAll('.mo').forEach(el=>el.addEventListener('click',e=>{if(
     }
   };
 
-  window.manualLogout=function(){if(confirm('確定要登出嗎？'))showLogin();};
+  window.manualLogout=function(){
+    if(confirm('確定要登出嗎？')){
+      localStorage.removeItem(KEY);localStorage.removeItem(TS_KEY);
+      window.location.href='index.html';
+    }
+  };
 })();
 </script>
 </body>

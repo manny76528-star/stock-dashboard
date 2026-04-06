@@ -2148,7 +2148,7 @@ function checkBkWarn(){
 function exportData(){
   const now=new Date();
   const ts=[now.getFullYear(),String(now.getMonth()+1).padStart(2,'0'),String(now.getDate()).padStart(2,'0'),
-    String(now.getHours()).padStart(2,'0'),String(now.getMinutes()).padStart(2,'0'),String(now.getSeconds()).padStart(2,'0')].join('');
+    String(now.getHours()).padStart(2,'0'),String(now.getMinutes()).padStart(2,'0')].join('_');
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([JSON.stringify(db,null,2)],{type:'application/json'}));
   a.download=`資產備份_${ts}.json`;a.click();
