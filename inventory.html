@@ -796,12 +796,58 @@ function onProdPick(sel,row){
   if(!pid)return;
   const p=db.products.find(x=>x.id===pid);
   if(!p)return;
-  // 帶入規格、成本、售價
+
   const specEl=row.querySelector('.spec-field');
   const numInputs=row.querySelectorAll('input[type="number"]:not(.qty-field)');
+  const priceEl=numInputs[1];
+
+  // 帶入規格和成本
   if(specEl)specEl.value=p.spec||'';
   if(numInputs[0])numInputs[0].value=p.cost||'';
-  // 售價由用戶自行填入（每個客戶終端價不同）
+
+  // 查詢這個客戶對這個商品的最後一次售價
+  const custId=document.getElementById('o-cust').value;
+  const custName=custId
+    ?db.customers.find(c=>c.id===custId)?.name
+    :null;
+
+  let lastPrice=null;
+  let lastDate='';
+  if(custId||custName){
+    // 找這個客戶所有訂單，取最新的含此商品的那筆
+    const custOrders=db.orders
+      .filter(o=>(o.custId===custId)||(o.custName===custName))
+      .sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+
+    for(const order of custOrders){
+      const matchItem=(order.items||[]).find(it=>
+        it.type===p.type && it.subtype===p.sub
+      );
+      if(matchItem&&matchItem.price){
+        lastPrice=matchItem.price;
+        lastDate=order.date;
+        break;
+      }
+    }
+  }
+
+  if(lastPrice&&priceEl){
+    priceEl.value=lastPrice;
+    // 顯示提示
+    let hint=row.querySelector('.price-hint');
+    if(!hint){
+      hint=document.createElement('div');
+      hint.className='price-hint';
+      hint.style.cssText='font-size:10px;color:#2563eb;margin-top:2px';
+      priceEl.parentNode.style.position='relative';
+      priceEl.after(hint);
+    }
+    hint.textContent='↑ 上次 '+fmtDate(lastDate)+' $'+lastPrice.toLocaleString();
+  } else if(priceEl){
+    const hint=row.querySelector('.price-hint');
+    if(hint)hint.textContent='';
+  }
+
   calcTotal();
 }
 
