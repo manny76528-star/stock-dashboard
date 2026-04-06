@@ -318,8 +318,8 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
 
     <!-- 品項 -->
     <div style="margin:16px 0 8px;font-size:13px;font-weight:700;color:#1e293b">📦 品項明細</div>
-    <div class="items-hdr" style="grid-template-columns:80px 90px 1fr 90px 80px 80px 50px 28px">
-      <span>類型</span><span>品項</span><span>規格/備註</span><span>序號</span><span>成本</span><span>售價</span><span>發票</span><span></span>
+    <div class="items-hdr" style="grid-template-columns:80px 90px 1fr 50px 90px 80px 80px 50px 28px">
+      <span>類型</span><span>品項</span><span>規格/備註</span><span>數量</span><span>序號</span><span>成本</span><span>售價</span><span>發票</span><span></span>
     </div>
     <div id="items-container"></div>
     <button class="btn btn-secondary" onclick="addItemRow()" style="font-size:12px;padding:6px 14px;margin-bottom:12px">＋ 新增品項</button>
@@ -637,7 +637,7 @@ function addItemRow(it={}){
   const container=document.getElementById('items-container');
   const div=document.createElement('div');
   div.className='item-row';
-  div.style.gridTemplateColumns='80px 90px 1fr 90px 80px 80px 50px 28px';
+  div.style.gridTemplateColumns='80px 90px 1fr 50px 90px 80px 80px 50px 28px';
   const curType=it.type||'device';
   const isDevice=curType==='device';
   const typeOpts=Object.keys(TYPE_LABELS_G).map(k=>
@@ -650,6 +650,7 @@ function addItemRow(it={}){
     '<select class="fi-sm type-sel" onchange="onTypeChange(this)">'+typeOpts+'</select>'
     +'<select class="fi-sm sub-sel">'+subOpts+'</select>'
     +'<input class="fi-sm" type="text" placeholder="規格/備註" value="'+(it.spec||'')+'">'
+    +'<input class="fi-sm qty-field" type="number" placeholder="1" min="1" value="'+(it.qty||1)+'" oninput="calcTotal()" style="text-align:center">'
     +'<input class="fi-sm sn-field" type="text" placeholder="'+(isDevice?'填序號':'—')+'" value="'+(it.sn||'')+'"'
       +(!isDevice?' disabled style="background:#f8fafc;color:#94a3b8"':'')+' >'
     +'<input class="fi-sm" type="number" placeholder="成本" value="'+(it.cost||'')+'" oninput="calcTotal()">'
@@ -680,9 +681,11 @@ function onTypeChange(sel){
 function calcTotal(){
   let rev=0,cost=0,tax=0;
   document.querySelectorAll('#items-container .item-row').forEach(row=>{
-    const numInputs=row.querySelectorAll('input[type="number"]');
-    const c=parseFloat(numInputs[0]?.value)||0;
-    const sp=parseFloat(numInputs[1]?.value)||0;
+    const qtyEl=row.querySelector('.qty-field');
+    const numInputs=row.querySelectorAll('input[type="number"]:not(.qty-field)');
+    const qty=parseFloat(qtyEl?.value)||1;
+    const c=(parseFloat(numInputs[0]?.value)||0)*qty;
+    const sp=(parseFloat(numInputs[1]?.value)||0)*qty;
     const hasInv=row.querySelector('input[type="checkbox"]')?.checked||false;
     const t=hasInv?sp*0.05:0;
     rev+=sp;cost+=c;tax+=t;
@@ -748,10 +751,11 @@ function showOrderDetail(id){
       <div><div class="profit-label">電話</div><div>${o.phone||'—'}</div></div>
     </div>
     <table class="tbl" style="margin-bottom:12px">
-      <thead><tr><th>品項</th><th>序號</th><th>成本</th><th>售價</th><th>發票</th><th>利潤</th></tr></thead>
+      <thead><tr><th>品項</th><th>數量</th><th>序號</th><th>成本</th><th>售價</th><th>發票</th><th>利潤</th></tr></thead>
       <tbody>${(o.items||[]).map(it=>{
-        const t=it.invoice?it.price*0.05:0;
-        const p=it.price-it.cost-t;
+        const qty=it.qty||1;
+        const t=it.invoice?it.price*qty*0.05:0;
+        const p=it.price*qty-it.cost*qty-t;
         const typeBadge=it.type==='consumable'?'<span class="badge badge-gray">🔧耗材</span>':'<span class="badge badge-blue">🖥️設備</span>';
         return`<tr><td>${typeBadge}</td><td>${it.name}</td><td class="mono muted">${it.sn||'—'}</td><td class="mono">${fmt(it.cost)}</td><td class="mono">${fmt(it.price)}</td><td>${it.invoice?'<span class="badge badge-blue">有</span>':'<span class="badge badge-gray">無</span>'}</td><td class="mono gain">${fmt(p)}</td></tr>`;
       }).join('')}</tbody>
