@@ -377,7 +377,7 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
 
     <div class="fbr">
       <button class="btn btn-secondary" onclick="closeModal('order-modal')">取消</button>
-      <button class="btn btn-primary" onclick="saveOrder()">儲存訂單</button>
+      <button class="btn btn-primary" id="save-order-btn" onclick="this.disabled=true;this.textContent='儲存中...';saveOrder()">儲存訂單</button>
     </div>
   </div>
 </div>
@@ -710,6 +710,9 @@ function openOrderModal(id=null){
   items.forEach(it=>addItemRow(it));
 
   document.getElementById('order-modal').classList.add('open');
+  // 重設儲存按鈕
+  const sb=document.getElementById('save-order-btn');
+  if(sb){sb.disabled=false;sb.textContent='儲存訂單';}
   calcTotal();
 }
 
@@ -977,7 +980,16 @@ function saveOrder(){
   } else {
     db.orders.push(order);
   }
-  save();closeModal('order-modal');renderOrders();renderOverview();
+  save();
+  closeModal('order-modal');
+  renderOrders();
+  renderOverview();
+  // 儲存後跳到訂單記錄 tab，讓用戶看到新訂單
+  showTab('orders');
+  toast('✅ 訂單已儲存');
+  // 重設按鈕
+  const sb=document.getElementById('save-order-btn');
+  if(sb){sb.disabled=false;sb.textContent='儲存訂單';}
 }
 
 // ── 訂單詳情 ──
