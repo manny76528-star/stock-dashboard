@@ -1616,7 +1616,6 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
       <a href="index.html" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.8);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Noto Sans TC',sans-serif;text-decoration:none;transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,.2)'" onmouseout="this.style.background='rgba(255,255,255,.1)'">🏠 主目錄</a>
       <button onclick="manualLogout()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.8);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,.2)'" onmouseout="this.style.background='rgba(255,255,255,.1)'">🔒 登出</button>
 
-    <button class="db-btn primary" onclick="refreshPrices()">↻ 更新股價</button>
     <button class="db-btn success" onclick="exportData()">📤 備份</button>
     <label class="db-btn neutral" style="cursor:pointer">📥 還原<input type="file" accept=".json" style="display:none" onchange="importData(event)"></label>
     <button class="db-btn purple" onclick="undoLast()" id="undoBtn" disabled>← 回上一步</button>
@@ -1679,6 +1678,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
         <span style="display:none" id="t-mkt">—</span>
       </div>
       <div class="big5-right">
+        <button class="big5-add-btn" onclick="event.stopPropagation();refreshPrices()" title="更新股價">↻</button>
         <button class="big5-add-btn" onclick="event.stopPropagation();openInvModal()">＋</button>
         <button class="big5-add-btn" onclick="event.stopPropagation();openSearchModal()">🔍</button>
         <button class="big5-toggle-btn" id="tog-inv" onclick="toggleSection('inv-detail')">展開 ▼</button>
