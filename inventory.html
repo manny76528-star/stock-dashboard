@@ -922,9 +922,14 @@ function fillCustInfo(custId){
 
 function saveOrder(){
   const custId=document.getElementById('o-cust').value;
-  const custName=custId?db.customers.find(c=>c.id===custId)?.name:document.getElementById('o-cust').options[document.getElementById('o-cust').selectedIndex]?.text;
+  const custNameRaw=custId
+    ?db.customers.find(c=>c.id===custId)?.name
+    :document.getElementById('o-cust').options[document.getElementById('o-cust').selectedIndex]?.text;
+  // 過濾掉「-- 選擇客戶 --」這種預設選項
+  const custName=(custNameRaw&&!custNameRaw.startsWith('--')&&!custNameRaw.includes('選擇客戶'))?custNameRaw:'';
   const date=document.getElementById('o-date').value;
   if(!date){alert('請填寫出貨日期');return;}
+  if(!custId&&!custName){alert('請選擇客戶');return;}
 
   const items=[];
   document.querySelectorAll('#items-container .item-row').forEach(row=>{
@@ -951,7 +956,10 @@ function saveOrder(){
       invoice: invoiceEl?.checked||false
     });
   });
-  if(items.length===0){alert('請至少填寫一個品項');return;}
+  if(items.length===0){
+    alert('請至少填寫一個品項\n（請確認已選擇品項類型，或在規格欄填入文字）');
+    return;
+  }
 
   const order={
     id:editOrderId||uid(),date,custId,custName,
@@ -1366,7 +1374,7 @@ function doImport(input){
 load();
 // 初始化各頁面
 renderOverview();
-document.querySelectorAll('.mo').forEach(el=>el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open');}));
+// 點 Modal 外面不關閉（避免填寫中意外關閉）
 </script>
 </div><!-- /main-content -->
 

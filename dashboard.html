@@ -3127,7 +3127,7 @@ function renderSum(){
 // ═══════ MODALS ═══════
 function openModal(id){document.getElementById(id).classList.add('open');}
 function closeModal(id){document.getElementById(id).classList.remove('open');editId=null;}
-document.querySelectorAll('.mo').forEach(el=>el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open');}));
+// 點 Modal 外面不關閉（避免填寫中意外關閉）
 
 // INVEST
 function openInvModal(id=null){
