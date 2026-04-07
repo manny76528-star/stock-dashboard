@@ -452,17 +452,34 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
   </div>
 </div>
 
-<input type="file" id="import-file"  accept=".json" style="display:none" onchange="doImport(this)">
+<!-- ══ 出貨單 Modal ══ -->
+<div class="mo" id="invoice-modal">
+  <div class="modal" style="max-width:680px;padding:0">
+    <!-- 工具列 -->
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:#f8fafc;border-bottom:1px solid #e2e8f0">
+      <span style="font-size:13px;font-weight:700;color:#1e293b">📄 客戶出貨單</span>
+      <div style="display:flex;gap:8px">
+        <button onclick="editBankInfo()" style="padding:6px 14px;border:1px solid #e2e8f0;border-radius:7px;background:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:'Noto Sans TC',sans-serif">✏️ 匯款資訊</button>
+        <button onclick="closeModal('invoice-modal')" style="padding:6px 14px;border:1px solid #e2e8f0;border-radius:7px;background:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:'Noto Sans TC',sans-serif">✕ 關閉</button>
+      </div>
+    </div>
+    <!-- 出貨單內容 -->
+    <div id="invoice-content" style="padding:24px;background:#fff"></div>
+  </div>
+</div>
+
+<input type="file" id="import-file"   accept=".json" style="display:none" onchange="doImport(this)">
 
 <script>
 const STORE='inv_db_v1';
-let db={orders:[],customers:[],products:[]};
+let db={orders:[],customers:[],products:[],settings:{bankName:'國泰銀行',bankCode:'013',bankAccount:'061506186489'}};
 let editOrderId=null,editCustId=null,overviewPeriod='all',orderFilter='all';
 
 function load(){
   try{const d=localStorage.getItem(STORE);if(d)db=JSON.parse(d);}catch(e){}
   // 確保新欄位存在（舊資料可能沒有）
   if(!db.products)db.products=[];
+  if(!db.settings)db.settings={bankName:'國泰銀行',bankCode:'013',bankAccount:'061506186489'};
   if(!db.orders)db.orders=[];
   if(!db.customers)db.customers=[];
   // 若客戶清單是空的，自動載入預設客戶
@@ -664,7 +681,10 @@ function renderOrders(){
       <td class="mono gain">${fmt(c.profit)}</td>
       <td>${hasInv?'<span class="badge badge-blue">是</span>':'<span class="badge badge-gray">否</span>'}</td>
       <td>${o.paid?'<span class="badge badge-green">已收款</span>':'<span class="badge badge-red">未收款</span>'}</td>
-      <td><button class="btn btn-secondary" style="padding:4px 10px;font-size:11px" onclick="event.stopPropagation();openOrderModal('${o.id}')">編輯</button></td>
+      <td style="display:flex;gap:4px">
+        <button class="btn btn-secondary" style="padding:4px 10px;font-size:11px" onclick="event.stopPropagation();openOrderModal('${o.id}')">編輯</button>
+        <button class="btn" style="padding:4px 10px;font-size:11px;background:#0f172a;color:#fff;border:none" onclick="event.stopPropagation();showInvoice('${o.id}')">📄</button>
+      </td>
     </tr>`;
   }).join('');
 }
@@ -1333,6 +1353,103 @@ function showCustDetail(custKey){
       </table>
     </div>`;
   document.getElementById('cust-detail-modal').classList.add('open');
+}
+
+function showInvoice(id){
+  const o=db.orders.find(x=>x.id===id);if(!o)return;
+  const cust=db.customers.find(c=>c.id===o.custId)||{};
+  const s=db.settings||{};
+  const items=o.items||[];
+
+  // 建立品項列（最少6行）
+  const ROWS=Math.max(6,items.length+1);
+  let rowsHtml='';
+  for(let i=0;i<ROWS;i++){
+    const it=items[i];
+    if(it){
+      const total=(it.price||0)*(it.qty||1);
+      rowsHtml+=`<tr>
+        <td style="text-align:center">${i+1}</td>
+        <td>${it.subtype||''}</td>
+        <td>${it.spec||it.name||''}</td>
+        <td style="text-align:center">${it.qty||1}</td>
+        <td style="text-align:right">${(it.price||0).toLocaleString()}</td>
+        <td style="text-align:right">${total.toLocaleString()}</td>
+        <td></td>
+      </tr>`;
+    } else {
+      rowsHtml+=`<tr><td style="text-align:center">${i+1}</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>`;
+    }
+  }
+
+  // 合計
+  let grandTotal=0;
+  items.forEach(it=>{grandTotal+=(it.price||0)*(it.qty||1);});
+
+  const css=`
+    <style>
+    .inv-doc{font-family:'Noto Sans TC',sans-serif;color:#1e293b;font-size:13px;line-height:1.6;}
+    .inv-doc h2{text-align:center;font-size:20px;font-weight:900;margin-bottom:16px;letter-spacing:2px;}
+    .inv-doc table{width:100%;border-collapse:collapse;}
+    .inv-doc .info-tbl td{border:1px solid #888;padding:6px 10px;vertical-align:middle;}
+    .inv-doc .info-tbl td:first-child{background:#f1f5f9;font-weight:700;white-space:nowrap;width:80px;}
+    .inv-doc .items-tbl th{border:1px solid #888;padding:7px 10px;background:#1e293b;color:#fff;text-align:center;font-weight:700;}
+    .inv-doc .items-tbl td{border:1px solid #aaa;padding:7px 10px;min-height:28px;}
+    .inv-doc .items-tbl tr:nth-child(even) td{background:#fafafa;}
+    .inv-doc .total-row td{border:1px solid #888;padding:7px 10px;font-weight:700;}
+    .inv-doc .notes{margin-top:16px;font-size:12px;color:#374151;}
+    .inv-doc .notes p{margin-bottom:4px;}
+    .inv-doc .bank{font-weight:900;font-size:15px;margin-top:6px;color:#1e293b;}
+    </style>`;
+
+  document.getElementById('invoice-content').innerHTML=css+`<div class="inv-doc">
+    <h2>客戶出貨單</h2>
+    <table class="info-tbl" style="margin-bottom:12px">
+      <tr>
+        <td>客戶名稱*</td><td style="width:40%">${o.custName||'—'}</td>
+        <td style="background:#f1f5f9;font-weight:700;width:70px">聯絡人*</td><td>${o.contact||cust.contact||'—'}</td>
+      </tr>
+      <tr>
+        <td>聯絡電話*</td><td>${o.phone||cust.phone||'—'}</td>
+        <td style="background:#f1f5f9;font-weight:700">出貨日期*</td><td>${fmtDate(o.date)}</td>
+      </tr>
+      <tr>
+        <td>地址*</td><td colspan="3">${cust.addr||'—'}</td>
+      </tr>
+    </table>
+    <table class="items-tbl" style="margin-bottom:12px">
+      <thead><tr><th style="width:40px">項次</th><th style="width:80px">品名</th><th>規格</th><th style="width:50px">數量</th><th style="width:70px">單價</th><th style="width:70px">總價</th><th style="width:60px">備註</th></tr></thead>
+      <tbody>${rowsHtml}</tbody>
+      <tr class="total-row">
+        <td colspan="4" style="text-align:right;border:1px solid #888">合計</td>
+        <td style="text-align:right;border:1px solid #888">${grandTotal.toLocaleString()}</td>
+        <td style="border:1px solid #888"></td>
+      </tr>
+      <tr><td colspan="7" style="border:1px solid #888;padding:10px"><b>其他備註</b><br>${o.note||''}</td></tr>
+    </table>
+    <div class="notes">
+      <p><b>【備註事項】</b></p>
+      <p>1. 機器保固一年，印字頭保固三個月或20公里(先到者算)，不含線材。</p>
+      <p>2. 以上估價均以30天為有效期限，逾期另估，所估之內容如有所變動另行計價照加。</p>
+      <p>3. 匯款資訊：</p>
+      <p class="bank">${s.bankName||'國泰銀行'}&nbsp;&nbsp;代碼:${s.bankCode||'013'}&nbsp;&nbsp;帳號：&nbsp;&nbsp;${s.bankAccount||'061506186489'}</p>
+    </div>
+  </div>`;
+  document.getElementById('invoice-modal').classList.add('open');
+}
+
+function editBankInfo(){
+  const s=db.settings||{};
+  const bankName=prompt('銀行名稱：',s.bankName||'國泰銀行');
+  if(bankName===null)return;
+  const bankCode=prompt('銀行代碼：',s.bankCode||'013');
+  if(bankCode===null)return;
+  const bankAccount=prompt('帳號：',s.bankAccount||'061506186489');
+  if(bankAccount===null)return;
+  db.settings={...s,bankName,bankCode,bankAccount};
+  save();
+  toast('✅ 匯款資訊已更新');
+  // 重新顯示（找到當前訂單id）
 }
 
 function delProduct(id){
