@@ -706,7 +706,7 @@ function openOrderModal(id=null){
   // Items
   const container=document.getElementById('items-container');
   container.innerHTML='';
-  const items=o?.items||[{name:'',sn:'',cost:'',price:'',invoice:false,qty:1}];
+  const items=o?.items||[{type:'device',subtype:'',spec:'',sn:'',cost:'',price:'',invoice:false,qty:1}];
   items.forEach(it=>addItemRow(it));
 
   document.getElementById('order-modal').classList.add('open');
@@ -938,8 +938,9 @@ function saveOrder(){
     const type=typeSel?.value||'device';
     const subtype=subSel?.value||'';
     const spec=specEl?.value.trim()||'';
-    if(!subtype)return;
-    const name=subtype+(spec?' '+spec:'');
+    // subtype 或 spec 任一有值即可儲存
+    if(!subtype && !spec)return;
+    const name=(subtype+(spec?' '+spec:'')).trim()||'(未命名)';
     const qty=parseFloat(qtyEl?.value)||1;
     items.push({
       name, type, subtype, spec, qty,
