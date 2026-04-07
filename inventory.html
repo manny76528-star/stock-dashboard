@@ -646,7 +646,7 @@ function renderOrders(){
   if(orderFilter==='invoice')orders=orders.filter(o=>(o.items||[]).some(it=>it.invoice));
   if(q)orders=orders.filter(o=>
     (o.custName||'').toLowerCase().includes(q)||
-    (o.items||[]).some(it=>(it.name||'').toLowerCase().includes(q)||(it.sn||'').toLowerCase().includes(q))
+    (o.items||[]).some(it=>(it.name||'').toLowerCase().includes(q)||((it.sns||[it.sn]).filter(Boolean)).some(sn=>(sn||'').toLowerCase().includes(q)))
   );
   const body=document.getElementById('order-body');
   const empty=document.getElementById('order-empty');
@@ -1139,9 +1139,12 @@ function searchSN(){
   const found=[];
   db.orders.forEach(o=>{
     (o.items||[]).forEach(it=>{
-      if(it.sn&&it.sn.toLowerCase().includes(q)&&it.type!=='consumable'){
-        found.push({order:o,item:it});
-      }
+      if(it.type==='consumable')return;
+      const snList=it.sns&&it.sns.length?it.sns:[it.sn].filter(Boolean);
+      snList.forEach(sn=>{
+        if(sn&&sn.toLowerCase().includes(q))
+          found.push({order:o,item:{...it,sn}});
+      });
     });
   });
   if(found.length===0){res.innerHTML='<div class="warranty-result warranty-unknown"><div style="font-weight:700;margin-bottom:8px">🔍 查無結果</div><div style="font-size:13px;color:var(--muted)">找不到序號：'+q+'</div></div>';return;}
@@ -1170,7 +1173,13 @@ function searchSN(){
 function renderWarranty(){
   const body=document.getElementById('sn-list-body');
   const all=[];
-  db.orders.forEach(o=>{(o.items||[]).forEach(it=>{if(it.sn&&it.type!=='consumable')all.push({order:o,item:it});});});
+  db.orders.forEach(o=>{
+    (o.items||[]).forEach(it=>{
+      if(it.type==='consumable')return;
+      const snList=it.sns&&it.sns.length?it.sns:[it.sn].filter(Boolean);
+      snList.forEach(sn=>{if(sn)all.push({order:o,item:{...it,sn}});});
+    });
+  });
   if(all.length===0){body.innerHTML='<tr><td colspan="6" class="empty">尚無序號記錄</td></tr>';return;}
   const now=new Date();
   body.innerHTML=all.map(({order,item})=>{
