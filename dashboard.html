@@ -1215,6 +1215,10 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
   white-space:nowrap;
   flex-shrink:0;
 }
+.irow-l2-price {
+  font-size:13px;font-weight:700;font-family:'JetBrains Mono',monospace;
+  color:#64748b;white-space:nowrap;text-align:right;
+}
 .irow-l2-arrow { font-size:12px;color:#94a3b8;flex-shrink:0; }
 
 /* ═══ LAYER 3: 詳細展開 ═══ */
@@ -1414,7 +1418,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 /* ═══ IROW-L2: 投資標的第二層單行 ═══ */
 .irow-l2 {
   display:grid;
-  grid-template-columns: 75px 95px 1fr 62px 20px 100px;
+  grid-template-columns: 75px 90px 62px 1fr 62px 20px 100px;
   align-items:center;
   gap:0 8px;
   padding:13px 16px;
@@ -2479,6 +2483,7 @@ function renderInv(){
       '<div class="irow-l2" onclick="toggleInvDetail(\''+inv.id+'\')">'
         +codeHtml
         +'<span class="irow-l2-pnl-amt" style="color:'+pnColor+'">'+pnlTxt+'</span>'
+        +'<span class="irow-l2-price" style="color:'+prColor+'">'+priceTxt+'</span>'
         +noteHtml
         +'<span class="irow-l2-pnl-pct" style="color:'+pnColor+'">'+pctTxt+'</span>'
         +'<span class="irow-l2-arrow" id="iarr-'+inv.id+'">'+(isOpen?'▲':'▼')+'</span>'
@@ -4078,12 +4083,18 @@ render();checkBkWarn();refreshPrices();
 // Auto snapshot on 1st of each month
 (function autoSnapshot(){
   const today=new Date();
-  if(today.getDate()!==1)return; // only on 1st
-  const ym=today.toISOString().slice(0,7);
+  const dow=today.getDay();    // 0=日 5=週五
+  const hour=today.getHours();
+  // 週五 15:00 以後才執行
+  if(dow!==5||hour<15)return;
+  const dateKey=today.toISOString().slice(0,10); // YYYY-MM-DD
+  const snapshotKey='snap_done_'+dateKey;
+  // 同一天已執行過就跳過
+  if(localStorage.getItem(snapshotKey))return;
+  localStorage.setItem(snapshotKey,'1');
   if(!db.snapshots)db.snapshots=[];
-  const alreadyDone=db.snapshots.find(s=>s.ym===ym);
-  if(alreadyDone)return; // already recorded this month
-  // Slight delay so db is fully rendered first
+  // 趨勢圖用週 key（YYYY-WXX）
+  const ym=today.toISOString().slice(0,7); // 仍存月份 key 供趨勢圖
   setTimeout(()=>recordSnapshot(false),1500);
 })();
 // Restore custom title
