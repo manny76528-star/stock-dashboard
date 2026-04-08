@@ -1748,7 +1748,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
         <span class="big5-title">現金帳戶</span>
         <div class="big5-meta">
           <span>總餘額 <b id="cash-tot-badge" style="color:#fcd34d">—</b></span>
-          <span>待入帳 <b id="cash-pending-badge" style="color:#93c5fd">—</b></span>
+          <span>待入帳 <b id="cash-pending-badge" style="color:#93c5fd">—</b><span id="cash-next-div" style="font-size:11px;color:#fbbf24;font-weight:600;font-family:'JetBrains Mono',monospace;margin-left:4px"></span></span>
           <div id="cash-acct-summary" style="display:none"></div>
         </div>
         <span style="display:none" id="c-tot">—</span>
@@ -1772,7 +1772,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
         <div class="big5-meta">
           <span>今年 <b id="d-yr-badge" style="color:var(--gain)">—</b></span>
           <span>累積 <b id="d-tot-badge" style="color:var(--gain)">—</b></span>
-          <span>準備入帳 <b id="d-pend-badge" style="color:#93c5fd">—</b></span>
+          <span>準備入帳 <b id="d-pend-badge" style="color:#93c5fd">—</b><span id="div-next-badge" style="font-size:11px;color:#fbbf24;font-weight:600;font-family:'JetBrains Mono',monospace;margin-left:4px"></span></span>
         </div>
       </div>
       <div class="big5-right">
@@ -2933,7 +2933,22 @@ function renderCash(){
   const badge=document.getElementById('cash-tot-badge');
   if(badge){badge.textContent='$'+Math.abs(tB).toLocaleString();badge.style.color=tB>=0?'var(--gain)':'var(--loss)';}
   const cpb=document.getElementById('cash-pending-badge');
-  if(cpb)cpb.textContent=pendingTotal30>0?'$'+Math.round(pendingTotal30).toLocaleString():'—';
+  if(cpb){
+    cpb.textContent=pendingTotal30>0?'$'+Math.round(pendingTotal30).toLocaleString():'—';
+    // 找最近一筆待入帳（同一天加總）
+    const todayCash=new Date().toISOString().split('T')[0];
+    const upcomingDivs=pendingDivs30.filter(d=>d.date>todayCash).sort((a,b)=>a.date.localeCompare(b.date));
+    if(upcomingDivs.length>0){
+      const nextDate=upcomingDivs[0].date;
+      const nextAmt=upcomingDivs.filter(d=>d.date===nextDate).reduce((s,d)=>s+d.amount,0);
+      const daysLeft=Math.ceil((new Date(nextDate)-new Date(todayCash))/86400000);
+      const nextEl=document.getElementById('cash-next-div');
+      if(nextEl)nextEl.textContent='｜下筆 $'+Math.round(nextAmt).toLocaleString()+' ('+daysLeft+'天後)';
+    } else {
+      const nextEl=document.getElementById('cash-next-div');
+      if(nextEl)nextEl.textContent='';
+    }
+  }
 }
 
 
@@ -3023,7 +3038,22 @@ function renderDivs(){
   // Update header badges
   const dyb=document.getElementById('d-yr-badge');if(dyb)dyb.textContent='$'+Math.round(yrTot).toLocaleString();
   const dtb=document.getElementById('d-tot-badge');if(dtb)dtb.textContent='$'+Math.round(allTot).toLocaleString();
-  const dpb=document.getElementById('d-pend-badge');if(dpb)dpb.textContent=pendingTotal>0?'$'+Math.round(pendingTotal).toLocaleString():'—';
+  const dpb=document.getElementById('d-pend-badge');
+  if(dpb){
+    dpb.textContent=pendingTotal>0?'$'+Math.round(pendingTotal).toLocaleString():'—';
+    // 找最近一筆（同一天加總）
+    const todayDiv=new Date().toISOString().split('T')[0];
+    const upcoming=pendingDivs.filter(d=>d.date&&d.date>todayDiv).sort((a,b)=>a.date.localeCompare(b.date));
+    const divNextEl=document.getElementById('div-next-badge');
+    if(divNextEl&&upcoming.length>0){
+      const nextD=upcoming[0].date;
+      const nextA=upcoming.filter(d=>d.date===nextD).reduce((s,d)=>s+d.amount,0);
+      const dl=Math.ceil((new Date(nextD)-new Date(todayDiv))/86400000);
+      divNextEl.textContent='｜下筆 $'+Math.round(nextA).toLocaleString()+' ('+dl+'天後)';
+    } else if(divNextEl){
+      divNextEl.textContent='';
+    }
+  }
 
   function renderRows(divs,tbodyId){
     const tbody=document.getElementById(tbodyId);if(!tbody)return;
@@ -3118,7 +3148,7 @@ function renderSum(){
   setSB('qb-tot','$'+Math.round(tC).toLocaleString(),'#0369a1');
   setSB('qb-net','$'+Math.round(net).toLocaleString(),'#1d4ed8');
   setSB('qb-real',(tR>=0?'+':'-')+fmt(tR), tR>=0?'var(--gain)':'var(--loss)');
-  setSB('qb-pnl',(displayPnlSum>=0?'+':'')+fmt(displayPnlSum), displayPnlSum>=0?'var(--gain)':'var(--loss)');
+  setSB('qb-pnl',(displayPnlSum>0?'+':displayPnlSum<0?'-':'')+fmt(displayPnlSum), displayPnlSum>=0?'var(--gain)':'var(--loss)');
   setSB('qb-dr',dR.toFixed(1)+'%', dR>80?'var(--loss)':dR>60?'#f59e0b':'#1e293b');
   setSB('qb-loan','$'+Math.round(loanR).toLocaleString(),'var(--loss)');
   // dynamic card bg for realized/dr
