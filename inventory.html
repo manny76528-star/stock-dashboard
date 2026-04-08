@@ -589,7 +589,7 @@ function toggleMonthDetail(ym){
   const row=document.getElementById('md-'+ym);
   if(!row)return;
   const isOpen=row.style.display!=='none';
-  row.style.display=isOpen?'none':'';
+  row.style.display=isOpen?'none':'table-row';
   // 更新箭頭
   const arrow=row.previousElementSibling?.querySelector('span[style*="color:#94a3b8"]');
   if(arrow)arrow.textContent=isOpen?'▼':'▲';
