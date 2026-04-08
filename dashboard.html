@@ -2107,6 +2107,81 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 <script>
 // ═══════ DATA ═══════
 const STORE='assetDB_v6';
+
+// ── GitHub 雲端同步 ──
+const GH_OWNER='manny76528-star';
+const GH_REPO='stock-dashboard';
+const GH_FILE='data_dashboard.json';
+const GH_TOKEN='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';
+const GH_API=`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`;
+
+let _ghSha=''; // 記錄目前檔案的 SHA（更新時需要）
+let _syncTimer=null;
+
+async function ghPull(){
+  // 從 GitHub 讀取最新資料
+  try{
+    const r=await fetch(GH_API+'?t='+Date.now(),{
+      headers:{'Authorization':'token '+GH_TOKEN,'Accept':'application/vnd.github.v3+json'}
+    });
+    if(!r.ok){if(r.status===404){console.log('data_dashboard.json 尚未存在，將在首次儲存時建立');return false;}throw new Error('Pull failed: '+r.status);}
+    const j=await r.json();
+    _ghSha=j.sha;
+    const remote=JSON.parse(atob(j.content.replace(/\n/g,'')));
+    // 比較時間戳，取較新的
+    const localTs=db._ts||0;
+    const remoteTs=remote._ts||0;
+    if(remoteTs>localTs){
+      db=remote;
+      localStorage.setItem(STORE,JSON.stringify(db));
+      console.log('✅ 從 GitHub 同步最新資料，時間戳:',new Date(remoteTs).toLocaleString());
+      return true;
+    } else {
+      console.log('本地資料較新或相同，不覆蓋');
+      return false;
+    }
+  }catch(e){console.warn('GitHub Pull 失敗:',e.message);return false;}
+}
+
+async function ghPush(){
+  // 把最新資料推送到 GitHub
+  try{
+    db._ts=Date.now(); // 更新時間戳
+    localStorage.setItem(STORE,JSON.stringify(db));
+    const content=btoa(unescape(encodeURIComponent(JSON.stringify(db,null,2))));
+    const body={message:'sync: '+new Date().toLocaleString('zh-TW'),content};
+    if(_ghSha)body.sha=_ghSha;
+    const r=await fetch(GH_API,{
+      method:'PUT',
+      headers:{'Authorization':'token '+GH_TOKEN,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},
+      body:JSON.stringify(body)
+    });
+    if(!r.ok){const e=await r.json();throw new Error(e.message||r.status);}
+    const j=await r.json();
+    _ghSha=j.content.sha;
+    showSyncStatus('✅ 已同步至雲端');
+    console.log('✅ GitHub Push 成功');
+  }catch(e){showSyncStatus('⚠️ 同步失敗: '+e.message);console.warn('GitHub Push 失敗:',e.message);}
+}
+
+function schedulePush(){
+  // 防抖：3秒後才推送（避免頻繁寫入）
+  clearTimeout(_syncTimer);
+  _syncTimer=setTimeout(ghPush,3000);
+}
+
+function showSyncStatus(msg){
+  let el=document.getElementById('sync-status');
+  if(!el){
+    el=document.createElement('span');
+    el.id='sync-status';
+    el.style.cssText='font-size:11px;color:rgba(255,255,255,.6);margin-left:8px;';
+    const topbar=document.querySelector('.db-topbar-actions');
+    if(topbar)topbar.insertBefore(el,topbar.firstChild);
+  }
+  el.textContent=msg;
+  setTimeout(()=>{if(el)el.textContent='';},4000);
+}
 let db=JSON.parse(localStorage.getItem(STORE)||'null')||{investments:[],loans:[],flexLoans:[],cashAccounts:[],prices:{},dividends:[]};
 ['dividends','prices'].forEach(k=>{if(!db[k])db[k]=k==='prices'?{}:[];});
 
@@ -4113,7 +4188,15 @@ function editTitle(){
 undoStack=[JSON.stringify(db)];
 (function(){const u=document.getElementById('undoBtn');if(u)u.disabled=true;})();
 (function(){const r=document.getElementById('redoBtn');if(r)r.disabled=true;})();
-render();checkBkWarn();refreshPrices();
+// 啟動時先從 GitHub 拉取最新資料
+(async()=>{
+  showSyncStatus('🔄 同步中...');
+  const updated=await ghPull();
+  if(updated)render();
+  else render();
+  checkBkWarn();
+  refreshPrices();
+})();
 // Auto snapshot on 1st of each month
 (function autoSnapshot(){
   const today=new Date();

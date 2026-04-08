@@ -480,6 +480,77 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
 
 <script>
 const STORE='inv_db_v1';
+
+// ── GitHub 雲端同步 ──
+const GH_OWNER='manny76528-star';
+const GH_REPO='stock-dashboard';
+const GH_FILE_INV='data_inventory.json';
+const GH_TOKEN_INV='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';
+const GH_API_INV=`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE_INV}`;
+
+let _ghShаInv='';
+let _syncTimerInv=null;
+
+async function ghPullInv(){
+  try{
+    const r=await fetch(GH_API_INV+'?t='+Date.now(),{
+      headers:{'Authorization':'token '+GH_TOKEN_INV,'Accept':'application/vnd.github.v3+json'}
+    });
+    if(!r.ok){if(r.status===404){console.log('data_inventory.json 尚未存在');return false;}throw new Error('Pull failed: '+r.status);}
+    const j=await r.json();
+    _ghShаInv=j.sha;
+    const remote=JSON.parse(atob(j.content.replace(/\n/g,'')));
+    const localTs=db._ts||0;
+    const remoteTs=remote._ts||0;
+    if(remoteTs>localTs){
+      db=remote;
+      if(!db.products)db.products=[];
+      if(!db.orders)db.orders=[];
+      if(!db.customers)db.customers=[];
+      localStorage.setItem(STORE,JSON.stringify(db));
+      console.log('✅ 從 GitHub 同步進銷存資料');
+      return true;
+    }
+    return false;
+  }catch(e){console.warn('GitHub Pull 失敗:',e.message);return false;}
+}
+
+async function ghPushInv(){
+  try{
+    db._ts=Date.now();
+    localStorage.setItem(STORE,JSON.stringify(db));
+    const content=btoa(unescape(encodeURIComponent(JSON.stringify(db,null,2))));
+    const body={message:'inv-sync: '+new Date().toLocaleString('zh-TW'),content};
+    if(_ghShаInv)body.sha=_ghShаInv;
+    const r=await fetch(GH_API_INV,{
+      method:'PUT',
+      headers:{'Authorization':'token '+GH_TOKEN_INV,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},
+      body:JSON.stringify(body)
+    });
+    if(!r.ok){const e=await r.json();throw new Error(e.message||r.status);}
+    const j=await r.json();
+    _ghShаInv=j.content.sha;
+    showInvSync('✅ 已同步至雲端');
+  }catch(e){showInvSync('⚠️ 同步失敗');console.warn('GitHub Push 失敗:',e.message);}
+}
+
+function scheduleInvPush(){
+  clearTimeout(_syncTimerInv);
+  _syncTimerInv=setTimeout(ghPushInv,3000);
+}
+
+function showInvSync(msg){
+  let el=document.getElementById('inv-sync-status');
+  if(!el){
+    el=document.createElement('span');
+    el.id='inv-sync-status';
+    el.style.cssText='font-size:11px;color:rgba(255,255,255,.7);margin-right:8px;';
+    const actions=document.querySelector('.hdr-actions');
+    if(actions)actions.insertBefore(el,actions.firstChild);
+  }
+  el.textContent=msg;
+  setTimeout(()=>{if(el)el.textContent='';},4000);
+}
 let db={orders:[],customers:[],products:[],settings:{bankName:'國泰銀行',bankCode:'013',bankAccount:'061506186489'}};
 let editOrderId=null,editCustId=null,overviewPeriod='all',orderFilter='all',overviewYear='';
 
@@ -510,6 +581,7 @@ function save(){
   _future=[];
   localStorage.setItem(STORE,JSON.stringify(db));
   updateUndoRedo();
+  scheduleInvPush(); // 背景同步到 GitHub
 }
 function undo(){
   if(_history.length===0)return;
@@ -1655,9 +1727,17 @@ function doImport(input){
 }
 
 // ── Init ──
+// 啟動時先從 GitHub 拉取最新資料
 load();
-// 初始化各頁面
-renderOverview();
+(async()=>{
+  showInvSync('🔄 同步中...');
+  const updated=await ghPullInv();
+  if(updated){
+    // 重新確保必要欄位
+    if(!db.products)db.products=[];
+  }
+  renderOverview();
+})();
 // 點 Modal 外面不關閉（避免填寫中意外關閉）
 </script>
 </div><!-- /main-content -->
