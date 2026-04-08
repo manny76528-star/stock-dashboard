@@ -197,7 +197,9 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
         <div class="filter-bar">
           <button class="filter-btn" onclick="setPeriod('year',this)">近一年</button>
           <button class="filter-btn active" onclick="setPeriod('all',this)">全部</button>
-          <span id="year-btns"></span>
+          <select id="year-select" style="margin-left:8px;padding:5px 10px;border:1.5px solid var(--border);border-radius:20px;font-size:12px;font-weight:600;color:#475569;background:#fff;cursor:pointer;outline:none" onchange="setPeriodYear(this.value)">
+            <option value="">選擇年份...</option>
+          </select>
         </div>
       </div>
       <div class="sec-body">
@@ -647,11 +649,11 @@ function setPeriod(p,el){
   el.classList.add('active');
   renderOverview();
 }
-function setPeriodYear(yr,el){
+function setPeriodYear(yr){
+  if(!yr){return;} // 選擇年份... 不動作
   overviewPeriod='year-pick';
   overviewYear=yr;
   document.querySelectorAll('#tab-overview .filter-btn').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active');
   renderOverview();
 }
 function renderOverview(){
@@ -660,14 +662,12 @@ function renderOverview(){
   // 動態產生年份按鈕（依實際訂單年份）
   const allYears=[...new Set(db.orders.map(o=>o.date?.slice(0,4)).filter(Boolean))].sort().reverse();
   const yearBtns=document.getElementById('year-btns');
-  if(yearBtns){
-    yearBtns.innerHTML=allYears.map(yr=>
-      '<button class="filter-btn year-btn'+(overviewYear===yr?' active':'')+'" data-yr="'+yr+'" style="margin-left:4px">'+yr+'</button>'
-    ).join('');
-    yearBtns.onclick=function(e){
-      const btn=e.target.closest('.year-btn');
-      if(btn)setPeriodYear(btn.dataset.yr,btn);
-    };
+  const yearSel=document.getElementById('year-select');
+  if(yearSel){
+    const curVal=yearSel.value;
+    yearSel.innerHTML='<option value="">選擇年份...</option>'
+      +allYears.map(yr=>'<option value="'+yr+'"'+(overviewYear===yr?' selected':'')+'>'+yr+'</option>').join('');
+    if(overviewYear)yearSel.value=overviewYear;
   }
 
   // 依選擇過濾訂單
@@ -1313,7 +1313,10 @@ function searchSN(){
     const daysLeft=Math.floor((expDate-now)/86400000);
     return`<div class="warranty-result ${inWarranty?'warranty-ok':'warranty-expired'}" style="margin-bottom:12px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <div><div style="font-size:16px;font-weight:800">${item.name}</div><div style="font-size:12px;color:var(--muted);margin-top:2px">序號：${item.sn}</div></div>
+        <div>
+          <div style="font-size:16px;font-weight:800">${(()=>{const p=(db.products||[]).find(p=>p.type===item.type&&p.sub===item.subtype&&(item.spec===p.spec||item.spec===p.name));return p?p.name:(item.spec||item.subtype||item.name||'—');})()}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px">${item.subtype||''} | 序號：${item.sn}</div>
+        </div>
         <span class="badge ${inWarranty?'badge-green':'badge-red'}" style="font-size:13px;padding:4px 14px">${inWarranty?'✓ 保固中':'✗ 已過保'}</span>
       </div>
       <div class="fr">
@@ -1343,7 +1346,13 @@ function renderWarranty(){
     const months=item.warranty||12;
     const exp=new Date(order.date);exp.setMonth(exp.getMonth()+months);
     const inW=now<=exp;
-    return`<tr style="cursor:pointer" onclick="showOrderDetail('${order.id}');showTab('orders')" title="點擊查看訂單"><td class="mono" style="color:var(--accent2)">${item.sn}</td><td>${item.name}</td><td class="muted">${months}個月</td><td>${order.custName||'—'}</td><td>${fmtDate(order.date)}</td><td>${fmtDate(exp.toISOString().split('T')[0])}</td><td><span class="badge ${inW?'badge-green':'badge-red'}">${inW?'保固中':'已過保'}</span></td></tr>`;
+    // 從 db.products 找對應商品名稱
+    const prod=(db.products||[]).find(p=>
+      p.type===item.type && p.sub===item.subtype &&
+      (item.spec===p.spec || item.name===p.sub+' '+(p.spec||'') || item.name===p.sub || item.spec===p.name)
+    );
+    const displayName=prod?prod.name:(item.spec||item.subtype||item.name||'—');
+    return`<tr style="cursor:pointer" onclick="showOrderDetail('${order.id}');showTab('orders')" title="點擊查看訂單"><td class="mono" style="color:var(--accent2)">${item.sn}</td><td><div style="font-weight:600">${displayName}</div><div style="font-size:11px;color:#94a3b8">${item.subtype||''}</div></td><td class="muted">${months}個月</td><td>${order.custName||'—'}</td><td>${fmtDate(order.date)}</td><td>${fmtDate(exp.toISOString().split('T')[0])}</td><td><span class="badge ${inW?'badge-green':'badge-red'}">${inW?'保固中':'已過保'}</span></td></tr>`;
   }).join('');
 }
 
