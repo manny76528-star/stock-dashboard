@@ -260,7 +260,7 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
   <div id="tab-receivable" style="display:none">
     <div class="stat-strip" style="grid-template-columns:repeat(3,1fr)">
       <div class="stat-card"><div class="stat-label">📬 未收款筆數</div><div class="stat-val blue" id="recv-cnt">0</div></div>
-      <div class="stat-card"><div class="stat-label">💸 未收款金額</div><div class="stat-val loss" id="recv-amt">$0</div></div>
+      <div class="stat-card"><div class="stat-label">💸 未收款金額</div><div class="stat-val" style="color:var(--gain)" id="recv-amt">$0</div></div>
       <div class="stat-card"><div class="stat-label">⚠️ 超過30天</div><div class="stat-val loss" id="recv-old">0 筆</div></div>
     </div>
     <div class="sec">
@@ -403,12 +403,14 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
 
 <!-- ══ 訂單詳情 Modal ══ -->
 <div class="mo" id="detail-modal">
-  <div class="modal">
-    <div class="modal-title">📋 訂單詳情</div>
-    <div id="detail-content"></div>
-    <div class="fbr">
-      <button class="btn btn-danger" id="detail-del-btn">刪除</button>
-      <button class="btn btn-secondary" onclick="closeModal('detail-modal')">關閉</button>
+  <div class="modal" style="max-width:720px;padding:0;display:flex;flex-direction:column;max-height:92vh">
+    <div style="padding:18px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+      <div class="modal-title" style="margin:0">📋 訂單詳情</div>
+      <button class="btn btn-secondary" onclick="closeModal('detail-modal')" style="padding:5px 12px">✕ 關閉</button>
+    </div>
+    <div id="detail-content" style="overflow-y:auto;flex:1;padding:18px 24px"></div>
+    <div class="fbr" style="padding:12px 24px;border-top:1px solid var(--border);flex-shrink:0">
+      <button class="btn btn-danger" id="detail-del-btn">🗑 刪除</button>
       <button class="btn btn-primary" id="detail-paid-btn">標記已收款</button>
     </div>
   </div>
@@ -583,6 +585,16 @@ function calcOrder(order){
 }
 
 // ── 業績總覽 ──
+function toggleMonthDetail(ym){
+  const row=document.getElementById('md-'+ym);
+  if(!row)return;
+  const isOpen=row.style.display!=='none';
+  row.style.display=isOpen?'none':'';
+  // 更新箭頭
+  const arrow=row.previousElementSibling?.querySelector('span[style*="color:#94a3b8"]');
+  if(arrow)arrow.textContent=isOpen?'▼':'▲';
+}
+
 function setPeriod(p,el){
   overviewPeriod=p;
   document.querySelectorAll('#tab-overview .filter-btn').forEach(b=>b.classList.remove('active'));
@@ -614,8 +626,30 @@ function renderOverview(){
   const mons=Object.keys(monthly).sort().reverse();
   const mb=document.getElementById('monthly-body');
   mb.innerHTML=mons.length===0?'<tr><td colspan="6" class="empty">尚無資料</td></tr>':
-    mons.map(ym=>{const m=monthly[ym];const rate=m.revenue?Math.round(m.profit/m.revenue*100):0;
-      return`<tr><td>${ym}</td><td>${m.orders}</td><td class="mono">${fmt(m.revenue)}</td><td class="mono gain">${fmt(m.profit)}</td><td><span class="badge badge-blue">${rate}%</span></td><td class="mono loss">${m.unpaid>0?fmt(m.unpaid):'—'}</td></tr>`;
+    mons.map(ym=>{
+      const m=monthly[ym];const rate=m.revenue?Math.round(m.profit/m.revenue*100):0;
+      // 找該月訂單
+      const ymOrders=orders.filter(o=>o.date&&o.date.slice(0,7)===ym)
+        .sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+      const detailRows=ymOrders.map(o=>{
+        const c=calcOrder(o);
+        return`<tr style="background:#f8fafc">
+          <td style="padding-left:28px;font-size:12px;color:#64748b">↳ ${fmtDate(o.date)}</td>
+          <td colspan="1" style="font-size:12px"><b>${o.custName||'—'}</b></td>
+          <td class="mono" style="font-size:12px">${fmt(c.revenue+c.tax)}</td>
+          <td class="mono gain" style="font-size:12px">${fmt(c.profit)}</td>
+          <td colspan="2" style="font-size:11px;color:#94a3b8">${(o.items||[]).map(it=>it.name||'').filter(Boolean).join('、')||'—'}</td>
+        </tr>`;
+      }).join('');
+      return`<tr style="cursor:pointer" onclick="toggleMonthDetail('${ym}')">
+        <td>${ym}</td>
+        <td><span style="color:var(--accent2);font-weight:700">${m.orders}</span> <span style="font-size:10px;color:#94a3b8">▼</span></td>
+        <td class="mono">${fmt(m.revenue)}</td>
+        <td class="mono gain">${fmt(m.profit)}</td>
+        <td><span class="badge badge-blue">${rate}%</span></td>
+        <td class="mono loss">${m.unpaid>0?fmt(m.unpaid):'—'}</td>
+      </tr>
+      <tr id="md-${ym}" style="display:none"><td colspan="6" style="padding:0">${detailRows}</td></tr>`;
     }).join('');
 
   // Customer rank
@@ -684,6 +718,7 @@ function renderOrders(){
       <td style="display:flex;gap:4px">
         <button class="btn btn-secondary" style="padding:4px 10px;font-size:11px" onclick="event.stopPropagation();openOrderModal('${o.id}')">編輯</button>
         <button class="btn" style="padding:4px 10px;font-size:11px;background:#0f172a;color:#fff;border:none" onclick="event.stopPropagation();showInvoice('${o.id}')">📄</button>
+        <button class="btn btn-danger" style="padding:4px 10px;font-size:11px" onclick="event.stopPropagation();deleteOrderDirect('${o.id}')">🗑</button>
       </td>
     </tr>`;
   }).join('');
@@ -1163,6 +1198,21 @@ function renderReceivable(){
     </tr>`;
   }).join('');
 }
+function deleteOrderDirect(id){
+  const o=db.orders.find(x=>x.id===id);
+  if(!o)return;
+  if(!confirm('確定刪除此訂單？\n客戶：'+(o.custName||'—')+'\n出貨日：'+fmtDate(o.date)))return;
+  if(!confirm('再次確認：刪除後無法復原！'))return;
+  _history.push(JSON.stringify(db));
+  if(_history.length>_MAX_HIST)_history.shift();
+  _future=[];
+  db.orders=db.orders.filter(x=>x.id!==id);
+  localStorage.setItem(STORE,JSON.stringify(db));
+  updateUndoRedo();
+  renderOrders();renderOverview();
+  toast('🗑 訂單已刪除');
+}
+
 function markPaid(id){
   const o=db.orders.find(x=>x.id===id);if(!o)return;
   o.paid=true;o.paidDate=today();save();renderReceivable();renderOverview();
@@ -1225,7 +1275,7 @@ function renderWarranty(){
     const months=item.warranty||12;
     const exp=new Date(order.date);exp.setMonth(exp.getMonth()+months);
     const inW=now<=exp;
-    return`<tr><td class="mono">${item.sn}</td><td>${item.name}</td><td class="muted">${months}個月</td><td>${order.custName||'—'}</td><td>${fmtDate(order.date)}</td><td>${fmtDate(exp.toISOString().split('T')[0])}</td><td><span class="badge ${inW?'badge-green':'badge-red'}">${inW?'保固中':'已過保'}</span></td></tr>`;
+    return`<tr style="cursor:pointer" onclick="showOrderDetail('${order.id}');showTab('orders')" title="點擊查看訂單"><td class="mono" style="color:var(--accent2)">${item.sn}</td><td>${item.name}</td><td class="muted">${months}個月</td><td>${order.custName||'—'}</td><td>${fmtDate(order.date)}</td><td>${fmtDate(exp.toISOString().split('T')[0])}</td><td><span class="badge ${inW?'badge-green':'badge-red'}">${inW?'保固中':'已過保'}</span></td></tr>`;
   }).join('');
 }
 
