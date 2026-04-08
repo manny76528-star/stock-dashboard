@@ -322,7 +322,7 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
   <div class="modal">
     <div class="modal-title" id="order-modal-title">📋 新增訂單</div>
     <div class="fr">
-      <div class="fg"><label class="fl">出貨日期 *</label><input class="fi" type="date" id="o-date" onchange="document.getElementById('o-paid-date').value=this.value"></div>
+      <div class="fg"><label class="fl">出貨日期 *</label><input class="fi" type="date" id="o-date" onchange="onShipDateChange(this)"></div>
       <div class="fg">
         <label class="fl">客戶名稱 *</label>
         <select class="fi" id="o-cust" onchange="onCustChange(this.value)">
@@ -910,6 +910,21 @@ function calcTotal(){
   document.getElementById('o-total-profit').style.color=profit>=0?'var(--gain)':'var(--loss)';
 }
 
+function onShipDateChange(el){
+  // 防止年份超過4碼
+  const val=el.value;
+  if(val){
+    const year=parseInt(val.split('-')[0]);
+    if(year>9999){
+      el.value='';
+      return;
+    }
+    if(String(year).length<=4){
+      document.getElementById('o-paid-date').value=val;
+    }
+  }
+}
+
 function onCustChange(val){
   if(val==='__new__'){
     const name=prompt('請輸入新客戶名稱：');
@@ -1127,8 +1142,10 @@ function renderReceivable(){
   const now=new Date();
   let amt=0,old=0;
   unpaid.forEach(o=>{const c=calcOrder(o);amt+=c.revenue+c.tax;const days=Math.floor((now-new Date(o.date))/86400000);if(days>30)old++;});
+  let totProfit=0;
+  unpaid.forEach(o=>{const c=calcOrder(o);totProfit+=c.profit;});
   document.getElementById('recv-cnt').textContent=unpaid.length;
-  document.getElementById('recv-amt').textContent=fmt(amt);
+  document.getElementById('recv-amt').textContent=fmt(amt)+(totProfit>0?' ('+Math.round(totProfit).toLocaleString()+')':'');
   document.getElementById('recv-old').textContent=old+' 筆';
   const body=document.getElementById('recv-body');
   const empty=document.getElementById('recv-empty');
@@ -1140,7 +1157,7 @@ function renderReceivable(){
     return`<tr>
       <td>${fmtDate(o.date)}</td>
       <td><b>${o.custName||'—'}</b></td>
-      <td class="mono">${fmt(c.revenue+c.tax)}</td>
+      <td class="mono">${fmt(c.revenue+c.tax)}<br><span style="font-size:11px;color:var(--loss);font-weight:600">(${Math.round(c.profit).toLocaleString()})</span></td>
       <td><span class="badge ${days>30?'badge-red':days>14?'badge-orange':'badge-gray'}">${days} 天</span></td>
       <td><button class="btn btn-primary" style="padding:4px 12px;font-size:11px" onclick="markPaid('${o.id}')">標記已收款</button></td>
     </tr>`;
@@ -1200,6 +1217,8 @@ function renderWarranty(){
       snList.forEach(sn=>{if(sn)all.push({order:o,item:{...it,sn}});});
     });
   });
+  // 日期新到舊排序
+  all.sort((a,b)=>(b.order.date||'').localeCompare(a.order.date||''));
   if(all.length===0){body.innerHTML='<tr><td colspan="6" class="empty">尚無序號記錄</td></tr>';return;}
   const now=new Date();
   body.innerHTML=all.map(({order,item})=>{
