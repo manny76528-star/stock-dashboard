@@ -68,42 +68,47 @@ jobs:
           except Exception as e:
               print(f'TPEx error: {e}')
 
-          # ── 個別即時補抓（針對可能延遲的股票）──
-          # 用 TWSE 即時行情 API 單獨抓，確保是當日最新收盤
-          late_codes = ['00996A', '00988A', '00981D', '00996B']
-          for code in late_codes:
+          # ── TWSE 即時行情 API（補抓全量可能遺漏的個股）──
+          # 特別針對新上市ETF或全量API較慢更新的標的
+          realtime_codes = ['00996A', '00988A', '00981D', '00985B', '00864B']
+          print('--- Realtime補抓 ---')
+          for code in realtime_codes:
               try:
-                  time.sleep(0.5)
+                  time.sleep(0.3)
+                  # TWSE 即時行情
                   url3 = f'https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=tse_{code.lower()}.tw&json=1&delay=0'
                   req3 = urllib.request.Request(url3, headers={
-                      'User-Agent':'Mozilla/5.0',
-                      'Referer':'https://mis.twse.com.tw'
+                      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                      'Referer': 'https://mis.twse.com.tw/stock/fibest.html'
                   })
                   with urllib.request.urlopen(req3, timeout=10) as r3:
                       d3 = json.loads(r3.read().decode('utf-8'))
                   items3 = d3.get('msgArray', [])
                   if items3:
                       it = items3[0]
-                      z = it.get('z','') or it.get('y','')  # z=即時價, y=昨收
-                      o = it.get('o','')  # 開盤
-                      y = it.get('y','')  # 昨收
-                      try:
+                      # z=成交價(即時), y=昨收
+                      z = it.get('z', '-')
+                      y = it.get('y', '0')
+                      if z and z != '-' and z != '0':
                           price = float(z.replace(',',''))
-                          prev = float(y.replace(',','')) if y else price
+                          prev = float(y.replace(',','')) if y and y != '0' else price
                           chg = round(price - prev, 2)
                           pct = round(chg/prev*100, 2) if prev > 0 else 0
                           if price > 0:
                               prices[code] = {'price': price, 'change': chg, 'changePct': pct}
-                              print(f'  ✓ {code} realtime: {price} (chg:{chg})')
-                      except: pass
-                  else:
-                      print(f'  ✗ {code}: no data from realtime API')
+                              print(f'  ✓ {code}: {price} (chg:{chg}, {pct}%)')
+                          else:
+                              print(f'  - {code}: price=0, skip')
+                      else:
+                          print(f'  - {code}: z={z!r}, no realtime price (market closed?), keeping bulk: {prices.get(code,{}).get("price","N/A")}')
               except Exception as e:
-                  print(f'  realtime {code} error: {e}')
+                  print(f'  ✗ {code} realtime error: {e}')
 
           # ── 結果確認 ──
+          print('--- Final check ---')
           for check in ['00985B','00864B','00981D','00988A','00996A']:
-              print(f'  {"✓" if check in prices else "✗"} {check}: {prices.get(check,"NOT FOUND")}')
+              p = prices.get(check)
+              print(f'  {"✓" if p else "✗"} {check}: {p}')
 
           # ── 寫出 prices.json ──
           output = {
