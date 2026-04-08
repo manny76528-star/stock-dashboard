@@ -403,13 +403,16 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
 
 <!-- ══ 訂單詳情 Modal ══ -->
 <div class="mo" id="detail-modal">
-  <div class="modal" style="max-width:720px;padding:0;display:flex;flex-direction:column;max-height:92vh">
-    <div style="padding:18px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
-      <div class="modal-title" style="margin:0">📋 訂單詳情</div>
-      <button class="btn btn-secondary" onclick="closeModal('detail-modal')" style="padding:5px 12px">✕ 關閉</button>
+  <div class="modal" style="max-width:720px;padding:0;overflow:hidden;display:flex;flex-direction:column;height:min(92vh,700px)">
+    <!-- 固定標題 -->
+    <div style="padding:16px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:#fff;flex-shrink:0;z-index:1">
+      <span style="font-size:16px;font-weight:800">📋 訂單詳情</span>
+      <button class="btn btn-secondary" onclick="closeModal('detail-modal')" style="padding:5px 14px;font-size:12px">✕ 關閉</button>
     </div>
-    <div id="detail-content" style="overflow-y:auto;flex:1;padding:18px 24px"></div>
-    <div class="fbr" style="padding:12px 24px;border-top:1px solid var(--border);flex-shrink:0">
+    <!-- 可捲動內容 -->
+    <div id="detail-content" style="overflow-y:auto;flex:1;padding:18px 22px;-webkit-overflow-scrolling:touch"></div>
+    <!-- 固定底部按鈕 -->
+    <div style="padding:12px 22px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;background:#fff;flex-shrink:0">
       <button class="btn btn-danger" id="detail-del-btn">🗑 刪除</button>
       <button class="btn btn-primary" id="detail-paid-btn">標記已收款</button>
     </div>
@@ -586,13 +589,59 @@ function calcOrder(order){
 
 // ── 業績總覽 ──
 function toggleMonthDetail(ym){
-  const row=document.getElementById('md-'+ym);
-  if(!row)return;
-  const isOpen=row.style.display!=='none';
-  row.style.display=isOpen?'none':'table-row';
-  // 更新箭頭
-  const arrow=row.previousElementSibling?.querySelector('span[style*="color:#94a3b8"]');
-  if(arrow)arrow.textContent=isOpen?'▼':'▲';
+  let detailRow=document.getElementById('md-'+ym);
+  const arrow=document.querySelector('.md-arrow-'+ym);
+
+  if(detailRow){
+    // 已存在：切換顯示/隱藏
+    const isOpen=detailRow.style.display!=='none';
+    detailRow.style.display=isOpen?'none':'table-row';
+    if(arrow)arrow.textContent=isOpen?'▼':'▲';
+    return;
+  }
+
+  // 第一次點：動態建立詳細列
+  const ymOrders=db.orders.filter(o=>o.date&&o.date.slice(0,7)===ym)
+    .sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+
+  const detailHtml=ymOrders.map(o=>{
+    const c=calcOrder(o);
+    const oid=o.id;
+    return'<tr style="background:#f8fafc;cursor:pointer" onclick="showOrderDetail(this.dataset.id)" data-id="'+oid+'">'
+      +'<td style="padding-left:24px;font-size:12px;color:#64748b">↳ '+fmtDate(o.date)+'</td>'
+      +'<td style="font-size:12px"><b>'+(o.custName||'—')+'</b></td>'
+      +'<td class="mono" style="font-size:12px">'+fmt(c.revenue+c.tax)+'</td>'
+      +'<td class="mono gain" style="font-size:12px">'+fmt(c.profit)+'</td>'
+      +'<td colspan="2" style="font-size:11px;color:#94a3b8">'
+        +((o.items||[]).map(it=>it.name||'').filter(Boolean).join('、')||'—')
+      +'</td>'
+      +'</tr>';
+  }).join('');
+
+  // 找到該月的 tr，在其後插入詳細列
+  const tbody=document.getElementById('monthly-body');
+  const rows=tbody.querySelectorAll('tr');
+  let targetRow=null;
+  rows.forEach(r=>{if(r.onclick&&r.onclick.toString().includes(ym))targetRow=r;});
+
+  if(!targetRow){
+    // 用文字比對找
+    for(const r of rows){
+      if(r.cells[0]&&r.cells[0].textContent===ym){targetRow=r;break;}
+    }
+  }
+
+  const newTr=document.createElement('tr');
+  newTr.id='md-'+ym;
+  newTr.style.display='table-row';
+  newTr.innerHTML='<td colspan="6" style="padding:0"><table style="width:100%">'+detailHtml+'</table></td>';
+
+  if(targetRow&&targetRow.nextSibling){
+    tbody.insertBefore(newTr,targetRow.nextSibling);
+  } else if(targetRow){
+    tbody.appendChild(newTr);
+  }
+  if(arrow)arrow.textContent='▲';
 }
 
 function setPeriod(p,el){
@@ -628,29 +677,18 @@ function renderOverview(){
   mb.innerHTML=mons.length===0?'<tr><td colspan="6" class="empty">尚無資料</td></tr>':
     mons.map(ym=>{
       const m=monthly[ym];const rate=m.revenue?Math.round(m.profit/m.revenue*100):0;
-      // 找該月訂單
-      const ymOrders=orders.filter(o=>o.date&&o.date.slice(0,7)===ym)
-        .sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-      const detailRows=ymOrders.map(o=>{
-        const c=calcOrder(o);
-        return`<tr style="background:#f8fafc">
-          <td style="padding-left:28px;font-size:12px;color:#64748b">↳ ${fmtDate(o.date)}</td>
-          <td colspan="1" style="font-size:12px"><b>${o.custName||'—'}</b></td>
-          <td class="mono" style="font-size:12px">${fmt(c.revenue+c.tax)}</td>
-          <td class="mono gain" style="font-size:12px">${fmt(c.profit)}</td>
-          <td colspan="2" style="font-size:11px;color:#94a3b8">${(o.items||[]).map(it=>it.name||'').filter(Boolean).join('、')||'—'}</td>
-        </tr>`;
-      }).join('');
-      return`<tr style="cursor:pointer" onclick="toggleMonthDetail('${ym}')">
-        <td>${ym}</td>
-        <td><span style="color:var(--accent2);font-weight:700">${m.orders}</span> <span style="font-size:10px;color:#94a3b8">▼</span></td>
-        <td class="mono">${fmt(m.revenue)}</td>
-        <td class="mono gain">${fmt(m.profit)}</td>
-        <td><span class="badge badge-blue">${rate}%</span></td>
-        <td class="mono loss">${m.unpaid>0?fmt(m.unpaid):'—'}</td>
-      </tr>
-      <tr id="md-${ym}" style="display:none"><td colspan="6" style="padding:0">${detailRows}</td></tr>`;
+      return'<tr style="cursor:pointer" onclick="toggleMonthDetail(this.dataset.ym)" data-ym="'+ym+'">'
+        +'<td>'+ym+'</td>'
+        +'<td><span style="color:var(--accent2);font-weight:700">'+m.orders+'</span>'
+        +' <span class="md-arrow-'+ym+'" style="font-size:10px;color:#94a3b8">▼</span></td>'
+        +'<td class="mono">'+fmt(m.revenue)+'</td>'
+        +'<td class="mono gain">'+fmt(m.profit)+'</td>'
+        +'<td><span class="badge badge-blue">'+rate+'%</span></td>'
+        +'<td class="mono loss">'+(m.unpaid>0?fmt(m.unpaid):'—')+'</td>'
+        +'</tr>';
     }).join('');
+  // 注意：詳細列另外用 JS 動態插入，不寫在 innerHTML 裡
+  // 觸發後由 toggleMonthDetail 按需建立
 
   // Customer rank
   // 客戶排行（用全部訂單）
