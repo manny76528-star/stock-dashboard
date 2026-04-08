@@ -197,6 +197,7 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
         <div class="filter-bar">
           <button class="filter-btn" onclick="setPeriod('year',this)">近一年</button>
           <button class="filter-btn active" onclick="setPeriod('all',this)">全部</button>
+          <span id="year-btns"></span>
         </div>
       </div>
       <div class="sec-body">
@@ -478,7 +479,7 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
 <script>
 const STORE='inv_db_v1';
 let db={orders:[],customers:[],products:[],settings:{bankName:'國泰銀行',bankCode:'013',bankAccount:'061506186489'}};
-let editOrderId=null,editCustId=null,overviewPeriod='all',orderFilter='all';
+let editOrderId=null,editCustId=null,overviewPeriod='all',orderFilter='all',overviewYear='';
 
 function load(){
   try{const d=localStorage.getItem(STORE);if(d)db=JSON.parse(d);}catch(e){}
@@ -641,6 +642,14 @@ function toggleMonthDetail(ym){
 
 function setPeriod(p,el){
   overviewPeriod=p;
+  overviewYear='';
+  document.querySelectorAll('#tab-overview .filter-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderOverview();
+}
+function setPeriodYear(yr,el){
+  overviewPeriod='year-pick';
+  overviewYear=yr;
   document.querySelectorAll('#tab-overview .filter-btn').forEach(b=>b.classList.remove('active'));
   el.classList.add('active');
   renderOverview();
@@ -648,7 +657,24 @@ function setPeriod(p,el){
 function renderOverview(){
   const now=new Date();
   const oneYearAgo=new Date(now.getFullYear()-1,now.getMonth(),now.getDate()).toISOString().split('T')[0];
-  const orders=overviewPeriod==='year'?db.orders.filter(o=>o.date>=oneYearAgo):db.orders;
+  // 動態產生年份按鈕（依實際訂單年份）
+  const allYears=[...new Set(db.orders.map(o=>o.date?.slice(0,4)).filter(Boolean))].sort().reverse();
+  const yearBtns=document.getElementById('year-btns');
+  if(yearBtns){
+    yearBtns.innerHTML=allYears.map(yr=>
+      '<button class="filter-btn year-btn'+(overviewYear===yr?' active':'')+'" data-yr="'+yr+'" style="margin-left:4px">'+yr+'</button>'
+    ).join('');
+    yearBtns.onclick=function(e){
+      const btn=e.target.closest('.year-btn');
+      if(btn)setPeriodYear(btn.dataset.yr,btn);
+    };
+  }
+
+  // 依選擇過濾訂單
+  let orders;
+  if(overviewPeriod==='year') orders=db.orders.filter(o=>o.date>=oneYearAgo);
+  else if(overviewPeriod==='year-pick') orders=db.orders.filter(o=>o.date&&o.date.startsWith(overviewYear));
+  else orders=db.orders;
 
   let totRev=0,totProfit=0,totUnpaid=0;
   orders.forEach(o=>{const c=calcOrder(o);totRev+=c.revenue;totProfit+=c.profit;if(!o.paid)totUnpaid+=c.revenue;});
