@@ -2,7 +2,7 @@ name: Update Stock Prices
 
 on:
   schedule:
-    - cron: '30 6 * * 1-5'
+    - cron: '30 6 * * 1-5'  # 每個交易日台灣時間 14:30 (UTC 06:30)
   workflow_dispatch:
 
 permissions:
@@ -28,22 +28,20 @@ jobs:
               with urllib.request.urlopen(req, timeout=20) as r:
                   data = json.loads(r.read().decode('utf-8'))
               for item in data:
-                  code = str(item.get('Code') or item.get('證券代號') or '').strip()
+                  code = str(item.get('Code') or item.get('證券代號') or '').strip().upper()
                   price_raw = str(item.get('ClosingPrice') or item.get('收盤價') or '')
                   chg_raw = str(item.get('Change') or item.get('漲跌價差') or '0')
                   try:
                       price = float(price_raw.replace(',',''))
-                      chg = float(re.sub(r'[^\d.\-]','',chg_raw) or '0')
+                      chg = float(re.sub(r'[^\d.\-]','', chg_raw) or '0')
                       if code and price > 0:
                           prev = price - chg
                           prices[code] = {'price': price, 'change': round(chg,2),
                               'changePct': round(chg/prev*100,2) if prev > 0 else 0}
                   except: pass
               print(f'TWSE: {len(prices)} stocks')
-              # Print sample
-              sample = list(prices.items())[:3]
-              for k,v in sample:
-                  print(f'  {k}: {v}')
+              for check in ['00985B','00864B','00981D','00988A','00996A']:
+                  print(f'  {"✓" if check in prices else "✗"} {check}: {prices.get(check,"NOT FOUND")}')
           except Exception as e:
               print(f'TWSE error: {e}')
 
@@ -69,16 +67,12 @@ jobs:
                               'changePct': round(chg/prev*100,2) if prev > 0 else 0}
                   except: pass
               print(f'TPEx: +{len(prices)-before} stocks, total: {len(prices)}')
-              # Check specific codes
-              for check in ['00985B','00864B','00981B','00988A','9933','2330','0056','0050']:
-                  if check in prices:
-                      print(f'  ✓ {check}: {prices[check]}')
-                  else:
-                      print(f'  ✗ {check}: NOT FOUND')
+              for check in ['00985B','00864B','00981D','00988A','00996A']:
+                  print(f'  {"✓" if check in prices else "✗"} {check}: {prices.get(check,"NOT FOUND")}')
           except Exception as e:
               print(f'TPEx error: {e}')
 
-          # ── Write output ──
+          # ── 寫出 prices.json ──
           output = {
               'updated': datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ'),
               'count': len(prices),
@@ -94,5 +88,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add prices.json
-          git diff --staged --quiet || git commit -m "prices: $(date -u +%Y-%m-%d\ %H:%M) UTC"
+          git diff --staged --quiet || git commit -m "prices: $(date -u +'%Y-%m-%d %H:%M') UTC"
           git push
