@@ -636,7 +636,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 .inv-hero-label{font-size:11px;color:#6b7280;font-weight:600;letter-spacing:.3px;}
 .inv-hero-value{font-size:24px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#1e293b;line-height:1.1;}
 @media(max-width:700px){
-  .inv-hero-strip{grid-template-columns:repeat(2,1fr);}
+  .inv-hero-strip{grid-template-columns:repeat(3,1fr);}
   .inv-hero-card{padding:12px 14px;}
   .inv-hero-value{font-size:18px;}
 }
@@ -1646,6 +1646,10 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
       <div class="inv-hero-label">✅ 已實現損益</div>
       <div class="inv-hero-value" id="qb-real">—</div>
     </div>
+    <div class="inv-hero-card" id="inv-hero-pnl">
+      <div class="inv-hero-label">📊 損益</div>
+      <div class="inv-hero-value" id="qb-pnl">—</div>
+    </div>
     <div class="inv-hero-card">
       <div class="inv-hero-label">📈 股票總額</div>
       <div class="inv-hero-value" id="qb-tot">—</div>
@@ -1654,7 +1658,6 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
       <div class="inv-hero-label">📊 負債比</div>
       <div class="inv-hero-value" id="qb-dr">—</div>
     </div>
-
   </div>
   <div id="sum-tbl" style="display:none"></div>
 </div>
@@ -3115,6 +3118,7 @@ function renderSum(){
   setSB('qb-tot','$'+Math.round(tC).toLocaleString(),'#0369a1');
   setSB('qb-net','$'+Math.round(net).toLocaleString(),'#1d4ed8');
   setSB('qb-real',(tR>=0?'+':'-')+fmt(tR), tR>=0?'var(--gain)':'var(--loss)');
+  setSB('qb-pnl',(displayPnlSum>=0?'+':'')+fmt(displayPnlSum), displayPnlSum>=0?'var(--gain)':'var(--loss)');
   setSB('qb-dr',dR.toFixed(1)+'%', dR>80?'var(--loss)':dR>60?'#f59e0b':'#1e293b');
   setSB('qb-loan','$'+Math.round(loanR).toLocaleString(),'var(--loss)');
   // dynamic card bg for realized/dr
