@@ -17,11 +17,11 @@ jobs:
       - name: Fetch and save prices
         run: |
           python3 - << 'EOF'
-          import urllib.request, json, datetime, re
+          import urllib.request, json, datetime, re, time
 
           prices = {}
 
-          # ── TWSE 上市 ──
+          # ── TWSE 上市（全量）──
           try:
               url = 'https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL'
               req = urllib.request.Request(url, headers={'User-Agent':'Mozilla/5.0','Accept':'application/json'})
@@ -39,13 +39,11 @@ jobs:
                           prices[code] = {'price': price, 'change': round(chg,2),
                               'changePct': round(chg/prev*100,2) if prev > 0 else 0}
                   except: pass
-              print(f'TWSE: {len(prices)} stocks')
-              for check in ['00985B','00864B','00981D','00988A','00996A']:
-                  print(f'  {"✓" if check in prices else "✗"} {check}: {prices.get(check,"NOT FOUND")}')
+              print(f'TWSE bulk: {len(prices)} stocks')
           except Exception as e:
-              print(f'TWSE error: {e}')
+              print(f'TWSE bulk error: {e}')
 
-          # ── TPEx 上櫃 ──
+          # ── TPEx 上櫃（全量）──
           before = len(prices)
           try:
               url2 = 'https://www.tpex.org.tw/openapi/v1/tpex_mainboard_daily_close_quotes'
@@ -67,10 +65,45 @@ jobs:
                               'changePct': round(chg/prev*100,2) if prev > 0 else 0}
                   except: pass
               print(f'TPEx: +{len(prices)-before} stocks, total: {len(prices)}')
-              for check in ['00985B','00864B','00981D','00988A','00996A']:
-                  print(f'  {"✓" if check in prices else "✗"} {check}: {prices.get(check,"NOT FOUND")}')
           except Exception as e:
               print(f'TPEx error: {e}')
+
+          # ── 個別即時補抓（針對可能延遲的股票）──
+          # 用 TWSE 即時行情 API 單獨抓，確保是當日最新收盤
+          late_codes = ['00996A', '00988A', '00981D', '00996B']
+          for code in late_codes:
+              try:
+                  time.sleep(0.5)
+                  url3 = f'https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=tse_{code.lower()}.tw&json=1&delay=0'
+                  req3 = urllib.request.Request(url3, headers={
+                      'User-Agent':'Mozilla/5.0',
+                      'Referer':'https://mis.twse.com.tw'
+                  })
+                  with urllib.request.urlopen(req3, timeout=10) as r3:
+                      d3 = json.loads(r3.read().decode('utf-8'))
+                  items3 = d3.get('msgArray', [])
+                  if items3:
+                      it = items3[0]
+                      z = it.get('z','') or it.get('y','')  # z=即時價, y=昨收
+                      o = it.get('o','')  # 開盤
+                      y = it.get('y','')  # 昨收
+                      try:
+                          price = float(z.replace(',',''))
+                          prev = float(y.replace(',','')) if y else price
+                          chg = round(price - prev, 2)
+                          pct = round(chg/prev*100, 2) if prev > 0 else 0
+                          if price > 0:
+                              prices[code] = {'price': price, 'change': chg, 'changePct': pct}
+                              print(f'  ✓ {code} realtime: {price} (chg:{chg})')
+                      except: pass
+                  else:
+                      print(f'  ✗ {code}: no data from realtime API')
+              except Exception as e:
+                  print(f'  realtime {code} error: {e}')
+
+          # ── 結果確認 ──
+          for check in ['00985B','00864B','00981D','00988A','00996A']:
+              print(f'  {"✓" if check in prices else "✗"} {check}: {prices.get(check,"NOT FOUND")}')
 
           # ── 寫出 prices.json ──
           output = {
