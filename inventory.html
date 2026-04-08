@@ -622,13 +622,8 @@ function toggleMonthDetail(ym){
   const tbody=document.getElementById('monthly-body');
   const rows=tbody.querySelectorAll('tr');
   let targetRow=null;
-  rows.forEach(r=>{if(r.onclick&&r.onclick.toString().includes(ym))targetRow=r;});
-
-  if(!targetRow){
-    // 用文字比對找
-    for(const r of rows){
-      if(r.cells[0]&&r.cells[0].textContent===ym){targetRow=r;break;}
-    }
+  for(const r of rows){
+    if(r.cells[0]&&r.cells[0].textContent.trim()===ym){targetRow=r;break;}
   }
 
   const newTr=document.createElement('tr');
@@ -677,7 +672,7 @@ function renderOverview(){
   mb.innerHTML=mons.length===0?'<tr><td colspan="6" class="empty">尚無資料</td></tr>':
     mons.map(ym=>{
       const m=monthly[ym];const rate=m.revenue?Math.round(m.profit/m.revenue*100):0;
-      return'<tr style="cursor:pointer" onclick="toggleMonthDetail(this.dataset.ym)" data-ym="'+ym+'">'
+      return'<tr class="month-row" data-ym="'+ym+'" style="cursor:pointer">'
         +'<td>'+ym+'</td>'
         +'<td><span style="color:var(--accent2);font-weight:700">'+m.orders+'</span>'
         +' <span class="md-arrow-'+ym+'" style="font-size:10px;color:#94a3b8">▼</span></td>'
@@ -689,6 +684,15 @@ function renderOverview(){
     }).join('');
   // 注意：詳細列另外用 JS 動態插入，不寫在 innerHTML 裡
   // 觸發後由 toggleMonthDetail 按需建立
+
+  // 月度業績 click delegation
+  const mb2=document.getElementById('monthly-body');
+  if(mb2){
+    mb2.onclick=function(e){
+      const tr=e.target.closest('.month-row');
+      if(tr)toggleMonthDetail(tr.dataset.ym);
+    };
+  }
 
   // Customer rank
   // 客戶排行（用全部訂單）
