@@ -2160,21 +2160,23 @@ async function ghPull(){
     const localTs=db._ts||0;
     const remoteTs=remote._ts||0;
     console.log(`Pull: 本地重量${localW} 遠端重量${remoteW} | 本地ts${localTs} 遠端ts${remoteTs}`);
-    // 安全規則：遠端資料量要比本地多，才考慮覆蓋
-    if(remoteW>localW&&remoteTs>localTs){
+    // 安全規則：
+    // 1. 本地是空的 → 使用遠端
+    // 2. 遠端資料量 > 本地 且 時間戳較新 → 使用遠端
+    // 3. 其他情況 → 保留本地
+    console.log(`Pull比較: 本地重量${localW}/ts${localTs} vs 遠端重量${remoteW}/ts${remoteTs}`);
+    if(localW===0&&remoteW>0){
       db=remote;
       localStorage.setItem(STORE,JSON.stringify(db));
       showSyncStatus('☁️ 已從雲端同步');
-      console.log('✅ Pull成功，使用遠端資料');
       return true;
-    } else if(remoteTs>localTs&&localW===0){
-      // 本地是空的，無條件使用遠端
+    } else if(remoteW>localW&&remoteTs>localTs){
       db=remote;
       localStorage.setItem(STORE,JSON.stringify(db));
       showSyncStatus('☁️ 已從雲端同步');
       return true;
     } else {
-      console.log('本地資料較完整，保留本地');
+      console.log('保留本地資料（本地較完整或較新）');
       return false;
     }
   }catch(e){console.warn('Pull失敗:',e.message);return false;}
@@ -2311,9 +2313,15 @@ function importData(e){
       render();
       toast('✅ 還原成功！共 '+(db.investments||[]).length+' 筆投資');
       refreshPrices();
-      // 同步到雲端
+      // 停用 sync → Push → 重新啟用（防止 Pull 把資料蓋回去）
+      _syncEnabled=false;
+      clearTimeout(_syncTimer);
       _ghSha='';
-      setTimeout(()=>ghPush(),1000);
+      setTimeout(async()=>{
+        await ghPush();
+        _syncEnabled=true;
+        showSyncStatus('✅ 還原並同步完成');
+      },800);
     }catch(err){
       toast('❌ 讀取失敗：'+err.message);
     }
@@ -4427,11 +4435,12 @@ undoStack=[JSON.stringify(db)];
 render();
 checkBkWarn();
 refreshPrices();
-// 啟動後 5 秒才嘗試 Pull（讓本地資料先穩定）
+// 啟動後 8 秒才嘗試 Pull（給匯入操作足夠時間）
 setTimeout(async()=>{
+  if(!_syncEnabled)return; // 匯入中不 Pull
   const updated=await ghPull();
   if(updated){render();showSyncStatus('☁️ 已從雲端同步');}
-},5000);
+},8000);
 // Auto snapshot on 1st of each month
 (function autoSnapshot(){
   const today=new Date();
