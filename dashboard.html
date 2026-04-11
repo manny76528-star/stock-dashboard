@@ -1795,7 +1795,11 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
           &nbsp;｜&nbsp;🏆 累積：<span class="gain mono" id="d-tot" style="font-size:15px">$0</span>
         </div>
         <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;color:var(--muted)">
-          <input type="checkbox" id="div-hist-chk" onchange="renderDivs()" style="accent-color:var(--accent);width:15px;height:15px"> 顯示歷史
+          <select id="div-year-sel" onchange="renderDivs()" style="padding:4px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;color:#475569;background:#fff;cursor:pointer;outline:none">
+            <option value="cur">今年</option>
+            <option value="all">全部</option>
+          </select>
+          <input type="checkbox" id="div-hist-chk" style="display:none">
         </label>
       </div>
       <div class="div-section-hdr" style="background:#ccfbf1;color:#0f766e" onclick="toggleDivYear()">
@@ -2148,7 +2152,16 @@ async function ghPush(){
   try{
     db._ts=Date.now(); // 更新時間戳
     localStorage.setItem(STORE,JSON.stringify(db));
-    const content=btoa(unescape(encodeURIComponent(JSON.stringify(db,null,2))));
+    // 排除備份資料（太大），只同步核心資料
+    const syncDb={...db};
+    delete syncDb._backup; // 移除備份欄位
+    const jsonStr=JSON.stringify(syncDb,null,2);
+    if(jsonStr.length>900000){
+      showSyncStatus('⚠️ 資料過大，略過本次同步');
+      console.warn('資料超過900KB，跳過Push');
+      return;
+    }
+    const content=btoa(unescape(encodeURIComponent(jsonStr)));
     const body={message:'sync: '+new Date().toLocaleString('zh-TW'),content};
     if(_ghSha)body.sha=_ghSha;
     const r=await fetch(GH_API,{
@@ -3040,7 +3053,13 @@ function renderDivs(){
   // pending: 除息日已到但發放日未到
   const pendingDivs=db.dividends.filter(d=>d.pending||(d.exDate&&d.exDate<=today&&d.date&&d.date>today));
   const paidDivs=db.dividends.filter(d=>!d.pending&&(!d.exDate||(d.date&&d.date<=today)));
-  const yrDivs=paidDivs.filter(d=>d.date&&d.date.startsWith(yr));
+  // 年份下拉值
+  const yrSelEl=document.getElementById('div-year-sel');
+  const yrSelVal=yrSelEl?.value||'cur';
+  const filterYr=yrSelVal==='cur'?yr:(yrSelVal==='all'?null:yrSelVal);
+  const yrDivs=filterYr
+    ?paidDivs.filter(d=>d.date&&d.date.startsWith(filterYr))
+    :paidDivs;
   const histDivs=paidDivs.filter(d=>!d.date||!d.date.startsWith(yr));
   // Pending bar
   const pendingTotal=pendingDivs.reduce((s,d)=>s+d.amount,0);
@@ -3072,7 +3091,20 @@ function renderDivs(){
       }).join('');
     }
   }
-  const showHist=document.getElementById('div-hist-chk')?.checked||false;
+  // 年份下拉：動態加入有資料的年份
+  const yrSel=document.getElementById('div-year-sel');
+  const allDivYears=[...new Set((db.dividends||[]).filter(d=>!d.pending&&d.date).map(d=>d.date.slice(0,4)))].sort().reverse();
+  if(yrSel){
+    const curVal=yrSel.value;
+    // 保留固定選項，動態加年份
+    const fixedOpts='<option value="cur">今年</option><option value="all">全部</option>';
+    const yearOpts=allDivYears.map(yr=>'<option value="'+yr+'"'+(curVal===yr?' selected':'')+'>'+yr+'</option>').join('');
+    yrSel.innerHTML=fixedOpts+yearOpts;
+    if(curVal)yrSel.value=curVal;
+  }
+  const yrSelVal=yrSel?.value||'cur';
+  const showHist=yrSelVal==='all'||allDivYears.includes(yrSelVal);
+  const filterYear=yrSelVal==='all'||yrSelVal==='cur'?null:yrSelVal;
 
   // Cards
   const byCode={};
@@ -3150,6 +3182,21 @@ function renderDivs(){
   renderRows(yrDivs,'div-body-yr');
   document.getElementById('div-hist-sec').style.display=showHist?'block':'none';
   if(showHist)renderRows(histDivs,'div-body-hist');
+}
+
+function confirmDivPaid(id){
+  const d=db.dividends.find(x=>x.id===id);
+  if(!d)return;
+  if(!confirm('確認「'+d.code+'」$'+Math.round(d.amount).toLocaleString()+' 已入帳？\n入帳後將移入今年領息明細'))return;
+  // 移除 pending 標記，設定為已入帳
+  d.pending=false;
+  d.exDate=d.exDate||'';
+  // 確保有入帳日期
+  if(!d.date||d.date>new Date().toISOString().split('T')[0]){
+    d.date=new Date().toISOString().split('T')[0];
+  }
+  save();renderDivs();renderSum();
+  toast('✅ 已確認入帳：'+d.code+' $'+Math.round(d.amount).toLocaleString());
 }
 
 function toggleDivYear(){
@@ -4127,32 +4174,79 @@ function renderTrendChart(){
     data:{labels,datasets},
     options:{
       responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{position:'top',labels:{font:{size:11},boxWidth:14}}},
+      interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{
+          position:'top',
+          labels:{
+            font:{family:"'Noto Sans TC',sans-serif",size:12,weight:'600'},
+            boxWidth:12,boxHeight:12,borderRadius:6,padding:16,
+            color:'#475569'
+          }
+        },
+        tooltip:{
+          backgroundColor:'rgba(15,23,42,0.92)',
+          titleFont:{family:"'Noto Sans TC',sans-serif",size:13,weight:'700'},
+          bodyFont:{family:"'JetBrains Mono',monospace",size:12},
+          padding:12,cornerRadius:10,
+          callbacks:{
+            label:function(ctx){
+              const v=ctx.parsed.y;
+              if(ctx.dataset.yAxisID==='y2')return ' '+ctx.dataset.label+': '+v.toFixed(1)+'%';
+              return ' '+ctx.dataset.label+': '+(v>=1000000?'$'+(v/1000000).toFixed(2)+'M':v>=1000?'$'+(v/1000).toFixed(0)+'K':'$'+v.toLocaleString());
+            }
+          }
+        }
+      },
       scales:{
-        y:{position:'left',ticks:{callback:v=>v>=1000000?'$'+(v/1000000).toFixed(1)+'M':v>=1000?'$'+(v/1000).toFixed(0)+'K':'$'+v}},
-        y2:{position:'right',display:showDebt,grid:{drawOnChartArea:false},ticks:{callback:v=>v+'%'}}
+        x:{
+          grid:{color:'rgba(148,163,184,0.1)'},
+          ticks:{font:{family:"'Noto Sans TC',sans-serif",size:11},color:'#94a3b8'}
+        },
+        y:{
+          position:'left',
+          grid:{color:'rgba(148,163,184,0.12)'},
+          ticks:{
+            font:{family:"'JetBrains Mono',monospace",size:11},color:'#64748b',
+            callback:v=>v>=1000000?'$'+(v/1000000).toFixed(1)+'M':v>=1000?'$'+(v/1000).toFixed(0)+'K':'$'+v
+          }
+        },
+        y2:{
+          position:'right',display:showDebt,
+          grid:{drawOnChartArea:false},
+          ticks:{font:{family:"'JetBrains Mono',monospace",size:11},color:'#f59e0b',callback:v=>v+'%'}
+        }
       }
     }
   });
-  // Table
-  document.getElementById('trend-table').innerHTML=`<table style="width:100%;border-collapse:collapse">
-    <thead><tr style="background:var(--sh)">
-      <th style="padding:4px 8px;text-align:left">月份</th>
-      <th style="padding:4px 8px">淨資產</th>
-      <th style="padding:4px 8px">每月股息</th>
-      <th style="padding:4px 8px">每月現金流</th>
-      <th style="padding:4px 8px">負債比</th>
-      <th style="padding:4px 8px"></th>
-    </tr></thead>
-    <tbody>${snaps.slice().reverse().map(s=>`<tr style="border-bottom:1px solid var(--border)">
-      <td style="padding:4px 8px;font-weight:600">${s.ym}</td>
-      <td style="padding:4px 8px;font-family:monospace;color:${s.net>=0?'var(--gain)':'var(--loss)'}">$${s.net.toLocaleString()}</td>
-      <td style="padding:4px 8px;font-family:monospace;color:var(--gain)">$${s.div.toLocaleString()}</td>
-      <td style="padding:4px 8px;font-family:monospace;color:${s.cf>=0?'var(--gain)':'var(--loss)'}">${s.cf>=0?'+':''}$${s.cf.toLocaleString()}</td>
-      <td style="padding:4px 8px;font-family:monospace">${s.debtRatio}%</td>
-      <td style="padding:4px 8px"><button onclick="deleteSnapshot('${s.ym}')" style="background:none;border:1px solid var(--loss);color:var(--loss);border-radius:4px;padding:2px 6px;font-size:10px;cursor:pointer">刪</button></td>
-    </tr>`).join('')}</tbody>
-  </table>`;
+  // 美化表格
+  document.getElementById('trend-table').innerHTML=`
+  <div style="overflow-x:auto;margin-top:4px">
+  <table style="width:100%;border-collapse:separate;border-spacing:0;font-family:'Noto Sans TC',sans-serif;font-size:13px">
+    <thead>
+      <tr style="background:linear-gradient(135deg,#0f172a,#1e3a5f)">
+        <th style="padding:10px 14px;text-align:left;color:rgba(255,255,255,.7);font-weight:600;font-size:11px;letter-spacing:.5px;border-radius:8px 0 0 0">月份</th>
+        <th style="padding:10px 14px;text-align:right;color:rgba(255,255,255,.7);font-weight:600;font-size:11px;letter-spacing:.5px">淨資產</th>
+        <th style="padding:10px 14px;text-align:right;color:rgba(255,255,255,.7);font-weight:600;font-size:11px;letter-spacing:.5px">每月股息</th>
+        <th style="padding:10px 14px;text-align:right;color:rgba(255,255,255,.7);font-weight:600;font-size:11px;letter-spacing:.5px">每月現金流</th>
+        <th style="padding:10px 14px;text-align:right;color:rgba(255,255,255,.7);font-weight:600;font-size:11px;letter-spacing:.5px">負債比</th>
+        <th style="padding:10px 14px;border-radius:0 8px 0 0"></th>
+      </tr>
+    </thead>
+    <tbody>
+    ${snaps.slice().reverse().map((s,i)=>{
+      const bg=i%2===0?'#fff':'#f8fafc';
+      return '<tr style="background:'+bg+';transition:background .15s" onmouseover="this.style.background='#f0f7ff'" onmouseout="this.style.background=''+bg+''">'
+        +'<td style="padding:10px 14px;font-weight:700;color:#1e293b;border-bottom:1px solid #f1f5f9">'+s.ym+'</td>'
+        +'<td style="padding:10px 14px;text-align:right;font-family:'JetBrains Mono',monospace;font-weight:600;color:'+( s.net>=0?'#2563eb':'#dc2626')+';border-bottom:1px solid #f1f5f9">$'+s.net.toLocaleString()+'</td>'
+        +'<td style="padding:10px 14px;text-align:right;font-family:'JetBrains Mono',monospace;font-weight:600;color:#16a34a;border-bottom:1px solid #f1f5f9">$'+s.div.toLocaleString()+'</td>'
+        +'<td style="padding:10px 14px;text-align:right;font-family:'JetBrains Mono',monospace;font-weight:600;color:'+(s.cf>=0?'#16a34a':'#dc2626')+';border-bottom:1px solid #f1f5f9">'+(s.cf>=0?'+':'')+s.cf.toLocaleString()+'</td>'
+        +'<td style="padding:10px 14px;text-align:right;font-family:'JetBrains Mono',monospace;color:#64748b;border-bottom:1px solid #f1f5f9">'+s.debtRatio+'%</td>'
+        +'<td style="padding:10px 14px;text-align:center;border-bottom:1px solid #f1f5f9"><button onclick="deleteSnapshot(''+s.ym+'')" style="background:none;border:1px solid #fca5a5;color:#dc2626;border-radius:6px;padding:3px 8px;font-size:10px;cursor:pointer;font-weight:600">刪</button></td>'
+        +'</tr>';
+    }).join('')}
+    </tbody>
+  </table></div>`;
 }
 
 // ═══ EDIT TITLE ═══
