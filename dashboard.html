@@ -3905,59 +3905,67 @@ function delTxnFromSearch(code, txnId){
 function buildTxnRows(inv,c){
   const txns=(inv.transactions||[]).slice().reverse();
   if(txns.length===0)return '<div class="irow-hist-empty">尚無交易記錄</div>';
-  return txns.map(t=>{
+  return txns.map(function(t){
     const isB=t.type==='buy';
     const gross=t.lots*1000*t.price;
     const fee=t.fee||0;
     const tid='txd-'+inv.id+'-'+t.id;
+    // 計算賣出損益
     let pnlHtml='';
     if(!isB&&t.lotRefs&&t.lotRefs.length){
       let cost=0;
-      t.lotRefs.forEach(ref=>{
-        const buyT=(inv.transactions||[]).find(x=>x.id===ref.txnId);
+      t.lotRefs.forEach(function(ref){
+        const buyT=(inv.transactions||[]).find(function(x){return x.id===ref.txnId;});
         if(buyT)cost+=ref.lots*1000*buyT.price+(buyT.fee||0)*(ref.lots/(buyT.lots||1));
       });
       const pnl=gross-fee-cost;
       const roi=cost>0?pnl/cost*100:0;
-      pnlHtml='<span style="color:'+(pnl>=0?'var(--gain)':'var(--loss)')+';font-weight:700;font-size:11px;font-family:JetBrains Mono,monospace">'+(pnl>=0?'+':'')+Math.round(pnl).toLocaleString()+' ('+(roi>=0?'+':'')+roi.toFixed(2)+'%)</span>';
+      const pnlColor=pnl>=0?'var(--gain)':'var(--loss)';
+      pnlHtml='<span style="color:'+pnlColor+';font-weight:700;font-size:11px">'+(pnl>=0?'+':'')+Math.round(pnl).toLocaleString()+' ('+(roi>=0?'+':'')+roi.toFixed(2)+'%)</span>';
     }
-    const canExpand=!isB&&t.lotRefs&&t.lotRefs.length;
-    const l1='<div class="irow-txn '+(isB?'irow-txn-buy':'irow-txn-sell')+'"'+(canExpand?' style="cursor:pointer" onclick="toggleTxnDetail(\\''+tid+'\\')"':'')+ '>'
-      +'<span class="irow-txn-type">''+(isB?'▲ 買入':'▼ 賣出')+'</span>'
-      +'<span>'+t.date+'</span>'
-      +'<span>'+t.lots+'張</span>'
-      +'<span style="font-family:JetBrains Mono,monospace">$'+t.price.toFixed(2)+'</span>'
-      +'<span style="font-family:JetBrains Mono,monospace">'+fmt(gross)+'</span>'
-      +'<span style="color:#94a3b8;font-size:10px">'+(fee?'手續費$'+Math.round(fee).toLocaleString():'')+'</span>'
-      +(!isB?pnlHtml:'')
-      +(t.remark&&isB?'<span class="irow-txn-note">'+t.remark+'</span>':'')
-      +(canExpand?'<button class="irow-sm-btn" id="tarr-'+tid+'" style="margin-left:auto;font-size:10px;color:#94a3b8">▼</button>':'')
-      +'<button class="irow-sm-btn del" onclick="event.stopPropagation();delTxn(\\''+inv.id+'\\',\\''+t.id+'\\')">'+'刪</button>'
-      +'</div>';
+    const canExpand=!isB&&t.lotRefs&&t.lotRefs.length>0;
+    // 第一層
+    let l1='<div class="irow-txn '+(isB?'irow-txn-buy':'irow-txn-sell')+'"';
+    if(canExpand)l1+=' style="cursor:pointer" onclick="toggleTxnDetail(\''+tid+'\')"';
+    l1+='>';
+    l1+='<span class="irow-txn-type">'+(isB?'▲ 買入':'▼ 賣出')+'</span>';
+    l1+='<span>'+t.date+'</span>';
+    l1+='<span>'+t.lots+'張</span>';
+    l1+='<span style="font-family:\'JetBrains Mono\',monospace">$'+t.price.toFixed(2)+'</span>';
+    l1+='<span style="font-family:\'JetBrains Mono\',monospace">'+fmt(gross)+'</span>';
+    l1+='<span style="color:#94a3b8;font-size:10px">'+(fee?'手續費$'+Math.round(fee).toLocaleString():'')+'</span>';
+    if(!isB)l1+=pnlHtml;
+    if(isB&&t.remark)l1+='<span class="irow-txn-note">'+t.remark+'</span>';
+    if(canExpand)l1+='<button class="irow-sm-btn" id="tarr-'+tid+'" style="margin-left:auto;font-size:10px;color:#94a3b8">▼</button>';
+    l1+='<button class="irow-sm-btn del" onclick="event.stopPropagation();delTxn(\''+inv.id+'\',\''+t.id+'\')">刪</button>';
+    l1+='</div>';
+    // 第二層（賣出才有）
     let l2='';
     if(canExpand){
-      const hdr='<div style="display:grid;grid-template-columns:85px 50px 60px 60px 85px 70px 1fr;gap:4px;padding:5px 16px;font-size:10px;font-weight:700;color:#94a3b8;background:#e0f2fe;letter-spacing:.3px">'
-        +'<span>買入日</span><span>張數</span><span>買入價</span><span>賣出價</span><span>單筆損益</span><span>報酬率</span><span>買入備註</span></div>';
-      const rows=t.lotRefs.map(ref=>{
-        const buyT=(inv.transactions||[]).find(x=>x.id===ref.txnId);
-        if(!buyT)return'';
+      let hdr='<div style="display:grid;grid-template-columns:85px 50px 60px 60px 85px 70px 1fr;gap:4px;padding:5px 16px;font-size:10px;font-weight:700;color:#94a3b8;background:#e0f2fe">';
+      hdr+='<span>買入日</span><span>張數</span><span>買入價</span><span>賣出價</span><span>單筆損益</span><span>報酬率</span><span>買入備註</span></div>';
+      let rows='';
+      t.lotRefs.forEach(function(ref){
+        const buyT=(inv.transactions||[]).find(function(x){return x.id===ref.txnId;});
+        if(!buyT)return;
         const uPnl=(t.price-buyT.price)*ref.lots*1000;
         const uRoi=buyT.price>0?(t.price-buyT.price)/buyT.price*100:0;
-        return'<div style="display:grid;grid-template-columns:85px 50px 60px 60px 85px 70px 1fr;gap:4px;padding:7px 16px;font-size:11px;background:#f0f9ff;border-bottom:1px solid #e0f2fe;font-family:JetBrains Mono,monospace">'
-          +'<span style="color:#64748b">'+buyT.date+'</span>'
-          +'<span>'+ref.lots+'張</span>'
-          +'<span style="color:#dc2626">$'+buyT.price.toFixed(2)+'</span>'
-          +'<span style="color:#16a34a">$'+t.price.toFixed(2)+'</span>'
-          +'<span style="color:'+(uPnl>=0?'var(--gain)':'var(--loss)')+';font-weight:700">'+(uPnl>=0?'+':'')+Math.round(uPnl).toLocaleString()+'</span>'
-          +'<span style="color:'+(uRoi>=0?'var(--gain)':'var(--loss)')+'">'+(uRoi>=0?'+':'')+uRoi.toFixed(2)+'%</span>'
-          +'<span style="color:#64748b;font-family:Noto Sans TC,sans-serif;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(buyT.remark||'—')+'</span>'
-          +'</div>';
-      }).join('');
+        rows+='<div style="display:grid;grid-template-columns:85px 50px 60px 60px 85px 70px 1fr;gap:4px;padding:7px 16px;font-size:11px;background:#f0f9ff;border-bottom:1px solid #e0f2fe">';
+        rows+='<span style="color:#64748b">'+buyT.date+'</span>';
+        rows+='<span>'+ref.lots+'張</span>';
+        rows+='<span style="color:#dc2626">$'+buyT.price.toFixed(2)+'</span>';
+        rows+='<span style="color:#16a34a">$'+t.price.toFixed(2)+'</span>';
+        rows+='<span style="color:'+(uPnl>=0?'var(--gain)':'var(--loss)')+';font-weight:700">'+(uPnl>=0?'+':'')+Math.round(uPnl).toLocaleString()+'</span>';
+        rows+='<span style="color:'+(uRoi>=0?'var(--gain)':'var(--loss)\')')+'">'+(uRoi>=0?'+':'')+uRoi.toFixed(2)+'%</span>';
+        rows+='<span style="color:#64748b;font-size:10px">'+( buyT.remark||'—')+'</span>';
+        rows+='</div>';
+      });
       l2='<div id="'+tid+'" style="display:none;border-bottom:2px solid #bfdbfe">'+hdr+rows+'</div>';
     }
     return l1+l2;
   }).join('');
 }
+
 function toggleTxnDetail(tid){
   const el=document.getElementById(tid);if(!el)return;
   const isOpen=el.style.display!=='none';
