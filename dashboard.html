@@ -2646,8 +2646,8 @@ function renderInv(){
         +'</div>'
         // 交易記錄
         +'<div class="irow-l3-hist">'
-          +'<div class="irow-l3-hist-title" onclick="toggleInvHist(\''+inv.id+'\')" id="hb-'+inv.id+'">📋 交易記錄（'+(inv.transactions||[]).length+' 筆）▼</div>'
-          +'<div class="irow-hist-body" id="hr-'+inv.id+'" style="display:none">'+buildTxnRows(inv,c)+'</div>'
+          +'<div class="irow-l3-hist-title" id="hb-'+inv.id+'">📋 交易記錄（'+(inv.transactions||[]).length+' 筆）</div>'
+          +'<div class="irow-hist-body" id="hr-'+inv.id+'">'+buildTxnRows(inv,c)+'</div>'
         +'</div>'
       +'</div>';
 
@@ -3095,7 +3095,14 @@ function renderDivs(){
   const yr=new Date().getFullYear().toString();
   const today=new Date().toISOString().split('T')[0];
   // pending: 除息日已到但發放日未到
-  const pendingDivs=db.dividends.filter(d=>d.pending||(d.exDate&&d.exDate<=today&&d.date&&d.date>today));
+  // pending=true 且入帳日已到 → 仍顯示在準備入帳，但加「確認入帳」按鈕
+  // pending=true 且入帳日未到 → 顯示倒數
+  // exDate到但date未到（自動pending）→ 同上
+  const pendingDivs=db.dividends.filter(d=>{
+    if(d.pending)return true; // 手動標記的一律顯示
+    if(d.exDate&&d.exDate<=today&&d.date&&d.date>today)return true; // 除息已到但入帳未到
+    return false;
+  });
   const paidDivs=db.dividends.filter(d=>!d.pending&&(!d.exDate||(d.date&&d.date<=today)));
   // 年份下拉值
   const yrSelEl=document.getElementById('div-year-sel');
