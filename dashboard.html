@@ -4391,33 +4391,30 @@ function renderTrendChart(){
     }
   });
   // 美化表格
-  document.getElementById('trend-table').innerHTML=`
-  <div style="overflow-x:auto;margin-top:4px">
-  <table style="width:100%;border-collapse:separate;border-spacing:0;font-family:'Noto Sans TC',sans-serif;font-size:13px">
-    <thead>
-      <tr style="background:linear-gradient(135deg,#0f172a,#1e3a5f)">
-        <th style="padding:10px 14px;text-align:left;color:rgba(255,255,255,.7);font-weight:600;font-size:11px;letter-spacing:.5px;border-radius:8px 0 0 0">月份</th>
-        <th style="padding:10px 14px;text-align:right;color:rgba(255,255,255,.7);font-weight:600;font-size:11px;letter-spacing:.5px">淨資產</th>
-        <th style="padding:10px 14px;text-align:right;color:rgba(255,255,255,.7);font-weight:600;font-size:11px;letter-spacing:.5px">每月股息</th>
-        <th style="padding:10px 14px;text-align:right;color:rgba(255,255,255,.7);font-weight:600;font-size:11px;letter-spacing:.5px">每月現金流</th>
-        <th style="padding:10px 14px;text-align:right;color:rgba(255,255,255,.7);font-weight:600;font-size:11px;letter-spacing:.5px">負債比</th>
-        <th style="padding:10px 14px;border-radius:0 8px 0 0"></th>
-      </tr>
-    </thead>
-    <tbody>
-    ${snaps.slice().reverse().map((s,i)=>{
-      const bg=i%2===0?'#fff':'#f8fafc';
-      return '<tr style="background:'+bg+';transition:background .15s" onmouseover="this.style.background='#f0f7ff'" onmouseout="this.style.background=''+bg+''">'
-        +'<td style="padding:10px 14px;font-weight:700;color:#1e293b;border-bottom:1px solid #f1f5f9">'+s.ym+'</td>'
-        +'<td style="padding:10px 14px;text-align:right;font-family:'JetBrains Mono',monospace;font-weight:600;color:'+( s.net>=0?'#2563eb':'#dc2626')+';border-bottom:1px solid #f1f5f9">$'+s.net.toLocaleString()+'</td>'
-        +'<td style="padding:10px 14px;text-align:right;font-family:'JetBrains Mono',monospace;font-weight:600;color:#16a34a;border-bottom:1px solid #f1f5f9">$'+s.div.toLocaleString()+'</td>'
-        +'<td style="padding:10px 14px;text-align:right;font-family:'JetBrains Mono',monospace;font-weight:600;color:'+(s.cf>=0?'#16a34a':'#dc2626')+';border-bottom:1px solid #f1f5f9">'+(s.cf>=0?'+':'')+s.cf.toLocaleString()+'</td>'
-        +'<td style="padding:10px 14px;text-align:right;font-family:'JetBrains Mono',monospace;color:#64748b;border-bottom:1px solid #f1f5f9">'+s.debtRatio+'%</td>'
-        +'<td style="padding:10px 14px;text-align:center;border-bottom:1px solid #f1f5f9"><button onclick="deleteSnapshot(''+s.ym+'')" style="background:none;border:1px solid #fca5a5;color:#dc2626;border-radius:6px;padding:3px 8px;font-size:10px;cursor:pointer;font-weight:600">刪</button></td>'
-        +'</tr>';
-    }).join('')}
-    </tbody>
-  </table></div>`;
+  // 趨勢表格（用字串拼接避免引號衝突）
+  var tblHtml='<div style="overflow-x:auto;margin-top:4px"><table style="width:100%;border-collapse:separate;border-spacing:0;font-size:13px">';
+  tblHtml+='<thead><tr style="background:linear-gradient(135deg,#0f172a,#1e3a5f)">';
+  tblHtml+='<th style="padding:10px 14px;text-align:left;color:rgba(255,255,255,.7);font-size:11px;font-weight:600">月份</th>';
+  tblHtml+='<th style="padding:10px 14px;text-align:right;color:rgba(255,255,255,.7);font-size:11px;font-weight:600">淨資產</th>';
+  tblHtml+='<th style="padding:10px 14px;text-align:right;color:rgba(255,255,255,.7);font-size:11px;font-weight:600">每月股息</th>';
+  tblHtml+='<th style="padding:10px 14px;text-align:right;color:rgba(255,255,255,.7);font-size:11px;font-weight:600">每月現金流</th>';
+  tblHtml+='<th style="padding:10px 14px;text-align:right;color:rgba(255,255,255,.7);font-size:11px;font-weight:600">負債比</th>';
+  tblHtml+='<th style="padding:10px 14px"></th></tr></thead><tbody>';
+  snaps.slice().reverse().forEach(function(s,i){
+    var bg=i%2===0?'#fff':'#f8fafc';
+    var netColor=s.net>=0?'#2563eb':'#dc2626';
+    var cfColor=s.cf>=0?'#16a34a':'#dc2626';
+    tblHtml+='<tr style="background:'+bg+'">';
+    tblHtml+='<td style="padding:10px 14px;font-weight:700;color:#1e293b;border-bottom:1px solid #f1f5f9">'+s.ym+'</td>';
+    tblHtml+='<td style="padding:10px 14px;text-align:right;font-weight:600;color:'+netColor+';border-bottom:1px solid #f1f5f9">$'+s.net.toLocaleString()+'</td>';
+    tblHtml+='<td style="padding:10px 14px;text-align:right;font-weight:600;color:#16a34a;border-bottom:1px solid #f1f5f9">$'+s.div.toLocaleString()+'</td>';
+    tblHtml+='<td style="padding:10px 14px;text-align:right;font-weight:600;color:'+cfColor+';border-bottom:1px solid #f1f5f9">'+(s.cf>=0?'+':'')+s.cf.toLocaleString()+'</td>';
+    tblHtml+='<td style="padding:10px 14px;text-align:right;color:#64748b;border-bottom:1px solid #f1f5f9">'+s.debtRatio+'%</td>';
+    tblHtml+='<td style="padding:10px 14px;text-align:center;border-bottom:1px solid #f1f5f9"><button onclick="deleteSnapshot(\'' +s.ym+ '\')" style="background:none;border:1px solid #fca5a5;color:#dc2626;border-radius:6px;padding:3px 8px;font-size:10px;cursor:pointer;font-weight:600">刪</button></td>';
+    tblHtml+='</tr>';
+  });
+  tblHtml+='</tbody></table></div>';
+  document.getElementById('trend-table').innerHTML=tblHtml;
 }
 
 // ═══ EDIT TITLE ═══
