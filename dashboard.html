@@ -1990,7 +1990,13 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
     </div>
     <div class="fr3">
       <div class="fg"><label class="fl">現金</label><input class="fi" id="c-cash" type="number" placeholder="例：5000"></div>
-      <div class="fg"><label class="fl">交割 DAY1</label><input class="fi" id="c-d1" type="number" placeholder="例：-999093"></div>
+      <div class="fg">
+        <label class="fl">交割 DAY1（買入日）<span id="c-d1-settle" style="color:var(--accent);font-size:10px;margin-left:4px"></span></label>
+        <div style="display:flex;gap:6px">
+          <input class="fi" id="c-d1-date" type="date" style="flex:1" onchange="updateSettleDate()" placeholder="交易日">
+          <input class="fi" id="c-d1" type="number" style="flex:1" placeholder="金額（負=待扣）">
+        </div>
+      </div>
       <div class="fg"><label class="fl">交割 DAY2</label><input class="fi" id="c-d2" type="number" placeholder="例：-266175"></div>
     </div>
     <div class="br"><button class="btn btn-s" onclick="closeModal('cashModal')">取消</button><button class="btn btn-p" onclick="saveCash()">儲存</button></div>
@@ -2112,73 +2118,100 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 // ═══════ DATA ═══════
 const STORE='assetDB_v6';
 
-// ── GitHub 雲端同步 ──
+// ── GitHub 雲端同步（安全版）──
 const GH_OWNER='manny76528-star';
 const GH_REPO='stock-dashboard';
 const GH_FILE='data_dashboard.json';
 const GH_TOKEN='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';
 const GH_API=`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`;
 
-let _ghSha=''; // 記錄目前檔案的 SHA（更新時需要）
+let _ghSha='';
 let _syncTimer=null;
+let _syncEnabled=true; // 可手動停用
+
+function dbWeight(d){
+  // 用資料量判斷哪份資料比較「完整」
+  return (d.investments||[]).length*100
+    +(d.loans||[]).length*10
+    +(d.dividends||[]).length*5
+    +(d.cashAccounts||[]).length*10
+    +(d.snapshots||[]).length;
+}
 
 async function ghPull(){
-  // 從 GitHub 讀取最新資料
+  if(!_syncEnabled)return false;
   try{
     const r=await fetch(GH_API+'?t='+Date.now(),{
       headers:{'Authorization':'token '+GH_TOKEN,'Accept':'application/vnd.github.v3+json'}
     });
-    if(!r.ok){if(r.status===404){console.log('data_dashboard.json 尚未存在，將在首次儲存時建立');return false;}throw new Error('Pull failed: '+r.status);}
+    if(!r.ok){
+      if(r.status===404){
+        // 遠端沒有檔案 → 本次 Push 建立
+        console.log('data_dashboard.json 不存在，略過Pull');
+        return false;
+      }
+      throw new Error('Pull '+r.status);
+    }
     const j=await r.json();
     _ghSha=j.sha;
     const remote=JSON.parse(atob(j.content.replace(/\n/g,'')));
-    // 比較時間戳，取較新的
+    const localW=dbWeight(db);
+    const remoteW=dbWeight(remote);
     const localTs=db._ts||0;
     const remoteTs=remote._ts||0;
-    if(remoteTs>localTs){
+    console.log(`Pull: 本地重量${localW} 遠端重量${remoteW} | 本地ts${localTs} 遠端ts${remoteTs}`);
+    // 安全規則：遠端資料量要比本地多，才考慮覆蓋
+    if(remoteW>localW&&remoteTs>localTs){
       db=remote;
       localStorage.setItem(STORE,JSON.stringify(db));
-      console.log('✅ 從 GitHub 同步最新資料，時間戳:',new Date(remoteTs).toLocaleString());
+      showSyncStatus('☁️ 已從雲端同步');
+      console.log('✅ Pull成功，使用遠端資料');
+      return true;
+    } else if(remoteTs>localTs&&localW===0){
+      // 本地是空的，無條件使用遠端
+      db=remote;
+      localStorage.setItem(STORE,JSON.stringify(db));
+      showSyncStatus('☁️ 已從雲端同步');
       return true;
     } else {
-      console.log('本地資料較新或相同，不覆蓋');
+      console.log('本地資料較完整，保留本地');
       return false;
     }
-  }catch(e){console.warn('GitHub Pull 失敗:',e.message);return false;}
+  }catch(e){console.warn('Pull失敗:',e.message);return false;}
 }
 
 async function ghPush(){
-  // 把最新資料推送到 GitHub
+  if(!_syncEnabled)return;
   try{
-    db._ts=Date.now(); // 更新時間戳
+    db._ts=Date.now();
     localStorage.setItem(STORE,JSON.stringify(db));
-    // 排除備份資料（太大），只同步核心資料
     const syncDb={...db};
-    delete syncDb._backup; // 移除備份欄位
+    delete syncDb._backup;
     const jsonStr=JSON.stringify(syncDb,null,2);
-    if(jsonStr.length>900000){
-      showSyncStatus('⚠️ 資料過大，略過本次同步');
-      console.warn('資料超過900KB，跳過Push');
-      return;
+    if(jsonStr.length>900000){showSyncStatus('⚠️資料過大');return;}
+    const encoded=btoa(unescape(encodeURIComponent(jsonStr)));
+    // 若沒有 sha，先嘗試取得
+    if(!_ghSha){
+      try{
+        const chk=await fetch(GH_API,{headers:{'Authorization':'token '+GH_TOKEN}});
+        if(chk.ok){const cj=await chk.json();_ghSha=cj.sha;}
+      }catch(e){}
     }
-    const content=btoa(unescape(encodeURIComponent(jsonStr)));
-    const body={message:'sync: '+new Date().toLocaleString('zh-TW'),content};
+    const body={message:'sync:'+Date.now(),content:encoded};
     if(_ghSha)body.sha=_ghSha;
     const r=await fetch(GH_API,{
       method:'PUT',
-      headers:{'Authorization':'token '+GH_TOKEN,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},
+      headers:{'Authorization':'token '+GH_TOKEN,'Content-Type':'application/json'},
       body:JSON.stringify(body)
     });
-    if(!r.ok){const e=await r.json();throw new Error(e.message||r.status);}
+    if(!r.ok){const e=await r.json();throw new Error(e.message);}
     const j=await r.json();
     _ghSha=j.content.sha;
     showSyncStatus('✅ 已同步至雲端');
-    console.log('✅ GitHub Push 成功');
-  }catch(e){showSyncStatus('⚠️ 同步失敗: '+e.message);console.warn('GitHub Push 失敗:',e.message);}
+  }catch(e){showSyncStatus('⚠️ 同步失敗');console.warn('Push失敗:',e.message);}
 }
 
 function schedulePush(){
-  // 防抖：3秒後才推送（避免頻繁寫入）
   clearTimeout(_syncTimer);
   _syncTimer=setTimeout(ghPush,3000);
 }
@@ -2188,12 +2221,12 @@ function showSyncStatus(msg){
   if(!el){
     el=document.createElement('span');
     el.id='sync-status';
-    el.style.cssText='font-size:11px;color:rgba(255,255,255,.6);margin-left:8px;';
+    el.style.cssText='font-size:11px;color:rgba(255,255,255,.6);margin-left:8px;transition:opacity .3s;';
     const topbar=document.querySelector('.db-topbar-actions');
     if(topbar)topbar.insertBefore(el,topbar.firstChild);
   }
-  el.textContent=msg;
-  setTimeout(()=>{if(el)el.textContent='';},4000);
+  el.textContent=msg;el.style.opacity='1';
+  setTimeout(()=>{el.style.opacity='0';},4000);
 }
 let db=JSON.parse(localStorage.getItem(STORE)||'null')||{investments:[],loans:[],flexLoans:[],cashAccounts:[],prices:{},dividends:[]};
 ['dividends','prices'].forEach(k=>{if(!db[k])db[k]=k==='prices'?{}:[];});
@@ -2603,7 +2636,7 @@ function renderInv(){
         // 交易記錄
         +'<div class="irow-l3-hist">'
           +'<div class="irow-l3-hist-title" onclick="toggleInvHist(\''+inv.id+'\')" id="hb-'+inv.id+'">📋 交易記錄（'+(inv.transactions||[]).length+' 筆）▼</div>'
-          +'<div class="irow-hist-body" id="hr-'+inv.id+'" style="display:none">'+tHTML+'</div>'
+          +'<div class="irow-hist-body" id="hr-'+inv.id+'" style="display:none">'+buildTxnRows(inv,c)+'</div>'
         +'</div>'
       +'</div>';
 
@@ -2969,7 +3002,7 @@ function renderCash(){
     const breakdown=document.createElement('div');
     breakdown.className='cash-card-breakdown';
     breakdown.innerHTML='<div class="cash-item"><span class="cash-item-label">現金</span><span class="cash-item-val">$'+(c.cash||0).toLocaleString()+'</span></div>'
-      +(hasD1?'<div class="cash-item"><span class="cash-item-label">交割 DAY1</span><span class="cash-item-val '+(c.d1<0?'loss':'gain')+'">$'+c.d1.toLocaleString()+'</span></div>':'')
+      +(hasD1?'<div class="cash-item"><span class="cash-item-label">交割 DAY1'+(c.d1Date?' <span style="font-size:10px;color:#94a3b8">(交割'+fmtMMDD(getSettleDate(c.d1Date))+')</span>':'')+'</span><span class="cash-item-val '+(c.d1<0?'loss':'gain')+'">$'+c.d1.toLocaleString()+'</span></div>':'')
       +(hasD2?'<div class="cash-item"><span class="cash-item-label">交割 DAY2</span><span class="cash-item-val '+(c.d2<0?'loss':'gain')+'">$'+c.d2.toLocaleString()+'</span></div>':'');
     card.appendChild(breakdown);
 
@@ -3121,7 +3154,7 @@ function renderDivs(){
       const dc=getDivColor(code);
       const inv=db.investments.find(i=>i.code===code);
       const pend=d.pending||0;
-      return '<div class="div-row" data-divcode=""+code+""" data-action="showDiv" style="border-left:4px solid '+dc+'">'
+      return '<div class="div-row" onclick="showDivDetail(\''+code+'\')" style="border-left:4px solid '+dc+';cursor:pointer">'
         +'<div class="div-row-name">'
           +'<span class="div-row-code" style="color:'+dc+'">'+code+'</span>'
           +(inv?.name?'<span class="div-row-invname">'+inv.name+'</span>':'')
@@ -3195,8 +3228,15 @@ function confirmDivPaid(id){
   if(!d.date||d.date>new Date().toISOString().split('T')[0]){
     d.date=new Date().toISOString().split('T')[0];
   }
-  save();renderDivs();renderSum();
-  toast('✅ 已確認入帳：'+d.code+' $'+Math.round(d.amount).toLocaleString());
+  // 自動加入 Line Bank
+  const lineBank=db.cashAccounts.find(c=>c.bank&&c.bank.toLowerCase().includes('line'));
+  if(lineBank){
+    lineBank.cash=(lineBank.cash||0)+Math.round(d.amount);
+    toast('✅ 已入帳：'+d.code+' $'+Math.round(d.amount).toLocaleString()+' → Line Bank');
+  } else {
+    toast('✅ 已確認入帳：'+d.code+' $'+Math.round(d.amount).toLocaleString());
+  }
+  save();renderDivs();renderCash();renderSum();
 }
 
 function toggleDivYear(){
@@ -3613,6 +3653,40 @@ function toggleCustomBank(sel){
   c.style.display=sel.value==='__custom__'?'block':'none';
   if(sel.value==='__custom__')c.focus();else c.value='';
 }
+// ── 台灣交易日計算（跳週末，國定假日需手動維護）──
+const TW_HOLIDAYS_2026=[
+  '2026-01-01','2026-01-28','2026-01-29','2026-01-30','2026-01-31',
+  '2026-02-02','2026-02-03','2026-02-04','2026-04-02','2026-04-03','2026-04-04',
+  '2026-05-01','2026-06-19','2026-09-03','2026-10-09','2026-10-10'
+];
+function isTradeDay(dateStr){
+  const d=new Date(dateStr+'T00:00:00');
+  const dow=d.getDay();
+  if(dow===0||dow===6)return false;
+  if(TW_HOLIDAYS_2026.includes(dateStr))return false;
+  return true;
+}
+function nextTradeDay(dateStr,n=1){
+  // 往後找 n 個交易日
+  let d=new Date(dateStr+'T00:00:00');
+  let count=0;
+  while(count<n){
+    d.setDate(d.getDate()+1);
+    const ds=d.toISOString().split('T')[0];
+    if(isTradeDay(ds))count++;
+  }
+  return d.toISOString().split('T')[0];
+}
+function getSettleDate(tradeDate){
+  // T+2 交易日
+  return nextTradeDay(tradeDate,2);
+}
+function fmtMMDD(dateStr){
+  if(!dateStr)return'';
+  const parts=dateStr.split('-');
+  return parts[1]+'/'+parts[2];
+}
+
 function openCashModal(id=null){
   editId=id;const c=id?db.cashAccounts.find(x=>x.id===id):null;
   const known=['台灣銀行','Line Bank','國泰銀行','凱基銀行','統一券商','期貨','永豐銀行','凱基券商'];
@@ -3627,15 +3701,29 @@ function openCashModal(id=null){
   set('c-cash',c?.cash||'');
   set('c-d1',c?.d1||'');
   set('c-d2',c?.d2||'');
+  if(document.getElementById('c-d1-date'))document.getElementById('c-d1-date').value=c?.d1Date||'';
+  updateSettleDate();
   openModal('cashModal');
 }
 function editCash(id){openCashModal(id);}
+function updateSettleDate(){
+  const tradeDate=document.getElementById('c-d1-date')?.value;
+  const label=document.getElementById('c-d1-settle');
+  if(tradeDate&&label){
+    const settle=getSettleDate(tradeDate);
+    label.textContent='交割日：'+fmtMMDD(settle);
+    // 把交割日存到 data attribute 供後續用
+    document.getElementById('c-d1-date').dataset.settle=settle;
+  }
+}
+
 function saveCash(){
   const sel=document.getElementById('c-bank').value;
   const bank=(sel==='__custom__'?document.getElementById('c-bank-custom').value.trim():sel).trim();
   if(!bank)return toast('請選擇帳戶');
   const obj={id:editId||uid(),bank,
     cash:parseFloat(document.getElementById('c-cash').value)||0,
+    d1Date:document.getElementById('c-d1-date')?.value||'',
     d1:parseFloat(document.getElementById('c-d1').value)||0,
     d2:parseFloat(document.getElementById('c-d2').value)||0};
   if(editId){const i=db.cashAccounts.findIndex(x=>x.id===editId);db.cashAccounts[i]=obj;}
@@ -3801,6 +3889,70 @@ function delTxnFromSearch(code, txnId){
   }
   runSearch();
   toast('已刪除');
+}
+
+function buildTxnRows(inv,c){
+  const txns=(inv.transactions||[]).slice().reverse();
+  if(txns.length===0)return '<div class="irow-hist-empty">尚無交易記錄</div>';
+  return txns.map(t=>{
+    const isB=t.type==='buy';
+    const gross=t.lots*1000*t.price;
+    const fee=t.fee||0;
+    const tid='txd-'+inv.id+'-'+t.id;
+    let pnlHtml='';
+    if(!isB&&t.lotRefs&&t.lotRefs.length){
+      let cost=0;
+      t.lotRefs.forEach(ref=>{
+        const buyT=(inv.transactions||[]).find(x=>x.id===ref.txnId);
+        if(buyT)cost+=ref.lots*1000*buyT.price+(buyT.fee||0)*(ref.lots/(buyT.lots||1));
+      });
+      const pnl=gross-fee-cost;
+      const roi=cost>0?pnl/cost*100:0;
+      pnlHtml='<span style="color:'+(pnl>=0?'var(--gain)':'var(--loss)')+';font-weight:700;font-size:11px;font-family:JetBrains Mono,monospace">'+(pnl>=0?'+':'')+Math.round(pnl).toLocaleString()+' ('+(roi>=0?'+':'')+roi.toFixed(2)+'%)</span>';
+    }
+    const canExpand=!isB&&t.lotRefs&&t.lotRefs.length;
+    const l1='<div class="irow-txn '+(isB?'irow-txn-buy':'irow-txn-sell')+'"'+(canExpand?' style="cursor:pointer" onclick="toggleTxnDetail(\\''+tid+'\\')"':'')+ '>'
+      +'<span class="irow-txn-type">''+(isB?'▲ 買入':'▼ 賣出')+'</span>'
+      +'<span>'+t.date+'</span>'
+      +'<span>'+t.lots+'張</span>'
+      +'<span style="font-family:JetBrains Mono,monospace">$'+t.price.toFixed(2)+'</span>'
+      +'<span style="font-family:JetBrains Mono,monospace">'+fmt(gross)+'</span>'
+      +'<span style="color:#94a3b8;font-size:10px">'+(fee?'手續費$'+Math.round(fee).toLocaleString():'')+'</span>'
+      +(!isB?pnlHtml:'')
+      +(t.remark&&isB?'<span class="irow-txn-note">'+t.remark+'</span>':'')
+      +(canExpand?'<button class="irow-sm-btn" id="tarr-'+tid+'" style="margin-left:auto;font-size:10px;color:#94a3b8">▼</button>':'')
+      +'<button class="irow-sm-btn del" onclick="event.stopPropagation();delTxn(\\''+inv.id+'\\',\\''+t.id+'\\')">'+'刪</button>'
+      +'</div>';
+    let l2='';
+    if(canExpand){
+      const hdr='<div style="display:grid;grid-template-columns:85px 50px 60px 60px 85px 70px 1fr;gap:4px;padding:5px 16px;font-size:10px;font-weight:700;color:#94a3b8;background:#e0f2fe;letter-spacing:.3px">'
+        +'<span>買入日</span><span>張數</span><span>買入價</span><span>賣出價</span><span>單筆損益</span><span>報酬率</span><span>買入備註</span></div>';
+      const rows=t.lotRefs.map(ref=>{
+        const buyT=(inv.transactions||[]).find(x=>x.id===ref.txnId);
+        if(!buyT)return'';
+        const uPnl=(t.price-buyT.price)*ref.lots*1000;
+        const uRoi=buyT.price>0?(t.price-buyT.price)/buyT.price*100:0;
+        return'<div style="display:grid;grid-template-columns:85px 50px 60px 60px 85px 70px 1fr;gap:4px;padding:7px 16px;font-size:11px;background:#f0f9ff;border-bottom:1px solid #e0f2fe;font-family:JetBrains Mono,monospace">'
+          +'<span style="color:#64748b">'+buyT.date+'</span>'
+          +'<span>'+ref.lots+'張</span>'
+          +'<span style="color:#dc2626">$'+buyT.price.toFixed(2)+'</span>'
+          +'<span style="color:#16a34a">$'+t.price.toFixed(2)+'</span>'
+          +'<span style="color:'+(uPnl>=0?'var(--gain)':'var(--loss)')+';font-weight:700">'+(uPnl>=0?'+':'')+Math.round(uPnl).toLocaleString()+'</span>'
+          +'<span style="color:'+(uRoi>=0?'var(--gain)':'var(--loss)')+'">'+(uRoi>=0?'+':'')+uRoi.toFixed(2)+'%</span>'
+          +'<span style="color:#64748b;font-family:Noto Sans TC,sans-serif;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(buyT.remark||'—')+'</span>'
+          +'</div>';
+      }).join('');
+      l2='<div id="'+tid+'" style="display:none;border-bottom:2px solid #bfdbfe">'+hdr+rows+'</div>';
+    }
+    return l1+l2;
+  }).join('');
+}
+function toggleTxnDetail(tid){
+  const el=document.getElementById(tid);if(!el)return;
+  const isOpen=el.style.display!=='none';
+  el.style.display=isOpen?'none':'block';
+  const btn=document.getElementById('tarr-'+tid);
+  if(btn)btn.textContent=isOpen?'▼':'▲';
 }
 
 function openSearchModal(){
