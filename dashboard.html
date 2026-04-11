@@ -1,4 +1,4 @@
-<!DOCTYPE html><!-- v20260405 -->
+<!DOCTYPE html><!-- v20260411 -->
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
@@ -2292,7 +2292,10 @@ function importData(e){
   const r=new FileReader();
   r.onload=ev=>{
     try{
-      const d=JSON.parse(ev.target.result);
+      const text=ev.target.result;
+      console.log('importData: 讀取到檔案，長度='+text.length);
+      const d=JSON.parse(text);
+      console.log('importData: 解析成功，investments='+(d.investments||[]).length+' loans='+(d.loans||[]).length);
       if(!d.investments&&!d.loans&&!d.cashAccounts){
         toast('❌ 格式不正確，找不到必要欄位');return;
       }
