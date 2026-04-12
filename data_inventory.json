@@ -1,0 +1,6080 @@
+{
+  "orders": [
+    {
+      "id": "mnn61h9rv3o1",
+      "date": "2022-01-09",
+      "custId": "mnmofk0wjmq9",
+      "custName": "福寶水產",
+      "contact": "李彥賢先生",
+      "phone": "0935-085-022",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙 100*150",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "100*150",
+          "qty": 70,
+          "sn": "",
+          "sns": [],
+          "cost": 300,
+          "price": 320,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶 110*91",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "110*91",
+          "qty": 30,
+          "sn": "",
+          "sns": [],
+          "cost": 130,
+          "price": 190,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2022-01-09"
+    },
+    {
+      "id": "mnn6acuig6gn",
+      "date": "2021-02-04",
+      "custId": "mnmofk0wci92",
+      "custName": "泰茂企業有限公司",
+      "contact": "陳明彥先生",
+      "phone": "0916929388",
+      "note": "ㄋ",
+      "items": [
+        {
+          "name": "掃描器 SATO CG408滾軸",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "SATO CG408滾軸",
+          "qty": 1,
+          "sn": "",
+          "cost": 10,
+          "price": 1000,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2021-02-04",
+      "createdAt": "2026-04-06T12:34:46.794Z"
+    },
+    {
+      "id": "mnn6edt6ui72",
+      "date": "2021-02-06",
+      "custId": "mnmofk0wcsf4",
+      "custName": "河川企業社",
+      "contact": "張河川先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙 100*70",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "100*70",
+          "qty": 15,
+          "sn": "",
+          "cost": 165,
+          "price": 200,
+          "invoice": true
+        },
+        {
+          "name": "珠光紙 70*40",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "70*40",
+          "qty": 50,
+          "sn": "",
+          "cost": 120,
+          "price": 160,
+          "invoice": true
+        },
+        {
+          "name": "抗刮碳帶 SP330",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "SP330",
+          "qty": 20,
+          "sn": "",
+          "cost": 139,
+          "price": 190,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2021-02-05",
+      "createdAt": "2026-04-06T12:37:54.666Z"
+    },
+    {
+      "id": "mnn6x34txi2c",
+      "date": "2021-02-27",
+      "custId": "mnn6mnr48vi7",
+      "custName": "志鵬綜合果干行",
+      "contact": "陳大鵬先生",
+      "phone": "0919-007011",
+      "note": "",
+      "items": [
+        {
+          "name": "掃描器 TSC-345",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "TSC-345",
+          "qty": 1,
+          "sn": "",
+          "cost": 7000,
+          "price": 9200,
+          "invoice": false
+        },
+        {
+          "name": "銅版紙 80*60",
+          "type": "paper",
+          "subtype": "銅版紙",
+          "spec": "80*60",
+          "qty": 16,
+          "sn": "",
+          "cost": 85,
+          "price": 120,
+          "invoice": false
+        },
+        {
+          "name": "一般碳帶 90*300",
+          "type": "ribbon",
+          "subtype": "一般碳帶",
+          "spec": "90*300",
+          "qty": 6,
+          "sn": "",
+          "cost": 125,
+          "price": 170,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2021-02-17"
+    },
+    {
+      "id": "mnn70asl3qtt",
+      "date": "2021-03-26",
+      "custId": "mnn6ymsaxyqa",
+      "custName": "屏東九如芭樂合作社",
+      "contact": "",
+      "phone": "",
+      "note": "",
+      "items": [
+        {
+          "name": "條碼機 GODEX 120",
+          "type": "device",
+          "subtype": "條碼機",
+          "spec": "GODEX 120",
+          "qty": 1,
+          "sn": "",
+          "cost": 5000,
+          "price": 9500,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶 80*300",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "80*300",
+          "qty": 15,
+          "sn": "",
+          "cost": 250,
+          "price": 350,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2021-03-26"
+    },
+    {
+      "id": "mnn73maj819j",
+      "date": "2021-04-06",
+      "custId": "mnmofk0wcsf4",
+      "custName": "河川企業社",
+      "contact": "張河川先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "抗刮碳帶 110*91",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "110*91",
+          "qty": 20,
+          "sn": "",
+          "cost": 120,
+          "price": 190,
+          "invoice": false
+        },
+        {
+          "name": "珠光紙 70*40",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "70*40",
+          "qty": 40,
+          "sn": "",
+          "cost": 120,
+          "price": 160,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2021-04-07"
+    },
+    {
+      "id": "mnn77h31ygag",
+      "date": "2021-04-15",
+      "custId": "mnn751wo4ij4",
+      "custName": "屏東郭先生",
+      "contact": "",
+      "phone": "",
+      "note": "",
+      "items": [
+        {
+          "name": "條碼機 GODEX 120",
+          "type": "device",
+          "subtype": "條碼機",
+          "spec": "GODEX 120",
+          "qty": 1,
+          "sn": "",
+          "cost": 6300,
+          "price": 8600,
+          "invoice": false
+        },
+        {
+          "name": "珠光紙 70*40",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "70*40",
+          "qty": 8,
+          "sn": "",
+          "cost": 100,
+          "price": 250,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶 SP330 80*91",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "SP330 80*91",
+          "qty": 2,
+          "sn": "",
+          "cost": 100,
+          "price": 360,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2021-04-15",
+      "createdAt": "2026-04-06T13:00:31.933Z"
+    },
+    {
+      "id": "mnn7arqzoywc",
+      "date": "2021-06-04",
+      "custId": "mnmofk0wcsf4",
+      "custName": "河川企業社",
+      "contact": "張河川先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙 100*70",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "100*70",
+          "qty": 20,
+          "sn": "",
+          "cost": 165,
+          "price": 200,
+          "invoice": false
+        },
+        {
+          "name": "珠光紙 70*40",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "70*40",
+          "qty": 40,
+          "sn": "",
+          "cost": 125,
+          "price": 160,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶 100*91",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "100*91",
+          "qty": 20,
+          "sn": "",
+          "cost": 145,
+          "price": 190,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2021-06-04",
+      "createdAt": "2026-04-06T13:03:05.723Z"
+    },
+    {
+      "id": "mnn7byt3anex",
+      "date": "2021-07-06",
+      "custId": "mnmofk0wbk4k",
+      "custName": "御富健康事業股份有限公司",
+      "contact": "黃崇師先生",
+      "phone": "",
+      "note": "",
+      "items": [
+        {
+          "name": "抗刮碳帶 110*300",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "110*300",
+          "qty": 3,
+          "sn": "",
+          "cost": 150,
+          "price": 480,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2021-07-06"
+    },
+    {
+      "id": "mnn7eep90784",
+      "date": "2021-08-24",
+      "custId": "mnmofk0wcsf4",
+      "custName": "河川企業社",
+      "contact": "張河川先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙 40米",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "40米",
+          "qty": 20,
+          "sn": "",
+          "cost": 165,
+          "price": 200,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶 110*91",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "110*91",
+          "qty": 20,
+          "sn": "",
+          "cost": 140,
+          "price": 190,
+          "invoice": false
+        },
+        {
+          "name": "珠光紙 40米",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "40米",
+          "qty": 40,
+          "sn": "",
+          "cost": 125,
+          "price": 160,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2021-08-24"
+    },
+    {
+      "id": "mnn8kcp0mhxw",
+      "date": "2021-07-13",
+      "custId": "mnmofk0wcsf4",
+      "custName": "河川企業社",
+      "contact": "張河川先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙 40米",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "40米",
+          "qty": 40,
+          "sn": "",
+          "cost": 165,
+          "price": 200,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 40,
+          "sn": "",
+          "cost": 125,
+          "price": 188,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2021-07-13",
+      "createdAt": "2026-04-06T13:38:32.388Z"
+    },
+    {
+      "id": "mnn8rps6fc71",
+      "date": "2021-07-21",
+      "custId": "mnmofk0wjmq9",
+      "custName": "福寶水產",
+      "contact": "李彥賢先生",
+      "phone": "0935-085-022",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "",
+          "qty": 50,
+          "sn": "",
+          "cost": 100,
+          "price": 165,
+          "invoice": false
+        },
+        {
+          "name": "珠光紙",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "",
+          "qty": 50,
+          "sn": "",
+          "cost": 100,
+          "price": 165,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 30,
+          "sn": "",
+          "cost": 130,
+          "price": 180,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2021-07-21",
+      "createdAt": "2026-04-06T13:44:15.942Z"
+    },
+    {
+      "id": "mnn8un5gb92m",
+      "date": "2021-09-28",
+      "custId": "mnn8sg0xwv65",
+      "custName": "大宇玩具",
+      "contact": "",
+      "phone": "",
+      "note": "",
+      "items": [
+        {
+          "name": "條碼機 EZ120",
+          "type": "device",
+          "subtype": "條碼機",
+          "spec": "EZ120",
+          "qty": 1,
+          "sn": "",
+          "cost": 4500,
+          "price": 7500,
+          "invoice": false
+        },
+        {
+          "name": "銅版紙 40*50",
+          "type": "paper",
+          "subtype": "銅版紙",
+          "spec": "40*50",
+          "qty": 4,
+          "sn": "",
+          "cost": 40,
+          "price": 90,
+          "invoice": false
+        },
+        {
+          "name": "銅版紙 50*20",
+          "type": "paper",
+          "subtype": "銅版紙",
+          "spec": "50*20",
+          "qty": 6,
+          "sn": "",
+          "cost": 40,
+          "price": 90,
+          "invoice": false
+        },
+        {
+          "name": "一般碳帶 50*300米",
+          "type": "ribbon",
+          "subtype": "一般碳帶",
+          "spec": "50*300米",
+          "qty": 5,
+          "sn": "",
+          "cost": 30,
+          "price": 110,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2021-09-28",
+      "createdAt": "2026-04-06T13:46:32.500Z"
+    },
+    {
+      "id": "mnn8zkq1rvcx",
+      "date": "2021-10-31",
+      "custId": "mnmofk0wbk4k",
+      "custName": "御富健康事業股份有限公司",
+      "contact": "黃崇師先生",
+      "phone": "",
+      "note": "EZ120 FOR 鳥松包材行",
+      "items": [
+        {
+          "name": "條碼機 EZ120",
+          "type": "device",
+          "subtype": "條碼機",
+          "spec": "EZ120",
+          "qty": 1,
+          "sn": "",
+          "cost": 2600,
+          "price": 7500,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 3,
+          "sn": "",
+          "cost": 20,
+          "price": 450,
+          "invoice": false
+        },
+        {
+          "name": "一般碳帶 100*300",
+          "type": "ribbon",
+          "subtype": "一般碳帶",
+          "spec": "100*300",
+          "qty": 2,
+          "sn": "",
+          "cost": 130,
+          "price": 210,
+          "invoice": false
+        },
+        {
+          "name": "珠光紙 50*20",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "50*20",
+          "qty": 2,
+          "sn": "",
+          "cost": 50,
+          "price": 380,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2021-10-31",
+      "createdAt": "2026-04-06T13:50:22.633Z"
+    },
+    {
+      "id": "mnn91kzv5dz8",
+      "date": "2021-11-05",
+      "custId": "mnmofk0wcsf4",
+      "custName": "河川企業社",
+      "contact": "張河川先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙 40米",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "40米",
+          "qty": 20,
+          "sn": "",
+          "cost": 165,
+          "price": 200,
+          "invoice": false
+        },
+        {
+          "name": "珠光紙 40米",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "40米",
+          "qty": 40,
+          "sn": "",
+          "cost": 120,
+          "price": 160,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 20,
+          "sn": "",
+          "cost": 120,
+          "price": 190,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2021-11-05",
+      "createdAt": "2026-04-06T13:51:56.299Z"
+    },
+    {
+      "id": "mnn9336uok1n",
+      "date": "2021-12-06",
+      "custId": "mnn92phzqp6u",
+      "custName": "台灣好味鮮股份有限公司",
+      "contact": "梁滋玲",
+      "phone": "0988-011936",
+      "note": "出貨給中正路 莊先生 SATO CG408 (無帳)",
+      "items": [
+        {
+          "name": "條碼機 SATO CG408",
+          "type": "device",
+          "subtype": "條碼機",
+          "spec": "SATO CG408",
+          "qty": 1,
+          "sn": "",
+          "cost": 100,
+          "price": 12000,
+          "invoice": false
+        },
+        {
+          "name": "珠光紙 農產履歷 75*42",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "農產履歷 75*42",
+          "qty": 15,
+          "sn": "",
+          "cost": 110,
+          "price": 185,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 10,
+          "sn": "",
+          "cost": 130,
+          "price": 180,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2021-12-06"
+    },
+    {
+      "id": "mnn97ob4rx8g",
+      "date": "2021-12-14",
+      "custId": "mnmofk0wcsf4",
+      "custName": "河川企業社",
+      "contact": "張河川先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙 40米",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "40米",
+          "qty": 40,
+          "sn": "",
+          "cost": 120,
+          "price": 160,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 40,
+          "sn": "",
+          "cost": 130,
+          "price": 190,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2021-12-14",
+      "createdAt": "2026-04-06T13:56:40.528Z"
+    },
+    {
+      "id": "mnn9bz2vixfz",
+      "date": "2022-01-05",
+      "custId": "mnmofk0wjmq9",
+      "custName": "福寶水產",
+      "contact": "李彥賢先生",
+      "phone": "0935-085-022",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "",
+          "qty": 100,
+          "sn": "",
+          "cost": 110,
+          "price": 160,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 50,
+          "sn": "",
+          "cost": 160,
+          "price": 170,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2022-01-05",
+      "createdAt": "2026-04-06T14:00:01.111Z"
+    },
+    {
+      "id": "mnn9dzcucb8e",
+      "date": "2022-01-11",
+      "custId": "mnmofk0wcsf4",
+      "custName": "河川企業社",
+      "contact": "張河川先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙 40米",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "40米",
+          "qty": 20,
+          "sn": "",
+          "cost": 165,
+          "price": 200,
+          "invoice": false
+        },
+        {
+          "name": "珠光紙 40米",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "40米",
+          "qty": 40,
+          "sn": "",
+          "cost": 125,
+          "price": 160,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 20,
+          "sn": "",
+          "cost": 140,
+          "price": 190,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2022-01-11",
+      "createdAt": "2026-04-06T14:01:34.782Z"
+    },
+    {
+      "id": "mnn9f52alh1e",
+      "date": "2022-03-15",
+      "custId": "mnmofk0wcsf4",
+      "custName": "河川企業社",
+      "contact": "張河川先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙 40米",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "40米",
+          "qty": 40,
+          "sn": "",
+          "cost": 120,
+          "price": 160,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 20,
+          "sn": "",
+          "cost": 120,
+          "price": 190,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2022-03-15",
+      "createdAt": "2026-04-06T14:02:28.834Z"
+    },
+    {
+      "id": "mnn9g0ek96ij",
+      "date": "2022-03-18",
+      "custId": "mnmofk0wess9",
+      "custName": "王強條碼企業社",
+      "contact": "王銘裕",
+      "phone": "0952668663",
+      "note": "",
+      "items": [
+        {
+          "name": "掃描器 USB",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "USB",
+          "qty": 1,
+          "sn": "C1082196",
+          "cost": 1,
+          "price": 2300,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2022-03-18",
+      "createdAt": "2026-04-06T14:03:09.453Z"
+    },
+    {
+      "id": "mnn9htzuk0s8",
+      "date": "2022-03-22",
+      "custId": "mnmofk0wiuh5",
+      "custName": "衣藝服裝批發",
+      "contact": "涂嘉昇 先生",
+      "phone": "",
+      "note": "SATO CG408 主機板維修",
+      "items": [
+        {
+          "name": "條碼機 SATO CG408 主機板",
+          "type": "device",
+          "subtype": "條碼機",
+          "spec": "SATO CG408 主機板",
+          "qty": 1,
+          "sn": "",
+          "cost": 10,
+          "price": 2100,
+          "invoice": false
+        },
+        {
+          "name": "掃描器 CINO USB CABLE",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "CINO USB CABLE",
+          "qty": 2,
+          "sn": "",
+          "cost": 10,
+          "price": 200,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2022-03-22",
+      "createdAt": "2026-04-06T14:04:34.458Z"
+    },
+    {
+      "id": "mnn9j8pl94e3",
+      "date": "2022-05-21",
+      "custId": "mnn92phzqp6u",
+      "custName": "台灣好味鮮股份有限公司",
+      "contact": "梁滋玲",
+      "phone": "0988-011936",
+      "note": "",
+      "items": [
+        {
+          "name": "條碼機 GODEX G500UES",
+          "type": "device",
+          "subtype": "條碼機",
+          "spec": "GODEX G500UES",
+          "qty": 1,
+          "sn": "IM21502964",
+          "cost": 4000,
+          "price": 10000,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2022-05-21",
+      "createdAt": "2026-04-06T14:05:40.185Z"
+    },
+    {
+      "id": "mnn9kg14btgg",
+      "date": "2022-05-25",
+      "custId": "mnmofk0wcsf4",
+      "custName": "河川企業社",
+      "contact": "張河川先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙 40米",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "40米",
+          "qty": 20,
+          "sn": "",
+          "cost": 165,
+          "price": 200,
+          "invoice": false
+        },
+        {
+          "name": "珠光紙 40米",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "40米",
+          "qty": 40,
+          "sn": "",
+          "cost": 125,
+          "price": 160,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 40,
+          "sn": "",
+          "cost": 130,
+          "price": 190,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2022-05-25",
+      "createdAt": "2026-04-06T14:06:36.328Z"
+    },
+    {
+      "id": "mnn9lku5y0gt",
+      "date": "2022-06-10",
+      "custId": "mnmofk0wcsf4",
+      "custName": "河川企業社",
+      "contact": "張河川先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙 40米",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "40米",
+          "qty": 60,
+          "sn": "",
+          "cost": 125,
+          "price": 160,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2022-06-10",
+      "createdAt": "2026-04-06T14:07:29.213Z"
+    },
+    {
+      "id": "mnnap1z9ce3t",
+      "date": "2022-06-11",
+      "custId": "mnmofk0wci92",
+      "custName": "泰茂企業有限公司",
+      "contact": "陳明彥先生",
+      "phone": "0916929388",
+      "note": "",
+      "items": [
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 16,
+          "sn": "",
+          "cost": 120,
+          "price": 150,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2022-06-11"
+    },
+    {
+      "id": "mnnar0pw4ylh",
+      "date": "2022-06-12",
+      "custId": "mnn92phzqp6u",
+      "custName": "台灣好味鮮股份有限公司",
+      "contact": "梁滋玲",
+      "phone": "0988-011936",
+      "note": "紙張_無帳",
+      "items": [
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 2,
+          "sn": "",
+          "cost": 130,
+          "price": 250,
+          "invoice": false
+        },
+        {
+          "name": "珠光紙 100*95",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "100*95",
+          "qty": 3,
+          "sn": "",
+          "cost": 60,
+          "price": 380,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2022-06-12",
+      "createdAt": "2026-04-06T14:39:42.692Z"
+    },
+    {
+      "id": "mnnarxuephot",
+      "date": "2022-06-28",
+      "custId": "mnmofk0wci92",
+      "custName": "泰茂企業有限公司",
+      "contact": "陳明彥先生",
+      "phone": "0916929388",
+      "note": "驅動安裝",
+      "items": [
+        {
+          "name": "條碼機 SATO CG 驅動",
+          "type": "device",
+          "subtype": "條碼機",
+          "spec": "SATO CG 驅動",
+          "qty": 1,
+          "sn": "",
+          "cost": 5,
+          "price": 600,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2022-06-28",
+      "createdAt": "2026-04-06T14:40:25.622Z"
+    },
+    {
+      "id": "mnnatqezhmel",
+      "date": "2022-07-07",
+      "custId": "mnn92phzqp6u",
+      "custName": "台灣好味鮮股份有限公司",
+      "contact": "梁滋玲",
+      "phone": "0988-011936",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙 100*60",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "100*60",
+          "qty": 24,
+          "sn": "",
+          "cost": 185,
+          "price": 250,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 2,
+          "sn": "",
+          "cost": 330,
+          "price": 480,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2022-07-07",
+      "createdAt": "2026-04-06T14:41:49.307Z"
+    },
+    {
+      "id": "mnnauyicnrt3",
+      "date": "2022-07-30",
+      "custId": "mnmofk0wcsf4",
+      "custName": "河川企業社",
+      "contact": "張河川先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙 40米",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "40米",
+          "qty": 40,
+          "sn": "",
+          "cost": 120,
+          "price": 160,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 40,
+          "sn": "",
+          "cost": 130,
+          "price": 190,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2022-07-30",
+      "createdAt": "2026-04-06T14:42:46.452Z"
+    },
+    {
+      "id": "mnnaxijobenv",
+      "date": "2022-08-22",
+      "custId": "mnmofk0wbk4k",
+      "custName": "御富健康事業股份有限公司",
+      "contact": "黃崇師先生",
+      "phone": "",
+      "note": "SATO CL4NX滾軸_無帳",
+      "items": [
+        {
+          "name": "條碼機 SATO CL4NX 滾軸",
+          "type": "device",
+          "subtype": "條碼機",
+          "spec": "SATO CL4NX 滾軸",
+          "qty": 1,
+          "sn": "",
+          "cost": 1,
+          "price": 2300,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2022-08-22",
+      "createdAt": "2026-04-06T14:44:45.732Z"
+    },
+    {
+      "id": "mnnb3be4vv4l",
+      "date": "2022-09-01",
+      "custId": "mnmofk0wwuzf",
+      "custName": "聿展有限公司",
+      "contact": "林老闆",
+      "phone": "0933272900",
+      "note": "",
+      "items": [
+        {
+          "name": "條碼機 CP-3140L",
+          "type": "device",
+          "subtype": "條碼機",
+          "spec": "CP-3140L",
+          "qty": 1,
+          "sn": "22A51745",
+          "cost": 7000,
+          "price": 9800,
+          "invoice": false
+        },
+        {
+          "name": "珠光紙 40*15 銀龍紙",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "40*15 銀龍紙",
+          "qty": 2,
+          "sn": "",
+          "cost": 10,
+          "price": 295,
+          "invoice": false
+        },
+        {
+          "name": "珠光紙 60*20",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "60*20",
+          "qty": 15,
+          "sn": "",
+          "cost": 280,
+          "price": 345,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶 70*300",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "70*300",
+          "qty": 6,
+          "sn": "",
+          "cost": 10,
+          "price": 280,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2022-09-01",
+      "createdAt": "2026-04-06T14:49:16.396Z"
+    },
+    {
+      "id": "mnnb4cny64i2",
+      "date": "2022-09-08",
+      "custId": "mnmofk0wcsf4",
+      "custName": "河川企業社",
+      "contact": "張河川先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙 40米",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "40米",
+          "qty": 40,
+          "sn": "",
+          "cost": 120,
+          "price": 160,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 40,
+          "sn": "",
+          "cost": 130,
+          "price": 190,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2022-09-08",
+      "createdAt": "2026-04-06T14:50:04.702Z"
+    },
+    {
+      "id": "mnnb51xkbbwq",
+      "date": "2022-10-04",
+      "custId": "mnn8sg0xwv65",
+      "custName": "大宇玩具",
+      "contact": "",
+      "phone": "",
+      "note": "",
+      "items": [
+        {
+          "name": "銅版紙 40*50",
+          "type": "paper",
+          "subtype": "銅版紙",
+          "spec": "40*50",
+          "qty": 22,
+          "sn": "",
+          "cost": 65,
+          "price": 95,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2022-10-04",
+      "createdAt": "2026-04-06T14:50:37.448Z"
+    },
+    {
+      "id": "mnnb6sku7d4i",
+      "date": "2022-10-08",
+      "custId": "mnn751wo4ij4",
+      "custName": "屏東郭先生",
+      "contact": "",
+      "phone": "",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙 40米",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "40米",
+          "qty": 10,
+          "sn": "",
+          "cost": 120,
+          "price": 250,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶 90*91米",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "90*91米",
+          "qty": 5,
+          "sn": "",
+          "cost": 50,
+          "price": 230,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2022-10-08",
+      "createdAt": "2026-04-06T14:51:58.638Z"
+    },
+    {
+      "id": "mnnb7qyeximy",
+      "date": "2022-10-27",
+      "custId": "mnmofk0wci92",
+      "custName": "泰茂企業有限公司",
+      "contact": "陳明彥先生",
+      "phone": "0916929388",
+      "note": "",
+      "items": [
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 20,
+          "sn": "",
+          "cost": 119,
+          "price": 150,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2022-10-27",
+      "createdAt": "2026-04-06T14:52:43.190Z"
+    },
+    {
+      "id": "mnnb90ski70u",
+      "date": "2022-11-01",
+      "custId": "mnmofk0w94kc",
+      "custName": "興業企業行",
+      "contact": "黃柏堯先生",
+      "phone": "07-6109199",
+      "note": "PCHOME購買",
+      "items": [
+        {
+          "name": "掃描器 二維藍芽",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "二維藍芽",
+          "qty": 1,
+          "sn": "",
+          "cost": 1000,
+          "price": 2700,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2022-11-01",
+      "createdAt": "2026-04-06T14:53:42.596Z"
+    },
+    {
+      "id": "mnnbamrupxas",
+      "date": "2022-11-12",
+      "custId": "mnmofk0wcsf4",
+      "custName": "河川企業社",
+      "contact": "張河川先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙 40米",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "40米",
+          "qty": 20,
+          "sn": "",
+          "cost": 165,
+          "price": 200,
+          "invoice": false
+        },
+        {
+          "name": "珠光紙 40米",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "40米",
+          "qty": 40,
+          "sn": "",
+          "cost": 120,
+          "price": 160,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 20,
+          "sn": "",
+          "cost": 119,
+          "price": 190,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2022-11-12",
+      "createdAt": "2026-04-06T14:54:57.738Z"
+    },
+    {
+      "id": "mnnbbtbwzfrk",
+      "date": "2022-11-15",
+      "custId": "mnmofk0wess9",
+      "custName": "王強條碼企業社",
+      "contact": "王銘裕",
+      "phone": "0952668663",
+      "note": "華東拆機 賣7000 不保固",
+      "items": [
+        {
+          "name": "條碼機 SATO CL4NX 203 印字頭",
+          "type": "device",
+          "subtype": "條碼機",
+          "spec": "SATO CL4NX 203 印字頭",
+          "qty": 1,
+          "sn": "EDB-8Y-01169",
+          "cost": 10,
+          "price": 7000,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2022-11-15",
+      "createdAt": "2026-04-06T14:55:52.892Z"
+    },
+    {
+      "id": "mnnbe31ukjec",
+      "date": "2022-11-21",
+      "custId": "mnmofk0wess9",
+      "custName": "王強條碼企業社",
+      "contact": "王銘裕",
+      "phone": "0952668663",
+      "note": "長華黑帳",
+      "items": [
+        {
+          "name": "掃描器 CINO F680 RS232+ADAPTER",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "CINO F680 RS232+ADAPTER",
+          "qty": 1,
+          "sn": "C2361011",
+          "cost": 10,
+          "price": 1100,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2022-11-21",
+      "createdAt": "2026-04-06T14:57:38.802Z"
+    },
+    {
+      "id": "mnnbfrbhpuyo",
+      "date": "2022-12-19",
+      "custId": "mnnbesyceej1",
+      "custName": "蝦皮賣場",
+      "contact": "",
+      "phone": "",
+      "note": "",
+      "items": [
+        {
+          "name": "掃描器 HONEYWELL USB CABLE",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "HONEYWELL USB CABLE",
+          "qty": 10,
+          "sn": "",
+          "cost": 1,
+          "price": 150,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2022-12-19",
+      "createdAt": "2026-04-06T14:58:56.909Z"
+    },
+    {
+      "id": "mnnbgzfca23a",
+      "date": "2022-12-21",
+      "custId": "mnmofk0wbk4k",
+      "custName": "御富健康事業股份有限公司",
+      "contact": "黃崇師先生",
+      "phone": "",
+      "note": "碳帶_無帳",
+      "items": [
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 3,
+          "sn": "",
+          "cost": 1,
+          "price": 400,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2022-12-21"
+    },
+    {
+      "id": "mnnbi3zjg5qe",
+      "date": "2022-12-28",
+      "custId": "mnmofk0wcsf4",
+      "custName": "河川企業社",
+      "contact": "張河川先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙 40米",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "40米",
+          "qty": 40,
+          "sn": "",
+          "cost": 120,
+          "price": 160,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 20,
+          "sn": "",
+          "cost": 120,
+          "price": 190,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2022-12-28",
+      "createdAt": "2026-04-06T15:00:46.639Z"
+    },
+    {
+      "id": "mnncafdxa2ah",
+      "date": "2023-01-01",
+      "custId": "mnmofk0wiuh5",
+      "custName": "衣藝服裝批發",
+      "contact": "涂嘉昇 先生",
+      "phone": "",
+      "note": "",
+      "items": [
+        {
+          "name": "銅版紙 40*30熱感紙",
+          "type": "paper",
+          "subtype": "銅版紙",
+          "spec": "40*30熱感紙",
+          "qty": 32,
+          "sn": "",
+          "cost": 38,
+          "price": 68,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2023-01-01",
+      "createdAt": "2026-04-06T15:22:47.781Z"
+    },
+    {
+      "id": "mnncdmfs9oyl",
+      "date": "2023-02-05",
+      "custId": "mnnbesyceej1",
+      "custName": "蝦皮賣場",
+      "contact": "",
+      "phone": "",
+      "note": "",
+      "items": [
+        {
+          "name": "掃描器 CINO USB CABLE",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "CINO USB CABLE",
+          "qty": 12,
+          "sn": "",
+          "cost": 15,
+          "price": 150,
+          "invoice": false
+        },
+        {
+          "name": "掃描器 HONEYWELL USB CABLE",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "HONEYWELL USB CABLE",
+          "qty": 3,
+          "sn": "",
+          "cost": 3,
+          "price": 300,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2023-02-05",
+      "createdAt": "2026-04-06T15:25:16.888Z"
+    },
+    {
+      "id": "mnncfezd0maz",
+      "date": "2023-02-14",
+      "custId": "mnn6mnr48vi7",
+      "custName": "志鵬綜合果干行",
+      "contact": "陳大鵬先生",
+      "phone": "0919-007011",
+      "note": "",
+      "items": [
+        {
+          "name": "條碼機 ARGOX CX3040",
+          "type": "device",
+          "subtype": "條碼機",
+          "spec": "ARGOX CX3040",
+          "qty": 1,
+          "sn": "22B53569",
+          "cost": 6800,
+          "price": 9300,
+          "invoice": false
+        },
+        {
+          "name": "條碼機 TSC 345 維修印字頭卡蠟",
+          "type": "device",
+          "subtype": "條碼機",
+          "spec": "TSC 345 維修印字頭卡蠟",
+          "qty": 1,
+          "sn": "",
+          "cost": 1,
+          "price": 1500,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2023-02-14",
+      "createdAt": "2026-04-06T15:26:40.537Z"
+    },
+    {
+      "id": "mnncgndxq8e7",
+      "date": "2023-02-24",
+      "custId": "mnmofk0wwuzf",
+      "custName": "聿展有限公司",
+      "contact": "林老闆",
+      "phone": "0933272900",
+      "note": "",
+      "items": [
+        {
+          "name": "抗刮碳帶 70*210_型號4070",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "70*210_型號4070",
+          "qty": 11,
+          "sn": "",
+          "cost": 1,
+          "price": 200,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2023-02-24",
+      "createdAt": "2026-04-06T15:27:38.085Z"
+    },
+    {
+      "id": "mnncic0g0d5j",
+      "date": "2023-03-05",
+      "custId": "mnmofk0wcsf4",
+      "custName": "河川企業社",
+      "contact": "張河川先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙 40米",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "40米",
+          "qty": 40,
+          "sn": "",
+          "cost": 120,
+          "price": 160,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 40,
+          "sn": "",
+          "cost": 130,
+          "price": 190,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2023-03-05",
+      "createdAt": "2026-04-06T15:28:56.656Z"
+    },
+    {
+      "id": "mnncj4wqy3ce",
+      "date": "2023-02-25",
+      "custId": "mnncin3g7nas",
+      "custName": "公司旁_汽車保養廠",
+      "contact": "",
+      "phone": "",
+      "note": "",
+      "items": [
+        {
+          "name": "掃描器 保養維修",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "保養維修",
+          "qty": 1,
+          "sn": "",
+          "cost": 1,
+          "price": 1501,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2023-02-25",
+      "createdAt": "2026-04-06T15:29:34.106Z"
+    },
+    {
+      "id": "mnncorzwjqwp",
+      "date": "2023-03-09",
+      "custId": "mnmofk0wpc0i",
+      "custName": "訊控有限公司",
+      "contact": "陳甫騁先生",
+      "phone": "0935111093",
+      "note": "進貨來源_政宏",
+      "items": [
+        {
+          "name": "條碼機 USB",
+          "type": "device",
+          "subtype": "條碼機",
+          "spec": "USB",
+          "qty": 1,
+          "sn": "IN22100625",
+          "cost": 7500,
+          "price": 9300,
+          "invoice": false
+        },
+        {
+          "name": "珠光紙",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "",
+          "qty": 40,
+          "sn": "",
+          "cost": 170,
+          "price": 230,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 10,
+          "sn": "",
+          "cost": 300,
+          "price": 410,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2023-03-09"
+    },
+    {
+      "id": "mnnctbxhwlqs",
+      "date": "2023-03-16",
+      "custId": "mnmofk0wess9",
+      "custName": "王強條碼企業社",
+      "contact": "王銘裕",
+      "phone": "0952668663",
+      "note": "",
+      "items": [
+        {
+          "name": "掃描器 CINO F680 RS232",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "CINO F680 RS232",
+          "qty": 1,
+          "sn": "C2430749",
+          "cost": 1,
+          "price": 1100,
+          "invoice": false
+        },
+        {
+          "name": "掃描器 CINO F680 RS232",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "CINO F680 RS232",
+          "qty": 1,
+          "sn": "C2430750",
+          "cost": 1,
+          "price": 1098,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2023-03-16",
+      "createdAt": "2026-04-06T15:37:29.765Z"
+    },
+    {
+      "id": "mnncxrtaihd1",
+      "date": "2023-03-25",
+      "custId": "mnmofk0wpc0i",
+      "custName": "訊控有限公司",
+      "contact": "陳甫騁先生",
+      "phone": "0935111093",
+      "note": "政宏進貨",
+      "items": [
+        {
+          "name": "條碼機 USB",
+          "type": "device",
+          "subtype": "條碼機",
+          "spec": "USB",
+          "qty": 1,
+          "sn": "IN22100627",
+          "cost": 7500,
+          "price": 9300,
+          "invoice": false
+        },
+        {
+          "name": "掃描器",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "",
+          "qty": 1,
+          "sn": "22136B2059",
+          "cost": 6000,
+          "price": 8000,
+          "invoice": false
+        },
+        {
+          "name": "掃描器",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "",
+          "qty": 1,
+          "sn": "22137B0BCD",
+          "cost": 6000,
+          "price": 8000,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2023-03-25",
+      "createdAt": "2026-04-06T15:40:56.974Z"
+    },
+    {
+      "id": "mnnczwltcfbs",
+      "date": "2023-03-31",
+      "custId": "mnmofk0wnp95",
+      "custName": "宜茂企業有限公司",
+      "contact": "陳靜宜",
+      "phone": "",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙 95*90",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "95*90",
+          "qty": 16,
+          "sn": "",
+          "cost": 185,
+          "price": 230,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 3,
+          "sn": "",
+          "cost": 200,
+          "price": 450,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2023-03-31",
+      "createdAt": "2026-04-06T15:42:36.497Z"
+    },
+    {
+      "id": "mnnd1vq9o34c",
+      "date": "2023-04-27",
+      "custId": "mnmofk0wci92",
+      "custName": "泰茂企業有限公司",
+      "contact": "陳明彥先生",
+      "phone": "0916929388",
+      "note": "",
+      "items": [
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 20,
+          "sn": "",
+          "cost": 60,
+          "price": 150,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2023-04-27",
+      "createdAt": "2026-04-06T15:44:08.673Z"
+    },
+    {
+      "id": "mnnd2uhzw16u",
+      "date": "2023-05-01",
+      "custId": "mnmofk0wess9",
+      "custName": "王強條碼企業社",
+      "contact": "王銘裕",
+      "phone": "0952668663",
+      "note": "",
+      "items": [
+        {
+          "name": "掃描器 CINO F680 RS232",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "CINO F680 RS232",
+          "qty": 1,
+          "sn": "C2361015",
+          "cost": 0,
+          "price": 1100,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2023-05-01",
+      "createdAt": "2026-04-06T15:44:53.735Z"
+    },
+    {
+      "id": "mnnd7kafu4wr",
+      "date": "2023-05-15",
+      "custId": "mnmofk0wpc0i",
+      "custName": "訊控有限公司",
+      "contact": "陳甫騁先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "條碼機 USB",
+          "type": "device",
+          "subtype": "條碼機",
+          "spec": "USB",
+          "qty": 1,
+          "sn": "IN22100636",
+          "cost": 7500,
+          "price": 9300,
+          "invoice": false
+        },
+        {
+          "name": "掃描器",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "",
+          "qty": 1,
+          "sn": "22136B2042",
+          "cost": 6200,
+          "price": 8000,
+          "invoice": false
+        },
+        {
+          "name": "珠光紙",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "",
+          "qty": 40,
+          "sn": "",
+          "cost": 170,
+          "price": 230,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 10,
+          "sn": "",
+          "cost": 300,
+          "price": 410,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2023-05-15",
+      "createdAt": "2026-04-06T15:48:33.783Z"
+    },
+    {
+      "id": "mnnd9bc75gob",
+      "date": "2023-05-18",
+      "custId": "mnmofk0wcsf4",
+      "custName": "河川企業社",
+      "contact": "張河川先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙 40米",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "40米",
+          "qty": 20,
+          "sn": "",
+          "cost": 165,
+          "price": 200,
+          "invoice": false
+        },
+        {
+          "name": "珠光紙 40米",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "40米",
+          "qty": 20,
+          "sn": "",
+          "cost": 125,
+          "price": 160,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 20,
+          "sn": "",
+          "cost": 60,
+          "price": 190,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2023-05-18",
+      "createdAt": "2026-04-06T15:49:55.495Z"
+    },
+    {
+      "id": "mnndbge0hh5c",
+      "date": "2023-05-11",
+      "custId": "mnncin3g7nas",
+      "custName": "公司旁_汽車保養廠",
+      "contact": "",
+      "phone": "",
+      "note": "汽車保養(800) + 發電機費用4500 (報價6400)",
+      "items": [
+        {
+          "name": "掃描器 汽車保養",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "汽車保養",
+          "qty": 1,
+          "sn": "",
+          "cost": 1,
+          "price": 2500,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2023-05-11",
+      "createdAt": "2026-04-06T15:51:35.352Z"
+    },
+    {
+      "id": "mnndepv6rwbk",
+      "date": "2023-05-22",
+      "custId": "mnmofk0wpc0i",
+      "custName": "訊控有限公司",
+      "contact": "陳甫騁先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙 10*9",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "10*9",
+          "qty": 10,
+          "sn": "",
+          "cost": 210,
+          "price": 230,
+          "invoice": false
+        },
+        {
+          "name": "珠光紙 8*5",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "8*5",
+          "qty": 20,
+          "sn": "",
+          "cost": 135,
+          "price": 190,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 2,
+          "sn": "",
+          "cost": 330,
+          "price": 420,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 5,
+          "sn": "",
+          "cost": 268,
+          "price": 360,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2023-05-22",
+      "createdAt": "2026-04-06T15:54:07.602Z"
+    },
+    {
+      "id": "mnndl3uivnqb",
+      "date": "2023-05-23",
+      "custId": "mnmofk0w94kc",
+      "custName": "興業企業行",
+      "contact": "黃柏堯先生",
+      "phone": "07-6109199",
+      "note": "這台機器沒有TEAR OFF功能 不太推薦",
+      "items": [
+        {
+          "name": "條碼機 GODEX GE300 LAN PORT",
+          "type": "device",
+          "subtype": "條碼機",
+          "spec": "GODEX GE300 LAN PORT",
+          "qty": 1,
+          "sn": "L121A00451",
+          "cost": 4900,
+          "price": 6500,
+          "invoice": false
+        },
+        {
+          "name": "珠光紙 100*100",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "100*100",
+          "qty": 6,
+          "sn": "",
+          "cost": 140,
+          "price": 270,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 5,
+          "sn": "",
+          "cost": 60,
+          "price": 190,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2023-05-23"
+    },
+    {
+      "id": "mnndmjkfhrup",
+      "date": "2023-06-01",
+      "custId": "mnncin3g7nas",
+      "custName": "公司旁_汽車保養廠",
+      "contact": "",
+      "phone": "",
+      "note": "發電機皮帶(700) , 動力皮帶(500) ",
+      "items": [
+        {
+          "name": "掃描器 汽車保養",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "汽車保養",
+          "qty": 1,
+          "sn": "",
+          "cost": 1,
+          "price": 1501,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2023-06-01",
+      "createdAt": "2026-04-06T16:00:12.687Z"
+    },
+    {
+      "id": "mnndnyictyae",
+      "date": "2023-06-04",
+      "custId": "mnmofk0w94kc",
+      "custName": "興業企業行",
+      "contact": "黃柏堯先生",
+      "phone": "07-6109199",
+      "note": "",
+      "items": [
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 10,
+          "sn": "",
+          "cost": 130,
+          "price": 270,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2023-06-04",
+      "createdAt": "2026-04-06T16:01:18.708Z"
+    },
+    {
+      "id": "mnndotj0ymru",
+      "date": "2023-06-06",
+      "custId": "mnn92phzqp6u",
+      "custName": "台灣好味鮮股份有限公司",
+      "contact": "梁滋玲",
+      "phone": "0988-011936",
+      "note": "碳帶_沒帳",
+      "items": [
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 1,
+          "sn": "",
+          "cost": 1,
+          "price": 421,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2023-06-06",
+      "createdAt": "2026-04-06T16:01:58.908Z"
+    },
+    {
+      "id": "mnndrxwep8zx",
+      "date": "2023-06-07",
+      "custId": "mnndpcz60xma",
+      "custName": "和益_介紹屏東客戶",
+      "contact": "熊小姐",
+      "phone": "",
+      "note": "碳帶_沒帳",
+      "items": [
+        {
+          "name": "條碼機 ARGOX CX2140",
+          "type": "device",
+          "subtype": "條碼機",
+          "spec": "ARGOX CX2140",
+          "qty": 1,
+          "sn": "22J57760",
+          "cost": 5800,
+          "price": 8350,
+          "invoice": false
+        },
+        {
+          "name": "珠光紙 70*35",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "70*35",
+          "qty": 7,
+          "sn": "",
+          "cost": 310,
+          "price": 430,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 4,
+          "sn": "",
+          "cost": 10,
+          "price": 420,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2023-06-07",
+      "createdAt": "2026-04-06T16:04:24.542Z"
+    },
+    {
+      "id": "mnndsumwodwv",
+      "date": "2023-06-20",
+      "custId": "mnmofk0wjmq9",
+      "custName": "福寶水產",
+      "contact": "李彥賢先生",
+      "phone": "0935-085-022",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "",
+          "qty": 100,
+          "sn": "",
+          "cost": 110,
+          "price": 160,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2023-06-20",
+      "createdAt": "2026-04-06T16:05:06.968Z"
+    },
+    {
+      "id": "mnndtorw3yt6",
+      "date": "2023-06-21",
+      "custId": "mnmofk0wcsf4",
+      "custName": "河川企業社",
+      "contact": "張河川先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙 40米",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "40米",
+          "qty": 40,
+          "sn": "",
+          "cost": 120,
+          "price": 160,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2023-06-21",
+      "createdAt": "2026-04-06T16:05:46.028Z"
+    },
+    {
+      "id": "mnndwxd18gc1",
+      "date": "2023-06-22",
+      "custId": "mnmofk0w94kc",
+      "custName": "興業企業行",
+      "contact": "黃柏堯先生",
+      "phone": "07-6109199",
+      "note": "興業介紹_張先生(搬到後庄)",
+      "items": [
+        {
+          "name": "條碼機 TSC MB240T+剝離器",
+          "type": "device",
+          "subtype": "條碼機",
+          "spec": "TSC MB240T+剝離器",
+          "qty": 1,
+          "sn": "MB222460397",
+          "cost": 25000,
+          "price": 27500,
+          "invoice": false
+        },
+        {
+          "name": "珠光紙 80*60",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "80*60",
+          "qty": 30,
+          "sn": "",
+          "cost": 260,
+          "price": 295,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶 90*300",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "90*300",
+          "qty": 7,
+          "sn": "",
+          "cost": 200,
+          "price": 270,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2023-06-22",
+      "createdAt": "2026-04-06T16:08:17.125Z"
+    },
+    {
+      "id": "mnndxememarh",
+      "date": "2023-06-27",
+      "custId": "mnmofk0wci92",
+      "custName": "泰茂企業有限公司",
+      "contact": "陳明彥先生",
+      "phone": "0916929388",
+      "note": "",
+      "items": [
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 20,
+          "sn": "",
+          "cost": 60,
+          "price": 150,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2023-06-27",
+      "createdAt": "2026-04-06T16:08:39.494Z"
+    },
+    {
+      "id": "mnndyaylpcpd",
+      "date": "2023-06-30",
+      "custId": "mnmofk0w94kc",
+      "custName": "興業企業行",
+      "contact": "黃柏堯先生",
+      "phone": "07-6109199",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "",
+          "qty": 60,
+          "sn": "",
+          "cost": 140,
+          "price": 270,
+          "invoice": true
+        }
+      ],
+      "paid": true,
+      "paidDate": "2023-06-30",
+      "createdAt": "2026-04-06T16:09:21.405Z"
+    },
+    {
+      "id": "mnndz4j57we7",
+      "date": "2023-07-03",
+      "custId": "mnmofk0wpc0i",
+      "custName": "訊控有限公司",
+      "contact": "陳甫騁先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "條碼機 USB",
+          "type": "device",
+          "subtype": "條碼機",
+          "spec": "USB",
+          "qty": 1,
+          "sn": "IN22A00169",
+          "cost": 7500,
+          "price": 9300,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2023-07-03",
+      "createdAt": "2026-04-06T16:09:59.729Z"
+    },
+    {
+      "id": "mnne0a3bfd8y",
+      "date": "2023-08-03",
+      "custId": "mnmofk0wwuzf",
+      "custName": "聿展有限公司",
+      "contact": "林老闆",
+      "phone": "0933272900",
+      "note": "維修_ARGOX CP3140L USB port抓不到 換usb插孔就好了",
+      "items": [
+        {
+          "name": "條碼機 ARGOX CP3140維修",
+          "type": "device",
+          "subtype": "條碼機",
+          "spec": "ARGOX CP3140維修",
+          "qty": 1,
+          "sn": "",
+          "cost": 1,
+          "price": 1301,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2023-08-03",
+      "createdAt": "2026-04-06T16:10:53.591Z"
+    },
+    {
+      "id": "mnne1oty6hnt",
+      "date": "2023-08-08",
+      "custId": "mnmofk0wcsf4",
+      "custName": "河川企業社",
+      "contact": "張河川先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙 40米",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "40米",
+          "qty": 20,
+          "sn": "",
+          "cost": 165,
+          "price": 200,
+          "invoice": true
+        },
+        {
+          "name": "珠光紙 40米",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "40米",
+          "qty": 40,
+          "sn": "",
+          "cost": 120,
+          "price": 160,
+          "invoice": true
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 20,
+          "sn": "",
+          "cost": 60,
+          "price": 190,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2023-08-08",
+      "createdAt": "2026-04-06T16:11:59.350Z"
+    },
+    {
+      "id": "mnne2g9w2kuz",
+      "date": "2023-08-09",
+      "custId": "mnncin3g7nas",
+      "custName": "公司旁_汽車保養廠",
+      "contact": "",
+      "phone": "",
+      "note": "更換汽車左燈殼1700(報價2900)",
+      "items": [
+        {
+          "name": "掃描器 汽車維修",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "汽車維修",
+          "qty": 1,
+          "sn": "",
+          "cost": 1,
+          "price": 1001,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2023-08-09",
+      "createdAt": "2026-04-06T16:12:34.916Z"
+    },
+    {
+      "id": "mnne36lakqd2",
+      "date": "2023-08-21",
+      "custId": "mnmofk0w94kc",
+      "custName": "興業企業行",
+      "contact": "黃柏堯先生",
+      "phone": "07-6109199",
+      "note": "",
+      "items": [
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 20,
+          "sn": "",
+          "cost": 60,
+          "price": 190,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2023-08-21",
+      "createdAt": "2026-04-06T16:13:09.022Z"
+    },
+    {
+      "id": "mnne5r8i5zp8",
+      "date": "2023-08-31",
+      "custId": "mnmofk0wiuh5",
+      "custName": "衣藝服裝批發",
+      "contact": "涂嘉昇 先生",
+      "phone": "",
+      "note": "",
+      "items": [
+        {
+          "name": "銅版紙 40*30熱感紙",
+          "type": "paper",
+          "subtype": "銅版紙",
+          "spec": "40*30熱感紙",
+          "qty": 40,
+          "sn": "",
+          "cost": 42,
+          "price": 68,
+          "invoice": false
+        },
+        {
+          "name": "一般碳帶 50*91米",
+          "type": "ribbon",
+          "subtype": "一般碳帶",
+          "spec": "50*91米",
+          "qty": 10,
+          "sn": "",
+          "cost": 30,
+          "price": 85,
+          "invoice": false
+        },
+        {
+          "name": "銅版紙 40*30 銅版紙染色",
+          "type": "paper",
+          "subtype": "銅版紙",
+          "spec": "40*30 銅版紙染色",
+          "qty": 40,
+          "sn": "",
+          "cost": 60,
+          "price": 75,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2023-08-31",
+      "createdAt": "2026-04-06T16:15:09.090Z"
+    },
+    {
+      "id": "mnne6kwzsl2y",
+      "date": "2023-09-22",
+      "custId": "mnncin3g7nas",
+      "custName": "公司旁_汽車保養廠",
+      "contact": "",
+      "phone": "",
+      "note": "更換汽車右燈殼 蝦皮買800(報價2400)",
+      "items": [
+        {
+          "name": "掃描器 汽車維修 燈殼更換",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "汽車維修 燈殼更換",
+          "qty": 1,
+          "sn": "",
+          "cost": 1,
+          "price": 1501,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2023-09-22",
+      "createdAt": "2026-04-06T16:15:47.555Z"
+    },
+    {
+      "id": "mnne7pz783a2",
+      "date": "2023-10-12",
+      "custId": "mnmofk0wcsf4",
+      "custName": "河川企業社",
+      "contact": "張河川先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙 40米",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "40米",
+          "qty": 40,
+          "sn": "",
+          "cost": 120,
+          "price": 160,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 20,
+          "sn": "",
+          "cost": 60,
+          "price": 190,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2023-10-12",
+      "createdAt": "2026-04-06T16:16:40.771Z"
+    },
+    {
+      "id": "mnneawack49a",
+      "date": "2023-10-06",
+      "custId": "mnmofk0wpc0i",
+      "custName": "訊控有限公司",
+      "contact": "陳甫騁先生",
+      "phone": "0935111093",
+      "note": "其中一台來源 掛給佐茂取得",
+      "items": [
+        {
+          "name": "條碼機 USB",
+          "type": "device",
+          "subtype": "條碼機",
+          "spec": "USB",
+          "qty": 1,
+          "sn": "IN23300203",
+          "cost": 7500,
+          "price": 9300,
+          "invoice": false
+        },
+        {
+          "name": "條碼機 USB",
+          "type": "device",
+          "subtype": "條碼機",
+          "spec": "USB",
+          "qty": 1,
+          "sn": "IN23300201",
+          "cost": 7500,
+          "price": 9300,
+          "invoice": false
+        },
+        {
+          "name": "掃描器",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "",
+          "qty": 1,
+          "sn": "22355B0873",
+          "cost": 5000,
+          "price": 8000,
+          "invoice": false
+        },
+        {
+          "name": "掃描器",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "",
+          "qty": 1,
+          "sn": "22223B0910",
+          "cost": 5000,
+          "price": 8000,
+          "invoice": false
+        },
+        {
+          "name": "掃描器",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "",
+          "qty": 1,
+          "sn": "23223B0951",
+          "cost": 5000,
+          "price": 8000,
+          "invoice": false
+        },
+        {
+          "name": "掃描器",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "",
+          "qty": 1,
+          "sn": "",
+          "cost": 1000,
+          "price": 8000,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2023-10-06",
+      "createdAt": "2026-04-06T16:19:08.916Z"
+    },
+    {
+      "id": "mnnebytb78o1",
+      "date": "2023-10-17",
+      "custId": "mnmofk0wpc0i",
+      "custName": "訊控有限公司",
+      "contact": "陳甫騁先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "",
+          "qty": 40,
+          "sn": "",
+          "cost": 170,
+          "price": 230,
+          "invoice": true
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 10,
+          "sn": "",
+          "cost": 300,
+          "price": 420,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2023-10-17",
+      "createdAt": "2026-04-06T16:19:58.847Z"
+    },
+    {
+      "id": "mnnedvu5d3d8",
+      "date": "2023-10-23",
+      "custId": "mnmofk0wvucy",
+      "custName": "騰亦資訊",
+      "contact": "Jack歐",
+      "phone": "07-5885038",
+      "note": "來源 : 璟茂科技, 強茂",
+      "items": [
+        {
+          "name": "掃描器 USB",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "USB",
+          "qty": 1,
+          "sn": "C2221750",
+          "cost": 100,
+          "price": 2350,
+          "invoice": false
+        },
+        {
+          "name": "掃描器 USB",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "USB",
+          "qty": 1,
+          "sn": "C0220698",
+          "cost": 100,
+          "price": 2350,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2023-10-23",
+      "createdAt": "2026-04-06T16:21:28.301Z"
+    },
+    {
+      "id": "mnneg1jwggp1",
+      "date": "2023-11-01",
+      "custId": "mnmofk0wpc0i",
+      "custName": "訊控有限公司",
+      "contact": "陳甫騁先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "條碼機 USB",
+          "type": "device",
+          "subtype": "條碼機",
+          "spec": "USB",
+          "qty": 1,
+          "sn": "IN23300197",
+          "cost": 7500,
+          "price": 9300,
+          "invoice": false
+        },
+        {
+          "name": "條碼機 USB",
+          "type": "device",
+          "subtype": "條碼機",
+          "spec": "USB",
+          "qty": 1,
+          "sn": "IN23300186",
+          "cost": 7500,
+          "price": 9300,
+          "invoice": false
+        },
+        {
+          "name": "掃描器",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "",
+          "qty": 1,
+          "sn": "23223B08FE",
+          "cost": 6800,
+          "price": 8000,
+          "invoice": false
+        },
+        {
+          "name": "掃描器",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "",
+          "qty": 1,
+          "sn": "23223B098C",
+          "cost": 6800,
+          "price": 8000,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2023-11-01",
+      "createdAt": "2026-04-06T16:23:09.020Z"
+    },
+    {
+      "id": "mnneh6nhl6gw",
+      "date": "2023-11-08",
+      "custId": "mnn6mnr48vi7",
+      "custName": "志鵬綜合果干行",
+      "contact": "陳大鵬先生",
+      "phone": "0919-007011",
+      "note": "",
+      "items": [
+        {
+          "name": "銅版紙 80*60",
+          "type": "paper",
+          "subtype": "銅版紙",
+          "spec": "80*60",
+          "qty": 20,
+          "sn": "",
+          "cost": 85,
+          "price": 135,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2023-11-08",
+      "createdAt": "2026-04-06T16:24:02.285Z"
+    },
+    {
+      "id": "mnnekeb0top8",
+      "date": "2023-11-16",
+      "custId": "mnnehl6ceplu",
+      "custName": "碁揚企業社",
+      "contact": "林校岳",
+      "phone": "",
+      "note": "線材跟電供掛華新帳)    付款期限60天  後來發現基揚是出給興亞",
+      "items": [
+        {
+          "name": "掃描器 CINO F680 RS232",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "CINO F680 RS232",
+          "qty": 1,
+          "sn": "C3170075",
+          "cost": 1,
+          "price": 3101,
+          "invoice": false
+        },
+        {
+          "name": "掃描器 CINO F680 RS232",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "CINO F680 RS232",
+          "qty": 1,
+          "sn": "C3170397",
+          "cost": 1,
+          "price": 3101,
+          "invoice": false
+        },
+        {
+          "name": "掃描器 CINO F680 RS232",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "CINO F680 RS232",
+          "qty": 1,
+          "sn": "C3170077",
+          "cost": 1,
+          "price": 3101,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2023-11-16",
+      "createdAt": "2026-04-06T16:26:32.172Z"
+    },
+    {
+      "id": "mnneme4dj4x2",
+      "date": "2023-11-24",
+      "custId": "mnmofk0wjmq9",
+      "custName": "福寶水產",
+      "contact": "李彥賢先生",
+      "phone": "0935-085-022",
+      "note": "",
+      "items": [
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 30,
+          "sn": "",
+          "cost": 70,
+          "price": 170,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2023-11-24",
+      "createdAt": "2026-04-06T16:28:05.245Z"
+    },
+    {
+      "id": "mnnenenq4zp6",
+      "date": "2023-11-29",
+      "custId": "mnmofk0wvucy",
+      "custName": "騰亦資訊",
+      "contact": "Jack歐",
+      "phone": "07-5885038",
+      "note": "來源 : 長華",
+      "items": [
+        {
+          "name": "掃描器 USB",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "USB",
+          "qty": 1,
+          "sn": "C3343113",
+          "cost": 1,
+          "price": 2351,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2023-11-29",
+      "createdAt": "2026-04-06T16:28:52.599Z"
+    },
+    {
+      "id": "mnneomt6lp7y",
+      "date": "2023-12-21",
+      "custId": "mnmofk0wwuzf",
+      "custName": "聿展有限公司",
+      "contact": "林老闆",
+      "phone": "0933272900",
+      "note": "庫存無帳的",
+      "items": [
+        {
+          "name": "珠光紙 銀龍紙50番 43mm*35mm/ 50米",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "銀龍紙50番 43mm*35mm/ 50米",
+          "qty": 5,
+          "sn": "",
+          "cost": 1,
+          "price": 321,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2023-12-21",
+      "createdAt": "2026-04-06T16:29:49.818Z"
+    },
+    {
+      "id": "mnneq3o6jozj",
+      "date": "2024-01-03",
+      "custId": "mnmofk0wcsf4",
+      "custName": "河川企業社",
+      "contact": "張河川先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙 40米",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "40米",
+          "qty": 40,
+          "sn": "",
+          "cost": 120,
+          "price": 160,
+          "invoice": true
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 40,
+          "sn": "",
+          "cost": 60,
+          "price": 190,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2024-01-03",
+      "createdAt": "2026-04-06T16:30:58.326Z"
+    },
+    {
+      "id": "mnner5jrbooa",
+      "date": "2024-01-04",
+      "custId": "mnmofk0w94kc",
+      "custName": "興業企業行",
+      "contact": "黃柏堯先生",
+      "phone": "07-6109199",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "",
+          "qty": 60,
+          "sn": "",
+          "cost": 140,
+          "price": 260,
+          "invoice": true
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 20,
+          "sn": "",
+          "cost": 60,
+          "price": 190,
+          "invoice": true
+        }
+      ],
+      "paid": true,
+      "paidDate": "2024-01-04",
+      "createdAt": "2026-04-06T16:31:47.415Z"
+    },
+    {
+      "id": "mnnes8jvwies",
+      "date": "2024-01-04",
+      "custId": "mnmofk0wpc0i",
+      "custName": "訊控有限公司",
+      "contact": "陳甫騁先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "",
+          "qty": 60,
+          "sn": "",
+          "cost": 170,
+          "price": 230,
+          "invoice": true
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 5,
+          "sn": "",
+          "cost": 300,
+          "price": 420,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2024-01-04",
+      "createdAt": "2026-04-06T16:32:37.963Z"
+    },
+    {
+      "id": "mnnesxpvsqdp",
+      "date": "2024-01-19",
+      "custId": "mnncin3g7nas",
+      "custName": "公司旁_汽車保養廠",
+      "contact": "",
+      "phone": "",
+      "note": "更換煞車油(800), 方向盤油(600) ,  總維修4800",
+      "items": [
+        {
+          "name": "掃描器 汽車維修保養",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "汽車維修保養",
+          "qty": 1,
+          "sn": "",
+          "cost": 1,
+          "price": 3001,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2024-01-19",
+      "createdAt": "2026-04-06T16:33:10.579Z"
+    },
+    {
+      "id": "mnneubhkaocr",
+      "date": "2024-01-24",
+      "custId": "mnmofk0wbk4k",
+      "custName": "御富健康事業股份有限公司",
+      "contact": "黃崇師先生",
+      "phone": "",
+      "note": "碳帶_無帳",
+      "items": [
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 4,
+          "sn": "",
+          "cost": 80,
+          "price": 450,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2024-01-24",
+      "createdAt": "2026-04-06T16:34:15.080Z"
+    },
+    {
+      "id": "mnnevdr1llcp",
+      "date": "2024-03-05",
+      "custId": "mnmofk0wcsf4",
+      "custName": "河川企業社",
+      "contact": "張河川先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙 40米",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "40米",
+          "qty": 20,
+          "sn": "",
+          "cost": 165,
+          "price": 200,
+          "invoice": false
+        },
+        {
+          "name": "珠光紙 40米",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "40米",
+          "qty": 40,
+          "sn": "",
+          "cost": 120,
+          "price": 160,
+          "invoice": true
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 20,
+          "sn": "",
+          "cost": 60,
+          "price": 190,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2024-03-05",
+      "createdAt": "2026-04-06T16:35:04.669Z"
+    },
+    {
+      "id": "mnnevznupdhh",
+      "date": "2024-03-07",
+      "custId": "mnmofk0wy13w",
+      "custName": "基福",
+      "contact": "廖根良先生",
+      "phone": "",
+      "note": "",
+      "items": [
+        {
+          "name": "掃描器 COGNEX 8050HDX 一台傭金",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "COGNEX 8050HDX 一台傭金",
+          "qty": 1,
+          "sn": "",
+          "cost": 1,
+          "price": 8001,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2024-03-07",
+      "createdAt": "2026-04-06T16:35:33.066Z"
+    },
+    {
+      "id": "mnnexa0wceii",
+      "date": "2024-03-14",
+      "custId": "mnmofk0wvucy",
+      "custName": "騰亦資訊",
+      "contact": "Jack歐",
+      "phone": "07-5885038",
+      "note": "來源 : 長華,新盛力",
+      "items": [
+        {
+          "name": "掃描器 USB",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "USB",
+          "qty": 1,
+          "sn": "C3343438",
+          "cost": 51,
+          "price": 2351,
+          "invoice": false
+        },
+        {
+          "name": "掃描器 USB",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "USB",
+          "qty": 1,
+          "sn": "C3343169",
+          "cost": 51,
+          "price": 2351,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2024-03-14",
+      "createdAt": "2026-04-06T16:36:33.152Z"
+    },
+    {
+      "id": "mnnf0h8wqhga",
+      "date": "2024-03-19",
+      "custId": "mnmofk0wpc0i",
+      "custName": "訊控有限公司",
+      "contact": "陳甫騁先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "",
+          "qty": 15,
+          "sn": "",
+          "cost": 170,
+          "price": 230,
+          "invoice": true
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 10,
+          "sn": "",
+          "cost": 300,
+          "price": 420,
+          "invoice": true
+        }
+      ],
+      "paid": true,
+      "paidDate": "2024-03-19",
+      "createdAt": "2026-04-06T16:39:02.480Z"
+    },
+    {
+      "id": "mnnf0tygix0q",
+      "date": "2024-03-20",
+      "custId": "mnmofk0wci92",
+      "custName": "泰茂企業有限公司",
+      "contact": "陳明彥先生",
+      "phone": "0916929388",
+      "note": "",
+      "items": [
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 20,
+          "sn": "",
+          "cost": 60,
+          "price": 150,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2024-03-20",
+      "createdAt": "2026-04-06T16:39:18.952Z"
+    },
+    {
+      "id": "mnofvtxd25hg",
+      "date": "2024-04-02",
+      "custId": "mnmofk0wess9",
+      "custName": "王強條碼企業社",
+      "contact": "王銘裕",
+      "phone": "0952668663",
+      "note": "SATO CL4NX滾軸",
+      "items": [
+        {
+          "name": "條碼機 SATO CL4NX滾軸",
+          "type": "device",
+          "subtype": "條碼機",
+          "spec": "SATO CL4NX滾軸",
+          "qty": 1,
+          "sn": "",
+          "sns": [],
+          "cost": 1,
+          "price": 1801,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2024-04-02",
+      "createdAt": "2026-04-07T09:51:11.425Z"
+    },
+    {
+      "id": "mnofz1akxmf0",
+      "date": "2024-04-10",
+      "custId": "mnmofk0wcsf4",
+      "custName": "河川企業社",
+      "contact": "張河川先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙 40米",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "40米",
+          "qty": 20,
+          "sn": "",
+          "sns": [],
+          "cost": 165,
+          "price": 200,
+          "invoice": false
+        },
+        {
+          "name": "珠光紙 40米",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "40米",
+          "qty": 20,
+          "sn": "",
+          "sns": [],
+          "cost": 120,
+          "price": 160,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2024-04-10",
+      "createdAt": "2026-04-07T09:53:40.940Z"
+    },
+    {
+      "id": "mnog0x348pgt",
+      "date": "2024-04-16",
+      "custId": "mnmofk0wjmq9",
+      "custName": "福寶水產",
+      "contact": "李彥賢先生",
+      "phone": "0935-085-022",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "",
+          "qty": 320,
+          "sn": "",
+          "sns": [],
+          "cost": 80,
+          "price": 130,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 20,
+          "sn": "",
+          "sns": [],
+          "cost": 60,
+          "price": 160,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2024-04-16",
+      "createdAt": "2026-04-07T09:55:08.800Z"
+    },
+    {
+      "id": "mnog2db6jvo7",
+      "date": "2024-04-17",
+      "custId": "mnmofk0wess9",
+      "custName": "王強條碼企業社",
+      "contact": "王銘裕",
+      "phone": "0952668663",
+      "note": "設定( STX/ETX) ,   來源  (雙葉/南樺)",
+      "items": [
+        {
+          "name": "掃描器 CINO A680 RS232",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "CINO A680 RS232",
+          "qty": 1,
+          "sn": "C4060090",
+          "sns": [
+            "C4060090"
+          ],
+          "cost": 1,
+          "price": 2401,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2024-04-17",
+      "createdAt": "2026-04-07T09:56:16.482Z"
+    },
+    {
+      "id": "mnog2zg0rna5",
+      "date": "2024-04-26",
+      "custId": "mnncin3g7nas",
+      "custName": "公司旁_汽車保養廠",
+      "contact": "",
+      "phone": "",
+      "note": "水泵浦3100+長效水箱精 (600) / 機油保養1800",
+      "items": [
+        {
+          "name": "掃描器",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "",
+          "qty": 1,
+          "sn": "",
+          "sns": [],
+          "cost": 1,
+          "price": 3701,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2024-04-26",
+      "createdAt": "2026-04-07T09:56:45.168Z"
+    },
+    {
+      "id": "mnog42epcl28",
+      "date": "2024-05-05",
+      "custId": "mnmofk0wvucy",
+      "custName": "騰亦資訊",
+      "contact": "Jack歐",
+      "phone": "07-5885038",
+      "note": "  (雙葉/南樺)",
+      "items": [
+        {
+          "name": "掃描器 USB",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "USB",
+          "qty": 1,
+          "sn": "C4060088",
+          "sns": [
+            "C4060088"
+          ],
+          "cost": 1,
+          "price": 2351,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2024-05-05",
+      "createdAt": "2026-04-07T09:57:35.665Z"
+    },
+    {
+      "id": "mnog5mpc4ghv",
+      "date": "2024-05-22",
+      "custId": "mnmofk0w94kc",
+      "custName": "興業企業行",
+      "contact": "黃柏堯先生",
+      "phone": "07-6109199",
+      "note": "",
+      "items": [
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 20,
+          "sn": "",
+          "sns": [],
+          "cost": 60,
+          "price": 190,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2024-05-22",
+      "createdAt": "2026-04-07T09:58:48.624Z"
+    },
+    {
+      "id": "mnog687n76g8",
+      "date": "2024-05-23",
+      "custId": "mnncin3g7nas",
+      "custName": "公司旁_汽車保養廠",
+      "contact": "",
+      "phone": "",
+      "note": "水箱 (5000)5500 ,水箱水(600) , 膨脹閥 2500 ",
+      "items": [
+        {
+          "name": "掃描器",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "",
+          "qty": 1,
+          "sn": "",
+          "sns": [],
+          "cost": 1,
+          "price": 501,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2024-05-23",
+      "createdAt": "2026-04-07T09:59:16.499Z"
+    },
+    {
+      "id": "mnog784ymaty",
+      "date": "2024-06-18",
+      "custId": "mnn92phzqp6u",
+      "custName": "台灣好味鮮股份有限公司",
+      "contact": "梁滋玲",
+      "phone": "0988-011936",
+      "note": "6捲 沒帳的",
+      "items": [
+        {
+          "name": "珠光紙 100*60 790張",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "100*60 790張",
+          "qty": 6,
+          "sn": "",
+          "sns": [],
+          "cost": 1,
+          "price": 265,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2024-06-18",
+      "createdAt": "2026-04-07T10:00:03.058Z"
+    },
+    {
+      "id": "mnog7utx2d2x",
+      "date": "2024-07-02",
+      "custId": "mnmofk0wvucy",
+      "custName": "騰亦資訊",
+      "contact": "Jack歐",
+      "phone": "07-5885038",
+      "note": "",
+      "items": [
+        {
+          "name": "掃描器 USB",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "USB",
+          "qty": 1,
+          "sn": "C4060095",
+          "sns": [
+            "C4060095"
+          ],
+          "cost": 1,
+          "price": 2351,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2024-07-02",
+      "createdAt": "2026-04-07T10:00:32.469Z"
+    },
+    {
+      "id": "mnog93lqb97z",
+      "date": "2024-07-03",
+      "custId": "mnn92phzqp6u",
+      "custName": "台灣好味鮮股份有限公司",
+      "contact": "梁滋玲",
+      "phone": "0988-011936",
+      "note": "群洽訂貨",
+      "items": [
+        {
+          "name": "珠光紙 100*60 790張",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "100*60 790張",
+          "qty": 20,
+          "sn": "",
+          "sns": [],
+          "cost": 175,
+          "price": 250,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2024-07-03"
+    },
+    {
+      "id": "mnogaczhhkqh",
+      "date": "2024-07-05",
+      "custId": "mnmofk0wvucy",
+      "custName": "騰亦資訊",
+      "contact": "Jack歐",
+      "phone": "07-5885038",
+      "note": "我是這樣KEY的 C4060420,C4060394,C4060400",
+      "items": [
+        {
+          "name": "掃描器 USB",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "USB",
+          "qty": 3,
+          "sn": "C4060420",
+          "sns": [
+            "C4060420",
+            "C4060394",
+            "C4060400"
+          ],
+          "cost": 1,
+          "price": 2351,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2024-07-05"
+    },
+    {
+      "id": "mnoggxl73psu",
+      "date": "2024-07-15",
+      "custId": "mnmofk0wpc0i",
+      "custName": "訊控有限公司",
+      "contact": "陳甫騁先生",
+      "phone": "0935111093",
+      "note": "5000塊 淘寶進貨的",
+      "items": [
+        {
+          "name": "掃描器",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "",
+          "qty": 1,
+          "sn": "24065B1591",
+          "sns": [
+            "24065B1591"
+          ],
+          "cost": 6200,
+          "price": 8000,
+          "invoice": false
+        },
+        {
+          "name": "掃描器",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "",
+          "qty": 1,
+          "sn": "24065B140A",
+          "sns": [
+            "24065B140A"
+          ],
+          "cost": 5000,
+          "price": 8000,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2024-07-15",
+      "createdAt": "2026-04-07T10:07:35.947Z"
+    },
+    {
+      "id": "mnoghsejfgt7",
+      "date": "2024-07-15",
+      "custId": "mnmofk0wcsf4",
+      "custName": "河川企業社",
+      "contact": "張河川先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙 40米",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "40米",
+          "qty": 40,
+          "sn": "",
+          "sns": [],
+          "cost": 120,
+          "price": 160,
+          "invoice": true
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 40,
+          "sn": "",
+          "sns": [],
+          "cost": 60,
+          "price": 190,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2024-07-15",
+      "createdAt": "2026-04-07T10:08:15.883Z"
+    },
+    {
+      "id": "mnogiofj06nw",
+      "date": "2024-07-16",
+      "custId": "mnmofk0wvucy",
+      "custName": "騰亦資訊",
+      "contact": "Jack歐",
+      "phone": "07-5885038",
+      "note": "",
+      "items": [
+        {
+          "name": "掃描器 USB",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "USB",
+          "qty": 1,
+          "sn": "C4060398",
+          "sns": [
+            "C4060398"
+          ],
+          "cost": 1,
+          "price": 2351,
+          "invoice": false
+        },
+        {
+          "name": "掃描器 USB",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "USB",
+          "qty": 1,
+          "sn": "C4060399",
+          "sns": [
+            "C4060399"
+          ],
+          "cost": 1,
+          "price": 2351,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2024-07-16",
+      "createdAt": "2026-04-07T10:08:57.391Z"
+    },
+    {
+      "id": "mnogo6t0jwo9",
+      "date": "2024-07-22",
+      "custId": "mnmofk0wpc0i",
+      "custName": "訊控有限公司",
+      "contact": "陳甫騁先生",
+      "phone": "0935111093",
+      "note": "無帳_一台  (英特格) + CINO A680 (英特格)  , 另一台還掛長華帳上",
+      "items": [
+        {
+          "name": "掃描器",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "",
+          "qty": 2,
+          "sn": "23315BE3FF",
+          "sns": [
+            "23315BE3FF",
+            "24081B6567"
+          ],
+          "cost": 1500,
+          "price": 8000,
+          "invoice": false
+        },
+        {
+          "name": "掃描器 USB",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "USB",
+          "qty": 1,
+          "sn": "C4110001",
+          "sns": [
+            "C4110001"
+          ],
+          "cost": 450,
+          "price": 3400,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2024-07-22",
+      "createdAt": "2026-04-07T10:13:14.484Z"
+    },
+    {
+      "id": "mnogpfbzvu4l",
+      "date": "2024-07-31",
+      "custId": "mnmofk0wvucy",
+      "custName": "騰亦資訊",
+      "contact": "Jack歐",
+      "phone": "07-5885038",
+      "note": "",
+      "items": [
+        {
+          "name": "掃描器 USB",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "USB",
+          "qty": 2,
+          "sn": "C4060396",
+          "sns": [
+            "C4060396",
+            "C4110034"
+          ],
+          "cost": 50,
+          "price": 2351,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2024-07-31",
+      "createdAt": "2026-04-07T10:14:12.191Z"
+    },
+    {
+      "id": "mnogq0vlu40j",
+      "date": "2024-08-01",
+      "custId": "mnncin3g7nas",
+      "custName": "公司旁_汽車保養廠",
+      "contact": "",
+      "phone": "",
+      "note": "機油保養,換方向燈總座,換燈泡",
+      "items": [
+        {
+          "name": "掃描器",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "",
+          "qty": 1,
+          "sn": "",
+          "sns": [],
+          "cost": 1,
+          "price": 3501,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2024-08-01",
+      "createdAt": "2026-04-07T10:14:40.113Z"
+    },
+    {
+      "id": "mnogsaj5js44",
+      "date": "2024-08-13",
+      "custId": "mnmofk0wpc0i",
+      "custName": "訊控有限公司",
+      "contact": "陳甫騁先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "",
+          "qty": 60,
+          "sn": "",
+          "sns": [],
+          "cost": 170,
+          "price": 220,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 8,
+          "sn": "",
+          "sns": [],
+          "cost": 330,
+          "price": 420,
+          "invoice": false
+        },
+        {
+          "name": "珠光紙 100*30",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "100*30",
+          "qty": 30,
+          "sn": "",
+          "sns": [],
+          "cost": 185,
+          "price": 230,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2024-08-13",
+      "createdAt": "2026-04-07T10:16:25.937Z"
+    },
+    {
+      "id": "mnogt0cubdez",
+      "date": "2024-09-20",
+      "custId": "mnncin3g7nas",
+      "custName": "公司旁_汽車保養廠",
+      "contact": "",
+      "phone": "",
+      "note": "換後煞車皮(2000) , 引擎亮燈 後含氧無做動(新4500,殺肉2000) , 前空氣流量異常(新1500)",
+      "items": [
+        {
+          "name": "掃描器",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "",
+          "qty": 1,
+          "sn": "",
+          "sns": [],
+          "cost": 1,
+          "price": 6001,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2024-09-20",
+      "createdAt": "2026-04-07T10:16:59.406Z"
+    },
+    {
+      "id": "mnogtvr6tvjc",
+      "date": "2024-09-20",
+      "custId": "mnmofk0w94kc",
+      "custName": "興業企業行",
+      "contact": "黃柏堯先生",
+      "phone": "07-6109199",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "",
+          "qty": 60,
+          "sn": "",
+          "sns": [],
+          "cost": 140,
+          "price": 250,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 20,
+          "sn": "",
+          "sns": [],
+          "cost": 58,
+          "price": 190,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2024-09-20",
+      "createdAt": "2026-04-07T10:17:40.098Z"
+    },
+    {
+      "id": "mnoguq2w86hs",
+      "date": "2024-10-18",
+      "custId": "mnmofk0wwuzf",
+      "custName": "聿展有限公司",
+      "contact": "林老闆",
+      "phone": "0933272900",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙 銀龍紙50番 43mm*35mm/ 50米",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "銀龍紙50番 43mm*35mm/ 50米",
+          "qty": 2,
+          "sn": "",
+          "sns": [],
+          "cost": 20,
+          "price": 320,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2024-10-18",
+      "createdAt": "2026-04-07T10:18:19.400Z"
+    },
+    {
+      "id": "mnogw18nkyzp",
+      "date": "2024-11-01",
+      "custId": "mnmofk0wess9",
+      "custName": "王強條碼企業社",
+      "contact": "王銘裕",
+      "phone": "0952668663",
+      "note": "",
+      "items": [
+        {
+          "name": "掃描器 CINO A688BT",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "CINO A688BT",
+          "qty": 1,
+          "sn": "C4270680",
+          "sns": [
+            "C4270680"
+          ],
+          "cost": 1,
+          "price": 6001,
+          "invoice": false
+        },
+        {
+          "name": "掃描器 USB",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "USB",
+          "qty": 1,
+          "sn": "C4110033",
+          "sns": [
+            "C4110033"
+          ],
+          "cost": 1,
+          "price": 2301,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2024-11-01",
+      "createdAt": "2026-04-07T10:19:20.519Z"
+    },
+    {
+      "id": "mnogwotv85ye",
+      "date": "2024-11-02",
+      "custId": "mnmofk0wpc0i",
+      "custName": "訊控有限公司",
+      "contact": "陳甫騁先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "",
+          "qty": 60,
+          "sn": "",
+          "sns": [],
+          "cost": 170,
+          "price": 220,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 5,
+          "sn": "",
+          "sns": [],
+          "cost": 300,
+          "price": 420,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2024-11-02",
+      "createdAt": "2026-04-07T10:19:51.091Z"
+    },
+    {
+      "id": "mnogxk97x28s",
+      "date": "2024-11-04",
+      "custId": "mnmofk0wcsf4",
+      "custName": "河川企業社",
+      "contact": "張河川先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙 40米",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "40米",
+          "qty": 40,
+          "sn": "",
+          "sns": [],
+          "cost": 120,
+          "price": 160,
+          "invoice": true
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 20,
+          "sn": "",
+          "sns": [],
+          "cost": 60,
+          "price": 190,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2024-11-04",
+      "createdAt": "2026-04-07T10:20:31.819Z"
+    },
+    {
+      "id": "mnogydvnl8mj",
+      "date": "2024-12-03",
+      "custId": "mnmofk0wwuzf",
+      "custName": "聿展有限公司",
+      "contact": "林老闆",
+      "phone": "0933272900",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙 銀龍紙50番 43mm*35mm/ 50米",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "銀龍紙50番 43mm*35mm/ 50米",
+          "qty": 21,
+          "sn": "",
+          "sns": [],
+          "cost": 200,
+          "price": 350,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2024-12-03",
+      "createdAt": "2026-04-07T10:21:10.211Z"
+    },
+    {
+      "id": "mnogz0t8ecxg",
+      "date": "2024-12-17",
+      "custId": "mnncin3g7nas",
+      "custName": "公司旁_汽車保養廠",
+      "contact": "",
+      "phone": "",
+      "note": "更換變速箱油(2000) , 電瓶(1600 , 火星塞(1600) , 機油芯 (200) ",
+      "items": [
+        {
+          "name": "掃描器",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "",
+          "qty": 1,
+          "sn": "",
+          "sns": [],
+          "cost": 1,
+          "price": 3301,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2024-12-17",
+      "createdAt": "2026-04-07T10:21:39.932Z"
+    },
+    {
+      "id": "mnogzi728ojo",
+      "date": "2024-12-20",
+      "custId": "mnmofk0wcsf4",
+      "custName": "河川企業社",
+      "contact": "張河川先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙 40米",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "40米",
+          "qty": 40,
+          "sn": "",
+          "sns": [],
+          "cost": 120,
+          "price": 160,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2024-12-20",
+      "createdAt": "2026-04-07T10:22:02.462Z"
+    },
+    {
+      "id": "mnpv91os3eu9",
+      "date": "2025-02-06",
+      "custId": "mnmofk0wjmq9",
+      "custName": "福寶水產",
+      "contact": "李彥賢先生",
+      "phone": "0935-085-022",
+      "note": "",
+      "items": [
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 60,
+          "sn": "",
+          "sns": [],
+          "cost": 60,
+          "price": 155,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2025-02-06",
+      "createdAt": "2026-04-08T09:49:08.428Z"
+    },
+    {
+      "id": "mnpv9ogglv87",
+      "date": "2025-02-11",
+      "custId": "mnmofk0wci92",
+      "custName": "泰茂企業有限公司",
+      "contact": "陳明彥先生",
+      "phone": "0916929388",
+      "note": "",
+      "items": [
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 20,
+          "sn": "",
+          "sns": [],
+          "cost": 60,
+          "price": 150,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2025-02-11"
+    },
+    {
+      "id": "mnpvbmcaax7a",
+      "date": "2025-02-14",
+      "custId": "mnmofk0wpc0i",
+      "custName": "訊控有限公司",
+      "contact": "陳甫騁先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "",
+          "qty": 40,
+          "sn": "",
+          "sns": [],
+          "cost": 170,
+          "price": 220,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 10,
+          "sn": "",
+          "sns": [],
+          "cost": 300,
+          "price": 420,
+          "invoice": true
+        }
+      ],
+      "paid": true,
+      "paidDate": "2025-02-14",
+      "createdAt": "2026-04-08T09:51:08.506Z"
+    },
+    {
+      "id": "mnpvc695juli",
+      "date": "2025-02-27",
+      "custId": "mnmofk0wvucy",
+      "custName": "騰亦資訊",
+      "contact": "Jack歐",
+      "phone": "07-5885038",
+      "note": "",
+      "items": [
+        {
+          "name": "掃描器 USB",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "USB",
+          "qty": 1,
+          "sn": "C4110031",
+          "sns": [
+            "C4110031"
+          ],
+          "cost": 1,
+          "price": 2351,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2025-02-27",
+      "createdAt": "2026-04-08T09:51:34.313Z"
+    },
+    {
+      "id": "mnpvd5w4jsuf",
+      "date": "2025-03-15",
+      "custId": "mnmofk0wwuzf",
+      "custName": "聿展有限公司",
+      "contact": "林老闆",
+      "phone": "0933272900",
+      "note": "佐茂碳帶產出_無帳",
+      "items": [
+        {
+          "name": "條碼機 TSC 345",
+          "type": "device",
+          "subtype": "條碼機",
+          "spec": "TSC 345",
+          "qty": 1,
+          "sn": "T4324490720",
+          "sns": [
+            "T4324490720"
+          ],
+          "cost": 1,
+          "price": 9501,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2025-03-15",
+      "createdAt": "2026-04-08T09:52:20.500Z"
+    },
+    {
+      "id": "mnpve2jm48ar",
+      "date": "2025-03-18",
+      "custId": "mnmofk0wpc0i",
+      "custName": "訊控有限公司",
+      "contact": "陳甫騁先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "",
+          "qty": 80,
+          "sn": "",
+          "sns": [],
+          "cost": 170,
+          "price": 220,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 10,
+          "sn": "",
+          "sns": [],
+          "cost": 300,
+          "price": 420,
+          "invoice": true
+        }
+      ],
+      "paid": true,
+      "paidDate": "2025-03-18",
+      "createdAt": "2026-04-08T09:53:02.818Z"
+    },
+    {
+      "id": "mnpveu4hcr4e",
+      "date": "2025-03-19",
+      "custId": "mnmofk0wcsf4",
+      "custName": "河川企業社",
+      "contact": "張河川先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙 40米",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "40米",
+          "qty": 40,
+          "sn": "",
+          "sns": [],
+          "cost": 120,
+          "price": 160,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 20,
+          "sn": "",
+          "sns": [],
+          "cost": 60,
+          "price": 190,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2025-03-19",
+      "createdAt": "2026-04-08T09:53:38.561Z"
+    },
+    {
+      "id": "mnpvfq625h7v",
+      "date": "2025-03-21",
+      "custId": "mnmofk0wvucy",
+      "custName": "騰亦資訊",
+      "contact": "Jack歐",
+      "phone": "07-5885038",
+      "note": "",
+      "items": [
+        {
+          "name": "掃描器 USB",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "USB",
+          "qty": 2,
+          "sn": "C4110004",
+          "sns": [
+            "C4110004",
+            "C4110311"
+          ],
+          "cost": 2,
+          "price": 2351,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2025-03-21",
+      "createdAt": "2026-04-08T09:54:20.090Z"
+    },
+    {
+      "id": "mnpvg7bdztd4",
+      "date": "2025-04-08",
+      "custId": "mnmofk0w94kc",
+      "custName": "興業企業行",
+      "contact": "黃柏堯先生",
+      "phone": "07-6109199",
+      "note": "",
+      "items": [
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 20,
+          "sn": "",
+          "sns": [],
+          "cost": 60,
+          "price": 190,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2025-04-08",
+      "createdAt": "2026-04-08T09:54:42.313Z"
+    },
+    {
+      "id": "mnpvgrmbrrx5",
+      "date": "2025-04-29",
+      "custId": "mnmofk0wvucy",
+      "custName": "騰亦資訊",
+      "contact": "Jack歐",
+      "phone": "07-5885038",
+      "note": "",
+      "items": [
+        {
+          "name": "掃描器 USB",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "USB",
+          "qty": 1,
+          "sn": "C4110312",
+          "sns": [
+            "C4110312"
+          ],
+          "cost": 1,
+          "price": 2351,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2025-04-29",
+      "createdAt": "2026-04-08T09:55:08.627Z"
+    },
+    {
+      "id": "mnpvhe9xcjcr",
+      "date": "2025-06-05",
+      "custId": "mnmofk0wvucy",
+      "custName": "騰亦資訊",
+      "contact": "Jack歐",
+      "phone": "07-5885038",
+      "note": "",
+      "items": [
+        {
+          "name": "掃描器 USB",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "USB",
+          "qty": 2,
+          "sn": "4110003",
+          "sns": [
+            "4110003",
+            "4110020"
+          ],
+          "cost": 1,
+          "price": 2351,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2025-06-05",
+      "createdAt": "2026-04-08T09:55:37.989Z"
+    },
+    {
+      "id": "mnpviwgwlou5",
+      "date": "2025-07-01",
+      "custId": "mnmofk0wess9",
+      "custName": "王強條碼企業社",
+      "contact": "王銘裕",
+      "phone": "0952668663",
+      "note": "佐茂程式銷帳",
+      "items": [
+        {
+          "name": "掃描器 CINO A688BT",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "CINO A688BT",
+          "qty": 1,
+          "sn": "C4530054",
+          "sns": [
+            "C4530054"
+          ],
+          "cost": 1,
+          "price": 6001,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2025-07-01",
+      "createdAt": "2026-04-08T09:56:48.224Z"
+    },
+    {
+      "id": "mnpvjmdbfj1f",
+      "date": "2025-07-15",
+      "custId": "mnmofk0w94kc",
+      "custName": "興業企業行",
+      "contact": "黃柏堯先生",
+      "phone": "07-6109199",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "",
+          "qty": 60,
+          "sn": "",
+          "sns": [],
+          "cost": 130,
+          "price": 250,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2025-07-15",
+      "createdAt": "2026-04-08T09:57:21.791Z"
+    },
+    {
+      "id": "mnpvka6mz31h",
+      "date": "2025-07-20",
+      "custId": "mnmofk0wpc0i",
+      "custName": "訊控有限公司",
+      "contact": "陳甫騁先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "",
+          "qty": 60,
+          "sn": "",
+          "sns": [],
+          "cost": 170,
+          "price": 220,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 10,
+          "sn": "",
+          "sns": [],
+          "cost": 300,
+          "price": 420,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2025-07-20",
+      "createdAt": "2026-04-08T09:57:52.654Z"
+    },
+    {
+      "id": "mnpvn1a92t4n",
+      "date": "2025-07-27",
+      "custId": "mnmofk0wcsf4",
+      "custName": "河川企業社",
+      "contact": "張河川先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙 40米",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "40米",
+          "qty": 20,
+          "sn": "",
+          "sns": [],
+          "cost": 165,
+          "price": 200,
+          "invoice": true
+        },
+        {
+          "name": "珠光紙 40米",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "40米",
+          "qty": 20,
+          "sn": "",
+          "sns": [],
+          "cost": 120,
+          "price": 160,
+          "invoice": true
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 20,
+          "sn": "",
+          "sns": [],
+          "cost": 60,
+          "price": 190,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2025-07-27",
+      "createdAt": "2026-04-08T10:00:01.089Z"
+    },
+    {
+      "id": "mnpvo68czyxr",
+      "date": "2025-07-28",
+      "custId": "mnmofk0wjmq9",
+      "custName": "福寶水產",
+      "contact": "李彥賢先生",
+      "phone": "0935-085-022",
+      "note": "蝦皮進貨",
+      "items": [
+        {
+          "name": "條碼機 SBARCO T4ES",
+          "type": "device",
+          "subtype": "條碼機",
+          "spec": "SBARCO T4ES",
+          "qty": 1,
+          "sn": "0152103000010-203",
+          "sns": [
+            "0152103000010-203",
+            "dpi"
+          ],
+          "cost": 7000,
+          "price": 9800,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2025-07-28",
+      "createdAt": "2026-04-08T10:00:54.156Z"
+    },
+    {
+      "id": "mnpvq2m1wo4f",
+      "date": "2025-07-30",
+      "custId": "mnmofk0wvucy",
+      "custName": "騰亦資訊",
+      "contact": "Jack歐",
+      "phone": "07-5885038",
+      "note": "",
+      "items": [
+        {
+          "name": "掃描器 USB",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "USB",
+          "qty": 11,
+          "sn": "C5170015",
+          "sns": [
+            "C5170015",
+            "C5170016",
+            "C5122255",
+            "C4420179",
+            "B9155683",
+            "C5122256",
+            "C0220944",
+            "C4110313",
+            "C5170017",
+            "C4110032",
+            "C5122259"
+          ],
+          "cost": 100,
+          "price": 2351,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2025-07-30",
+      "createdAt": "2026-04-08T10:02:22.777Z"
+    },
+    {
+      "id": "mnpvrjzw2vb8",
+      "date": "2025-08-11",
+      "custId": "mnmofk0wpc0i",
+      "custName": "訊控有限公司",
+      "contact": "陳甫騁先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙 100*90",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "100*90",
+          "qty": 10,
+          "sn": "",
+          "sns": [],
+          "cost": 200,
+          "price": 220,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2025-08-11",
+      "createdAt": "2026-04-08T10:03:31.964Z"
+    },
+    {
+      "id": "mnpvsmv3ofa5",
+      "date": "2025-08-22",
+      "custId": "mnnbesyceej1",
+      "custName": "蝦皮賣場",
+      "contact": "",
+      "phone": "",
+      "note": "",
+      "items": [
+        {
+          "name": "掃描器 CINO USB CABLE",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "CINO USB CABLE",
+          "qty": 25,
+          "sn": "",
+          "sns": [],
+          "cost": 1,
+          "price": 121,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2025-08-22",
+      "createdAt": "2026-04-08T10:04:22.335Z"
+    },
+    {
+      "id": "mnpvu46q0sdz",
+      "date": "2025-08-25",
+      "custId": "mnmofk0wvucy",
+      "custName": "騰亦資訊",
+      "contact": "Jack歐",
+      "phone": "07-5885038",
+      "note": "",
+      "items": [
+        {
+          "name": "掃描器 USB",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "USB",
+          "qty": 1,
+          "sn": "C5122409",
+          "sns": [
+            "C5122409"
+          ],
+          "cost": 51,
+          "price": 2351,
+          "invoice": false
+        },
+        {
+          "name": "掃描器 CINO F560",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "CINO F560",
+          "qty": 1,
+          "sn": "C5190445",
+          "sns": [
+            "C5190445"
+          ],
+          "cost": 100,
+          "price": 1400,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2025-08-25",
+      "createdAt": "2026-04-08T10:05:31.442Z"
+    },
+    {
+      "id": "mnpvvflljvuz",
+      "date": "2025-08-28",
+      "custId": "mnmofk0wvucy",
+      "custName": "騰亦資訊",
+      "contact": "Jack歐",
+      "phone": "07-5885038",
+      "note": "",
+      "items": [
+        {
+          "name": "掃描器 HONEYWELL 7620",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "HONEYWELL 7620",
+          "qty": 1,
+          "sn": "24178B279F",
+          "sns": [
+            "24178B279F"
+          ],
+          "cost": 5100,
+          "price": 5500,
+          "invoice": false
+        },
+        {
+          "name": "掃描器 HF360",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "HF360",
+          "qty": 1,
+          "sn": "24250B2E32",
+          "sns": [
+            "24250B2E32"
+          ],
+          "cost": 3100,
+          "price": 3400,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2025-08-28",
+      "createdAt": "2026-04-08T10:06:32.889Z"
+    },
+    {
+      "id": "mnpvwnl1jp8y",
+      "date": "2025-08-31",
+      "custId": "mnmofk0wvucy",
+      "custName": "騰亦資訊",
+      "contact": "Jack歐",
+      "phone": "07-5885038",
+      "note": "普利悠測試掛榮總*還在帳上",
+      "items": [
+        {
+          "name": "掃描器 HF680",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "HF680",
+          "qty": 1,
+          "sn": "23219B49BC",
+          "sns": [
+            "23219B49BC"
+          ],
+          "cost": 3000,
+          "price": 3400,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2025-08-31",
+      "createdAt": "2026-04-08T10:07:29.893Z"
+    },
+    {
+      "id": "mnpvxjns3zsk",
+      "date": "2025-09-20",
+      "custId": "mnmofk0wcsf4",
+      "custName": "河川企業社",
+      "contact": "張河川先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙 40米",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "40米",
+          "qty": 40,
+          "sn": "",
+          "sns": [],
+          "cost": 120,
+          "price": 160,
+          "invoice": true
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 40,
+          "sn": "",
+          "sns": [],
+          "cost": 60,
+          "price": 190,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2025-09-20",
+      "createdAt": "2026-04-08T10:08:11.464Z"
+    },
+    {
+      "id": "mnpvxxq41i9n",
+      "date": "2025-09-25",
+      "custId": "mnmofk0w94kc",
+      "custName": "興業企業行",
+      "contact": "黃柏堯先生",
+      "phone": "07-6109199",
+      "note": "",
+      "items": [
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 20,
+          "sn": "",
+          "sns": [],
+          "cost": 60,
+          "price": 190,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2025-09-25",
+      "createdAt": "2026-04-08T10:08:29.692Z"
+    },
+    {
+      "id": "mnpvz2ri8v52",
+      "date": "2025-09-25",
+      "custId": "mnmofk0wbk4k",
+      "custName": "御富健康事業股份有限公司",
+      "contact": "黃崇師先生",
+      "phone": "",
+      "note": "TS03 110*300 (成本330)  FOR 王強出貨",
+      "items": [
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 3,
+          "sn": "",
+          "sns": [],
+          "cost": 330,
+          "price": 450,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2025-09-25",
+      "createdAt": "2026-04-08T10:09:22.878Z"
+    },
+    {
+      "id": "mnpw01bkvj27",
+      "date": "2025-09-27",
+      "custId": "mnmofk0wpc0i",
+      "custName": "訊控有限公司",
+      "contact": "陳甫騁先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "",
+          "qty": 40,
+          "sn": "",
+          "sns": [],
+          "cost": 170,
+          "price": 220,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 10,
+          "sn": "",
+          "sns": [],
+          "cost": 300,
+          "price": 420,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2025-09-27",
+      "createdAt": "2026-04-08T10:10:07.664Z"
+    },
+    {
+      "id": "mnpw1941p53i",
+      "date": "2025-10-07",
+      "custId": "mnmofk0wjmq9",
+      "custName": "福寶水產",
+      "contact": "李彥賢先生",
+      "phone": "0935-085-022",
+      "note": "<數量錯誤 下次注意> 不能缺少",
+      "items": [
+        {
+          "name": "珠光紙",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "",
+          "qty": 320,
+          "sn": "",
+          "sns": [],
+          "cost": 85,
+          "price": 130,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 60,
+          "sn": "",
+          "sns": [],
+          "cost": 60,
+          "price": 155,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2025-10-07",
+      "createdAt": "2026-04-08T10:11:04.417Z"
+    },
+    {
+      "id": "mnpw3ezw97hn",
+      "date": "2025-10-03",
+      "custId": "mnmofk0wvucy",
+      "custName": "騰亦資訊",
+      "contact": "Jack歐",
+      "phone": "07-5885038",
+      "note": "掛佐茂出貨",
+      "items": [
+        {
+          "name": "掃描器 USB",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "USB",
+          "qty": 2,
+          "sn": "5360019",
+          "sns": [
+            "5360019",
+            "C5360020"
+          ],
+          "cost": 2,
+          "price": 2350,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2025-10-03",
+      "createdAt": "2026-04-08T10:12:45.356Z"
+    },
+    {
+      "id": "mnpw3sx1bteu",
+      "date": "2025-10-22",
+      "custId": "mnmofk0wci92",
+      "custName": "泰茂企業有限公司",
+      "contact": "陳明彥先生",
+      "phone": "0916929388",
+      "note": "",
+      "items": [
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 20,
+          "sn": "",
+          "sns": [],
+          "cost": 60,
+          "price": 150,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2025-10-22",
+      "createdAt": "2026-04-08T10:13:03.397Z"
+    },
+    {
+      "id": "mnpw55umouwh",
+      "date": "2025-11-10",
+      "custId": "mnmofk0wvucy",
+      "custName": "騰亦資訊",
+      "contact": "Jack歐",
+      "phone": "07-5885038",
+      "note": "掛佐茂兩台 銷帳完成",
+      "items": [
+        {
+          "name": "掃描器 HF680",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "HF680",
+          "qty": 2,
+          "sn": "5360019",
+          "sns": [
+            "5360019",
+            "C5360020"
+          ],
+          "cost": 2,
+          "price": 3400,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2025-11-10",
+      "createdAt": "2026-04-08T10:14:06.814Z"
+    },
+    {
+      "id": "mnpw5t1seqoj",
+      "date": "2025-11-25",
+      "custId": "mnmofk0wcsf4",
+      "custName": "河川企業社",
+      "contact": "張河川先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙 40米",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "40米",
+          "qty": 20,
+          "sn": "",
+          "sns": [],
+          "cost": 165,
+          "price": 200,
+          "invoice": false
+        },
+        {
+          "name": "珠光紙 40米",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "40米",
+          "qty": 40,
+          "sn": "",
+          "sns": [],
+          "cost": 120,
+          "price": 160,
+          "invoice": true
+        }
+      ],
+      "paid": true,
+      "paidDate": "2025-11-25",
+      "createdAt": "2026-04-08T10:14:36.880Z"
+    },
+    {
+      "id": "mnpw6p82k6qo",
+      "date": "2025-12-10",
+      "custId": "mnpw68brkuam",
+      "custName": "周先生(前唐榮)",
+      "contact": "",
+      "phone": "",
+      "note": "傭金_他離職去其他國營事業了",
+      "items": [
+        {
+          "name": "掃描器",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "",
+          "qty": 1,
+          "sn": "",
+          "sns": [],
+          "cost": 1,
+          "price": 2001,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2025-12-10",
+      "createdAt": "2026-04-08T10:15:18.578Z"
+    },
+    {
+      "id": "mnpw7c91l4aa",
+      "date": "2025-12-16",
+      "custId": "mnmofk0wiuh5",
+      "custName": "衣藝服裝批發",
+      "contact": "涂嘉昇 先生",
+      "phone": "",
+      "note": "",
+      "items": [
+        {
+          "name": "銅版紙 熱感紙",
+          "type": "paper",
+          "subtype": "銅版紙",
+          "spec": "熱感紙",
+          "qty": 40,
+          "sn": "",
+          "sns": [],
+          "cost": 42,
+          "price": 72,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2025-12-16",
+      "createdAt": "2026-04-08T10:15:48.421Z"
+    },
+    {
+      "id": "mnpw9nt6f4jw",
+      "date": "2026-01-19",
+      "custId": "mnmofk0wpc0i",
+      "custName": "訊控有限公司",
+      "contact": "陳甫騁先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "",
+          "qty": 60,
+          "sn": "",
+          "sns": [],
+          "cost": 170,
+          "price": 220,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 10,
+          "sn": "",
+          "sns": [],
+          "cost": 300,
+          "price": 420,
+          "invoice": true
+        },
+        {
+          "name": "珠光紙 100*95",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "100*95",
+          "qty": 21,
+          "sn": "",
+          "sns": [],
+          "cost": 200,
+          "price": 201,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2026-01-19",
+      "createdAt": "2026-04-08T10:17:36.714Z"
+    },
+    {
+      "id": "mnpwafdlibb3",
+      "date": "2026-01-20",
+      "custId": "mnmofk0wess9",
+      "custName": "王強條碼企業社",
+      "contact": "王銘裕",
+      "phone": "0952668663",
+      "note": "FOR 佐茂碳帶 不保固",
+      "items": [
+        {
+          "name": "條碼機 SATO CL4NX印字頭",
+          "type": "device",
+          "subtype": "條碼機",
+          "spec": "SATO CL4NX印字頭",
+          "qty": 1,
+          "sn": "EFW-25300566",
+          "sns": [
+            "EFW-25300566"
+          ],
+          "cost": 1,
+          "price": 3501,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2026-01-20"
+    },
+    {
+      "id": "mnpwaxo7qta6",
+      "date": "2026-02-08",
+      "custId": "mnmofk0wy13w",
+      "custName": "基福",
+      "contact": "廖根良先生",
+      "phone": "",
+      "note": "",
+      "items": [
+        {
+          "name": "掃描器 8050傭金",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "8050傭金",
+          "qty": 1,
+          "sn": "",
+          "sns": [],
+          "cost": 1,
+          "price": 8001,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2026-02-08"
+    },
+    {
+      "id": "mnpwco7u2nkx",
+      "date": "2026-03-01",
+      "custId": "mnmofk0wcsf4",
+      "custName": "河川企業社",
+      "contact": "張河川先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙 40米",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "40米",
+          "qty": 20,
+          "sn": "",
+          "sns": [],
+          "cost": 165,
+          "price": 200,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 40,
+          "sn": "",
+          "sns": [],
+          "cost": 60,
+          "price": 190,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2026-03-01",
+      "createdAt": "2026-04-08T10:19:57.210Z"
+    },
+    {
+      "id": "mnpwdyp6km05",
+      "date": "2026-04-08",
+      "custId": "mnmofk0wy13w",
+      "custName": "基福",
+      "contact": "廖根良先生",
+      "phone": "",
+      "note": "",
+      "items": [
+        {
+          "name": "掃描器 8050傭金",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "8050傭金",
+          "qty": 1,
+          "sn": "",
+          "sns": [],
+          "cost": 1,
+          "price": 8001,
+          "invoice": false
+        }
+      ],
+      "paid": false,
+      "paidDate": "2026-04-08",
+      "createdAt": "2026-04-08T10:20:57.450Z"
+    },
+    {
+      "id": "mnpwf71ltqrt",
+      "date": "2026-03-02",
+      "custId": "mnmofk0wvucy",
+      "custName": "騰亦資訊",
+      "contact": "Jack歐",
+      "phone": "07-5885038",
+      "note": "",
+      "items": [
+        {
+          "name": "掃描器 USB",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "USB",
+          "qty": 2,
+          "sn": "C5360446",
+          "sns": [
+            "C5360446",
+            "C5360447"
+          ],
+          "cost": 2,
+          "price": 2351,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2026-03-02",
+      "createdAt": "2026-04-08T10:21:54.921Z"
+    },
+    {
+      "id": "mnpwg3csf6cq",
+      "date": "2026-03-03",
+      "custId": "mnmofk0wvucy",
+      "custName": "騰亦資訊",
+      "contact": "Jack歐",
+      "phone": "07-5885038",
+      "note": "",
+      "items": [
+        {
+          "name": "掃描器 USB",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "USB",
+          "qty": 2,
+          "sn": "C5360435",
+          "sns": [
+            "C5360435",
+            "C5170440"
+          ],
+          "cost": 2,
+          "price": 2351,
+          "invoice": false
+        }
+      ],
+      "paid": false,
+      "paidDate": "2026-03-03",
+      "createdAt": "2026-04-08T10:22:36.796Z"
+    },
+    {
+      "id": "mnpwgscymq8v",
+      "date": "2026-03-10",
+      "custId": "mnmofk0w94kc",
+      "custName": "興業企業行",
+      "contact": "黃柏堯先生",
+      "phone": "07-6109199",
+      "note": "",
+      "items": [
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 20,
+          "sn": "",
+          "sns": [],
+          "cost": 60,
+          "price": 190,
+          "invoice": false
+        }
+      ],
+      "paid": false,
+      "paidDate": "2026-03-10",
+      "createdAt": "2026-04-08T10:23:09.202Z"
+    },
+    {
+      "id": "mnpwhovqyvet",
+      "date": "2026-03-30",
+      "custId": "mnmofk0w94kc",
+      "custName": "興業企業行",
+      "contact": "黃柏堯先生",
+      "phone": "07-6109199",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "",
+          "qty": 30,
+          "sn": "",
+          "sns": [],
+          "cost": 140,
+          "price": 250,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 10,
+          "sn": "",
+          "sns": [],
+          "cost": 60,
+          "price": 190,
+          "invoice": false
+        }
+      ],
+      "paid": false,
+      "paidDate": "2026-03-30"
+    },
+    {
+      "id": "mnpwibiqgx8x",
+      "date": "2026-04-08",
+      "custId": "mnmofk0wjmq9",
+      "custName": "福寶水產",
+      "contact": "李彥賢先生",
+      "phone": "0935-085-022",
+      "note": "",
+      "items": [
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 60,
+          "sn": "",
+          "sns": [],
+          "cost": 60,
+          "price": 155,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2026-04-08",
+      "createdAt": "2026-04-08T10:24:20.690Z"
+    },
+    {
+      "id": "mnpwj6s1s22u",
+      "date": "2026-04-10",
+      "custId": "mnmofk0wpc0i",
+      "custName": "訊控有限公司",
+      "contact": "陳甫騁先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "",
+          "qty": 120,
+          "sn": "",
+          "sns": [],
+          "cost": 170,
+          "price": 220,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 20,
+          "sn": "",
+          "sns": [],
+          "cost": 300,
+          "price": 420,
+          "invoice": false
+        }
+      ],
+      "paid": false,
+      "paidDate": "2026-04-10",
+      "createdAt": "2026-04-08T10:25:01.201Z"
+    },
+    {
+      "id": "mnq47a2su2hg",
+      "date": "2026-03-24",
+      "custId": "mnmofk0wci92",
+      "custName": "泰茂企業有限公司",
+      "contact": "陳明彥先生",
+      "phone": "0916929388",
+      "note": "",
+      "items": [
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 20,
+          "sn": "",
+          "sns": [],
+          "cost": 60,
+          "price": 150,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2026-03-24",
+      "createdAt": "2026-04-08T13:59:42.532Z"
+    },
+    {
+      "id": "mnsltbcpgqc1",
+      "date": "2026-04-10",
+      "custId": "mnmofk0wcsf4",
+      "custName": "河川企業社",
+      "contact": "張河川先生",
+      "phone": "0935111093",
+      "note": "",
+      "items": [
+        {
+          "name": "珠光紙 40米",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "40米",
+          "qty": 40,
+          "sn": "",
+          "sns": [],
+          "cost": 120,
+          "price": 160,
+          "invoice": false
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 20,
+          "sn": "",
+          "sns": [],
+          "cost": 60,
+          "price": 190,
+          "invoice": false
+        }
+      ],
+      "paid": false,
+      "paidDate": "2026-04-10",
+      "createdAt": "2026-04-10T07:48:16.441Z"
+    }
+  ],
+  "customers": [
+    {
+      "id": "mnmofk0wjmq9",
+      "name": "福寶水產",
+      "contact": "李彥賢先生",
+      "phone": "0935-085-022",
+      "email": "",
+      "addr": "高雄市前鎮區新衙路296巷9號",
+      "note": ""
+    },
+    {
+      "id": "mnmofk0w94kc",
+      "name": "興業企業行",
+      "contact": "黃柏堯先生",
+      "phone": "07-6109199",
+      "email": "",
+      "addr": "高雄市梓官區赤崁北路141-41號",
+      "note": "抬頭 億興木器有限公司  統編45144158"
+    },
+    {
+      "id": "mnmofk0wci92",
+      "name": "泰茂企業有限公司",
+      "contact": "陳明彥先生",
+      "phone": "0916929388",
+      "email": "",
+      "addr": "",
+      "note": ""
+    },
+    {
+      "id": "mnmofk0wcsf4",
+      "name": "河川企業社",
+      "contact": "張河川先生",
+      "phone": "0935111093",
+      "email": "",
+      "addr": "",
+      "note": "聯盛食品有限公司 統編:28304362"
+    },
+    {
+      "id": "mnmofk0wy13w",
+      "name": "基福",
+      "contact": "廖根良先生",
+      "phone": "",
+      "email": "",
+      "addr": "",
+      "note": ""
+    },
+    {
+      "id": "mnmofk0wess9",
+      "name": "王強條碼企業社",
+      "contact": "王銘裕",
+      "phone": "0952668663",
+      "email": "",
+      "addr": "833高雄市鳥松區大埤路29之56號3樓",
+      "note": ""
+    },
+    {
+      "id": "mnmofk0wpc0i",
+      "name": "訊控有限公司",
+      "contact": "陳甫騁先生",
+      "phone": "0935111093",
+      "email": "",
+      "addr": "高雄市鳳山區華山街286號  ",
+      "note": "統編 28289171"
+    },
+    {
+      "id": "mnmofk0wiuh5",
+      "name": "衣藝服裝批發",
+      "contact": "涂嘉昇 先生",
+      "phone": "",
+      "email": "",
+      "addr": "高雄市三民區林森一路325號   ",
+      "note": ""
+    },
+    {
+      "id": "mnmofk0wvucy",
+      "name": "騰亦資訊",
+      "contact": "Jack歐",
+      "phone": "07-5885038",
+      "email": "",
+      "addr": "高雄市左營區左營大路586巷15號",
+      "note": ""
+    },
+    {
+      "id": "mnmofk0wwuzf",
+      "name": "聿展有限公司",
+      "contact": "林老闆",
+      "phone": "0933272900",
+      "email": "",
+      "addr": "833高雄市鳥松區水管路280巷13號B棟",
+      "note": ""
+    },
+    {
+      "id": "mnmofk0wnp95",
+      "name": "宜茂企業有限公司",
+      "contact": "陳靜宜",
+      "phone": "",
+      "email": "",
+      "addr": "高雄市鳳山區北賢街175號15樓",
+      "note": ""
+    },
+    {
+      "id": "mnmofk0wbk4k",
+      "name": "御富健康事業股份有限公司",
+      "contact": "黃崇師先生",
+      "phone": "",
+      "email": "高雄市新興區大明里中正四路６５號１３樓之２",
+      "addr": "",
+      "note": ""
+    },
+    {
+      "id": "mnn6mnr48vi7",
+      "name": "志鵬綜合果干行",
+      "contact": "陳大鵬先生",
+      "phone": "0919-007011",
+      "email": "",
+      "addr": "台南市關廟區南雄里中崙街11巷67號",
+      "note": ""
+    },
+    {
+      "id": "mnn6ymsaxyqa",
+      "name": "屏東九如芭樂合作社",
+      "contact": "",
+      "phone": "",
+      "email": "",
+      "addr": "",
+      "note": ""
+    },
+    {
+      "id": "mnn751wo4ij4",
+      "name": "屏東郭先生",
+      "contact": "",
+      "phone": "",
+      "email": "",
+      "addr": "",
+      "note": ""
+    },
+    {
+      "id": "mnn8sg0xwv65",
+      "name": "大宇玩具",
+      "contact": "",
+      "phone": "",
+      "email": "",
+      "addr": "",
+      "note": ""
+    },
+    {
+      "id": "mnn92phzqp6u",
+      "name": "台灣好味鮮股份有限公司",
+      "contact": "梁滋玲",
+      "phone": "0988-011936",
+      "email": "",
+      "addr": "台東市泰安街195號",
+      "note": "統一編號：   24639628"
+    },
+    {
+      "id": "mnnbesyceej1",
+      "name": "蝦皮賣場",
+      "contact": "",
+      "phone": "",
+      "email": "",
+      "addr": "",
+      "note": ""
+    },
+    {
+      "id": "mnncin3g7nas",
+      "name": "公司旁_汽車保養廠",
+      "contact": "",
+      "phone": "",
+      "email": "",
+      "addr": "",
+      "note": ""
+    },
+    {
+      "id": "mnndpcz60xma",
+      "name": "和益_介紹屏東客戶",
+      "contact": "",
+      "phone": "",
+      "email": "",
+      "addr": "",
+      "note": ""
+    },
+    {
+      "id": "mnnehl6ceplu",
+      "name": "碁揚企業社",
+      "contact": "",
+      "phone": "",
+      "email": "",
+      "addr": "",
+      "note": ""
+    },
+    {
+      "id": "mnpw68brkuam",
+      "name": "周先生(前唐榮)",
+      "contact": "",
+      "phone": "",
+      "email": "",
+      "addr": "",
+      "note": ""
+    }
+  ],
+  "products": [
+    {
+      "id": "mnn8ahzyaqpg",
+      "type": "paper",
+      "sub": "珠光紙",
+      "name": "70*40*40米",
+      "spec": "40米",
+      "cost": 120
+    },
+    {
+      "id": "mnn8azf21tg7",
+      "type": "paper",
+      "sub": "珠光紙",
+      "name": "100*70*40米",
+      "spec": "40米",
+      "cost": 165
+    },
+    {
+      "id": "mnn8c5fyyzbg",
+      "type": "ribbon",
+      "sub": "抗刮碳帶",
+      "name": "SP330 110*91米",
+      "spec": "",
+      "cost": 130
+    },
+    {
+      "id": "mnn8cqvu263z",
+      "type": "device",
+      "sub": "掃描器",
+      "name": "CINO A680",
+      "spec": "USB",
+      "cost": 2300
+    },
+    {
+      "id": "mnn8ozzy95sf",
+      "type": "paper",
+      "sub": "珠光紙",
+      "name": "90*70**40米",
+      "spec": "",
+      "cost": 110
+    },
+    {
+      "id": "mnn8q0ebj220",
+      "type": "paper",
+      "sub": "珠光紙",
+      "name": "90*50*40米",
+      "spec": "",
+      "cost": 110
+    },
+    {
+      "id": "mnn8vwnumzuc",
+      "type": "ribbon",
+      "sub": "抗刮碳帶",
+      "name": "SP330 110*300米",
+      "spec": "",
+      "cost": 330
+    },
+    {
+      "id": "mnncp6j88n3s",
+      "type": "device",
+      "sub": "條碼機",
+      "name": "GODEX G530",
+      "spec": "USB",
+      "cost": 7500
+    },
+    {
+      "id": "mnncpxbxphly",
+      "type": "paper",
+      "sub": "珠光紙",
+      "name": "90*90*50米",
+      "spec": "",
+      "cost": 170
+    },
+    {
+      "id": "mnncqeyjelem",
+      "type": "ribbon",
+      "sub": "抗刮碳帶",
+      "name": "TRR03 100*300米 外捲",
+      "spec": "",
+      "cost": 300
+    },
+    {
+      "id": "mnncrix3vrx5",
+      "type": "device",
+      "sub": "掃描器",
+      "name": "HONEYWELL 1472G",
+      "spec": "",
+      "cost": 5000
+    },
+    {
+      "id": "mnnd1cmy0dx8",
+      "type": "ribbon",
+      "sub": "抗刮碳帶",
+      "name": "TRS03+_ 110*91米",
+      "spec": "",
+      "cost": 60
+    },
+    {
+      "id": "mnndn92sitoh",
+      "type": "paper",
+      "sub": "珠光紙",
+      "name": "100*100珠光紙",
+      "spec": "",
+      "cost": 140
+    }
+  ],
+  "settings": {
+    "bankName": "國泰銀行",
+    "bankCode": "013",
+    "bankAccount": "061506186489"
+  },
+  "_ts": 1776013363994
+}
