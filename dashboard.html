@@ -2208,12 +2208,10 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 // ═══════ DATA ═══════
 const STORE='assetDB_v6';
 
-// ── GitHub 雲端同步（安全版）──
-const GH_OWNER='manny76528-star';
-const GH_REPO='stock-dashboard';
+// ── GitHub 雲端同步（透過 Cloudflare Worker，token 安全）──
+const CF_WORKER='https://dashboard-sync.manny76528.workers.dev';
 const GH_FILE='data_dashboard.json';
-const GH_TOKEN='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';
-const GH_API=`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`;
+const GH_API=CF_WORKER+'/'+GH_FILE;
 
 let _ghSha='';
 let _syncTimer=null;
@@ -2231,9 +2229,7 @@ function dbWeight(d){
 async function ghPull(){
   if(!_syncEnabled)return false;
   try{
-    const r=await fetch(GH_API+'?t='+Date.now(),{
-      headers:{'Authorization':'token '+GH_TOKEN,'Accept':'application/vnd.github.v3+json'}
-    });
+    const r=await fetch(GH_API+'?t='+Date.now());
     if(!r.ok){
       if(r.status===404){
         // 遠端沒有檔案 → 本次 Push 建立
@@ -2285,7 +2281,7 @@ async function ghPush(){
     // 若沒有 sha，先嘗試取得
     if(!_ghSha){
       try{
-        const chk=await fetch(GH_API,{headers:{'Authorization':'token '+GH_TOKEN}});
+        const chk=await fetch(GH_API);
         if(chk.ok){const cj=await chk.json();_ghSha=cj.sha;}
       }catch(e){}
     }
@@ -2293,7 +2289,7 @@ async function ghPush(){
     if(_ghSha)body.sha=_ghSha;
     const r=await fetch(GH_API,{
       method:'PUT',
-      headers:{'Authorization':'token '+GH_TOKEN,'Content-Type':'application/json'},
+      headers:{'Content-Type':'application/json'},
       body:JSON.stringify(body)
     });
     if(!r.ok){const e=await r.json();throw new Error(e.message);}

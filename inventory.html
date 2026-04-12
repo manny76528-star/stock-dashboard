@@ -482,20 +482,16 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
 const STORE='inv_db_v1';
 
 // ── GitHub 雲端同步 ──
-const GH_OWNER='manny76528-star';
-const GH_REPO='stock-dashboard';
+const CF_WORKER_INV='https://dashboard-sync.manny76528.workers.dev';
 const GH_FILE_INV='data_inventory.json';
-const GH_TOKEN_INV='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';
-const GH_API_INV=`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE_INV}`;
+const GH_API_INV=CF_WORKER_INV+'/'+GH_FILE_INV;
 
 let _ghShаInv='';
 let _syncTimerInv=null;
 
 async function ghPullInv(){
   try{
-    const r=await fetch(GH_API_INV+'?t='+Date.now(),{
-      headers:{'Authorization':'token '+GH_TOKEN_INV,'Accept':'application/vnd.github.v3+json'}
-    });
+    const r=await fetch(GH_API_INV+'?t='+Date.now());
     if(!r.ok){if(r.status===404){console.log('data_inventory.json 尚未存在');return false;}throw new Error('Pull failed: '+r.status);}
     const j=await r.json();
     _ghShаInv=j.sha;
@@ -524,7 +520,7 @@ async function ghPushInv(){
     if(_ghShаInv)body.sha=_ghShаInv;
     const r=await fetch(GH_API_INV,{
       method:'PUT',
-      headers:{'Authorization':'token '+GH_TOKEN_INV,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},
+      headers:{'Content-Type':'application/json'},
       body:JSON.stringify(body)
     });
     if(!r.ok){const e=await r.json();throw new Error(e.message||r.status);}
