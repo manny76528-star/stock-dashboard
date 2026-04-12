@@ -2303,6 +2303,14 @@ async function ghPush(){
   }
 }
 
+async function manualSync(){
+  showSyncStatus('🔄 同步中...');
+  _ghSha='';
+  await ghPush();
+  const updated=await ghPull();
+  if(updated){render();showSyncStatus('☁️ 已從雲端同步');}
+}
+
 function schedulePush(){
   clearTimeout(_syncTimer);
   _syncTimer=setTimeout(ghPush,3000);
