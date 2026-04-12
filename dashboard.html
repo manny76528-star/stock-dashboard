@@ -216,6 +216,12 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 
 <style>
 .trend-section{max-width:1200px;margin:0 auto 10px;background:var(--white);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:var(--card-shadow);}
+.j-tag-btn{padding:5px 10px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:#fff;color:#475569;transition:all .15s;font-family:'Noto Sans TC',sans-serif;}
+.j-tag-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.j-mood-btn{padding:5px 10px;border-radius:20px;font-size:12px;cursor:pointer;border:1.5px solid var(--border);background:#fff;color:#475569;transition:all .15s;font-family:'Noto Sans TC',sans-serif;}
+.j-mood-btn.active{background:#fef3c7;border-color:#f59e0b;color:#92400e;}
+.j-card{background:#fff;border-radius:10px;border:1px solid var(--border);padding:14px 16px;transition:box-shadow .2s;}
+.j-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.08);}
 .trend-hdr{background:var(--section-header);color:#fff;padding:10px 16px;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:space-between;}
 .trend-body{display:none;padding:14px;}.trend-body.open{display:block;}
 .trend-checks{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:12px;font-size:12px;}
@@ -1839,6 +1845,85 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 </div>
 
 </div><!-- /db-root -->
+
+<!-- ═══ 交易日誌 ═══ -->
+<div style="max-width:1300px;margin:0 auto;padding:0 0 32px">
+  <div class="trend-section">
+    <div class="trend-hdr" style="cursor:pointer" onclick="toggleJournal()">
+      <span>📓 交易日誌</span>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span id="journal-count" style="font-size:11px;opacity:.7"></span>
+        <button onclick="event.stopPropagation();openJournalModal()" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:6px;padding:4px 12px;font-size:11px;font-weight:700;cursor:pointer">＋ 新增日誌</button>
+        <span id="journal-arrow" style="font-size:12px">▼</span>
+      </div>
+    </div>
+    <!-- 搜尋列 -->
+    <div id="journal-body" style="display:none">
+      <div style="padding:12px 16px;background:#f8fafc;border-bottom:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <input id="journal-search" type="text" placeholder="搜尋日誌..." style="flex:1;min-width:120px;padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;outline:none" oninput="renderJournal()">
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="j-tag-btn" data-tag="" onclick="setJournalTag(this)">全部</button>
+          <button class="j-tag-btn" data-tag="看多" onclick="setJournalTag(this)">📈 看多</button>
+          <button class="j-tag-btn" data-tag="看空" onclick="setJournalTag(this)">📉 看空</button>
+          <button class="j-tag-btn" data-tag="買入" onclick="setJournalTag(this)">▲ 買入</button>
+          <button class="j-tag-btn" data-tag="賣出" onclick="setJournalTag(this)">▼ 賣出</button>
+          <button class="j-tag-btn" data-tag="重大事項" onclick="setJournalTag(this)">🔔 重大事項</button>
+        </div>
+      </div>
+      <div id="journal-list" style="padding:12px 16px;display:flex;flex-direction:column;gap:10px;max-height:600px;overflow-y:auto"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 交易日誌 Modal -->
+<div class="mo" id="journalModal">
+  <div class="modal" style="max-width:640px">
+    <div class="mt"><h3 id="journal-modal-title">📓 新增交易日誌</h3><button onclick="closeModal('journalModal')" style="background:none;border:none;font-size:18px;cursor:pointer;color:#94a3b8">✕</button></div>
+    <!-- 日期 + 標籤 -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+      <div><label class="fl">日期</label><input class="fi" type="date" id="j-date"></div>
+      <div>
+        <label class="fl">標籤（可複選）</label>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
+          <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer"><input type="checkbox" id="jtag-bull" value="看多"> 📈 看多</label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer"><input type="checkbox" id="jtag-bear" value="看空"> 📉 看空</label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer"><input type="checkbox" id="jtag-buy" value="買入"> ▲ 買入</label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer"><input type="checkbox" id="jtag-sell" value="賣出"> ▼ 賣出</label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer"><input type="checkbox" id="jtag-alert" value="重大事項"> 🔔 重大事項</label>
+        </div>
+      </div>
+    </div>
+    <!-- 大盤環境 -->
+    <div class="fg">
+      <label class="fl">🌐 大盤環境 / 重大新聞</label>
+      <textarea class="fi" id="j-market" rows="3" placeholder="今日大盤走勢、重要新聞、總體經濟事件..." style="resize:vertical"></textarea>
+    </div>
+    <!-- 心態情緒 -->
+    <div class="fg">
+      <label class="fl">🧠 心態 / 情緒紀錄</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+        <button type="button" class="j-mood-btn" data-mood="😊 興奮" onclick="setMood(this)">😊 興奮</button>
+        <button type="button" class="j-mood-btn" data-mood="😰 焦慮" onclick="setMood(this)">😰 焦慮</button>
+        <button type="button" class="j-mood-btn" data-mood="😌 平靜" onclick="setMood(this)">😌 平靜</button>
+        <button type="button" class="j-mood-btn" data-mood="😤 衝動" onclick="setMood(this)">😤 衝動</button>
+        <button type="button" class="j-mood-btn" data-mood="😨 恐懼" onclick="setMood(this)">😨 恐懼</button>
+        <button type="button" class="j-mood-btn" data-mood="🤔 猶豫" onclick="setMood(this)">🤔 猶豫</button>
+        <button type="button" class="j-mood-btn" data-mood="💪 自信" onclick="setMood(this)">💪 自信</button>
+      </div>
+      <input class="fi" id="j-mood" placeholder="或自行輸入情緒描述...">
+    </div>
+    <!-- 交易日誌 -->
+    <div class="fg">
+      <label class="fl">📝 交易日誌</label>
+      <textarea class="fi" id="j-content" rows="5" placeholder="記錄今日的操作邏輯、反思、策略調整..." style="resize:vertical"></textarea>
+    </div>
+    <div class="br">
+      <button class="act-btn" onclick="closeModal('journalModal')">取消</button>
+      <button class="act-btn del" id="j-del-btn" style="display:none" onclick="deleteJournal()">🗑 刪除</button>
+      <button class="act-btn add" onclick="saveJournal()">儲存日誌</button>
+    </div>
+  </div>
+</div>
 
 <!-- ======= MODALS ======= -->
 
@@ -4371,15 +4456,15 @@ function recordSnapshot(manual=false){
   const net=tot-lR;
   const dR=tot>0?Math.round(lR/tot*1000)/10:0;
   const fl=Math.round(tD-mO);
-  const ym=new Date().toISOString().slice(0,7);
-  const existing=db.snapshots.findIndex(s=>s.ym===ym);
-  const snap={ym,net:Math.round(net),div:Math.round(tD),cf:fl,debtRatio:dR};
+  const dateKey=new Date().toISOString().slice(0,10); // 完整日期 YYYY-MM-DD
+  const existing=db.snapshots.findIndex(s=>s.ym===dateKey);
+  const snap={ym:dateKey,net:Math.round(net),div:Math.round(tD),cf:fl,debtRatio:dR};
   if(existing>=0)db.snapshots[existing]=snap;
   else db.snapshots.push(snap);
   db.snapshots.sort((a,b)=>a.ym.localeCompare(b.ym));
   save();renderTrendChart();
-  if(manual)toast('✅ 已記錄 '+ym+' 快照（淨資產:$'+Math.round(net).toLocaleString()+'）');
-  else console.log('Auto snapshot:',ym,'net:',Math.round(net));
+  if(manual)toast('✅ 已記錄 '+dateKey+' 快照（淨資產:$'+Math.round(net).toLocaleString()+'）');
+  else console.log('Auto snapshot:',dateKey,'net:',Math.round(net));
 }
 
 function renderTrendChart(){
@@ -4388,7 +4473,7 @@ function renderTrendChart(){
     return;
   }
   const snaps=db.snapshots;
-  const labels=snaps.map(s=>s.ym);
+  const labels=snaps.map(s=>s.ym.length===7?s.ym:s.ym.slice(5)); // 月份顯示ym，日期顯示MM/DD
   const showNet=document.getElementById('tc-net')?.checked;
   const showDiv=document.getElementById('tc-div')?.checked;
   const showCf=document.getElementById('tc-cf')?.checked;
@@ -4465,7 +4550,7 @@ function renderTrendChart(){
     var netColor=s.net>=0?'#2563eb':'#dc2626';
     var cfColor=s.cf>=0?'#16a34a':'#dc2626';
     tblHtml+='<tr style="background:'+bg+'">';
-    tblHtml+='<td style="padding:10px 14px;font-weight:700;color:#1e293b;border-bottom:1px solid #f1f5f9">'+s.ym+'</td>';
+    tblHtml+='<td style="padding:10px 14px;font-weight:700;color:#1e293b;border-bottom:1px solid #f1f5f9">'+( s.ym.length>7?s.ym:s.ym)+'</td>';
     tblHtml+='<td style="padding:10px 14px;text-align:right;font-weight:600;color:'+netColor+';border-bottom:1px solid #f1f5f9">$'+s.net.toLocaleString()+'</td>';
     tblHtml+='<td style="padding:10px 14px;text-align:right;font-weight:600;color:#16a34a;border-bottom:1px solid #f1f5f9">$'+s.div.toLocaleString()+'</td>';
     tblHtml+='<td style="padding:10px 14px;text-align:right;font-weight:600;color:'+cfColor+';border-bottom:1px solid #f1f5f9">'+(s.cf>=0?'+':'')+s.cf.toLocaleString()+'</td>';
@@ -4480,8 +4565,8 @@ function renderTrendChart(){
 // ═══ EDIT TITLE ═══
 function clearAndReRecord(){
   if(!confirm('重算本月快照？\n這會用目前的正確數值覆蓋本月的快照。'))return;
-  const ym=new Date().toISOString().slice(0,7);
-  // Remove current month snapshot
+  const ym=new Date().toISOString().slice(0,10);
+  // Remove today's snapshot
   db.snapshots=(db.snapshots||[]).filter(s=>s.ym!==ym);
   // Force re-record with correct formula
   recordSnapshot(false);
@@ -4673,6 +4758,133 @@ setInterval(()=>{const h=new Date().getHours(),m=new Date().getMinutes();if(h*60
     }
   };
 })();
+
+// ═══ 交易日誌 ═══
+if(!db.journals)db.journals=[];
+let editJournalId=null;
+let journalTagFilter='';
+let journalOpen=false;
+
+function toggleJournal(){
+  journalOpen=!journalOpen;
+  document.getElementById('journal-body').style.display=journalOpen?'block':'none';
+  document.getElementById('journal-arrow').textContent=journalOpen?'▲':'▼';
+  if(journalOpen)renderJournal();
+}
+
+function setJournalTag(btn){
+  journalTagFilter=btn.dataset.tag;
+  document.querySelectorAll('.j-tag-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderJournal();
+}
+
+function setMood(btn){
+  document.querySelectorAll('.j-mood-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('j-mood').value=btn.dataset.mood;
+}
+
+function openJournalModal(id=null){
+  editJournalId=id;
+  const j=id?(db.journals||[]).find(x=>x.id===id):null;
+  document.getElementById('journal-modal-title').textContent=id?'✏️ 編輯日誌':'📓 新增交易日誌';
+  document.getElementById('j-date').value=j?.date||new Date().toISOString().split('T')[0];
+  document.getElementById('j-market').value=j?.market||'';
+  document.getElementById('j-mood').value=j?.mood||'';
+  document.getElementById('j-content').value=j?.content||'';
+  // 標籤
+  ['jtag-bull','jtag-bear','jtag-buy','jtag-sell','jtag-alert'].forEach(id2=>{
+    const el=document.getElementById(id2);
+    if(el)el.checked=j?.tags?.includes(el.value)||false;
+  });
+  // 情緒按鈕
+  document.querySelectorAll('.j-mood-btn').forEach(b=>{
+    b.classList.toggle('active',j?.mood===b.dataset.mood);
+  });
+  document.getElementById('j-del-btn').style.display=id?'':'none';
+  openModal('journalModal');
+}
+
+function saveJournal(){
+  const date=document.getElementById('j-date').value;
+  if(!date){toast('請填寫日期');return;}
+  const tags=[];
+  ['jtag-bull','jtag-bear','jtag-buy','jtag-sell','jtag-alert'].forEach(id2=>{
+    const el=document.getElementById(id2);
+    if(el&&el.checked)tags.push(el.value);
+  });
+  const j={
+    id:editJournalId||uid(),
+    date,
+    tags,
+    market:document.getElementById('j-market').value.trim(),
+    mood:document.getElementById('j-mood').value.trim(),
+    content:document.getElementById('j-content').value.trim()
+  };
+  if(!db.journals)db.journals=[];
+  if(editJournalId){
+    const idx=db.journals.findIndex(x=>x.id===editJournalId);
+    if(idx>=0)db.journals[idx]=j;
+  } else {
+    db.journals.push(j);
+  }
+  db.journals.sort((a,b)=>b.date.localeCompare(a.date));
+  save();
+  closeModal('journalModal');
+  renderJournal();
+  updateJournalCount();
+  toast('✅ 日誌已儲存');
+}
+
+function deleteJournal(){
+  if(!editJournalId)return;
+  if(!confirm('確定刪除這篇日誌？'))return;
+  db.journals=(db.journals||[]).filter(x=>x.id!==editJournalId);
+  save();closeModal('journalModal');renderJournal();updateJournalCount();
+  toast('已刪除');
+}
+
+function updateJournalCount(){
+  const el=document.getElementById('journal-count');
+  if(el)el.textContent=(db.journals||[]).length+' 篇';
+}
+
+function renderJournal(){
+  const q=(document.getElementById('journal-search')?.value||'').toLowerCase();
+  let list=(db.journals||[]).slice();
+  if(journalTagFilter)list=list.filter(j=>(j.tags||[]).includes(journalTagFilter));
+  if(q)list=list.filter(j=>
+    (j.content||'').toLowerCase().includes(q)||
+    (j.market||'').toLowerCase().includes(q)||
+    (j.mood||'').toLowerCase().includes(q)||
+    (j.date||'').includes(q)
+  );
+  const container=document.getElementById('journal-list');
+  if(!container)return;
+  if(list.length===0){container.innerHTML='<div style="text-align:center;color:var(--muted);padding:20px;font-size:13px">尚無日誌記錄</div>';return;}
+  const tagColors={'看多':'#dcfce7','看空':'#fef2f2','買入':'#dbeafe','賣出':'#fce7f3','重大事項':'#fef3c7'};
+  const tagTextColors={'看多':'#16a34a','看空':'#dc2626','買入':'#2563eb','賣出':'#db2777','重大事項':'#d97706'};
+  container.innerHTML=list.map(j=>{
+    const tags=(j.tags||[]).map(t=>'<span style="display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;background:'+(tagColors[t]||'#f1f5f9')+';color:'+(tagTextColors[t]||'#475569')+';margin-right:4px">'+t+'</span>').join('');
+    return '<div class="j-card">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
+      +'<div style="display:flex;align-items:center;gap:8px">'
+      +'<span style="font-size:13px;font-weight:700;color:#1e293b">'+j.date+'</span>'
+      +tags
+      +(j.mood?'<span style="font-size:12px;color:#64748b">'+j.mood+'</span>':'')
+      +'</div>'
+      +'<button data-jid="'+j.id+'" onclick="openJournalModal(this.dataset.jid)" style="background:none;border:1px solid var(--border);border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;color:#475569">✏️ 編輯</button>'
+      +'</div>'
+      +(j.market?'<div style="font-size:12px;color:#475569;background:#f8fafc;border-radius:6px;padding:8px 10px;margin-bottom:6px;border-left:3px solid #94a3b8">🌐 '+j.market+'</div>':'')
+      +(j.content?'<div style="font-size:13px;color:#1e293b;line-height:1.6;white-space:pre-wrap">'+j.content+'</div>':'')
+      +'</div>';
+  }).join('');
+  updateJournalCount();
+}
+
+// 初始化日誌計數
+updateJournalCount();
 </script>
 </body>
 </html>
