@@ -4130,7 +4130,7 @@ function runSearch(){
 
     // 第一層：匯總列
     html+='<div style="margin-bottom:12px;border:1px solid var(--border);border-radius:10px;overflow:hidden">';
-    html+='<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#f8fafc;cursor:pointer;user-select:none" onclick="toggleSrDetail(''+uid2+'')">';
+    html+='<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#f8fafc;cursor:pointer;user-select:none" data-uid="'+uid2+'" onclick="toggleSrDetail(this.dataset.uid)">';
     html+='<div style="display:flex;align-items:center;gap:12px">';
     html+='<span style="font-weight:800;color:var(--accent);font-size:14px">'+code+'</span>';
     if(name)html+='<span style="font-size:11px;color:var(--muted)">'+name+'</span>';
