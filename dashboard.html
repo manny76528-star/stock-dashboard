@@ -1619,6 +1619,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
     <span id="title-display">２０２６ 資產損益表</span>
   </div>
   <div class="db-topbar-actions">
+        <button class="db-btn neutral" onclick="manualSync()" title="手動同步到雲端" style="font-size:11px">☁️ 同步</button>
       <a href="index.html" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.8);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Noto Sans TC',sans-serif;text-decoration:none;transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,.2)'" onmouseout="this.style.background='rgba(255,255,255,.1)'">🏠 主目錄</a>
       <button onclick="manualLogout()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.8);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,.2)'" onmouseout="this.style.background='rgba(255,255,255,.1)'">🔒 登出</button>
 
@@ -2299,7 +2300,11 @@ async function ghPush(){
     const j=await r.json();
     _ghSha=j.content.sha;
     showSyncStatus('✅ 已同步至雲端');
-  }catch(e){showSyncStatus('⚠️ 同步失敗');console.warn('Push失敗:',e.message);}
+  }catch(e){
+    showSyncStatus('⚠️ 同步失敗: '+e.message);
+    console.warn('Push失敗:',e.message);
+    console.warn('請確認 Token 是否有效、repo 是否存在');
+  }
 }
 
 function schedulePush(){
@@ -4876,7 +4881,7 @@ function renderJournal(){
       +'</div>'
       +'<button data-jid="'+j.id+'" onclick="openJournalModal(this.dataset.jid)" style="background:none;border:1px solid var(--border);border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;color:#475569">✏️ 編輯</button>'
       +'</div>'
-      +(j.market?'<div style="font-size:12px;color:#475569;background:#f8fafc;border-radius:6px;padding:8px 10px;margin-bottom:6px;border-left:3px solid #94a3b8">🌐 '+j.market+'</div>':'')
+      +(j.market?'<div style="margin-bottom:8px;padding:10px 14px;background:linear-gradient(135deg,#0f172a,#1e3a5f);border-radius:8px;border-left:4px solid #3b82f6"><div style="font-size:10px;color:rgba(255,255,255,.6);font-weight:600;letter-spacing:.5px;margin-bottom:4px">🌐 大盤環境 / 重大新聞</div><div style="font-size:15px;font-weight:800;color:#fff;line-height:1.5;white-space:pre-wrap">'+j.market+'</div></div>':'')
       +(j.content?'<div style="font-size:13px;color:#1e293b;line-height:1.6;white-space:pre-wrap">'+j.content+'</div>':'')
       +'</div>';
   }).join('');
