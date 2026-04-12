@@ -2250,19 +2250,22 @@ async function ghPull(){
     // 1. 本地是空的 → 使用遠端
     // 2. 遠端資料量 > 本地 且 時間戳較新 → 使用遠端
     // 3. 其他情況 → 保留本地
-    console.log(`Pull比較: 本地重量${localW}/ts${localTs} vs 遠端重量${remoteW}/ts${remoteTs}`);
-    if(localW===0&&remoteW>0){
+    console.log(`Pull比較: 本地ts=${localTs} 遠端ts=${remoteTs}`);
+    if(remoteTs>localTs){
+      // 遠端較新 → 直接更新
       db=remote;
       localStorage.setItem(STORE,JSON.stringify(db));
       showSyncStatus('☁️ 已從雲端同步');
+      console.log('✅ Pull 成功，使用遠端資料');
       return true;
-    } else if(remoteW>localW&&remoteTs>localTs){
+    } else if(localW===0&&remoteW>0){
+      // 本地是空的 → 使用遠端
       db=remote;
       localStorage.setItem(STORE,JSON.stringify(db));
       showSyncStatus('☁️ 已從雲端同步');
       return true;
     } else {
-      console.log('保留本地資料（本地較完整或較新）');
+      console.log('本地資料較新或相同，保留本地');
       return false;
     }
   }catch(e){console.warn('Pull失敗:',e.message);return false;}
