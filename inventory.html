@@ -160,16 +160,21 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
     <span class="hdr-title">進銷存系統</span>
   </div>
   <div class="hdr-actions">
-    <button onclick="manualLogout()" class="hdr-btn">🔒 登出</button>
-    <button onclick="invManualSync()" class="hdr-btn" style="background:#2563eb;color:#fff;border-color:#2563eb">☁️ 同步</button>
-    <button onclick="exportInvData()" class="hdr-btn">📤 備份</button>
-    <label class="hdr-btn" style="cursor:pointer">📥 還原<input type="file" accept=".json" style="display:none" onchange="importInvData(event)"></label>
-    <button class="hdr-btn primary" onclick="openOrderModal()">＋ 新增訂單</button>
+    <a href="index.html" class="hdr-btn">🏠 主目錄</a>
     <button class="hdr-btn" id="undo-btn" onclick="undo()" disabled>← 上一步</button>
     <button class="hdr-btn" id="redo-btn" onclick="redo()" disabled>下一步 →</button>
-    <button class="hdr-btn" onclick="exportData()">備份</button>
-    <button class="hdr-btn" onclick="importData()">還原</button>
-    <a href="index.html" class="hdr-back">← 主目錄</a>
+    <button class="hdr-btn primary" onclick="openOrderModal()">＋ 新增訂單</button>
+    <!-- ··· 下拉選單 -->
+    <div style="position:relative;display:inline-block" id="inv-more-wrap">
+      <button class="hdr-btn" onclick="toggleInvMore()" style="font-size:15px;letter-spacing:2px;padding:5px 12px">···</button>
+      <div id="inv-more-menu" style="display:none;position:absolute;right:0;top:calc(100% + 6px);background:#1e293b;border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:6px;min-width:140px;z-index:999;box-shadow:0 8px 24px rgba(0,0,0,.3)">
+        <button onclick="invManualSync();toggleInvMore()" style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 12px;background:none;border:none;color:#fff;font-size:13px;font-weight:600;cursor:pointer;border-radius:6px;font-family:'Noto Sans TC',sans-serif" onmouseover="this.style.background='rgba(255,255,255,.1)'" onmouseout="this.style.background='none'">☁️ 雲端同步</button>
+        <button onclick="exportInvData();toggleInvMore()" style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 12px;background:none;border:none;color:#fff;font-size:13px;font-weight:600;cursor:pointer;border-radius:6px;font-family:'Noto Sans TC',sans-serif" onmouseover="this.style.background='rgba(255,255,255,.1)'" onmouseout="this.style.background='none'">📤 備份</button>
+        <label style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 12px;background:none;color:#fff;font-size:13px;font-weight:600;cursor:pointer;border-radius:6px;font-family:'Noto Sans TC',sans-serif" onmouseover="this.style.background='rgba(255,255,255,.1)'" onmouseout="this.style.background='none'">📥 還原<input type="file" accept=".json" style="display:none" onchange="importInvData(event);toggleInvMore()"></label>
+        <div style="height:1px;background:rgba(255,255,255,.1);margin:4px 0"></div>
+        <button onclick="manualLogout();toggleInvMore()" style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 12px;background:none;border:none;color:#fca5a5;font-size:13px;font-weight:600;cursor:pointer;border-radius:6px;font-family:'Noto Sans TC',sans-serif" onmouseover="this.style.background='rgba(255,255,255,.1)'" onmouseout="this.style.background='none'">🔒 登出</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -490,6 +495,19 @@ let _syncTimerInv=null;
 let _syncEnabledInv=true;
 
 
+
+function toggleInvMore(){
+  const menu=document.getElementById('inv-more-menu');
+  if(!menu)return;
+  menu.style.display=menu.style.display==='none'?'block':'none';
+}
+document.addEventListener('click',function(e){
+  const wrap=document.getElementById('inv-more-wrap');
+  if(wrap&&!wrap.contains(e.target)){
+    const menu=document.getElementById('inv-more-menu');
+    if(menu)menu.style.display='none';
+  }
+});
 
 async function ghPullInv(){
   try{

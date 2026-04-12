@@ -1619,14 +1619,20 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
     <span id="title-display">２０２６ 資產損益表</span>
   </div>
   <div class="db-topbar-actions">
-        <button class="db-btn neutral" onclick="manualSync()" title="手動同步到雲端" style="font-size:11px">☁️ 同步</button>
-      <a href="index.html" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.8);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Noto Sans TC',sans-serif;text-decoration:none;transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,.2)'" onmouseout="this.style.background='rgba(255,255,255,.1)'">🏠 主目錄</a>
-      <button onclick="manualLogout()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.8);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,.2)'" onmouseout="this.style.background='rgba(255,255,255,.1)'">🔒 登出</button>
-
-    <button class="db-btn success" onclick="exportData()">📤 備份</button>
-    <label class="db-btn neutral" style="cursor:pointer">📥 還原<input type="file" accept=".json" style="display:none" onchange="importData(event)"></label>
-    <button class="db-btn purple" onclick="undoLast()" id="undoBtn" disabled>← 回上一步</button>
-    <button class="db-btn indigo" onclick="redoLast()" id="redoBtn" disabled>→ 回下一步</button>
+    <a href="index.html" class="db-btn neutral">🏠 主目錄</a>
+    <button class="db-btn purple" onclick="undoLast()" id="undoBtn" disabled>← 上一步</button>
+    <button class="db-btn indigo" onclick="redoLast()" id="redoBtn" disabled>→ 下一步</button>
+    <!-- ⋯ 下拉選單 -->
+    <div style="position:relative;display:inline-block" id="more-menu-wrap">
+      <button class="db-btn neutral" onclick="toggleMoreMenu()" style="font-size:15px;letter-spacing:2px;padding:5px 12px">···</button>
+      <div id="more-menu" style="display:none;position:absolute;right:0;top:calc(100% + 6px);background:#1e293b;border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:6px;min-width:140px;z-index:999;box-shadow:0 8px 24px rgba(0,0,0,.3)">
+        <button onclick="manualSync();toggleMoreMenu()" style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 12px;background:none;border:none;color:#fff;font-size:13px;font-weight:600;cursor:pointer;border-radius:6px;font-family:'Noto Sans TC',sans-serif;text-align:left" onmouseover="this.style.background='rgba(255,255,255,.1)'" onmouseout="this.style.background='none'">☁️ 雲端同步</button>
+        <button onclick="exportData();toggleMoreMenu()" style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 12px;background:none;border:none;color:#fff;font-size:13px;font-weight:600;cursor:pointer;border-radius:6px;font-family:'Noto Sans TC',sans-serif;text-align:left" onmouseover="this.style.background='rgba(255,255,255,.1)'" onmouseout="this.style.background='none'">📤 備份</button>
+        <label style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 12px;background:none;border:none;color:#fff;font-size:13px;font-weight:600;cursor:pointer;border-radius:6px;font-family:'Noto Sans TC',sans-serif" onmouseover="this.style.background='rgba(255,255,255,.1)'" onmouseout="this.style.background='none'">📥 還原<input type="file" accept=".json" style="display:none" onchange="importData(event);toggleMoreMenu()"></label>
+        <div style="height:1px;background:rgba(255,255,255,.1);margin:4px 0"></div>
+        <button onclick="manualLogout();toggleMoreMenu()" style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 12px;background:none;border:none;color:#fca5a5;font-size:13px;font-weight:600;cursor:pointer;border-radius:6px;font-family:'Noto Sans TC',sans-serif;text-align:left" onmouseover="this.style.background='rgba(255,255,255,.1)'" onmouseout="this.style.background='none'">🔒 登出</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -2314,6 +2320,20 @@ async function ghPush(){
     console.warn('請確認 Token 是否有效、repo 是否存在');
   }
 }
+
+function toggleMoreMenu(){
+  const menu=document.getElementById('more-menu');
+  if(!menu)return;
+  menu.style.display=menu.style.display==='none'?'block':'none';
+}
+// 點外面關閉
+document.addEventListener('click',function(e){
+  const wrap=document.getElementById('more-menu-wrap');
+  if(wrap&&!wrap.contains(e.target)){
+    const menu=document.getElementById('more-menu');
+    if(menu)menu.style.display='none';
+  }
+});
 
 async function manualSync(){
   showSyncStatus('🔄 同步中...');
