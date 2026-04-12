@@ -2240,7 +2240,12 @@ async function ghPull(){
     }
     const j=await r.json();
     _ghSha=j.sha;
-    const remote=JSON.parse(atob(j.content.replace(/\n/g,'')));
+    // 正確解碼中文
+    const b64=j.content.replace(/\n/g,'');
+    const binStr2=atob(b64);
+    const bytes2=new Uint8Array(binStr2.length);
+    for(let i=0;i<binStr2.length;i++)bytes2[i]=binStr2.charCodeAt(i);
+    const remote=JSON.parse(new TextDecoder().decode(bytes2));
     const localW=dbWeight(db);
     const remoteW=dbWeight(remote);
     const localTs=db._ts||0;
@@ -2280,7 +2285,11 @@ async function ghPush(){
     delete syncDb._backup;
     const jsonStr=JSON.stringify(syncDb,null,2);
     if(jsonStr.length>900000){showSyncStatus('⚠️資料過大');return;}
-    const encoded=btoa(unescape(encodeURIComponent(jsonStr)));
+    // 正確處理中文：用 TextEncoder 轉 base64
+    const encoder=new TextEncoder();
+    const bytes=encoder.encode(jsonStr);
+    const binStr=Array.from(bytes,b=>String.fromCharCode(b)).join('');
+    const encoded=btoa(binStr);
     // 若沒有 sha，先嘗試取得
     if(!_ghSha){
       try{
@@ -4646,8 +4655,13 @@ setTimeout(async()=>{
     if(deductDay!==todayDay)return;
     const LOAN_KEY='loan_deducted_'+l.id+'_'+todayStr.slice(0,7); // 每月一次
     if(localStorage.getItem(LOAN_KEY))return;
-    const acc=db.cashAccounts.find(c=>c.bank&&l.deductBank&&
-      c.bank.toLowerCase().includes(l.deductBank.toLowerCase().replace(/[\d號]/g,'').trim()));
+    // 精確比對：Line Bank → Line Bank
+    const deductBankName=(l.deductBank||'').toLowerCase().trim();
+    const acc=db.cashAccounts.find(c=>{
+      if(!c.bank)return false;
+      const cBank=c.bank.toLowerCase().trim();
+      return cBank===deductBankName || cBank.includes(deductBankName) || deductBankName.includes(cBank);
+    });
     if(acc){
       acc.cash=(acc.cash||0)-Math.round(l.monthly||0);
       localStorage.setItem(LOAN_KEY,'1');
