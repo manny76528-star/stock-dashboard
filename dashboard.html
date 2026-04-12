@@ -1999,7 +1999,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
         <input class="fi" id="c-d1" type="number" placeholder="金額（負=待扣）">
       </div>
       <div class="fg">
-        <label class="fl">交割 DAY2</label>
+        <label class="fl">交割 DAY2 <span id="c-d2-settle" style="color:var(--accent);font-size:10px;margin-left:4px"></span></label>
         <input class="fi" id="c-d2" type="number" placeholder="金額（負=待扣）">
       </div>
     </div>
@@ -3741,10 +3741,12 @@ function editCash(id){openCashModal(id);}
 function updateSettleDate(){
   const tradeDate=document.getElementById('c-d1-date')?.value;
   const label=document.getElementById('c-d1-settle');
+  const label2=document.getElementById('c-d2-settle');
   if(tradeDate&&label){
-    const settle=getSettleDate(tradeDate);
+    const settle=getSettleDate(tradeDate);       // T+2 = DAY1 交割
+    const settle2=nextTradeDay(tradeDate,3);     // T+3 = DAY2 交割
     label.textContent='交割日：'+fmtMMDD(settle);
-    // 把交割日存到 data attribute 供後續用
+    if(label2)label2.textContent='交割日：'+fmtMMDD(settle2);
     document.getElementById('c-d1-date').dataset.settle=settle;
   }
 }
@@ -3936,7 +3938,9 @@ function buildTxnRows(inv,c){
     if(!isB&&t.lotRefs&&t.lotRefs.length){
       let cost=0;
       t.lotRefs.forEach(function(ref){
-        const buyT=(inv.transactions||[]).find(function(x){return x.id===ref.txnId;});
+        let buyT=(inv.transactions||[]).find(function(x){return x.id===ref.txnId;});
+        if(!buyT)buyT=(db.archivedTxns||[]).find(function(x){return x.id===ref.txnId;});
+        if(!buyT&&ref.price)buyT={price:ref.price,lots:ref.lots,fee:0};
         if(buyT)cost+=ref.lots*1000*buyT.price+(buyT.fee||0)*(ref.lots/(buyT.lots||1));
       });
       const pnl=gross-fee-cost;
@@ -3967,8 +3971,14 @@ function buildTxnRows(inv,c){
       hdr+='<span>買入日</span><span>張數</span><span>買入價</span><span>賣出價</span><span>單筆損益</span><span>報酬率</span><span>買入備註</span></div>';
       let rows='';
       t.lotRefs.forEach(function(ref){
-        const buyT=(inv.transactions||[]).find(function(x){return x.id===ref.txnId;});
-        if(!buyT)return;
+        // 先在 inv.transactions 找，找不到再去 archivedTxns
+        let buyT=(inv.transactions||[]).find(function(x){return x.id===ref.txnId;});
+        if(!buyT)buyT=(db.archivedTxns||[]).find(function(x){return x.id===ref.txnId;});
+        if(!buyT){
+          // 還找不到：用 ref 的資料（date/price 可能有記錄在 lotRefs 裡）
+          if(ref.date&&ref.price){buyT={date:ref.date,price:ref.price,lots:ref.lots,fee:0,remark:''};}
+          else return;
+        }
         const uPnl=(t.price-buyT.price)*ref.lots*1000;
         const uRoi=buyT.price>0?(t.price-buyT.price)/buyT.price*100:0;
         rows+='<div style="display:grid;grid-template-columns:85px 50px 60px 60px 85px 70px 1fr;gap:4px;padding:7px 16px;font-size:11px;background:#f0f9ff;border-bottom:1px solid #e0f2fe">';
