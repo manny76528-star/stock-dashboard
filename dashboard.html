@@ -4481,6 +4481,59 @@ setTimeout(async()=>{
   const updated=await ghPull();
   if(updated){render();showSyncStatus('☁️ 已從雲端同步');}
 },8000);
+// ── 每日自動連動（股息入帳 + 信貸扣款）──
+(function dailyAutoProcess(){
+  const todayStr=new Date().toISOString().split('T')[0];
+  const todayDay=new Date().getDate(); // 幾號
+  const DONE_KEY='daily_done_'+todayStr;
+  if(localStorage.getItem(DONE_KEY))return; // 今天已執行過
+
+  const lineBank=db.cashAccounts.find(c=>c.bank&&c.bank.toLowerCase().includes('line'));
+  let changed=false;
+  const msgs=[];
+
+  // 1. 股息自動入帳：入帳日=今天且 pending=true → 加入 Line Bank
+  (db.dividends||[]).forEach(d=>{
+    if(d.pending&&d.date&&d.date===todayStr){
+      d.pending=false;
+      if(lineBank){
+        lineBank.cash=(lineBank.cash||0)+Math.round(d.amount);
+        msgs.push('💰 股息入帳 '+d.code+' +$'+Math.round(d.amount).toLocaleString());
+      }
+      changed=true;
+    }
+  });
+
+  // 2. 信貸自動扣款：扣款日=今天 → 從 deductBank 扣除
+  (db.loans||[]).forEach(l=>{
+    const deductDay=parseInt(l.deductDay)||0;
+    if(deductDay!==todayDay)return;
+    const LOAN_KEY='loan_deducted_'+l.id+'_'+todayStr.slice(0,7); // 每月一次
+    if(localStorage.getItem(LOAN_KEY))return;
+    const acc=db.cashAccounts.find(c=>c.bank&&l.deductBank&&
+      c.bank.toLowerCase().includes(l.deductBank.toLowerCase().replace(/[\d號]/g,'').trim()));
+    if(acc){
+      acc.cash=(acc.cash||0)-Math.round(l.monthly||0);
+      localStorage.setItem(LOAN_KEY,'1');
+      msgs.push('🏦 信貸扣款 '+l.bank+' -$'+Math.round(l.monthly||0).toLocaleString());
+      changed=true;
+    }
+  });
+
+  if(changed){
+    localStorage.setItem(DONE_KEY,'1');
+    localStorage.setItem(STORE,JSON.stringify(db));
+    schedulePush();
+    if(msgs.length>0){
+      setTimeout(()=>{
+        msgs.forEach((m,i)=>setTimeout(()=>toast(m),i*1500));
+      },1000);
+    }
+  } else {
+    localStorage.setItem(DONE_KEY,'1'); // 今天沒事也記錄，避免重複跑
+  }
+})();
+
 // Auto snapshot on 1st of each month
 (function autoSnapshot(){
   const today=new Date();
