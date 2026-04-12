@@ -4053,7 +4053,10 @@ function runSearch(){
     const invTxns=[...txns].sort((a,b)=>a.date.localeCompare(b.date));
     const lots=[];let realized=0;
     invTxns.forEach(t=>{
-      if(t.type==='buy'){
+      if(t.type==='buy'&&!t.archived){
+        lots.push({txnId:t.id,date:t.date,price:t.price,remaining:t.lots,fee:t.fee||0,original:t.lots,remark:t.remark||''});
+      } else if(t.type==='buy'&&t.archived){
+        // archived 買入也加入，供 lotRefs 查找
         lots.push({txnId:t.id,date:t.date,price:t.price,remaining:t.lots,fee:t.fee||0,original:t.lots,remark:t.remark||''});
       } else {
         // 賣出淨收入 = 張數×1000×賣價 - 費用
@@ -4063,12 +4066,16 @@ function runSearch(){
         const refs=t.lotRefs;
         if(refs&&refs.length){
           refs.forEach(r=>{
-            const l=lots.find(x=>x.txnId===r.txnId);
+            let l=lots.find(x=>x.txnId===r.txnId);
+            // 找不到時去 archivedTxns 找
+            if(!l){
+              const arch=(db.archivedTxns||[]).find(x=>x.id===r.txnId);
+              if(arch)l={txnId:arch.id,date:arch.date,price:arch.price,remaining:r.lots,fee:arch.fee||0,original:r.lots,remark:arch.remark||''};
+            }
             if(l){
               const lotFeeShare=l.original>0?l.fee*(r.lots/l.original):0;
               cost+=r.lots*1000*l.price+lotFeeShare;
               costLots.push({date:l.date,lots:r.lots,buyPrice:l.price,remark:l.remark||''});
-              l.remaining=Math.max(0,l.remaining-r.lots);
             }
           });
         } else {
@@ -4103,81 +4110,103 @@ function runSearch(){
     realizedByCode[code]=realized;
   });
 
-  container.innerHTML=Object.entries(byCode).map(([code,{name,txns}])=>`
-    <div style="margin-bottom:16px">
-      <div style="font-weight:700;color:var(--accent);font-size:13px;padding:6px 0;border-bottom:2px solid var(--accent-lt);display:flex;justify-content:space-between;align-items:center">
-        <span>${code} ${name} <span style="font-size:11px;color:var(--muted)">${txns.length} 筆</span></span>
-        ${realizedByCode[code]!==0?`<span style="font-size:12px;font-weight:700;color:${realizedByCode[code]>=0?'var(--gain)':'var(--loss)'}">已實現損益：${realizedByCode[code]>=0?'+':'-'}$${Math.abs(Math.round(realizedByCode[code])).toLocaleString()}</span>`:''}
-      </div>
-      <table style="width:100%;border-collapse:collapse;font-size:11px;margin-top:4px">
-        <thead><tr style="background:var(--sh)">
-          <th style="padding:4px 8px;text-align:left">類型</th>
-          <th style="padding:4px 8px">日期</th>
-          <th style="padding:4px 8px">張數</th>
-          <th style="padding:4px 8px">價格</th>
-          <th style="padding:4px 8px">金額</th>
-          <th style="padding:4px 8px">手續費</th>
-          <th style="padding:4px 8px"></th>
-        </tr></thead>
-        <tbody>
-          ${txns.map(t=>{
-            const isB=t.type==='buy';
-            const breakdown=!isB&&sellBreakdown[code]?sellBreakdown[code].find(b=>b.txnId===t.id):null;
-            const pnlColor=breakdown?(breakdown.pnl>=0?'var(--gain)':'var(--loss)'):'';
-            const bdHTML=breakdown?`
-              <tr style="background:#f8f4ff;border-bottom:1px solid #e0d4f8">
-                <td colspan="7" style="padding:6px 12px">
-                  <div style="font-size:11px;color:#7c3aed;font-weight:700;margin-bottom:4px">📊 這筆賣出的組成明細${breakdown.sellRemark?` &nbsp;·&nbsp; <span style="color:var(--muted);font-weight:400">📝賣出原因：${breakdown.sellRemark}</span>`:''}</div>
-                  <table style="width:100%;border-collapse:collapse;font-size:10px">
-                    <thead><tr style="background:#ede9fe">
-                      <th style="padding:3px 6px;text-align:left">買入日</th>
-                      <th style="padding:3px 6px">張數</th>
-                      <th style="padding:3px 6px">買入價</th>
-                      <th style="padding:3px 6px">賣出價</th>
-                      <th style="padding:3px 6px">單筆損益</th>
-                      <th style="padding:3px 6px">報酬率</th>
-                      <th style="padding:3px 6px;text-align:left">買入備註</th>
-                    </tr></thead>
-                    <tbody>
-                    ${breakdown.costLots.map(cl=>{
-                      const clCost=cl.lots*1000*cl.buyPrice;
-                      const clRev=cl.lots*1000*breakdown.sellPrice;
-                      const clPnl=clRev-clCost;
-                      const clRoi=clCost>0?clPnl/clCost*100:0;
-                      return `<tr style="border-bottom:1px solid #e0d4f8">
-                        <td style="padding:3px 6px;font-family:monospace">${cl.date}</td>
-                        <td style="padding:3px 6px;font-family:monospace">${cl.lots}張</td>
-                        <td style="padding:3px 6px;font-family:monospace">$${cl.buyPrice.toFixed(2)}</td>
-                        <td style="padding:3px 6px;font-family:monospace">$${breakdown.sellPrice.toFixed(2)}</td>
-                        <td style="padding:3px 6px;font-family:monospace;font-weight:700;color:${clPnl>=0?'var(--gain)':'var(--loss)'}">${clPnl>=0?'+':'-'}$${Math.abs(Math.round(clPnl)).toLocaleString()}</td>
-                        <td style="padding:3px 6px;font-family:monospace;color:${clRoi>=0?'var(--gain)':'var(--loss)'}">${clRoi>=0?'+':''}${clRoi.toFixed(2)}%</td>
-                        <td style="padding:3px 6px;color:var(--muted)">${cl.remark||'—'}</td>
-                      </tr>`;
-                    }).join('')}
-                    </tbody>
-                  </table>
-                  <div style="margin-top:4px;font-size:11px;font-weight:700;color:${breakdown.pnl>=0?'var(--gain)':'var(--loss)'}">
-                    合計損益：${breakdown.pnl>=0?'+':'-'}$${Math.abs(Math.round(breakdown.pnl)).toLocaleString()} (${breakdown.roi>=0?'+':''}${breakdown.roi.toFixed(2)}%)
-                  </div>
-                </td>
-              </tr>`:''
-            ;
-            return `<tr style="border-bottom:1px solid var(--border)${t.archived?' background:#fffbe6':''}">
-              <td style="padding:4px 8px;font-weight:700;color:${isB?'var(--gain)':'var(--loss)'}">
-                ${isB?'▲ 買入':'▼ 賣出'}${t.archived?' (已刪)':''}
-              </td>
-              <td style="padding:4px 8px;font-family:monospace">${t.date}</td>
-              <td style="padding:4px 8px;font-family:monospace">${t.lots} 張</td>
-              <td style="padding:4px 8px;font-family:monospace">$${t.price.toFixed(2)}</td>
-              <td style="padding:4px 8px;font-family:monospace">$${Math.round(t.lots*1000*t.price).toLocaleString()}</td>
-              <td style="padding:4px 8px;font-family:monospace">${t.fee?'$'+Math.round(t.fee).toLocaleString():'—'}${!isB&&breakdown?`<br><span style="color:${pnlColor};font-size:10px;font-weight:700">${breakdown.pnl>=0?'+':'-'}$${Math.abs(Math.round(breakdown.pnl)).toLocaleString()} (${breakdown.roi>=0?'+':''}${breakdown.roi.toFixed(2)}%)</span>`:''}${isB&&t.remark?`<br><span style="color:var(--muted);font-size:10px">📝${t.remark}</span>`:''}</td>
-              <td style="padding:4px 8px">${!t.archived?`<button onclick="delTxnFromSearch('${t.code||code}','${t.id}')" style="background:none;border:1px solid var(--loss);color:var(--loss);border-radius:4px;padding:2px 6px;font-size:10px;cursor:pointer">刪</button>`:''}</td>
-            </tr>${bdHTML}`;
-          }).join('')}
-        </tbody>
-      </table>
-    </div>
-  `).join('');
+  // 重建顯示：第一層=匯總，第二層=逐筆明細
+  let html='';
+  Object.entries(byCode).forEach(function([code,info]){
+    const txns=info.txns;
+    const name=info.name;
+    const realized=realizedByCode[code]||0;
+    const breakdown=sellBreakdown[code]||[];
+    const uid2='sr-'+code.replace(/[^a-z0-9]/gi,'');
+
+    // 計算匯總
+    const buyTxns=txns.filter(function(t){return t.type==='buy';});
+    const sellTxns=txns.filter(function(t){return t.type==='sell';});
+    const totalBuyLots=buyTxns.reduce(function(s,t){return s+t.lots;},0);
+    const totalSellLots=sellTxns.reduce(function(s,t){return s+t.lots;},0);
+    const avgBuyPrice=totalBuyLots>0?buyTxns.reduce(function(s,t){return s+t.price*t.lots;},0)/totalBuyLots:0;
+    const avgSellPrice=totalSellLots>0?sellTxns.reduce(function(s,t){return s+t.price*t.lots;},0)/totalSellLots:0;
+    const pnlColor=realized>=0?'var(--gain)':'var(--loss)';
+
+    // 第一層：匯總列
+    html+='<div style="margin-bottom:12px;border:1px solid var(--border);border-radius:10px;overflow:hidden">';
+    html+='<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#f8fafc;cursor:pointer;user-select:none" onclick="toggleSrDetail(''+uid2+'')">';
+    html+='<div style="display:flex;align-items:center;gap:12px">';
+    html+='<span style="font-weight:800;color:var(--accent);font-size:14px">'+code+'</span>';
+    if(name)html+='<span style="font-size:11px;color:var(--muted)">'+name+'</span>';
+    html+='</div>';
+    html+='<div style="display:flex;align-items:center;gap:16px">';
+    if(totalBuyLots>0)html+='<span style="font-size:12px;color:#dc2626">▲買 '+totalBuyLots+'張 均$'+avgBuyPrice.toFixed(2)+'</span>';
+    if(totalSellLots>0)html+='<span style="font-size:12px;color:#16a34a">▼賣 '+totalSellLots+'張 均$'+avgSellPrice.toFixed(2)+'</span>';
+    if(realized!==0)html+='<span style="font-size:13px;font-weight:700;color:'+pnlColor+'">'+(realized>=0?'+':'')+Math.round(realized).toLocaleString()+'</span>';
+    html+='<span style="font-size:11px;color:#94a3b8" id="sarr-'+uid2+'">▼</span>';
+    html+='</div></div>';
+
+    // 第二層：逐筆明細（預設隱藏）
+    html+='<div id="'+uid2+'" style="display:none">';
+    html+='<table style="width:100%;border-collapse:collapse;font-size:11px">';
+    html+='<thead><tr style="background:#f1f5f9">';
+    html+='<th style="padding:6px 10px;text-align:left;color:#64748b;font-size:10px">類型</th>';
+    html+='<th style="padding:6px 10px;color:#64748b;font-size:10px">日期</th>';
+    html+='<th style="padding:6px 10px;color:#64748b;font-size:10px">張數</th>';
+    html+='<th style="padding:6px 10px;color:#64748b;font-size:10px">價格</th>';
+    html+='<th style="padding:6px 10px;color:#64748b;font-size:10px">金額</th>';
+    html+='<th style="padding:6px 10px;color:#64748b;font-size:10px">損益</th>';
+    html+='<th style="padding:6px 10px"></th>';
+    html+='</tr></thead><tbody>';
+
+    txns.forEach(function(t){
+      const isB=t.type==='buy';
+      const gross=t.lots*1000*t.price;
+      const bd=!isB?breakdown.find(function(b){return b.txnId===t.id;}):null;
+      const rowBg=t.archived?'#fffbe6':'#fff';
+      html+='<tr style="background:'+rowBg+';border-bottom:1px solid #f1f5f9">';
+      html+='<td style="padding:6px 10px;font-weight:700;color:'+(isB?'#dc2626':'#16a34a')+'">'+(isB?'▲ 買入':'▼ 賣出')+(t.archived?' (已刪)':'')+'</td>';
+      html+='<td style="padding:6px 10px;font-family:monospace">'+t.date+'</td>';
+      html+='<td style="padding:6px 10px;font-family:monospace">'+t.lots+'張</td>';
+      html+='<td style="padding:6px 10px;font-family:monospace">$'+t.price.toFixed(2)+'</td>';
+      html+='<td style="padding:6px 10px;font-family:monospace">$'+Math.round(gross).toLocaleString()+'</td>';
+      html+='<td style="padding:6px 10px;font-family:monospace;font-weight:700;color:'+(bd?(bd.pnl>=0?'var(--gain)':'var(--loss)'):'#94a3b8')+'">'+( bd?(bd.pnl>=0?'+':'')+Math.round(bd.pnl).toLocaleString():'—')+'</td>';
+      html+='<td style="padding:6px 10px">'+(t.archived?'':'<button onclick="delTxnFromSearch(\''+( t.code||code)+'\',\''+t.id+'\')" style="background:none;border:1px solid #fca5a5;color:#dc2626;border-radius:4px;padding:2px 6px;font-size:10px;cursor:pointer">刪</button>')+'</td>';
+      html+='</tr>';
+
+      // 如果是賣出且有明細，加一行展開式明細
+      if(bd&&bd.costLots&&bd.costLots.length){
+        html+='<tr style="background:#f0f9ff;border-bottom:2px solid #bfdbfe"><td colspan="7" style="padding:6px 10px">';
+        html+='<div style="font-size:10px;color:#7c3aed;font-weight:700;margin-bottom:4px">📊 組成明細'+(t.remark?' · 📝'+t.remark:'')+'</div>';
+        html+='<div style="display:grid;grid-template-columns:80px 50px 60px 60px 80px 65px 1fr;gap:3px 6px;font-size:10px;color:#94a3b8;font-weight:700;padding:3px 0">買入日<span>張數</span><span>買入價</span><span>賣出價</span><span>單筆損益</span><span>報酬率</span><span>備註</span></div>';
+        bd.costLots.forEach(function(cl){
+          const clCost=cl.lots*1000*cl.buyPrice;
+          const clRev=cl.lots*1000*bd.sellPrice;
+          const clPnl=clRev-clCost;
+          const clRoi=clCost>0?clPnl/clCost*100:0;
+          html+='<div style="display:grid;grid-template-columns:80px 50px 60px 60px 80px 65px 1fr;gap:3px 6px;font-size:11px;font-family:monospace;padding:4px 0;border-top:1px solid #e0f2fe">';
+          html+='<span style="color:#64748b">'+cl.date+'</span>';
+          html+='<span>'+cl.lots+'張</span>';
+          html+='<span style="color:#dc2626">$'+cl.buyPrice.toFixed(2)+'</span>';
+          html+='<span style="color:#16a34a">$'+bd.sellPrice.toFixed(2)+'</span>';
+          html+='<span style="font-weight:700;color:'+(clPnl>=0?'var(--gain)':'var(--loss)')+'">'+( clPnl>=0?'+':'')+Math.round(clPnl).toLocaleString()+'</span>';
+          html+='<span style="color:'+(clRoi>=0?'var(--gain)':'var(--loss)')+'">'+( clRoi>=0?'+':'')+clRoi.toFixed(2)+'%</span>';
+          html+='<span style="color:#94a3b8;font-family:sans-serif;font-size:10px">'+(cl.remark||'—')+'</span>';
+          html+='</div>';
+        });
+        html+='<div style="font-size:11px;font-weight:700;color:'+(bd.pnl>=0?'var(--gain)':'var(--loss)')+';margin-top:4px">合計：'+(bd.pnl>=0?'+':'')+Math.round(bd.pnl).toLocaleString()+' ('+( bd.roi>=0?'+':'')+bd.roi.toFixed(2)+'%)</div>';
+        html+='</td></tr>';
+      }
+    });
+
+    html+='</tbody></table></div></div>';
+  });
+  container.innerHTML=html;
+}
+
+function toggleSrDetail(uid2){
+  const el=document.getElementById(uid2);
+  const arr=document.getElementById('sarr-'+uid2);
+  if(!el)return;
+  const open=el.style.display==='none';
+  el.style.display=open?'':'none';
+  if(arr)arr.textContent=open?'▲':'▼';
 }
 
 // ═══ LOAN HISTORY ═══
