@@ -1991,13 +1991,17 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
     <div class="fr3">
       <div class="fg"><label class="fl">現金</label><input class="fi" id="c-cash" type="number" placeholder="例：5000"></div>
       <div class="fg">
-        <label class="fl">交割 DAY1（買入日）<span id="c-d1-settle" style="color:var(--accent);font-size:10px;margin-left:4px"></span></label>
-        <div style="display:flex;gap:6px">
-          <input class="fi" id="c-d1-date" type="date" style="flex:1" onchange="updateSettleDate()" placeholder="交易日">
-          <input class="fi" id="c-d1" type="number" style="flex:1" placeholder="金額（負=待扣）">
+        <label class="fl">交割 DAY1</label>
+        <div style="display:flex;gap:6px;margin-bottom:6px">
+          <input class="fi" id="c-d1-date" type="date" style="flex:1" onchange="updateSettleDate()" placeholder="買入日">
+          <span id="c-d1-settle" style="color:var(--accent);font-size:11px;align-self:center;white-space:nowrap;min-width:70px"></span>
         </div>
+        <input class="fi" id="c-d1" type="number" placeholder="金額（負=待扣）">
       </div>
-      <div class="fg"><label class="fl">交割 DAY2</label><input class="fi" id="c-d2" type="number" placeholder="例：-266175"></div>
+      <div class="fg">
+        <label class="fl">交割 DAY2</label>
+        <input class="fi" id="c-d2" type="number" placeholder="金額（負=待扣）">
+      </div>
     </div>
     <div class="br"><button class="btn btn-s" onclick="closeModal('cashModal')">取消</button><button class="btn btn-p" onclick="saveCash()">儲存</button></div>
   </div>
@@ -3095,12 +3099,22 @@ function renderDivs(){
   const yr=new Date().getFullYear().toString();
   const today=new Date().toISOString().split('T')[0];
   // pending: 除息日已到但發放日未到
-  // pending=true 且入帳日已到 → 仍顯示在準備入帳，但加「確認入帳」按鈕
-  // pending=true 且入帳日未到 → 顯示倒數
-  // exDate到但date未到（自動pending）→ 同上
+  // 自動處理：入帳日已到且標記 pending → 自動移為已領息（不需手動確認）
+  let autoUpdated=false;
+  db.dividends.forEach(d=>{
+    if(d.pending&&d.date&&d.date<=today){
+      d.pending=false; // 自動入帳
+      autoUpdated=true;
+    }
+  });
+  if(autoUpdated){
+    localStorage.setItem(STORE,JSON.stringify(db));
+    schedulePush();
+  }
+  // pending：入帳日未到的才算準備入帳
   const pendingDivs=db.dividends.filter(d=>{
-    if(d.pending)return true; // 手動標記的一律顯示
-    if(d.exDate&&d.exDate<=today&&d.date&&d.date>today)return true; // 除息已到但入帳未到
+    if(d.pending&&d.date&&d.date>today)return true; // pending 且入帳日未到
+    if(!d.pending&&d.exDate&&d.exDate<=today&&d.date&&d.date>today)return true; // 除息到但入帳未到
     return false;
   });
   const paidDivs=db.dividends.filter(d=>!d.pending&&(!d.exDate||(d.date&&d.date<=today)));
