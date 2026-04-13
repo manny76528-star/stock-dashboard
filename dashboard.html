@@ -4815,38 +4815,39 @@ setTimeout(async()=>{
 // ── 每日自動連動（股息入帳 + 信貸扣款）──
 (function dailyAutoProcess(){
   const todayStr=new Date().toISOString().split('T')[0];
-  const todayDay=new Date().getDate(); // 幾號
-  const DONE_KEY='daily_done_'+todayStr;
-  if(localStorage.getItem(DONE_KEY))return; // 今天已執行過
+  const todayDay=new Date().getDate();
 
   const lineBank=db.cashAccounts.find(c=>c.bank&&c.bank.toLowerCase().includes('line'));
   let changed=false;
   const msgs=[];
 
-  // 1. 股息自動入帳：入帳日=今天且 pending=true → 加入 Line Bank
-  (db.dividends||[]).forEach(d=>{
-    if(d.pending&&d.date&&d.date===todayStr){
-      d.pending=false;
-      if(lineBank){
-        lineBank.cash=(lineBank.cash||0)+Math.round(d.amount);
-        msgs.push('💰 股息入帳 '+d.code+' +$'+Math.round(d.amount).toLocaleString());
+  // 1. 股息自動入帳：入帳日=今天且 pending=true
+  const DIV_DONE='div_done_'+todayStr;
+  if(!localStorage.getItem(DIV_DONE)){
+    (db.dividends||[]).forEach(d=>{
+      if(d.pending&&d.date&&d.date===todayStr){
+        d.pending=false;
+        if(lineBank){
+          lineBank.cash=(lineBank.cash||0)+Math.round(d.amount);
+          msgs.push('💰 股息入帳 '+d.code+' +$'+Math.round(d.amount).toLocaleString());
+        }
+        changed=true;
       }
-      changed=true;
-    }
-  });
+    });
+    if(changed)localStorage.setItem(DIV_DONE,'1');
+  }
 
-  // 2. 信貸自動扣款：扣款日=今天 → 從 deductBank 扣除
+  // 2. 信貸自動扣款：每筆各自用 LOAN_KEY 控制，不受 DONE_KEY 影響
   (db.loans||[]).forEach(l=>{
     const deductDay=parseInt(l.deductDay)||0;
     if(deductDay!==todayDay)return;
-    const LOAN_KEY='loan_deducted_'+l.id+'_'+todayStr.slice(0,7); // 每月一次
-    if(localStorage.getItem(LOAN_KEY))return;
-    // 精確比對：Line Bank → Line Bank
+    const LOAN_KEY='loan_deducted_'+l.id+'_'+todayStr.slice(0,7);
+    if(localStorage.getItem(LOAN_KEY))return; // 這個月已扣過
     const deductBankName=(l.deductBank||'').toLowerCase().trim();
     const acc=db.cashAccounts.find(c=>{
       if(!c.bank)return false;
       const cBank=c.bank.toLowerCase().trim();
-      return cBank===deductBankName || cBank.includes(deductBankName) || deductBankName.includes(cBank);
+      return cBank===deductBankName||cBank.includes(deductBankName)||deductBankName.includes(cBank);
     });
     if(acc){
       acc.cash=(acc.cash||0)-Math.round(l.monthly||0);
@@ -4857,16 +4858,11 @@ setTimeout(async()=>{
   });
 
   if(changed){
-    localStorage.setItem(DONE_KEY,'1');
     localStorage.setItem(STORE,JSON.stringify(db));
     schedulePush();
-    if(msgs.length>0){
-      setTimeout(()=>{
-        msgs.forEach((m,i)=>setTimeout(()=>toast(m),i*1500));
-      },1000);
-    }
-  } else {
-    localStorage.setItem(DONE_KEY,'1'); // 今天沒事也記錄，避免重複跑
+    setTimeout(()=>{
+      msgs.forEach((m,i)=>setTimeout(()=>toast(m),i*1500));
+    },1000);
   }
 })();
 
