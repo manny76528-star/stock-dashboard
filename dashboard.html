@@ -2004,6 +2004,18 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
     </div>
     <div class="fg"><label class="fl">自定義連結（選填，點名稱可跳轉）</label><input class="fi" id="i-url" placeholder="例：https://www.moneydj.com/ETF/X/Basic/Basic0.xdjhtm?etfid=00985B"></div>
     <div class="fg"><label class="fl">初始買入原因（選填）</label><input class="fi" id="i-remark" placeholder="例：看好升息循環結束，布局債券ETF"></div>
+    <div class="fg" id="i-mood-wrap">
+      <label class="fl">下單情緒（選填）</label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button type="button" class="mood-sel-btn" data-mood="😌 平靜" onclick="selectMoodBtn(this,'i')">😌 平靜</button>
+        <button type="button" class="mood-sel-btn" data-mood="💪 自信" onclick="selectMoodBtn(this,'i')">💪 自信</button>
+        <button type="button" class="mood-sel-btn" data-mood="😊 興奮" onclick="selectMoodBtn(this,'i')">😊 興奮</button>
+        <button type="button" class="mood-sel-btn" data-mood="🤔 猶豫" onclick="selectMoodBtn(this,'i')">🤔 猶豫</button>
+        <button type="button" class="mood-sel-btn" data-mood="😰 焦慮" onclick="selectMoodBtn(this,'i')">😰 焦慮</button>
+        <button type="button" class="mood-sel-btn" data-mood="😤 衝動" onclick="selectMoodBtn(this,'i')">😤 衝動</button>
+      </div>
+      <input class="fi" id="i-mood" placeholder="或自填情緒..." style="margin-top:6px">
+    </div>
     <div class="br"><button class="btn btn-s" onclick="closeModal('invModal')">取消</button><button class="btn btn-p" onclick="saveInv()">儲存</button></div>
   </div>
 </div>
@@ -2413,9 +2425,11 @@ document.addEventListener('click',function(e){
 async function manualSync(){
   showSyncStatus('🔄 同步中...');
   _ghSha='';
-  await ghPush();
+  // 先 Pull（看有沒有更新的遠端資料），再 Push 本地資料
   const updated=await ghPull();
-  if(updated){render();showSyncStatus('☁️ 已從雲端同步');}
+  if(updated)render();
+  await ghPush();
+  showSyncStatus('✅ 同步完成');
 }
 
 function schedulePush(){
@@ -3582,6 +3596,10 @@ function openInvModal(id=null){
   if(avgEl){avgEl.readOnly=false;avgEl.style.background='';avgEl.style.color='';}
   const avgNote=document.getElementById('i-avg-note');
   if(avgNote){avgNote.style.display=hasTxns2?'block':'none';}
+  // 清空情緒選擇
+  const imEl=document.getElementById('i-mood');if(imEl)imEl.value='';
+  const imWrap=document.getElementById('i-mood-wrap');
+  if(imWrap)imWrap.querySelectorAll('.mood-sel-btn').forEach(b=>b.classList.remove('active'));
   openModal('invModal');setTimeout(()=>document.getElementById('i-code').focus(),100);
 }
 function saveInv(){
@@ -4923,27 +4941,55 @@ function renderAnalytics(){
   // 只看賣出
   const sells=allTxns.filter(t=>t.type==='sell');
 
-  // ── 計算每筆賣出損益 ──
+  // ── 計算每筆賣出損益（跟 runSearch 完全相同的邏輯）──
+  // 先建立每個標的的買入池（含 archivedTxns）
+  const buyPoolByCode={};
+  allTxns.filter(x=>x.type==='buy').forEach(t=>{
+    if(!buyPoolByCode[t.code])buyPoolByCode[t.code]=[];
+    buyPoolByCode[t.code].push({txnId:t.id,date:t.date,price:t.price,lots:t.lots,fee:t.fee||0,original:t.lots,remark:t.remark||''});
+  });
+
   const sellResults=[];
   sells.forEach(t=>{
     const inv=db.investments.find(i=>i.code===t.code);
-    const allInvTxns=[...allTxns.filter(x=>x.code===t.code&&x.type==='buy')].sort((a,b)=>a.date.localeCompare(b.date));
+    const pool=buyPoolByCode[t.code]||[];
     let cost=0;
-    let holdDays=0;
+    let holdDays=1;
+
     if(t.lotRefs&&t.lotRefs.length){
+      // 有 lotRefs：逐筆對應買入
       t.lotRefs.forEach(ref=>{
-        let buyT=allTxns.find(x=>x.id===ref.txnId);
+        let buyT=pool.find(x=>x.txnId===ref.txnId);
         if(!buyT)buyT=(db.archivedTxns||[]).find(x=>x.id===ref.txnId);
         if(buyT){
-          cost+=ref.lots*1000*buyT.price+(buyT.fee||0)*(ref.lots/(buyT.lots||1));
+          const lotFee=buyT.original>0?(buyT.fee||0)*(ref.lots/buyT.original):0;
+          cost+=ref.lots*1000*buyT.price+lotFee;
           const days=Math.max(1,Math.round((new Date(t.date)-new Date(buyT.date))/86400000));
           holdDays=Math.max(holdDays,days);
+        } else if(inv&&inv.avgPrice){
+          // lotRef 找不到買入 → 用 avgPrice 估算單批成本
+          cost+=ref.lots*1000*inv.avgPrice;
         }
       });
-    } else if(inv){
-      cost=t.lots*1000*(inv.avgPrice||0);
-      holdDays=30;
+    } else {
+      // 無 lotRefs：FIFO
+      let remaining=t.lots;
+      const fifoPool=[...pool].sort((a,b)=>a.date.localeCompare(b.date));
+      for(const b of fifoPool){
+        if(remaining<=0)break;
+        const take=Math.min(b.lots,remaining);
+        const lotFee=b.original>0?(b.fee||0)*(take/b.original):0;
+        cost+=take*1000*b.price+lotFee;
+        const days=Math.max(1,Math.round((new Date(t.date)-new Date(b.date))/86400000));
+        holdDays=Math.max(holdDays,days);
+        remaining-=take;
+      }
+      // 還有剩：用 avgPrice
+      if(remaining>0&&inv&&inv.avgPrice){
+        cost+=remaining*1000*inv.avgPrice;
+      }
     }
+
     const gross=t.lots*1000*t.price;
     const pnl=gross-(t.fee||0)-cost;
     const roi=cost>0?pnl/cost*100:0;
