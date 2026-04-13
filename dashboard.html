@@ -5201,8 +5201,14 @@ function renderAnalytics(){
   const avgLoss=losses.length>0?Math.abs(losses.reduce((s,x)=>s+x.pnl,0)/losses.length):0;
   const profitFactor=avgLoss>0?avgWin/avgLoss:0;
   const totalPnl=sellResults.reduce((s,x)=>s+x.pnl,0);
-  const avgAnnualRoi=sellResults.length>0?sellResults.reduce((s,x)=>s+x.annualRoi,0)/sellResults.length:0;
-  const totalCost=db.investments.reduce((s,inv)=>s+calcInv(inv).tCost,0);
+  // 資金年化報酬率
+  const totalCostAll=sellResults.reduce((s,x)=>s+x.cost,0);
+  const avgHoldDays=sellResults.length>0?sellResults.reduce((s,x)=>s+x.holdDays,0)/sellResults.length:1;
+  const capitalAnnualRoi=totalCostAll>0?(totalPnl/totalCostAll)*(365/avgHoldDays)*100:0;
+  // 信貸加權平均利率
+  const totalLoanAmt=(db.loans||[]).reduce((s,l)=>s+(l.amount||0),0);
+  const wtdLoanRate=totalLoanAmt>0?(db.loans||[]).reduce((s,l)=>s+(l.rate||0)*(l.amount||0),0)/totalLoanAmt:0;
+  const beatLoan=capitalAnnualRoi>wtdLoanRate;
 
   // KPI 顯示
   const kpiEl=document.getElementById('analytics-kpi');
@@ -5210,16 +5216,20 @@ function renderAnalytics(){
     const kpis=[
       {label:'已實現筆數',value:sellResults.length+'筆',color:'#2563eb'},
       {label:'整體勝率',value:winRate.toFixed(1)+'%',color:winRate>=50?'var(--gain)':'var(--loss)'},
-      {label:'均年化報酬（交易）',value:(avgAnnualRoi>=0?'+':'')+avgAnnualRoi.toFixed(1)+'%',color:avgAnnualRoi>=0?'var(--gain)':'var(--loss)'},
+      {label:'資金年化報酬率',value:(capitalAnnualRoi>=0?'+':'')+capitalAnnualRoi.toFixed(1)+'%',color:capitalAnnualRoi>=0?'var(--gain)':'var(--loss)',sub:beatLoan?'✅ 跑贏借貸成本':'⚠️ 未跑贏借貸成本',subColor:beatLoan?'var(--gain)':'#f59e0b'},
+      {label:'信貸加權利率',value:'+'+wtdLoanRate.toFixed(2)+'%',color:'var(--loss)',sub:'需超越此門檻',subColor:'#94a3b8'},
       {label:'盈虧比',value:profitFactor.toFixed(2)+'x',color:profitFactor>=1?'var(--gain)':'var(--loss)'},
       {label:'平均獲利/筆',value:'$'+Math.round(avgWin).toLocaleString(),color:'var(--gain)'},
       {label:'平均虧損/筆',value:'$'+Math.round(avgLoss).toLocaleString(),color:'var(--loss)'},
       {label:'交易損益',value:(totalPnl>=0?'+':'')+Math.round(totalPnl).toLocaleString(),color:totalPnl>=0?'var(--gain)':'var(--loss)'},
     ];
-    kpiEl.innerHTML=kpis.map(k=>'<div style="background:#fff;border-radius:10px;padding:14px 16px;border:1px solid var(--border);box-shadow:0 1px 4px rgba(0,0,0,.05)">'
-      +'<div style="font-size:10px;color:#94a3b8;font-weight:600;letter-spacing:.3px;margin-bottom:6px">'+k.label+'</div>'
-      +'<div style="font-size:20px;font-weight:800;color:'+k.color+'">'+k.value+'</div>'
-      +'</div>').join('');
+    kpiEl.innerHTML=kpis.map(function(k){
+      return '<div style="background:#fff;border-radius:10px;padding:14px 16px;border:1px solid var(--border);box-shadow:0 1px 4px rgba(0,0,0,.05)">'
+        +'<div style="font-size:10px;color:#94a3b8;font-weight:600;letter-spacing:.3px;margin-bottom:6px">'+k.label+'</div>'
+        +'<div style="font-size:20px;font-weight:800;color:'+k.color+'">'+k.value+'</div>'
+        +(k.sub?'<div style="font-size:11px;font-weight:600;color:'+k.subColor+';margin-top:3px">'+k.sub+'</div>':'')
+        +'</div>';
+    }).join('');
   }
 
   // ── 情緒統計圖 ──
