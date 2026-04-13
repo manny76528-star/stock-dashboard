@@ -5280,65 +5280,106 @@ function renderAnalytics(){
 
   // ── 每月回顧報告 ──
   const monthMap={};
-  sellResults.forEach(t=>{
+  sellResults.forEach(function(t){
     const ym=t.date.slice(0,7);
-    if(!monthMap[ym])monthMap[ym]={wins:0,losses:0,pnl:0,txns:0};
+    if(!monthMap[ym])monthMap[ym]={wins:0,losses:0,pnl:0,txns:0,sells:[]};
     monthMap[ym].txns++;
     monthMap[ym].pnl+=t.pnl;
     if(t.pnl>0)monthMap[ym].wins++;else monthMap[ym].losses++;
+    monthMap[ym].sells.push(t);
   });
-  // 加股息
-  (db.dividends||[]).filter(d=>!d.pending&&d.date).forEach(d=>{
-    const ym=d.date.slice(0,7);
-    if(!monthMap[ym])monthMap[ym]={wins:0,losses:0,pnl:0,txns:0,div:0};
-    monthMap[ym].div=(monthMap[ym].div||0)+d.amount;
-  });
+
+  // 年份下拉動態更新
+  const yrSel2=document.getElementById('report-year-sel');
+  const allMonthYears=[...new Set(Object.keys(monthMap).map(function(ym){return ym.slice(0,4);}))].sort().reverse();
+  if(yrSel2){
+    const curVal2=yrSel2.value||'all';
+    yrSel2.innerHTML='<option value="all">全部</option>'+allMonthYears.map(function(y){
+      return '<option value="'+y+'"'+(curVal2===y?' selected':'')+'>'+y+'年</option>';
+    }).join('');
+  }
+  const filterYr2=yrSel2?yrSel2.value:'all';
 
   const reportEl=document.getElementById('monthly-report');
-  if(reportEl){
-    const months=Object.keys(monthMap).sort().reverse();
-    if(months.length===0){
-      reportEl.innerHTML='<div style="color:#94a3b8;font-size:12px;text-align:center;padding:20px">尚無交易記錄</div>';
-    } else {
-      reportEl.innerHTML='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">'
-        +'<thead><tr style="background:#f1f5f9">'
-        +'<th style="padding:8px 12px;text-align:left;color:#64748b;font-size:11px">月份</th>'
-        +'<th style="padding:8px 12px;color:#64748b;font-size:11px">交易筆</th>'
-        +'<th style="padding:8px 12px;color:#64748b;font-size:11px">勝率</th>'
-        +'<th style="padding:8px 12px;color:#64748b;font-size:11px">交易損益</th>'
-        +'<th style="padding:8px 12px;color:#64748b;font-size:11px">股息收入</th>'
-        +'<th style="padding:8px 12px;color:#64748b;font-size:11px">合計</th>'
-        +'<th style="padding:8px 12px;color:#64748b;font-size:11px">評語</th>'
-        +'</tr></thead><tbody>'
-        +months.map(ym=>{
-          const m=monthMap[ym];
-          const wr=m.txns>0?Math.round(m.wins/m.txns*100):0;
-          const div=m.div||0;
-          const total=m.pnl+div;
-          const pnlColor=m.pnl>=0?'var(--gain)':'var(--loss)';
-          const totalColor=total>=0?'var(--gain)':'var(--loss)';
-          // 自動評語
-          let comment='';
-          if(m.txns===0)comment='純息月';
-          else if(wr>=80)comment='🔥 超強月';
-          else if(wr>=60)comment='👍 穩定月';
-          else if(wr>=40)comment='😐 普通月';
-          else comment='📉 需檢討';
-          return '<tr style="border-bottom:1px solid #f1f5f9">'
-            +'<td style="padding:8px 12px;font-weight:700">'+ym+'</td>'
-            +'<td style="padding:8px 12px;text-align:center">'+m.txns+'</td>'
-            +'<td style="padding:8px 12px;text-align:center;color:'+(wr>=50?'var(--gain)':'var(--loss)')+'">'+wr+'%</td>'
-            +'<td style="padding:8px 12px;text-align:right;font-family:monospace;color:'+pnlColor+'">'+(m.pnl>=0?'+':'')+Math.round(m.pnl).toLocaleString()+'</td>'
-            +'<td style="padding:8px 12px;text-align:right;font-family:monospace;color:var(--gain)">+'+(div>0?Math.round(div).toLocaleString():'0')+'</td>'
-            +'<td style="padding:8px 12px;text-align:right;font-family:monospace;font-weight:700;color:'+totalColor+'">'+(total>=0?'+':'')+Math.round(total).toLocaleString()+'</td>'
-            +'<td style="padding:8px 12px;font-size:11px">'+comment+'</td>'
-            +'</tr>';
-        }).join('')
-        +'</tbody></table></div>';
-    }
+  if(!reportEl)return;
+
+  let months=Object.keys(monthMap).sort().reverse();
+  if(filterYr2!=='all')months=months.filter(function(ym){return ym.startsWith(filterYr2);});
+
+  if(months.length===0){
+    reportEl.innerHTML='<div style="color:#94a3b8;font-size:12px;text-align:center;padding:20px">尚無交易記錄</div>';
+    return;
   }
+
+  // 年度小計
+  var yrPnl=0,yrWins=0,yrTxns=0;
+  months.forEach(function(ym){var m=monthMap[ym];yrPnl+=m.pnl;yrWins+=m.wins;yrTxns+=m.txns;});
+  var yrWr=yrTxns>0?Math.round(yrWins/yrTxns*100):0;
+
+  var html='';
+  months.forEach(function(ym){
+    var m=monthMap[ym];
+    var wr=m.txns>0?Math.round(m.wins/m.txns*100):0;
+    var pnlColor=m.pnl>=0?'var(--gain)':'var(--loss)';
+    var comment='';
+    if(m.txns===0)comment='—';
+    else if(wr>=80)comment='🔥 超強月';
+    else if(wr>=60)comment='👍 穩定月';
+    else if(wr>=40)comment='😐 普通月';
+    else comment='📉 需檢討';
+    var detailId='mr-'+ym.replace('-','');
+
+    html+='<div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:8px">';
+    // 第一層：點擊展開
+    html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#f8fafc;cursor:pointer" data-id="'+detailId+'" onclick="toggleMonthDetail(this.dataset.id)">';
+    html+='<div style="display:flex;align-items:center;gap:16px">';
+    html+='<span style="font-weight:700;color:#1e293b;min-width:70px">'+ym+'</span>';
+    html+='<span style="font-size:12px;color:#64748b">'+m.txns+'筆</span>';
+    html+='<span style="font-size:12px;color:'+(wr>=50?'var(--gain)':'var(--loss)')+'">勝率 '+wr+'%</span>';
+    html+='<span style="font-size:13px;font-weight:700;color:'+pnlColor+'">'+(m.pnl>=0?'+':'')+Math.round(m.pnl).toLocaleString()+'</span>';
+    html+='<span style="font-size:11px;color:#94a3b8">'+comment+'</span>';
+    html+='</div>';
+    html+='<span id="arr-'+detailId+'" style="font-size:11px;color:#94a3b8">▼</span>';
+    html+='</div>';
+
+    // 第二層：逐筆明細
+    html+='<div id="'+detailId+'" style="display:none">';
+    html+='<div style="display:grid;grid-template-columns:85px 1fr 50px 65px 65px 100px;gap:4px;padding:6px 14px;background:#f1f5f9;font-size:10px;font-weight:700;color:#94a3b8">';
+    html+='<span>日期</span><span>標的</span><span style="text-align:center">張數</span><span style="text-align:center">買入均</span><span style="text-align:center">賣出價</span><span style="text-align:right">損益</span></div>';
+    m.sells.forEach(function(t){
+      var tc=t.pnl>=0?'var(--gain)':'var(--loss)';
+      var avgBuy=t.cost>0?(t.cost/(t.lots*1000)).toFixed(2):'—';
+      html+='<div style="display:grid;grid-template-columns:85px 1fr 50px 65px 65px 100px;gap:4px;padding:8px 14px;border-bottom:1px solid #f8fafc;font-size:11px">';
+      html+='<span style="color:#64748b">'+t.date+'</span>';
+      html+='<span style="font-weight:600">'+t.code+(t.name?' '+t.name:'')+'</span>';
+      html+='<span style="text-align:center">'+t.lots+'張</span>';
+      html+='<span style="text-align:center;font-family:monospace">$'+avgBuy+'</span>';
+      html+='<span style="text-align:center;font-family:monospace">$'+t.price.toFixed(2)+'</span>';
+      html+='<span style="text-align:right;font-family:monospace;font-weight:700;color:'+tc+'">'+(t.pnl>=0?'+':'')+Math.round(t.pnl).toLocaleString()+'</span>';
+      html+='</div>';
+    });
+    html+='</div></div>';
+  });
+
+  // 年度小計
+  html+='<div style="display:flex;align-items:center;gap:16px;padding:10px 14px;background:#eff6ff;border:2px solid #3b82f6;border-radius:10px;margin-top:4px">';
+  html+='<span style="font-weight:800;color:#2563eb;min-width:70px">📊 小計</span>';
+  html+='<span style="font-size:12px;font-weight:700">'+yrTxns+'筆</span>';
+  html+='<span style="font-size:12px;font-weight:700;color:'+(yrWr>=50?'var(--gain)':'var(--loss)')+'">勝率 '+yrWr+'%</span>';
+  html+='<span style="font-size:14px;font-weight:800;color:'+(yrPnl>=0?'var(--gain)':'var(--loss)')+'">'+(yrPnl>=0?'+':'')+Math.round(yrPnl).toLocaleString()+'</span>';
+  html+='</div>';
+
+  reportEl.innerHTML=html;
 }
 
+function toggleMonthDetail(id){
+  var el=document.getElementById(id);
+  if(!el)return;
+  var open=el.style.display==='none';
+  el.style.display=open?'block':'none';
+  var arr=document.getElementById('arr-'+id);
+  if(arr)arr.textContent=open?'▲':'▼';
+}
 // ═══ 交易日誌 ═══
 if(!db.journals)db.journals=[];
 let editJournalId=null;
