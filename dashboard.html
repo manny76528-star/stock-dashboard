@@ -87,6 +87,10 @@ body{background:#eef2f7;color:var(--text);font-family:'Noto Sans TC',sans-serif;
 .add-bar{padding:8px 14px;border-top:1px solid var(--border);background:#f8fafc;text-align:right;}
 
 /* MODAL */
+.mood-sel-btn{padding:5px 10px;border-radius:20px;font-size:12px;cursor:pointer;border:1.5px solid var(--border);background:#fff;color:#475569;transition:all .15s;font-family:'Noto Sans TC',sans-serif;}
+.mood-sel-btn.active{background:#fef3c7;border-color:#f59e0b;color:#92400e;}
+.loss-sel-btn{padding:5px 10px;border-radius:20px;font-size:12px;cursor:pointer;border:1.5px solid var(--border);background:#fff;color:#475569;transition:all .15s;font-family:'Noto Sans TC',sans-serif;}
+.loss-sel-btn.active{background:#fef2f2;border-color:#dc2626;color:#dc2626;}
 .mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);z-index:999;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto;}
 .mo.open{display:flex;}
 .modal{background:var(--white);border-radius:14px;padding:22px 18px;width:100%;max-width:520px;box-shadow:0 20px 60px rgba(0,0,0,.25);animation:popIn .25s ease;margin:auto;}
@@ -1853,6 +1857,43 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 
 </div><!-- /db-root -->
 
+<!-- ═══ 投資分析儀表板 ═══ -->
+<div style="max-width:1300px;margin:0 auto;padding:0 0 0">
+  <div class="trend-section">
+    <div class="trend-hdr" style="cursor:pointer" onclick="toggleAnalytics()">
+      <span>📊 投資分析儀表板</span>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button onclick="event.stopPropagation();renderAnalytics()" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:6px;padding:4px 12px;font-size:11px;font-weight:700;cursor:pointer">🔄 重新計算</button>
+        <span id="analytics-arrow" style="font-size:12px">▼</span>
+      </div>
+    </div>
+    <div id="analytics-body" style="display:none">
+      <!-- KPI 卡片列 -->
+      <div id="analytics-kpi" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;padding:16px"></div>
+      <!-- 圖表區 -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:0 16px 16px">
+        <!-- 情緒統計圖 -->
+        <div style="background:#f8fafc;border-radius:12px;padding:16px">
+          <div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:12px">🧠 情緒 vs 勝率</div>
+          <div id="mood-chart"></div>
+        </div>
+        <!-- 虧損原因分類 -->
+        <div style="background:#f8fafc;border-radius:12px;padding:16px">
+          <div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:12px">❌ 虧損原因分析</div>
+          <div id="loss-chart"></div>
+        </div>
+      </div>
+      <!-- 每月回顧報告 -->
+      <div style="padding:0 16px 16px">
+        <div style="background:#f8fafc;border-radius:12px;padding:16px">
+          <div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:12px">📅 每月回顧報告</div>
+          <div id="monthly-report"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ═══ 交易日誌 ═══ -->
 <div style="max-width:1300px;margin:0 auto;padding:0 0 32px">
   <div class="trend-section">
@@ -1980,7 +2021,19 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
       <div class="fg"><label class="fl">手續費（2.8折自動算）</label><input class="fi" id="b-fee" type="number" step="1" placeholder="自動" style="background:#f0f9f4;border-color:#aad4bc"></div>
     </div>
     <div class="preview-box" id="buy-prev" style="background:var(--gain-bg);border-color:#aad4bc;color:var(--gain)"></div>
-    <div class="fg"><label class="fl">買入備註（選填，記錄買入原因）</label><input class="fi" id="b-remark" placeholder="例：看好升息循環結束，布局債券ETF"></div>
+    <div class="fg"><label class="fl">買入備註（選填）</label><input class="fi" id="b-remark" placeholder="例：看好升息循環結束，布局債券ETF"></div>
+    <div class="fg">
+      <label class="fl">下單情緒</label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button type="button" class="mood-sel-btn" data-mood="😌 平靜" onclick="selectMoodBtn(this,'b')">😌 平靜</button>
+        <button type="button" class="mood-sel-btn" data-mood="💪 自信" onclick="selectMoodBtn(this,'b')">💪 自信</button>
+        <button type="button" class="mood-sel-btn" data-mood="😊 興奮" onclick="selectMoodBtn(this,'b')">😊 興奮</button>
+        <button type="button" class="mood-sel-btn" data-mood="🤔 猶豫" onclick="selectMoodBtn(this,'b')">🤔 猶豫</button>
+        <button type="button" class="mood-sel-btn" data-mood="😰 焦慮" onclick="selectMoodBtn(this,'b')">😰 焦慮</button>
+        <button type="button" class="mood-sel-btn" data-mood="😤 衝動" onclick="selectMoodBtn(this,'b')">😤 衝動</button>
+      </div>
+      <input class="fi" id="b-mood" placeholder="或自填情緒..." style="margin-top:6px">
+    </div>
     <div class="br"><button class="btn btn-s" onclick="closeModal('buyModal')">取消</button><button class="btn btn-p" onclick="saveBuy()">確認買入</button></div>
   </div>
 </div>
@@ -1997,6 +2050,28 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
     <div class="fg"><label class="fl">選擇批次</label><div class="lot-picker" id="lot-picker"></div></div>
     <div class="preview-box" id="sell-sum"></div>
     <div class="fg"><label class="fl">賣出原因（選填）</label><input class="fi" id="s-remark" placeholder="例：停利出場，目標達成"></div>
+    <div class="fg">
+      <label class="fl">虧損原因分類（若虧損選填）</label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button type="button" class="loss-sel-btn" data-reason="停損觸發" onclick="selectLossBtn(this)">🛑 停損觸發</button>
+        <button type="button" class="loss-sel-btn" data-reason="判斷錯誤" onclick="selectLossBtn(this)">❌ 判斷錯誤</button>
+        <button type="button" class="loss-sel-btn" data-reason="紀律問題" onclick="selectLossBtn(this)">⚠️ 紀律問題</button>
+        <button type="button" class="loss-sel-btn" data-reason="黑天鵝事件" onclick="selectLossBtn(this)">🦢 黑天鵝</button>
+        <button type="button" class="loss-sel-btn" data-reason="停利出場" onclick="selectLossBtn(this)">✅ 停利</button>
+      </div>
+    </div>
+    <div class="fg">
+      <label class="fl">下單情緒</label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button type="button" class="mood-sel-btn" data-mood="😌 平靜" onclick="selectMoodBtn(this,'s')">😌 平靜</button>
+        <button type="button" class="mood-sel-btn" data-mood="💪 自信" onclick="selectMoodBtn(this,'s')">💪 自信</button>
+        <button type="button" class="mood-sel-btn" data-mood="😊 興奮" onclick="selectMoodBtn(this,'s')">😊 興奮</button>
+        <button type="button" class="mood-sel-btn" data-mood="🤔 猶豫" onclick="selectMoodBtn(this,'s')">🤔 猶豫</button>
+        <button type="button" class="mood-sel-btn" data-mood="😰 焦慮" onclick="selectMoodBtn(this,'s')">😰 焦慮</button>
+        <button type="button" class="mood-sel-btn" data-mood="😤 衝動" onclick="selectMoodBtn(this,'s')">😤 衝動</button>
+      </div>
+      <input class="fi" id="s-mood" placeholder="或自填情緒..." style="margin-top:6px">
+    </div>
     <div class="br"><button class="btn btn-s" onclick="closeModal('sellModal')">取消</button><button class="btn btn-p" onclick="saveSell()" style="background:var(--loss)">確認賣出</button></div>
   </div>
 </div>
@@ -3572,7 +3647,8 @@ function calcBuy(){
 function openBuyModal(invId){
   buyInvId=invId;const inv=db.investments.find(i=>i.id===invId);
   document.getElementById('buyMT').textContent=`買入 · ${inv.code} ${inv.name||''}`;
-  ['b-lots','b-price','b-fee','b-remark'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['b-lots','b-price','b-fee','b-remark','b-mood'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.querySelectorAll('.mood-sel-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('buy-prev').style.display='none';
   document.getElementById('b-date').value=new Date().toISOString().split('T')[0];
   openModal('buyModal');setTimeout(()=>document.getElementById('b-lots').focus(),100);
@@ -3594,7 +3670,8 @@ function saveBuy(){
       date:inv.addedDate||'2020-01-01',fee:0,remark:'初始持倉'});
   }
   const remark=document.getElementById('b-remark')?.value.trim()||'';
-  inv.transactions.push({id:uid(),type:'buy',lots,price,date,fee,remark});
+  const mood=document.getElementById('b-mood')?.value.trim()||'';
+  inv.transactions.push({id:uid(),type:'buy',lots,price,date,fee,remark,mood});
   inv.transactions.sort((a,b)=>a.date.localeCompare(b.date));
   save();closeModal('buyModal');render();toast(`買入 ${lots} 張已記錄`);
 }
@@ -3606,6 +3683,8 @@ function openSellModal(invId){
   document.getElementById('s-date').value=new Date().toISOString().split('T')[0];
   document.getElementById('s-price').value='';
   const srEl=document.getElementById('s-remark');if(srEl)srEl.value='';
+  const smEl=document.getElementById('s-mood');if(smEl)smEl.value='';
+  document.querySelectorAll('.mood-sel-btn,.loss-sel-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('sell-sum').style.display='none';
   let active=buildLots(inv).filter(l=>l.remaining>0);
   // If no transactions but stock has lots set directly, create a virtual lot
@@ -3682,7 +3761,9 @@ function saveSell(){
     lotRefs.forEach(r=>{if(r.isVirtual)r.txnId=initBuyId;});
   }
   const sRemark=document.getElementById('s-remark')?.value.trim()||'';
-  inv.transactions.push({id:uid(),type:'sell',lots:tLots,price,date,fee:fee+tax,lotRefs:lotRefs.map(r=>({txnId:r.txnId,lots:r.lots,date:r.date})),remark:sRemark});
+  const sMood=document.getElementById('s-mood')?.value.trim()||'';
+  const sLossReason=document.querySelector('.loss-sel-btn.active')?.dataset?.reason||'';
+  inv.transactions.push({id:uid(),type:'sell',lots:tLots,price,date,fee:fee+tax,lotRefs:lotRefs.map(r=>({txnId:r.txnId,lots:r.lots,date:r.date})),remark:sRemark,mood:sMood,lossReason:sLossReason});
   inv.transactions.sort((a,b)=>a.date.localeCompare(b.date));
   save();closeModal('sellModal');render();toast(`賣出 ${tLots} 張已記錄`);
 }
@@ -4804,6 +4885,217 @@ setInterval(()=>{const h=new Date().getHours(),m=new Date().getMinutes();if(h*60
     }
   };
 })();
+
+
+// ═══ 投資分析儀表板 ═══
+let analyticsOpen=false;
+
+function toggleAnalytics(){
+  analyticsOpen=!analyticsOpen;
+  document.getElementById('analytics-body').style.display=analyticsOpen?'block':'none';
+  document.getElementById('analytics-arrow').textContent=analyticsOpen?'▲':'▼';
+  if(analyticsOpen)renderAnalytics();
+}
+
+function selectMoodBtn(btn,prefix){
+  const parent=btn.closest('.fg');
+  parent.querySelectorAll('.mood-sel-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const input=document.getElementById(prefix+'-mood');
+  if(input)input.value=btn.dataset.mood;
+}
+
+function selectLossBtn(btn){
+  document.querySelectorAll('.loss-sel-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function renderAnalytics(){
+  // 收集所有交易
+  const allTxns=[];
+  db.investments.forEach(inv=>{
+    (inv.transactions||[]).forEach(t=>{
+      allTxns.push({...t,code:inv.code,name:inv.name||''});
+    });
+  });
+  (db.archivedTxns||[]).forEach(t=>allTxns.push({...t,archived:true}));
+
+  // 只看賣出
+  const sells=allTxns.filter(t=>t.type==='sell');
+
+  // ── 計算每筆賣出損益 ──
+  const sellResults=[];
+  sells.forEach(t=>{
+    const inv=db.investments.find(i=>i.code===t.code);
+    const allInvTxns=[...allTxns.filter(x=>x.code===t.code&&x.type==='buy')].sort((a,b)=>a.date.localeCompare(b.date));
+    let cost=0;
+    let holdDays=0;
+    if(t.lotRefs&&t.lotRefs.length){
+      t.lotRefs.forEach(ref=>{
+        let buyT=allTxns.find(x=>x.id===ref.txnId);
+        if(!buyT)buyT=(db.archivedTxns||[]).find(x=>x.id===ref.txnId);
+        if(buyT){
+          cost+=ref.lots*1000*buyT.price+(buyT.fee||0)*(ref.lots/(buyT.lots||1));
+          const days=Math.max(1,Math.round((new Date(t.date)-new Date(buyT.date))/86400000));
+          holdDays=Math.max(holdDays,days);
+        }
+      });
+    } else if(inv){
+      cost=t.lots*1000*(inv.avgPrice||0);
+      holdDays=30;
+    }
+    const gross=t.lots*1000*t.price;
+    const pnl=gross-(t.fee||0)-cost;
+    const roi=cost>0?pnl/cost*100:0;
+    const annualRoi=holdDays>0?roi*(365/holdDays):0;
+    sellResults.push({...t,pnl,roi,annualRoi,holdDays,cost});
+  });
+
+  // ── KPI 計算 ──
+  const wins=sellResults.filter(s=>s.pnl>0);
+  const losses=sellResults.filter(s=>s.pnl<=0);
+  const winRate=sellResults.length>0?wins.length/sellResults.length*100:0;
+  const avgWin=wins.length>0?wins.reduce((s,x)=>s+x.pnl,0)/wins.length:0;
+  const avgLoss=losses.length>0?Math.abs(losses.reduce((s,x)=>s+x.pnl,0)/losses.length):0;
+  const profitFactor=avgLoss>0?avgWin/avgLoss:0;
+  const totalPnl=sellResults.reduce((s,x)=>s+x.pnl,0);
+  const avgAnnualRoi=sellResults.length>0?sellResults.reduce((s,x)=>s+x.annualRoi,0)/sellResults.length:0;
+  const totalCost=db.investments.reduce((s,inv)=>s+calcInv(inv).tCost,0);
+
+  // KPI 顯示
+  const kpiEl=document.getElementById('analytics-kpi');
+  if(kpiEl){
+    const kpis=[
+      {label:'總交易筆數',value:sellResults.length+'筆',color:'#2563eb'},
+      {label:'勝率',value:winRate.toFixed(1)+'%',color:winRate>=50?'var(--gain)':'var(--loss)'},
+      {label:'平均年化報酬',value:(avgAnnualRoi>=0?'+':'')+avgAnnualRoi.toFixed(1)+'%',color:avgAnnualRoi>=0?'var(--gain)':'var(--loss)'},
+      {label:'盈虧比',value:profitFactor.toFixed(2)+'x',color:profitFactor>=1?'var(--gain)':'var(--loss)'},
+      {label:'平均獲利',value:'$'+Math.round(avgWin).toLocaleString(),color:'var(--gain)'},
+      {label:'平均虧損',value:'$'+Math.round(avgLoss).toLocaleString(),color:'var(--loss)'},
+      {label:'已實現損益',value:(totalPnl>=0?'+':'')+Math.round(totalPnl).toLocaleString(),color:totalPnl>=0?'var(--gain)':'var(--loss)'},
+    ];
+    kpiEl.innerHTML=kpis.map(k=>'<div style="background:#fff;border-radius:10px;padding:14px 16px;border:1px solid var(--border);box-shadow:0 1px 4px rgba(0,0,0,.05)">'
+      +'<div style="font-size:10px;color:#94a3b8;font-weight:600;letter-spacing:.3px;margin-bottom:6px">'+k.label+'</div>'
+      +'<div style="font-size:20px;font-weight:800;color:'+k.color+'">'+k.value+'</div>'
+      +'</div>').join('');
+  }
+
+  // ── 情緒統計圖 ──
+  const moodMap={};
+  sellResults.forEach(t=>{
+    const m=t.mood||'未記錄';
+    if(!moodMap[m])moodMap[m]={win:0,loss:0};
+    if(t.pnl>0)moodMap[m].win++;else moodMap[m].loss++;
+  });
+  const moodEl=document.getElementById('mood-chart');
+  if(moodEl){
+    if(Object.keys(moodMap).length===0){
+      moodEl.innerHTML='<div style="color:#94a3b8;font-size:12px;text-align:center;padding:20px">尚無情緒記錄<br><span style="font-size:11px">買入/賣出時選擇情緒後會顯示統計</span></div>';
+    } else {
+      moodEl.innerHTML=Object.entries(moodMap).map(([mood,stat])=>{
+        const total=stat.win+stat.loss;
+        const wr=total>0?Math.round(stat.win/total*100):0;
+        const barW=Math.max(4,wr);
+        return '<div style="margin-bottom:10px">'
+          +'<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px">'
+          +'<span style="font-weight:600">'+mood+'</span>'
+          +'<span style="color:'+( wr>=50?'var(--gain)':'var(--loss)')+';font-weight:700">勝率 '+wr+'% ('+stat.win+'/'+total+')</span>'
+          +'</div>'
+          +'<div style="height:8px;background:#f1f5f9;border-radius:4px;overflow:hidden">'
+          +'<div style="height:8px;width:'+barW+'%;background:'+(wr>=50?'#16a34a':'#dc2626')+';border-radius:4px;transition:width .5s"></div>'
+          +'</div></div>';
+      }).join('');
+    }
+  }
+
+  // ── 虧損原因分析 ──
+  const lossReasonMap={};
+  losses.forEach(t=>{
+    const r=t.lossReason||'未分類';
+    if(!lossReasonMap[r])lossReasonMap[r]={count:0,total:0};
+    lossReasonMap[r].count++;
+    lossReasonMap[r].total+=Math.abs(t.pnl);
+  });
+  const lossEl=document.getElementById('loss-chart');
+  if(lossEl){
+    if(Object.keys(lossReasonMap).length===0){
+      lossEl.innerHTML='<div style="color:#94a3b8;font-size:12px;text-align:center;padding:20px">尚無虧損記錄 🎉</div>';
+    } else {
+      const totalLoss=losses.reduce((s,t)=>s+Math.abs(t.pnl),0);
+      lossEl.innerHTML=Object.entries(lossReasonMap).sort((a,b)=>b[1].total-a[1].total).map(([reason,stat])=>{
+        const pct=totalLoss>0?Math.round(stat.total/totalLoss*100):0;
+        return '<div style="margin-bottom:10px">'
+          +'<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px">'
+          +'<span style="font-weight:600">'+reason+'</span>'
+          +'<span style="color:var(--loss)">'+stat.count+'筆 $'+Math.round(stat.total).toLocaleString()+'</span>'
+          +'</div>'
+          +'<div style="height:8px;background:#f1f5f9;border-radius:4px;overflow:hidden">'
+          +'<div style="height:8px;width:'+pct+'%;background:#dc2626;border-radius:4px"></div>'
+          +'</div></div>';
+      }).join('');
+    }
+  }
+
+  // ── 每月回顧報告 ──
+  const monthMap={};
+  sellResults.forEach(t=>{
+    const ym=t.date.slice(0,7);
+    if(!monthMap[ym])monthMap[ym]={wins:0,losses:0,pnl:0,txns:0};
+    monthMap[ym].txns++;
+    monthMap[ym].pnl+=t.pnl;
+    if(t.pnl>0)monthMap[ym].wins++;else monthMap[ym].losses++;
+  });
+  // 加股息
+  (db.dividends||[]).filter(d=>!d.pending&&d.date).forEach(d=>{
+    const ym=d.date.slice(0,7);
+    if(!monthMap[ym])monthMap[ym]={wins:0,losses:0,pnl:0,txns:0,div:0};
+    monthMap[ym].div=(monthMap[ym].div||0)+d.amount;
+  });
+
+  const reportEl=document.getElementById('monthly-report');
+  if(reportEl){
+    const months=Object.keys(monthMap).sort().reverse();
+    if(months.length===0){
+      reportEl.innerHTML='<div style="color:#94a3b8;font-size:12px;text-align:center;padding:20px">尚無交易記錄</div>';
+    } else {
+      reportEl.innerHTML='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">'
+        +'<thead><tr style="background:#f1f5f9">'
+        +'<th style="padding:8px 12px;text-align:left;color:#64748b;font-size:11px">月份</th>'
+        +'<th style="padding:8px 12px;color:#64748b;font-size:11px">交易筆</th>'
+        +'<th style="padding:8px 12px;color:#64748b;font-size:11px">勝率</th>'
+        +'<th style="padding:8px 12px;color:#64748b;font-size:11px">交易損益</th>'
+        +'<th style="padding:8px 12px;color:#64748b;font-size:11px">股息收入</th>'
+        +'<th style="padding:8px 12px;color:#64748b;font-size:11px">合計</th>'
+        +'<th style="padding:8px 12px;color:#64748b;font-size:11px">評語</th>'
+        +'</tr></thead><tbody>'
+        +months.map(ym=>{
+          const m=monthMap[ym];
+          const wr=m.txns>0?Math.round(m.wins/m.txns*100):0;
+          const div=m.div||0;
+          const total=m.pnl+div;
+          const pnlColor=m.pnl>=0?'var(--gain)':'var(--loss)';
+          const totalColor=total>=0?'var(--gain)':'var(--loss)';
+          // 自動評語
+          let comment='';
+          if(m.txns===0)comment='純息月';
+          else if(wr>=80)comment='🔥 超強月';
+          else if(wr>=60)comment='👍 穩定月';
+          else if(wr>=40)comment='😐 普通月';
+          else comment='📉 需檢討';
+          return '<tr style="border-bottom:1px solid #f1f5f9">'
+            +'<td style="padding:8px 12px;font-weight:700">'+ym+'</td>'
+            +'<td style="padding:8px 12px;text-align:center">'+m.txns+'</td>'
+            +'<td style="padding:8px 12px;text-align:center;color:'+(wr>=50?'var(--gain)':'var(--loss)')+'">'+wr+'%</td>'
+            +'<td style="padding:8px 12px;text-align:right;font-family:monospace;color:'+pnlColor+'">'+(m.pnl>=0?'+':'')+Math.round(m.pnl).toLocaleString()+'</td>'
+            +'<td style="padding:8px 12px;text-align:right;font-family:monospace;color:var(--gain)">+'+(div>0?Math.round(div).toLocaleString():'0')+'</td>'
+            +'<td style="padding:8px 12px;text-align:right;font-family:monospace;font-weight:700;color:'+totalColor+'">'+(total>=0?'+':'')+Math.round(total).toLocaleString()+'</td>'
+            +'<td style="padding:8px 12px;font-size:11px">'+comment+'</td>'
+            +'</tr>';
+        }).join('')
+        +'</tbody></table></div>';
+    }
+  }
+}
 
 // ═══ 交易日誌 ═══
 if(!db.journals)db.journals=[];
