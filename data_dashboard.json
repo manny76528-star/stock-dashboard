@@ -309,7 +309,8 @@
     {
       "id": "mncull1439i",
       "bank": "Line Bank",
-      "cash": 57215,
+      "cash": 55215,
+      "d1Date": "",
       "d1": 0,
       "d2": 0
     },
@@ -573,7 +574,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1776087287696,
+  "_ts": 1776087335086,
   "journals": [
     {
       "id": "mnvui6pia89",
