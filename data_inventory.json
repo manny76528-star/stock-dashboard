@@ -5569,8 +5569,8 @@
           "invoice": false
         }
       ],
-      "paid": false,
-      "paidDate": "2026-03-03",
+      "paid": true,
+      "paidDate": "2026-04-13",
       "createdAt": "2026-04-08T10:22:36.796Z"
     },
     {
@@ -6075,5 +6075,5 @@
     "bankCode": "013",
     "bankAccount": "061506186489"
   },
-  "_ts": 1776013399834
+  "_ts": 1776074997431
 }
