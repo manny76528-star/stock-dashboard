@@ -5207,17 +5207,14 @@ function renderAnalytics(){
   // KPI 顯示
   const kpiEl=document.getElementById('analytics-kpi');
   if(kpiEl){
-    const totalDiv=(db.dividends||[]).filter(d=>!d.pending&&d.date).reduce((s,d)=>s+d.amount,0);
     const kpis=[
       {label:'已實現筆數',value:sellResults.length+'筆',color:'#2563eb'},
       {label:'整體勝率',value:winRate.toFixed(1)+'%',color:winRate>=50?'var(--gain)':'var(--loss)'},
-      {label:'均年化報酬（交易）',value:(avgAnnualRoi>=0?'+':'')+avgAnnualRoi.toFixed(1)+'%',color:avgAnnualRoi>=0?'var(--gain)':'var(--loss)',note:'不含股息'},
+      {label:'均年化報酬（交易）',value:(avgAnnualRoi>=0?'+':'')+avgAnnualRoi.toFixed(1)+'%',color:avgAnnualRoi>=0?'var(--gain)':'var(--loss)'},
       {label:'盈虧比',value:profitFactor.toFixed(2)+'x',color:profitFactor>=1?'var(--gain)':'var(--loss)'},
       {label:'平均獲利/筆',value:'$'+Math.round(avgWin).toLocaleString(),color:'var(--gain)'},
       {label:'平均虧損/筆',value:'$'+Math.round(avgLoss).toLocaleString(),color:'var(--loss)'},
-      {label:'交易已實現損益',value:(totalPnl>=0?'+':'')+Math.round(totalPnl).toLocaleString(),color:totalPnl>=0?'var(--gain)':'var(--loss)',note:'不含股息'},
-      {label:'累積股息收入',value:'$'+Math.round(totalDiv).toLocaleString(),color:'var(--gain)',note:'已入帳'},
-      {label:'交易+股息合計',value:(totalPnl+totalDiv>=0?'+':'')+Math.round(totalPnl+totalDiv).toLocaleString(),color:(totalPnl+totalDiv)>=0?'var(--gain)':'var(--loss)'},
+      {label:'交易損益',value:(totalPnl>=0?'+':'')+Math.round(totalPnl).toLocaleString(),color:totalPnl>=0?'var(--gain)':'var(--loss)'},
     ];
     kpiEl.innerHTML=kpis.map(k=>'<div style="background:#fff;border-radius:10px;padding:14px 16px;border:1px solid var(--border);box-shadow:0 1px 4px rgba(0,0,0,.05)">'
       +'<div style="font-size:10px;color:#94a3b8;font-weight:600;letter-spacing:.3px;margin-bottom:6px">'+k.label+'</div>'
