@@ -309,7 +309,7 @@
     {
       "id": "mncull1439i",
       "bank": "Line Bank",
-      "cash": 48896,
+      "cash": 42577,
       "d1Date": "",
       "d1": 0,
       "d2": 0
@@ -574,7 +574,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1776139798240,
+  "_ts": 1776159352719,
   "journals": [
     {
       "id": "mnvui6pia89",
@@ -609,5 +609,8 @@
       "priority": "中",
       "addedDate": "2026-04-13"
     }
-  ]
+  ],
+  "_loanDeducted": {
+    "mncug22msvu_2026-04": true
+  }
 }
