@@ -1638,6 +1638,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
         <button onclick="manualSync();toggleMoreMenu()" style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 12px;background:none;border:none;color:#fff;font-size:13px;font-weight:600;cursor:pointer;border-radius:6px;font-family:'Noto Sans TC',sans-serif;text-align:left" onmouseover="this.style.background='rgba(255,255,255,.1)'" onmouseout="this.style.background='none'">☁️ 雲端同步</button>
         <button onclick="exportData();toggleMoreMenu()" style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 12px;background:none;border:none;color:#fff;font-size:13px;font-weight:600;cursor:pointer;border-radius:6px;font-family:'Noto Sans TC',sans-serif;text-align:left" onmouseover="this.style.background='rgba(255,255,255,.1)'" onmouseout="this.style.background='none'">📤 備份</button>
         <label style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 12px;background:none;border:none;color:#fff;font-size:13px;font-weight:600;cursor:pointer;border-radius:6px;font-family:'Noto Sans TC',sans-serif" onmouseover="this.style.background='rgba(255,255,255,.1)'" onmouseout="this.style.background='none'">📥 還原<input type="file" accept=".json" style="display:none" onchange="importData(event);toggleMoreMenu()"></label>
+        <button onclick="forceDailyProcess();toggleMoreMenu()" style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 12px;background:none;border:none;color:#fbbf24;font-size:13px;font-weight:600;cursor:pointer;border-radius:6px;font-family:'Noto Sans TC',sans-serif;text-align:left" onmouseover="this.style.background='rgba(255,255,255,.1)'" onmouseout="this.style.background='none'">⚡ 強制今日連動</button>
         <div style="height:1px;background:rgba(255,255,255,.1);margin:4px 0"></div>
         <button onclick="manualLogout();toggleMoreMenu()" style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 12px;background:none;border:none;color:#fca5a5;font-size:13px;font-weight:600;cursor:pointer;border-radius:6px;font-family:'Noto Sans TC',sans-serif;text-align:left" onmouseover="this.style.background='rgba(255,255,255,.1)'" onmouseout="this.style.background='none'">🔒 登出</button>
       </div>
@@ -4806,43 +4807,59 @@ undoStack=[JSON.stringify(db)];
 render();
 checkBkWarn();
 refreshPrices();
-// 啟動後 8 秒才嘗試 Pull（給匯入操作足夠時間）
+// 啟動後 3 秒 Pull（給頁面載入時間）
 setTimeout(async()=>{
-  if(!_syncEnabled)return; // 匯入中不 Pull
+  if(!_syncEnabled)return;
   const updated=await ghPull();
   if(updated){render();showSyncStatus('☁️ 已從雲端同步');}
-},8000);
+},3000);
+
+// 每 5 分鐘自動 Pull 一次（手機長時間開著也能更新）
+setInterval(async()=>{
+  if(!_syncEnabled)return;
+  const updated=await ghPull();
+  if(updated){render();showSyncStatus('☁️ 已從雲端同步');}
+},5*60*1000);
+
+// 頁面重新顯示時（從背景切回來）也 Pull
+document.addEventListener('visibilitychange',async function(){
+  if(document.visibilityState==='visible'){
+    if(!_syncEnabled)return;
+    const updated=await ghPull();
+    if(updated){render();showSyncStatus('☁️ 已從雲端同步');}
+  }
+});
 // ── 每日自動連動（股息入帳 + 信貸扣款）──
-(function dailyAutoProcess(){
+function runDailyProcess(force){
   const todayStr=new Date().toISOString().split('T')[0];
   const todayDay=new Date().getDate();
-
   const lineBank=db.cashAccounts.find(c=>c.bank&&c.bank.toLowerCase().includes('line'));
   let changed=false;
   const msgs=[];
 
-  // 1. 股息自動入帳：入帳日=今天且 pending=true
+  // 1. 股息自動入帳
   const DIV_DONE='div_done_'+todayStr;
-  if(!localStorage.getItem(DIV_DONE)){
+  if(force||!localStorage.getItem(DIV_DONE)){
+    let divChanged=false;
     (db.dividends||[]).forEach(d=>{
-      if(d.pending&&d.date&&d.date===todayStr){
+      if(d.pending&&d.date&&d.date<=todayStr){
         d.pending=false;
         if(lineBank){
           lineBank.cash=(lineBank.cash||0)+Math.round(d.amount);
           msgs.push('💰 股息入帳 '+d.code+' +$'+Math.round(d.amount).toLocaleString());
         }
-        changed=true;
+        changed=true;divChanged=true;
       }
     });
-    if(changed)localStorage.setItem(DIV_DONE,'1');
+    if(divChanged)localStorage.setItem(DIV_DONE,'1');
   }
 
-  // 2. 信貸自動扣款：每筆各自用 LOAN_KEY 控制，不受 DONE_KEY 影響
+  // 2. 信貸自動扣款
   (db.loans||[]).forEach(l=>{
     const deductDay=parseInt(l.deductDay)||0;
     if(deductDay!==todayDay)return;
     const LOAN_KEY='loan_deducted_'+l.id+'_'+todayStr.slice(0,7);
-    if(localStorage.getItem(LOAN_KEY))return; // 這個月已扣過
+    if(!force&&localStorage.getItem(LOAN_KEY))return;
     const deductBankName=(l.deductBank||'').toLowerCase().trim();
     const acc=db.cashAccounts.find(c=>{
       if(!c.bank)return false;
@@ -4854,17 +4871,37 @@ setTimeout(async()=>{
       localStorage.setItem(LOAN_KEY,'1');
       msgs.push('🏦 信貸扣款 '+l.bank+' -$'+Math.round(l.monthly||0).toLocaleString());
       changed=true;
+    } else {
+      console.warn('找不到扣款帳戶：'+l.deductBank+'（'+l.bank+'）');
     }
   });
 
   if(changed){
-    localStorage.setItem(STORE,JSON.stringify(db));
-    schedulePush();
+    save();
+    render();
     setTimeout(()=>{
       msgs.forEach((m,i)=>setTimeout(()=>toast(m),i*1500));
-    },1000);
+    },300);
+    return msgs;
   }
-})();
+  return [];
+}
+
+// 強制執行今日連動（提供給手動按鈕用）
+function forceDailyProcess(){
+  // 清掉今天的 key，讓它重新執行
+  const todayStr=new Date().toISOString().split('T')[0];
+  localStorage.removeItem('div_done_'+todayStr);
+  (db.loans||[]).forEach(l=>{
+    localStorage.removeItem('loan_deducted_'+l.id+'_'+todayStr.slice(0,7));
+  });
+  const results=runDailyProcess(true);
+  if(results.length===0)toast('今日無需執行連動（股息或扣款日不符）');
+}
+
+// 啟動時自動執行
+runDailyProcess(false);
+
 
 // Auto snapshot on 1st of each month
 (function autoSnapshot(){
