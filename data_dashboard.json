@@ -14,7 +14,7 @@
           "type": "buy",
           "lots": 800,
           "price": 10.25,
-          "date": "2020-01-01",
+          "date": "2025-12-14",
           "fee": 0,
           "remark": "初始持倉"
         },
@@ -41,7 +41,17 @@
       "avgPrice": 46.82,
       "divPerShare": 0.186,
       "note": "質押中",
-      "transactions": [],
+      "transactions": [
+        {
+          "id": "init-864b",
+          "type": "buy",
+          "lots": 128,
+          "price": 46.82,
+          "date": "2025-03-18",
+          "fee": 0,
+          "remark": "初始持倉"
+        }
+      ],
       "order": 2,
       "url": "https://www.wantgoo.com/stock/etf/00864b/dividend-policy/ex-dividend",
       "holdType": "long",
@@ -162,7 +172,7 @@
           "type": "buy",
           "lots": 100,
           "price": 10.53,
-          "date": "2026-04-02",
+          "date": "2025-12-14",
           "fee": 0,
           "remark": "可隨景氣調整公債,投等,非投比例 且目前有9%殖利率"
         }
@@ -361,7 +371,7 @@
       "price": 10.28,
       "change": -0.01,
       "changePct": -0.1,
-      "ts": 1776162331898
+      "ts": 1776162395096
     },
     "00950B": {
       "price": 14.22,
@@ -373,7 +383,7 @@
       "price": 10.45,
       "change": 0,
       "changePct": 0,
-      "ts": 1776162331898
+      "ts": 1776162395096
     },
     "00988A": {
       "price": 11.85,
@@ -391,7 +401,7 @@
       "price": 46.55,
       "change": 0.04,
       "changePct": 0.09,
-      "ts": 1776162331898
+      "ts": 1776162395096
     },
     "00933B": {
       "price": 16.08,
@@ -588,7 +598,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1776162338916,
+  "_ts": 1776162427719,
   "journals": [
     {
       "id": "mnvui6pia89",
