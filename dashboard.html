@@ -1863,6 +1863,21 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 
 </div><!-- /db-root -->
 
+<!-- ═══ 持倉健康檢查 ═══ -->
+<div style="max-width:1300px;margin:0 auto;padding:0 0 0">
+  <div class="trend-section">
+    <div class="trend-hdr" style="cursor:pointer" onclick="toggleHealth()">
+      <span>💎 持倉健康檢查</span>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span id="health-arrow" style="font-size:12px">▼</span>
+      </div>
+    </div>
+    <div id="health-body" style="display:none;padding:16px">
+      <div id="health-grid" style="display:flex;flex-direction:column;gap:10px"></div>
+    </div>
+  </div>
+</div>
+
 <!-- ═══ 觀察股區 ═══ -->
 <div style="max-width:1300px;margin:0 auto;padding:0 0 0">
   <div class="trend-section">
@@ -5005,6 +5020,81 @@ setInterval(()=>{const h=new Date().getHours(),m=new Date().getMinutes();if(h*60
 })();
 
 
+
+
+// ═══ 持倉健康檢查 ═══
+let healthOpen=false;
+
+function toggleHealth(){
+  healthOpen=!healthOpen;
+  document.getElementById('health-body').style.display=healthOpen?'block':'none';
+  document.getElementById('health-arrow').textContent=healthOpen?'▲':'▼';
+  if(healthOpen)renderHealth();
+}
+
+function renderHealth(){
+  const grid=document.getElementById('health-grid');
+  if(!grid)return;
+  const today=new Date().toISOString().split('T')[0];
+
+  const activeInvs=db.investments.filter(inv=>{
+    const c=calcInv(inv);
+    return c.tLots>0;
+  });
+
+  if(activeInvs.length===0){
+    grid.innerHTML='<div style="text-align:center;color:var(--muted);padding:20px">尚無持倉</div>';
+    return;
+  }
+
+  grid.innerHTML=activeInvs.map(function(inv){
+    const c=calcInv(inv);
+    // 持有天數
+    const buyTxns=(inv.transactions||[]).filter(t=>t.type==='buy');
+    const earliestBuy=buyTxns.length>0?buyTxns.reduce((e,t)=>t.date<e?t.date:e,buyTxns[0].date):null;
+    const holdDays=earliestBuy?Math.round((Date.now()-new Date(earliestBuy))/86400000):0;
+    const holdYears=(holdDays/365).toFixed(1);
+    // 含息損益
+    const divTot=c.divTot||0;
+    const pnlWithDiv=c.pnlWithDiv||0;
+    const pnlPctWithDiv=c.pnlPctWithDiv||0;
+    // 含息年化
+    const annualRoi=c.tCost>0&&holdDays>30?(pnlWithDiv/c.tCost)*(365/holdDays)*100:0;
+    // 每年股息殖利率
+    const annualDiv=c.moDivAmt*12;
+    const yieldRate=c.tCost>0?annualDiv/c.tCost*100:0;
+    // 信心進度條（含息報酬率 / 目標5% 年化）
+    const TARGET_ROI=5;
+    const confPct=Math.min(100,Math.max(0,(annualRoi/TARGET_ROI)*100));
+    const confColor=annualRoi>=TARGET_ROI?'#16a34a':annualRoi>=0?'#f59e0b':'#dc2626';
+    // 情緒回顧：找這個標的最近的買入情緒
+    const moodTxns=(inv.transactions||[]).filter(t=>t.type==='buy'&&t.mood).slice(-3);
+
+    return '<div style="background:#fff;border-radius:12px;border:1px solid var(--border);padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.05)">'
+      // 標題列
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'
+      +'<div><span style="font-size:15px;font-weight:800;color:var(--accent)">'+inv.code+'</span>'+(inv.name?'<span style="font-size:12px;color:var(--muted);margin-left:6px">'+inv.name+'</span>':'')+'</div>'
+      +'<div style="font-size:11px;color:#64748b">持有 '+holdDays+'天 ('+holdYears+'年)</div>'
+      +'</div>'
+      // 數據網格
+      +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px">'
+      +'<div style="text-align:center;padding:8px;background:#f8fafc;border-radius:8px"><div style="font-size:10px;color:#94a3b8;margin-bottom:3px">累積股息</div><div style="font-size:14px;font-weight:700;color:var(--gain)">+'+(divTot>0?Math.round(divTot).toLocaleString():'0')+'</div></div>'
+      +'<div style="text-align:center;padding:8px;background:#f8fafc;border-radius:8px"><div style="font-size:10px;color:#94a3b8;margin-bottom:3px">含息損益</div><div style="font-size:14px;font-weight:700;color:'+(pnlWithDiv>=0?'var(--gain)':'var(--loss)')+'">'+(pnlWithDiv>=0?'+':'')+Math.round(pnlWithDiv).toLocaleString()+'</div></div>'
+      +'<div style="text-align:center;padding:8px;background:#f8fafc;border-radius:8px"><div style="font-size:10px;color:#94a3b8;margin-bottom:3px">含息年化</div><div style="font-size:14px;font-weight:700;color:'+(annualRoi>=0?'var(--gain)':'var(--loss)')+'">'+(annualRoi>=0?'+':'')+annualRoi.toFixed(1)+'%</div></div>'
+      +'<div style="text-align:center;padding:8px;background:#f8fafc;border-radius:8px"><div style="font-size:10px;color:#94a3b8;margin-bottom:3px">殖利率/年</div><div style="font-size:14px;font-weight:700;color:var(--gain)">'+yieldRate.toFixed(1)+'%</div></div>'
+      +'</div>'
+      // 信心進度條
+      +'<div style="margin-bottom:10px">'
+      +'<div style="display:flex;justify-content:space-between;font-size:10px;color:#64748b;margin-bottom:4px"><span>投資進度（目標年化 '+TARGET_ROI+'%）</span><span style="color:'+confColor+';font-weight:700">'+(annualRoi>=0?'+':'')+annualRoi.toFixed(1)+'%</span></div>'
+      +'<div style="height:8px;background:#f1f5f9;border-radius:4px;overflow:hidden">'
+      +'<div style="height:8px;width:'+confPct+'%;background:'+confColor+';border-radius:4px;transition:width .6s"></div>'
+      +'</div>'
+      +'</div>'
+      // 情緒回顧
+      +(moodTxns.length>0?'<div style="font-size:11px;color:#64748b">📊 買入情緒：'+moodTxns.map(t=>'<span style="display:inline-block;padding:2px 8px;border-radius:20px;background:#fef3c7;color:#92400e;font-size:10px;font-weight:600;margin:0 2px">'+t.mood+'</span>').join('')+'</div>':'')
+      +'</div>';
+  }).join('');
+}
 
 // ═══ 觀察股 ═══
 if(!db.watchlist)db.watchlist=[];
