@@ -1,0 +1,135 @@
+name: Daily Auto Process
+
+on:
+  schedule:
+    - cron: '0 1 * * *'  # 每天 UTC 01:00 = 台灣時間 09:00
+  workflow_dispatch:       # 也可以手動觸發
+
+jobs:
+  daily-process:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run Daily Process
+        run: |
+          node << 'NODEJS'
+          const https = require('https');
+
+          const OWNER = 'manny76528-star';
+          const REPO  = 'stock-dashboard';
+          const FILE  = 'data_dashboard.json';
+          const TOKEN = process.env.GH_TOKEN;
+
+          function ghRequest(method, path, body) {
+            return new Promise((resolve, reject) => {
+              const data = body ? JSON.stringify(body) : null;
+              const req = https.request({
+                hostname: 'api.github.com',
+                path,
+                method,
+                headers: {
+                  'Authorization': `token ${TOKEN}`,
+                  'Accept': 'application/vnd.github.v3+json',
+                  'User-Agent': 'daily-process',
+                  'Content-Type': 'application/json',
+                  ...(data ? { 'Content-Length': Buffer.byteLength(data) } : {})
+                }
+              }, res => {
+                let body = '';
+                res.on('data', c => body += c);
+                res.on('end', () => resolve({ status: res.statusCode, data: JSON.parse(body) }));
+              });
+              req.on('error', reject);
+              if (data) req.write(data);
+              req.end();
+            });
+          }
+
+          async function main() {
+            // 取得現有資料
+            const { status, data: fileData } = await ghRequest('GET', `/repos/${OWNER}/${REPO}/contents/${FILE}`);
+            if (status === 404) { console.log('data_dashboard.json 不存在，略過'); return; }
+            if (status !== 200) { console.error('取得檔案失敗:', status); return; }
+
+            const sha = fileData.sha;
+            const content = Buffer.from(fileData.content.replace(/\n/g, ''), 'base64').toString('utf8');
+            const db = JSON.parse(content);
+
+            // 今天日期（台灣時間 UTC+8）
+            const now = new Date(Date.now() + 8 * 3600000);
+            const todayStr = now.toISOString().slice(0, 10);
+            const todayDay = now.getUTCDate();
+            console.log('處理日期:', todayStr, '幾號:', todayDay);
+
+            let changed = false;
+            const msgs = [];
+
+            // 找 Line Bank 帳戶
+            const lineBank = (db.cashAccounts || []).find(c =>
+              c.bank && c.bank.toLowerCase().includes('line')
+            );
+
+            // 1. 股息自動入帳：入帳日 <= 今天且 pending=true
+            (db.dividends || []).forEach(d => {
+              if (d.pending && d.date && d.date <= todayStr) {
+                d.pending = false;
+                if (lineBank) {
+                  lineBank.cash = (lineBank.cash || 0) + Math.round(d.amount);
+                  msgs.push(`💰 股息入帳 ${d.code} +$${Math.round(d.amount).toLocaleString()}`);
+                }
+                changed = true;
+              }
+            });
+
+            // 2. 信貸自動扣款：扣款日=今天
+            const ym = todayStr.slice(0, 7);
+            if (!db._loanDeducted) db._loanDeducted = {};
+            (db.loans || []).forEach(l => {
+              const deductDay = parseInt(l.deductDay) || 0;
+              if (deductDay !== todayDay) return;
+              const key = l.id + '_' + ym;
+              if (db._loanDeducted[key]) return; // 這個月已扣過
+              const deductBankName = (l.deductBank || '').toLowerCase().trim();
+              const acc = (db.cashAccounts || []).find(c => {
+                if (!c.bank) return false;
+                const cBank = c.bank.toLowerCase().trim();
+                return cBank === deductBankName || cBank.includes(deductBankName) || deductBankName.includes(cBank);
+              });
+              if (acc) {
+                acc.cash = (acc.cash || 0) - Math.round(l.monthly || 0);
+                db._loanDeducted[key] = true;
+                msgs.push(`🏦 信貸扣款 ${l.bank} -$${Math.round(l.monthly || 0).toLocaleString()}`);
+                changed = true;
+              } else {
+                console.warn(`找不到扣款帳戶: ${l.deductBank} (${l.bank})`);
+              }
+            });
+
+            if (!changed) {
+              console.log('今日無需處理');
+              return;
+            }
+
+            msgs.forEach(m => console.log(m));
+
+            // 更新時間戳
+            db._ts = Date.now();
+
+            // 存回 GitHub
+            const newContent = Buffer.from(JSON.stringify(db, null, 2)).toString('base64');
+            const { status: putStatus } = await ghRequest('PUT', `/repos/${OWNER}/${REPO}/contents/${FILE}`, {
+              message: `daily-process: ${todayStr} ${msgs.join(', ')}`,
+              content: newContent,
+              sha
+            });
+
+            if (putStatus === 200 || putStatus === 201) {
+              console.log('✅ 更新成功');
+            } else {
+              console.error('❌ 更新失敗:', putStatus);
+            }
+          }
+
+          main().catch(console.error);
+          NODEJS
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
