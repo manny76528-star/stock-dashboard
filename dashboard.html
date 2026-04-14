@@ -3416,10 +3416,15 @@ function renderDivs(){
   // pending: 除息日已到但發放日未到
   // 自動處理：入帳日已到且標記 pending → 自動移為已領息（不需手動確認）
   let autoUpdated=false;
+  const lineBankAcc=db.cashAccounts.find(c=>c.bank&&c.bank.toLowerCase().includes('line'));
   db.dividends.forEach(d=>{
     if(d.pending&&d.date&&d.date<=today){
       d.pending=false; // 自動入帳
       autoUpdated=true;
+      // 同時加進 Line Bank
+      if(lineBankAcc){
+        lineBankAcc.cash=(lineBankAcc.cash||0)+Math.round(d.amount);
+      }
     }
   });
   if(autoUpdated){
@@ -5067,9 +5072,11 @@ function renderHealth(){
   if(!grid)return;
   const today=new Date().toISOString().split('T')[0];
 
+  // 確保所有標的都有 holdType（處理從雲端拉下來的舊資料）
+  (db.investments||[]).forEach(inv=>{if(!inv.holdType)inv.holdType='long';if(!inv.targetRoi)inv.targetRoi=5;});
   const activeInvs=db.investments.filter(inv=>{
     const c=calcInv(inv);
-    return c.tLots>0&&(inv.holdType==='long'||!inv.holdType); // 只顯示長期持有
+    return c.tLots>0&&inv.holdType==='long';
   });
 
   if(activeInvs.length===0){
