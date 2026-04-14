@@ -169,7 +169,7 @@
       ],
       "order": 6,
       "holdType": "long",
-      "targetRoi": 5
+      "targetRoi": 8
     },
     {
       "id": "mnhn02jiyo7",
@@ -373,7 +373,7 @@
       "price": 10.45,
       "change": 0,
       "changePct": 0,
-      "ts": 1776161960450
+      "ts": 1776162011348
     },
     "00988A": {
       "price": 11.85,
@@ -391,7 +391,7 @@
       "price": 46.55,
       "change": 0.04,
       "changePct": 0.09,
-      "ts": 1776161960450
+      "ts": 1776162001429
     },
     "00933B": {
       "price": 16.08,
@@ -588,7 +588,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1776161972142,
+  "_ts": 1776162023732,
   "journals": [
     {
       "id": "mnvui6pia89",
