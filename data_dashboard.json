@@ -31,7 +31,7 @@
       "order": 1,
       "url": "https://www.wantgoo.com/stock/etf/00985B/dividend-policy/ex-dividend",
       "holdType": "long",
-      "targetRoi": 5
+      "targetRoi": 6
     },
     {
       "id": "mng7ni9zryt",
@@ -369,7 +369,7 @@
       "price": 10.27,
       "change": -0.01,
       "changePct": -0.1,
-      "ts": 1776170222454
+      "ts": 1776170566241
     },
     "00950B": {
       "price": 14.22,
@@ -381,7 +381,7 @@
       "price": 10.43,
       "change": -0.02,
       "changePct": -0.19,
-      "ts": 1776170222454
+      "ts": 1776170518825
     },
     "00988A": {
       "price": 11.85,
@@ -399,7 +399,7 @@
       "price": 46.3,
       "change": -0.25,
       "changePct": -0.54,
-      "ts": 1776170222454
+      "ts": 1776170518825
     },
     "00933B": {
       "price": 16.08,
@@ -596,7 +596,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1776170234494,
+  "_ts": 1776170587408,
   "watchlist": [],
   "journals": []
 }
