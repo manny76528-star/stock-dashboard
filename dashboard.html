@@ -2560,6 +2560,8 @@ let db=JSON.parse(localStorage.getItem(STORE)||'null')||null;
 })();
 if(!db)db={investments:[],loans:[],flexLoans:[],cashAccounts:[],prices:{},dividends:[]};
 ['dividends','prices'].forEach(k=>{if(!db[k])db[k]=k==='prices'?{}:[];});
+// 舊標的沒有 holdType 的預設設為長期持有
+(db.investments||[]).forEach(inv=>{if(!inv.holdType)inv.holdType='long';if(!inv.targetRoi)inv.targetRoi=5;});
 
 let editId=null, sellInvId=null, buyInvId=null;
 let undoStack=[];
@@ -3747,6 +3749,7 @@ function saveInv(){
       transactions:initTxns,order:maxOrder+1});
   }
   save();closeModal('invModal');render();toast(editId?'已更新':'已新增 '+code);
+  if(healthOpen)renderHealth(); // 持倉健康檢查同步更新
   fetchPrice(code).then(p=>{if(p){db.prices[code]=p;localStorage.setItem(STORE,JSON.stringify(db));renderInv();}});
 }
 function delInv(id){
