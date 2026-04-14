@@ -5070,7 +5070,18 @@ function renderHealth(){
   });
 
   if(activeInvs.length===0){
-    grid.innerHTML='<div style="text-align:center;color:var(--muted);padding:20px">尚無持倉</div>';
+    // 檢查是否有標的但都被過濾掉了
+    const allActive=db.investments.filter(inv=>calcInv(inv).tLots>0);
+    if(allActive.length>0){
+      // 有持倉但都是短期，顯示提示並把全部顯示
+      grid.innerHTML='<div style="text-align:center;color:var(--muted);padding:12px;font-size:13px">所有持倉均為短期交易，若要加入健康檢查請編輯標的改為「長期持有」</div>'
+        +'<div style="padding:0 0 8px;display:flex;flex-direction:column;gap:10px" id="health-grid-all"></div>';
+      // 臨時顯示全部（讓用戶能編輯）
+      const allGrid=document.getElementById('health-grid-all');
+      if(allGrid)allGrid.innerHTML=allActive.map(inv=>'<div style="padding:8px 12px;background:#f8fafc;border-radius:8px;display:flex;justify-content:space-between;align-items:center"><span style="font-weight:700">'+inv.code+(inv.name?' '+inv.name:'')+'</span><button onclick="openInvModal(''+inv.id+'')" style="background:#eff6ff;border:1px solid #3b82f6;color:#2563eb;border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;font-weight:600">設為長期持有</button></div>').join('');
+    } else {
+      grid.innerHTML='<div style="text-align:center;color:var(--muted);padding:20px">尚無持倉</div>';
+    }
     return;
   }
 
