@@ -2713,40 +2713,64 @@ async function loadPrices(){
 async function fetchPrice(code){
   if(!/^[\dA-Za-z]+$/.test(code))return null;
   try{
-    // 先用 Cloudflare Worker 即時抓
     const r=await fetch(CF_WORKER+'/price?code='+code+'&t='+Date.now());
     if(r.ok){
       const d=await r.json();
-      if(d.price){return {price:d.price,change:d.change||0,changePct:d.changePct||0,ts:Date.now()};}
+      if(d.price)return {price:d.price,change:d.change||0,changePct:d.changePct||0,ts:Date.now()};
     }
-  }catch(e){console.warn('即時股價失敗，改用 prices.json:',e.message);}
-  // 備用：從 prices.json
+  }catch(e){console.warn('即時股價失敗:',e.message);}
   await loadPrices();
   return _pm[code.toUpperCase()]?{..._pm[code.toUpperCase()],ts:Date.now()}:null;
 }
 
+async function fetchPricesBatch(codes){
+  // 批次查詢多檔股票
+  try{
+    const r=await fetch(CF_WORKER+'/prices?codes='+codes.join(',')+'&t='+Date.now());
+    if(r.ok){
+      const d=await r.json();
+      return d; // {code: {price,change,changePct,ts}, ...}
+    }
+  }catch(e){console.warn('批次股價失敗，改單檔:',e.message);}
+  return null;
+}
+
 async function refreshPrices(){
   document.getElementById('pstat').innerHTML='<span class="spin"></span> 即時更新中...';
-  const activeCodes=[...new Set(db.investments
-    .filter(inv=>calcInv(inv).tLots>0)
-    .map(i=>i.code))];
-  // 同時也抓觀察股
+  const activeCodes=[...new Set(db.investments.filter(inv=>calcInv(inv).tLots>0).map(i=>i.code))];
   const watchCodes=(db.watchlist||[]).map(w=>w.code);
   const allCodes=[...new Set([...activeCodes,...watchCodes])];
+  if(allCodes.length===0){document.getElementById('pstat').innerHTML='無持股';return;}
+
   const found=[], notFound=[];
 
-  await Promise.all(allCodes.map(async c=>{
-    const p=await fetchPrice(c);
-    if(p){db.prices[c]=p;found.push(c+':$'+p.price);}
-    else notFound.push(c);
-  }));
+  // 優先用批次查詢
+  const batchResult=await fetchPricesBatch(allCodes);
+  if(batchResult&&Object.keys(batchResult).length>0){
+    allCodes.forEach(c=>{
+      if(batchResult[c]){db.prices[c]=batchResult[c];found.push(c+'$'+batchResult[c].price);}
+      else notFound.push(c);
+    });
+    // 找不到的單檔補抓
+    await Promise.all(notFound.map(async c=>{
+      const p=await fetchPrice(c);
+      if(p){db.prices[c]=p;found.push(c+'$'+p.price);notFound.splice(notFound.indexOf(c),1);}
+    }));
+  } else {
+    // 批次失敗，全部單檔抓
+    await Promise.all(allCodes.map(async c=>{
+      const p=await fetchPrice(c);
+      if(p){db.prices[c]=p;found.push(c+'$'+p.price);}
+      else notFound.push(c);
+    }));
+  }
 
   save();render();
   if(healthOpen)renderHealth();
   if(watchOpen)renderWatchlist();
   const n=new Date();
-  let msg='即時股價已更新';
-  if(found.length)msg+=' | '+found.join(', ');
+  const isAfterMarket=found.length===0&&notFound.length>0;
+  let msg=isAfterMarket?'盤後 - 使用收盤價':'即時股價已更新 '+found.length+'檔';
   if(notFound.length)msg+=' | 找不到:'+notFound.join(',');
   document.getElementById('pstat').innerHTML='<span class="dot"></span>'+n.toLocaleTimeString('zh-TW')+' '+msg;
 }
