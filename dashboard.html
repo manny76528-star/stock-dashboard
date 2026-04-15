@@ -2441,7 +2441,11 @@ async function ghPull(){
     // 3. 其他情況 → 保留本地
     console.log(`Pull比較: 本地ts=${localTs} 遠端ts=${remoteTs}`);
     if(remoteTs>localTs){
-      // 遠端較新 → 直接更新
+      // 遠端較新 → 合併更新，但保護本地較多的資料
+      // journals：取較多的那份
+      if((db.journals||[]).length>(remote.journals||[]).length){
+        remote.journals=db.journals;
+      }
       db=remote;
       localStorage.setItem(STORE,JSON.stringify(db));
       showSyncStatus('☁️ 已從雲端同步');
