@@ -2584,6 +2584,7 @@ function save(){
   const _ub=document.getElementById('undoBtn');if(_ub)_ub.disabled=undoStack.length<=1;
   const _rb=document.getElementById('redoBtn');if(_rb)_rb.disabled=true;
   checkBkWarn();
+  schedulePush(); // 自動同步到雲端
 }
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
 
