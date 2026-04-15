@@ -5727,7 +5727,7 @@
     },
     {
       "id": "mnsltbcpgqc1",
-      "date": "2026-04-10",
+      "date": "2026-04-21",
       "custId": "mnmofk0wcsf4",
       "custName": "河川企業社",
       "contact": "張河川先生",
@@ -5760,8 +5760,7 @@
         }
       ],
       "paid": false,
-      "paidDate": "2026-04-10",
-      "createdAt": "2026-04-10T07:48:16.441Z"
+      "paidDate": "2026-04-21"
     }
   ],
   "customers": [
@@ -6075,5 +6074,5 @@
     "bankCode": "013",
     "bankAccount": "061506186489"
   },
-  "_ts": 1776244693544
+  "_ts": 1776245345149
 }
