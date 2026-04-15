@@ -2711,38 +2711,44 @@ async function loadPrices(){
 }
 
 async function fetchPrice(code){
-  if(!/^\d+[A-Za-z]?$/.test(code))return null;
+  if(!/^[\dA-Za-z]+$/.test(code))return null;
+  try{
+    // 先用 Cloudflare Worker 即時抓
+    const r=await fetch(CF_WORKER+'/price?code='+code+'&t='+Date.now());
+    if(r.ok){
+      const d=await r.json();
+      if(d.price){return {price:d.price,change:d.change||0,changePct:d.changePct||0,ts:Date.now()};}
+    }
+  }catch(e){console.warn('即時股價失敗，改用 prices.json:',e.message);}
+  // 備用：從 prices.json
   await loadPrices();
   return _pm[code.toUpperCase()]?{..._pm[code.toUpperCase()],ts:Date.now()}:null;
 }
 
 async function refreshPrices(){
-  document.getElementById('pstat').innerHTML='<span class="spin"></span> 更新中...';
-  _pmTime=0;
-  await loadPrices();
-  
-  const totalLoaded=Object.keys(_pm).length;
-  // Only fetch prices for stocks with remaining inventory
+  document.getElementById('pstat').innerHTML='<span class="spin"></span> 即時更新中...';
   const activeCodes=[...new Set(db.investments
     .filter(inv=>calcInv(inv).tLots>0)
     .map(i=>i.code))];
+  // 同時也抓觀察股
+  const watchCodes=(db.watchlist||[]).map(w=>w.code);
+  const allCodes=[...new Set([...activeCodes,...watchCodes])];
   const found=[], notFound=[];
-  
-  await Promise.all(activeCodes.map(async c=>{
+
+  await Promise.all(allCodes.map(async c=>{
     const p=await fetchPrice(c);
     if(p){db.prices[c]=p;found.push(c+':$'+p.price);}
     else notFound.push(c);
   }));
-  
-  localStorage.setItem(STORE,JSON.stringify(db));render();
+
+  save();render();
+  if(healthOpen)renderHealth();
+  if(watchOpen)renderWatchlist();
   const n=new Date();
-  
-  // Show debug info
-  let msg=`prices.json: ${totalLoaded}支股票`;
-  if(found.length) msg+=` | 找到: ${found.join(', ')}`;
-  if(notFound.length) msg+=` | 找不到: ${notFound.join(', ')}`;
-  
-  document.getElementById('pstat').innerHTML=`<span class="dot"></span>${n.toLocaleTimeString('zh-TW')} ${msg}`;
+  let msg='即時股價已更新';
+  if(found.length)msg+=' | '+found.join(', ');
+  if(notFound.length)msg+=' | 找不到:'+notFound.join(',');
+  document.getElementById('pstat').innerHTML='<span class="dot"></span>'+n.toLocaleTimeString('zh-TW')+' '+msg;
 }
 
 // ═══════ TICKER ═══════
