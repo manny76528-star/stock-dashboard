@@ -376,6 +376,14 @@
       "cash": 600000,
       "d1": 0,
       "d2": 0
+    },
+    {
+      "id": "mo1at1t4mrw",
+      "bank": "凱基銀行",
+      "cash": 160000,
+      "d1Date": "",
+      "d1": 0,
+      "d2": 0
     }
   ],
   "prices": {
@@ -628,7 +636,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1776332967327,
+  "_ts": 1776333006882,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
