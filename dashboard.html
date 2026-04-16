@@ -1594,7 +1594,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
   font-size:10px;color:#2563eb;font-family:'Noto Sans TC',sans-serif;
 }
 </style>
-<div class="bkwarn" id="bkwarn">⚠️ 距上次備份已超過 3 天，請記得備份！<button class="act-btn" style="margin-left:auto" onclick="exportData()">📤 立即備份</button></div>
+<div class="bkwarn" id="bkwarn" style="display:none"></div>
 
 
 
@@ -2612,9 +2612,7 @@ function redoLast(){
 
 // ═══════ BACKUP ═══════
 function checkBkWarn(){
-  const last=parseInt(localStorage.getItem('lastBk')||'0');
-  const days=(Date.now()-last)/86400000;
-  document.getElementById('bkwarn').classList.toggle('show',last>0&&days>3);
+  // 備份提醒已關閉
 }
 function exportData(){
   const now=new Date();
@@ -2867,7 +2865,10 @@ function calcInv(inv){
   const cp=db.prices[inv.code];
   const curPrice=cp?cp.price:null;
   const mktVal=curPrice?tLots*1000*curPrice:null;
-  const pnl=mktVal!==null?mktVal-tCost:null;
+  // 未實現損益 = 市值 - 成本 - 預估賣出費用（手續費+證交稅）
+  const sellFeeRate=0.001425*0.28+0.003; // 手續費2.8折 + 證交稅0.3%
+  const estSellFee=mktVal!==null?Math.round(mktVal*sellFeeRate):0;
+  const pnl=mktVal!==null?mktVal-tCost-estSellFee:null;
   const pnlPct=tCost>0&&pnl!==null?pnl/tCost*100:null;
   const _td=new Date().toISOString().split('T')[0];
   const divTot=(db.dividends||[])
@@ -4083,15 +4084,15 @@ function isTradeDay(dateStr){
   return true;
 }
 function nextTradeDay(dateStr,n=1){
-  // 往後找 n 個交易日
-  let d=new Date(dateStr+'T00:00:00');
+  // 從隔天開始往後找 n 個交易日
+  let d=new Date(dateStr+'T12:00:00');
   let count=0;
   while(count<n){
     d.setDate(d.getDate()+1);
-    const ds=d.toISOString().split('T')[0];
-    if(isTradeDay(ds))count++;
+    const dow=d.getDay();
+    if(dow!==0&&dow!==6)count++; // 跳過週末
   }
-  return d.toISOString().split('T')[0];
+  return d.toISOString().slice(0,10);
 }
 function getSettleDate(tradeDate){
   // T+2 交易日
