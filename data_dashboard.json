@@ -628,17 +628,18 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1776334285120,
+  "_ts": 1776334292131,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
       "code": "00997A",
-      "name": "",
-      "reason": "TEST",
+      "name": "主動群益美國增長",
+      "reason": "台股估值過高 股價淨值比(P/B)回到3.5倍的歷史新高，價格並不便宜\n美股道瓊、標普500、納斯達克今年表現相對落後，且本益比低於20倍，相較台股更具吸引力",
       "target": 10,
       "alertDir": "below",
       "priority": "高",
-      "addedDate": "2026-04-15"
+      "url": "https://www.wantgoo.com/stock/etf/00997a/dividend-policy/ex-dividend",
+      "addedDate": "2026-04-16"
     }
   ],
   "journals": [
