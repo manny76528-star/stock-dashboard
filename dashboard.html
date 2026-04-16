@@ -3779,7 +3779,15 @@ function saveInv(){
       holdType:holdTypeE,targetRoi:targetRoiE});
     if(!hasTxns){inv.lots=lots;inv.avgPrice=avg;} // 只有無交易記錄時才更新初始張數
   }else{
-    if(db.investments.find(i=>i.code===code))return toast(code+' 已存在');
+    const existInv=db.investments.find(i=>i.code===code);
+    if(existInv){
+      if(calcInv(existInv).tLots>0)return toast(code+' 已存在，目前仍有持倉');
+      // 已售完但記錄存在 → 直接開啟買入 Modal 讓用戶加倉
+      closeModal('invModal');
+      toast('ℹ️ '+code+' 已有歷史記錄，直接開啟買入');
+      setTimeout(()=>openBuyModal(existInv.id),300);
+      return;
+    }
     const noteSel2=document.getElementById('i-note-sel').value;
     const noteVal2=noteSel2==='__custom__'?document.getElementById('i-note').value.trim():noteSel2===''?'':noteSel2;
     const maxOrder=db.investments.reduce((m,x)=>Math.max(m,x.order||0),0);
