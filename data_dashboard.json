@@ -636,19 +636,8 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1776333546088,
-  "watchlist": [
-    {
-      "id": "mnzvrjngm5e",
-      "code": "00997A",
-      "name": "",
-      "reason": "TEST",
-      "target": 10,
-      "alertDir": "below",
-      "priority": "高",
-      "addedDate": "2026-04-15"
-    }
-  ],
+  "_ts": 1776333583204,
+  "watchlist": [],
   "journals": [
     {
       "id": "mnzuqffpvo6",
