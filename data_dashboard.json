@@ -257,7 +257,7 @@
       "avgPrice": 15.37,
       "divPerShare": 0,
       "note": "現股",
-      "url": "",
+      "url": "https://www.wantgoo.com/stock/etf/00988A/dividend-policy/ex-dividend",
       "holdType": "short",
       "targetRoi": 5,
       "transactions": [
@@ -413,7 +413,7 @@
       "price": 15.48,
       "change": -0.07,
       "changePct": -0.45,
-      "ts": 1776321499618
+      "ts": 1776321559743
     },
     "00996A": {
       "price": 9.87,
@@ -628,7 +628,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1776321529648,
+  "_ts": 1776321562478,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
