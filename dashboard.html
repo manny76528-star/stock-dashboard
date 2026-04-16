@@ -1915,6 +1915,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
         </select>
       </div>
     </div>
+    <div class="fg"><label class="fl">外部連結（選填）</label><input class="fi" id="w-url" placeholder="例：https://www.wantgoo.com/stock/etf/00997a"></div>
     <div class="fg"><label class="fl">優先等級</label>
       <div style="display:flex;gap:8px">
         <button type="button" class="priority-btn" data-p="高" onclick="selectPriority(this)">🔴 高</button>
@@ -4946,7 +4947,40 @@ function runDailyProcess(force){
     if(divChanged)localStorage.setItem(DIV_DONE,'1');
   }
 
-  // 2. 信貸自動扣款
+  // 2. DAY1/DAY2 交割自動連動
+  (db.cashAccounts||[]).forEach(acc=>{
+    // DAY1：交割日到了 → 加/扣到現金，清空 d1
+    if(acc.d1&&acc.d1!==0&&acc.d1Date){
+      const settleDate=getSettleDate(acc.d1Date);
+      if(settleDate<=todayStr){
+        const D1_KEY='d1_settled_'+acc.id+'_'+settleDate;
+        if(force||!localStorage.getItem(D1_KEY)){
+          acc.cash=(acc.cash||0)+Math.round(acc.d1);
+          msgs.push('📋 交割 '+acc.bank+' DAY1 '+(acc.d1>0?'+':'')+Math.round(acc.d1).toLocaleString());
+          acc.d1=0;
+          acc.d1Date='';
+          localStorage.setItem(D1_KEY,'1');
+          changed=true;
+        }
+      }
+    }
+    // DAY2：T+3 到了 → 加/扣到現金，清空 d2
+    if(acc.d2&&acc.d2!==0&&acc.d1Date){
+      const settleDate2=nextTradeDay(acc.d1Date,3);
+      if(settleDate2<=todayStr){
+        const D2_KEY='d2_settled_'+acc.id+'_'+settleDate2;
+        if(force||!localStorage.getItem(D2_KEY)){
+          acc.cash=(acc.cash||0)+Math.round(acc.d2);
+          msgs.push('📋 交割 '+acc.bank+' DAY2 '+(acc.d2>0?'+':'')+Math.round(acc.d2).toLocaleString());
+          acc.d2=0;
+          localStorage.setItem(D2_KEY,'1');
+          changed=true;
+        }
+      }
+    }
+  });
+
+  // 3. 信貸自動扣款
   (db.loans||[]).forEach(l=>{
     const deductDay=parseInt(l.deductDay)||0;
     if(deductDay!==todayDay)return;
@@ -5227,6 +5261,7 @@ function openWatchModal(id=null){
   document.getElementById('w-reason').value=w?.reason||'';
   document.getElementById('w-target').value=w?.target||'';
   document.getElementById('w-alert-dir').value=w?.alertDir||'below';
+  const wUrlEl=document.getElementById('w-url');if(wUrlEl)wUrlEl.value=w?.url||'';
   document.querySelectorAll('.priority-btn').forEach(b=>{
     b.classList.toggle('active',b.dataset.p===(w?.priority||'中'));
   });
@@ -5247,6 +5282,7 @@ function saveWatch(){
     target:parseFloat(document.getElementById('w-target').value)||null,
     alertDir:document.getElementById('w-alert-dir').value,
     priority,
+    url:document.getElementById('w-url')?.value.trim()||'',
     addedDate:new Date().toISOString().split('T')[0]
   };
   if(!db.watchlist)db.watchlist=[];
@@ -5305,7 +5341,7 @@ function renderWatchlist(){
     return '<div class="watch-card">'
       +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">'
       +'<div>'
-      +'<span style="font-size:16px;font-weight:800;color:var(--accent)">'+w.code+'</span>'
+      +(w.url?'<a href="'+w.url+'" target="_blank" style="font-size:16px;font-weight:800;color:var(--accent);text-decoration:none" onclick="event.stopPropagation()">'+w.code+'</a>':'<span style="font-size:16px;font-weight:800;color:var(--accent)">'+w.code+'</span>')
       +(w.name?'<span style="font-size:11px;color:var(--muted);margin-left:6px">'+w.name+'</span>':'')
       +'<span style="display:inline-block;margin-left:8px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;background:'+priorityBg[w.priority||'中']+';color:'+priorityColor[w.priority||'中']+'">'+( w.priority||'中')+'</span>'
       +'</div>'
