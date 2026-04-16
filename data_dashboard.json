@@ -337,9 +337,9 @@
       "name": "永豐銀行",
       "rate": 2.89,
       "limit": 3000000,
-      "used": 2379820,
-      "remain": 620180,
-      "monthly": 5731,
+      "used": 2979820,
+      "remain": 20180,
+      "monthly": 7176,
       "note": "每個月自動扣除利息 要注意餘額"
     },
     {
@@ -376,14 +376,6 @@
       "cash": 600000,
       "d1": 0,
       "d2": 0
-    },
-    {
-      "id": "mo1at1t4mrw",
-      "bank": "凱基銀行",
-      "cash": 160000,
-      "d1Date": "",
-      "d1": 0,
-      "d2": 0
     }
   ],
   "prices": {
@@ -403,7 +395,7 @@
       "price": 10.23,
       "change": -0.02,
       "changePct": -0.2,
-      "ts": 1776333599444
+      "ts": 1776334104882
     },
     "00950B": {
       "price": 14.22,
@@ -412,16 +404,16 @@
       "ts": 1775098699349
     },
     "00981D": {
-      "price": 10.43,
+      "price": 10.44,
       "change": 0,
       "changePct": 0,
-      "ts": 1776333604088
+      "ts": 1776334106128
     },
     "00988A": {
       "price": 15.48,
       "change": -0.07,
       "changePct": -0.45,
-      "ts": 1776333599382
+      "ts": 1776334104892
     },
     "00996A": {
       "price": 9.87,
@@ -430,10 +422,10 @@
       "ts": 1775717884438
     },
     "00864B": {
-      "price": 46.31,
-      "change": 0.01,
-      "changePct": 0.02,
-      "ts": 1776333604778
+      "price": 46.17,
+      "change": 0,
+      "changePct": 0,
+      "ts": 1776334106071
     },
     "00933B": {
       "price": 16.08,
@@ -451,7 +443,7 @@
       "price": 10.38,
       "change": -0.11,
       "changePct": -1.05,
-      "ts": 1776333599408
+      "ts": 1776334104885
     }
   },
   "dividends": [
@@ -636,18 +628,17 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1776334082256,
+  "_ts": 1776334109138,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
       "code": "00997A",
-      "name": "主動群益美國增長",
-      "reason": "台股估值淨值比(P/B)回到3.5倍的歷史新高，價格並不便宜\n美股道瓊、標普500、納斯達克今年表現相對落後，且本益比低於20倍，相較台股更具吸引力",
+      "name": "",
+      "reason": "TEST",
       "target": 10,
       "alertDir": "below",
       "priority": "高",
-      "url": "https://www.wantgoo.com/stock/etf/00997a/dividend-policy/ex-dividend",
-      "addedDate": "2026-04-16"
+      "addedDate": "2026-04-15"
     }
   ],
   "journals": [
