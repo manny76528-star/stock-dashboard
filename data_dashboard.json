@@ -248,6 +248,30 @@
       "order": 7,
       "holdType": "long",
       "targetRoi": 5
+    },
+    {
+      "id": "mo0uor25iej",
+      "code": "00988A",
+      "name": "主動統一全球創新",
+      "lots": 10,
+      "avgPrice": 15.37,
+      "divPerShare": 0,
+      "note": "現股",
+      "url": "",
+      "holdType": "short",
+      "targetRoi": 5,
+      "transactions": [
+        {
+          "id": "mo0uor250ti",
+          "type": "buy",
+          "lots": 10,
+          "price": 15.37,
+          "date": "2026-04-16",
+          "fee": 0,
+          "remark": "台股美股都創新高，但00988A連續兩天下跌 主要是記憶體族群影響 先健倉分批買進"
+        }
+      ],
+      "order": 8
     }
   ],
   "loans": [
@@ -385,10 +409,10 @@
       "ts": 1776305901441
     },
     "00988A": {
-      "price": 11.85,
-      "change": -0.69,
-      "changePct": -5.5,
-      "ts": 1775098699349
+      "price": 15.67,
+      "change": 0.84,
+      "changePct": 5.66,
+      "ts": 1776305929876
     },
     "00996A": {
       "price": 9.87,
@@ -603,7 +627,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1776305904539,
+  "_ts": 1776305932470,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
