@@ -281,8 +281,8 @@
       "rate": 3.28,
       "amount": 800000,
       "start": "2024-05-13",
-      "due": "2028-06-13",
-      "monthly": 17467,
+      "due": "2028-05-13",
+      "monthly": 17807,
       "deductDay": "13號",
       "deductBank": "Line Bank"
     },
@@ -337,9 +337,9 @@
       "name": "永豐銀行",
       "rate": 2.89,
       "limit": 3000000,
-      "used": 2979820,
-      "remain": 20180,
-      "monthly": 7176,
+      "used": 2379820,
+      "remain": 620180,
+      "monthly": 5731,
       "note": "每個月自動扣除利息 要注意餘額"
     },
     {
@@ -365,7 +365,7 @@
     {
       "id": "mneeom9dzod",
       "bank": "統一券商",
-      "cash": 5446,
+      "cash": 165446,
       "d1Date": "2026-04-16",
       "d1": -153761,
       "d2": 0
@@ -395,7 +395,7 @@
       "price": 10.23,
       "change": -0.02,
       "changePct": -0.2,
-      "ts": 1776334745617
+      "ts": 1776334815124
     },
     "00950B": {
       "price": 14.22,
@@ -407,13 +407,13 @@
       "price": 10.43,
       "change": 0,
       "changePct": 0,
-      "ts": 1776334746510
+      "ts": 1776334820656
     },
     "00988A": {
       "price": 15.48,
       "change": -0.07,
       "changePct": -0.45,
-      "ts": 1776334745626
+      "ts": 1776334815124
     },
     "00996A": {
       "price": 9.87,
@@ -422,10 +422,10 @@
       "ts": 1775717884438
     },
     "00864B": {
-      "price": 46.17,
-      "change": 0,
-      "changePct": 0,
-      "ts": 1776334746555
+      "price": 46.31,
+      "change": 0.01,
+      "changePct": 0.02,
+      "ts": 1776334820353
     },
     "00933B": {
       "price": 16.08,
@@ -443,7 +443,7 @@
       "price": 10.38,
       "change": -0.11,
       "changePct": -1.05,
-      "ts": 1776334745564
+      "ts": 1776334815124
     }
   },
   "dividends": [
@@ -628,17 +628,18 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1776334783349,
+  "_ts": 1776334823659,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
       "code": "00997A",
-      "name": "",
-      "reason": "TEST",
+      "name": "主動群益美國增長",
+      "reason": "台股估值過高 股價淨值比(P/B)回到3.5倍的歷史新高，價格並不便宜\n美股道瓊、標普500、納斯達克今年表現相對落後，且本益比低於20倍，相較台股更具吸引力",
       "target": 10,
       "alertDir": "below",
       "priority": "高",
-      "addedDate": "2026-04-15"
+      "url": "https://www.wantgoo.com/stock/etf/00997a/dividend-policy/ex-dividend",
+      "addedDate": "2026-04-16"
     }
   ],
   "journals": [
