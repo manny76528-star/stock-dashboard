@@ -4899,13 +4899,36 @@ undoStack=[JSON.stringify(db)];
 // 啟動時直接 render（不自動 Pull 避免覆蓋本地資料）
 render();
 checkBkWarn();
-refreshPrices();
-// 啟動後 3 秒 Pull（給頁面載入時間）
+// 啟動時先強制 Pull，確保拿到最新雲端資料後才開始
+_syncEnabled=false; // 先停用 Push，等 Pull 完再開
 setTimeout(async()=>{
-  if(!_syncEnabled)return;
-  const updated=await ghPull();
-  if(updated){render();showSyncStatus('☁️ 已從雲端同步');}
-},3000);
+  try{
+    const r=await fetch(GH_API+'?t='+Date.now());
+    if(r.ok){
+      const j=await r.json();
+      _ghSha=j.sha;
+      const b64=j.content.replace(/\n/g,'');
+      const binStr=atob(b64);
+      const bytes=new Uint8Array(binStr.length);
+      for(let i=0;i<binStr.length;i++)bytes[i]=binStr.charCodeAt(i);
+      const remote=JSON.parse(new TextDecoder().decode(bytes));
+      const remoteTs=remote._ts||0;
+      const localTs=db._ts||0;
+      console.log('啟動Pull: 本地ts='+localTs+' 遠端ts='+remoteTs);
+      if(remoteTs>=localTs){
+        // 雲端較新或一樣 → 用雲端（保護journals/watchlist）
+        if((db.journals||[]).length>(remote.journals||[]).length)remote.journals=db.journals;
+        if((db.watchlist||[]).length>(remote.watchlist||[]).length)remote.watchlist=db.watchlist;
+        db=remote;
+        localStorage.setItem(STORE,JSON.stringify(db));
+        render();
+        showSyncStatus('☁️ 已從雲端同步');
+      }
+    }
+  }catch(e){console.warn('啟動Pull失敗:',e.message);}
+  _syncEnabled=true; // Pull 完才允許 Push
+  refreshPrices();
+},1500);
 
 // 每 5 分鐘自動 Pull 一次（手機長時間開著也能更新）
 setInterval(async()=>{
@@ -4914,12 +4937,34 @@ setInterval(async()=>{
   if(updated){render();showSyncStatus('☁️ 已從雲端同步');}
 },5*60*1000);
 
-// 頁面重新顯示時（從背景切回來）也 Pull
+// 頁面重新顯示時（從背景切回來）強制 Pull
 document.addEventListener('visibilitychange',async function(){
   if(document.visibilityState==='visible'){
     if(!_syncEnabled)return;
-    const updated=await ghPull();
-    if(updated){render();showSyncStatus('☁️ 已從雲端同步');}
+    _syncEnabled=false;
+    try{
+      const r=await fetch(GH_API+'?t='+Date.now());
+      if(r.ok){
+        const j=await r.json();
+        _ghSha=j.sha;
+        const b64=j.content.replace(/\n/g,'');
+        const binStr=atob(b64);
+        const bytes=new Uint8Array(binStr.length);
+        for(let i=0;i<binStr.length;i++)bytes[i]=binStr.charCodeAt(i);
+        const remote=JSON.parse(new TextDecoder().decode(bytes));
+        const remoteTs=remote._ts||0;
+        const localTs=db._ts||0;
+        if(remoteTs>=localTs){
+          if((db.journals||[]).length>(remote.journals||[]).length)remote.journals=db.journals;
+          if((db.watchlist||[]).length>(remote.watchlist||[]).length)remote.watchlist=db.watchlist;
+          db=remote;
+          localStorage.setItem(STORE,JSON.stringify(db));
+          render();
+          showSyncStatus('☁️ 已從雲端同步');
+        }
+      }
+    }catch(e){console.warn('visibilitychange Pull失敗:',e.message);}
+    _syncEnabled=true;
   }
 });
 // ── 每日自動連動（股息入帳 + 信貸扣款）──
