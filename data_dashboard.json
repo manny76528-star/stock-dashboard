@@ -281,8 +281,8 @@
       "rate": 3.28,
       "amount": 800000,
       "start": "2024-05-13",
-      "due": "2028-06-13",
-      "monthly": 17467,
+      "due": "2028-05-13",
+      "monthly": 17807,
       "deductDay": "13號",
       "deductBank": "Line Bank"
     },
@@ -628,7 +628,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1776334572874,
+  "_ts": 1776334616566,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
