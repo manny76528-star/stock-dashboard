@@ -5130,7 +5130,32 @@ function runDailyProcess(force){
     }
   });
 
-  // 3. 信貸自動扣款
+  // 3. B/C 帳戶每月1號自動累加
+  if(todayDay===1){
+    const FP_BC_KEY='fp_bc_added_'+todayStr.slice(0,7);
+    if(force||!localStorage.getItem(FP_BC_KEY)){
+      if(!db.finPlan)db.finPlan={};
+      let fpChanged=false;
+      // B 富邦：加每月定額
+      if(db.finPlan.bMonthly){
+        db.finPlan.bNow=(db.finPlan.bNow||0)+db.finPlan.bMonthly;
+        msgs.push('📈 富邦定額 +$'+(db.finPlan.bMonthly).toLocaleString()+' → $'+Math.round(db.finPlan.bNow).toLocaleString());
+        fpChanged=true;
+      }
+      // C 凱基：加每月利息
+      if(db.finPlan.cMonthly){
+        db.finPlan.cNow=(db.finPlan.cNow||0)+db.finPlan.cMonthly;
+        msgs.push('💰 凱基利息 +$'+(db.finPlan.cMonthly).toLocaleString()+' → $'+Math.round(db.finPlan.cNow).toLocaleString());
+        fpChanged=true;
+      }
+      if(fpChanged){
+        localStorage.setItem(FP_BC_KEY,'1');
+        changed=true;
+      }
+    }
+  }
+
+  // 4. 信貸自動扣款
   (db.loans||[]).forEach(l=>{
     const deductDay=parseInt(l.deductDay)||0;
     if(deductDay!==todayDay)return;
@@ -5405,7 +5430,7 @@ function initFinPlan(){
   sv('fp-a-save',s.aSave||25000);
   sc('fp-a-div-chk',s.aDivChk);
   sc('fp-a-save-chk',s.aSaveChk);
-  sv('fp-b-now',s.bNow||0);
+  sv('fp-b-now',s.bNow||0); // 載入時顯示最新累積金額
   sv('fp-b-monthly',s.bMonthly||16000);
   sv('fp-b-monthly2',s.bMonthly2||16000);
   sv('fp-b-rate',s.bRate||5);
