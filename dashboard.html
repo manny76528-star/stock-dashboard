@@ -2036,6 +2036,24 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
         </div>
       </div>
 
+      <!-- 目標設定 -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+        <div style="display:flex;align-items:center;gap:8px;background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:10px 12px">
+          <span style="font-size:12px;font-weight:700;color:#2563eb;white-space:nowrap">第一目標年份</span>
+          <input type="number" id="fp-year2029" placeholder="2029" style="width:70px;padding:4px 6px;border:1px solid var(--border);border-radius:6px;font-size:12px;text-align:center" oninput="calcFinPlan()">
+          <span style="font-size:12px;color:#64748b;white-space:nowrap">目標金額</span>
+          <input type="number" id="fp-target2029" placeholder="660" style="width:70px;padding:4px 6px;border:1px solid var(--border);border-radius:6px;font-size:12px;text-align:center" oninput="calcFinPlan()">
+          <span style="font-size:12px;color:#64748b">萬</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:10px 12px">
+          <span style="font-size:12px;font-weight:700;color:#db2777;white-space:nowrap">第二目標年份</span>
+          <input type="number" id="fp-year2032" placeholder="2032" style="width:70px;padding:4px 6px;border:1px solid var(--border);border-radius:6px;font-size:12px;text-align:center" oninput="calcFinPlan()">
+          <span style="font-size:12px;color:#64748b;white-space:nowrap">目標金額</span>
+          <input type="number" id="fp-target2032" placeholder="930" style="width:70px;padding:4px 6px;border:1px solid var(--border);border-radius:6px;font-size:12px;text-align:center" oninput="calcFinPlan()">
+          <span style="font-size:12px;color:#64748b">萬</span>
+        </div>
+      </div>
+
       <!-- 結果 -->
       <div id="finplan-result"></div>
 
@@ -5395,6 +5413,10 @@ function initFinPlan(){
   sv('fp-c-monthly',s.cMonthly||10000);
   sv('fp-c-annual',s.cAnnual||80000);
   sv('fp-c-rate',s.cRate||5);
+  sv('fp-year2029',s.year2029||2029);
+  sv('fp-target2029',s.target2029||660);
+  sv('fp-year2032',s.year2032||2032);
+  sv('fp-target2032',s.target2032||930);
 
   calcFinPlan();
 }
@@ -5426,7 +5448,7 @@ function calcFinPlan(){
 
   // ── A 帳戶計算 ──
   // 2029：信貸清零，淨資產 = 現在總資產（股票+現金）- 0負債 ≈ 總資產
-  const a2029=totalAssetNow; // 假設股票市值不變，只是負債清零
+  const a2029=netNow+loanR; // 2029：淨資產 + 信貸清零 = 目前淨資產 + 信貸餘額
   // 2029-2032：配息+自提每月滾入
   const aMonthly2=(s.aDivChk?s.aDiv:0)+(s.aSaveChk?s.aSave:0);
   const a2032=a2029+aMonthly2*36;
@@ -5454,8 +5476,8 @@ function calcFinPlan(){
 
   const total2029=a2029+b2029+c2029;
   const total2032=a2032+b2032+c2032;
-  const target2029=6600000;
-  const target2032=9300000;
+  const target2029=(parseFloat(document.getElementById('fp-target2029')?.value)||660)*10000;
+  const target2032=(parseFloat(document.getElementById('fp-target2032')?.value)||930)*10000;
 
   // 進度條
   const prog2029=Math.min(100,Math.round(netNow/target2029*100));
@@ -5474,7 +5496,7 @@ function calcFinPlan(){
 
     // 2029 目標
     '<div style="border:1px solid var(--border);border-radius:10px;padding:14px;background:#eff6ff">'+
-    '<div style="font-size:12px;font-weight:700;color:#2563eb;margin-bottom:8px">📅 2029/4/17 目標</div>'+
+    '<div style="font-size:12px;font-weight:700;color:#2563eb;margin-bottom:8px">📅 2029 目標</div>'+
     '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">'+
     '<div style="text-align:center"><div style="font-size:10px;color:#64748b">A 統一</div><div style="font-size:14px;font-weight:700;color:#1e293b">'+fmtN(a2029)+'</div></div>'+
     '<div style="text-align:center"><div style="font-size:10px;color:#64748b">B 富邦</div><div style="font-size:14px;font-weight:700;color:#1e293b">'+fmtN(b2029)+'</div></div>'+
@@ -5482,7 +5504,7 @@ function calcFinPlan(){
     '</div>'+
     '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">'+
     '<span style="font-size:13px;font-weight:700;color:#2563eb">預估合計：'+fmtN(total2029)+'</span>'+
-    '<span style="font-size:12px;color:#64748b">目標：660萬</span>'+
+    '<span style="font-size:12px;color:#64748b">目標：'+(document.getElementById('fp-target2029')?.value||660)+'萬</span>'+
     '</div>'+
     '<div style="height:10px;background:#dbeafe;border-radius:5px;overflow:hidden">'+
     '<div style="height:10px;background:#2563eb;width:'+prog2029+'%;border-radius:5px;transition:width .6s"></div>'+
@@ -5491,19 +5513,19 @@ function calcFinPlan(){
     '</div>'+
 
     // 2032 目標
-    '<div style="border:1px solid var(--border);border-radius:10px;padding:14px;background:#f0fdf4">'+
-    '<div style="font-size:12px;font-weight:700;color:#16a34a;margin-bottom:8px">📅 2032/4/17 目標</div>'+
+    '<div style="border:1px solid var(--border);border-radius:10px;padding:14px;background:#fdf2f8">'+
+    '<div style="font-size:12px;font-weight:700;color:#db2777;margin-bottom:8px">📅 2032 目標</div>'+
     '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">'+
     '<div style="text-align:center"><div style="font-size:10px;color:#64748b">A 統一</div><div style="font-size:14px;font-weight:700;color:#1e293b">'+fmtN(a2032)+'</div></div>'+
     '<div style="text-align:center"><div style="font-size:10px;color:#64748b">B 富邦</div><div style="font-size:14px;font-weight:700;color:#1e293b">'+fmtN(b2032)+'</div></div>'+
     '<div style="text-align:center"><div style="font-size:10px;color:#64748b">C 凱基</div><div style="font-size:14px;font-weight:700;color:#1e293b">'+fmtN(c2032)+'</div></div>'+
     '</div>'+
     '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">'+
-    '<span style="font-size:13px;font-weight:700;color:#16a34a">預估合計：'+fmtN(total2032)+'</span>'+
-    '<span style="font-size:12px;color:#64748b">目標：930萬</span>'+
+    '<span style="font-size:13px;font-weight:700;color:#db2777">預估合計：'+fmtN(total2032)+'</span>'+
+    '<span style="font-size:12px;color:#64748b">目標：'+(document.getElementById('fp-target2032')?.value||930)+'萬</span>'+
     '</div>'+
-    '<div style="height:10px;background:#dcfce7;border-radius:5px;overflow:hidden">'+
-    '<div style="height:10px;background:#16a34a;width:'+prog2032+'%;border-radius:5px;transition:width .6s"></div>'+
+    '<div style="height:10px;background:#fce7f3;border-radius:5px;overflow:hidden">'+
+    '<div style="height:10px;background:#db2777;width:'+prog2032+'%;border-radius:5px;transition:width .6s"></div>'+
     '</div>'+
     '<div style="font-size:11px;color:#64748b;margin-top:4px">目前進度 '+prog2032+'%（淨資產 '+fmtN(netNow)+'）</div>'+
     '</div>'+
