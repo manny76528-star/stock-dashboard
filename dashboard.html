@@ -2024,6 +2024,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
     <div class="fg">
       <label class="fl">🌐 大盤環境 / 重大新聞</label>
       <textarea class="fi" id="j-market" rows="3" placeholder="今日大盤走勢、重要新聞、總體經濟事件..." style="resize:vertical"></textarea>
+      <input class="fi" id="j-market-url" placeholder="🔗 新聞連結（選填，可點擊回看原文）" style="margin-top:6px">
     </div>
     <!-- 心態情緒 -->
     <div class="fg">
@@ -5746,6 +5747,7 @@ function openJournalModal(id=null){
   document.getElementById('journal-modal-title').textContent=id?'✏️ 編輯日誌':'📓 新增交易日誌';
   document.getElementById('j-date').value=j?.date||new Date().toISOString().split('T')[0];
   document.getElementById('j-market').value=j?.market||'';
+  const jmUrlEl=document.getElementById('j-market-url');if(jmUrlEl)jmUrlEl.value=j?.marketUrl||'';
   document.getElementById('j-mood').value=j?.mood||'';
   document.getElementById('j-content').value=j?.content||'';
   // 標籤
@@ -5774,6 +5776,7 @@ function saveJournal(){
     date,
     tags,
     market:document.getElementById('j-market').value.trim(),
+    marketUrl:document.getElementById('j-market-url')?.value.trim()||'',
     mood:document.getElementById('j-mood').value.trim(),
     content:document.getElementById('j-content').value.trim()
   };
@@ -5831,7 +5834,7 @@ function renderJournal(){
       +'</div>'
       +'<button data-jid="'+j.id+'" onclick="openJournalModal(this.dataset.jid)" style="background:none;border:1px solid var(--border);border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;color:#475569">✏️ 編輯</button>'
       +'</div>'
-      +(j.market?'<div style="margin-bottom:8px;padding:10px 14px;background:linear-gradient(135deg,#0f172a,#1e3a5f);border-radius:8px;border-left:4px solid #3b82f6"><div style="font-size:10px;color:rgba(255,255,255,.6);font-weight:600;letter-spacing:.5px;margin-bottom:4px">🌐 大盤環境 / 重大新聞</div><div style="font-size:15px;font-weight:800;color:#fff;line-height:1.5;white-space:pre-wrap">'+j.market+'</div></div>':'')
+      +(j.market?'<div style="margin-bottom:8px;padding:10px 14px;background:linear-gradient(135deg,#0f172a,#1e3a5f);border-radius:8px;border-left:4px solid #3b82f6"><div style="font-size:10px;color:rgba(255,255,255,.6);font-weight:600;letter-spacing:.5px;margin-bottom:4px">🌐 大盤環境 / 重大新聞'+(j.marketUrl?' <a href="'+j.marketUrl+'" target="_blank" style="color:#93c5fd;font-size:10px;margin-left:8px">🔗 查看原文</a>':'')+'</div><div style="font-size:15px;font-weight:800;color:#fff;line-height:1.5;white-space:pre-wrap">'+(j.marketUrl?'<a href="'+j.marketUrl+'" target="_blank" style="color:#fff;text-decoration:none">'+j.market+'</a>':j.market)+'</div></div>':'')
       +(j.content?'<div style="font-size:13px;color:#1e293b;line-height:1.6;white-space:pre-wrap">'+j.content+'</div>':'')
       +'</div>';
   }).join('');
