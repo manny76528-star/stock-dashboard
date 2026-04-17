@@ -5077,14 +5077,12 @@ function runDailyProcess(force){
 
 // 強制執行今日連動（提供給手動按鈕用）
 function forceDailyProcess(){
-  // 清掉今天的 key，讓它重新執行
+  // 只清掉股息的 key（可能當天沒開頁面），信貸不清（避免重複扣款）
   const todayStr=new Date().toISOString().split('T')[0];
   localStorage.removeItem('div_done_'+todayStr);
-  (db.loans||[]).forEach(l=>{
-    localStorage.removeItem('loan_deducted_'+l.id+'_'+todayStr.slice(0,7));
-  });
-  const results=runDailyProcess(true);
-  if(results.length===0)toast('今日無需執行連動（股息或扣款日不符）');
+  // 信貸的 LOAN_KEY 不清，已扣過的不會重複
+  const results=runDailyProcess(false); // false = 不強制，尊重已執行記錄
+  if(results.length===0)toast('今日無需執行連動（已全部執行過或日期不符）');
 }
 
 // 啟動時自動執行
