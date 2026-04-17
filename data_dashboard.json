@@ -652,7 +652,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1776441830837,
+  "_ts": 1776441861674,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
@@ -722,13 +722,16 @@
     "aDivChk": false,
     "aSave": 25000,
     "aSaveChk": false,
-    "bNow": 80000,
+    "bNow": 96000,
     "bMonthly": 16000,
     "bMonthly2": 16000,
     "bRate": 5,
-    "cNow": 700000,
+    "cNow": 710000,
     "cMonthly": 10000,
     "cAnnual": 80000,
     "cRate": 6
+  },
+  "_fpBcAdded": {
+    "fp_bc_added_2026-05": true
   }
 }
