@@ -5095,18 +5095,15 @@ runDailyProcess(false);
 // Auto snapshot on 1st of each month
 (function autoSnapshot(){
   const today=new Date();
-  const dow=today.getDay();    // 0=日 5=週五
+  const dow=today.getDay();
   const hour=today.getHours();
   // 週五 15:00 以後才執行
   if(dow!==5||hour<15)return;
-  const dateKey=today.toISOString().slice(0,10); // YYYY-MM-DD
-  const snapshotKey='snap_done_'+dateKey;
-  // 同一天已執行過就跳過
+  const dateKey=today.toISOString().slice(0,10);
+  const snapshotKey='snap_done_'+dateKey+'_'+hour; // 加入小時，每小時可重新記錄
   if(localStorage.getItem(snapshotKey))return;
   localStorage.setItem(snapshotKey,'1');
   if(!db.snapshots)db.snapshots=[];
-  // 趨勢圖用週 key（YYYY-WXX）
-  const ym=today.toISOString().slice(0,7); // 仍存月份 key 供趨勢圖
   setTimeout(()=>recordSnapshot(false),1500);
 })();
 // Restore custom title
