@@ -1973,6 +1973,76 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
   </div>
 </div>
 
+<!-- ═══ 財務規劃 ═══ -->
+<div style="max-width:1300px;margin:0 auto 10px">
+  <div class="trend-section">
+    <div class="trend-hdr" style="cursor:pointer" onclick="toggleFinPlan()">
+      <span>🎯 財務規劃</span>
+      <span id="finplan-arrow" style="font-size:12px">▼</span>
+    </div>
+    <div id="finplan-body" style="display:none;padding:16px">
+
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px">
+
+        <!-- A 統一證券 -->
+        <div style="border:1px solid var(--border);border-radius:10px;padding:12px;background:#f8fafc">
+          <div style="font-weight:700;color:#1e293b;font-size:13px;margin-bottom:10px">🏦 A 統一證券</div>
+          <div style="font-size:11px;color:#64748b;margin-bottom:2px">目前淨資產（自動）</div>
+          <div id="fp-a-net" style="font-size:15px;font-weight:700;color:#2563eb;margin-bottom:8px">—</div>
+          <div style="font-size:11px;color:#64748b;margin-bottom:2px">信貸餘額（自動）</div>
+          <div id="fp-a-loan" style="font-size:15px;font-weight:700;color:#dc2626;margin-bottom:8px">—</div>
+          <div style="font-size:11px;color:#94a3b8;padding:6px 8px;background:#fef3c7;border-radius:6px;margin-bottom:10px">📌 2029前：配息全數還貸，資產 = 淨資產 + 信貸清零</div>
+          <div style="border-top:1px solid var(--border);padding-top:10px">
+            <div style="font-size:11px;font-weight:700;color:#475569;margin-bottom:8px">✅ 2029清償後每月加入：</div>
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+              <input type="checkbox" id="fp-a-div-chk" onchange="calcFinPlan()">
+              <label for="fp-a-div-chk" style="font-size:12px;color:#475569;min-width:36px">配息</label>
+              <input type="number" id="fp-a-div" placeholder="25000" style="flex:1;padding:4px 6px;border:1px solid var(--border);border-radius:6px;font-size:12px" oninput="calcFinPlan()">
+              <span style="font-size:11px;color:#94a3b8">元/月</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <input type="checkbox" id="fp-a-save-chk" onchange="calcFinPlan()">
+              <label for="fp-a-save-chk" style="font-size:12px;color:#475569;min-width:36px">自提</label>
+              <input type="number" id="fp-a-save" placeholder="25000" style="flex:1;padding:4px 6px;border:1px solid var(--border);border-radius:6px;font-size:12px" oninput="calcFinPlan()">
+              <span style="font-size:11px;color:#94a3b8">元/月</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- B 富邦證券 -->
+        <div style="border:1px solid var(--border);border-radius:10px;padding:12px;background:#f8fafc">
+          <div style="font-weight:700;color:#1e293b;font-size:13px;margin-bottom:10px">📈 B 富邦證券</div>
+          <div style="font-size:11px;color:#64748b;margin-bottom:2px">目前資產（元）</div>
+          <input type="number" id="fp-b-now" placeholder="0" style="width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;margin-bottom:8px;box-sizing:border-box" oninput="calcFinPlan()">
+          <div style="font-size:11px;color:#64748b;margin-bottom:2px">每月定額投入（元）</div>
+          <input type="number" id="fp-b-monthly" placeholder="16000" style="width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;margin-bottom:8px;box-sizing:border-box" oninput="calcFinPlan()">
+          <div style="font-size:11px;color:#64748b;margin-bottom:2px">2029後每月繼續投入（元）</div>
+          <input type="number" id="fp-b-monthly2" placeholder="16000" style="width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;margin-bottom:8px;box-sizing:border-box" oninput="calcFinPlan()">
+          <div style="font-size:11px;color:#64748b;margin-bottom:2px">預估年化報酬（%）</div>
+          <input type="number" id="fp-b-rate" placeholder="5" step="0.5" style="width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;box-sizing:border-box" oninput="calcFinPlan()">
+        </div>
+
+        <!-- C 凱基證券 -->
+        <div style="border:1px solid var(--border);border-radius:10px;padding:12px;background:#f8fafc">
+          <div style="font-weight:700;color:#1e293b;font-size:13px;margin-bottom:10px">💰 C 凱基證券</div>
+          <div style="font-size:11px;color:#64748b;margin-bottom:2px">目前資產（元）</div>
+          <input type="number" id="fp-c-now" placeholder="600000" style="width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;margin-bottom:8px;box-sizing:border-box" oninput="calcFinPlan()">
+          <div style="font-size:11px;color:#64748b;margin-bottom:2px">每月利息投入（元）</div>
+          <input type="number" id="fp-c-monthly" placeholder="10000" style="width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;margin-bottom:8px;box-sizing:border-box" oninput="calcFinPlan()">
+          <div style="font-size:11px;color:#64748b;margin-bottom:2px">年底加碼（元/年）</div>
+          <input type="number" id="fp-c-annual" placeholder="80000" style="width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;margin-bottom:8px;box-sizing:border-box" oninput="calcFinPlan()">
+          <div style="font-size:11px;color:#64748b;margin-bottom:2px">預估年化報酬（%）</div>
+          <input type="number" id="fp-c-rate" placeholder="5" step="0.5" style="width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;box-sizing:border-box" oninput="calcFinPlan()">
+        </div>
+      </div>
+
+      <!-- 結果 -->
+      <div id="finplan-result"></div>
+
+    </div>
+  </div>
+</div>
+
 <!-- ═══ 交易日誌 ═══ -->
 <div style="max-width:1300px;margin:0 auto;padding:0 0 32px">
   <div class="trend-section">
@@ -5283,6 +5353,163 @@ function renderHealth(){
       +'</div>';
   }).join('');
 }
+
+// ═══ 財務規劃 ═══
+let finPlanOpen=false;
+
+function toggleFinPlan(){
+  finPlanOpen=!finPlanOpen;
+  document.getElementById('finplan-body').style.display=finPlanOpen?'block':'none';
+  document.getElementById('finplan-arrow').textContent=finPlanOpen?'▲':'▼';
+  if(finPlanOpen)initFinPlan();
+}
+
+function initFinPlan(){
+  // 自動抓淨資產和信貸餘額
+  let tC=0,tM=0;
+  db.investments.forEach(inv=>{const c=calcInv(inv);tC+=c.tCost;if(c.mktVal)tM+=c.mktVal;});
+  const loanR=db.loans.reduce((s,l)=>s+calcLoanRemain(l),0);
+  const flexR=db.flexLoans.reduce((s,f)=>s+(f.used||0),0);
+  const cT=db.cashAccounts.reduce((s,c)=>s+(c.cash||0)+(c.d1||0)+(c.d2||0),0);
+  const invVal=tM>0?tM:tC;
+  const net=invVal+cT-(loanR+flexR);
+
+  const netEl=document.getElementById('fp-a-net');
+  const loanEl=document.getElementById('fp-a-loan');
+  if(netEl)netEl.textContent='$'+Math.round(net).toLocaleString();
+  if(loanEl)loanEl.textContent='$'+Math.round(loanR).toLocaleString();
+
+  // 載入已儲存的設定
+  const s=db.finPlan||{};
+  const sv=(id,v)=>{const el=document.getElementById(id);if(el&&v!==undefined&&v!=='')el.value=v;};
+  const sc=(id,v)=>{const el=document.getElementById(id);if(el)el.checked=!!v;};
+  sv('fp-a-div',s.aDiv||25000);
+  sv('fp-a-save',s.aSave||25000);
+  sc('fp-a-div-chk',s.aDivChk);
+  sc('fp-a-save-chk',s.aSaveChk);
+  sv('fp-b-now',s.bNow||0);
+  sv('fp-b-monthly',s.bMonthly||16000);
+  sv('fp-b-monthly2',s.bMonthly2||16000);
+  sv('fp-b-rate',s.bRate||5);
+  sv('fp-c-now',s.cNow||600000);
+  sv('fp-c-monthly',s.cMonthly||10000);
+  sv('fp-c-annual',s.cAnnual||80000);
+  sv('fp-c-rate',s.cRate||5);
+
+  calcFinPlan();
+}
+
+function calcFinPlan(){
+  // 儲存設定
+  const gv=(id)=>parseFloat(document.getElementById(id)?.value)||0;
+  const gc=(id)=>document.getElementById(id)?.checked||false;
+
+  const s={
+    aDiv:gv('fp-a-div'), aDivChk:gc('fp-a-div-chk'),
+    aSave:gv('fp-a-save'), aSaveChk:gc('fp-a-save-chk'),
+    bNow:gv('fp-b-now'), bMonthly:gv('fp-b-monthly'), bMonthly2:gv('fp-b-monthly2'), bRate:gv('fp-b-rate'),
+    cNow:gv('fp-c-now'), cMonthly:gv('fp-c-monthly'), cAnnual:gv('fp-c-annual'), cRate:gv('fp-c-rate')
+  };
+  if(!db.finPlan)db.finPlan={};
+  Object.assign(db.finPlan,s);
+  save();
+
+  // 抓目前淨資產和信貸餘額
+  let tC=0,tM=0;
+  db.investments.forEach(inv=>{const c=calcInv(inv);tC+=c.tCost;if(c.mktVal)tM+=c.mktVal;});
+  const loanR=db.loans.reduce((ss,l)=>ss+calcLoanRemain(l),0);
+  const flexR=db.flexLoans.reduce((ss,f)=>ss+(f.used||0),0);
+  const cT=db.cashAccounts.reduce((ss,c)=>ss+(c.cash||0)+(c.d1||0)+(c.d2||0),0);
+  const invVal=tM>0?tM:tC;
+  const netNow=invVal+cT-(loanR+flexR);
+  const totalAssetNow=invVal+cT; // 總資產（含負債）
+
+  // ── A 帳戶計算 ──
+  // 2029：信貸清零，淨資產 = 現在總資產（股票+現金）- 0負債 ≈ 總資產
+  const a2029=totalAssetNow; // 假設股票市值不變，只是負債清零
+  // 2029-2032：配息+自提每月滾入
+  const aMonthly2=(s.aDivChk?s.aDiv:0)+(s.aSaveChk?s.aSave:0);
+  const a2032=a2029+aMonthly2*36;
+
+  // ── B 帳戶計算（複利）──
+  const bRate=s.bRate/100/12;
+  // 2026-2029（36個月）
+  let b2029=s.bNow;
+  for(let i=0;i<36;i++) b2029=b2029*(1+(s.bRate/100/12))+s.bMonthly;
+  // 2029-2032（再36個月）
+  let b2032=b2029;
+  for(let i=0;i<36;i++) b2032=b2032*(1+(s.bRate/100/12))+(s.bMonthly2||s.bMonthly);
+
+  // ── C 帳戶計算（複利）──
+  let c2029=s.cNow;
+  for(let i=0;i<36;i++){
+    c2029=c2029*(1+(s.cRate/100/12))+s.cMonthly;
+    if(i%12===11) c2029+=s.cAnnual;
+  }
+  let c2032=c2029;
+  for(let i=0;i<36;i++){
+    c2032=c2032*(1+(s.cRate/100/12))+s.cMonthly;
+    if(i%12===11) c2032+=s.cAnnual;
+  }
+
+  const total2029=a2029+b2029+c2029;
+  const total2032=a2032+b2032+c2032;
+  const target2029=6600000;
+  const target2032=9300000;
+
+  // 進度條
+  const prog2029=Math.min(100,Math.round(netNow/target2029*100));
+  const prog2032=Math.min(100,Math.round(netNow/target2032*100));
+
+  const fmt=v=>'$'+Math.round(v/10000)+'萬';
+  const fmtN=v=>Math.round(v/10000)+'萬';
+
+  const el=document.getElementById('finplan-result');
+  if(!el)return;
+
+  el.innerHTML=
+    // 目標進度
+    '<div style="margin-bottom:16px">'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">'+
+
+    // 2029 目標
+    '<div style="border:1px solid var(--border);border-radius:10px;padding:14px;background:#eff6ff">'+
+    '<div style="font-size:12px;font-weight:700;color:#2563eb;margin-bottom:8px">📅 2029/4/17 目標</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">'+
+    '<div style="text-align:center"><div style="font-size:10px;color:#64748b">A 統一</div><div style="font-size:14px;font-weight:700;color:#1e293b">'+fmtN(a2029)+'</div></div>'+
+    '<div style="text-align:center"><div style="font-size:10px;color:#64748b">B 富邦</div><div style="font-size:14px;font-weight:700;color:#1e293b">'+fmtN(b2029)+'</div></div>'+
+    '<div style="text-align:center"><div style="font-size:10px;color:#64748b">C 凱基</div><div style="font-size:14px;font-weight:700;color:#1e293b">'+fmtN(c2029)+'</div></div>'+
+    '</div>'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">'+
+    '<span style="font-size:13px;font-weight:700;color:#2563eb">預估合計：'+fmtN(total2029)+'</span>'+
+    '<span style="font-size:12px;color:#64748b">目標：660萬</span>'+
+    '</div>'+
+    '<div style="height:10px;background:#dbeafe;border-radius:5px;overflow:hidden">'+
+    '<div style="height:10px;background:#2563eb;width:'+prog2029+'%;border-radius:5px;transition:width .6s"></div>'+
+    '</div>'+
+    '<div style="font-size:11px;color:#64748b;margin-top:4px">目前進度 '+prog2029+'%（淨資產 '+fmtN(netNow)+'）</div>'+
+    '</div>'+
+
+    // 2032 目標
+    '<div style="border:1px solid var(--border);border-radius:10px;padding:14px;background:#f0fdf4">'+
+    '<div style="font-size:12px;font-weight:700;color:#16a34a;margin-bottom:8px">📅 2032/4/17 目標</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">'+
+    '<div style="text-align:center"><div style="font-size:10px;color:#64748b">A 統一</div><div style="font-size:14px;font-weight:700;color:#1e293b">'+fmtN(a2032)+'</div></div>'+
+    '<div style="text-align:center"><div style="font-size:10px;color:#64748b">B 富邦</div><div style="font-size:14px;font-weight:700;color:#1e293b">'+fmtN(b2032)+'</div></div>'+
+    '<div style="text-align:center"><div style="font-size:10px;color:#64748b">C 凱基</div><div style="font-size:14px;font-weight:700;color:#1e293b">'+fmtN(c2032)+'</div></div>'+
+    '</div>'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">'+
+    '<span style="font-size:13px;font-weight:700;color:#16a34a">預估合計：'+fmtN(total2032)+'</span>'+
+    '<span style="font-size:12px;color:#64748b">目標：930萬</span>'+
+    '</div>'+
+    '<div style="height:10px;background:#dcfce7;border-radius:5px;overflow:hidden">'+
+    '<div style="height:10px;background:#16a34a;width:'+prog2032+'%;border-radius:5px;transition:width .6s"></div>'+
+    '</div>'+
+    '<div style="font-size:11px;color:#64748b;margin-top:4px">目前進度 '+prog2032+'%（淨資產 '+fmtN(netNow)+'）</div>'+
+    '</div>'+
+    '</div></div>';
+}
+
 
 // ═══ 觀察股 ═══
 if(!db.watchlist)db.watchlist=[];
