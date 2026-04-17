@@ -652,7 +652,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1776440441022,
+  "_ts": 1776440450906,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
@@ -725,10 +725,10 @@
     "bNow": 200000,
     "bMonthly": 16000,
     "bMonthly2": 16000,
-    "bRate": 5,
+    "bRate": 6,
     "cNow": 600000,
     "cMonthly": 10000,
     "cAnnual": 80000,
-    "cRate": 5
+    "cRate": 6
   }
 }
