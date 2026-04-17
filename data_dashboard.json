@@ -568,15 +568,7 @@
       "pending": true
     }
   ],
-  "snapshots": [
-    {
-      "ym": "2026-04",
-      "net": 3404736,
-      "div": 72128,
-      "cf": -10410,
-      "debtRatio": 79.5
-    }
-  ],
+  "snapshots": [],
   "settings": {
     "title": "２０２６　資產損益表"
   },
@@ -652,7 +644,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1776419713873,
+  "_ts": 1776419725071,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
