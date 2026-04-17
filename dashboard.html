@@ -2703,6 +2703,7 @@ function undoLast(){
   db=JSON.parse(undoStack[undoStack.length-1]);
   localStorage.setItem(STORE,JSON.stringify(db));
   render();toast('← 已回上一步');
+  if(finPlanOpen)initFinPlan();
   const _ub2=document.getElementById('undoBtn');if(_ub2)_ub2.disabled=undoStack.length<=1;
   const _rb2=document.getElementById('redoBtn');if(_rb2)_rb2.disabled=redoStack.length===0;
 }
@@ -2713,6 +2714,7 @@ function redoLast(){
   undoStack.push(state);
   db=JSON.parse(state);
   localStorage.setItem(STORE,JSON.stringify(db));
+  if(finPlanOpen)initFinPlan();
   render();toast('→ 已回下一步');
   const _ub3=document.getElementById('undoBtn');if(_ub3)_ub3.disabled=undoStack.length<=1;
   const _rb3=document.getElementById('redoBtn');if(_rb3)_rb3.disabled=redoStack.length===0;
