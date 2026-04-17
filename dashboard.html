@@ -5013,32 +5013,30 @@ function runDailyProcess(force){
 
   // 2. DAY1/DAY2 交割自動連動
   (db.cashAccounts||[]).forEach(acc=>{
-    // DAY1：交割日到了 → 加/扣到現金，清空 d1
+    // Step 1：DAY1 交割日到了 → 扣現金，清空 d1，同時把 d2 移到 d1
     if(acc.d1&&acc.d1!==0&&acc.d1Date){
       const settleDate=getSettleDate(acc.d1Date);
       if(settleDate<=todayStr){
         const D1_KEY='d1_settled_'+acc.id+'_'+settleDate;
         if(force||!localStorage.getItem(D1_KEY)){
+          // 扣 DAY1
           acc.cash=(acc.cash||0)+Math.round(acc.d1);
           msgs.push('📋 交割 '+acc.bank+' DAY1 '+(acc.d1>0?'+':'')+Math.round(acc.d1).toLocaleString());
-          acc.d1=0;
-          acc.d1Date='';
           localStorage.setItem(D1_KEY,'1');
           changed=true;
-        }
-      }
-    }
-    // DAY2：T+3 到了 → 加/扣到現金，清空 d2
-    if(acc.d2&&acc.d2!==0&&acc.d1Date){
-      const settleDate2=nextTradeDay(acc.d1Date,3);
-      if(settleDate2<=todayStr){
-        const D2_KEY='d2_settled_'+acc.id+'_'+settleDate2;
-        if(force||!localStorage.getItem(D2_KEY)){
-          acc.cash=(acc.cash||0)+Math.round(acc.d2);
-          msgs.push('📋 交割 '+acc.bank+' DAY2 '+(acc.d2>0?'+':'')+Math.round(acc.d2).toLocaleString());
-          acc.d2=0;
-          localStorage.setItem(D2_KEY,'1');
-          changed=true;
+          // DAY2 移到 DAY1（保留 d1Date 供計算下次交割日）
+          if(acc.d2&&acc.d2!==0){
+            acc.d1=acc.d2;  // d2 移入 d1
+            // d1Date 不變（下次交割日 = 原 d1Date 的 T+3）
+            // 但要重新算：DAY2 的交割日是原買入日的 T+3
+            // 所以下次 DAY1 的交割日就是現在這個 settleDate 的下一個交割日
+            acc.d1Date=settleDate; // 用今天當新的基準，T+2後就是下次交割
+            acc.d2=0;
+            msgs.push('📋 '+acc.bank+' DAY2→DAY1 移轉 '+(acc.d1>0?'+':'')+Math.round(acc.d1).toLocaleString());
+          } else {
+            acc.d1=0;
+            acc.d1Date='';
+          }
         }
       }
     }
