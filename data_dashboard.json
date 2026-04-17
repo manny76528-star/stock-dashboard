@@ -652,7 +652,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1776442159801,
+  "_ts": 1776442163824,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
@@ -720,7 +720,7 @@
   "finPlan": {
     "aDiv": 25000,
     "aDivChk": false,
-    "aSave": 25000,
+    "aSave": 50000,
     "aSaveChk": true,
     "bNow": 80000,
     "bMonthly": 16000,
