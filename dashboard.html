@@ -3968,8 +3968,23 @@ function renderSum(){
 }
 
 // ═══════ MODALS ═══════
-function openModal(id){document.getElementById(id).classList.add('open');}
-function closeModal(id){document.getElementById(id).classList.remove('open');editId=null;}
+function openModal(id){
+  document.getElementById(id).classList.add('open');
+  // 暫時移除 sp-overlay 的 backdrop-filter，避免 stacking context 把 modal 壓在後面
+  document.querySelectorAll('.sp-overlay').forEach(el=>{
+    el.style.backdropFilter='none';
+    el.style.webkitBackdropFilter='none';
+  });
+}
+function closeModal(id){
+  document.getElementById(id).classList.remove('open');
+  editId=null;
+  // 還原 sp-overlay 的 backdrop-filter
+  document.querySelectorAll('.sp-overlay').forEach(el=>{
+    el.style.backdropFilter='';
+    el.style.webkitBackdropFilter='';
+  });
+}
 // 點 Modal 外面不關閉（避免填寫中意外關閉）
 
 // INVEST
@@ -6247,21 +6262,21 @@ function renderJournal(){
     const hasBody = j.market || j.content;
     const header =
       `<div class="j-row-hdr" onclick="toggleJCard('jc-${j.id}')" style="
-        display:flex;align-items:center;justify-content:space-between;
+        display:flex;align-items:flex-start;justify-content:space-between;gap:8px;
         background:linear-gradient(135deg,#0f172a,#1e3a5f);
         border-radius:10px;padding:11px 14px;cursor:${hasBody?'pointer':'default'};
         user-select:none;transition:background .15s;
       ">
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-          <span style="font-size:13px;font-weight:700;color:#e2e8f0;font-family:'JetBrains Mono',monospace">${j.date}</span>
+        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;flex:1;min-width:0">
+          <span style="font-size:13px;font-weight:700;color:#e2e8f0;font-family:'JetBrains Mono',monospace;white-space:nowrap">${j.date}</span>
           ${tags}
-          ${j.mood?`<span style="font-size:12px;color:rgba(255,255,255,.65)">${j.mood}</span>`:''}
-          ${j.market?`<span style="font-size:12px;color:#93c5fd;font-weight:600;white-space:pre-wrap;word-break:break-word">${j.market}</span>`:''}
+          ${j.mood?`<span style="font-size:12px;color:rgba(255,255,255,.65);white-space:nowrap">${j.mood}</span>`:''}
+          ${j.market?`<span style="font-size:12px;color:#93c5fd;font-weight:600;white-space:pre-wrap;word-break:break-word;width:100%">${j.market}</span>`:''}
         </div>
-        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;padding-top:1px">
           <button data-jid="${j.id}" onclick="event.stopPropagation();openJournalModal(this.dataset.jid)"
-            style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;color:rgba(255,255,255,.8)">✏️ 編輯</button>
-          ${hasBody?`<span id="arr-jc-${j.id}" style="font-size:12px;color:rgba(255,255,255,.5);transition:transform .2s">▼</span>`:''}
+            style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;color:rgba(255,255,255,.8);white-space:nowrap">✏️ 編輯</button>
+          ${hasBody?`<span id="arr-jc-${j.id}" style="font-size:12px;color:rgba(255,255,255,.5);transition:transform .2s;white-space:nowrap">▼</span>`:''}
         </div>
       </div>`;
 
