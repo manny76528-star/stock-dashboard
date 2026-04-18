@@ -91,7 +91,7 @@ body{background:#eef2f7;color:var(--text);font-family:'Noto Sans TC',sans-serif;
 .mood-sel-btn.active{background:#fef3c7;border-color:#f59e0b;color:#92400e;}
 .loss-sel-btn{padding:5px 10px;border-radius:20px;font-size:12px;cursor:pointer;border:1.5px solid var(--border);background:#fff;color:#475569;transition:all .15s;font-family:'Noto Sans TC',sans-serif;}
 .loss-sel-btn.active{background:#fef2f2;border-color:#dc2626;color:#dc2626;}
-.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);z-index:1500;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto;}
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:1500;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto;}
 .mo.open{display:flex;}
 .modal{background:var(--white);border-radius:14px;padding:22px 18px;width:100%;max-width:520px;box-shadow:0 20px 60px rgba(0,0,0,.25);animation:popIn .25s ease;margin:auto;}
 @keyframes popIn{from{transform:scale(.94);opacity:0}to{transform:scale(1);opacity:1}}
@@ -1914,7 +1914,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 /* Popup overlay */
 .sp-overlay{
   display:none;position:fixed;inset:0;
-  background:rgba(0,0,0,.6);backdrop-filter:blur(5px);
+  background:rgba(0,0,0,.6);
   z-index:1200;align-items:flex-start;justify-content:center;
   padding:20px;overflow-y:auto;
 }
@@ -6258,39 +6258,37 @@ function renderJournal(){
   container.innerHTML=list.map(j=>{
     const tags=(j.tags||[]).map(t=>`<span style="display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;background:${tagColors[t]||'#f1f5f9'};color:${tagTextColors[t]||'#475569'};margin-right:4px">${t}</span>`).join('');
 
-    // 第一層：深色 header（預設顯示，可點擊展開）
     const hasBody = j.market || j.content;
-    const header =
-      `<div class="j-row-hdr" onclick="toggleJCard('jc-${j.id}')" style="
-        display:flex;align-items:flex-start;justify-content:space-between;gap:8px;
+
+    // 紅框 header：日期、標籤、情緒、完整標題、連結
+    const header = `<div onclick="toggleJCard('jc-${j.id}')" style="
         background:linear-gradient(135deg,#0f172a,#1e3a5f);
-        border-radius:10px;padding:11px 14px;cursor:${hasBody?'pointer':'default'};
-        user-select:none;transition:background .15s;
+        border-radius:10px;padding:12px 14px;
+        cursor:${hasBody?'pointer':'default'};user-select:none;
       ">
-        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;flex:1;min-width:0">
-          <span style="font-size:13px;font-weight:700;color:#e2e8f0;font-family:'JetBrains Mono',monospace;white-space:nowrap">${j.date}</span>
-          ${tags}
-          ${j.mood?`<span style="font-size:12px;color:rgba(255,255,255,.65);white-space:nowrap">${j.mood}</span>`:''}
-          ${j.market?`<span style="font-size:12px;color:#93c5fd;font-weight:600;white-space:pre-wrap;word-break:break-word;width:100%">${j.market}</span>`:''}
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+          <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;flex:1;min-width:0">
+            <span style="font-size:13px;font-weight:700;color:#e2e8f0;font-family:'JetBrains Mono',monospace;white-space:nowrap">${j.date}</span>
+            ${tags}
+            ${j.mood?`<span style="font-size:12px;color:rgba(255,255,255,.65)">${j.mood}</span>`:''}
+            ${j.marketUrl?`<a href="${j.marketUrl}" target="_blank" onclick="event.stopPropagation()" style="font-size:11px;color:#93c5fd;text-decoration:none;white-space:nowrap" title="查看原文">🔗 原文</a>`:''}
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+            <button data-jid="${j.id}" onclick="event.stopPropagation();openJournalModal(this.dataset.jid)"
+              style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;color:rgba(255,255,255,.8);white-space:nowrap">✏️ 編輯</button>
+            ${hasBody?`<span id="arr-jc-${j.id}" style="font-size:12px;color:rgba(255,255,255,.5);display:inline-block;transition:transform .2s">▼</span>`:''}
+          </div>
         </div>
-        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;padding-top:1px">
-          <button data-jid="${j.id}" onclick="event.stopPropagation();openJournalModal(this.dataset.jid)"
-            style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;color:rgba(255,255,255,.8);white-space:nowrap">✏️ 編輯</button>
-          ${hasBody?`<span id="arr-jc-${j.id}" style="font-size:12px;color:rgba(255,255,255,.5);transition:transform .2s;white-space:nowrap">▼</span>`:''}
-        </div>
+        ${j.market?`<div style="margin-top:7px;font-size:13px;font-weight:700;color:#93c5fd;line-height:1.55;white-space:pre-wrap;word-break:break-word">${j.market}</div>`:''}
       </div>`;
 
-    // 第二層：內容（預設隱藏）
+    // 第二層：只顯示正文（黃框深色區塊移除，標題已在紅框顯示）
     const body = hasBody ? `
-      <div id="jc-${j.id}" style="display:none;padding:12px 14px 4px;animation:fadeIn .18s ease">
-        ${j.market?`<div style="margin-bottom:10px;padding:10px 14px;background:linear-gradient(135deg,#0f172a,#1e3a5f);border-radius:8px;border-left:4px solid #3b82f6">
-          <div style="font-size:10px;color:rgba(255,255,255,.6);font-weight:600;letter-spacing:.5px;margin-bottom:4px">🌐 大盤環境 / 重大新聞${j.marketUrl?` <a href="${j.marketUrl}" target="_blank" style="color:#93c5fd;font-size:10px;margin-left:8px">🔗 查看原文</a>`:''}</div>
-          <div style="font-size:15px;font-weight:800;color:#fff;line-height:1.5;white-space:pre-wrap">${j.marketUrl?`<a href="${j.marketUrl}" target="_blank" style="color:#fff;text-decoration:none">${j.market}</a>`:j.market}</div>
-        </div>`:''}
-        ${j.content?`<div style="font-size:13px;color:#1e293b;line-height:1.7;white-space:pre-wrap;padding-bottom:10px">${j.content}</div>`:''}
+      <div id="jc-${j.id}" style="display:none;padding:12px 14px 10px;animation:fadeIn .18s ease">
+        ${j.content?`<div style="font-size:13px;color:#1e293b;line-height:1.7;white-space:pre-wrap">${j.content}</div>`:''}
       </div>` : '';
 
-    return `<div class="j-card" style="padding:0;overflow:hidden;border-radius:10px;border:1px solid #e2e8f0">
+    return `<div class="j-card" style="padding:0;overflow:hidden;border-radius:10px;border:1px solid rgba(255,255,255,.08);margin-bottom:0">
       ${header}${body}
     </div>`;
   }).join('');
