@@ -6281,12 +6281,6 @@ function closeSP(id){
   el.classList.remove('open');
   document.body.style.overflow='';
 }
-// 點背景遮罩關閉
-document.querySelectorAll('.sp-overlay').forEach(el=>{
-  el.addEventListener('click',function(e){
-    if(e.target===this) closeSP(this.id.replace('sp-',''));
-  });
-});
 // ESC 關閉
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){
