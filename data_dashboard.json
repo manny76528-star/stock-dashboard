@@ -652,7 +652,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1776524258924,
+  "_ts": 1776524289772,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
@@ -664,6 +664,17 @@
       "priority": "高",
       "url": "https://www.wantgoo.com/stock/etf/00997a/dividend-policy/ex-dividend",
       "addedDate": "2026-04-16"
+    },
+    {
+      "id": "mo4gowml2q0",
+      "code": "009819",
+      "name": "中信數據及電力",
+      "reason": "Google、Oracle瘋狂跟BE下單？AI資料中心電力缺口三年翻倍！\n以電力需求來說成長的幅度目前大於AI設備需求",
+      "target": 20,
+      "alertDir": "above",
+      "priority": "高",
+      "url": "",
+      "addedDate": "2026-04-18"
     }
   ],
   "journals": [
