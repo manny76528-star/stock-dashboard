@@ -652,7 +652,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1776529528765,
+  "_ts": 1776529566614,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
@@ -732,7 +732,9 @@
     {
       "id": "mo0snars860",
       "date": "2026-04-12",
-      "tags": [],
+      "tags": [
+        "重大事項"
+      ],
       "market": "美以伊戰爭：巴基斯坦和平談判失敗 萬斯帶著「最後提議」離開巴基斯坦\n台股估值過高：台股股價淨值比(P/B)回到3.5倍的歷史新高，價格並不便宜",
       "marketUrl": "https://www.bbc.com/zhongwen/articles/cjw81e6q10yo/trad",
       "mood": "🤔 猶豫",
