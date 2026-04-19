@@ -575,12 +575,21 @@ function shuffleAnswers(){
 }
 
 function restartAll(){
-  db.todayDone=[];
-  db.streak=0;
-  saveDB();
-  currentRound=1;
-  updateStats();
-  buildRound();
+  showConfirm({
+    icon:'🔁',
+    title:'重頭開始',
+    msg:'確定要從第一輪重新開始嗎？\n今日已完成的進度會清空，但錯誤統計和單字庫不受影響。',
+    btnText:'確定重頭開始',
+    btnClass:'btn-warn',
+    onOk:()=>{
+      db.todayDone=[];
+      db.streak=0;
+      saveDB();
+      currentRound=1;
+      updateStats();
+      buildRound();
+    }
+  });
 }
 
 // ══════════════════════════════════════
