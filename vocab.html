@@ -136,7 +136,26 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-seri
 .import-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;}
 .import-sub{font-size:12px;color:var(--muted);}
 
-/* ── TOAST ── */
+/* ── CONFIRM DIALOG ── */
+.confirm-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.7);
+  z-index:9000;align-items:center;justify-content:center;
+}
+.confirm-overlay.open{display:flex;}
+.confirm-box{
+  background:#1e293b;border:1px solid #334155;
+  border-radius:16px;padding:28px 24px;
+  width:100%;max-width:360px;
+  box-shadow:0 24px 60px rgba(0,0,0,.5);
+  animation:spPop .2s ease;
+  text-align:center;
+}
+.confirm-icon{font-size:36px;margin-bottom:12px;}
+.confirm-title{font-size:16px;font-weight:800;color:#f1f5f9;margin-bottom:8px;}
+.confirm-msg{font-size:13px;color:#94a3b8;line-height:1.6;margin-bottom:22px;}
+.confirm-btns{display:flex;gap:10px;justify-content:center;}
+@keyframes spPop{from{opacity:0;transform:scale(.93)}to{opacity:1;transform:scale(1)}}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a2535;color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;z-index:9999;transition:transform .3s;border:1px solid var(--border);white-space:nowrap;}
 .toast.show{transform:translateX(-50%) translateY(0);}
 
@@ -307,6 +326,19 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-seri
   </div>
 
 </div><!-- /main -->
+
+<!-- ══ 自製確認視窗 ══ -->
+<div class="confirm-overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <div class="confirm-icon" id="confirm-icon">⚠️</div>
+    <div class="confirm-title" id="confirm-title"></div>
+    <div class="confirm-msg" id="confirm-msg"></div>
+    <div class="confirm-btns">
+      <button class="btn btn-ghost" onclick="closeConfirm()">取消</button>
+      <button class="btn btn-danger" id="confirm-ok-btn">確定</button>
+    </div>
+  </div>
+</div>
 
 <div class="toast" id="toast"></div>
 
@@ -672,8 +704,14 @@ function renderErrors(){
 }
 
 function clearErrors(){
-  if(!confirm('確定清除所有錯誤記錄？'))return;
-  db.errors={};saveDB();updateStats();renderErrors();toast('已清除錯誤記錄');
+  showConfirm({
+    icon:'🗑',
+    title:'清除錯誤記錄',
+    msg:'確定清除所有錯誤次數記錄？\n常錯單字統計將會歸零。',
+    btnText:'清除',
+    btnClass:'btn-danger',
+    onOk:()=>{db.errors={};saveDB();updateStats();renderErrors();toast('已清除錯誤記錄');}
+  });
 }
 
 // ══════════════════════════════════════
@@ -752,18 +790,34 @@ function renderVocabPreview(){
 }
 
 function clearAllVocab(){
-  if(!confirm('確定清除所有單字嗎？這個操作無法恢復！'))return;
-  db.vocab=[];db.errors={};db.todayDone=[];saveDB();
-  updateStats();renderVocabPreview();buildRound();toast('已清除所有單字');
+  showConfirm({
+    icon:'🗑',
+    title:'清除所有單字',
+    msg:'確定要刪除全部單字庫嗎？\n所有單字、學習記錄、錯誤統計都會一併清除，且無法恢復！',
+    btnText:'確定清除',
+    btnClass:'btn-danger',
+    onOk:()=>{db.vocab=[];db.errors={};db.todayDone=[];saveDB();updateStats();renderVocabPreview();buildRound();toast('已清除所有單字');}
+  });
 }
 function clearAllProgress(){
-  if(!confirm('確定清除所有學習記錄（含錯誤次數）？'))return;
-  db.errors={};db.todayDone=[];db.streak=0;saveDB();
-  updateStats();buildRound();toast('已清除學習記錄');
+  showConfirm({
+    icon:'🔄',
+    title:'清除學習記錄',
+    msg:'確定清除所有學習記錄（含今日進度與錯誤次數）？\n單字庫不會受影響。',
+    btnText:'清除記錄',
+    btnClass:'btn-warn',
+    onOk:()=>{db.errors={};db.todayDone=[];db.streak=0;saveDB();updateStats();buildRound();toast('已清除學習記錄');}
+  });
 }
 function resetTodayProgress(){
-  if(!confirm('確定重置今日進度？'))return;
-  db.todayDone=[];saveDB();updateStats();currentRound=1;buildRound();toast('今日進度已重置');
+  showConfirm({
+    icon:'🔄',
+    title:'重置今日進度',
+    msg:'確定要重置今日進度嗎？\n\n你的學習記錄會從頭開始，但錯誤統計和單字庫不受影響。\n\n⚠️ 如果你是分多天複習，建議不要重置！',
+    btnText:'確定重置',
+    btnClass:'btn-warn',
+    onOk:()=>{db.todayDone=[];saveDB();updateStats();currentRound=1;buildRound();toast('今日進度已重置');}
+  });
 }
 
 // ══════════════════════════════════════
@@ -793,6 +847,32 @@ function toast(msg){
   const t=el('toast');t.textContent=msg;t.classList.add('show');
   clearTimeout(_toastTimer);_toastTimer=setTimeout(()=>t.classList.remove('show'),2800);
 }
+
+// ══════════════════════════════════════
+// CUSTOM CONFIRM DIALOG
+// ══════════════════════════════════════
+let _confirmCallback=null;
+function showConfirm({icon='⚠️',title,msg,btnText='確定',btnClass='btn-danger',onOk}){
+  el('confirm-icon').textContent=icon;
+  el('confirm-title').textContent=title;
+  el('confirm-msg').textContent=msg;
+  const okBtn=el('confirm-ok-btn');
+  okBtn.textContent=btnText;
+  okBtn.className='btn '+btnClass;
+  _confirmCallback=onOk;
+  el('confirm-overlay').classList.add('open');
+}
+function closeConfirm(){
+  el('confirm-overlay').classList.remove('open');
+  _confirmCallback=null;
+}
+el('confirm-ok-btn').addEventListener('click',()=>{
+  closeConfirm();
+  if(_confirmCallback)_confirmCallback();
+  _confirmCallback=null;
+});
+// ESC 關閉
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeConfirm();});
 
 // ══════════════════════════════════════
 // LOAD SHEETJS
