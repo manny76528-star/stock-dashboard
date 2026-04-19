@@ -1742,9 +1742,9 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
     </div>
   </div>
 
-  <!-- 3. 不限用途 -->
-  <div class="big5-card" id="b5-flex">
-    <div class="big5-header">
+  <!-- 3. 不限用途 → 小卡片 -->
+  <div class="big5-card" id="b5-flex" style="cursor:pointer" onclick="openSP('flex')">
+    <div class="big5-header" style="pointer-events:none">
       <div class="big5-left">
         <span class="big5-icon">💳</span>
         <span class="big5-title">不限用途額度</span>
@@ -1755,15 +1755,14 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
           <span style="display:none" id="tot-mo-out">—</span>
         </div>
       </div>
-      <div class="big5-right">
+      <div class="big5-right" style="pointer-events:auto">
         <button class="big5-add-btn" onclick="event.stopPropagation();openFlexModal()">＋</button>
-        <button class="big5-toggle-btn" id="tog-flex" onclick="toggleSection('flex-detail')">展開 ▼</button>
+        <button class="big5-toggle-btn" onclick="event.stopPropagation();openSP('flex')">展開 ▼</button>
       </div>
     </div>
-    <div class="big5-detail" id="flex-detail" style="display:none">
-      <div class="flex-card-grid" id="flex-body"></div>
-    </div>
   </div>
+  <!-- hidden body for flex (渲染用) -->
+  <div style="display:none"><div class="flex-card-grid" id="flex-body"></div></div>
 
   <!-- 4. 現金帳戶 -->
   <div class="big5-card" id="b5-cash">
@@ -1788,9 +1787,9 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
     </div>
   </div>
 
-  <!-- 5. 股息記錄 -->
-  <div class="big5-card" id="b5-div">
-    <div class="big5-header">
+  <!-- 5. 股息記錄 → 小卡片 -->
+  <div class="big5-card" id="b5-div" style="cursor:pointer" onclick="openSP('div')">
+    <div class="big5-header" style="pointer-events:none">
       <div class="big5-left">
         <span class="big5-icon">🎯</span>
         <span class="big5-title">股息記錄</span>
@@ -1800,13 +1799,55 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
           <span>準備入帳 <b id="d-pend-badge" style="color:#93c5fd">—</b><span id="div-next-badge" style="font-size:11px;color:#fbbf24;font-weight:600;font-family:'JetBrains Mono',monospace;margin-left:4px"></span></span>
         </div>
       </div>
-      <div class="big5-right">
+      <div class="big5-right" style="pointer-events:auto">
         <button class="big5-add-btn" onclick="event.stopPropagation();openDivModal()">＋</button>
-        <button class="big5-toggle-btn" id="tog-div" onclick="toggleSection('div-detail')">展開 ▼</button>
+        <button class="big5-toggle-btn" onclick="event.stopPropagation();openSP('div')">展開 ▼</button>
       </div>
     </div>
-    <div class="big5-detail" id="div-detail" style="display:none">
-      <div class="div-cards" id="div-cards"><span style="padding:10px;display:block;color:var(--muted);font-size:11px">尚無領息記錄</span></div>
+  </div>
+
+<table id="cash-tbl" style="display:none"><tbody id="cash-body-compat"></tbody></table>
+<table id="loan-tbl" style="display:none"><tbody></tbody></table>
+<table id="flex-tbl" style="display:none"><tbody></tbody></table>
+
+</div><!-- /big5-wrap -->
+
+<!-- ═══ POPUP：不限用途額度 ═══ -->
+<div class="sp-overlay" id="sp-flex">
+  <div class="sp-modal" style="max-width:1100px">
+    <div class="sp-hdr">
+      <div class="sp-hdr-left">
+        <span class="sp-hdr-icon">💳</span>
+        <span class="sp-hdr-title">不限用途額度</span>
+      </div>
+      <div class="sp-hdr-right">
+        <button onclick="openFlexModal()" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif">＋ 新增</button>
+        <button class="sp-close" onclick="closeSP('flex')">✕ 關閉</button>
+      </div>
+    </div>
+    <div class="sp-body" style="padding:12px">
+      <div class="flex-card-grid" id="flex-body-popup"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ POPUP：股息記錄 ═══ -->
+<div class="sp-overlay" id="sp-div">
+  <div class="sp-modal" style="max-width:1100px">
+    <div class="sp-hdr">
+      <div class="sp-hdr-left">
+        <span class="sp-hdr-icon">🎯</span>
+        <span class="sp-hdr-title">股息記錄</span>
+      </div>
+      <div class="sp-hdr-right">
+        <button onclick="openDivModal()" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif">＋ 新增股息</button>
+        <button class="sp-close" onclick="closeSP('div')">✕ 關閉</button>
+      </div>
+    </div>
+    <div class="sp-body" style="padding:0">
+      <!-- 卡片速覽 -->
+      <div class="div-cards" id="div-cards" style="padding:14px 16px;background:#f0fdfa;border-bottom:1px solid #99f6e4"><span style="color:var(--muted);font-size:11px">尚無領息記錄</span></div>
+      <!-- 準備入帳 -->
       <div id="div-pending-bar" style="display:none">
         <div style="padding:8px 14px 4px;background:#eff6ff;border-bottom:1px solid #bfdbfe;display:flex;align-items:center;justify-content:space-between">
           <span style="font-size:12px;font-weight:700;color:#1d4ed8">⏳ 準備入帳</span>
@@ -1814,6 +1855,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
         </div>
         <div class="pending-card-grid" id="d-pending-cards"></div>
       </div>
+      <!-- 年份統計列 -->
       <div class="div-yr-bar">
         <div style="font-size:13px;font-weight:700">
           📅 今年：<span class="gain mono" id="d-yr" style="font-size:16px">$0</span>
@@ -1827,6 +1869,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
           <input type="checkbox" id="div-hist-chk" style="display:none">
         </label>
       </div>
+      <!-- 今年明細 -->
       <div class="div-section-hdr" style="background:#ccfbf1;color:#0f766e" onclick="toggleDivYear()">
         <span>📋 今年明細</span><span id="div-yr-hint">▼ 展開</span>
       </div>
@@ -1836,6 +1879,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
           <tbody id="div-body-yr"></tbody>
         </table>
       </div>
+      <!-- 歷史記錄 -->
       <div id="div-hist-sec" style="display:none">
         <div style="padding:6px 12px;background:#e8edf5;font-size:11px;font-weight:700;color:var(--accent)">📚 歷史記錄</div>
         <div style="overflow-x:auto">
@@ -1845,15 +1889,9 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
           </table>
         </div>
       </div>
-
-<table id="cash-tbl" style="display:none"><tbody id="cash-body-compat"></tbody></table>
-<table id="loan-tbl" style="display:none"><tbody></tbody></table>
-<table id="flex-tbl" style="display:none"><tbody></tbody></table>
-
-
-    </div><!-- /div-detail -->
-  </div><!-- /big5-card div -->
-</div><!-- /big5-wrap -->
+    </div>
+  </div>
+</div>
 
 <!-- ═══ BOTTOM STATUS BAR ═══ -->
 <div class="db-status-bar">
@@ -3536,9 +3574,12 @@ function renderLoans(){
 
 
 function renderFlex(){
-  const grid=document.getElementById('flex-body');
-  if(!grid)return;
-  grid.innerHTML='';
+  const grids=[
+    document.getElementById('flex-body'),
+    document.getElementById('flex-body-popup')
+  ].filter(Boolean);
+  grids.forEach(grid=>grid.innerHTML='');
+
   let tUsed=0,tMo=0;
 
   db.flexLoans.forEach(f=>{
@@ -3549,40 +3590,42 @@ function renderFlex(){
     const usedPct=fLimit>0?Math.min(100,Math.round(fUsed/fLimit*100)):0;
     const barColor=usedPct>90?'#dc2626':usedPct>70?'#d97706':'#16a34a';
 
-    const card=document.createElement('div');
-    card.className='flex-card';
-    card.dataset.id=f.id;
-    card.innerHTML=
-      '<div class="loan-card-top">'
-        +'<div><div class="loan-card-bank">'+f.name+'</div>'
-        +(f.note?'<div class="loan-card-sub">'+f.note+'</div>':'')+'</div>'
-        +'<div style="text-align:right">'
-          +'<div class="loan-card-rate">'+(f.rate||0).toFixed(2)+'%</div>'
-          +'<div style="font-size:10px;color:var(--muted)">額度 $'+fLimit.toLocaleString()+'</div>'
+    grids.forEach(grid=>{
+      const card=document.createElement('div');
+      card.className='flex-card';
+      card.dataset.id=f.id;
+      card.innerHTML=
+        '<div class="loan-card-top">'
+          +'<div><div class="loan-card-bank">'+f.name+'</div>'
+          +(f.note?'<div class="loan-card-sub">'+f.note+'</div>':'')+'</div>'
+          +'<div style="text-align:right">'
+            +'<div class="loan-card-rate">'+(f.rate||0).toFixed(2)+'%</div>'
+            +'<div style="font-size:10px;color:var(--muted)">額度 $'+fLimit.toLocaleString()+'</div>'
+          +'</div>'
         +'</div>'
-      +'</div>'
-      +'<div style="padding:0 16px 4px;display:flex;justify-content:space-between;align-items:center">'
-        +'<span style="font-size:10px;color:#94a3b8">額度使用率</span>'
-        +'<span style="font-size:11px;font-weight:700;color:'+barColor+'">'+usedPct+'%</span>'
-      +'</div>'
-      +'<div class="loan-progress-wrap"><div class="loan-progress-bar" style="width:'+usedPct+'%;background:'+barColor+'"></div></div>'
-      +'<div class="loan-card-amounts">'
-        +'<div class="loan-amt-block"><div class="loan-amt-label">使用額度</div><div class="loan-amt-val loss">$'+fUsed.toLocaleString()+'</div></div>'
-        +'<div class="loan-amt-block"><div class="loan-amt-label">剩餘額度</div><div class="loan-amt-val gain">$'+fAvail.toLocaleString()+'</div></div>'
-        +'<div class="loan-amt-block"><div class="loan-amt-label">使用率</div><div class="loan-amt-val" style="color:'+barColor+'">'+usedPct+'%</div></div>'
-        +'<div class="loan-amt-block"><div class="loan-amt-label">每月利息</div><div class="loan-amt-val loss">$'+(f.monthly||0).toLocaleString()+'</div></div>'
-      +'</div>'
-      +'<div class="loan-card-footer"><div></div>'
-        +'<div style="display:flex;gap:5px">'
-          +'<button class="card-act-btn edit" data-action="editFlex">✏️ 編輯</button>'
-          +'<button class="card-act-btn danger" data-action="delFlex">🗑</button>'
+        +'<div style="padding:0 16px 4px;display:flex;justify-content:space-between;align-items:center">'
+          +'<span style="font-size:10px;color:#94a3b8">額度使用率</span>'
+          +'<span style="font-size:11px;font-weight:700;color:'+barColor+'">'+usedPct+'%</span>'
         +'</div>'
-      +'</div>';
-    card.querySelectorAll('[data-action]').forEach(btn=>{
-      const act=btn.dataset.action;
-      btn.onclick=()=>{if(act==='editFlex')editFlex(f.id);else if(act==='delFlex')delFlex(f.id);};
+        +'<div class="loan-progress-wrap"><div class="loan-progress-bar" style="width:'+usedPct+'%;background:'+barColor+'"></div></div>'
+        +'<div class="loan-card-amounts">'
+          +'<div class="loan-amt-block"><div class="loan-amt-label">使用額度</div><div class="loan-amt-val loss">$'+fUsed.toLocaleString()+'</div></div>'
+          +'<div class="loan-amt-block"><div class="loan-amt-label">剩餘額度</div><div class="loan-amt-val gain">$'+fAvail.toLocaleString()+'</div></div>'
+          +'<div class="loan-amt-block"><div class="loan-amt-label">使用率</div><div class="loan-amt-val" style="color:'+barColor+'">'+usedPct+'%</div></div>'
+          +'<div class="loan-amt-block"><div class="loan-amt-label">每月利息</div><div class="loan-amt-val loss">$'+(f.monthly||0).toLocaleString()+'</div></div>'
+        +'</div>'
+        +'<div class="loan-card-footer"><div></div>'
+          +'<div style="display:flex;gap:5px">'
+            +'<button class="card-act-btn edit" data-action="editFlex">✏️ 編輯</button>'
+            +'<button class="card-act-btn danger" data-action="delFlex">🗑</button>'
+          +'</div>'
+        +'</div>';
+      card.querySelectorAll('[data-action]').forEach(btn=>{
+        const act=btn.dataset.action;
+        btn.onclick=()=>{if(act==='editFlex')editFlex(f.id);else if(act==='delFlex')delFlex(f.id);};
+      });
+      grid.appendChild(card);
     });
-    grid.appendChild(card);
   });
 
   const lM=db.loans.reduce((s,l)=>s+(l.monthly||0),0);
@@ -6316,12 +6359,18 @@ function openSP(id){
   if(!el)return;
   el.classList.add('open');
   document.body.style.overflow='hidden';
-  // 觸發對應渲染
   if(id==='health' && typeof renderHealth==='function') renderHealth();
   if(id==='watch'  && typeof renderWatchlist==='function') renderWatchlist();
   if(id==='analytics' && typeof renderAnalytics==='function') renderAnalytics();
   if(id==='finplan' && typeof calcFinPlan==='function') calcFinPlan();
   if(id==='journal'){ if(typeof renderJournal==='function') renderJournal(); updateJournalCount(); }
+  if(id==='flex'){
+    if(typeof renderFlex==='function') renderFlex();
+  }
+  if(id==='div'){
+    // 重新渲染股息（DOM 元素已在 popup 裡，直接觸發）
+    if(typeof renderDivs==='function') renderDivs();
+  }
 }
 function closeSP(id){
   const el=document.getElementById('sp-'+id);
