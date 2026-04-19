@@ -1,0 +1,807 @@
+<!DOCTYPE html><!-- vocab v1.0 -->
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>日文單字複習</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Sans+JP:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0f172a;--surface:#1e293b;--surface2:#263348;--border:#334155;
+  --accent:#38bdf8;--accent2:#0ea5e9;--green:#22c55e;--red:#ef4444;
+  --yellow:#fbbf24;--purple:#a78bfa;--pink:#f472b6;
+  --text:#f1f5f9;--muted:#94a3b8;--white:#fff;
+  --card-shadow:0 4px 24px rgba(0,0,0,.4);
+  --mono:'JetBrains Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;font-size:14px;min-height:100vh;}
+
+/* ── TOPBAR ── */
+.topbar{
+  background:linear-gradient(135deg,#0c1a2e,#1a2f4a);
+  border-bottom:1px solid var(--border);
+  padding:14px 20px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+}
+.topbar-left{display:flex;align-items:center;gap:12px;}
+.topbar-logo{font-size:24px;}
+.topbar-title{font-size:18px;font-weight:900;color:var(--white);letter-spacing:2px;}
+.topbar-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.topbar-right{display:flex;gap:8px;align-items:center;}
+
+/* ── BUTTONS ── */
+.btn{border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:all .15s;}
+.btn-primary{background:var(--accent2);color:#fff;}.btn-primary:hover{background:#0284c7;}
+.btn-success{background:#16a34a;color:#fff;}.btn-success:hover{background:#15803d;}
+.btn-warn{background:#d97706;color:#fff;}.btn-warn:hover{background:#b45309;}
+.btn-danger{background:#dc2626;color:#fff;}.btn-danger:hover{background:#b91c1c;}
+.btn-ghost{background:rgba(255,255,255,.08);color:var(--text);border:1px solid var(--border);}.btn-ghost:hover{background:rgba(255,255,255,.15);}
+.btn-sm{padding:5px 10px;font-size:11px;}
+
+/* ── MAIN ── */
+.main{max-width:1200px;margin:0 auto;padding:20px 16px;}
+
+/* ── STAT STRIP ── */
+.stat-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:20px;}
+.stat-card{background:var(--surface);border-radius:12px;padding:14px 16px;border:1px solid var(--border);}
+.stat-label{font-size:10px;color:var(--muted);font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;}
+.stat-val{font-size:22px;font-weight:800;font-family:var(--mono);}
+.stat-val.blue{color:var(--accent);}
+.stat-val.green{color:var(--green);}
+.stat-val.yellow{color:var(--yellow);}
+.stat-val.red{color:var(--red);}
+.stat-val.purple{color:var(--purple);}
+
+/* ── PROGRESS BAR ── */
+.prog-wrap{background:var(--surface);border-radius:12px;padding:14px 16px;margin-bottom:20px;border:1px solid var(--border);}
+.prog-label{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:8px;}
+.prog-bar-bg{height:10px;background:#1e293b;border-radius:5px;overflow:hidden;border:1px solid var(--border);}
+.prog-bar{height:10px;background:linear-gradient(90deg,var(--accent2),var(--green));border-radius:5px;transition:width .5s ease;}
+
+/* ── TAB NAV ── */
+.tab-nav{display:flex;gap:4px;margin-bottom:20px;background:var(--surface);padding:4px;border-radius:12px;border:1px solid var(--border);}
+.tab-btn{flex:1;padding:9px;text-align:center;font-size:12px;font-weight:700;cursor:pointer;border-radius:9px;border:none;background:transparent;color:var(--muted);transition:all .15s;font-family:'Noto Sans TC',sans-serif;}
+.tab-btn.active{background:var(--accent2);color:#fff;}
+.tab-btn:hover:not(.active){background:rgba(255,255,255,.06);color:var(--text);}
+
+/* ── VIEWS ── */
+.view{display:none;}.view.active{display:block;}
+
+/* ── MATCH GAME ── */
+.match-wrap{display:grid;grid-template-columns:1fr 40px 1fr;gap:0;align-items:start;}
+.match-col{display:flex;flex-direction:column;gap:8px;}
+.match-center{display:flex;flex-direction:column;gap:8px;align-items:center;padding-top:0;}
+
+.match-item{
+  background:var(--surface);border:2px solid var(--border);
+  border-radius:10px;padding:12px 14px;cursor:pointer;
+  transition:all .15s;user-select:none;min-height:60px;
+  display:flex;align-items:center;
+}
+.match-item:hover{border-color:var(--accent);background:var(--surface2);}
+.match-item.selected{border-color:var(--accent);background:rgba(56,189,248,.1);box-shadow:0 0 0 2px rgba(56,189,248,.3);}
+.match-item.matched{border-color:var(--green);background:rgba(34,197,94,.08);opacity:.5;pointer-events:none;}
+.match-item.wrong{border-color:var(--red);background:rgba(239,68,68,.1);animation:shake .3s ease;}
+.match-item.disabled{opacity:.3;pointer-events:none;}
+
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@keyframes matchPop{0%{transform:scale(1)}50%{transform:scale(1.04)}100%{transform:scale(1)}}
+.match-item.pop{animation:matchPop .25s ease;}
+
+.match-jp{font-family:'Noto Sans JP',sans-serif;font-size:15px;font-weight:700;color:var(--accent);}
+.match-zh{font-size:13px;color:var(--muted);margin-top:3px;}
+.match-ans{font-size:14px;color:var(--text);font-family:'Noto Sans JP',sans-serif;}
+
+.match-connector{width:40px;display:flex;justify-content:center;align-items:center;height:60px;margin-top:0;}
+.conn-line{width:2px;background:var(--border);height:100%;border-radius:1px;}
+
+/* ── ROUND INFO ── */
+.round-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;}
+.round-info{font-size:12px;color:var(--muted);}
+.round-info b{color:var(--text);}
+
+/* ── RESULT PANEL ── */
+.result-panel{background:var(--surface);border-radius:14px;padding:24px;text-align:center;border:1px solid var(--border);margin-top:20px;}
+.result-emoji{font-size:48px;margin-bottom:12px;}
+.result-title{font-size:20px;font-weight:800;color:var(--white);margin-bottom:6px;}
+.result-sub{font-size:13px;color:var(--muted);margin-bottom:20px;}
+
+/* ── ERROR LIST ── */
+.error-list{display:flex;flex-direction:column;gap:8px;}
+.error-item{
+  background:var(--surface);border-radius:10px;padding:12px 14px;
+  border:1px solid var(--border);border-left:3px solid var(--red);
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+}
+.error-item.many{border-left-color:var(--red);}
+.error-item.few{border-left-color:var(--yellow);}
+.error-q{display:flex;flex-direction:column;gap:2px;}
+.error-jp{font-family:'Noto Sans JP',sans-serif;font-size:14px;font-weight:700;color:var(--accent);}
+.error-zh{font-size:12px;color:var(--muted);}
+.error-ans{font-size:13px;color:var(--text);}
+.error-cnt{font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;white-space:nowrap;}
+.error-cnt.many{background:rgba(239,68,68,.2);color:var(--red);}
+.error-cnt.few{background:rgba(251,191,36,.2);color:var(--yellow);}
+
+/* ── IMPORT PANEL ── */
+.import-zone{
+  border:2px dashed var(--border);border-radius:14px;padding:40px;
+  text-align:center;cursor:pointer;transition:all .2s;
+  background:var(--surface);
+}
+.import-zone:hover,.import-zone.drag{border-color:var(--accent);background:rgba(56,189,248,.05);}
+.import-icon{font-size:36px;margin-bottom:12px;}
+.import-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;}
+.import-sub{font-size:12px;color:var(--muted);}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a2535;color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;z-index:9999;transition:transform .3s;border:1px solid var(--border);white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+/* ── EMPTY ── */
+.empty{text-align:center;padding:60px;color:var(--muted);}
+.empty-icon{font-size:40px;margin-bottom:12px;}
+
+/* ── BADGE ── */
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;}
+.badge-red{background:rgba(239,68,68,.2);color:var(--red);}
+.badge-green{background:rgba(34,197,94,.2);color:var(--green);}
+.badge-blue{background:rgba(56,189,248,.2);color:var(--accent);}
+
+/* ── PRACTICE ERRORS BTN ── */
+.prac-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;}
+.prac-title{font-size:15px;font-weight:700;color:var(--white);}
+.prac-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+
+@media(max-width:600px){
+  .match-wrap{grid-template-columns:1fr 24px 1fr;gap:0;}
+  .match-item{padding:10px 10px;min-height:52px;}
+  .match-jp{font-size:13px;}
+  .stat-strip{grid-template-columns:repeat(2,1fr);}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-logo">🇯🇵</span>
+    <div>
+      <div class="topbar-title">日文單字複習</div>
+      <div class="topbar-sub" id="top-sub">載入中...</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <button class="btn btn-ghost btn-sm" onclick="document.getElementById('import-file').click()">📥 匯入 Excel</button>
+    <button class="btn btn-warn btn-sm" onclick="resetTodayProgress()">🔄 重置今日</button>
+    <a href="index.html" class="btn btn-ghost btn-sm">🏠 主目錄</a>
+    <input type="file" id="import-file" accept=".xlsx,.csv" style="display:none" onchange="importFile(event)">
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- 進度條 -->
+  <div class="prog-wrap">
+    <div class="prog-label">
+      <span>今日進度</span>
+      <span id="prog-text">0 / 0</span>
+    </div>
+    <div class="prog-bar-bg"><div class="prog-bar" id="prog-bar" style="width:0%"></div></div>
+  </div>
+
+  <!-- 統計 -->
+  <div class="stat-strip">
+    <div class="stat-card"><div class="stat-label">📚 總單字數</div><div class="stat-val blue" id="s-total">0</div></div>
+    <div class="stat-card"><div class="stat-label">✅ 今日完成</div><div class="stat-val green" id="s-done">0</div></div>
+    <div class="stat-card"><div class="stat-label">📋 待複習</div><div class="stat-val yellow" id="s-remain">0</div></div>
+    <div class="stat-card"><div class="stat-label">❌ 常錯單字</div><div class="stat-val red" id="s-errors">0</div></div>
+    <div class="stat-card"><div class="stat-label">🔥 連續答對</div><div class="stat-val purple" id="s-streak">0</div></div>
+  </div>
+
+  <!-- Tab -->
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('match')">🎯 配對練習</button>
+    <button class="tab-btn" onclick="switchTab('errors')">❌ 常錯單字</button>
+    <button class="tab-btn" onclick="switchTab('practice-errors')">🔥 練習常錯</button>
+    <button class="tab-btn" onclick="switchTab('import')">📥 匯入管理</button>
+  </div>
+
+  <!-- ══ TAB 1: 配對練習 ══ -->
+  <div class="view active" id="view-match">
+    <div class="round-bar">
+      <div class="round-info">第 <b id="round-num">1</b> 輪　本輪 <b>10</b> 組　<span id="round-matched">0</span>/10 已配對</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-ghost btn-sm" onclick="shuffleAnswers()">🔀 重排答案</button>
+        <button class="btn btn-primary btn-sm" onclick="nextRound()">下一輪 →</button>
+      </div>
+    </div>
+
+    <div class="match-wrap" id="match-area">
+      <!-- JS 渲染 -->
+    </div>
+
+    <div id="round-complete" style="display:none">
+      <div class="result-panel">
+        <div class="result-emoji">🎉</div>
+        <div class="result-title">本輪完成！</div>
+        <div class="result-sub" id="round-result-sub"></div>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+          <button class="btn btn-primary" onclick="nextRound()">繼續下一輪 →</button>
+          <button class="btn btn-ghost" onclick="restartAll()">重頭開始</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="all-done" style="display:none">
+      <div class="result-panel">
+        <div class="result-emoji">🏆</div>
+        <div class="result-title">全部完成！</div>
+        <div class="result-sub" id="all-done-sub"></div>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+          <button class="btn btn-warn" onclick="restartAll()">再來一次</button>
+          <button class="btn btn-ghost" onclick="switchTab('errors')">查看常錯單字</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB 2: 常錯單字 ══ -->
+  <div class="view" id="view-errors">
+    <div class="prac-header">
+      <div>
+        <div class="prac-title">❌ 常錯單字</div>
+        <div class="prac-sub">答錯 2 次以上的單字會列在這裡</div>
+      </div>
+      <button class="btn btn-warn btn-sm" onclick="clearErrors()">清除記錄</button>
+    </div>
+    <div id="error-list-wrap"></div>
+  </div>
+
+  <!-- ══ TAB 3: 練習常錯 ══ -->
+  <div class="view" id="view-practice-errors">
+    <div class="prac-header">
+      <div>
+        <div class="prac-title">🔥 練習常錯單字</div>
+        <div class="prac-sub" id="pe-sub">從常錯單字中出題</div>
+      </div>
+      <button class="btn btn-warn btn-sm" onclick="startPracticeErrors()">重新出題</button>
+    </div>
+    <div id="pe-round-bar" style="margin-bottom:14px;display:none">
+      <div class="round-info">已配對 <b id="pe-matched">0</b> / <b id="pe-total">0</b></div>
+    </div>
+    <div class="match-wrap" id="pe-match-area"></div>
+    <div id="pe-done" style="display:none">
+      <div class="result-panel">
+        <div class="result-emoji">💪</div>
+        <div class="result-title">常錯單字練習完成！</div>
+        <div class="result-sub">繼續保持，錯誤率會越來越低的！</div>
+        <button class="btn btn-warn" onclick="startPracticeErrors()">再練一次</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB 4: 匯入管理 ══ -->
+  <div class="view" id="view-import">
+    <div class="import-zone" id="drop-zone"
+      ondragover="event.preventDefault();this.classList.add('drag')"
+      ondragleave="this.classList.remove('drag')"
+      ondrop="dropFile(event)"
+      onclick="document.getElementById('import-file').click()">
+      <div class="import-icon">📊</div>
+      <div class="import-title">點擊或拖曳 Excel / CSV 檔案</div>
+      <div class="import-sub">A 欄：中文＋日文（問題）　B 欄：正確解答<br>新匯入會合併保留，不會覆蓋學習記錄</div>
+    </div>
+
+    <div style="margin-top:20px;background:var(--surface);border-radius:12px;padding:16px;border:1px solid var(--border)">
+      <div style="font-size:13px;font-weight:700;color:var(--white);margin-bottom:10px">📋 目前單字庫</div>
+      <div id="vocab-preview" style="font-size:12px;color:var(--muted)">尚未載入</div>
+    </div>
+
+    <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-danger btn-sm" onclick="clearAllVocab()">🗑 清除所有單字</button>
+      <button class="btn btn-ghost btn-sm" onclick="clearAllProgress()">🔄 清除學習記錄</button>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════
+// DATA LAYER
+// ══════════════════════════════════════
+const DB_KEY='vocab_db_v1';
+
+function loadDB(){
+  try{ return JSON.parse(localStorage.getItem(DB_KEY))||newDB(); }
+  catch{ return newDB(); }
+}
+function newDB(){
+  return {
+    vocab:[],         // [{id,q,a}]
+    errors:{},        // {id: count}
+    todayDone:[],     // [id] 今日完成
+    todayDate:'',
+    streak:0,
+  };
+}
+function saveDB(){ localStorage.setItem(DB_KEY,JSON.stringify(db)); }
+
+let db=loadDB();
+
+// 重置今日（如果換日了）
+function checkNewDay(){
+  const today=new Date().toISOString().slice(0,10);
+  if(db.todayDate!==today){
+    db.todayDate=today;
+    db.todayDone=[];
+    saveDB();
+  }
+}
+checkNewDay();
+
+// ══════════════════════════════════════
+// MATCH GAME STATE
+// ══════════════════════════════════════
+const ROUND_SIZE=10;
+let roundQueue=[];     // 本輪待答 vocab items
+let roundAnswers=[];   // 右側打亂的答案
+let selectedLeft=null; // 選中的左側 id
+let selectedRight=null;// 選中的右側 index
+let roundMatchedCount=0;
+let currentRound=1;
+let totalMatchedToday=0;
+
+// ══════════════════════════════════════
+// INIT
+// ══════════════════════════════════════
+function init(){
+  updateStats();
+  buildRound();
+  renderVocabPreview();
+}
+
+function updateStats(){
+  const total=db.vocab.length;
+  const done=db.todayDone.length;
+  const remain=Math.max(0,total-done);
+  const errCount=Object.values(db.errors).filter(c=>c>=2).length;
+  el('s-total').textContent=total;
+  el('s-done').textContent=done;
+  el('s-remain').textContent=remain;
+  el('s-errors').textContent=errCount;
+  el('s-streak').textContent=db.streak||0;
+  const pct=total>0?Math.round(done/total*100):0;
+  el('prog-bar').style.width=pct+'%';
+  el('prog-text').textContent=done+' / '+total;
+  el('top-sub').textContent=total>0?`共 ${total} 個單字・今日完成 ${done} 個`:'尚未載入單字';
+}
+
+// ══════════════════════════════════════
+// ROUND BUILDER
+// ══════════════════════════════════════
+function buildRound(){
+  el('round-complete').style.display='none';
+  el('all-done').style.display='none';
+  el('match-area').style.display='';
+
+  // 優先挑今天還沒完成的
+  const notDone=db.vocab.filter(v=>!db.todayDone.includes(v.id));
+
+  if(notDone.length===0){
+    // 全部完成
+    el('match-area').style.display='none';
+    el('all-done').style.display='block';
+    el('all-done-sub').textContent=`共完成 ${db.vocab.length} 個單字！錯誤累計 ${Object.values(db.errors).reduce((a,b)=>a+b,0)} 次`;
+    return;
+  }
+
+  // 常錯的先出
+  const withErrors=notDone.filter(v=>(db.errors[v.id]||0)>=2);
+  const normal=notDone.filter(v=>(db.errors[v.id]||0)<2);
+
+  let pool=[...shuffle(withErrors),...shuffle(normal)];
+  roundQueue=pool.slice(0,ROUND_SIZE);
+  roundAnswers=shuffle([...roundQueue]);
+  roundMatchedCount=0;
+
+  el('round-num').textContent=currentRound;
+  el('round-matched').textContent='0';
+  renderMatchArea();
+}
+
+function renderMatchArea(){
+  const area=el('match-area');
+  // 建左右兩欄 + 中間連接
+  let leftHTML='', rightHTML='', midHTML='';
+  roundQueue.forEach((v,i)=>{
+    const matchedClass=db.todayDone.includes(v.id)&&roundQueue.includes(v)?'matched':'';
+    leftHTML+=`<div class="match-item ${matchedClass}" id="left-${v.id}" onclick="selectLeft('${v.id}')">
+      <div>
+        <div class="match-jp">${escHtml(v.q.split('\n')[0])}</div>
+        ${v.q.split('\n')[1]?`<div class="match-zh">${escHtml(v.q.split('\n')[1])}</div>`:''}
+      </div>
+    </div>`;
+    midHTML+=`<div class="match-connector"><div class="conn-line"></div></div>`;
+  });
+  roundAnswers.forEach((v,i)=>{
+    leftHTML; // keep
+    rightHTML+=`<div class="match-item" id="right-${i}" onclick="selectRight(${i},'${v.id}')">
+      <div class="match-ans">${escHtml(v.a)}</div>
+    </div>`;
+  });
+
+  area.innerHTML=`
+    <div class="match-col" id="col-left">${leftHTML}</div>
+    <div class="match-center">${midHTML}</div>
+    <div class="match-col" id="col-right">${rightHTML}</div>
+  `;
+}
+
+// ══════════════════════════════════════
+// SELECTION LOGIC
+// ══════════════════════════════════════
+function selectLeft(id){
+  // deselect previous
+  if(selectedLeft){
+    const prev=el('left-'+selectedLeft);
+    if(prev)prev.classList.remove('selected');
+  }
+  selectedLeft=id;
+  const item=el('left-'+id);
+  if(item){item.classList.add('selected');item.classList.remove('wrong');}
+  tryMatch();
+}
+
+function selectRight(idx,id){
+  if(selectedRight!==null){
+    const prev=el('right-'+selectedRight);
+    if(prev)prev.classList.remove('selected');
+  }
+  selectedRight=idx;
+  selectedRight_id=id;
+  const item=el('right-'+idx);
+  if(item){item.classList.add('selected');item.classList.remove('wrong');}
+  tryMatch();
+}
+
+let selectedRight_id=null;
+
+function tryMatch(){
+  if(selectedLeft===null||selectedRight===null)return;
+
+  const leftId=selectedLeft;
+  const rightId=selectedRight_id;
+  const rightIdx=selectedRight;
+
+  // reset
+  selectedLeft=null;selectedRight=null;selectedRight_id=null;
+
+  if(leftId===rightId){
+    // ✅ 正確
+    const lEl=el('left-'+leftId);
+    const rEl=el('right-'+rightIdx);
+    if(lEl){lEl.classList.remove('selected');lEl.classList.add('matched','pop');}
+    if(rEl){rEl.classList.remove('selected');rEl.classList.add('matched','pop');}
+
+    roundMatchedCount++;
+    el('round-matched').textContent=roundMatchedCount;
+
+    // 記錄完成
+    if(!db.todayDone.includes(leftId))db.todayDone.push(leftId);
+    db.streak=(db.streak||0)+1;
+    saveDB();
+    updateStats();
+
+    if(roundMatchedCount>=roundQueue.length){
+      setTimeout(showRoundComplete,400);
+    }
+  } else {
+    // ❌ 錯誤
+    const lEl=el('left-'+leftId);
+    const rEl=el('right-'+rightIdx);
+    if(lEl){lEl.classList.remove('selected');lEl.classList.add('wrong');setTimeout(()=>lEl.classList.remove('wrong'),600);}
+    if(rEl){rEl.classList.remove('selected');rEl.classList.add('wrong');setTimeout(()=>rEl.classList.remove('wrong'),600);}
+
+    // 累計錯誤
+    db.errors[leftId]=(db.errors[leftId]||0)+1;
+    db.streak=0;
+    saveDB();
+    updateStats();
+  }
+}
+
+function showRoundComplete(){
+  el('match-area').style.display='none';
+  el('round-complete').style.display='block';
+  const notDone=db.vocab.filter(v=>!db.todayDone.includes(v.id));
+  el('round-result-sub').textContent=`還有 ${notDone.length} 個單字待複習`;
+}
+
+function nextRound(){
+  currentRound++;
+  buildRound();
+}
+
+function shuffleAnswers(){
+  roundAnswers=shuffle([...roundAnswers]);
+  // re-render right col only
+  const rightCol=el('col-right');
+  if(!rightCol)return;
+  let html='';
+  roundAnswers.forEach((v,i)=>{
+    const isMatched=document.getElementById('right-'+i)?.classList.contains('matched');
+    html+=`<div class="match-item${isMatched?' matched':''}" id="right-${i}" onclick="selectRight(${i},'${v.id}')">
+      <div class="match-ans">${escHtml(v.a)}</div>
+    </div>`;
+  });
+  rightCol.innerHTML=html;
+}
+
+function restartAll(){
+  db.todayDone=[];
+  db.streak=0;
+  saveDB();
+  currentRound=1;
+  updateStats();
+  buildRound();
+}
+
+// ══════════════════════════════════════
+// PRACTICE ERRORS
+// ══════════════════════════════════════
+let peQueue=[], peAnswers=[], peLeft=null, peRight=null, peRightId=null, peMatched=0;
+
+function startPracticeErrors(){
+  const errVocab=db.vocab.filter(v=>(db.errors[v.id]||0)>=1)
+    .sort((a,b)=>(db.errors[b.id]||0)-(db.errors[a.id]||0))
+    .slice(0,10);
+
+  el('pe-done').style.display='none';
+
+  if(errVocab.length===0){
+    el('pe-match-area').innerHTML='<div class="empty"><div class="empty-icon">🎊</div><div>還沒有錯誤記錄！先去做配對練習吧</div></div>';
+    el('pe-round-bar').style.display='none';
+    el('pe-sub').textContent='從常錯單字中出題';
+    return;
+  }
+
+  peQueue=errVocab;
+  peAnswers=shuffle([...peQueue]);
+  peLeft=null;peRight=null;peRightId=null;peMatched=0;
+
+  el('pe-sub').textContent=`共 ${peQueue.length} 個常錯單字`;
+  el('pe-round-bar').style.display='block';
+  el('pe-total').textContent=peQueue.length;
+  el('pe-matched').textContent=0;
+
+  renderPEArea();
+}
+
+function renderPEArea(){
+  const area=el('pe-match-area');
+  let lH='',rH='',mH='';
+  peQueue.forEach(v=>{
+    lH+=`<div class="match-item" id="pe-left-${v.id}" onclick="pSelectLeft('${v.id}')">
+      <div>
+        <div class="match-jp">${escHtml(v.q.split('\n')[0])}</div>
+        ${v.q.split('\n')[1]?`<div class="match-zh">${escHtml(v.q.split('\n')[1])}</div>`:''}
+        <span class="badge badge-red" style="margin-top:4px;font-size:9px">錯 ${db.errors[v.id]||0} 次</span>
+      </div>
+    </div>`;
+    mH+=`<div class="match-connector"><div class="conn-line"></div></div>`;
+  });
+  peAnswers.forEach((v,i)=>{
+    rH+=`<div class="match-item" id="pe-right-${i}" onclick="pSelectRight(${i},'${v.id}')">
+      <div class="match-ans">${escHtml(v.a)}</div>
+    </div>`;
+  });
+  area.innerHTML=`
+    <div class="match-col">${lH}</div>
+    <div class="match-center">${mH}</div>
+    <div class="match-col">${rH}</div>`;
+}
+
+function pSelectLeft(id){
+  if(peLeft){const p=el('pe-left-'+peLeft);if(p)p.classList.remove('selected');}
+  peLeft=id;
+  const item=el('pe-left-'+id);if(item){item.classList.add('selected');item.classList.remove('wrong');}
+  pTryMatch();
+}
+function pSelectRight(idx,id){
+  if(peRight!==null){const p=el('pe-right-'+peRight);if(p)p.classList.remove('selected');}
+  peRight=idx;peRightId=id;
+  const item=el('pe-right-'+idx);if(item){item.classList.add('selected');item.classList.remove('wrong');}
+  pTryMatch();
+}
+function pTryMatch(){
+  if(peLeft===null||peRight===null)return;
+  const lId=peLeft, rId=peRightId, rIdx=peRight;
+  peLeft=null;peRight=null;peRightId=null;
+  if(lId===rId){
+    const lEl=el('pe-left-'+lId), rEl=el('pe-right-'+rIdx);
+    if(lEl){lEl.classList.remove('selected');lEl.classList.add('matched','pop');}
+    if(rEl){rEl.classList.remove('selected');rEl.classList.add('matched','pop');}
+    peMatched++;
+    el('pe-matched').textContent=peMatched;
+    if(peMatched>=peQueue.length)setTimeout(()=>{el('pe-done').style.display='block';},400);
+  } else {
+    const lEl=el('pe-left-'+lId), rEl=el('pe-right-'+rIdx);
+    if(lEl){lEl.classList.remove('selected');lEl.classList.add('wrong');setTimeout(()=>lEl.classList.remove('wrong'),600);}
+    if(rEl){rEl.classList.remove('selected');rEl.classList.add('wrong');setTimeout(()=>rEl.classList.remove('wrong'),600);}
+    db.errors[lId]=(db.errors[lId]||0)+1;
+    saveDB();updateStats();
+    // update badge
+    const badge=lEl?.querySelector('.badge');
+    if(badge)badge.textContent=`錯 ${db.errors[lId]} 次`;
+  }
+}
+
+// ══════════════════════════════════════
+// ERROR LIST RENDER
+// ══════════════════════════════════════
+function renderErrors(){
+  const wrap=el('error-list-wrap');
+  const errList=db.vocab
+    .filter(v=>(db.errors[v.id]||0)>=1)
+    .sort((a,b)=>(db.errors[b.id]||0)-(db.errors[a.id]||0));
+
+  if(errList.length===0){
+    wrap.innerHTML='<div class="empty"><div class="empty-icon">🎊</div><div>還沒有任何錯誤！繼續保持</div></div>';
+    return;
+  }
+  wrap.innerHTML='<div class="error-list">'+errList.map(v=>{
+    const cnt=db.errors[v.id]||0;
+    const cls=cnt>=3?'many':'few';
+    const parts=v.q.split('\n');
+    return `<div class="error-item ${cls}">
+      <div class="error-q">
+        <div class="error-jp">${escHtml(parts[0])}</div>
+        ${parts[1]?`<div class="error-zh">${escHtml(parts[1])}</div>`:''}
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="error-ans">→ ${escHtml(v.a)}</div>
+        <span class="error-cnt ${cls}">錯 ${cnt} 次</span>
+      </div>
+    </div>`;
+  }).join('')+'</div>';
+}
+
+function clearErrors(){
+  if(!confirm('確定清除所有錯誤記錄？'))return;
+  db.errors={};saveDB();updateStats();renderErrors();toast('已清除錯誤記錄');
+}
+
+// ══════════════════════════════════════
+// IMPORT
+// ══════════════════════════════════════
+function importFile(evt){
+  const file=evt.target.files[0];if(!file)return;
+  evt.target.value='';
+  const ext=file.name.split('.').pop().toLowerCase();
+  if(ext==='csv'){
+    const reader=new FileReader();
+    reader.onload=e=>parseCSV(e.target.result);
+    reader.readAsText(file,'UTF-8');
+  } else {
+    // xlsx - use SheetJS
+    const reader=new FileReader();
+    reader.onload=e=>{
+      try{
+        const data=new Uint8Array(e.target.result);
+        const wb=XLSX.read(data,{type:'array'});
+        const ws=wb.Sheets[wb.SheetNames[0]];
+        const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+        processRows(rows);
+      } catch(err){ toast('❌ 讀取失敗：'+err.message); }
+    };
+    reader.readAsArrayBuffer(file);
+  }
+}
+
+function dropFile(evt){
+  evt.preventDefault();
+  el('drop-zone').classList.remove('drag');
+  const file=evt.dataTransfer.files[0];if(!file)return;
+  const fakeEvt={target:{files:[file],value:''}};
+  importFile(fakeEvt);
+}
+
+function parseCSV(text){
+  const lines=text.split('\n').filter(l=>l.trim());
+  const rows=lines.map(l=>{
+    // handle quoted CSV
+    const m=l.match(/("(?:[^"]|"")*"|[^,]*),("(?:[^"]|"")*"|[^,]*)/);
+    if(m)return[m[1].replace(/^"|"$/g,'').replace(/""/g,'"'),m[2].replace(/^"|"$/g,'').replace(/""/g,'"')];
+    const parts=l.split(',');return[parts[0]||'',parts[1]||''];
+  });
+  processRows(rows);
+}
+
+function processRows(rows){
+  let added=0,skipped=0;
+  const existing=new Set(db.vocab.map(v=>v.q+'|'+v.a));
+  rows.forEach(row=>{
+    const q=(row[0]||'').toString().trim();
+    const a=(row[1]||'').toString().trim();
+    if(!q||!a)return;
+    const key=q+'|'+a;
+    if(existing.has(key)){skipped++;return;}
+    const id='v'+Date.now()+Math.random().toString(36).slice(2,6);
+    db.vocab.push({id,q,a});
+    existing.add(key);
+    added++;
+  });
+  saveDB();updateStats();renderVocabPreview();
+  toast(`✅ 新增 ${added} 個・跳過重複 ${skipped} 個`);
+  switchTab('match');
+  buildRound();
+}
+
+function renderVocabPreview(){
+  const wrap=el('vocab-preview');
+  if(db.vocab.length===0){wrap.textContent='尚未載入單字';return;}
+  const sample=db.vocab.slice(0,5);
+  wrap.innerHTML=`<div style="margin-bottom:8px">共 <b style="color:var(--accent)">${db.vocab.length}</b> 個單字</div>`
+    +sample.map(v=>`<div style="padding:4px 0;border-bottom:1px solid var(--border);display:flex;gap:12px"><span style="color:var(--accent);min-width:120px">${escHtml(v.q.split('\n')[0])}</span><span style="color:var(--muted)">→</span><span>${escHtml(v.a)}</span></div>`).join('')
+    +(db.vocab.length>5?`<div style="margin-top:6px;color:var(--muted);font-size:11px">...以及其他 ${db.vocab.length-5} 個單字</div>`:'');
+}
+
+function clearAllVocab(){
+  if(!confirm('確定清除所有單字嗎？這個操作無法恢復！'))return;
+  db.vocab=[];db.errors={};db.todayDone=[];saveDB();
+  updateStats();renderVocabPreview();buildRound();toast('已清除所有單字');
+}
+function clearAllProgress(){
+  if(!confirm('確定清除所有學習記錄（含錯誤次數）？'))return;
+  db.errors={};db.todayDone=[];db.streak=0;saveDB();
+  updateStats();buildRound();toast('已清除學習記錄');
+}
+function resetTodayProgress(){
+  if(!confirm('確定重置今日進度？'))return;
+  db.todayDone=[];saveDB();updateStats();currentRound=1;buildRound();toast('今日進度已重置');
+}
+
+// ══════════════════════════════════════
+// TAB
+// ══════════════════════════════════════
+function switchTab(id){
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>{
+    const ids=['match','errors','practice-errors','import'];
+    b.classList.toggle('active',ids[i]===id);
+  });
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  el('view-'+id).classList.add('active');
+  if(id==='errors')renderErrors();
+  if(id==='practice-errors')startPracticeErrors();
+}
+
+// ══════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════
+function el(id){return document.getElementById(id);}
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function shuffle(arr){
+  const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;
+}
+let _toastTimer=null;
+function toast(msg){
+  const t=el('toast');t.textContent=msg;t.classList.add('show');
+  clearTimeout(_toastTimer);_toastTimer=setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+// ══════════════════════════════════════
+// LOAD SHEETJS
+// ══════════════════════════════════════
+const script=document.createElement('script');
+script.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+script.onload=()=>init();
+script.onerror=()=>{ console.warn('SheetJS 載入失敗，仍可使用 CSV'); init(); };
+document.head.appendChild(script);
+</script>
+</body>
+</html>
