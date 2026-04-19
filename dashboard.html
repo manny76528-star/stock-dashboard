@@ -1742,26 +1742,8 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
     </div>
   </div>
 
-  <!-- 3. 不限用途 → 小卡片 -->
-  <div class="big5-card" id="b5-flex" style="cursor:pointer" onclick="openSP('flex')">
-    <div class="big5-header" style="pointer-events:none">
-      <div class="big5-left">
-        <span class="big5-icon">💳</span>
-        <span class="big5-title">不限用途額度</span>
-        <div class="big5-meta">
-          <span>使用 <b id="f-rem">—</b></span>
-          <span>剩餘 <b id="f-avail">—</b></span>
-          <span>月息 <b id="f-mo">—</b></span>
-          <span style="display:none" id="tot-mo-out">—</span>
-        </div>
-      </div>
-      <div class="big5-right" style="pointer-events:auto">
-        <button class="big5-add-btn" onclick="event.stopPropagation();openFlexModal()">＋</button>
-        <button class="big5-toggle-btn" onclick="event.stopPropagation();openSP('flex')">展開 ▼</button>
-      </div>
-    </div>
-  </div>
-  <!-- hidden body for flex (渲染用) -->
+
+  <!-- hidden containers for flex and div rendering (不顯示在 big5，改為小卡片) -->
   <div style="display:none"><div class="flex-card-grid" id="flex-body"></div></div>
 
   <!-- 4. 現金帳戶 -->
@@ -1784,25 +1766,6 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
     </div>
     <div class="big5-detail" id="cash-detail" style="display:none">
       <div class="cash-card-grid" id="cash-body"></div>
-    </div>
-  </div>
-
-  <!-- 5. 股息記錄 → 小卡片 -->
-  <div class="big5-card" id="b5-div" style="cursor:pointer" onclick="openSP('div')">
-    <div class="big5-header" style="pointer-events:none">
-      <div class="big5-left">
-        <span class="big5-icon">🎯</span>
-        <span class="big5-title">股息記錄</span>
-        <div class="big5-meta">
-          <span>今年 <b id="d-yr-badge" style="color:var(--gain)">—</b></span>
-          <span>累積 <b id="d-tot-badge" style="color:var(--gain)">—</b></span>
-          <span>準備入帳 <b id="d-pend-badge" style="color:#93c5fd">—</b><span id="div-next-badge" style="font-size:11px;color:#fbbf24;font-weight:600;font-family:'JetBrains Mono',monospace;margin-left:4px"></span></span>
-        </div>
-      </div>
-      <div class="big5-right" style="pointer-events:auto">
-        <button class="big5-add-btn" onclick="event.stopPropagation();openDivModal()">＋</button>
-        <button class="big5-toggle-btn" onclick="event.stopPropagation();openSP('div')">展開 ▼</button>
-      </div>
     </div>
   </div>
 
@@ -1908,11 +1871,12 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 .mini-card-row{
   max-width:1300px;margin:0 auto 24px;
   display:grid;
-  grid-template-columns:repeat(5,1fr);
+  grid-template-columns:repeat(7,1fr);
   gap:12px;
 }
-@media(max-width:900px){.mini-card-row{grid-template-columns:repeat(3,1fr);}}
-@media(max-width:580px){.mini-card-row{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:1100px){.mini-card-row{grid-template-columns:repeat(4,1fr);}}
+@media(max-width:700px){.mini-card-row{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:480px){.mini-card-row{grid-template-columns:repeat(2,1fr);}}
 
 .mini-card{
   background:#1e293b;
@@ -2027,6 +1991,22 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
     <div class="mini-card-badge blue">
       <span id="journal-count">0 篇</span>
     </div>
+    <div class="mini-card-open-hint">點擊查看 ›</div>
+  </div>
+
+  <!-- 6. 不限用途額度 -->
+  <div class="mini-card" onclick="openSP('flex')">
+    <div class="mini-card-icon">💳</div>
+    <div class="mini-card-title">不限用途</div>
+    <div class="mini-card-badge red"><span id="f-rem-mc">—</span></div>
+    <div class="mini-card-open-hint">點擊查看 ›</div>
+  </div>
+
+  <!-- 7. 股息記錄 -->
+  <div class="mini-card" onclick="openSP('div')">
+    <div class="mini-card-icon">🎯</div>
+    <div class="mini-card-title">股息記錄</div>
+    <div class="mini-card-badge green"><span id="d-yr-badge-mc">—</span></div>
     <div class="mini-card-open-hint">點擊查看 ›</div>
   </div>
 
@@ -2257,9 +2237,13 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
     </div>
     <div class="sp-body" style="padding:0">
       <div style="padding:12px 16px;background:#f8fafc;border-bottom:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-        <input id="journal-search" type="text" placeholder="搜尋日誌..." style="flex:1;min-width:120px;padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;outline:none" oninput="renderJournal()">
+        <input id="journal-search" type="text" placeholder="搜尋日誌..." style="flex:1;min-width:100px;padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;outline:none" oninput="renderJournal()">
+        <!-- 年度選擇 -->
+        <select id="journal-year-sel" onchange="renderJournal()" style="padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:700;color:#475569;background:#fff;cursor:pointer;outline:none;min-width:80px">
+          <option value="all">全部年份</option>
+        </select>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
-          <button class="j-tag-btn" data-tag="" onclick="setJournalTag(this)">全部</button>
+          <button class="j-tag-btn active" data-tag="" onclick="setJournalTag(this)">全部</button>
           <button class="j-tag-btn" data-tag="看多" onclick="setJournalTag(this)">📈 看多</button>
           <button class="j-tag-btn" data-tag="看空" onclick="setJournalTag(this)">📉 看空</button>
           <button class="j-tag-btn" data-tag="買入" onclick="setJournalTag(this)">▲ 買入</button>
@@ -3635,6 +3619,7 @@ function renderFlex(){
   setEl('f-avail','$'+Math.max(0,totalLimit-tUsed).toLocaleString());
   setEl('f-mo','$'+tMo.toLocaleString());
   setEl('tot-mo-out','$'+(lM+tMo).toLocaleString());
+  setEl('f-rem-mc','使用 $'+tUsed.toLocaleString());
 }
 
 
@@ -3868,6 +3853,7 @@ function renderDivs(){
   // Update header badges
   const dyb=document.getElementById('d-yr-badge');if(dyb)dyb.textContent='$'+Math.round(yrTot).toLocaleString();
   const dtb=document.getElementById('d-tot-badge');if(dtb)dtb.textContent='$'+Math.round(allTot).toLocaleString();
+  const dmc=document.getElementById('d-yr-badge-mc');if(dmc)dmc.textContent='今年 $'+Math.round(yrTot).toLocaleString();
   const dpb=document.getElementById('d-pend-badge');
   if(dpb){
     dpb.textContent=pendingTotal>0?'$'+Math.round(pendingTotal).toLocaleString():'—';
@@ -6284,8 +6270,20 @@ function updateJournalCount(){
 
 function renderJournal(){
   const q=(document.getElementById('journal-search')?.value||'').toLowerCase();
+  const yrSel=document.getElementById('journal-year-sel');
+  const selYear=yrSel?yrSel.value:'all';
   let list=(db.journals||[]).slice();
+
+  // 動態更新年份選單
+  if(yrSel){
+    const years=[...new Set(list.map(j=>(j.date||'').slice(0,4)).filter(Boolean))].sort((a,b)=>b-a);
+    const curVal=yrSel.value;
+    yrSel.innerHTML='<option value="all">全部年份</option>'+years.map(y=>`<option value="${y}">${y} 年</option>`).join('');
+    yrSel.value=years.includes(curVal)?curVal:'all';
+  }
+
   if(journalTagFilter)list=list.filter(j=>(j.tags||[]).includes(journalTagFilter));
+  if(selYear&&selYear!=='all')list=list.filter(j=>(j.date||'').startsWith(selYear));
   if(q)list=list.filter(j=>
     (j.content||'').toLowerCase().includes(q)||
     (j.market||'').toLowerCase().includes(q)||
