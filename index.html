@@ -11,7 +11,7 @@ body{min-height:100vh;background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 60%,#
 .logo{font-size:13px;color:rgba(255,255,255,.4);letter-spacing:3px;text-transform:uppercase;margin-bottom:8px;}
 .title{font-size:32px;font-weight:900;color:#fff;margin-bottom:4px;letter-spacing:1px;}
 .sub{font-size:14px;color:rgba(255,255,255,.5);margin-bottom:48px;}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;width:100%;max-width:620px;}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;width:100%;max-width:920px;}
 .card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:32px 28px;cursor:pointer;transition:all .25s;text-decoration:none;display:flex;flex-direction:column;gap:16px;position:relative;overflow:hidden;}
 .card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.08),transparent);opacity:0;transition:opacity .25s;}
 .card:hover{border-color:rgba(255,255,255,.3);transform:translateY(-4px);box-shadow:0 20px 40px rgba(0,0,0,.3);}
@@ -49,6 +49,16 @@ body{min-height:100vh;background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 60%,#
       <div class="card-desc">客戶管理、開單記帳、序號查詢、應收帳款、業績分析</div>
     </div>
     <div class="card-badge new">業務記帳</div>
+    <div class="card-arrow">→</div>
+  </a>
+
+  <a href="vocab.html" class="card">
+    <div class="card-icon">🇯🇵</div>
+    <div>
+      <div class="card-title">日文單字複習</div>
+      <div class="card-desc">配對練習、常錯單字追蹤、進度統計、Excel 單字匯入</div>
+    </div>
+    <div class="card-badge new">語言學習</div>
     <div class="card-arrow">→</div>
   </a>
 </div>
