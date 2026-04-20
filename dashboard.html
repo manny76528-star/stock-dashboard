@@ -5388,33 +5388,12 @@ function forceDailyProcess(){
   const now=new Date();
   const twNow=new Date(now.getTime()+8*3600000);
   const todayStr=twNow.toISOString().slice(0,10);
-
-  // ── 診斷資訊 ──
-  let debugInfo='【診斷】今日(台灣)：'+todayStr+'\n';
-  db.cashAccounts.forEach(acc=>{
-    if(acc.d1||acc.d2){
-      const settleDate=acc.d1Date?getSettleDate(acc.d1Date):'(無d1Date)';
-      const D1_KEY='d1_settled_'+acc.id+'_'+settleDate;
-      const alreadyDone=localStorage.getItem(D1_KEY);
-      debugInfo+='\n帳戶：'+acc.bank;
-      debugInfo+='\n  d1='+acc.d1+'  d1Date='+acc.d1Date;
-      debugInfo+='\n  算出交割日='+settleDate;
-      debugInfo+='\n  交割日<=今日？'+(settleDate<=todayStr?'✅ 是':'❌ 否');
-      debugInfo+='\n  localStorage key='+D1_KEY;
-      debugInfo+='\n  已執行過？'+(alreadyDone?'✅ 是（被擋住）':'❌ 否');
-    }
-  });
-  console.log(debugInfo);
-  alert(debugInfo);
-
-  // 清除今日所有交割的 key
+  // 清除今日所有交割和股息的 key，讓它重新執行
   localStorage.removeItem('div_done_'+todayStr);
   db.cashAccounts.forEach(acc=>{
     if(acc.d1&&acc.d1Date){
       const settleDate=getSettleDate(acc.d1Date);
-      const key='d1_settled_'+acc.id+'_'+settleDate;
-      debugInfo+='\n清除 key: '+key;
-      localStorage.removeItem(key);
+      localStorage.removeItem('d1_settled_'+acc.id+'_'+settleDate);
     }
   });
   const results=runDailyProcess(true);
