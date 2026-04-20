@@ -136,6 +136,16 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-seri
 .import-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;}
 .import-sub{font-size:12px;color:var(--muted);}
 
+/* ── NUMBER TYPE BTNS ── */
+.num-type-btn{
+  padding:7px 14px;border-radius:20px;font-size:12px;font-weight:700;
+  cursor:pointer;border:1.5px solid var(--border);
+  background:var(--surface);color:var(--muted);
+  transition:all .15s;font-family:'Noto Sans TC',sans-serif;
+}
+.num-type-btn.active{background:var(--accent2);color:#fff;border-color:var(--accent2);}
+.num-type-btn:hover:not(.active){border-color:var(--accent);color:var(--accent);}
+
 /* ── CONFIRM DIALOG ── */
 .confirm-overlay{
   display:none;position:fixed;inset:0;
@@ -226,10 +236,11 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-seri
 
   <!-- Tab -->
   <div class="tab-nav">
-    <button class="tab-btn active" onclick="switchTab('match')">🎯 配對練習</button>
-    <button class="tab-btn" onclick="switchTab('errors')">❌ 常錯單字</button>
-    <button class="tab-btn" onclick="switchTab('practice-errors')">🔥 練習常錯</button>
-    <button class="tab-btn" onclick="switchTab('import')">📥 匯入管理</button>
+    <button class="tab-btn active" onclick="switchTab('match')">🎯 配對</button>
+    <button class="tab-btn" onclick="switchTab('errors')">❌ 常錯</button>
+    <button class="tab-btn" onclick="switchTab('practice-errors')">🔥 練常錯</button>
+    <button class="tab-btn" onclick="switchTab('numbers')">🔢 數字</button>
+    <button class="tab-btn" onclick="switchTab('import')">📥 匯入</button>
   </div>
 
   <!-- ══ TAB 1: 配對練習 ══ -->
@@ -310,7 +321,41 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-seri
     </div>
   </div>
 
-  <!-- ══ TAB 4: 匯入管理 ══ -->
+  <!-- ══ TAB 4: 數字練習 ══ -->
+  <div class="view" id="view-numbers">
+    <div class="prac-header">
+      <div>
+        <div class="prac-title">🔢 數字練習</div>
+        <div class="prac-sub" id="num-sub">選擇練習類型</div>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="startNumGame()">重新出題</button>
+    </div>
+
+    <!-- 類型選擇 -->
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+      <button class="num-type-btn active" data-type="count" onclick="selectNumType(this)">🧮 數量詞 1-10</button>
+      <button class="num-type-btn" data-type="num1" onclick="selectNumType(this)">🔢 數字 1-10</button>
+      <button class="num-type-btn" data-type="num2" onclick="selectNumType(this)">🔢 數字 11-20</button>
+      <button class="num-type-btn" data-type="all" onclick="selectNumType(this)">🎲 全部混合</button>
+    </div>
+
+    <div id="num-score-bar" style="display:none;margin-bottom:10px">
+      <div class="round-info">已配對 <b id="num-matched">0</b> / <b id="num-total">0</b></div>
+    </div>
+
+    <div class="match-wrap" id="num-match-area"></div>
+
+    <div id="num-done" style="display:none">
+      <div class="result-panel">
+        <div class="result-emoji">🎉</div>
+        <div class="result-title">練習完成！</div>
+        <div class="result-sub">數字掌握得很好！再來一次鞏固記憶？</div>
+        <button class="btn btn-primary" onclick="startNumGame()">再練一次</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB 5: 匯入管理 ══ -->
   <div class="view" id="view-import">
     <div class="import-zone" id="drop-zone"
       ondragover="event.preventDefault();this.classList.add('drag')"
@@ -902,19 +947,142 @@ function resetTodayProgress(){
 // ══════════════════════════════════════
 function switchTab(id){
   document.querySelectorAll('.tab-btn').forEach((b,i)=>{
-    const ids=['match','errors','practice-errors','import'];
+    const ids=['match','errors','practice-errors','numbers','import'];
     b.classList.toggle('active',ids[i]===id);
   });
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   el('view-'+id).classList.add('active');
   if(id==='errors')renderErrors();
   if(id==='practice-errors')startPracticeErrors();
+  if(id==='numbers')startNumGame();
 }
 
 // ══════════════════════════════════════
+// 數字練習
+// ══════════════════════════════════════
+const NUM_DATA={
+  // 數量詞 1-10（個）
+  count:[
+    {q:'1個',a:'ひとつ（一つ）'},
+    {q:'2個',a:'ふたつ（二つ）'},
+    {q:'3個',a:'みっつ（三つ）'},
+    {q:'4個',a:'よっつ（四つ）'},
+    {q:'5個',a:'いつつ（五つ）'},
+    {q:'6個',a:'むっつ（六つ）'},
+    {q:'7個',a:'ななつ（七つ）'},
+    {q:'8個',a:'やっつ（八つ）'},
+    {q:'9個',a:'ここのつ（九つ）'},
+    {q:'10個',a:'とお（十）'},
+  ],
+  // 數字 1-10
+  num1:[
+    {q:'1',a:'いち（一）'},
+    {q:'2',a:'に（二）'},
+    {q:'3',a:'さん（三）'},
+    {q:'4',a:'し・よん（四）'},
+    {q:'5',a:'ご（五）'},
+    {q:'6',a:'ろく（六）'},
+    {q:'7',a:'しち・なな（七）'},
+    {q:'8',a:'はち（八）'},
+    {q:'9',a:'く・きゅう（九）'},
+    {q:'10',a:'じゅう（十）'},
+  ],
+  // 數字 11-20
+  num2:[
+    {q:'11',a:'じゅういち（十一）'},
+    {q:'12',a:'じゅうに（十二）'},
+    {q:'13',a:'じゅうさん（十三）'},
+    {q:'14',a:'じゅうし（十四）'},
+    {q:'15',a:'じゅうご（十五）'},
+    {q:'16',a:'じゅうろく（十六）'},
+    {q:'17',a:'じゅうしち（十七）'},
+    {q:'18',a:'じゅうはち（十八）'},
+    {q:'19',a:'じゅうく（十九）'},
+    {q:'20',a:'にじゅう（二十）'},
+  ],
+};
+
+let numType='count';
+let numLeft=null, numRight=null, numRightId=null, numMatched=0, numQueue=[];
+
+function selectNumType(btn){
+  document.querySelectorAll('.num-type-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  numType=btn.dataset.type;
+  startNumGame();
+}
+
+function startNumGame(){
+  el('num-done').style.display='none';
+  numLeft=null;numRight=null;numRightId=null;numMatched=0;
+
+  // 決定資料來源
+  let pool=[];
+  if(numType==='all'){
+    pool=[...NUM_DATA.count,...NUM_DATA.num1,...NUM_DATA.num2];
+  } else {
+    pool=[...NUM_DATA[numType]||NUM_DATA.count];
+  }
+  // 加上唯一 id
+  numQueue=pool.map((v,i)=>({...v,id:'n'+i}));
+  const answers=shuffle([...numQueue]);
+
+  el('num-score-bar').style.display='block';
+  el('num-total').textContent=numQueue.length;
+  el('num-matched').textContent=0;
+  el('num-sub').textContent=`共 ${numQueue.length} 題`;
+
+  const area=el('num-match-area');
+  let lH='',rH='',mH='';
+  numQueue.forEach(v=>{
+    lH+=`<div class="match-item" id="nl-${v.id}" onclick="numSelLeft('${v.id}')">
+      <div style="font-size:13px;font-weight:700;color:var(--accent)">${escHtml(v.q)}</div>
+    </div>`;
+    mH+=`<div class="match-connector"><div class="conn-line"></div></div>`;
+  });
+  answers.forEach((v,i)=>{
+    rH+=`<div class="match-item" id="nr-${i}" onclick="numSelRight(${i},'${v.id}')">
+      <div style="font-size:11px;color:var(--text);font-family:'Noto Sans JP',sans-serif">${escHtml(v.a)}</div>
+    </div>`;
+  });
+  area.innerHTML=`
+    <div class="match-col">${lH}</div>
+    <div class="match-center">${mH}</div>
+    <div class="match-col">${rH}</div>`;
+}
+
+function numSelLeft(id){
+  if(numLeft){const p=el('nl-'+numLeft);if(p)p.classList.remove('selected');}
+  numLeft=id;
+  const item=el('nl-'+id);if(item){item.classList.add('selected');item.classList.remove('wrong');}
+  numTryMatch();
+}
+function numSelRight(idx,id){
+  if(numRight!==null){const p=el('nr-'+numRight);if(p)p.classList.remove('selected');}
+  numRight=idx;numRightId=id;
+  const item=el('nr-'+idx);if(item){item.classList.add('selected');item.classList.remove('wrong');}
+  numTryMatch();
+}
+function numTryMatch(){
+  if(numLeft===null||numRight===null)return;
+  const lId=numLeft,rId=numRightId,rIdx=numRight;
+  numLeft=null;numRight=null;numRightId=null;
+  if(lId===rId){
+    const lEl=el('nl-'+lId),rEl=el('nr-'+rIdx);
+    if(lEl){lEl.classList.remove('selected');lEl.classList.add('matched','pop');}
+    if(rEl){rEl.classList.remove('selected');rEl.classList.add('matched','pop');}
+    numMatched++;
+    el('num-matched').textContent=numMatched;
+    if(numMatched>=numQueue.length)setTimeout(()=>{el('num-done').style.display='block';},400);
+  } else {
+    const lEl=el('nl-'+lId),rEl=el('nr-'+rIdx);
+    if(lEl){lEl.classList.remove('selected');lEl.classList.add('wrong');setTimeout(()=>lEl.classList.remove('wrong'),600);}
+    if(rEl){rEl.classList.remove('selected');rEl.classList.add('wrong');setTimeout(()=>rEl.classList.remove('wrong'),600);}
+  }
+}
+// ══════════════════════════════════════
 // UTILS
 // ══════════════════════════════════════
-function el(id){return document.getElementById(id);}
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function shuffle(arr){
   const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;
