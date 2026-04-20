@@ -1029,7 +1029,11 @@ function selectNumType(btn){
 }
 
 function startNumGame(){
-  el('num-done').style.display='none';
+  const numDoneEl=el('num-done');
+  const numArea=el('num-match-area');
+  const numScoreBar=el('num-score-bar');
+  if(!numDoneEl||!numArea)return; // 元素還沒渲染
+  numDoneEl.style.display='none';
   numLeft=null;numRight=null;numRightId=null;numMatched=0;
 
   // 決定資料來源
@@ -1044,12 +1048,12 @@ function startNumGame(){
   numQueue=pool.map((v,i)=>({...v,id:'n'+i}));
   const answers=shuffle([...numQueue]);
 
-  el('num-score-bar').style.display='block';
+  if(numScoreBar)numScoreBar.style.display='block';
   el('num-total').textContent=numQueue.length;
   el('num-matched').textContent=0;
   el('num-sub').textContent=`共 ${numQueue.length} 題`;
 
-  const area=el('num-match-area');
+  const area=numArea;
   let lH='',rH='',mH='';
   numQueue.forEach(v=>{
     lH+=`<div class="match-item" id="nl-${v.id}" onclick="numSelLeft('${v.id}')">
@@ -1100,6 +1104,7 @@ function numTryMatch(){
 // ══════════════════════════════════════
 // UTILS
 // ══════════════════════════════════════
+function el(id){return document.getElementById(id);}
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function shuffle(arr){
   const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;
@@ -1279,9 +1284,8 @@ setInterval(async()=>{
 const script=document.createElement('script');
 script.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
 script.onload=async()=>{
-  // 啟動：停用Push → Pull → Pull完才init → 啟用Push
-  _syncEnabled=false;
-  showSyncStatus('🔄 同步中...');
+  _syncEnabled=false; // 禁止 Push，先 Pull
+  showSyncStatus('🔄 載入中...');
   try{
     const r=await fetch(GH_API+'?t='+Date.now());
     if(r.ok){
@@ -1294,21 +1298,29 @@ script.onload=async()=>{
       const remote=JSON.parse(new TextDecoder().decode(bytes));
       const remoteTs=remote._ts||0;
       const localTs=db._ts||0;
-      console.log('vocab 啟動Pull: 本地ts='+localTs+' 遠端ts='+remoteTs);
-      if(remoteTs>=localTs){
-        if((db.vocab||[]).length>(remote.vocab||[]).length)remote.vocab=db.vocab;
+      const remoteVocab=(remote.vocab||[]).length;
+      const localVocab=(db.vocab||[]).length;
+      console.log(`vocab啟動: 本地ts=${localTs}(${localVocab}字) 雲端ts=${remoteTs}(${remoteVocab}字)`);
+      // 雲端較新 或 雲端有資料而本地沒有 → 用雲端
+      if(remoteTs>=localTs || (remoteVocab>0 && localVocab===0)){
+        if(localVocab>remoteVocab)remote.vocab=db.vocab; // 保護本地較多的字
         if(Object.keys(db.errors||{}).length>Object.keys(remote.errors||{}).length)remote.errors=db.errors;
         db=remote;
         localStorage.setItem(DB_KEY,JSON.stringify(db));
         showSyncStatus('☁️ 已從雲端同步');
+        console.log('✅ 啟動 Pull 成功');
       }
     }
-  }catch(e){console.warn('啟動Pull失敗:',e.message);}
+  }catch(e){
+    console.warn('啟動Pull失敗:',e.message);
+    showSyncStatus('⚠️ 同步失敗，使用本地資料');
+  }
   _syncEnabled=true;
-  init(); // Pull完才init，確保顯示最新資料
+  init(); // Pull完才init
 };
 script.onerror=()=>{
   console.warn('SheetJS 載入失敗，仍可使用 CSV');
+  _syncEnabled=true;
   init();
 };
 document.head.appendChild(script);
