@@ -566,6 +566,16 @@
       "perShare": 0.048,
       "amount": 38400,
       "pending": true
+    },
+    {
+      "id": "mo6n0fm3kvl",
+      "code": "00981D",
+      "exDate": "2026-04-20",
+      "date": "2026-05-15",
+      "lots": 100,
+      "perShare": 0.07,
+      "amount": 7000.000000000001,
+      "pending": true
     }
   ],
   "snapshots": [
@@ -652,7 +662,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1776655815285,
+  "_ts": 1776655837636,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
