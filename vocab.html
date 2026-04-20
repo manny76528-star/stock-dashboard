@@ -955,6 +955,7 @@ const GH_FILE='data_vocab.json';
 const GH_API=CF_WORKER+'/'+GH_FILE;
 let _ghSha='';
 let _syncTimer=null;
+let _syncEnabled=true;
 
 function showSyncStatus(msg){
   const el2=document.getElementById('sync-status');
@@ -962,6 +963,7 @@ function showSyncStatus(msg){
 }
 
 async function ghPull(){
+  if(!_syncEnabled)return false;
   try{
     const r=await fetch(GH_API+'?t='+Date.now());
     if(!r.ok){if(r.status===404)return false;throw new Error('Pull '+r.status);}
@@ -974,23 +976,27 @@ async function ghPull(){
     const remote=JSON.parse(new TextDecoder().decode(bytes));
     const localTs=db._ts||0;
     const remoteTs=remote._ts||0;
-    if(remoteTs>localTs){
-      // 遠端較新，但保護本地較多的vocab和errors
+    console.log('vocab Pull: 本地ts='+localTs+' 遠端ts='+remoteTs);
+    if(remoteTs>=localTs){
+      // 遠端較新或相同 → 合併，保護本地較多的vocab和errors
       if((db.vocab||[]).length>(remote.vocab||[]).length)remote.vocab=db.vocab;
       if(Object.keys(db.errors||{}).length>Object.keys(remote.errors||{}).length)remote.errors=db.errors;
       db=remote;
-      saveDB();
+      localStorage.setItem(DB_KEY,JSON.stringify(db));
       showSyncStatus('☁️ 已從雲端同步');
+      console.log('✅ vocab Pull 成功');
       return true;
     }
+    console.log('本地資料較新，保留本地');
     return false;
   }catch(e){console.warn('Pull失敗:',e.message);return false;}
 }
 
 async function ghPush(){
+  if(!_syncEnabled)return;
   try{
     db._ts=Date.now();
-    saveDB();
+    localStorage.setItem(DB_KEY,JSON.stringify(db));
     const jsonStr=JSON.stringify(db,null,2);
     const encoder=new TextEncoder();
     const bytes=encoder.encode(jsonStr);
@@ -1035,10 +1041,48 @@ async function manualSync(){
   showSyncStatus('✅ 同步完成');
 }
 
-// 頁面隱藏前立即 Push
-document.addEventListener('visibilitychange',function(){
-  if(document.visibilityState==='hidden'){clearTimeout(_syncTimer);ghPush();}
+// 離開頁面前立即 Push
+document.addEventListener('visibilitychange',async function(){
+  if(document.visibilityState==='hidden'){
+    clearTimeout(_syncTimer);
+    ghPush();
+  }
+  // 切回頁面：停用Push → 強制Pull → 啟用Push
+  if(document.visibilityState==='visible'){
+    if(!_syncEnabled)return;
+    _syncEnabled=false;
+    try{
+      const r=await fetch(GH_API+'?t='+Date.now());
+      if(r.ok){
+        const j=await r.json();
+        _ghSha=j.sha;
+        const b64=j.content.replace(/\n/g,'');
+        const binStr=atob(b64);
+        const bytes=new Uint8Array(binStr.length);
+        for(let i=0;i<binStr.length;i++)bytes[i]=binStr.charCodeAt(i);
+        const remote=JSON.parse(new TextDecoder().decode(bytes));
+        const remoteTs=remote._ts||0;
+        const localTs=db._ts||0;
+        if(remoteTs>=localTs){
+          if((db.vocab||[]).length>(remote.vocab||[]).length)remote.vocab=db.vocab;
+          if(Object.keys(db.errors||{}).length>Object.keys(remote.errors||{}).length)remote.errors=db.errors;
+          db=remote;
+          localStorage.setItem(DB_KEY,JSON.stringify(db));
+          updateStats();buildRound();renderVocabPreview();
+          showSyncStatus('☁️ 已從雲端同步');
+        }
+      }
+    }catch(e){console.warn('visibilitychange Pull失敗:',e.message);}
+    _syncEnabled=true;
+  }
 });
+
+// 每 5 分鐘自動 Pull 一次
+setInterval(async()=>{
+  if(!_syncEnabled)return;
+  const updated=await ghPull();
+  if(updated){updateStats();buildRound();renderVocabPreview();showSyncStatus('☁️ 已從雲端同步');}
+},5*60*1000);
 
 // ══════════════════════════════════════
 // LOAD SHEETJS
@@ -1046,16 +1090,38 @@ document.addEventListener('visibilitychange',function(){
 const script=document.createElement('script');
 script.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
 script.onload=async()=>{
-  showSyncStatus('🔄 同步中...');
-  const updated=await ghPull();
-  if(updated){updateStats();renderVocabPreview();}
+  // 啟動：停用Push → 1.5秒後Pull → 啟用Push
+  _syncEnabled=false;
+  setTimeout(async()=>{
+    try{
+      const r=await fetch(GH_API+'?t='+Date.now());
+      if(r.ok){
+        const j=await r.json();
+        _ghSha=j.sha;
+        const b64=j.content.replace(/\n/g,'');
+        const binStr=atob(b64);
+        const bytes=new Uint8Array(binStr.length);
+        for(let i=0;i<binStr.length;i++)bytes[i]=binStr.charCodeAt(i);
+        const remote=JSON.parse(new TextDecoder().decode(bytes));
+        const remoteTs=remote._ts||0;
+        const localTs=db._ts||0;
+        console.log('vocab 啟動Pull: 本地ts='+localTs+' 遠端ts='+remoteTs);
+        if(remoteTs>=localTs){
+          if((db.vocab||[]).length>(remote.vocab||[]).length)remote.vocab=db.vocab;
+          if(Object.keys(db.errors||{}).length>Object.keys(remote.errors||{}).length)remote.errors=db.errors;
+          db=remote;
+          localStorage.setItem(DB_KEY,JSON.stringify(db));
+          updateStats();buildRound();renderVocabPreview();
+          showSyncStatus('☁️ 已從雲端同步');
+        }
+      }
+    }catch(e){console.warn('啟動Pull失敗:',e.message);}
+    _syncEnabled=true;
+  },1500);
   init();
-  await ghPush();
 };
-script.onerror=async()=>{
-  console.warn('SheetJS 載入失敗');
-  const updated=await ghPull();
-  if(updated){updateStats();renderVocabPreview();}
+script.onerror=()=>{
+  console.warn('SheetJS 載入失敗，仍可使用 CSV');
   init();
 };
 document.head.appendChild(script);

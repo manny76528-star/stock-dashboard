@@ -2673,53 +2673,30 @@ async function ghPull(){
   try{
     const r=await fetch(GH_API+'?t='+Date.now());
     if(!r.ok){
-      if(r.status===404){
-        // 遠端沒有檔案 → 本次 Push 建立
-        console.log('data_dashboard.json 不存在，略過Pull');
-        return false;
-      }
+      if(r.status===404){console.log('data_dashboard.json 不存在，略過Pull');return false;}
       throw new Error('Pull '+r.status);
     }
     const j=await r.json();
     _ghSha=j.sha;
-    // 正確解碼中文
     const b64=j.content.replace(/\n/g,'');
     const binStr2=atob(b64);
     const bytes2=new Uint8Array(binStr2.length);
     for(let i=0;i<binStr2.length;i++)bytes2[i]=binStr2.charCodeAt(i);
     const remote=JSON.parse(new TextDecoder().decode(bytes2));
-    const localW=dbWeight(db);
-    const remoteW=dbWeight(remote);
     const localTs=db._ts||0;
     const remoteTs=remote._ts||0;
-    console.log(`Pull: 本地重量${localW} 遠端重量${remoteW} | 本地ts${localTs} 遠端ts${remoteTs}`);
-    // 安全規則：
-    // 1. 本地是空的 → 使用遠端
-    // 2. 遠端資料量 > 本地 且 時間戳較新 → 使用遠端
-    // 3. 其他情況 → 保留本地
-    console.log(`Pull比較: 本地ts=${localTs} 遠端ts=${remoteTs}`);
-    if(remoteTs>localTs){
-      // 遠端較新 → 合併更新，但保護本地較多的資料
-      // journals 和 watchlist：取較多的那份
-      if((db.journals||[]).length>(remote.journals||[]).length){
-        remote.journals=db.journals;
-      }
-      if((db.watchlist||[]).length>(remote.watchlist||[]).length){
-        remote.watchlist=db.watchlist;
-      }
+    console.log(`Pull: 本地ts=${localTs} 遠端ts=${remoteTs}`);
+    if(remoteTs>=localTs){
+      // 遠端較新或相同 → 合併，保護本地較多的欄位
+      if((db.journals||[]).length>(remote.journals||[]).length)remote.journals=db.journals;
+      if((db.watchlist||[]).length>(remote.watchlist||[]).length)remote.watchlist=db.watchlist;
       db=remote;
       localStorage.setItem(STORE,JSON.stringify(db));
       showSyncStatus('☁️ 已從雲端同步');
-      console.log('✅ Pull 成功，使用遠端資料');
-      return true;
-    } else if(localW===0&&remoteW>0){
-      // 本地是空的 → 使用遠端
-      db=remote;
-      localStorage.setItem(STORE,JSON.stringify(db));
-      showSyncStatus('☁️ 已從雲端同步');
+      console.log('✅ Pull 成功');
       return true;
     } else {
-      console.log('本地資料較新或相同，保留本地');
+      console.log('本地資料較新，保留本地');
       return false;
     }
   }catch(e){console.warn('Pull失敗:',e.message);return false;}
@@ -2799,7 +2776,6 @@ document.addEventListener('click',function(e){
 async function manualSync(){
   showSyncStatus('🔄 同步中...');
   _ghSha='';
-  // 先 Pull（看有沒有更新的遠端資料），再 Push 本地資料
   const updated=await ghPull();
   if(updated)render();
   await ghPush();
@@ -3655,7 +3631,7 @@ function renderCash(){
     const breakdown=document.createElement('div');
     breakdown.className='cash-card-breakdown';
     breakdown.innerHTML='<div class="cash-item"><span class="cash-item-label">現金</span><span class="cash-item-val">$'+(c.cash||0).toLocaleString()+'</span></div>'
-      +(hasD1?'<div class="cash-item"><span class="cash-item-label">交割 DAY1'+(c.d1Date?' <span style="font-size:10px;color:#94a3b8">(交割'+fmtMMDD(getSettleDate(c.d1Date))+')</span>':'')+'</span><span class="cash-item-val '+(c.d1<0?'loss':'gain')+'">$'+c.d1.toLocaleString()+'</span></div>':'')
+      +(hasD1?'<div class="cash-item"><span class="cash-item-label">交割 DAY1'+(c.d1Date?' <span style="font-size:10px;color:#94a3b8">(交割'+fmtMMDD(c.d1SettleDate||getSettleDate(c.d1Date))+')</span>':'')+'</span><span class="cash-item-val '+(c.d1<0?'loss':'gain')+'">$'+c.d1.toLocaleString()+'</span></div>':'')
       +(hasD2?'<div class="cash-item"><span class="cash-item-label">交割 DAY2</span><span class="cash-item-val '+(c.d2<0?'loss':'gain')+'">$'+c.d2.toLocaleString()+'</span></div>':'');
     card.appendChild(breakdown);
 
@@ -5295,13 +5271,13 @@ function runDailyProcess(force){
   // 2. DAY1/DAY2 交割自動連動
   (db.cashAccounts||[]).forEach(acc=>{
     if(acc.d1&&acc.d1!==0&&acc.d1Date){
-      const settleDate=getSettleDate(acc.d1Date); // T+2 = DAY1交割日
+      // 優先用已算好的 d1SettleDate，沒有才動態算
+      const settleDate=acc.d1SettleDate||getSettleDate(acc.d1Date);
       if(settleDate<=todayStr){
         const D1_KEY='d1_settled_'+acc.id+'_'+settleDate;
         if(force||!localStorage.getItem(D1_KEY)){
-          // 先把 d2 的資料備份
           const d2Amt=acc.d2||0;
-          const d2Date=acc.d1Date; // DAY2買入日與DAY1相同批次，T+3交割
+          const originalD1Date=acc.d1Date; // 保留原始買入日，DAY2=T+3要用
 
           // 扣 DAY1
           acc.cash=(acc.cash||0)+Math.round(acc.d1);
@@ -5309,16 +5285,22 @@ function runDailyProcess(force){
           localStorage.setItem(D1_KEY,'1');
           changed=true;
 
-          // DAY2 移到 DAY1，交割日 = 原買入日 T+3
+          // DAY2 移到 DAY1
           if(d2Amt&&d2Amt!==0){
             acc.d1=d2Amt;
-            // DAY2 的交割日是原買入日 T+3，也就是 DAY1 settleDate 的下一個交割日
-            acc.d1Date=settleDate; // settleDate 當新基準，再 T+2 = 原 T+3
+            // DAY2 交割日 = 原買入日 T+3
+            // 用一個中間日讓 getSettleDate(T+1) = T+3，即存 T+1 當 d1Date
+            const d2SettleDate=nextTradeDay(originalD1Date,3); // 原買入日 T+3
+            // 反推：讓 getSettleDate(x) = d2SettleDate，即 x = d2SettleDate 前一個交易日
+            // 最簡單：直接存 d2SettleDate 本身，修改判斷邏輯改用 d1SettleDate 欄位
+            acc.d1Date=originalD1Date;  // 保留原始買入日
+            acc.d1SettleDate=d2SettleDate; // 直接存算好的交割日
             acc.d2=0;
-            msgs.push('📋 '+acc.bank+' DAY2→DAY1 移轉 '+(acc.d1>0?'+':'')+Math.round(acc.d1).toLocaleString()+'（交割日：'+fmtMMDD(getSettleDate(acc.d1Date))+'）');
+            msgs.push('📋 '+acc.bank+' DAY2→DAY1 移轉 '+(acc.d1>0?'+':'')+Math.round(acc.d1).toLocaleString()+'（交割日：'+fmtMMDD(d2SettleDate)+'）');
           } else {
             acc.d1=0;
             acc.d1Date='';
+            acc.d1SettleDate='';
           }
         }
       }
@@ -5392,7 +5374,7 @@ function forceDailyProcess(){
   localStorage.removeItem('div_done_'+todayStr);
   db.cashAccounts.forEach(acc=>{
     if(acc.d1&&acc.d1Date){
-      const settleDate=getSettleDate(acc.d1Date);
+      const settleDate=acc.d1SettleDate||getSettleDate(acc.d1Date);
       localStorage.removeItem('d1_settled_'+acc.id+'_'+settleDate);
     }
   });
