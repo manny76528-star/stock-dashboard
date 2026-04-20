@@ -336,6 +336,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-seri
       <button class="num-type-btn active" data-type="count" onclick="selectNumType(this)">🧮 數量詞 1-10</button>
       <button class="num-type-btn" data-type="num1" onclick="selectNumType(this)">🔢 數字 1-10</button>
       <button class="num-type-btn" data-type="num2" onclick="selectNumType(this)">🔢 數字 11-20</button>
+      <button class="num-type-btn" data-type="months" onclick="selectNumType(this)">📅 月份 1-12月</button>
       <button class="num-type-btn" data-type="all" onclick="selectNumType(this)">🎲 全部混合</button>
     </div>
 
@@ -1000,6 +1001,21 @@ const NUM_DATA={
     {q:'19',a:'じゅうく（十九）'},
     {q:'20',a:'にじゅう（二十）'},
   ],
+  // 月份 1-12月
+  months:[
+    {q:'1月',a:'いちがつ（一月）'},
+    {q:'2月',a:'にがつ（二月）'},
+    {q:'3月',a:'さんがつ（三月）'},
+    {q:'4月',a:'しがつ（四月）'},
+    {q:'5月',a:'ごがつ（五月）'},
+    {q:'6月',a:'ろくがつ（六月）'},
+    {q:'7月',a:'しちがつ（七月）'},
+    {q:'8月',a:'はちがつ（八月）'},
+    {q:'9月',a:'くがつ（九月）'},
+    {q:'10月',a:'じゅうがつ（十月）'},
+    {q:'11月',a:'じゅういちがつ（十一月）'},
+    {q:'12月',a:'じゅうにがつ（十二月）'},
+  ],
 };
 
 let numType='count';
@@ -1019,7 +1035,8 @@ function startNumGame(){
   // 決定資料來源
   let pool=[];
   if(numType==='all'){
-    pool=[...NUM_DATA.count,...NUM_DATA.num1,...NUM_DATA.num2];
+    const combined=[...NUM_DATA.count,...NUM_DATA.num1,...NUM_DATA.num2,...NUM_DATA.months];
+    pool=shuffle(combined).slice(0,10); // 隨機抽10題
   } else {
     pool=[...NUM_DATA[numType]||NUM_DATA.count];
   }
@@ -1262,35 +1279,33 @@ setInterval(async()=>{
 const script=document.createElement('script');
 script.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
 script.onload=async()=>{
-  // 啟動：停用Push → 1.5秒後Pull → 啟用Push
+  // 啟動：停用Push → Pull → Pull完才init → 啟用Push
   _syncEnabled=false;
-  setTimeout(async()=>{
-    try{
-      const r=await fetch(GH_API+'?t='+Date.now());
-      if(r.ok){
-        const j=await r.json();
-        _ghSha=j.sha;
-        const b64=j.content.replace(/\n/g,'');
-        const binStr=atob(b64);
-        const bytes=new Uint8Array(binStr.length);
-        for(let i=0;i<binStr.length;i++)bytes[i]=binStr.charCodeAt(i);
-        const remote=JSON.parse(new TextDecoder().decode(bytes));
-        const remoteTs=remote._ts||0;
-        const localTs=db._ts||0;
-        console.log('vocab 啟動Pull: 本地ts='+localTs+' 遠端ts='+remoteTs);
-        if(remoteTs>=localTs){
-          if((db.vocab||[]).length>(remote.vocab||[]).length)remote.vocab=db.vocab;
-          if(Object.keys(db.errors||{}).length>Object.keys(remote.errors||{}).length)remote.errors=db.errors;
-          db=remote;
-          localStorage.setItem(DB_KEY,JSON.stringify(db));
-          updateStats();buildRound();renderVocabPreview();
-          showSyncStatus('☁️ 已從雲端同步');
-        }
+  showSyncStatus('🔄 同步中...');
+  try{
+    const r=await fetch(GH_API+'?t='+Date.now());
+    if(r.ok){
+      const j=await r.json();
+      _ghSha=j.sha;
+      const b64=j.content.replace(/\n/g,'');
+      const binStr=atob(b64);
+      const bytes=new Uint8Array(binStr.length);
+      for(let i=0;i<binStr.length;i++)bytes[i]=binStr.charCodeAt(i);
+      const remote=JSON.parse(new TextDecoder().decode(bytes));
+      const remoteTs=remote._ts||0;
+      const localTs=db._ts||0;
+      console.log('vocab 啟動Pull: 本地ts='+localTs+' 遠端ts='+remoteTs);
+      if(remoteTs>=localTs){
+        if((db.vocab||[]).length>(remote.vocab||[]).length)remote.vocab=db.vocab;
+        if(Object.keys(db.errors||{}).length>Object.keys(remote.errors||{}).length)remote.errors=db.errors;
+        db=remote;
+        localStorage.setItem(DB_KEY,JSON.stringify(db));
+        showSyncStatus('☁️ 已從雲端同步');
       }
-    }catch(e){console.warn('啟動Pull失敗:',e.message);}
-    _syncEnabled=true;
-  },1500);
-  init();
+    }
+  }catch(e){console.warn('啟動Pull失敗:',e.message);}
+  _syncEnabled=true;
+  init(); // Pull完才init，確保顯示最新資料
 };
 script.onerror=()=>{
   console.warn('SheetJS 載入失敗，仍可使用 CSV');
