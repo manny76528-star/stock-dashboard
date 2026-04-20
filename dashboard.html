@@ -5266,8 +5266,11 @@ document.addEventListener('visibilitychange',async function(){
 });
 // ── 每日自動連動（股息入帳 + 信貸扣款）──
 function runDailyProcess(force){
-  const todayStr=new Date().toISOString().split('T')[0];
-  const todayDay=new Date().getDate();
+  const now=new Date();
+  // 台灣時間 UTC+8，避免 UTC 與台灣時間差一天的問題
+  const twNow=new Date(now.getTime()+8*3600000);
+  const todayStr=twNow.toISOString().slice(0,10);
+  const todayDay=twNow.getUTCDate();
   const lineBank=db.cashAccounts.find(c=>c.bank&&c.bank.toLowerCase().includes('line'));
   let changed=false;
   const msgs=[];
@@ -5382,12 +5385,19 @@ function runDailyProcess(force){
 
 // 強制執行今日連動（提供給手動按鈕用）
 function forceDailyProcess(){
-  // 只清掉股息的 key（可能當天沒開頁面），信貸不清（避免重複扣款）
-  const todayStr=new Date().toISOString().split('T')[0];
-  localStorage.removeItem('div_done_'+todayStr);
-  // 信貸的 LOAN_KEY 不清，已扣過的不會重複
-  const results=runDailyProcess(false); // false = 不強制，尊重已執行記錄
-  if(results.length===0)toast('今日無需執行連動（已全部執行過或日期不符）');
+  const now=new Date();
+  // 台灣時間 UTC+8
+  const twStr=new Date(now.getTime()+8*3600000).toISOString().slice(0,10);
+  // 清除今日所有交割的 key，讓它重新執行
+  localStorage.removeItem('div_done_'+twStr);
+  db.cashAccounts.forEach(acc=>{
+    if(acc.d1&&acc.d1Date){
+      const settleDate=getSettleDate(acc.d1Date);
+      localStorage.removeItem('d1_settled_'+acc.id+'_'+settleDate);
+    }
+  });
+  const results=runDailyProcess(true); // true = 強制執行
+  if(results.length===0)toast('今日無需執行連動（日期不符或無資料）');
 }
 
 // 啟動時自動執行
