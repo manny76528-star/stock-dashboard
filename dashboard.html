@@ -91,7 +91,7 @@ body{background:#eef2f7;color:var(--text);font-family:'Noto Sans TC',sans-serif;
 .mood-sel-btn.active{background:#fef3c7;border-color:#f59e0b;color:#92400e;}
 .loss-sel-btn{padding:5px 10px;border-radius:20px;font-size:12px;cursor:pointer;border:1.5px solid var(--border);background:#fff;color:#475569;transition:all .15s;font-family:'Noto Sans TC',sans-serif;}
 .loss-sel-btn.active{background:#fef2f2;border-color:#dc2626;color:#dc2626;}
-.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);z-index:999;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto;}
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:1500;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto;}
 .mo.open{display:flex;}
 .modal{background:var(--white);border-radius:14px;padding:22px 18px;width:100%;max-width:520px;box-shadow:0 20px 60px rgba(0,0,0,.25);animation:popIn .25s ease;margin:auto;}
 @keyframes popIn{from{transform:scale(.94);opacity:0}to{transform:scale(1);opacity:1}}
@@ -1742,28 +1742,9 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
     </div>
   </div>
 
-  <!-- 3. 不限用途 -->
-  <div class="big5-card" id="b5-flex">
-    <div class="big5-header">
-      <div class="big5-left">
-        <span class="big5-icon">💳</span>
-        <span class="big5-title">不限用途額度</span>
-        <div class="big5-meta">
-          <span>使用 <b id="f-rem">—</b></span>
-          <span>剩餘 <b id="f-avail">—</b></span>
-          <span>月息 <b id="f-mo">—</b></span>
-          <span style="display:none" id="tot-mo-out">—</span>
-        </div>
-      </div>
-      <div class="big5-right">
-        <button class="big5-add-btn" onclick="event.stopPropagation();openFlexModal()">＋</button>
-        <button class="big5-toggle-btn" id="tog-flex" onclick="toggleSection('flex-detail')">展開 ▼</button>
-      </div>
-    </div>
-    <div class="big5-detail" id="flex-detail" style="display:none">
-      <div class="flex-card-grid" id="flex-body"></div>
-    </div>
-  </div>
+
+  <!-- hidden containers for flex and div rendering (不顯示在 big5，改為小卡片) -->
+  <div style="display:none"><div class="flex-card-grid" id="flex-body"></div></div>
 
   <!-- 4. 現金帳戶 -->
   <div class="big5-card" id="b5-cash">
@@ -1788,25 +1769,48 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
     </div>
   </div>
 
-  <!-- 5. 股息記錄 -->
-  <div class="big5-card" id="b5-div">
-    <div class="big5-header">
-      <div class="big5-left">
-        <span class="big5-icon">🎯</span>
-        <span class="big5-title">股息記錄</span>
-        <div class="big5-meta">
-          <span>今年 <b id="d-yr-badge" style="color:var(--gain)">—</b></span>
-          <span>累積 <b id="d-tot-badge" style="color:var(--gain)">—</b></span>
-          <span>準備入帳 <b id="d-pend-badge" style="color:#93c5fd">—</b><span id="div-next-badge" style="font-size:11px;color:#fbbf24;font-weight:600;font-family:'JetBrains Mono',monospace;margin-left:4px"></span></span>
-        </div>
+<table id="cash-tbl" style="display:none"><tbody id="cash-body-compat"></tbody></table>
+<table id="loan-tbl" style="display:none"><tbody></tbody></table>
+<table id="flex-tbl" style="display:none"><tbody></tbody></table>
+
+</div><!-- /big5-wrap -->
+
+<!-- ═══ POPUP：不限用途額度 ═══ -->
+<div class="sp-overlay" id="sp-flex">
+  <div class="sp-modal" style="max-width:1100px">
+    <div class="sp-hdr">
+      <div class="sp-hdr-left">
+        <span class="sp-hdr-icon">💳</span>
+        <span class="sp-hdr-title">不限用途額度</span>
       </div>
-      <div class="big5-right">
-        <button class="big5-add-btn" onclick="event.stopPropagation();openDivModal()">＋</button>
-        <button class="big5-toggle-btn" id="tog-div" onclick="toggleSection('div-detail')">展開 ▼</button>
+      <div class="sp-hdr-right">
+        <button onclick="openFlexModal()" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif">＋ 新增</button>
+        <button class="sp-close" onclick="closeSP('flex')">✕ 關閉</button>
       </div>
     </div>
-    <div class="big5-detail" id="div-detail" style="display:none">
-      <div class="div-cards" id="div-cards"><span style="padding:10px;display:block;color:var(--muted);font-size:11px">尚無領息記錄</span></div>
+    <div class="sp-body" style="padding:12px">
+      <div class="flex-card-grid" id="flex-body-popup"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ POPUP：股息記錄 ═══ -->
+<div class="sp-overlay" id="sp-div">
+  <div class="sp-modal" style="max-width:1100px">
+    <div class="sp-hdr">
+      <div class="sp-hdr-left">
+        <span class="sp-hdr-icon">🎯</span>
+        <span class="sp-hdr-title">股息記錄</span>
+      </div>
+      <div class="sp-hdr-right">
+        <button onclick="openDivModal()" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif">＋ 新增股息</button>
+        <button class="sp-close" onclick="closeSP('div')">✕ 關閉</button>
+      </div>
+    </div>
+    <div class="sp-body" style="padding:0">
+      <!-- 卡片速覽 -->
+      <div class="div-cards" id="div-cards" style="padding:14px 16px;background:#f0fdfa;border-bottom:1px solid #99f6e4"><span style="color:var(--muted);font-size:11px">尚無領息記錄</span></div>
+      <!-- 準備入帳 -->
       <div id="div-pending-bar" style="display:none">
         <div style="padding:8px 14px 4px;background:#eff6ff;border-bottom:1px solid #bfdbfe;display:flex;align-items:center;justify-content:space-between">
           <span style="font-size:12px;font-weight:700;color:#1d4ed8">⏳ 準備入帳</span>
@@ -1814,6 +1818,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
         </div>
         <div class="pending-card-grid" id="d-pending-cards"></div>
       </div>
+      <!-- 年份統計列 -->
       <div class="div-yr-bar">
         <div style="font-size:13px;font-weight:700">
           📅 今年：<span class="gain mono" id="d-yr" style="font-size:16px">$0</span>
@@ -1827,6 +1832,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
           <input type="checkbox" id="div-hist-chk" style="display:none">
         </label>
       </div>
+      <!-- 今年明細 -->
       <div class="div-section-hdr" style="background:#ccfbf1;color:#0f766e" onclick="toggleDivYear()">
         <span>📋 今年明細</span><span id="div-yr-hint">▼ 展開</span>
       </div>
@@ -1836,6 +1842,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
           <tbody id="div-body-yr"></tbody>
         </table>
       </div>
+      <!-- 歷史記錄 -->
       <div id="div-hist-sec" style="display:none">
         <div style="padding:6px 12px;background:#e8edf5;font-size:11px;font-weight:700;color:var(--accent)">📚 歷史記錄</div>
         <div style="overflow-x:auto">
@@ -1845,15 +1852,9 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
           </table>
         </div>
       </div>
-
-<table id="cash-tbl" style="display:none"><tbody id="cash-body-compat"></tbody></table>
-<table id="loan-tbl" style="display:none"><tbody></tbody></table>
-<table id="flex-tbl" style="display:none"><tbody></tbody></table>
-
-
-    </div><!-- /div-detail -->
-  </div><!-- /big5-card div -->
-</div><!-- /big5-wrap -->
+    </div>
+  </div>
+</div>
 
 <!-- ═══ BOTTOM STATUS BAR ═══ -->
 <div class="db-status-bar">
@@ -1865,33 +1866,188 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 
 </div><!-- /db-root -->
 
-<!-- ═══ 持倉健康檢查 ═══ -->
-<div style="max-width:1300px;margin:0 auto;padding:0 0 0">
-  <div class="trend-section">
-    <div class="trend-hdr" style="cursor:pointer" onclick="toggleHealth()">
-      <span>💎 持倉健康檢查</span>
-      <div style="display:flex;gap:8px;align-items:center">
-        <span id="health-arrow" style="font-size:12px">▼</span>
+<!-- ═══ 5個功能小卡片橫排 ═══ -->
+<style>
+.mini-card-row{
+  max-width:1300px;margin:0 auto 24px;
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:12px;
+}
+@media(max-width:1100px){.mini-card-row{grid-template-columns:repeat(4,1fr);}}
+@media(max-width:700px){.mini-card-row{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:480px){.mini-card-row{grid-template-columns:repeat(2,1fr);}}
+
+.mini-card{
+  background:#1e293b;
+  border-radius:14px;
+  padding:18px 16px 14px;
+  cursor:pointer;
+  border:2px solid transparent;
+  transition:all .2s;
+  display:flex;flex-direction:column;align-items:center;
+  text-align:center;gap:8px;
+  position:relative;
+  box-shadow:0 2px 8px rgba(0,0,0,.15);
+}
+.mini-card:hover{
+  background:#1e3a5f;
+  border-color:rgba(255,255,255,.2);
+  transform:translateY(-3px);
+  box-shadow:0 8px 24px rgba(0,0,0,.25);
+}
+.mini-card-icon{font-size:28px;line-height:1;}
+.mini-card-title{font-size:12px;font-weight:700;color:#fff;letter-spacing:.5px;white-space:nowrap;}
+.mini-card-badge{
+  font-size:10px;font-weight:600;
+  padding:2px 9px;border-radius:20px;
+  background:rgba(255,255,255,.12);
+  color:rgba(255,255,255,.75);
+  white-space:nowrap;
+}
+.mini-card-badge.green{background:rgba(16,185,129,.2);color:#6ee7b7;}
+.mini-card-badge.blue{background:rgba(96,165,250,.2);color:#93c5fd;}
+.mini-card-badge.yellow{background:rgba(251,191,36,.2);color:#fcd34d;}
+.mini-card-badge.red{background:rgba(239,68,68,.2);color:#fca5a5;}
+.mini-card-open-hint{
+  font-size:9px;color:rgba(255,255,255,.35);margin-top:2px;letter-spacing:.3px;
+}
+
+/* Popup overlay */
+.sp-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.6);
+  z-index:1200;align-items:flex-start;justify-content:center;
+  padding:20px;overflow-y:auto;
+}
+.sp-overlay.open{display:flex;}
+.sp-modal{
+  background:#fff;border-radius:18px;
+  width:100%;max-width:1100px;
+  box-shadow:0 30px 90px rgba(0,0,0,.35);
+  animation:spPop .22s cubic-bezier(.34,1.56,.64,1);
+  margin:auto;overflow:hidden;
+}
+@keyframes spPop{from{opacity:0;transform:scale(.95) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.sp-hdr{
+  background:#1e293b;color:#fff;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 22px;
+}
+.sp-hdr-left{display:flex;align-items:center;gap:10px;}
+.sp-hdr-icon{font-size:20px;}
+.sp-hdr-title{font-size:16px;font-weight:700;letter-spacing:.3px;}
+.sp-hdr-right{display:flex;align-items:center;gap:8px;}
+.sp-close{
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);
+  color:#fff;border-radius:8px;padding:6px 14px;
+  font-size:13px;cursor:pointer;font-weight:600;
+  transition:background .15s;font-family:'Noto Sans TC',sans-serif;
+}
+.sp-close:hover{background:rgba(255,255,255,.25);}
+.sp-body{padding:20px;max-height:88vh;overflow-y:auto;}
+</style>
+
+<div class="mini-card-row">
+
+  <!-- 1. 不限用途額度 -->
+  <div class="mini-card" onclick="openSP('flex')">
+    <div class="mini-card-icon">💳</div>
+    <div class="mini-card-title">不限用途</div>
+    <div class="mini-card-badge red"><span id="f-rem-mc">—</span></div>
+    <div class="mini-card-open-hint">點擊查看 ›</div>
+  </div>
+
+  <!-- 2. 股息記錄 -->
+  <div class="mini-card" onclick="openSP('div')">
+    <div class="mini-card-icon">🎯</div>
+    <div class="mini-card-title">股息記錄</div>
+    <div class="mini-card-badge green"><span id="d-yr-badge-mc">—</span></div>
+    <div class="mini-card-open-hint">點擊查看 ›</div>
+  </div>
+
+  <!-- 3. 持倉健康檢查 -->
+  <div class="mini-card" onclick="openSP('health')">
+    <div class="mini-card-icon">💎</div>
+    <div class="mini-card-title">持倉健康檢查</div>
+    <div class="mini-card-badge blue" id="mc-health-badge">—</div>
+    <div class="mini-card-open-hint">點擊查看 ›</div>
+  </div>
+
+  <!-- 4. 觀察股區 -->
+  <div class="mini-card" onclick="openSP('watch')">
+    <div class="mini-card-icon">👁</div>
+    <div class="mini-card-title">觀察股區</div>
+    <div class="mini-card-badge yellow">
+      <span id="watch-count">0 檔</span>
+    </div>
+    <div class="mini-card-open-hint">點擊查看 ›</div>
+  </div>
+
+  <!-- 5. 投資分析儀表板 -->
+  <div class="mini-card" onclick="openSP('analytics')">
+    <div class="mini-card-icon">📊</div>
+    <div class="mini-card-title">投資分析</div>
+    <div class="mini-card-badge green">分析報告</div>
+    <div class="mini-card-open-hint">點擊查看 ›</div>
+  </div>
+
+  <!-- 6. 財務規劃 -->
+  <div class="mini-card" onclick="openSP('finplan')">
+    <div class="mini-card-icon">🎯</div>
+    <div class="mini-card-title">財務規劃</div>
+    <div class="mini-card-badge yellow">目標試算</div>
+    <div class="mini-card-open-hint">點擊查看 ›</div>
+  </div>
+
+  <!-- 7. 交易日誌 -->
+  <div class="mini-card" onclick="openSP('journal')">
+    <div class="mini-card-icon">📓</div>
+    <div class="mini-card-title">交易日誌</div>
+    <div class="mini-card-badge blue">
+      <span id="journal-count">0 篇</span>
+    </div>
+    <div class="mini-card-open-hint">點擊查看 ›</div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════
+     POPUP 1：持倉健康檢查
+══════════════════════════════════════ -->
+<div class="sp-overlay" id="sp-health">
+  <div class="sp-modal">
+    <div class="sp-hdr">
+      <div class="sp-hdr-left">
+        <span class="sp-hdr-icon">💎</span>
+        <span class="sp-hdr-title">持倉健康檢查</span>
+      </div>
+      <div class="sp-hdr-right">
+        <button class="sp-close" onclick="closeSP('health')">✕ 關閉</button>
       </div>
     </div>
-    <div id="health-body" style="display:none;padding:16px">
+    <div class="sp-body">
       <div id="health-grid" style="display:flex;flex-direction:column;gap:10px"></div>
     </div>
   </div>
 </div>
 
-<!-- ═══ 觀察股區 ═══ -->
-<div style="max-width:1300px;margin:0 auto;padding:0 0 0">
-  <div class="trend-section">
-    <div class="trend-hdr" style="cursor:pointer" onclick="toggleWatchlist()">
-      <span>👁 觀察股區</span>
-      <div style="display:flex;gap:8px;align-items:center">
-        <span id="watch-count" style="font-size:11px;opacity:.7"></span>
-        <button onclick="event.stopPropagation();openWatchModal()" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:6px;padding:4px 12px;font-size:11px;font-weight:700;cursor:pointer">＋ 新增</button>
-        <span id="watch-arrow" style="font-size:12px">▼</span>
+<!-- ══════════════════════════════════════
+     POPUP 2：觀察股區
+══════════════════════════════════════ -->
+<div class="sp-overlay" id="sp-watch">
+  <div class="sp-modal">
+    <div class="sp-hdr">
+      <div class="sp-hdr-left">
+        <span class="sp-hdr-icon">👁</span>
+        <span class="sp-hdr-title">觀察股區</span>
+      </div>
+      <div class="sp-hdr-right">
+        <button onclick="openWatchModal()" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif">＋ 新增</button>
+        <button class="sp-close" onclick="closeSP('watch')">✕ 關閉</button>
       </div>
     </div>
-    <div id="watchlist-body" style="display:none;padding:16px">
+    <div class="sp-body">
       <div id="watchlist-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px"></div>
     </div>
   </div>
@@ -1931,56 +2087,61 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
   </div>
 </div>
 
-<!-- ═══ 投資分析儀表板 ═══ -->
-<div style="max-width:1300px;margin:0 auto;padding:0 0 0">
-  <div class="trend-section">
-    <div class="trend-hdr" style="cursor:pointer" onclick="toggleAnalytics()">
-      <span>📊 投資分析儀表板</span>
-      <div style="display:flex;gap:8px;align-items:center">
-        <button onclick="event.stopPropagation();renderAnalytics()" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:6px;padding:4px 12px;font-size:11px;font-weight:700;cursor:pointer">🔄 重新計算</button>
-        <span id="analytics-arrow" style="font-size:12px">▼</span>
+<!-- ══════════════════════════════════════
+     POPUP 3：投資分析儀表板
+══════════════════════════════════════ -->
+<div class="sp-overlay" id="sp-analytics">
+  <div class="sp-modal" style="max-width:1200px">
+    <div class="sp-hdr">
+      <div class="sp-hdr-left">
+        <span class="sp-hdr-icon">📊</span>
+        <span class="sp-hdr-title">投資分析儀表板</span>
+      </div>
+      <div class="sp-hdr-right">
+        <button onclick="renderAnalytics()" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif">🔄 重新計算</button>
+        <button class="sp-close" onclick="closeSP('analytics')">✕ 關閉</button>
       </div>
     </div>
-    <div id="analytics-body" style="display:none">
-      <!-- KPI 卡片列 -->
-      <div id="analytics-kpi" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;padding:16px"></div>
-      <!-- 圖表區 -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:0 16px 16px">
-        <!-- 情緒統計圖 -->
+    <div class="sp-body" id="analytics-body">
+      <div id="analytics-kpi" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:16px"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
         <div style="background:#f8fafc;border-radius:12px;padding:16px">
           <div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:12px">🧠 情緒 vs 勝率</div>
           <div id="mood-chart"></div>
         </div>
-        <!-- 虧損原因分類 -->
         <div style="background:#f8fafc;border-radius:12px;padding:16px">
           <div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:12px">❌ 虧損原因分析</div>
           <div id="loss-chart"></div>
         </div>
       </div>
-      <!-- 每月回顧報告 -->
-      <div style="padding:0 16px 16px">
-        <div style="background:#f8fafc;border-radius:12px;padding:16px">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-            <div style="font-size:13px;font-weight:700;color:#1e293b">📅 每月回顧報告</div>
-            <select id="report-year-sel" onchange="renderAnalytics()" style="padding:5px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;background:#fff;cursor:pointer">
-              <option value="all">全部</option>
-            </select>
-          </div>
-          <div id="monthly-report"></div>
+      <div style="background:#f8fafc;border-radius:12px;padding:16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div style="font-size:13px;font-weight:700;color:#1e293b">📅 每月回顧報告</div>
+          <select id="report-year-sel" onchange="renderAnalytics()" style="padding:5px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;background:#fff;cursor:pointer">
+            <option value="all">全部</option>
+          </select>
         </div>
+        <div id="monthly-report"></div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ═══ 財務規劃 ═══ -->
-<div style="max-width:1300px;margin:0 auto 10px">
-  <div class="trend-section">
-    <div class="trend-hdr" style="cursor:pointer" onclick="toggleFinPlan()">
-      <span>🎯 財務規劃</span>
-      <span id="finplan-arrow" style="font-size:12px">▼</span>
+<!-- ══════════════════════════════════════
+     POPUP 4：財務規劃
+══════════════════════════════════════ -->
+<div class="sp-overlay" id="sp-finplan">
+  <div class="sp-modal" style="max-width:1100px">
+    <div class="sp-hdr">
+      <div class="sp-hdr-left">
+        <span class="sp-hdr-icon">🎯</span>
+        <span class="sp-hdr-title">財務規劃</span>
+      </div>
+      <div class="sp-hdr-right">
+        <button class="sp-close" onclick="closeSP('finplan')">✕ 關閉</button>
+      </div>
     </div>
-    <div id="finplan-body" style="display:none;padding:16px">
+    <div class="sp-body" id="finplan-body">
 
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px">
 
@@ -2054,30 +2215,35 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
         </div>
       </div>
 
-      <!-- 結果 -->
       <div id="finplan-result"></div>
-
     </div>
   </div>
 </div>
 
-<!-- ═══ 交易日誌 ═══ -->
-<div style="max-width:1300px;margin:0 auto;padding:0 0 32px">
-  <div class="trend-section">
-    <div class="trend-hdr" style="cursor:pointer" onclick="toggleJournal()">
-      <span>📓 交易日誌</span>
-      <div style="display:flex;gap:8px;align-items:center">
-        <span id="journal-count" style="font-size:11px;opacity:.7"></span>
-        <button onclick="event.stopPropagation();openJournalModal()" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:6px;padding:4px 12px;font-size:11px;font-weight:700;cursor:pointer">＋ 新增日誌</button>
-        <span id="journal-arrow" style="font-size:12px">▼</span>
+<!-- ══════════════════════════════════════
+     POPUP 5：交易日誌
+══════════════════════════════════════ -->
+<div class="sp-overlay" id="sp-journal">
+  <div class="sp-modal" style="max-width:900px">
+    <div class="sp-hdr">
+      <div class="sp-hdr-left">
+        <span class="sp-hdr-icon">📓</span>
+        <span class="sp-hdr-title">交易日誌</span>
+      </div>
+      <div class="sp-hdr-right">
+        <button onclick="openJournalModal()" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif">＋ 新增日誌</button>
+        <button class="sp-close" onclick="closeSP('journal')">✕ 關閉</button>
       </div>
     </div>
-    <!-- 搜尋列 -->
-    <div id="journal-body" style="display:none">
+    <div class="sp-body" style="padding:0">
       <div style="padding:12px 16px;background:#f8fafc;border-bottom:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-        <input id="journal-search" type="text" placeholder="搜尋日誌..." style="flex:1;min-width:120px;padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;outline:none" oninput="renderJournal()">
+        <input id="journal-search" type="text" placeholder="搜尋日誌..." style="flex:1;min-width:100px;padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;outline:none" oninput="renderJournal()">
+        <!-- 年度選擇 -->
+        <select id="journal-year-sel" onchange="renderJournal()" style="padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:700;color:#475569;background:#fff;cursor:pointer;outline:none;min-width:80px">
+          <option value="all">全部年份</option>
+        </select>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
-          <button class="j-tag-btn" data-tag="" onclick="setJournalTag(this)">全部</button>
+          <button class="j-tag-btn active" data-tag="" onclick="setJournalTag(this)">全部</button>
           <button class="j-tag-btn" data-tag="看多" onclick="setJournalTag(this)">📈 看多</button>
           <button class="j-tag-btn" data-tag="看空" onclick="setJournalTag(this)">📉 看空</button>
           <button class="j-tag-btn" data-tag="買入" onclick="setJournalTag(this)">▲ 買入</button>
@@ -2085,7 +2251,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
           <button class="j-tag-btn" data-tag="重大事項" onclick="setJournalTag(this)">🔔 重大事項</button>
         </div>
       </div>
-      <div id="journal-list" style="padding:12px 16px;display:flex;flex-direction:column;gap:10px;max-height:600px;overflow-y:auto"></div>
+      <div id="journal-list" style="padding:12px 16px;display:flex;flex-direction:column;gap:10px"></div>
     </div>
   </div>
 </div>
@@ -3392,9 +3558,12 @@ function renderLoans(){
 
 
 function renderFlex(){
-  const grid=document.getElementById('flex-body');
-  if(!grid)return;
-  grid.innerHTML='';
+  const grids=[
+    document.getElementById('flex-body'),
+    document.getElementById('flex-body-popup')
+  ].filter(Boolean);
+  grids.forEach(grid=>grid.innerHTML='');
+
   let tUsed=0,tMo=0;
 
   db.flexLoans.forEach(f=>{
@@ -3405,40 +3574,42 @@ function renderFlex(){
     const usedPct=fLimit>0?Math.min(100,Math.round(fUsed/fLimit*100)):0;
     const barColor=usedPct>90?'#dc2626':usedPct>70?'#d97706':'#16a34a';
 
-    const card=document.createElement('div');
-    card.className='flex-card';
-    card.dataset.id=f.id;
-    card.innerHTML=
-      '<div class="loan-card-top">'
-        +'<div><div class="loan-card-bank">'+f.name+'</div>'
-        +(f.note?'<div class="loan-card-sub">'+f.note+'</div>':'')+'</div>'
-        +'<div style="text-align:right">'
-          +'<div class="loan-card-rate">'+(f.rate||0).toFixed(2)+'%</div>'
-          +'<div style="font-size:10px;color:var(--muted)">額度 $'+fLimit.toLocaleString()+'</div>'
+    grids.forEach(grid=>{
+      const card=document.createElement('div');
+      card.className='flex-card';
+      card.dataset.id=f.id;
+      card.innerHTML=
+        '<div class="loan-card-top">'
+          +'<div><div class="loan-card-bank">'+f.name+'</div>'
+          +(f.note?'<div class="loan-card-sub">'+f.note+'</div>':'')+'</div>'
+          +'<div style="text-align:right">'
+            +'<div class="loan-card-rate">'+(f.rate||0).toFixed(2)+'%</div>'
+            +'<div style="font-size:10px;color:var(--muted)">額度 $'+fLimit.toLocaleString()+'</div>'
+          +'</div>'
         +'</div>'
-      +'</div>'
-      +'<div style="padding:0 16px 4px;display:flex;justify-content:space-between;align-items:center">'
-        +'<span style="font-size:10px;color:#94a3b8">額度使用率</span>'
-        +'<span style="font-size:11px;font-weight:700;color:'+barColor+'">'+usedPct+'%</span>'
-      +'</div>'
-      +'<div class="loan-progress-wrap"><div class="loan-progress-bar" style="width:'+usedPct+'%;background:'+barColor+'"></div></div>'
-      +'<div class="loan-card-amounts">'
-        +'<div class="loan-amt-block"><div class="loan-amt-label">使用額度</div><div class="loan-amt-val loss">$'+fUsed.toLocaleString()+'</div></div>'
-        +'<div class="loan-amt-block"><div class="loan-amt-label">剩餘額度</div><div class="loan-amt-val gain">$'+fAvail.toLocaleString()+'</div></div>'
-        +'<div class="loan-amt-block"><div class="loan-amt-label">使用率</div><div class="loan-amt-val" style="color:'+barColor+'">'+usedPct+'%</div></div>'
-        +'<div class="loan-amt-block"><div class="loan-amt-label">每月利息</div><div class="loan-amt-val loss">$'+(f.monthly||0).toLocaleString()+'</div></div>'
-      +'</div>'
-      +'<div class="loan-card-footer"><div></div>'
-        +'<div style="display:flex;gap:5px">'
-          +'<button class="card-act-btn edit" data-action="editFlex">✏️ 編輯</button>'
-          +'<button class="card-act-btn danger" data-action="delFlex">🗑</button>'
+        +'<div style="padding:0 16px 4px;display:flex;justify-content:space-between;align-items:center">'
+          +'<span style="font-size:10px;color:#94a3b8">額度使用率</span>'
+          +'<span style="font-size:11px;font-weight:700;color:'+barColor+'">'+usedPct+'%</span>'
         +'</div>'
-      +'</div>';
-    card.querySelectorAll('[data-action]').forEach(btn=>{
-      const act=btn.dataset.action;
-      btn.onclick=()=>{if(act==='editFlex')editFlex(f.id);else if(act==='delFlex')delFlex(f.id);};
+        +'<div class="loan-progress-wrap"><div class="loan-progress-bar" style="width:'+usedPct+'%;background:'+barColor+'"></div></div>'
+        +'<div class="loan-card-amounts">'
+          +'<div class="loan-amt-block"><div class="loan-amt-label">使用額度</div><div class="loan-amt-val loss">$'+fUsed.toLocaleString()+'</div></div>'
+          +'<div class="loan-amt-block"><div class="loan-amt-label">剩餘額度</div><div class="loan-amt-val gain">$'+fAvail.toLocaleString()+'</div></div>'
+          +'<div class="loan-amt-block"><div class="loan-amt-label">使用率</div><div class="loan-amt-val" style="color:'+barColor+'">'+usedPct+'%</div></div>'
+          +'<div class="loan-amt-block"><div class="loan-amt-label">每月利息</div><div class="loan-amt-val loss">$'+(f.monthly||0).toLocaleString()+'</div></div>'
+        +'</div>'
+        +'<div class="loan-card-footer"><div></div>'
+          +'<div style="display:flex;gap:5px">'
+            +'<button class="card-act-btn edit" data-action="editFlex">✏️ 編輯</button>'
+            +'<button class="card-act-btn danger" data-action="delFlex">🗑</button>'
+          +'</div>'
+        +'</div>';
+      card.querySelectorAll('[data-action]').forEach(btn=>{
+        const act=btn.dataset.action;
+        btn.onclick=()=>{if(act==='editFlex')editFlex(f.id);else if(act==='delFlex')delFlex(f.id);};
+      });
+      grid.appendChild(card);
     });
-    grid.appendChild(card);
   });
 
   const lM=db.loans.reduce((s,l)=>s+(l.monthly||0),0);
@@ -3448,6 +3619,7 @@ function renderFlex(){
   setEl('f-avail','$'+Math.max(0,totalLimit-tUsed).toLocaleString());
   setEl('f-mo','$'+tMo.toLocaleString());
   setEl('tot-mo-out','$'+(lM+tMo).toLocaleString());
+  setEl('f-rem-mc','使用 $'+tUsed.toLocaleString());
 }
 
 
@@ -3681,6 +3853,7 @@ function renderDivs(){
   // Update header badges
   const dyb=document.getElementById('d-yr-badge');if(dyb)dyb.textContent='$'+Math.round(yrTot).toLocaleString();
   const dtb=document.getElementById('d-tot-badge');if(dtb)dtb.textContent='$'+Math.round(allTot).toLocaleString();
+  const dmc=document.getElementById('d-yr-badge-mc');if(dmc)dmc.textContent='今年 $'+Math.round(yrTot).toLocaleString();
   const dpb=document.getElementById('d-pend-badge');
   if(dpb){
     dpb.textContent=pendingTotal>0?'$'+Math.round(pendingTotal).toLocaleString():'—';
@@ -3824,8 +3997,23 @@ function renderSum(){
 }
 
 // ═══════ MODALS ═══════
-function openModal(id){document.getElementById(id).classList.add('open');}
-function closeModal(id){document.getElementById(id).classList.remove('open');editId=null;}
+function openModal(id){
+  document.getElementById(id).classList.add('open');
+  // 暫時移除 sp-overlay 的 backdrop-filter，避免 stacking context 把 modal 壓在後面
+  document.querySelectorAll('.sp-overlay').forEach(el=>{
+    el.style.backdropFilter='none';
+    el.style.webkitBackdropFilter='none';
+  });
+}
+function closeModal(id){
+  document.getElementById(id).classList.remove('open');
+  editId=null;
+  // 還原 sp-overlay 的 backdrop-filter
+  document.querySelectorAll('.sp-overlay').forEach(el=>{
+    el.style.backdropFilter='';
+    el.style.webkitBackdropFilter='';
+  });
+}
 // 點 Modal 外面不關閉（避免填寫中意外關閉）
 
 // INVEST
@@ -5103,26 +5291,28 @@ function runDailyProcess(force){
 
   // 2. DAY1/DAY2 交割自動連動
   (db.cashAccounts||[]).forEach(acc=>{
-    // Step 1：DAY1 交割日到了 → 扣現金，清空 d1，同時把 d2 移到 d1
     if(acc.d1&&acc.d1!==0&&acc.d1Date){
-      const settleDate=getSettleDate(acc.d1Date);
+      const settleDate=getSettleDate(acc.d1Date); // T+2 = DAY1交割日
       if(settleDate<=todayStr){
         const D1_KEY='d1_settled_'+acc.id+'_'+settleDate;
         if(force||!localStorage.getItem(D1_KEY)){
+          // 先把 d2 的資料備份
+          const d2Amt=acc.d2||0;
+          const d2Date=acc.d1Date; // DAY2買入日與DAY1相同批次，T+3交割
+
           // 扣 DAY1
           acc.cash=(acc.cash||0)+Math.round(acc.d1);
-          msgs.push('📋 交割 '+acc.bank+' DAY1 '+(acc.d1>0?'+':'')+Math.round(acc.d1).toLocaleString());
+          msgs.push('📋 交割 '+acc.bank+' DAY1 '+(acc.d1>0?'+':'')+Math.round(acc.d1).toLocaleString()+'（現金→$'+Math.round(acc.cash).toLocaleString()+'）');
           localStorage.setItem(D1_KEY,'1');
           changed=true;
-          // DAY2 移到 DAY1（保留 d1Date 供計算下次交割日）
-          if(acc.d2&&acc.d2!==0){
-            acc.d1=acc.d2;  // d2 移入 d1
-            // d1Date 不變（下次交割日 = 原 d1Date 的 T+3）
-            // 但要重新算：DAY2 的交割日是原買入日的 T+3
-            // 所以下次 DAY1 的交割日就是現在這個 settleDate 的下一個交割日
-            acc.d1Date=settleDate; // 用今天當新的基準，T+2後就是下次交割
+
+          // DAY2 移到 DAY1，交割日 = 原買入日 T+3
+          if(d2Amt&&d2Amt!==0){
+            acc.d1=d2Amt;
+            // DAY2 的交割日是原買入日 T+3，也就是 DAY1 settleDate 的下一個交割日
+            acc.d1Date=settleDate; // settleDate 當新基準，再 T+2 = 原 T+3
             acc.d2=0;
-            msgs.push('📋 '+acc.bank+' DAY2→DAY1 移轉 '+(acc.d1>0?'+':'')+Math.round(acc.d1).toLocaleString());
+            msgs.push('📋 '+acc.bank+' DAY2→DAY1 移轉 '+(acc.d1>0?'+':'')+Math.round(acc.d1).toLocaleString()+'（交割日：'+fmtMMDD(getSettleDate(acc.d1Date))+'）');
           } else {
             acc.d1=0;
             acc.d1Date='';
@@ -5192,18 +5382,11 @@ function runDailyProcess(force){
 
 // 強制執行今日連動（提供給手動按鈕用）
 function forceDailyProcess(){
+  // 只清掉股息的 key（可能當天沒開頁面），信貸不清（避免重複扣款）
   const todayStr=new Date().toISOString().split('T')[0];
-  // 清股息 key
   localStorage.removeItem('div_done_'+todayStr);
-  // 清 DAY1 已執行記錄（讓它重新檢查）
-  (db.cashAccounts||[]).forEach(acc=>{
-    if(acc.d1Date){
-      const settleDate=getSettleDate(acc.d1Date);
-      if(settleDate<=todayStr) acc.d1SettledDate='';
-    }
-  });
   // 信貸的 LOAN_KEY 不清，已扣過的不會重複
-  const results=runDailyProcess(false);
+  const results=runDailyProcess(false); // false = 不強制，尊重已執行記錄
   if(results.length===0)toast('今日無需執行連動（已全部執行過或日期不符）');
 }
 
@@ -6089,8 +6272,20 @@ function updateJournalCount(){
 
 function renderJournal(){
   const q=(document.getElementById('journal-search')?.value||'').toLowerCase();
+  const yrSel=document.getElementById('journal-year-sel');
+  const selYear=yrSel?yrSel.value:'all';
   let list=(db.journals||[]).slice();
+
+  // 動態更新年份選單
+  if(yrSel){
+    const years=[...new Set(list.map(j=>(j.date||'').slice(0,4)).filter(Boolean))].sort((a,b)=>b-a);
+    const curVal=yrSel.value;
+    yrSel.innerHTML='<option value="all">全部年份</option>'+years.map(y=>`<option value="${y}">${y} 年</option>`).join('');
+    yrSel.value=years.includes(curVal)?curVal:'all';
+  }
+
   if(journalTagFilter)list=list.filter(j=>(j.tags||[]).includes(journalTagFilter));
+  if(selYear&&selYear!=='all')list=list.filter(j=>(j.date||'').startsWith(selYear));
   if(q)list=list.filter(j=>
     (j.content||'').toLowerCase().includes(q)||
     (j.market||'').toLowerCase().includes(q)||
@@ -6102,26 +6297,101 @@ function renderJournal(){
   if(list.length===0){container.innerHTML='<div style="text-align:center;color:var(--muted);padding:20px;font-size:13px">尚無日誌記錄</div>';return;}
   const tagColors={'看多':'#dcfce7','看空':'#fef2f2','買入':'#dbeafe','賣出':'#fce7f3','重大事項':'#fef3c7'};
   const tagTextColors={'看多':'#16a34a','看空':'#dc2626','買入':'#2563eb','賣出':'#db2777','重大事項':'#d97706'};
+
   container.innerHTML=list.map(j=>{
-    const tags=(j.tags||[]).map(t=>'<span style="display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;background:'+(tagColors[t]||'#f1f5f9')+';color:'+(tagTextColors[t]||'#475569')+';margin-right:4px">'+t+'</span>').join('');
-    return '<div class="j-card">'
-      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
-      +'<div style="display:flex;align-items:center;gap:8px">'
-      +'<span style="font-size:13px;font-weight:700;color:#1e293b">'+j.date+'</span>'
-      +tags
-      +(j.mood?'<span style="font-size:12px;color:#64748b">'+j.mood+'</span>':'')
-      +'</div>'
-      +'<button data-jid="'+j.id+'" onclick="openJournalModal(this.dataset.jid)" style="background:none;border:1px solid var(--border);border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;color:#475569">✏️ 編輯</button>'
-      +'</div>'
-      +(j.market?'<div style="margin-bottom:8px;padding:10px 14px;background:linear-gradient(135deg,#0f172a,#1e3a5f);border-radius:8px;border-left:4px solid #3b82f6"><div style="font-size:10px;color:rgba(255,255,255,.6);font-weight:600;letter-spacing:.5px;margin-bottom:4px">🌐 大盤環境 / 重大新聞'+(j.marketUrl?' <a href="'+j.marketUrl+'" target="_blank" style="color:#93c5fd;font-size:10px;margin-left:8px">🔗 查看原文</a>':'')+'</div><div style="font-size:15px;font-weight:800;color:#fff;line-height:1.5;white-space:pre-wrap">'+(j.marketUrl?'<a href="'+j.marketUrl+'" target="_blank" style="color:#fff;text-decoration:none">'+j.market+'</a>':j.market)+'</div></div>':'')
-      +(j.content?'<div style="font-size:13px;color:#1e293b;line-height:1.6;white-space:pre-wrap">'+j.content+'</div>':'')
-      +'</div>';
+    const tags=(j.tags||[]).map(t=>`<span style="display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;background:${tagColors[t]||'#f1f5f9'};color:${tagTextColors[t]||'#475569'};margin-right:4px">${t}</span>`).join('');
+
+    const hasBody = j.market || j.content;
+
+    // 紅框 header：日期、標籤、情緒、完整標題、連結
+    const header = `<div onclick="toggleJCard('jc-${j.id}')" style="
+        background:linear-gradient(135deg,#0f172a,#1e3a5f);
+        border-radius:10px;padding:12px 14px;
+        cursor:${hasBody?'pointer':'default'};user-select:none;
+      ">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+          <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;flex:1;min-width:0">
+            <span style="font-size:13px;font-weight:700;color:#e2e8f0;font-family:'JetBrains Mono',monospace;white-space:nowrap">${j.date}</span>
+            ${tags}
+            ${j.mood?`<span style="font-size:12px;color:rgba(255,255,255,.65)">${j.mood}</span>`:''}
+            ${j.marketUrl?`<a href="${j.marketUrl}" target="_blank" onclick="event.stopPropagation()" style="font-size:11px;color:#93c5fd;text-decoration:none;white-space:nowrap" title="查看原文">🔗 原文</a>`:''}
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+            <button data-jid="${j.id}" onclick="event.stopPropagation();openJournalModal(this.dataset.jid)"
+              style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;color:rgba(255,255,255,.8);white-space:nowrap">✏️ 編輯</button>
+            ${hasBody?`<span id="arr-jc-${j.id}" style="font-size:12px;color:rgba(255,255,255,.5);display:inline-block;transition:transform .2s">▼</span>`:''}
+          </div>
+        </div>
+        ${j.market?`<div style="margin-top:7px;font-size:13px;font-weight:700;color:#93c5fd;line-height:1.55;white-space:pre-wrap;word-break:break-word">${j.market}</div>`:''}
+      </div>`;
+
+    // 第二層：只顯示正文（黃框深色區塊移除，標題已在紅框顯示）
+    const body = hasBody ? `
+      <div id="jc-${j.id}" style="display:none;padding:12px 14px 10px;animation:fadeIn .18s ease">
+        ${j.content?`<div style="font-size:13px;color:#1e293b;line-height:1.7;white-space:pre-wrap">${j.content}</div>`:''}
+      </div>` : '';
+
+    return `<div class="j-card" style="padding:0;overflow:hidden;border-radius:10px;border:1px solid rgba(255,255,255,.08);margin-bottom:0">
+      ${header}${body}
+    </div>`;
   }).join('');
+
   updateJournalCount();
+}
+
+function toggleJCard(id){
+  const el=document.getElementById(id);
+  if(!el)return;
+  const open=el.style.display==='none';
+  el.style.display=open?'block':'none';
+  const arr=document.getElementById('arr-'+id);
+  if(arr)arr.style.transform=open?'rotate(180deg)':'';
 }
 
 // 初始化日誌計數
 updateJournalCount();
+
+// ═══════════════════════════════════════════
+// 小卡片 Popup 開關
+// ═══════════════════════════════════════════
+function openSP(id){
+  const el=document.getElementById('sp-'+id);
+  if(!el)return;
+  el.classList.add('open');
+  document.body.style.overflow='hidden';
+  if(id==='health' && typeof renderHealth==='function') renderHealth();
+  if(id==='watch'  && typeof renderWatchlist==='function') renderWatchlist();
+  if(id==='analytics' && typeof renderAnalytics==='function') renderAnalytics();
+  if(id==='finplan' && typeof calcFinPlan==='function') calcFinPlan();
+  if(id==='journal'){ if(typeof renderJournal==='function') renderJournal(); updateJournalCount(); }
+  if(id==='flex'){
+    if(typeof renderFlex==='function') renderFlex();
+  }
+  if(id==='div'){
+    // 重新渲染股息（DOM 元素已在 popup 裡，直接觸發）
+    if(typeof renderDivs==='function') renderDivs();
+  }
+}
+function closeSP(id){
+  const el=document.getElementById('sp-'+id);
+  if(!el)return;
+  el.classList.remove('open');
+  document.body.style.overflow='';
+}
+// ESC 關閉
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    document.querySelectorAll('.sp-overlay.open').forEach(el=>{
+      closeSP(el.id.replace('sp-',''));
+    });
+  }
+});
+// 把原本的展開函式改成無操作（保留不報錯）
+function toggleHealth(){}
+function toggleWatchlist(){}
+function toggleAnalytics(){}
+function toggleFinPlan(){}
+function toggleJournal(){}
 </script>
 </body>
 </html>

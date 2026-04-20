@@ -193,6 +193,8 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-seri
     </div>
   </div>
   <div class="topbar-right">
+    <span id="sync-status" style="font-size:11px;color:var(--muted);font-family:var(--mono)"></span>
+    <button class="btn btn-ghost btn-sm" onclick="manualSync()">☁️ 雲端同步</button>
     <button class="btn btn-ghost btn-sm" onclick="document.getElementById('import-file').click()">📥 匯入 Excel</button>
     <button class="btn btn-warn btn-sm" onclick="resetTodayProgress()">🔄 重置今日</button>
     <a href="index.html" class="btn btn-ghost btn-sm">🏠 主目錄</a>
@@ -232,7 +234,11 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-seri
   <div class="view active" id="view-match">
     <div class="round-bar">
       <div class="round-info">第 <b id="round-num">1</b> 輪　本輪 <b>10</b> 組　<span id="round-matched">0</span>/10 已配對</div>
-      <div style="display:flex;gap:8px">
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <!-- 模式切換 -->
+        <button class="btn btn-sm" id="mode-btn" onclick="toggleMode()" style="background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.4);color:#a78bfa;font-weight:700">
+          👁 看日文找中文
+        </button>
         <button class="btn btn-ghost btn-sm" onclick="shuffleAnswers()">🔀 重排答案</button>
         <button class="btn btn-primary btn-sm" onclick="nextRound()">下一輪 →</button>
       </div>
@@ -361,7 +367,10 @@ function newDB(){
     streak:0,
   };
 }
-function saveDB(){ localStorage.setItem(DB_KEY,JSON.stringify(db)); }
+function saveDB(){
+  localStorage.setItem(DB_KEY,JSON.stringify(db));
+  schedulePush();
+}
 
 let db=loadDB();
 
@@ -380,10 +389,11 @@ checkNewDay();
 // MATCH GAME STATE
 // ══════════════════════════════════════
 const ROUND_SIZE=10;
-let roundQueue=[];     // 本輪待答 vocab items
-let roundAnswers=[];   // 右側打亂的答案
-let selectedLeft=null; // 選中的左側 id
-let selectedRight=null;// 選中的右側 index
+let roundQueue=[];
+let roundAnswers=[];
+let roundMatchedIds=new Set();
+let selectedLeft=null;
+let selectedRight=null;
 let roundMatchedCount=0;
 let currentRound=1;
 let totalMatchedToday=0;
@@ -395,6 +405,9 @@ function init(){
   updateStats();
   buildRound();
   renderVocabPreview();
+  // 初始化模式按鈕
+  const btn=el('mode-btn');
+  if(btn){btn.textContent='📖 看中文找日文';btn.style.background='rgba(14,165,233,.15)';btn.style.borderColor='rgba(14,165,233,.4)';btn.style.color='#38bdf8';}
 }
 
 function updateStats(){
@@ -440,31 +453,82 @@ function buildRound(){
   roundQueue=pool.slice(0,ROUND_SIZE);
   roundAnswers=shuffle([...roundQueue]);
   roundMatchedCount=0;
+  roundMatchedIds=new Set();
 
   el('round-num').textContent=currentRound;
   el('round-matched').textContent='0';
   renderMatchArea();
 }
 
+// 0 = 看中文找日文（預設）, 1 = 看日文找中文
+let practiceMode=0;
+
+function toggleMode(){
+  practiceMode=practiceMode===0?1:0;
+  const btn=el('mode-btn');
+  if(practiceMode===0){
+    btn.textContent='📖 看中文找日文';
+    btn.style.background='rgba(14,165,233,.15)';
+    btn.style.borderColor='rgba(14,165,233,.4)';
+    btn.style.color='#38bdf8';
+  } else {
+    btn.textContent='👁 看日文找中文';
+    btn.style.background='rgba(168,85,247,.15)';
+    btn.style.borderColor='rgba(168,85,247,.4)';
+    btn.style.color='#a78bfa';
+  }
+  // 重新渲染不重置進度
+  selectedLeft=null;selectedRight=null;selectedRight_id=null;
+  renderMatchArea();
+  toast(practiceMode===0?'模式：看中文 → 找日文':'模式：看日文 → 找中文');
+}
+
 function renderMatchArea(){
   const area=el('match-area');
-  // 建左右兩欄 + 中間連接
   let leftHTML='', rightHTML='', midHTML='';
+
   roundQueue.forEach((v,i)=>{
-    const matchedClass=db.todayDone.includes(v.id)&&roundQueue.includes(v)?'matched':'';
-    leftHTML+=`<div class="match-item ${matchedClass}" id="left-${v.id}" onclick="selectLeft('${v.id}')">
-      <div>
-        <div class="match-jp">${escHtml(v.q.split('\n')[0])}</div>
-        ${v.q.split('\n')[1]?`<div class="match-zh">${escHtml(v.q.split('\n')[1])}</div>`:''}
-      </div>
-    </div>`;
+    const isMatched=roundMatchedIds&&roundMatchedIds.has(v.id);
+    const matchedClass=isMatched?'matched':'';
+
+    // 根據模式決定左側顯示內容
+    if(practiceMode===0){
+      // 看中文找日文：左側顯示中文題目（q欄），右側顯示日文答案（a欄）
+      const parts=v.q.split('\n');
+      leftHTML+=`<div class="match-item ${matchedClass}" id="left-${v.id}" onclick="selectLeft('${v.id}')">
+        <div>
+          <div class="match-jp">${escHtml(parts[0])}</div>
+          ${parts[1]?`<div class="match-zh">${escHtml(parts[1])}</div>`:''}
+        </div>
+      </div>`;
+    } else {
+      // 看日文找中文：左側顯示日文答案（a欄），右側顯示中文題目（q欄）
+      leftHTML+=`<div class="match-item ${matchedClass}" id="left-${v.id}" onclick="selectLeft('${v.id}')">
+        <div class="match-ans" style="font-family:'Noto Sans JP',sans-serif;font-size:16px;font-weight:700;color:var(--accent)">${escHtml(v.a)}</div>
+      </div>`;
+    }
     midHTML+=`<div class="match-connector"><div class="conn-line"></div></div>`;
   });
+
   roundAnswers.forEach((v,i)=>{
-    leftHTML; // keep
-    rightHTML+=`<div class="match-item" id="right-${i}" onclick="selectRight(${i},'${v.id}')">
-      <div class="match-ans">${escHtml(v.a)}</div>
-    </div>`;
+    const isMatched=roundMatchedIds&&roundMatchedIds.has(v.id);
+    const matchedClass=isMatched?'matched':'';
+
+    if(practiceMode===0){
+      // 右側顯示日文答案
+      rightHTML+=`<div class="match-item ${matchedClass}" id="right-${i}" onclick="selectRight(${i},'${v.id}')">
+        <div class="match-ans">${escHtml(v.a)}</div>
+      </div>`;
+    } else {
+      // 右側顯示中文題目
+      const parts=v.q.split('\n');
+      rightHTML+=`<div class="match-item ${matchedClass}" id="right-${i}" onclick="selectRight(${i},'${v.id}')">
+        <div>
+          <div class="match-jp" style="color:var(--text);font-size:13px">${escHtml(parts[0])}</div>
+          ${parts[1]?`<div class="match-zh">${escHtml(parts[1])}</div>`:''}
+        </div>
+      </div>`;
+    }
   });
 
   area.innerHTML=`
@@ -521,9 +585,9 @@ function tryMatch(){
     if(rEl){rEl.classList.remove('selected');rEl.classList.add('matched','pop');}
 
     roundMatchedCount++;
+    roundMatchedIds.add(leftId);
     el('round-matched').textContent=roundMatchedCount;
 
-    // 記錄完成
     if(!db.todayDone.includes(leftId))db.todayDone.push(leftId);
     db.streak=(db.streak||0)+1;
     saveDB();
@@ -884,12 +948,116 @@ el('confirm-ok-btn').addEventListener('click',()=>{
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeConfirm();});
 
 // ══════════════════════════════════════
+// GITHUB 雲端同步
+// ══════════════════════════════════════
+const CF_WORKER='https://dashboard-sync.manny76528.workers.dev';
+const GH_FILE='data_vocab.json';
+const GH_API=CF_WORKER+'/'+GH_FILE;
+let _ghSha='';
+let _syncTimer=null;
+
+function showSyncStatus(msg){
+  const el2=document.getElementById('sync-status');
+  if(el2){el2.textContent=msg;clearTimeout(el2._t);el2._t=setTimeout(()=>el2.textContent='',4000);}
+}
+
+async function ghPull(){
+  try{
+    const r=await fetch(GH_API+'?t='+Date.now());
+    if(!r.ok){if(r.status===404)return false;throw new Error('Pull '+r.status);}
+    const j=await r.json();
+    _ghSha=j.sha;
+    const b64=j.content.replace(/\n/g,'');
+    const binStr=atob(b64);
+    const bytes=new Uint8Array(binStr.length);
+    for(let i=0;i<binStr.length;i++)bytes[i]=binStr.charCodeAt(i);
+    const remote=JSON.parse(new TextDecoder().decode(bytes));
+    const localTs=db._ts||0;
+    const remoteTs=remote._ts||0;
+    if(remoteTs>localTs){
+      // 遠端較新，但保護本地較多的vocab和errors
+      if((db.vocab||[]).length>(remote.vocab||[]).length)remote.vocab=db.vocab;
+      if(Object.keys(db.errors||{}).length>Object.keys(remote.errors||{}).length)remote.errors=db.errors;
+      db=remote;
+      saveDB();
+      showSyncStatus('☁️ 已從雲端同步');
+      return true;
+    }
+    return false;
+  }catch(e){console.warn('Pull失敗:',e.message);return false;}
+}
+
+async function ghPush(){
+  try{
+    db._ts=Date.now();
+    saveDB();
+    const jsonStr=JSON.stringify(db,null,2);
+    const encoder=new TextEncoder();
+    const bytes=encoder.encode(jsonStr);
+    const binStr=Array.from(bytes,b=>String.fromCharCode(b)).join('');
+    const encoded=btoa(binStr);
+    if(!_ghSha){
+      try{const chk=await fetch(GH_API);if(chk.ok){const cj=await chk.json();_ghSha=cj.sha;}}catch(e){}
+    }
+    const body={message:'vocab-sync:'+Date.now(),content:encoded};
+    if(_ghSha)body.sha=_ghSha;
+    const r=await fetch(GH_API,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    if(!r.ok){
+      const e=await r.json();
+      if(e.message&&e.message.includes('does not match')){
+        try{
+          const chk2=await fetch(GH_API+'?t='+Date.now());
+          if(chk2.ok){const cj2=await chk2.json();_ghSha=cj2.sha;}
+          const body2={message:'vocab-retry:'+Date.now(),content:encoded,sha:_ghSha};
+          const r2=await fetch(GH_API,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body2)});
+          if(r2.ok){const j2=await r2.json();_ghSha=j2.content.sha;showSyncStatus('✅ 已同步至雲端');return;}
+        }catch(e2){}
+      }
+      throw new Error(e.message);
+    }
+    const j=await r.json();
+    _ghSha=j.content.sha;
+    showSyncStatus('✅ 已同步至雲端');
+  }catch(e){showSyncStatus('⚠️ 同步失敗');console.warn('Push失敗:',e.message);}
+}
+
+function schedulePush(){
+  clearTimeout(_syncTimer);
+  _syncTimer=setTimeout(ghPush,3000);
+}
+
+async function manualSync(){
+  showSyncStatus('🔄 同步中...');
+  _ghSha='';
+  const updated=await ghPull();
+  if(updated){updateStats();buildRound();renderVocabPreview();}
+  await ghPush();
+  showSyncStatus('✅ 同步完成');
+}
+
+// 頁面隱藏前立即 Push
+document.addEventListener('visibilitychange',function(){
+  if(document.visibilityState==='hidden'){clearTimeout(_syncTimer);ghPush();}
+});
+
+// ══════════════════════════════════════
 // LOAD SHEETJS
 // ══════════════════════════════════════
 const script=document.createElement('script');
 script.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
-script.onload=()=>init();
-script.onerror=()=>{ console.warn('SheetJS 載入失敗，仍可使用 CSV'); init(); };
+script.onload=async()=>{
+  showSyncStatus('🔄 同步中...');
+  const updated=await ghPull();
+  if(updated){updateStats();renderVocabPreview();}
+  init();
+  await ghPush();
+};
+script.onerror=async()=>{
+  console.warn('SheetJS 載入失敗');
+  const updated=await ghPull();
+  if(updated){updateStats();renderVocabPreview();}
+  init();
+};
 document.head.appendChild(script);
 </script>
 </body>
