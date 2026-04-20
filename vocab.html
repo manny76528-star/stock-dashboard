@@ -71,12 +71,12 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-seri
 
 /* ── MATCH GAME ── */
 .match-wrap{display:grid;grid-template-columns:1fr 24px 1fr;gap:0;align-items:start;}
-.match-col{display:flex;flex-direction:column;gap:4px;}
-.match-center{display:flex;flex-direction:column;gap:4px;align-items:center;padding-top:0;}
+.match-col{display:flex;flex-direction:column;gap:3px;}
+.match-center{display:flex;flex-direction:column;gap:3px;align-items:center;padding-top:0;}
 
 .match-item{
-  background:var(--surface);border:2px solid var(--border);
-  border-radius:8px;padding:6px 8px;cursor:pointer;
+  background:var(--surface);border:1.5px solid var(--border);
+  border-radius:7px;padding:5px 7px;cursor:pointer;
   transition:all .15s;user-select:none;min-height:0;
   display:flex;align-items:center;
 }
@@ -94,7 +94,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-seri
 .match-zh{font-size:10px;color:var(--muted);margin-top:1px;}
 .match-ans{font-size:12px;color:var(--text);font-family:'Noto Sans JP',sans-serif;}
 
-.match-connector{width:24px;display:flex;justify-content:center;align-items:center;height:36px;margin-top:0;}
+.match-connector{width:18px;display:flex;justify-content:center;align-items:center;height:30px;margin-top:0;}
 .conn-line{width:2px;background:var(--border);height:100%;border-radius:1px;}
 
 /* ── ROUND INFO ── */
@@ -198,7 +198,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-seri
     <span id="sync-status" style="font-size:11px;color:var(--muted);font-family:var(--mono)"></span>
     <button class="btn btn-ghost btn-sm" onclick="manualSync()">☁️ 雲端同步</button>
     <button class="btn btn-ghost btn-sm" onclick="document.getElementById('import-file').click()">📥 匯入 Excel</button>
-    <button class="btn btn-warn btn-sm" onclick="resetTodayProgress()">🔄 重置今日</button>
+    <button class="btn btn-warn btn-sm" onclick="resetTodayProgress()">🔄 重置進度</button>
     <a href="index.html" class="btn btn-ghost btn-sm">🏠 主目錄</a>
     <input type="file" id="import-file" accept=".xlsx,.csv" style="display:none" onchange="importFile(event)">
   </div>
@@ -209,7 +209,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-seri
   <!-- 進度條 -->
   <div class="prog-wrap">
     <div class="prog-label">
-      <span>今日進度</span>
+      <span>練習進度</span>
       <span id="prog-text">0 / 0</span>
     </div>
     <div class="prog-bar-bg"><div class="prog-bar" id="prog-bar" style="width:0%"></div></div>
@@ -218,7 +218,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-seri
   <!-- 統計 -->
   <div class="stat-strip">
     <div class="stat-card"><div class="stat-label">📚 總單字數</div><div class="stat-val blue" id="s-total">0</div></div>
-    <div class="stat-card"><div class="stat-label">✅ 今日完成</div><div class="stat-val green" id="s-done">0</div></div>
+    <div class="stat-card"><div class="stat-label">✅ 已完成</div><div class="stat-val green" id="s-done">0</div></div>
     <div class="stat-card"><div class="stat-label">📋 待複習</div><div class="stat-val yellow" id="s-remain">0</div></div>
     <div class="stat-card"><div class="stat-label">❌ 常錯單字</div><div class="stat-val red" id="s-errors">0</div></div>
     <div class="stat-card"><div class="stat-label">🔥 連續答對</div><div class="stat-val purple" id="s-streak">0</div></div>
@@ -378,12 +378,8 @@ let db=loadDB();
 
 // 重置今日（如果換日了）
 function checkNewDay(){
-  const today=new Date().toISOString().slice(0,10);
-  if(db.todayDate!==today){
-    db.todayDate=today;
-    db.todayDone=[];
-    saveDB();
-  }
+  // 不再每日重置，todayDone 改為累積完成清單
+  // 只有全部完成後才歸零
 }
 checkNewDay();
 
@@ -440,10 +436,16 @@ function buildRound(){
   const notDone=db.vocab.filter(v=>!db.todayDone.includes(v.id));
 
   if(notDone.length===0){
-    // 全部完成
+    // 全部完成 → 顯示完成畫面，歸零讓下次重練
     el('match-area').style.display='none';
     el('all-done').style.display='block';
-    el('all-done-sub').textContent=`共完成 ${db.vocab.length} 個單字！錯誤累計 ${Object.values(db.errors).reduce((a,b)=>a+b,0)} 次`;
+    const errTotal=Object.values(db.errors).reduce((a,b)=>a+b,0);
+    el('all-done-sub').textContent=`共完成 ${db.vocab.length} 個單字！錯誤累計 ${errTotal} 次`;
+    // 歸零，下次再練時從頭開始
+    db.todayDone=[];
+    db.streak=0;
+    saveDB();
+    updateStats();
     return;
   }
 
@@ -644,7 +646,7 @@ function restartAll(){
   showConfirm({
     icon:'🔁',
     title:'重頭開始',
-    msg:'確定要從第一輪重新開始嗎？\n今日已完成的進度會清空，但錯誤統計和單字庫不受影響。',
+    msg:'確定要從第一輪重新開始嗎？\n累積進度會清空，但錯誤統計和單字庫不受影響。',
     btnText:'確定重頭開始',
     btnClass:'btn-warn',
     onOk:()=>{
@@ -887,11 +889,11 @@ function clearAllProgress(){
 function resetTodayProgress(){
   showConfirm({
     icon:'🔄',
-    title:'重置今日進度',
-    msg:'確定要重置今日進度嗎？\n\n你的學習記錄會從頭開始，但錯誤統計和單字庫不受影響。\n\n⚠️ 如果你是分多天複習，建議不要重置！',
+    title:'重置練習進度',
+    msg:'確定要重置練習進度嗎？\n\n已完成的累積進度會清空，從頭開始練習。\n但錯誤統計和單字庫不受影響。\n\n⚠️ 還沒全部完成的話建議不要重置！',
     btnText:'確定重置',
     btnClass:'btn-warn',
-    onOk:()=>{db.todayDone=[];saveDB();updateStats();currentRound=1;buildRound();toast('今日進度已重置');}
+    onOk:()=>{db.todayDone=[];saveDB();updateStats();currentRound=1;buildRound();toast('進度已重置');}
   });
 }
 
