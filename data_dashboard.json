@@ -420,7 +420,7 @@
       "price": 10.22,
       "change": -0.01,
       "changePct": -0.1,
-      "ts": 1776762674743
+      "ts": 1776763058694
     },
     "00950B": {
       "price": 14.22,
@@ -438,7 +438,7 @@
       "price": 16.05,
       "change": 0.33,
       "changePct": 2.1,
-      "ts": 1776762674743
+      "ts": 1776763058694
     },
     "00996A": {
       "price": 9.87,
@@ -468,7 +468,7 @@
       "price": 10.64,
       "change": 0.14,
       "changePct": 1.33,
-      "ts": 1776762674734
+      "ts": 1776763058694
     }
   },
   "dividends": [
@@ -663,7 +663,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1776763049768,
+  "_ts": 1776763060619,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
@@ -787,18 +787,18 @@
     }
   ],
   "finPlan": {
-    "aDiv": 0,
+    "aDiv": 25000,
     "aDivChk": false,
-    "aSave": 0,
+    "aSave": 25000,
     "aSaveChk": false,
     "bNow": 0,
-    "bMonthly": 0,
-    "bMonthly2": 0,
-    "bRate": 0,
-    "cNow": 0,
-    "cMonthly": 0,
-    "cAnnual": 0,
-    "cRate": 0
+    "bMonthly": 16000,
+    "bMonthly2": 16000,
+    "bRate": 5,
+    "cNow": 600000,
+    "cMonthly": 10000,
+    "cAnnual": 80000,
+    "cRate": 5
   },
   "_fpBcAdded": {
     "fp_bc_added_2026-05": true
