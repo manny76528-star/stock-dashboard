@@ -11,7 +11,7 @@ body{min-height:100vh;background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 60%,#
 .logo{font-size:13px;color:rgba(255,255,255,.4);letter-spacing:3px;text-transform:uppercase;margin-bottom:8px;}
 .title{font-size:32px;font-weight:900;color:#fff;margin-bottom:4px;letter-spacing:1px;}
 .sub{font-size:14px;color:rgba(255,255,255,.5);margin-bottom:48px;}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;width:100%;max-width:920px;}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;width:100%;max-width:620px;}
 .card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:32px 28px;cursor:pointer;transition:all .25s;text-decoration:none;display:flex;flex-direction:column;gap:16px;position:relative;overflow:hidden;}
 .card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.08),transparent);opacity:0;transition:opacity .25s;}
 .card:hover{border-color:rgba(255,255,255,.3);transform:translateY(-4px);box-shadow:0 20px 40px rgba(0,0,0,.3);}
@@ -51,18 +51,80 @@ body{min-height:100vh;background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 60%,#
     <div class="card-badge new">業務記帳</div>
     <div class="card-arrow">→</div>
   </a>
-
-  <a href="vocab.html" class="card">
-    <div class="card-icon">🇯🇵</div>
-    <div>
-      <div class="card-title">日文單字複習</div>
-      <div class="card-desc">配對練習、常錯單字追蹤、進度統計、Excel 單字匯入</div>
-    </div>
-    <div class="card-badge new">語言學習</div>
-    <div class="card-arrow">→</div>
-  </a>
 </div>
 
 <div class="ver">v1.0 · 2026</div>
-</body>
+
+<!-- ══ 登入遮罩 ══ -->
+<div id="login-screen" style="position:fixed;inset:0;background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 100%);z-index:9999;display:flex;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:20px;padding:40px 36px;width:320px;box-shadow:0 20px 60px rgba(0,0,0,.4);text-align:center">
+    <div style="font-size:40px;margin-bottom:12px">🔐</div>
+    <div style="font-size:20px;font-weight:800;color:#1e293b;margin-bottom:4px">管理系統</div>
+    <div style="font-size:12px;color:#94a3b8;margin-bottom:28px">請輸入密碼以繼續</div>
+    <input id="pw-input" type="password" placeholder="輸入密碼"
+      autocomplete="new-password"
+      style="width:100%;box-sizing:border-box;padding:12px 16px;border:2px solid #e2e8f0;border-radius:10px;font-size:16px;outline:none;text-align:center;letter-spacing:4px;margin-bottom:12px"
+      onkeydown="if(event.key==='Enter')checkPw()">
+    <button onclick="checkPw()"
+      style="width:100%;padding:12px;background:#1e3a5f;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer"
+      onmouseover="this.style.background='#2563eb'" onmouseout="this.style.background='#1e3a5f'">
+      進入
+    </button>
+    <div id="pw-err" style="color:#ef4444;font-size:12px;margin-top:10px;display:none">密碼錯誤，請再試一次</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const PW='113067';
+  const KEY='master_auth_v1';
+  const TS_KEY='master_auth_ts';
+  const TIMEOUT=10*60*1000; // 10分鐘閒置登出
+  const ls=document.getElementById('login-screen');
+  const inp=document.getElementById('pw-input');
+
+  function show(){
+    ls.style.display='none';
+    resetTimer();
+  }
+  function showLogin(){
+    ls.style.display='flex';
+    localStorage.removeItem(KEY);
+    localStorage.removeItem(TS_KEY);
+    inp.value='';
+    setTimeout(()=>inp&&inp.focus(),100);
+  }
+
+  let timer=null;
+  function resetTimer(){
+    localStorage.setItem(TS_KEY,Date.now().toString());
+    clearTimeout(timer);
+    timer=setTimeout(()=>{ showLogin(); },TIMEOUT);
+  }
+  ['click','keydown','touchstart','scroll'].forEach(ev=>{
+    document.addEventListener(ev,()=>{if(localStorage.getItem(KEY)==='1')resetTimer();},{passive:true});
+  });
+
+  // 檢查是否已登入且未超時
+  const isAuth=localStorage.getItem(KEY)==='1';
+  const lastTs=parseInt(localStorage.getItem(TS_KEY)||'0');
+  if(isAuth&&(Date.now()-lastTs)<TIMEOUT){ show(); }
+  else{ showLogin(); }
+
+  window.checkPw=function(){
+    const val=inp.value.trim();
+    if(val===PW){
+      localStorage.setItem(KEY,'1');
+      localStorage.setItem(TS_KEY,Date.now().toString());
+      document.getElementById('pw-err').style.display='none';
+      show();
+    } else {
+      inp.value='';
+      document.getElementById('pw-err').style.display='block';
+      inp.style.borderColor='#ef4444';
+      setTimeout(()=>inp.style.borderColor='#e2e8f0',1500);
+    }
+  };
+})();
+</script>
 </html>

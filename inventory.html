@@ -139,6 +139,7 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
     <div style="font-size:20px;font-weight:800;color:#1e293b;margin-bottom:4px">進銷存系統</div>
     <div style="font-size:12px;color:#94a3b8;margin-bottom:28px">請輸入密碼以繼續</div>
     <input id="pw-input" type="password" placeholder="輸入密碼"
+      autocomplete="new-password"
       style="width:100%;box-sizing:border-box;padding:12px 16px;border:2px solid #e2e8f0;border-radius:10px;font-size:16px;outline:none;text-align:center;letter-spacing:4px;margin-bottom:12px"
       onkeydown="if(event.key==='Enter')checkPw()">
     <button onclick="checkPw()"
@@ -1869,68 +1870,16 @@ load();
 // 點 Modal 外面不關閉（避免填寫中意外關閉）
 </script>
 </div><!-- /main-content -->
-
-<script>
-(function(){
-  const PW='113067';
-  const KEY='inv_auth_v1';
-  const TS_KEY='inv_auth_ts';
-  const TIMEOUT=3*60*1000;
-  const ls=document.getElementById('login-screen');
-  const mc=document.getElementById('main-content');
-  const inp=document.getElementById('pw-input');
-
-  function show(){ls.style.display='none';mc.style.display='block';resetTimer();}
-  function showLogin(){
-    ls.style.display='flex';mc.style.display='none';
-    localStorage.removeItem(KEY);localStorage.removeItem(TS_KEY);
-    setTimeout(()=>inp&&inp.focus(),100);
-  }
-
-  let timer=null;
-  function resetTimer(){
-    localStorage.setItem(TS_KEY,Date.now().toString());
-    clearTimeout(timer);
-    timer=setTimeout(()=>{
-      localStorage.removeItem(KEY);localStorage.removeItem(TS_KEY);
-      window.location.href='index.html';
-    },TIMEOUT);
-  }
-  ['click','keydown','touchstart','scroll'].forEach(ev=>{
-    document.addEventListener(ev,()=>{if(localStorage.getItem(KEY)==='1')resetTimer();},{passive:true});
-  });
-
-  const isAuth=localStorage.getItem(KEY)==='1';
-  const elapsed=Date.now()-parseInt(localStorage.getItem(TS_KEY)||'0');
-  if(isAuth&&elapsed<TIMEOUT){show();}else{showLogin();}
-
-  window.checkPw=function(){
-    const val=inp.value.trim();
-    if(val===PW){
-      localStorage.setItem(KEY,'1');
-      document.getElementById('pw-err').style.display='none';
-      show();
-    } else {
-      inp.value='';
-      document.getElementById('pw-err').style.display='block';
-      inp.style.borderColor='#ef4444';
-      setTimeout(()=>{inp.style.borderColor='#e2e8f0';},1500);
-    }
-  };
-
-  window.manualLogout=function(){
-    if(confirm('確定要登出嗎？'))showLogin();
-  };
-})();
-</script>
 </div><!-- /main-content -->
 
 <script>
 (function(){
   const PW='113067';
+  const MASTER_KEY='master_auth_v1';
+  const MASTER_TS='master_auth_ts';
   const KEY='inv_auth_v1';
   const TS_KEY='inv_auth_ts';
-  const TIMEOUT=3*60*1000;
+  const TIMEOUT=10*60*1000;
   const ls=document.getElementById('login-screen');
   const mc=document.getElementById('main-content');
   const inp=document.getElementById('pw-input');
@@ -1939,22 +1888,28 @@ load();
   function showLogin(){
     ls.style.display='flex';mc.style.display='none';
     localStorage.removeItem(KEY);localStorage.removeItem(TS_KEY);
-    setTimeout(()=>inp&&inp.focus(),100);
+    if(inp){inp.value='';setTimeout(()=>inp.focus(),100);}
   }
 
   let timer=null;
   function resetTimer(){
     localStorage.setItem(TS_KEY,Date.now().toString());
     clearTimeout(timer);
-    timer=setTimeout(()=>{alert('閒置超過3分鐘，已自動登出');showLogin();},TIMEOUT);
+    timer=setTimeout(()=>{ showLogin(); },TIMEOUT);
   }
   ['click','keydown','touchstart','scroll'].forEach(ev=>{
     document.addEventListener(ev,()=>{if(localStorage.getItem(KEY)==='1')resetTimer();},{passive:true});
   });
 
-  const isAuth=localStorage.getItem(KEY)==='1';
-  const lastTs=parseInt(localStorage.getItem(TS_KEY)||'0');
-  if(isAuth&&(Date.now()-lastTs)<TIMEOUT){show();}else{showLogin();}
+  // 先檢查 master 登入（從主目錄登入）
+  const masterAuth=localStorage.getItem(MASTER_KEY)==='1';
+  const masterTs=parseInt(localStorage.getItem(MASTER_TS)||'0');
+  const invAuth=localStorage.getItem(KEY)==='1';
+  const invTs=parseInt(localStorage.getItem(TS_KEY)||'0');
+
+  if(masterAuth&&(Date.now()-masterTs)<TIMEOUT){ show(); }
+  else if(invAuth&&(Date.now()-invTs)<TIMEOUT){ show(); }
+  else{ showLogin(); }
 
   window.checkPw=function(){
     const val=inp.value.trim();
@@ -1972,7 +1927,8 @@ load();
 
   window.manualLogout=function(){
     if(confirm('確定要登出嗎？')){
-      localStorage.removeItem(KEY);localStorage.removeItem(TS_KEY);
+      localStorage.removeItem(MASTER_KEY);
+      localStorage.removeItem(MASTER_TS);
       window.location.href='index.html';
     }
   };
