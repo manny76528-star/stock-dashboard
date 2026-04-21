@@ -6375,7 +6375,7 @@ function openSP(id){
   if(id==='health' && typeof renderHealth==='function') renderHealth();
   if(id==='watch'  && typeof renderWatchlist==='function') renderWatchlist();
   if(id==='analytics' && typeof renderAnalytics==='function') renderAnalytics();
-  if(id==='finplan' && typeof calcFinPlan==='function') calcFinPlan();
+  if(id==='finplan' && typeof initFinPlan==='function') initFinPlan();
   if(id==='journal'){ if(typeof renderJournal==='function') renderJournal(); updateJournalCount(); }
   if(id==='flex'){
     if(typeof renderFlex==='function') renderFlex();
