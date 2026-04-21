@@ -468,7 +468,7 @@
       "price": 10.64,
       "change": 0.14,
       "changePct": 1.33,
-      "ts": 1776764078922
+      "ts": 1776764334074
     }
   },
   "dividends": [
@@ -663,7 +663,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1776764327999,
+  "_ts": 1776764334177,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
