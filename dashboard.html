@@ -2251,6 +2251,10 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
           <option value="賣出">▼ 賣出</option>
           <option value="重大事項">🔔 重大事項</option>
         </select>
+        <!-- 心情下拉（動態） -->
+        <select id="journal-mood-sel" onchange="renderJournal()" style="padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:700;color:#475569;background:#fff;cursor:pointer;outline:none;min-width:110px">
+          <option value="">全部心情</option>
+        </select>
       </div>
       <div id="journal-list" style="padding:12px 16px;display:flex;flex-direction:column;gap:10px"></div>
     </div>
@@ -6271,7 +6275,9 @@ function updateJournalCount(){
 function renderJournal(){
   const q=(document.getElementById('journal-search')?.value||'').toLowerCase();
   const yrSel=document.getElementById('journal-year-sel');
+  const moodSel=document.getElementById('journal-mood-sel');
   const selYear=yrSel?yrSel.value:'all';
+  const selMood=moodSel?moodSel.value:'';
   let list=(db.journals||[]).slice();
 
   // 動態更新年份選單
@@ -6282,8 +6288,17 @@ function renderJournal(){
     yrSel.value=years.includes(curVal)?curVal:'all';
   }
 
+  // 動態更新心情選單（從實際資料抓取）
+  if(moodSel){
+    const moods=[...new Set((db.journals||[]).map(j=>j.mood||'').filter(Boolean))].sort();
+    const curMood=moodSel.value;
+    moodSel.innerHTML='<option value="">全部心情</option>'+moods.map(m=>`<option value="${m}">${m}</option>`).join('');
+    moodSel.value=moods.includes(curMood)?curMood:'';
+  }
+
   if(journalTagFilter)list=list.filter(j=>(j.tags||[]).includes(journalTagFilter));
   if(selYear&&selYear!=='all')list=list.filter(j=>(j.date||'').startsWith(selYear));
+  if(selMood)list=list.filter(j=>(j.mood||'')==selMood);
   if(q)list=list.filter(j=>
     (j.content||'').toLowerCase().includes(q)||
     (j.market||'').toLowerCase().includes(q)||
