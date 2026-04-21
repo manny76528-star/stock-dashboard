@@ -280,7 +280,7 @@
       "lots": 55,
       "avgPrice": 10.42,
       "divPerShare": 0,
-      "note": "現股",
+      "note": "質押中",
       "url": "https://www.wantgoo.com/stock/etf/00997a/dividend-policy/ex-dividend",
       "holdType": "short",
       "targetRoi": 5,
@@ -468,7 +468,7 @@
       "price": 10.64,
       "change": 0.14,
       "changePct": 1.33,
-      "ts": 1776763397481
+      "ts": 1776763540364
     }
   },
   "dividends": [
@@ -663,7 +663,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1776763535335,
+  "_ts": 1776763543147,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
