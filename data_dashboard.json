@@ -465,10 +465,10 @@
       "ts": 1775057916853
     },
     "00997A": {
-      "price": 10.59,
-      "change": 0.09,
-      "changePct": 0.86,
-      "ts": 1776735604950
+      "price": 10.42,
+      "change": 0.04,
+      "changePct": 0.39,
+      "ts": 1776747444628
     }
   },
   "dividends": [
@@ -663,7 +663,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1776747441257,
+  "_ts": 1776747446922,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
