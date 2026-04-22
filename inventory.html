@@ -975,7 +975,12 @@ function renderOrders(){
   body.innerHTML=orders.map(o=>{
     const c=calcOrder(o);
     const hasInv=(o.items||[]).some(it=>it.invoice);
-    const itemNames=(o.items||[]).map(it=>(it.name||'')+(it.qty&&it.qty>1?' ×'+it.qty:'')).filter(Boolean).join('、');
+    const itemNames=(o.items||[]).map(it=>{
+      let s=it.name||'';
+      if(it.spec)s+=' '+it.spec;
+      if(it.qty&&it.qty>1)s+=' ×'+it.qty;
+      return s;
+    }).filter(Boolean).join('、');
     return`<tr style="cursor:pointer" onclick="showOrderDetail('${o.id}')">
       <td>${fmtDate(o.date)}</td>
       <td><b>${o.custName||'—'}</b></td>

@@ -3178,6 +3178,9 @@ function renderInv(){
   const sortedInvs=[...db.investments].sort((a,b)=>(a.order||999)-(b.order||999));
   const calcs=sortedInvs.map(inv=>({inv,c:calcInv(inv)}));
   calcs.forEach(({c})=>{tC+=c.tCost;if(c.mktVal)tM+=c.mktVal;tD+=c.moDivAmt;tDivTot+=c.divTot;});
+  // 總損益也扣預估賣出費用，與各標的一致
+  const sellFeeRate=0.001425*0.28+0.003;
+  const tEstSellFee=tM>0?Math.round(tM*sellFeeRate):0;
   const chk=document.getElementById('roi-chk');if(chk)chk.checked=showDivRoi;
 
   calcs.forEach(({inv,c})=>{
@@ -3272,7 +3275,7 @@ function renderInv(){
     grid.appendChild(row);
   });
 
-  const tPnl=tM-tC;
+  const tPnl=tM-tC-tEstSellFee;
   const dispPnl=showDivRoi&&tDivTot>0?tPnl+tDivTot:tPnl;
   const dispRoi=tC>0?dispPnl/tC*100:0;
   const setCl=(id,val,col)=>{const el=document.getElementById(id);if(el){el.textContent=val;if(col!==undefined)el.style.color=col;}};
