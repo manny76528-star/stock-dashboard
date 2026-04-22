@@ -296,6 +296,30 @@
         }
       ],
       "order": 9
+    },
+    {
+      "id": "moa352cbuvc",
+      "code": "009819",
+      "name": "中信數據及電力",
+      "lots": 60,
+      "avgPrice": 10,
+      "divPerShare": 0,
+      "note": "現股",
+      "url": "https://www.wantgoo.com/stock/etf/009819/dividend-policy/ex-dividend",
+      "holdType": "short",
+      "targetRoi": 5,
+      "transactions": [
+        {
+          "id": "moa352cbx7f",
+          "type": "buy",
+          "lots": 60,
+          "price": 10,
+          "date": "2026-04-22",
+          "fee": 0,
+          "remark": "2027年49 GW 缺口：Morgan Stanley 預測，2028年美國資料中心需求達74 GW，供給短缺約49 GW（數十座大型電廠規模）。 趨勢：2026–2027加速成長，2030年全球用電較2023年增165%–220%。AI吃電主導。 且用電需求不會突然斷崖：效率提升慢於需求爆炸，CapEx鎖定3–5年高成長。黃仁勳：電力是AI最大瓶頸, 電力供不應求是確定的。"
+        }
+      ],
+      "order": 10
     }
   ],
   "loans": [
@@ -656,7 +680,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1776864301143,
+  "_ts": 1776864326104,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
