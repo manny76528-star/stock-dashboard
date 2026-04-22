@@ -1722,8 +1722,8 @@ function showInvoice(id){
       const total=(it.price||0)*(it.qty||1);
       rowsHtml+=`<tr>
         <td style="text-align:center">${i+1}</td>
-        <td>${it.subtype||''}</td>
-        <td>${it.spec||it.name||''}</td>
+        <td>${it.subtype||it.name||''}</td>
+        <td>${it.spec||''}</td>
         <td style="text-align:center">${it.qty||1}</td>
         <td style="text-align:right">${(it.price||0).toLocaleString()}</td>
         <td style="text-align:right">${total.toLocaleString()}</td>
