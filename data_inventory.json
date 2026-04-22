@@ -5761,44 +5761,6 @@
       ],
       "paid": false,
       "paidDate": "2026-04-24"
-    },
-    {
-      "id": "moa2xh8qmesh",
-      "date": "2026-05-12",
-      "custId": "mnmofk0wpc0i",
-      "custName": "訊控有限公司",
-      "contact": "陳甫騁先生",
-      "phone": "0935111093",
-      "note": "這次要在下單四批, 加前次兩批共六批 (一批出陳先生 五批我用訊控名義幫他送過去) 要調整價格",
-      "items": [
-        {
-          "name": "珠光紙 90*90*50米",
-          "type": "paper",
-          "subtype": "珠光紙",
-          "spec": "90*90*50米",
-          "qty": 240,
-          "sn": "",
-          "sns": [],
-          "cost": 170,
-          "price": 220,
-          "invoice": false
-        },
-        {
-          "name": "抗刮碳帶",
-          "type": "ribbon",
-          "subtype": "抗刮碳帶",
-          "spec": "",
-          "qty": 40,
-          "sn": "",
-          "sns": [],
-          "cost": 300,
-          "price": 420,
-          "invoice": false
-        }
-      ],
-      "paid": false,
-      "paidDate": "2026-05-12",
-      "createdAt": "2026-04-22T13:19:29.162Z"
     }
   ],
   "customers": [
@@ -6070,7 +6032,7 @@
       "id": "mnncpxbxphly",
       "type": "paper",
       "sub": "珠光紙",
-      "name": "90*90*50米",
+      "name": "訊控珠光",
       "spec": "90*90*50米",
       "cost": 170
     },
@@ -6112,5 +6074,5 @@
     "bankCode": "013",
     "bankAccount": "061506186489"
   },
-  "_ts": 1776863972177
+  "_ts": 1776864006460
 }
