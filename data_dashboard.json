@@ -418,6 +418,14 @@
       "d1": 0,
       "d2": 0,
       "d1SettleDate": ""
+    },
+    {
+      "id": "moa36m8o0lf",
+      "bank": "國泰銀行",
+      "cash": 420000,
+      "d1Date": "",
+      "d1": 0,
+      "d2": 0
     }
   ],
   "prices": {
@@ -680,7 +688,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1776864326104,
+  "_ts": 1776864398547,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
