@@ -6025,7 +6025,7 @@
       "type": "device",
       "sub": "條碼機",
       "name": "GODEX G530",
-      "spec": "USB",
+      "spec": "GODEX G530 USB",
       "cost": 7500
     },
     {
@@ -6074,5 +6074,5 @@
     "bankCode": "013",
     "bankAccount": "061506186489"
   },
-  "_ts": 1776864058326
+  "_ts": 1776864068643
 }
