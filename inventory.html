@@ -1727,16 +1727,23 @@ function showInvoice(id){
     if(it){
       const total=(it.price||0)*(it.qty||1);
       const itemSpec=(()=>{
+        // 1. 直接有 spec 欄位
         if(it.spec)return it.spec;
+        // 2. 從 name 去掉 subtype 前綴
         const sub=it.subtype||'';
         const nm=it.name||'';
         if(sub&&nm.startsWith(sub)){
-          return nm.slice(sub.length).trim();
+          const rest=nm.slice(sub.length).trim();
+          if(rest)return rest;
         }
-        return nm!==sub?nm:'';
+        // 3. 去 products 資料庫比對找規格
+        const prod=(db.products||[]).find(p=>
+          p.sub===sub || p.sub===nm || p.name===nm ||
+          (sub&&p.sub===sub)
+        );
+        if(prod&&prod.spec)return prod.spec;
+        return '';
       })();
-      // debug: remove after fix
-      console.log('item debug:', JSON.stringify({name:it.name,subtype:it.subtype,spec:it.spec,itemSpec}));
       rowsHtml+=`<tr>
         <td style="text-align:center">${i+1}</td>
         <td>${it.subtype||it.name||''}</td>
