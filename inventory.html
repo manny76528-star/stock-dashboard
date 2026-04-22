@@ -1728,7 +1728,6 @@ function showInvoice(id){
       const total=(it.price||0)*(it.qty||1);
       const itemSpec=(()=>{
         if(it.spec)return it.spec;
-        // spec 欄位空的，從 name 裡去掉 subtype 前綴取得規格
         const sub=it.subtype||'';
         const nm=it.name||'';
         if(sub&&nm.startsWith(sub)){
@@ -1736,6 +1735,8 @@ function showInvoice(id){
         }
         return nm!==sub?nm:'';
       })();
+      // debug: remove after fix
+      console.log('item debug:', JSON.stringify({name:it.name,subtype:it.subtype,spec:it.spec,itemSpec}));
       rowsHtml+=`<tr>
         <td style="text-align:center">${i+1}</td>
         <td>${it.subtype||it.name||''}</td>
