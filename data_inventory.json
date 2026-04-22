@@ -5761,6 +5761,32 @@
       ],
       "paid": false,
       "paidDate": "2026-04-24"
+    },
+    {
+      "id": "mo9vsf8quzi3",
+      "date": "2026-04-29",
+      "custId": "mnmofk0wpc0i",
+      "custName": "訊控有限公司",
+      "contact": "陳甫騁先生",
+      "phone": "0935111093",
+      "note": "這次要在下單四批, 加前次兩批共六批 (一批出陳先生 五批我用訊控名義幫他送過去) 要調整價格",
+      "items": [
+        {
+          "name": "珠光紙",
+          "type": "paper",
+          "subtype": "珠光紙",
+          "spec": "",
+          "qty": 240,
+          "sn": "",
+          "sns": [],
+          "cost": 170,
+          "price": 220,
+          "invoice": false
+        }
+      ],
+      "paid": false,
+      "paidDate": "2026-04-29",
+      "createdAt": "2026-04-22T09:59:35.978Z"
     }
   ],
   "customers": [
@@ -6074,5 +6100,5 @@
     "bankCode": "013",
     "bankAccount": "061506186489"
   },
-  "_ts": 1776334162895
+  "_ts": 1776851978983
 }
