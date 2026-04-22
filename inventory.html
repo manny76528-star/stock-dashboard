@@ -976,8 +976,14 @@ function renderOrders(){
     const c=calcOrder(o);
     const hasInv=(o.items||[]).some(it=>it.invoice);
     const itemNames=(o.items||[]).map(it=>{
-      let s=it.name||'';
-      if(it.spec)s+=' '+it.spec;
+      let s=it.subtype||it.name||'';
+      const spec=it.spec||(()=>{
+        const sub=it.subtype||'';
+        const nm=it.name||'';
+        if(sub&&nm.startsWith(sub))return nm.slice(sub.length).trim();
+        return '';
+      })();
+      if(spec)s+=' '+spec;
       if(it.qty&&it.qty>1)s+=' ×'+it.qty;
       return s;
     }).filter(Boolean).join('、');
@@ -1720,10 +1726,20 @@ function showInvoice(id){
     const it=items[i];
     if(it){
       const total=(it.price||0)*(it.qty||1);
+      const itemSpec=(()=>{
+        if(it.spec)return it.spec;
+        // spec 欄位空的，從 name 裡去掉 subtype 前綴取得規格
+        const sub=it.subtype||'';
+        const nm=it.name||'';
+        if(sub&&nm.startsWith(sub)){
+          return nm.slice(sub.length).trim();
+        }
+        return nm!==sub?nm:'';
+      })();
       rowsHtml+=`<tr>
         <td style="text-align:center">${i+1}</td>
         <td>${it.subtype||it.name||''}</td>
-        <td>${it.spec||''}</td>
+        <td>${itemSpec}</td>
         <td style="text-align:center">${it.qty||1}</td>
         <td style="text-align:right">${(it.price||0).toLocaleString()}</td>
         <td style="text-align:right">${total.toLocaleString()}</td>
