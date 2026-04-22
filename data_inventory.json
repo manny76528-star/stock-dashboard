@@ -5764,7 +5764,7 @@
     },
     {
       "id": "mo9vsf8quzi3",
-      "date": "2026-04-29",
+      "date": "2026-05-05",
       "custId": "mnmofk0wpc0i",
       "custName": "訊控有限公司",
       "contact": "陳甫騁先生",
@@ -5782,11 +5782,22 @@
           "cost": 170,
           "price": 220,
           "invoice": false
+        },
+        {
+          "name": "抗刮碳帶",
+          "type": "ribbon",
+          "subtype": "抗刮碳帶",
+          "spec": "",
+          "qty": 40,
+          "sn": "",
+          "sns": [],
+          "cost": 300,
+          "price": 420,
+          "invoice": false
         }
       ],
       "paid": false,
-      "paidDate": "2026-04-29",
-      "createdAt": "2026-04-22T09:59:35.978Z"
+      "paidDate": "2026-05-05"
     }
   ],
   "customers": [
@@ -6100,5 +6111,5 @@
     "bankCode": "013",
     "bankAccount": "061506186489"
   },
-  "_ts": 1776851978983
+  "_ts": 1776852052263
 }
