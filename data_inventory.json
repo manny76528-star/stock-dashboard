@@ -5993,7 +5993,7 @@
       "type": "device",
       "sub": "掃描器",
       "name": "CINO A680",
-      "spec": "USB",
+      "spec": "CINO A680 USB",
       "cost": 2300
     },
     {
@@ -6074,5 +6074,5 @@
     "bankCode": "013",
     "bankAccount": "061506186489"
   },
-  "_ts": 1776864072578
+  "_ts": 1776864077356
 }
