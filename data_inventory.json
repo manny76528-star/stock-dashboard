@@ -6049,7 +6049,7 @@
       "type": "device",
       "sub": "掃描器",
       "name": "HONEYWELL 1472G",
-      "spec": "",
+      "spec": "HONEYWELL 1472G",
       "cost": 5000
     },
     {
@@ -6074,5 +6074,5 @@
     "bankCode": "013",
     "bankAccount": "061506186489"
   },
-  "_ts": 1776864068643
+  "_ts": 1776864072578
 }
