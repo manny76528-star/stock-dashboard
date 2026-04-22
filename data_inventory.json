@@ -5763,7 +5763,7 @@
       "paidDate": "2026-04-24"
     },
     {
-      "id": "mo9vsf8quzi3",
+      "id": "moa2thycdcoi",
       "date": "2026-05-05",
       "custId": "mnmofk0wpc0i",
       "custName": "訊控有限公司",
@@ -5797,7 +5797,8 @@
         }
       ],
       "paid": false,
-      "paidDate": "2026-05-05"
+      "paidDate": "2026-05-05",
+      "createdAt": "2026-04-22T13:16:23.460Z"
     }
   ],
   "customers": [
@@ -6111,5 +6112,5 @@
     "bankCode": "013",
     "bankAccount": "061506186489"
   },
-  "_ts": 1776852052263
+  "_ts": 1776863786469
 }
