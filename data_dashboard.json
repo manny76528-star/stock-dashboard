@@ -494,6 +494,12 @@
       "change": 0.14,
       "changePct": 1.33,
       "ts": 1776908025190
+    },
+    "009819": {
+      "price": 11.37,
+      "change": 1.38,
+      "changePct": 13.81,
+      "ts": 1776908830552
     }
   },
   "dividends": [
@@ -688,7 +694,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1776908040550,
+  "_ts": 1776908834239,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
