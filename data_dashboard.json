@@ -338,6 +338,30 @@
         }
       ],
       "order": 10
+    },
+    {
+      "id": "mobc156a3js",
+      "code": "009805",
+      "name": "新光美國電力基建",
+      "lots": 45,
+      "avgPrice": 16.08,
+      "divPerShare": 0,
+      "note": "現股",
+      "url": "https://www.wantgoo.com/stock/etf/009805/dividend-policy/ex-dividend",
+      "holdType": "short",
+      "targetRoi": 5,
+      "transactions": [
+        {
+          "id": "mobc156abpw",
+          "type": "buy",
+          "lots": 45,
+          "price": 16.08,
+          "date": "2026-04-23",
+          "fee": 0,
+          "remark": "GEV大漲12%,且展望非常的好 但當天GEV占比最多的009805 只有小漲0.5% 當下淨值都還有16.3"
+        }
+      ],
+      "order": 11
     }
   ],
   "loans": [
@@ -518,6 +542,12 @@
       "change": 2.55,
       "changePct": 25.53,
       "ts": 1776939471407
+    },
+    "009805": {
+      "price": 16.1,
+      "change": 0.09,
+      "changePct": 0.56,
+      "ts": 1776939723567
     }
   },
   "dividends": [
@@ -712,7 +742,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1776939595177,
+  "_ts": 1776939725869,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
