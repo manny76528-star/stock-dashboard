@@ -5799,6 +5799,32 @@
       "paid": false,
       "paidDate": "2026-05-12",
       "createdAt": "2026-04-22T13:21:56.164Z"
+    },
+    {
+      "id": "moatovh0vw95",
+      "date": "2026-05-01",
+      "custId": "mnncin3g7nas",
+      "custName": "公司旁_汽車保養廠",
+      "contact": "",
+      "phone": "",
+      "note": "變速器油更換3罐（老闆一罐500）, 估價單變速箱四罐（2400,煞車油500）",
+      "items": [
+        {
+          "name": "掃描器",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "",
+          "qty": 1,
+          "sn": "",
+          "sns": [],
+          "cost": 1,
+          "price": 1401,
+          "invoice": false
+        }
+      ],
+      "paid": false,
+      "paidDate": "2026-05-01",
+      "createdAt": "2026-04-23T01:48:37.332Z"
     }
   ],
   "customers": [
@@ -6112,5 +6138,5 @@
     "bankCode": "013",
     "bankAccount": "061506186489"
   },
-  "_ts": 1776864119171
+  "_ts": 1776908920334
 }
