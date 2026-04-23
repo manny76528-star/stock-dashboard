@@ -157,6 +157,16 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 
 /* SECTION CARD EXTRA POLISH */
 .sec{animation:fadeInUp .3s ease both;}
+/* ═══ PRIVACY MODE ═══ */
+.privacy-mask{
+  filter:blur(8px);
+  user-select:none;
+  pointer-events:none;
+  transition:filter .3s;
+}
+body.privacy .privacy-mask{filter:blur(8px);}
+body:not(.privacy) .privacy-mask{filter:none;}
+
 @keyframes fadeInUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
 .sec:nth-child(1){animation-delay:.05s}
 .sec:nth-child(2){animation-delay:.1s}
@@ -1632,6 +1642,7 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
   </div>
   <div class="db-topbar-actions">
     <a href="index.html" class="db-btn neutral">🏠 主目錄</a>
+    <button class="db-btn neutral" id="privacy-btn" onclick="togglePrivacy()" title="隱私模式">👁 顯示金額</button>
     <button class="db-btn purple" onclick="undoLast()" id="undoBtn" disabled>← 上一步</button>
     <button class="db-btn indigo" onclick="redoLast()" id="redoBtn" disabled>→ 下一步</button>
     <!-- ⋯ 下拉選單 -->
@@ -1666,23 +1677,23 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
   <div class="inv-hero-strip">
     <div class="inv-hero-card blue">
       <div class="inv-hero-label">🏛️ 淨資產</div>
-      <div class="inv-hero-value" id="qb-net">—</div>
+      <div class="inv-hero-value privacy-mask" id="qb-net">—</div>
     </div>
     <div class="inv-hero-card" id="inv-hero-real">
       <div class="inv-hero-label">✅ 已實現損益</div>
-      <div class="inv-hero-value" id="qb-real">—</div>
+      <div class="inv-hero-value privacy-mask" id="qb-real">—</div>
     </div>
     <div class="inv-hero-card" id="inv-hero-pnl" style="background:#fffbeb;">
       <div class="inv-hero-label">📊 損益</div>
-      <div class="inv-hero-value" id="qb-pnl">—</div>
+      <div class="inv-hero-value privacy-mask" id="qb-pnl">—</div>
     </div>
     <div class="inv-hero-card">
       <div class="inv-hero-label">📈 股票總額</div>
-      <div class="inv-hero-value" id="qb-tot">—</div>
+      <div class="inv-hero-value privacy-mask" id="qb-tot">—</div>
     </div>
     <div class="inv-hero-card" id="inv-hero-dr">
       <div class="inv-hero-label">📊 負債比</div>
-      <div class="inv-hero-value" id="qb-dr">—</div>
+      <div class="inv-hero-value privacy-mask" id="qb-dr">—</div>
     </div>
   </div>
   <div id="sum-tbl" style="display:none"></div>
@@ -1699,9 +1710,9 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
         <span class="big5-icon">📈</span>
         <span class="big5-title">投資標的</span>
         <div class="big5-meta">
-          <span>損益 <b id="t-pnl" style="color:var(--gain)">—</b></span>
-          <span>報酬 <b id="t-roi" style="color:var(--gain)">—</b></span>
-          <span>月息 <b id="t-div" style="color:var(--gain)">—</b></span>
+          <span>損益 <b class="privacy-mask" id="t-pnl" style="color:var(--gain)">—</b></span>
+          <span>報酬 <b class="privacy-mask" id="t-roi" style="color:var(--gain)">—</b></span>
+          <span>月息 <b class="privacy-mask" id="t-div" style="color:var(--gain)">—</b></span>
         </div>
         <span style="display:none" id="t-cost">—</span>
         <span style="display:none" id="t-mkt">—</span>
@@ -1859,10 +1870,10 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 
 <!-- ═══ BOTTOM STATUS BAR ═══ -->
 <div class="db-status-bar">
-  <span>每月淨現金流：<strong id="sb-cf">—</strong></span>
-  <span>每月股息：<strong id="sb-div">—</strong></span>
-  <span>負債比：<strong id="sb-dr">—</strong></span>
-  <span>信貸尚餘：<strong id="sb-loan">—</strong></span>
+  <span>每月淨現金流：<strong class="privacy-mask" id="sb-cf">—</strong></span>
+  <span>每月股息：<strong class="privacy-mask" id="sb-div">—</strong></span>
+  <span>負債比：<strong class="privacy-mask" id="sb-dr">—</strong></span>
+  <span>信貸尚餘：<strong class="privacy-mask" id="sb-loan">—</strong></span>
 </div>
 
 </div><!-- /db-root -->
@@ -3238,7 +3249,7 @@ function renderInv(){
       // ── Layer 2: 單行橫排（照上圖）──
       '<div class="irow-l2" onclick="toggleInvDetail(\''+inv.id+'\')">'
         +codeHtml
-        +'<span class="irow-l2-pnl-amt" style="color:'+pnColor+'">'+pnlTxt+'</span>'
+        +'<span class="irow-l2-pnl-amt privacy-mask" style="color:'+pnColor+'">'+pnlTxt+'</span>'
         +'<span class="irow-l2-price" style="color:'+prColor+'">'+priceTxt+'</span>'
         +noteHtml
         +'<span class="irow-l2-pnl-pct" style="color:'+pnColor+'">'+pctTxt+'</span>'
@@ -3284,6 +3295,8 @@ function renderInv(){
   setCl('t-pnl',tM>0?(dispPnl>=0?'+':dispPnl<0?'-':'')+fmt(dispPnl):'—',dispPnl>=0?'var(--gain)':'var(--loss)');
   setCl('t-roi',tM>0?(dispRoi>=0?'+':'')+dispRoi.toFixed(2)+'%':'—',dispRoi>=0?'var(--gain)':'var(--loss)');
   const tdiv=document.getElementById('t-div');if(tdiv)tdiv.textContent=fmt(tD);
+  // 重新套用隱私模式
+  if(typeof applyPrivacy==='function')applyPrivacy();
 }
 
 function toggleInvDetail(id){
@@ -6368,6 +6381,28 @@ function toggleJCard(id){
 
 // 初始化日誌計數
 updateJournalCount();
+
+// ═══ 隱私模式 ═══
+let privacyOn=true; // 預設開啟隱私模式
+function togglePrivacy(){
+  privacyOn=!privacyOn;
+  applyPrivacy();
+}
+function applyPrivacy(){
+  const btn=document.getElementById('privacy-btn');
+  if(privacyOn){
+    document.body.classList.add('privacy');
+    document.querySelectorAll('.privacy-mask').forEach(el=>el.style.filter='blur(8px)');
+    if(btn)btn.textContent='👁 顯示金額';
+  } else {
+    document.body.classList.remove('privacy');
+    document.querySelectorAll('.privacy-mask').forEach(el=>el.style.filter='none');
+    if(btn)btn.textContent='🙈 隱藏金額';
+  }
+}
+// 啟動時套用
+document.addEventListener('DOMContentLoaded',()=>applyPrivacy());
+setTimeout(()=>applyPrivacy(),500); // 確保元素都渲染完
 
 // ═══════════════════════════════════════════
 // 小卡片 Popup 開關
