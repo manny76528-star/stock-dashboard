@@ -4925,7 +4925,45 @@ function runSearch(){
 
     html+='</tbody></table></div></div>';
   });
-  container.innerHTML=html;
+  // ── 年度損益彙總卡片 ──
+  const totalRealized=Object.values(realizedByCode).reduce((s,v)=>s+v,0);
+  const totalBuyAmt=Object.values(byCode).reduce((s,info)=>{
+    return s+info.txns.filter(t=>t.type==='buy').reduce((ss,t)=>ss+t.lots*1000*t.price,0);
+  },0);
+  const totalSellLots2=Object.values(byCode).reduce((s,info)=>{
+    return s+info.txns.filter(t=>t.type==='sell').reduce((ss,t)=>ss+t.lots,0);
+  },0);
+  const totalBuyLots2=Object.values(byCode).reduce((s,info)=>{
+    return s+info.txns.filter(t=>t.type==='buy').reduce((ss,t)=>ss+t.lots,0);
+  },0);
+  const yearLabel=selYear==='all'?'全部期間':selYear+' 年';
+  const pnlColor2=totalRealized>=0?'var(--gain)':'var(--loss)';
+
+  let summaryHtml='';
+  if(Object.keys(realizedByCode).some(k=>realizedByCode[k]!==0)){
+    summaryHtml=`
+    <div style="background:linear-gradient(135deg,#0f172a,#1e3a5f);border-radius:12px;padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+      <div>
+        <div style="font-size:11px;color:rgba(255,255,255,.6);font-weight:600;margin-bottom:4px">📅 ${yearLabel} 已實現損益</div>
+        <div style="font-size:24px;font-weight:800;color:${pnlColor2};font-family:'JetBrains Mono',monospace">${totalRealized>=0?'+':''}${Math.round(totalRealized).toLocaleString()}</div>
+      </div>
+      <div style="display:flex;gap:20px">
+        <div style="text-align:center">
+          <div style="font-size:10px;color:rgba(255,255,255,.5);margin-bottom:3px">買入張數</div>
+          <div style="font-size:15px;font-weight:700;color:#fca5a5">${totalBuyLots2} 張</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:10px;color:rgba(255,255,255,.5);margin-bottom:3px">賣出張數</div>
+          <div style="font-size:15px;font-weight:700;color:#86efac">${totalSellLots2} 張</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:10px;color:rgba(255,255,255,.5);margin-bottom:3px">標的數</div>
+          <div style="font-size:15px;font-weight:700;color:#93c5fd">${Object.keys(byCode).length} 檔</div>
+        </div>
+      </div>
+    </div>`;
+  }
+  container.innerHTML=summaryHtml+html;
 }
 
 function toggleSrDetail(uid2){
