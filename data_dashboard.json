@@ -473,11 +473,10 @@
     {
       "id": "mneeom9dzod",
       "bank": "統一券商",
-      "cash": 3749,
-      "d1Date": "",
-      "d1": 0,
-      "d2": 0,
-      "d1SettleDate": ""
+      "cash": 15000,
+      "d1Date": "2026-04-23",
+      "d1": -14500,
+      "d2": 0
     },
     {
       "id": "moa36m8o0lf",
@@ -767,7 +766,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1777026301451,
+  "_ts": 1777026328445,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
