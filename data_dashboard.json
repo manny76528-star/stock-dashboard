@@ -694,7 +694,7 @@
       "type": "buy",
       "lots": 27,
       "price": 9.94,
-      "date": "2020-01-01",
+      "date": "2026-04-07",
       "fee": 0,
       "remark": "初始持倉",
       "code": "00996A",
@@ -760,7 +760,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1777024815385,
+  "_ts": 1777024839305,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
