@@ -5828,7 +5828,7 @@
     },
     {
       "id": "moc8jckp86lg",
-      "date": "2026-04-24",
+      "date": "2026-05-01",
       "custId": "mnmofk0wvucy",
       "custName": "騰亦資訊",
       "contact": "Jack歐",
@@ -5851,8 +5851,7 @@
         }
       ],
       "paid": false,
-      "paidDate": "2026-04-24",
-      "createdAt": "2026-04-24T01:31:59.977Z"
+      "paidDate": "2026-05-01"
     }
   ],
   "customers": [
@@ -6166,5 +6165,5 @@
     "bankCode": "013",
     "bankAccount": "061506186489"
   },
-  "_ts": 1776994322982
+  "_ts": 1776994361838
 }
