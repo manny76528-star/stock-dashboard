@@ -2321,6 +2321,16 @@ body:not(.privacy) .privacy-mask{filter:none;}
       <label class="fl">📝 交易日誌</label>
       <textarea class="fi" id="j-content" rows="5" placeholder="記錄今日的操作邏輯、反思、策略調整..." style="resize:vertical"></textarea>
     </div>
+    <!-- 圖片上傳 -->
+    <div class="fg">
+      <label class="fl">🖼 附加圖片（選填）</label>
+      <div id="j-img-preview" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px"></div>
+      <label style="display:inline-flex;align-items:center;gap:6px;background:#f1f5f9;border:1.5px dashed #cbd5e1;border-radius:8px;padding:8px 16px;cursor:pointer;font-size:12px;color:#475569;font-weight:600;transition:all .15s" onmouseover="this.style.borderColor='#3b82f6'" onmouseout="this.style.borderColor='#cbd5e1'">
+        📷 上傳圖片
+        <input type="file" id="j-img-input" accept="image/*" multiple style="display:none" onchange="handleJImgUpload(event)">
+      </label>
+      <div style="font-size:10px;color:#94a3b8;margin-top:4px">支援 JPG、PNG、GIF，自動壓縮，建議每張 5MB 以內</div>
+    </div>
     <div class="br">
       <button class="act-btn" onclick="closeModal('journalModal')">取消</button>
       <button class="act-btn del" id="j-del-btn" style="display:none" onclick="deleteJournal()">🗑 刪除</button>
@@ -6324,8 +6334,74 @@ function openJournalModal(id=null){
   document.querySelectorAll('.j-mood-btn').forEach(b=>{
     b.classList.toggle('active',j?.mood===b.dataset.mood);
   });
+  // 圖片
+  window._jImgs=[...(j?.images||[])];
+  renderJImgPreview();
+  const inp=document.getElementById('j-img-input');if(inp)inp.value='';
   document.getElementById('j-del-btn').style.display=id?'':'none';
   openModal('journalModal');
+}
+
+// 圖片暫存
+window._jImgs=[];
+
+function renderJImgPreview(){
+  const wrap=document.getElementById('j-img-preview');
+  if(!wrap)return;
+  if(!window._jImgs.length){wrap.innerHTML='';return;}
+  wrap.innerHTML=window._jImgs.map((img,i)=>`
+    <div style="position:relative;display:inline-block">
+      <img src="${img}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:1.5px solid #e2e8f0;cursor:pointer" onclick="viewJImg(${i})">
+      <button onclick="removeJImg(${i})" style="position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;background:#ef4444;color:#fff;border:none;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1">×</button>
+    </div>
+  `).join('');
+}
+
+function removeJImg(i){
+  window._jImgs.splice(i,1);
+  renderJImgPreview();
+}
+
+function viewJImg(i){
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center;cursor:zoom-out';
+  overlay.onclick=()=>document.body.removeChild(overlay);
+  const img=document.createElement('img');
+  img.src=window._jImgs[i];
+  img.style.cssText='max-width:95vw;max-height:90vh;border-radius:10px;object-fit:contain';
+  overlay.appendChild(img);
+  document.body.appendChild(overlay);
+}
+
+function handleJImgUpload(event){
+  const files=Array.from(event.target.files);
+  files.forEach(file=>{
+    compressImage(file,800,0.72).then(b64=>{
+      window._jImgs.push(b64);
+      renderJImgPreview();
+    });
+  });
+  event.target.value='';
+}
+
+function compressImage(file,maxW,quality){
+  return new Promise(resolve=>{
+    const reader=new FileReader();
+    reader.onload=e=>{
+      const img=new Image();
+      img.onload=()=>{
+        const canvas=document.createElement('canvas');
+        let w=img.width,h=img.height;
+        if(w>maxW){h=Math.round(h*maxW/w);w=maxW;}
+        canvas.width=w;canvas.height=h;
+        const ctx=canvas.getContext('2d');
+        ctx.drawImage(img,0,0,w,h);
+        resolve(canvas.toDataURL('image/jpeg',quality));
+      };
+      img.src=e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
 }
 
 function saveJournal(){
@@ -6343,7 +6419,8 @@ function saveJournal(){
     market:document.getElementById('j-market').value.trim(),
     marketUrl:document.getElementById('j-market-url')?.value.trim()||'',
     mood:document.getElementById('j-mood').value.trim(),
-    content:document.getElementById('j-content').value.trim()
+    content:document.getElementById('j-content').value.trim(),
+    images:window._jImgs||[]
   };
   if(!db.journals)db.journals=[];
   if(editJournalId){
@@ -6366,6 +6443,39 @@ function deleteJournal(){
   db.journals=(db.journals||[]).filter(x=>x.id!==editJournalId);
   save();closeModal('journalModal');renderJournal();updateJournalCount();
   toast('已刪除');
+}
+
+function viewJImgReadonly(journalId,imgIdx){
+  const j=(db.journals||[]).find(x=>x.id===journalId);
+  if(!j||!j.images)return;
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9999;display:flex;align-items:center;justify-content:center;cursor:zoom-out;flex-direction:column;gap:12px';
+  overlay.onclick=e=>{if(e.target===overlay)document.body.removeChild(overlay);};
+  const img=document.createElement('img');
+  img.src=j.images[imgIdx];
+  img.style.cssText='max-width:95vw;max-height:85vh;border-radius:10px;object-fit:contain';
+  // 多張圖時顯示前後按鈕
+  let curIdx=imgIdx;
+  const nav=document.createElement('div');
+  nav.style.cssText='display:flex;gap:12px;align-items:center';
+  if(j.images.length>1){
+    const prev=document.createElement('button');
+    prev.textContent='‹';prev.style.cssText='background:rgba(255,255,255,.2);color:#fff;border:none;border-radius:50%;width:36px;height:36px;font-size:22px;cursor:pointer';
+    prev.onclick=e=>{e.stopPropagation();curIdx=(curIdx-1+j.images.length)%j.images.length;img.src=j.images[curIdx];counter.textContent=(curIdx+1)+'/'+j.images.length;};
+    const next=document.createElement('button');
+    next.textContent='›';next.style.cssText='background:rgba(255,255,255,.2);color:#fff;border:none;border-radius:50%;width:36px;height:36px;font-size:22px;cursor:pointer';
+    next.onclick=e=>{e.stopPropagation();curIdx=(curIdx+1)%j.images.length;img.src=j.images[curIdx];counter.textContent=(curIdx+1)+'/'+j.images.length;};
+    const counter=document.createElement('span');
+    counter.textContent=(curIdx+1)+'/'+j.images.length;
+    counter.style.cssText='color:rgba(255,255,255,.7);font-size:13px';
+    nav.appendChild(prev);nav.appendChild(counter);nav.appendChild(next);
+  }
+  const close=document.createElement('button');
+  close.textContent='✕ 關閉';close.style.cssText='background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:8px;padding:6px 16px;font-size:13px;cursor:pointer';
+  close.onclick=()=>document.body.removeChild(overlay);
+  nav.appendChild(close);
+  overlay.appendChild(img);overlay.appendChild(nav);
+  document.body.appendChild(overlay);
 }
 
 function updateJournalCount(){
@@ -6443,6 +6553,14 @@ function renderJournal(){
     const body = hasBody ? `
       <div id="jc-${j.id}" style="display:none;padding:12px 14px 10px;animation:fadeIn .18s ease">
         ${j.content?`<div style="font-size:13px;color:#1e293b;line-height:1.7;white-space:pre-wrap">${j.content}</div>`:''}
+        ${(j.images&&j.images.length)?`
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px">
+          ${j.images.map((img,i)=>`
+            <img src="${img}" onclick="viewJImgReadonly('${j.id}',${i})"
+              style="width:90px;height:90px;object-fit:cover;border-radius:8px;border:1.5px solid #e2e8f0;cursor:zoom-in;transition:transform .15s"
+              onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform=''">
+          `).join('')}
+        </div>`:''}
       </div>` : '';
 
     return `<div class="j-card" style="padding:0;overflow:hidden;border-radius:10px;border:1px solid rgba(255,255,255,.08);margin-bottom:0">
