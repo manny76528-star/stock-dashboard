@@ -1642,7 +1642,6 @@ body:not(.privacy) .privacy-mask{filter:none;}
   </div>
   <div class="db-topbar-actions">
     <a href="index.html" class="db-btn neutral">🏠 主目錄</a>
-    <button class="db-btn neutral" id="privacy-btn" onclick="togglePrivacy()" title="隱私模式">👁 顯示金額</button>
     <button class="db-btn purple" onclick="undoLast()" id="undoBtn" disabled>← 上一步</button>
     <button class="db-btn indigo" onclick="redoLast()" id="redoBtn" disabled>→ 下一步</button>
     <!-- ⋯ 下拉選單 -->
@@ -1666,12 +1665,18 @@ body:not(.privacy) .privacy-mask{filter:none;}
 <div class="db-card" style="margin-bottom:12px">
   <div class="db-card-header" style="justify-content:space-between">
     <span>📊 資產總覽</span>
-    <label class="div-roi-toggle" onclick="showDivRoi=!document.getElementById('roi-chk-sum').checked;document.getElementById('roi-chk-sum').checked=showDivRoi;renderSum();renderInv()">
-      <input type="checkbox" id="roi-chk-sum" style="display:none">
-      <span class="div-roi-icon">💹</span>
-      <span class="div-roi-label">含息</span>
-      <span class="div-roi-switch" id="roi-switch-dot"></span>
-    </label>
+    <div style="display:flex;align-items:center;gap:8px">
+      <button id="privacy-btn" onclick="togglePrivacy()"
+        style="background:rgba(0,0,0,.06);border:1.5px solid #e2e8f0;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;color:#475569;display:flex;align-items:center;gap:5px">
+        👁 顯示金額
+      </button>
+      <label class="div-roi-toggle" onclick="showDivRoi=!document.getElementById('roi-chk-sum').checked;document.getElementById('roi-chk-sum').checked=showDivRoi;renderSum();renderInv()">
+        <input type="checkbox" id="roi-chk-sum" style="display:none">
+        <span class="div-roi-icon">💹</span>
+        <span class="div-roi-label">含息</span>
+        <span class="div-roi-switch" id="roi-switch-dot"></span>
+      </label>
+    </div>
   </div>
   <!-- 4張主角卡片 -->
   <div class="inv-hero-strip">
@@ -3278,8 +3283,17 @@ function renderInv(){
         +'</div>'
         // 交易記錄
         +'<div class="irow-l3-hist">'
-          +'<div class="irow-l3-hist-title" id="hb-'+inv.id+'">📋 交易記錄（'+(inv.transactions||[]).length+' 筆）</div>'
-          +'<div class="irow-hist-body" id="hr-'+inv.id+'">'+buildTxnRows(inv,c)+'</div>'
+          +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">'
+            +'<div class="irow-l3-hist-title" id="hb-'+inv.id+'">📋 交易記錄（'+(inv.transactions||[]).length+' 筆）</div>'
+            +'<select id="txn-yr-'+inv.id+'" onchange="filterTxnYear(\''+inv.id+'\')" style="padding:3px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:11px;font-weight:700;color:#475569;background:#fff;cursor:pointer;outline:none">'
+              +'<option value="all">全部年份</option>'
+              +(()=>{
+                const years=[...new Set((inv.transactions||[]).map(t=>(t.date||'').slice(0,4)).filter(Boolean))].sort((a,b)=>b-a);
+                return years.map(y=>'<option value="'+y+'">'+y+'年</option>').join('');
+              })()
+            +'</select>'
+          +'</div>'
+          +'<div class="irow-hist-body" id="hr-'+inv.id+'">'+buildTxnRows(inv,c,'all')+'</div>'
         +'</div>'
       +'</div>';
 
@@ -4608,9 +4622,23 @@ function delTxnFromSearch(code, txnId){
   toast('已刪除');
 }
 
-function buildTxnRows(inv,c){
-  const txns=(inv.transactions||[]).slice().reverse();
-  if(txns.length===0)return '<div class="irow-hist-empty">尚無交易記錄</div>';
+function filterTxnYear(invId){
+  const sel=document.getElementById('txn-yr-'+invId);
+  const yr=sel?sel.value:'all';
+  const inv=(db.investments||[]).find(x=>x.id===invId);
+  if(!inv)return;
+  const calcs=calcAll();
+  const found=calcs.find(x=>x.inv&&x.inv.id===invId);
+  const body=document.getElementById('hr-'+invId);
+  if(body)body.innerHTML=buildTxnRows(inv,found?found.c:null,yr);
+}
+
+function buildTxnRows(inv,c,yearFilter){
+  let txns=(inv.transactions||[]).slice().reverse();
+  if(yearFilter&&yearFilter!=='all'){
+    txns=txns.filter(t=>(t.date||'').startsWith(yearFilter));
+  }
+  if(txns.length===0)return '<div class="irow-hist-empty">'+(yearFilter&&yearFilter!=='all'?yearFilter+'年無交易記錄':'尚無交易記錄')+'</div>';
   return txns.map(function(t){
     const isB=t.type==='buy';
     const gross=t.lots*1000*t.price;
