@@ -2585,6 +2585,9 @@ body:not(.privacy) .privacy-mask{filter:none;}
     <div class="mt">🔍 交易記錄查詢</div>
     <div style="display:flex;gap:8px;margin-bottom:8px">
       <input class="fi" id="search-code" placeholder="輸入股票代號，例：00985B（留空顯示全部）" style="flex:1" oninput="runSearch()">
+      <select id="search-year" onchange="runSearch()" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-weight:700;color:#475569;background:#fff;cursor:pointer;outline:none;min-width:100px">
+        <option value="all">全部年份</option>
+      </select>
       <button class="btn btn-p" onclick="runSearch()" style="flex:0;padding:8px 16px">查詢</button>
     </div>
     <div style="display:flex;gap:12px;margin-bottom:12px;font-size:12px">
@@ -4724,6 +4727,7 @@ function openSearchModal(){
 
 function runSearch(){
   const q=document.getElementById('search-code').value.trim().toUpperCase();
+  const selYear=document.getElementById('search-year')?.value||'all';
   const container=document.getElementById('search-results');
   
   // Collect ALL transactions from ALL investments (including deleted ones via archived)
@@ -4737,11 +4741,24 @@ function runSearch(){
   (db.archivedTxns||[]).forEach(t=>{
     allTxns.push({...t, archived:true});
   });
+
+  // 動態更新年份選單
+  const yrSel=document.getElementById('search-year');
+  if(yrSel){
+    const years=[...new Set(allTxns.map(t=>(t.date||'').slice(0,4)).filter(Boolean))].sort((a,b)=>b-a);
+    const curVal=yrSel.value;
+    yrSel.innerHTML='<option value="all">全部年份</option>'+years.map(y=>`<option value="${y}">${y} 年</option>`).join('');
+    yrSel.value=years.includes(curVal)?curVal:'all';
+  }
   
   const showBuy=document.getElementById('sf-buy')?.checked!==false;
   const showSell=document.getElementById('sf-sell')?.checked!==false;
-  const filtered=(q ? allTxns.filter(t=>t.code.includes(q)) : allTxns)
+  let filtered=(q ? allTxns.filter(t=>t.code.includes(q)) : allTxns)
     .filter(t=>(t.type==='buy'&&showBuy)||(t.type==='sell'&&showSell)||(t.type!=='buy'&&t.type!=='sell'));
+  // 年度篩選
+  if(selYear&&selYear!=='all'){
+    filtered=filtered.filter(t=>(t.date||'').startsWith(selYear));
+  }
   filtered.sort((a,b)=>b.date.localeCompare(a.date));
   
   if(!filtered.length){
