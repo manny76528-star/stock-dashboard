@@ -387,6 +387,17 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
       <div class="fg"><label class="fl">收款日期</label><input class="fi" type="date" id="o-paid-date"></div>
     </div>
 
+    <!-- 圖片附件 -->
+    <div class="fg">
+      <label class="fl">🖼 附加圖片（選填）</label>
+      <div id="o-img-preview" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px"></div>
+      <label style="display:inline-flex;align-items:center;gap:6px;background:#f1f5f9;border:1.5px dashed #cbd5e1;border-radius:8px;padding:8px 16px;cursor:pointer;font-size:12px;color:#475569;font-weight:600;transition:all .15s" onmouseover="this.style.borderColor='#3b82f6'" onmouseout="this.style.borderColor='#cbd5e1'">
+        📷 上傳圖片
+        <input type="file" id="o-img-input" accept="image/*" multiple style="display:none" onchange="handleOImgUpload(event)">
+      </label>
+      <div style="font-size:10px;color:#94a3b8;margin-top:4px">可上傳多張，自動壓縮</div>
+    </div>
+
     <div class="fbr">
       <button class="btn btn-secondary" onclick="closeModal('order-modal')">取消</button>
       <button class="btn btn-primary" id="save-order-btn" onclick="this.disabled=true;this.textContent='儲存中...';saveOrder()">儲存訂單</button>
@@ -1016,7 +1027,10 @@ function openOrderModal(id=null){
   // 新訂單：收款日預設同出貨日；編輯訂單：保留原收款日
   document.getElementById('o-paid-date').value=o?.paidDate||initDate;
 
-  // Populate customer dropdown
+  // 圖片
+  window._oImgs=[...(o?.images||[])];
+  renderOImgPreview();
+  const inp=document.getElementById('o-img-input');if(inp)inp.value='';
   const sel=document.getElementById('o-cust');
   sel.innerHTML='<option value="">-- 選擇客戶 --</option>';
   db.customers.forEach(c=>{
@@ -1321,6 +1335,7 @@ function saveOrder(){
     note:document.getElementById('o-note').value,
     items,paid:document.getElementById('o-paid').value==='1',
     paidDate:document.getElementById('o-paid-date').value,
+    images:window._oImgs||[],
     createdAt:editOrderId?undefined:new Date().toISOString()
   };
 
@@ -1369,7 +1384,18 @@ function showOrderDetail(id){
       <div><div class="profit-label">淨利潤</div><div class="profit-val gain">${fmt(c.profit)}</div></div>
       <div><div class="profit-label">收款</div><div>${o.paid?'<span class="badge badge-green">✓ 已收款</span>':'<span class="badge badge-red">未收款</span>'}</div></div>
     </div>
-    ${o.note?`<div style="margin-top:8px;font-size:12px;color:var(--muted)">備註：${o.note}</div>`:''}`;
+    ${o.note?`<div style="margin-top:8px;font-size:12px;color:var(--muted)">備註：${o.note}</div>`:''}
+    ${(o.images&&o.images.length)?`
+    <div style="margin-top:12px">
+      <div style="font-size:12px;font-weight:700;color:#475569;margin-bottom:6px">🖼 附件圖片</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        ${o.images.map((img,i)=>`
+          <img src="${img}" onclick="viewOImg('${o.id}',${i})"
+            style="width:90px;height:90px;object-fit:cover;border-radius:8px;border:1.5px solid #e2e8f0;cursor:zoom-in;transition:transform .15s"
+            onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform=''">
+        `).join('')}
+      </div>
+    </div>`:''}`;
 
   const paidBtn=document.getElementById('detail-paid-btn');
   paidBtn.textContent=o.paid?'取消收款':'標記已收款';
@@ -1897,6 +1923,96 @@ load();
   renderOverview();
 })();
 // 點 Modal 外面不關閉（避免填寫中意外關閉）
+
+// ══ 訂單圖片功能 ══
+window._oImgs=[];
+
+function renderOImgPreview(){
+  const wrap=document.getElementById('o-img-preview');
+  if(!wrap)return;
+  if(!window._oImgs.length){wrap.innerHTML='';return;}
+  wrap.innerHTML=window._oImgs.map((img,i)=>`
+    <div style="position:relative;display:inline-block">
+      <img src="${img}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:1.5px solid #e2e8f0;cursor:pointer" onclick="viewOImgPreview(${i})">
+      <button onclick="removeOImg(${i})" style="position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;background:#ef4444;color:#fff;border:none;font-size:12px;cursor:pointer;line-height:1">×</button>
+    </div>
+  `).join('');
+}
+
+function removeOImg(i){
+  window._oImgs.splice(i,1);
+  renderOImgPreview();
+}
+
+function handleOImgUpload(event){
+  const files=Array.from(event.target.files);
+  files.forEach(file=>{
+    compressImg(file,800,0.72).then(b64=>{
+      window._oImgs.push(b64);
+      renderOImgPreview();
+    });
+  });
+  event.target.value='';
+}
+
+function compressImg(file,maxW,quality){
+  return new Promise(resolve=>{
+    const reader=new FileReader();
+    reader.onload=e=>{
+      const img=new Image();
+      img.onload=()=>{
+        const canvas=document.createElement('canvas');
+        let w=img.width,h=img.height;
+        if(w>maxW){h=Math.round(h*maxW/w);w=maxW;}
+        canvas.width=w;canvas.height=h;
+        canvas.getContext('2d').drawImage(img,0,0,w,h);
+        resolve(canvas.toDataURL('image/jpeg',quality));
+      };
+      img.src=e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function viewOImgPreview(i){
+  showImgOverlay(window._oImgs,i);
+}
+
+function viewOImg(orderId,imgIdx){
+  const o=db.orders.find(x=>x.id===orderId);
+  if(!o||!o.images)return;
+  showImgOverlay(o.images,imgIdx);
+}
+
+function showImgOverlay(imgs,startIdx){
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px';
+  overlay.onclick=e=>{if(e.target===overlay)document.body.removeChild(overlay);};
+  let cur=startIdx;
+  const imgEl=document.createElement('img');
+  imgEl.src=imgs[cur];
+  imgEl.style.cssText='max-width:95vw;max-height:82vh;border-radius:10px;object-fit:contain';
+  const nav=document.createElement('div');
+  nav.style.cssText='display:flex;gap:12px;align-items:center';
+  if(imgs.length>1){
+    const prev=document.createElement('button');
+    prev.textContent='‹';prev.style.cssText='background:rgba(255,255,255,.2);color:#fff;border:none;border-radius:50%;width:36px;height:36px;font-size:22px;cursor:pointer';
+    prev.onclick=e=>{e.stopPropagation();cur=(cur-1+imgs.length)%imgs.length;imgEl.src=imgs[cur];counter.textContent=(cur+1)+'/'+imgs.length;};
+    const next=document.createElement('button');
+    next.textContent='›';next.style.cssText='background:rgba(255,255,255,.2);color:#fff;border:none;border-radius:50%;width:36px;height:36px;font-size:22px;cursor:pointer';
+    next.onclick=e=>{e.stopPropagation();cur=(cur+1)%imgs.length;imgEl.src=imgs[cur];counter.textContent=(cur+1)+'/'+imgs.length;};
+    const counter=document.createElement('span');
+    counter.textContent=(cur+1)+'/'+imgs.length;
+    counter.style.cssText='color:rgba(255,255,255,.7);font-size:13px';
+    nav.appendChild(prev);nav.appendChild(counter);nav.appendChild(next);
+  }
+  const close=document.createElement('button');
+  close.textContent='✕ 關閉';close.style.cssText='background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:8px;padding:6px 16px;font-size:13px;cursor:pointer';
+  close.onclick=()=>document.body.removeChild(overlay);
+  nav.appendChild(close);
+  overlay.appendChild(imgEl);overlay.appendChild(nav);
+  document.body.appendChild(overlay);
+}
 </script>
 </div><!-- /main-content -->
 </div><!-- /main-content -->
