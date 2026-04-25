@@ -481,7 +481,7 @@
     {
       "id": "moa36m8o0lf",
       "bank": "國泰銀行",
-      "cash": 420000,
+      "cash": 630000,
       "d1Date": "",
       "d1": 0,
       "d2": 0
@@ -766,7 +766,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1777126812844,
+  "_ts": 1777126894008,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
