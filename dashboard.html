@@ -3518,6 +3518,7 @@ function renderLoans(){
         +'<span class="lc-pct">'+(paidPct>=80?'✓ ':'')+paidPct+'%</span>'
       +'</div>'
       +'<div class="lc-nums">'
+        +'<div class="lc-row"><span class="lc-k">原始本金</span><span class="lc-v" style="color:#64748b">$'+(l.amount||0).toLocaleString()+'</span></div>'
         +'<div class="lc-row"><span class="lc-k">尚餘本金</span><span class="lc-v loss">$'+calcRem.toLocaleString()+'</span></div>'
         +'<div class="lc-row"><span class="lc-k">月還款</span><span class="lc-v loss">$'+(l.monthly||0).toLocaleString()+'</span></div>'
         +'<div class="lc-row"><span class="lc-k">扣款日</span><span class="lc-v '+(urgent?'loss':'')+'">'+dTxt+'</span></div>'
