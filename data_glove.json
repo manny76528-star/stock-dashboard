@@ -246,7 +246,7 @@
       "buyPrice": 7000,
       "sellDate": "",
       "sellPrice": null,
-      "pros": "尺寸尚可 外型好看",
+      "pros": "經典坂本刀模及配色\n尺寸尚可 外型好看",
       "cons": "偏重610g , 土手塌軟 皮革黏稠",
       "note": "請手套維修店\n 更換全新日本線材,土手芯材,清潔表面皮革",
       "images": [
@@ -258,7 +258,7 @@
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777210586227_llkc.jpg",
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777210589553_y8n4.jpg"
       ],
-      "updatedAt": "2026-04-26T13:36:38.731Z",
+      "updatedAt": "2026-04-26T13:46:14.763Z",
       "createdAt": "2026-04-26T05:48:52.179Z"
     },
     {
@@ -284,5 +284,5 @@
       "createdAt": "2026-04-26T13:28:30.788Z"
     }
   ],
-  "_ts": 1777211124004
+  "_ts": 1777211177766
 }
