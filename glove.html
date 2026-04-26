@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>⚾ 手套收藏</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d0d0d;
+  --surface:#161616;
+  --surface2:#1f1f1f;
+  --border:#2a2a2a;
+  --accent:#e8a020;
+  --accent2:#c47f00;
+  --red:#e05252;
+  --green:#4caf7d;
+  --text:#f0ebe3;
+  --muted:#7a7570;
+  --card-bg:#181510;
+  --leather:#2a1f0e;
+  --mono:'JetBrains Mono',monospace;
+  --display:'Bebas Neue',sans-serif;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Noto Sans TC',sans-serif;
+  min-height:100vh;
+  background-image:
+    radial-gradient(ellipse at 20% 0%,rgba(232,160,32,.06) 0%,transparent 60%),
+    radial-gradient(ellipse at 80% 100%,rgba(232,160,32,.04) 0%,transparent 50%),
+    url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.015'%3E%3Cpath d='M0 0h40v1H0zM0 39h40v1H0z'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* ── TOPBAR ── */
+.topbar{
+  position:sticky;top:0;z-index:100;
+  background:rgba(13,13,13,.92);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  padding:0 24px;
+  display:flex;align-items:center;justify-content:space-between;
+  height:60px;
+}
+.topbar-brand{display:flex;align-items:center;gap:12px;}
+.topbar-icon{font-size:26px;line-height:1;}
+.topbar-name{
+  font-family:var(--display);
+  font-size:26px;
+  letter-spacing:3px;
+  color:var(--accent);
+  line-height:1;
+}
+.topbar-sub{font-size:11px;color:var(--muted);letter-spacing:1px;margin-top:2px;}
+.topbar-actions{display:flex;gap:10px;align-items:center;}
+
+/* ── BUTTONS ── */
+.btn{
+  border:none;border-radius:6px;padding:9px 18px;
+  font-size:12px;font-weight:700;cursor:pointer;
+  font-family:'Noto Sans TC',sans-serif;
+  letter-spacing:.5px;transition:all .15s;
+}
+.btn-primary{
+  background:var(--accent);color:#000;
+}
+.btn-primary:hover{background:var(--accent2);transform:translateY(-1px);}
+.btn-ghost{
+  background:transparent;color:var(--muted);
+  border:1px solid var(--border);
+}
+.btn-ghost:hover{color:var(--text);border-color:var(--muted);}
+.btn-sm{padding:6px 12px;font-size:11px;}
+.btn-danger{background:#3d1515;color:var(--red);border:1px solid #5a2020;}
+.btn-danger:hover{background:#5a2020;}
+
+/* ── MAIN ── */
+.main{max-width:1400px;margin:0 auto;padding:32px 24px;}
+
+/* ── STATS BAR ── */
+.stats-bar{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+  gap:12px;
+  margin-bottom:32px;
+}
+.stat-item{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:14px 16px;
+  position:relative;
+  overflow:hidden;
+}
+.stat-item::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--accent),transparent);
+}
+.stat-label{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;}
+.stat-val{font-family:var(--mono);font-size:20px;font-weight:600;color:var(--text);}
+.stat-val.gold{color:var(--accent);}
+.stat-val.green{color:var(--green);}
+.stat-val.red{color:var(--red);}
+
+/* ── FILTERS ── */
+.filters{
+  display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap;align-items:center;
+}
+.filter-chip{
+  padding:7px 16px;border-radius:20px;font-size:12px;font-weight:700;
+  cursor:pointer;border:1.5px solid var(--border);
+  background:transparent;color:var(--muted);
+  transition:all .15s;font-family:'Noto Sans TC',sans-serif;
+}
+.filter-chip.active{background:var(--accent);color:#000;border-color:var(--accent);}
+.filter-chip:hover:not(.active){border-color:var(--accent);color:var(--accent);}
+.search-box{
+  flex:1;min-width:200px;
+  background:var(--surface);border:1.5px solid var(--border);
+  border-radius:8px;padding:8px 14px;font-size:13px;
+  color:var(--text);outline:none;font-family:'Noto Sans TC',sans-serif;
+}
+.search-box:focus{border-color:var(--accent);}
+.search-box::placeholder{color:var(--muted);}
+
+/* ── GLOVE GRID ── */
+.glove-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+  gap:20px;
+}
+
+/* ── GLOVE CARD ── */
+.glove-card{
+  background:var(--card-bg);
+  border:1px solid var(--border);
+  border-radius:14px;
+  overflow:hidden;
+  cursor:pointer;
+  transition:all .2s;
+  position:relative;
+}
+.glove-card:hover{
+  border-color:var(--accent);
+  transform:translateY(-3px);
+  box-shadow:0 12px 40px rgba(0,0,0,.5),0 0 0 1px rgba(232,160,32,.15);
+}
+.glove-card.sold{opacity:.75;}
+.glove-card.sold .card-img-wrap::after{
+  content:'已售出';
+  position:absolute;top:12px;right:12px;
+  background:var(--red);color:#fff;
+  font-size:11px;font-weight:700;
+  padding:3px 10px;border-radius:20px;
+  letter-spacing:.5px;
+}
+
+/* 圖片區 */
+.card-img-wrap{
+  position:relative;height:200px;
+  background:var(--leather);
+  overflow:hidden;
+}
+.card-img-wrap img{
+  width:100%;height:100%;object-fit:cover;
+  transition:transform .3s;
+}
+.glove-card:hover .card-img-wrap img{transform:scale(1.04);}
+.card-img-placeholder{
+  width:100%;height:100%;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:8px;color:var(--muted);
+}
+.card-img-placeholder .ph-icon{font-size:40px;opacity:.4;}
+.card-img-placeholder .ph-text{font-size:11px;letter-spacing:1px;}
+.card-img-count{
+  position:absolute;bottom:10px;right:10px;
+  background:rgba(0,0,0,.7);color:#fff;
+  font-size:10px;font-weight:700;padding:3px 8px;border-radius:10px;
+  font-family:var(--mono);
+}
+
+/* 品牌 badge */
+.card-brand-badge{
+  position:absolute;top:12px;left:12px;
+  background:rgba(0,0,0,.75);
+  backdrop-filter:blur(4px);
+  border:1px solid rgba(232,160,32,.3);
+  color:var(--accent);
+  font-family:var(--display);
+  font-size:15px;letter-spacing:2px;
+  padding:4px 12px;border-radius:6px;
+  line-height:1.2;
+}
+
+/* 卡片內容 */
+.card-body{padding:16px;}
+.card-name{
+  font-family:var(--display);
+  font-size:20px;letter-spacing:1.5px;
+  color:var(--text);margin-bottom:4px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.card-meta{
+  font-size:11px;color:var(--muted);margin-bottom:12px;
+  display:flex;gap:10px;flex-wrap:wrap;
+}
+.card-meta span{display:flex;align-items:center;gap:3px;}
+
+.card-divider{height:1px;background:var(--border);margin:12px 0;}
+
+.card-prices{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;
+  margin-bottom:10px;
+}
+.price-block{background:var(--surface2);border-radius:8px;padding:8px 10px;}
+.price-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;}
+.price-val{font-family:var(--mono);font-size:14px;font-weight:600;}
+.price-val.buy{color:var(--red);}
+.price-val.sell{color:var(--green);}
+.price-val.pending{color:var(--muted);}
+
+.card-pnl{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-top:8px;
+}
+.pnl-tag{
+  font-family:var(--mono);font-size:13px;font-weight:700;
+  padding:4px 10px;border-radius:6px;
+}
+.pnl-tag.gain{background:rgba(76,175,125,.15);color:var(--green);}
+.pnl-tag.loss{background:rgba(224,82,82,.15);color:var(--red);}
+.pnl-tag.hold{background:rgba(122,117,112,.1);color:var(--muted);}
+
+.card-pros-cons{margin-top:10px;}
+.pros-cons-row{display:flex;gap:6px;margin-bottom:4px;font-size:11px;line-height:1.5;}
+.pros-cons-icon{flex-shrink:0;margin-top:1px;}
+.pros-cons-text{color:var(--muted);}
+
+/* ── EMPTY STATE ── */
+.empty-state{
+  text-align:center;padding:80px 20px;
+  grid-column:1/-1;
+}
+.empty-icon{font-size:60px;margin-bottom:16px;opacity:.4;}
+.empty-title{font-family:var(--display);font-size:28px;letter-spacing:2px;color:var(--muted);margin-bottom:8px;}
+.empty-sub{font-size:13px;color:#444;}
+
+/* ── MODAL ── */
+.mo{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.75);
+  z-index:1000;align-items:flex-start;justify-content:center;
+  padding:20px;overflow-y:auto;
+}
+.mo.open{display:flex;}
+.mo-box{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;
+  width:100%;max-width:680px;
+  margin:auto;
+  box-shadow:0 30px 80px rgba(0,0,0,.6);
+  animation:moPop .2s ease;
+  overflow:hidden;
+}
+@keyframes moPop{from{opacity:0;transform:scale(.96) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.mo-hdr{
+  background:var(--leather);
+  border-bottom:1px solid var(--border);
+  padding:18px 22px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.mo-title{font-family:var(--display);font-size:22px;letter-spacing:2px;color:var(--accent);}
+.mo-close{background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:5px 12px;font-size:13px;cursor:pointer;}
+.mo-close:hover{color:var(--text);border-color:var(--muted);}
+.mo-body{padding:22px;}
+
+.fg{margin-bottom:16px;}
+.fl{display:block;font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px;}
+.fi{
+  width:100%;background:var(--surface2);
+  border:1.5px solid var(--border);border-radius:8px;
+  padding:10px 12px;font-size:13px;color:var(--text);
+  outline:none;font-family:'Noto Sans TC',sans-serif;
+  transition:border-color .15s;
+}
+.fi:focus{border-color:var(--accent);}
+.fi::placeholder{color:#3a3a3a;}
+select.fi option{background:var(--surface2);}
+textarea.fi{resize:vertical;min-height:80px;}
+
+.fr2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+.mo-footer{
+  padding:16px 22px;
+  border-top:1px solid var(--border);
+  display:flex;justify-content:space-between;
+  align-items:center;
+}
+
+/* ── 圖片上傳 ── */
+.img-upload-zone{
+  border:2px dashed var(--border);border-radius:10px;
+  padding:20px;text-align:center;cursor:pointer;
+  transition:all .15s;background:var(--surface2);
+  margin-bottom:10px;
+}
+.img-upload-zone:hover{border-color:var(--accent);background:rgba(232,160,32,.04);}
+.img-upload-icon{font-size:28px;margin-bottom:6px;opacity:.6;}
+.img-upload-text{font-size:12px;color:var(--muted);}
+.img-preview-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+.img-thumb{
+  position:relative;width:80px;height:80px;
+  border-radius:8px;overflow:hidden;
+  border:1.5px solid var(--border);
+  flex-shrink:0;
+}
+.img-thumb img{width:100%;height:100%;object-fit:cover;}
+.img-thumb-del{
+  position:absolute;top:3px;right:3px;
+  width:18px;height:18px;border-radius:50%;
+  background:rgba(224,82,82,.9);color:#fff;
+  border:none;font-size:11px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;line-height:1;
+}
+
+/* ── DETAIL MODAL ── */
+.dm-imgs{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
+  gap:8px;margin-bottom:20px;
+}
+.dm-img{
+  aspect-ratio:1;border-radius:10px;overflow:hidden;
+  border:1px solid var(--border);cursor:zoom-in;
+}
+.dm-img img{width:100%;height:100%;object-fit:cover;transition:transform .2s;}
+.dm-img:hover img{transform:scale(1.05);}
+.dm-section{margin-bottom:16px;}
+.dm-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.dm-value{font-size:14px;color:var(--text);}
+.dm-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;}
+.dm-kv{background:var(--surface2);border-radius:8px;padding:10px 12px;}
+.dm-k{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px;}
+.dm-v{font-family:var(--mono);font-size:15px;font-weight:600;}
+
+/* ── PRO/CON TAGS ── */
+.tag-list{display:flex;flex-wrap:wrap;gap:6px;}
+.tag-pro{
+  background:rgba(76,175,125,.12);color:var(--green);
+  border:1px solid rgba(76,175,125,.25);
+  padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;
+}
+.tag-con{
+  background:rgba(224,82,82,.1);color:var(--red);
+  border:1px solid rgba(224,82,82,.2);
+  padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;
+}
+
+/* ── LIGHTBOX ── */
+.lightbox{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);
+  z-index:2000;align-items:center;justify-content:center;flex-direction:column;gap:14px;
+}
+.lightbox.open{display:flex;}
+.lightbox img{max-width:95vw;max-height:82vh;border-radius:10px;object-fit:contain;}
+.lb-nav{display:flex;gap:12px;align-items:center;}
+.lb-btn{
+  background:rgba(255,255,255,.1);border:none;color:#fff;
+  border-radius:50%;width:40px;height:40px;font-size:20px;cursor:pointer;
+  transition:background .15s;
+}
+.lb-btn:hover{background:rgba(255,255,255,.2);}
+.lb-counter{color:rgba(255,255,255,.6);font-size:12px;font-family:var(--mono);min-width:50px;text-align:center;}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
+  background:var(--surface);border:1px solid var(--accent);
+  color:var(--text);padding:10px 20px;border-radius:8px;
+  font-size:13px;z-index:3000;transition:transform .3s;white-space:nowrap;
+}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+@media(max-width:600px){
+  .glove-grid{grid-template-columns:1fr;}
+  .fr2{grid-template-columns:1fr;}
+  .dm-grid{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-brand">
+    <div class="topbar-icon">🧤</div>
+    <div>
+      <div class="topbar-name">GLOVE VAULT</div>
+      <div class="topbar-sub">棒球手套收藏記錄</div>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <a href="index.html" class="btn btn-ghost btn-sm">🏠 主目錄</a>
+    <button class="btn btn-primary" onclick="openAddModal()">＋ 新增手套</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- STATS -->
+  <div class="stats-bar">
+    <div class="stat-item">
+      <div class="stat-label">⚾ 總收藏數</div>
+      <div class="stat-val gold" id="s-total">0</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">🧤 持有中</div>
+      <div class="stat-val" id="s-hold">0</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">💰 總投入</div>
+      <div class="stat-val red" id="s-invested">$0</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">📈 已回收</div>
+      <div class="stat-val green" id="s-returned">$0</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">📊 損益</div>
+      <div class="stat-val" id="s-pnl">$0</div>
+    </div>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="filters">
+    <input type="text" class="search-box" placeholder="🔍 搜尋品牌、型號、備註..." oninput="renderGloves()">
+    <button class="filter-chip active" data-filter="all" onclick="setFilter(this)">全部</button>
+    <button class="filter-chip" data-filter="hold" onclick="setFilter(this)">持有中</button>
+    <button class="filter-chip" data-filter="sold" onclick="setFilter(this)">已售出</button>
+  </div>
+
+  <!-- GRID -->
+  <div class="glove-grid" id="glove-grid"></div>
+
+</div>
+
+<!-- ══ 新增/編輯 Modal ══ -->
+<div class="mo" id="add-modal">
+  <div class="mo-box">
+    <div class="mo-hdr">
+      <div class="mo-title" id="mo-title">NEW GLOVE</div>
+      <button class="mo-close" onclick="closeModal()">✕ 關閉</button>
+    </div>
+    <div class="mo-body">
+      <div class="fr2">
+        <div class="fg">
+          <label class="fl">品牌</label>
+          <input class="fi" id="g-brand" placeholder="例：Rawlings、Wilson">
+        </div>
+        <div class="fg">
+          <label class="fl">型號 / 名稱</label>
+          <input class="fi" id="g-model" placeholder="例：Heart of the Hide">
+        </div>
+      </div>
+      <div class="fr2">
+        <div class="fg">
+          <label class="fl">倉位</label>
+          <select class="fi" id="g-position">
+            <option value="">-- 選擇 --</option>
+            <option>投手</option><option>捕手</option><option>一壘</option>
+            <option>二壘</option><option>三壘</option><option>游擊</option>
+            <option>外野</option><option>通用</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label class="fl">尺寸</label>
+          <input class="fi" id="g-size" placeholder="例：11.5吋、12吋">
+        </div>
+      </div>
+      <div class="fr2">
+        <div class="fg">
+          <label class="fl">買入日期</label>
+          <input class="fi" type="date" id="g-buy-date">
+        </div>
+        <div class="fg">
+          <label class="fl">買入價格（元）</label>
+          <input class="fi" type="number" id="g-buy-price" placeholder="0">
+        </div>
+      </div>
+      <div class="fr2">
+        <div class="fg">
+          <label class="fl">賣出日期（選填）</label>
+          <input class="fi" type="date" id="g-sell-date">
+        </div>
+        <div class="fg">
+          <label class="fl">賣出價格（選填）</label>
+          <input class="fi" type="number" id="g-sell-price" placeholder="尚未賣出則留空">
+        </div>
+      </div>
+      <div class="fg">
+        <label class="fl">✅ 優點（每行一點）</label>
+        <textarea class="fi" id="g-pros" rows="3" placeholder="手感絕佳&#10;皮革厚實耐用&#10;開口適中"></textarea>
+      </div>
+      <div class="fg">
+        <label class="fl">❌ 缺點（每行一點）</label>
+        <textarea class="fi" id="g-cons" rows="3" placeholder="開手期較長&#10;價格偏高"></textarea>
+      </div>
+      <div class="fg">
+        <label class="fl">📝 備註</label>
+        <textarea class="fi" id="g-note" rows="2" placeholder="其他補充說明..."></textarea>
+      </div>
+
+      <!-- 圖片上傳 -->
+      <div class="fg">
+        <label class="fl">🖼 圖片（最多 5 張）</label>
+        <label class="img-upload-zone">
+          <div class="img-upload-icon">📷</div>
+          <div class="img-upload-text">點擊上傳圖片，自動壓縮</div>
+          <input type="file" id="g-img-input" accept="image/*" multiple style="display:none" onchange="handleImgUpload(event)">
+        </label>
+        <div class="img-preview-row" id="g-img-preview"></div>
+      </div>
+    </div>
+    <div class="mo-footer">
+      <button class="btn btn-danger btn-sm" id="del-btn" style="display:none" onclick="deleteGlove()">🗑 刪除</button>
+      <div style="display:flex;gap:8px;margin-left:auto">
+        <button class="btn btn-ghost" onclick="closeModal()">取消</button>
+        <button class="btn btn-primary" onclick="saveGlove()">儲存手套</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 詳情 Modal ══ -->
+<div class="mo" id="detail-modal">
+  <div class="mo-box" style="max-width:780px">
+    <div class="mo-hdr">
+      <div class="mo-title" id="dm-title">—</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-ghost btn-sm" id="dm-edit-btn" onclick="editFromDetail()">✏️ 編輯</button>
+        <button class="mo-close" onclick="closeDetail()">✕ 關閉</button>
+      </div>
+    </div>
+    <div class="mo-body" id="dm-body"></div>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox">
+  <img id="lb-img" src="" alt="">
+  <div class="lb-nav">
+    <button class="lb-btn" onclick="lbPrev()">‹</button>
+    <span class="lb-counter" id="lb-counter">1/1</span>
+    <button class="lb-btn" onclick="lbNext()">›</button>
+    <button class="lb-btn" style="border-radius:8px;padding:0 14px;font-size:13px;width:auto" onclick="closeLightbox()">✕</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════
+// DATA
+// ══════════════════════════
+const DB_KEY='glove_vault_v1';
+let db=load();
+function load(){try{return JSON.parse(localStorage.getItem(DB_KEY))||{gloves:[]};}catch{return{gloves:[]};}}
+function save(){localStorage.setItem(DB_KEY,JSON.stringify(db));}
+
+let editId=null;
+let currentImgs=[];
+let currentFilter='all';
+let lbImgs=[];let lbIdx=0;
+let detailId=null;
+
+// ══════════════════════════
+// RENDER
+// ══════════════════════════
+function renderGloves(){
+  const q=(document.querySelector('.search-box')?.value||'').toLowerCase();
+  let list=[...db.gloves].sort((a,b)=>b.buyDate.localeCompare(a.buyDate));
+  if(currentFilter==='hold')list=list.filter(g=>!g.sellDate||!g.sellPrice);
+  if(currentFilter==='sold')list=list.filter(g=>g.sellDate&&g.sellPrice);
+  if(q)list=list.filter(g=>
+    (g.brand||'').toLowerCase().includes(q)||
+    (g.model||'').toLowerCase().includes(q)||
+    (g.note||'').toLowerCase().includes(q)||
+    (g.pros||'').toLowerCase().includes(q)||
+    (g.cons||'').toLowerCase().includes(q)
+  );
+
+  const grid=document.getElementById('glove-grid');
+  if(list.length===0){
+    grid.innerHTML=`<div class="empty-state">
+      <div class="empty-icon">🧤</div>
+      <div class="empty-title">VAULT IS EMPTY</div>
+      <div class="empty-sub">點右上角「＋ 新增手套」開始記錄你的收藏</div>
+    </div>`;
+    updateStats();return;
+  }
+
+  grid.innerHTML=list.map(g=>{
+    const sold=g.sellDate&&g.sellPrice;
+    const pnl=sold?((+g.sellPrice)-(+g.buyPrice)):null;
+    const pnlClass=pnl===null?'hold':pnl>=0?'gain':'loss';
+    const pnlTxt=pnl===null?'持有中':(pnl>=0?'+':'')+pnl.toLocaleString();
+    const firstImg=g.images?.[0];
+    const imgCount=(g.images||[]).length;
+    const prosList=(g.pros||'').split('\n').filter(Boolean).slice(0,2);
+    const consList=(g.cons||'').split('\n').filter(Boolean).slice(0,2);
+
+    return`<div class="glove-card${sold?' sold':''}" onclick="openDetail('${g.id}')">
+      <div class="card-img-wrap">
+        ${firstImg
+          ?`<img src="${firstImg}" alt="${g.brand} ${g.model}" loading="lazy">`
+          :`<div class="card-img-placeholder"><div class="ph-icon">🧤</div><div class="ph-text">NO PHOTO</div></div>`
+        }
+        <div class="card-brand-badge">${g.brand||'—'}</div>
+        ${imgCount>1?`<div class="card-img-count">📷 ${imgCount}</div>`:''}
+      </div>
+      <div class="card-body">
+        <div class="card-name">${g.model||'未命名'}</div>
+        <div class="card-meta">
+          ${g.position?`<span>📍 ${g.position}</span>`:''}
+          ${g.size?`<span>📏 ${g.size}</span>`:''}
+          <span>📅 ${fmtDate(g.buyDate)}</span>
+        </div>
+        <div class="card-prices">
+          <div class="price-block">
+            <div class="price-label">買入價格</div>
+            <div class="price-val buy">$${(+g.buyPrice||0).toLocaleString()}</div>
+          </div>
+          <div class="price-block">
+            <div class="price-label">賣出價格</div>
+            <div class="price-val ${sold?'sell':'pending'}">${sold?'$'+(+g.sellPrice).toLocaleString():'—'}</div>
+          </div>
+        </div>
+        ${(prosList.length||consList.length)?`
+        <div class="card-divider"></div>
+        <div class="card-pros-cons">
+          ${prosList.map(p=>`<div class="pros-cons-row"><span class="pros-cons-icon">✅</span><span class="pros-cons-text">${p}</span></div>`).join('')}
+          ${consList.map(c=>`<div class="pros-cons-row"><span class="pros-cons-icon">❌</span><span class="pros-cons-text">${c}</span></div>`).join('')}
+        </div>`:''}
+        <div class="card-pnl">
+          <span class="pnl-tag ${pnlClass}">${pnl!==null?(pnl>=0?'▲':'▼')+' ':''} ${pnlTxt}</span>
+          <span style="font-size:10px;color:var(--muted)">${sold?fmtDate(g.sellDate):'未售出'}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  updateStats();
+}
+
+function updateStats(){
+  const all=db.gloves;
+  const hold=all.filter(g=>!g.sellDate||!g.sellPrice);
+  const sold=all.filter(g=>g.sellDate&&g.sellPrice);
+  const invested=all.reduce((s,g)=>s+(+g.buyPrice||0),0);
+  const returned=sold.reduce((s,g)=>s+(+g.sellPrice||0),0);
+  const pnl=returned-sold.reduce((s,g)=>s+(+g.buyPrice||0),0);
+  const el=id=>document.getElementById(id);
+  el('s-total').textContent=all.length;
+  el('s-hold').textContent=hold.length;
+  el('s-invested').textContent='$'+invested.toLocaleString();
+  el('s-returned').textContent='$'+returned.toLocaleString();
+  const pnlEl=el('s-pnl');
+  pnlEl.textContent=(pnl>=0?'+':'')+pnl.toLocaleString();
+  pnlEl.className='stat-val '+(pnl>0?'green':pnl<0?'red':'');
+}
+
+// ══════════════════════════
+// DETAIL MODAL
+// ══════════════════════════
+function openDetail(id){
+  detailId=id;
+  const g=db.gloves.find(x=>x.id===id);if(!g)return;
+  const sold=g.sellDate&&g.sellPrice;
+  const pnl=sold?((+g.sellPrice)-(+g.buyPrice)):null;
+  document.getElementById('dm-title').textContent=`${g.brand||''} ${g.model||''}`.trim()||'—';
+
+  const prosList=(g.pros||'').split('\n').filter(Boolean);
+  const consList=(g.cons||'').split('\n').filter(Boolean);
+  const imgs=g.images||[];
+
+  document.getElementById('dm-body').innerHTML=`
+    ${imgs.length?`<div class="dm-imgs">${imgs.map((img,i)=>`
+      <div class="dm-img" onclick="openLightbox(${i},'${g.id}')">
+        <img src="${img}" alt="" loading="lazy">
+      </div>`).join('')}</div>`:''}
+
+    <div class="dm-grid">
+      <div class="dm-kv">
+        <div class="dm-k">品牌</div>
+        <div class="dm-v" style="color:var(--accent)">${g.brand||'—'}</div>
+      </div>
+      <div class="dm-kv">
+        <div class="dm-k">倉位</div>
+        <div class="dm-v">${g.position||'—'}</div>
+      </div>
+      <div class="dm-kv">
+        <div class="dm-k">尺寸</div>
+        <div class="dm-v">${g.size||'—'}</div>
+      </div>
+      <div class="dm-kv">
+        <div class="dm-k">買入日期</div>
+        <div class="dm-v" style="font-size:13px">${fmtDate(g.buyDate)}</div>
+      </div>
+      <div class="dm-kv">
+        <div class="dm-k">買入價格</div>
+        <div class="dm-v" style="color:var(--red)">$${(+g.buyPrice||0).toLocaleString()}</div>
+      </div>
+      <div class="dm-kv">
+        <div class="dm-k">${sold?'損益':'狀態'}</div>
+        <div class="dm-v" style="color:${pnl===null?'var(--muted)':pnl>=0?'var(--green)':'var(--red)'}">
+          ${pnl===null?'持有中':(pnl>=0?'▲ +':pnl<0?'▼ ':'')+pnl.toLocaleString()}
+        </div>
+      </div>
+    </div>
+
+    ${sold?`<div class="dm-section" style="margin-bottom:12px">
+      <div style="display:flex;gap:10px;background:var(--surface2);border-radius:8px;padding:10px 14px">
+        <span style="font-size:12px;color:var(--muted)">賣出日期：<b style="color:var(--text)">${fmtDate(g.sellDate)}</b></span>
+        <span style="font-size:12px;color:var(--muted)">賣出價格：<b style="color:var(--green)">$${(+g.sellPrice).toLocaleString()}</b></span>
+      </div>
+    </div>`:''}
+
+    ${prosList.length?`<div class="dm-section">
+      <div class="dm-label">✅ 優點</div>
+      <div class="tag-list">${prosList.map(p=>`<span class="tag-pro">${p}</span>`).join('')}</div>
+    </div>`:''}
+    ${consList.length?`<div class="dm-section">
+      <div class="dm-label">❌ 缺點</div>
+      <div class="tag-list">${consList.map(c=>`<span class="tag-con">${c}</span>`).join('')}</div>
+    </div>`:''}
+    ${g.note?`<div class="dm-section">
+      <div class="dm-label">📝 備註</div>
+      <div class="dm-value" style="color:var(--muted);font-size:13px;line-height:1.7">${g.note}</div>
+    </div>`:''}
+  `;
+  document.getElementById('detail-modal').classList.add('open');
+}
+function closeDetail(){document.getElementById('detail-modal').classList.remove('open');}
+function editFromDetail(){closeDetail();openEditModal(detailId);}
+
+// ══════════════════════════
+// ADD / EDIT MODAL
+// ══════════════════════════
+function openAddModal(){
+  editId=null;currentImgs=[];
+  document.getElementById('mo-title').textContent='NEW GLOVE';
+  document.getElementById('del-btn').style.display='none';
+  ['g-brand','g-model','g-buy-date','g-buy-price','g-sell-date','g-sell-price','g-pros','g-cons','g-note'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.value='';
+  });
+  document.getElementById('g-position').value='';
+  document.getElementById('g-size').value='';
+  const inp=document.getElementById('g-img-input');if(inp)inp.value='';
+  renderImgPreview();
+  document.getElementById('add-modal').classList.add('open');
+}
+function openEditModal(id){
+  editId=id;
+  const g=db.gloves.find(x=>x.id===id);if(!g)return;
+  currentImgs=[...(g.images||[])];
+  document.getElementById('mo-title').textContent='EDIT GLOVE';
+  document.getElementById('del-btn').style.display='';
+  document.getElementById('g-brand').value=g.brand||'';
+  document.getElementById('g-model').value=g.model||'';
+  document.getElementById('g-position').value=g.position||'';
+  document.getElementById('g-size').value=g.size||'';
+  document.getElementById('g-buy-date').value=g.buyDate||'';
+  document.getElementById('g-buy-price').value=g.buyPrice||'';
+  document.getElementById('g-sell-date').value=g.sellDate||'';
+  document.getElementById('g-sell-price').value=g.sellPrice||'';
+  document.getElementById('g-pros').value=g.pros||'';
+  document.getElementById('g-cons').value=g.cons||'';
+  document.getElementById('g-note').value=g.note||'';
+  renderImgPreview();
+  document.getElementById('add-modal').classList.add('open');
+}
+function closeModal(){document.getElementById('add-modal').classList.remove('open');}
+
+function saveGlove(){
+  const brand=document.getElementById('g-brand').value.trim();
+  const model=document.getElementById('g-model').value.trim();
+  const buyDate=document.getElementById('g-buy-date').value;
+  const buyPrice=document.getElementById('g-buy-price').value;
+  if(!brand&&!model){toast('⚠️ 請填入品牌或型號');return;}
+  if(!buyDate){toast('⚠️ 請填入買入日期');return;}
+  if(!buyPrice){toast('⚠️ 請填入買入價格');return;}
+
+  const g={
+    id:editId||uid(),
+    brand,model,
+    position:document.getElementById('g-position').value,
+    size:document.getElementById('g-size').value.trim(),
+    buyDate,buyPrice:+buyPrice,
+    sellDate:document.getElementById('g-sell-date').value,
+    sellPrice:+document.getElementById('g-sell-price').value||null,
+    pros:document.getElementById('g-pros').value.trim(),
+    cons:document.getElementById('g-cons').value.trim(),
+    note:document.getElementById('g-note').value.trim(),
+    images:[...currentImgs],
+    updatedAt:new Date().toISOString()
+  };
+
+  if(editId){
+    const idx=db.gloves.findIndex(x=>x.id===editId);
+    if(idx>=0)db.gloves[idx]={...db.gloves[idx],...g};
+  } else {
+    g.createdAt=new Date().toISOString();
+    db.gloves.push(g);
+  }
+  save();closeModal();renderGloves();
+  toast(editId?'✅ 已更新！':'✅ 已新增！');
+}
+
+function deleteGlove(){
+  if(!editId)return;
+  const g=db.gloves.find(x=>x.id===editId);
+  if(!confirm(`確定刪除「${g?.brand||''} ${g?.model||''}」？`))return;
+  db.gloves=db.gloves.filter(x=>x.id!==editId);
+  save();closeModal();renderGloves();toast('🗑 已刪除');
+}
+
+// ══════════════════════════
+// IMAGE
+// ══════════════════════════
+function handleImgUpload(e){
+  const files=Array.from(e.target.files);
+  const remaining=5-currentImgs.length;
+  if(remaining<=0){toast('⚠️ 最多 5 張圖片');e.target.value='';return;}
+  files.slice(0,remaining).forEach(f=>{
+    compress(f,900,0.75).then(b64=>{currentImgs.push(b64);renderImgPreview();});
+  });
+  e.target.value='';
+}
+function renderImgPreview(){
+  const wrap=document.getElementById('g-img-preview');if(!wrap)return;
+  if(!currentImgs.length){wrap.innerHTML='';return;}
+  wrap.innerHTML=currentImgs.map((img,i)=>`
+    <div class="img-thumb">
+      <img src="${img}" alt="">
+      <button class="img-thumb-del" onclick="removeImg(${i})">×</button>
+    </div>`).join('');
+}
+function removeImg(i){currentImgs.splice(i,1);renderImgPreview();}
+function compress(file,maxW,q){
+  return new Promise(resolve=>{
+    const r=new FileReader();
+    r.onload=e=>{
+      const img=new Image();
+      img.onload=()=>{
+        const c=document.createElement('canvas');
+        let w=img.width,h=img.height;
+        if(w>maxW){h=Math.round(h*maxW/w);w=maxW;}
+        c.width=w;c.height=h;
+        c.getContext('2d').drawImage(img,0,0,w,h);
+        resolve(c.toDataURL('image/jpeg',q));
+      };
+      img.src=e.target.result;
+    };
+    r.readAsDataURL(file);
+  });
+}
+
+// ══════════════════════════
+// LIGHTBOX
+// ══════════════════════════
+function openLightbox(idx,gid){
+  const g=db.gloves.find(x=>x.id===gid);if(!g)return;
+  lbImgs=g.images||[];lbIdx=idx;
+  document.getElementById('lightbox').classList.add('open');
+  updateLb();
+}
+function closeLightbox(){document.getElementById('lightbox').classList.remove('open');}
+function updateLb(){
+  document.getElementById('lb-img').src=lbImgs[lbIdx];
+  document.getElementById('lb-counter').textContent=(lbIdx+1)+'/'+lbImgs.length;
+}
+function lbPrev(){lbIdx=(lbIdx-1+lbImgs.length)%lbImgs.length;updateLb();}
+function lbNext(){lbIdx=(lbIdx+1)%lbImgs.length;updateLb();}
+
+// ══════════════════════════
+// FILTER
+// ══════════════════════════
+function setFilter(btn){
+  currentFilter=btn.dataset.filter;
+  document.querySelectorAll('.filter-chip').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderGloves();
+}
+
+// ══════════════════════════
+// UTILS
+// ══════════════════════════
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
+function fmtDate(d){if(!d)return'—';const p=d.split('-');return p.length===3?p[0]+'/'+p[1]+'/'+p[2]:d;}
+let _tt=null;
+function toast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  clearTimeout(_tt);_tt=setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+// ESC 關閉
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    if(document.getElementById('lightbox').classList.contains('open'))closeLightbox();
+    else if(document.getElementById('detail-modal').classList.contains('open'))closeDetail();
+    else closeModal();
+  }
+  if(e.key==='ArrowLeft'&&document.getElementById('lightbox').classList.contains('open'))lbPrev();
+  if(e.key==='ArrowRight'&&document.getElementById('lightbox').classList.contains('open'))lbNext();
+});
+
+// Init
+renderGloves();
+</script>
+</body>
+</html>
