@@ -178,10 +178,11 @@
       "images": [
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209529066_923l.jpg",
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209531692_9x2r.jpg",
-        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209533853_en17.jpg",
-        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209535753_2tsx.jpg"
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209535753_2tsx.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777210549969_rdas.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777210554642_sdwt.jpg"
       ],
-      "updatedAt": "2026-04-26T13:19:05.145Z",
+      "updatedAt": "2026-04-26T13:35:59.514Z",
       "createdAt": "2026-04-26T05:30:41.165Z"
     },
     {
@@ -278,5 +279,5 @@
       "createdAt": "2026-04-26T13:28:30.788Z"
     }
   ],
-  "_ts": 1777210534172
+  "_ts": 1777210562514
 }
