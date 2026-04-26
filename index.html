@@ -11,7 +11,7 @@ body{min-height:100vh;background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 60%,#
 .logo{font-size:13px;color:rgba(255,255,255,.4);letter-spacing:3px;text-transform:uppercase;margin-bottom:8px;}
 .title{font-size:32px;font-weight:900;color:#fff;margin-bottom:4px;letter-spacing:1px;}
 .sub{font-size:14px;color:rgba(255,255,255,.5);margin-bottom:48px;}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;width:100%;max-width:920px;}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;width:100%;max-width:1100px;}
 .card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:32px 28px;cursor:pointer;transition:all .25s;text-decoration:none;display:flex;flex-direction:column;gap:16px;position:relative;overflow:hidden;}
 .card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.08),transparent);opacity:0;transition:opacity .25s;}
 .card:hover{border-color:rgba(255,255,255,.3);transform:translateY(-4px);box-shadow:0 20px 40px rgba(0,0,0,.3);}
@@ -59,6 +59,16 @@ body{min-height:100vh;background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 60%,#
       <div class="card-desc">配對練習、常錯單字追蹤、進度統計、Excel 單字匯入</div>
     </div>
     <div class="card-badge new">語言學習</div>
+    <div class="card-arrow">→</div>
+  </a>
+
+  <a href="glove.html" class="card">
+    <div class="card-icon">🧤</div>
+    <div>
+      <div class="card-title">手套收藏記錄</div>
+      <div class="card-desc">品牌型號、買賣記錄、優缺點評比、圖片收藏、損益追蹤</div>
+    </div>
+    <div class="card-badge" style="background:rgba(232,160,32,.2);color:#e8a020;border-color:rgba(232,160,32,.3)">棒球收藏</div>
     <div class="card-arrow">→</div>
   </a>
 </div>
