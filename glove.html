@@ -406,6 +406,7 @@ textarea.fi{resize:vertical;min-height:80px;}
   </div>
   <div class="topbar-actions">
     <a href="index.html" class="btn btn-ghost btn-sm">🏠 主目錄</a>
+    <button class="btn btn-ghost btn-sm" id="recomp-btn" onclick="recompressAll()" title="圖片空間快滿時使用">🗜 重新壓縮所有圖片</button>
     <button class="btn btn-primary" onclick="openAddModal()">＋ 新增手套</button>
   </div>
 </div>
@@ -534,7 +535,7 @@ textarea.fi{resize:vertical;min-height:80px;}
       <button class="btn btn-danger btn-sm" id="del-btn" style="display:none" onclick="deleteGlove()">🗑 刪除</button>
       <div style="display:flex;gap:8px;margin-left:auto">
         <button class="btn btn-ghost" onclick="closeModal()">取消</button>
-        <button class="btn btn-primary" onclick="saveGlove()">儲存手套</button>
+        <button class="btn btn-primary" id="save-btn-main" onclick="saveGlove()">儲存手套</button>
       </div>
     </div>
   </div>
@@ -832,21 +833,34 @@ function saveGlove(){
     updatedAt:new Date().toISOString()
   };
 
-  if(editId){
-    const idx=db.gloves.findIndex(x=>x.id===editId);
-    if(idx>=0)db.gloves[idx]={...db.gloves[idx],...g};
-  } else {
-    g.createdAt=new Date().toISOString();
-    db.gloves.push(g);
-  }
-  try{
-    save();
-    closeModal();
-    renderGloves();
-    toast(editId?'✅ 已更新！':'✅ 已新增！');
-  }catch(e){
-    // save() 已顯示錯誤 toast，不需再處理
-  }
+  // 先把目前圖片重新壓縮（針對舊的大圖）
+  const saveBtn=document.getElementById('save-btn-main');
+  if(saveBtn){saveBtn.disabled=true;saveBtn.textContent='壓縮中...';}
+
+  recompressImgs(g.images).then(newImgs=>{
+    g.images=newImgs;
+    if(editId){
+      const idx=db.gloves.findIndex(x=>x.id===editId);
+      if(idx>=0)db.gloves[idx]={...db.gloves[idx],...g};
+    } else {
+      g.createdAt=new Date().toISOString();
+      db.gloves.push(g);
+    }
+    try{
+      save();
+      closeModal();
+      renderGloves();
+      toast(editId?'✅ 已更新！':'✅ 已新增！');
+    }catch(e){
+      if(editId){
+        const idx=db.gloves.findIndex(x=>x.id===editId);
+        if(idx>=0)db.gloves[idx]={...db.gloves[idx],images:[]};
+      } else {
+        db.gloves.pop();
+      }
+    }
+    if(saveBtn){saveBtn.disabled=false;saveBtn.textContent='儲存手套';}
+  });
 }
 
 function deleteGlove(){
@@ -915,9 +929,51 @@ function compress(file,maxW,q){
   });
 }
 
-// ══════════════════════════
-// LIGHTBOX
-// ══════════════════════════
+// 重新壓縮圖片陣列（base64 → canvas → 更小的 base64）
+function recompressImgs(imgs){
+  if(!imgs||!imgs.length)return Promise.resolve([]);
+  return Promise.all(imgs.map(b64=>{
+    return new Promise(resolve=>{
+      if(!b64.startsWith('data:'))return resolve(b64);
+      const img=new Image();
+      img.onload=()=>{
+        const c=document.createElement('canvas');
+        let w=img.width,h=img.height;
+        const maxW=600; // 更積極壓縮
+        if(w>maxW){h=Math.round(h*maxW/w);w=maxW;}
+        c.width=w;c.height=h;
+        c.getContext('2d').drawImage(img,0,0,w,h);
+        resolve(c.toDataURL('image/jpeg',0.55));
+      };
+      img.onerror=()=>resolve(b64);
+      img.src=b64;
+    });
+  }));
+}
+
+// 一鍵重新壓縮所有手套的圖片
+async function recompressAll(){
+  const btn=document.getElementById('recomp-btn');
+  if(btn){btn.disabled=true;btn.textContent='壓縮中...';}
+  toast('🗜 正在壓縮所有圖片，請稍候...');
+
+  for(let i=0;i<db.gloves.length;i++){
+    const g=db.gloves[i];
+    if(g.images&&g.images.length){
+      db.gloves[i].images=await recompressImgs(g.images);
+    }
+  }
+  try{
+    save();
+    renderGloves();
+    const bytes=new Blob([localStorage.getItem(DB_KEY)||'']).size;
+    const kb=Math.round(bytes/1024);
+    toast(`✅ 壓縮完成！目前使用 ${kb}KB / 5120KB`);
+  }catch(e){
+    toast('⚠️ 壓縮後仍超出空間，請手動刪除部分圖片');
+  }
+  if(btn){btn.disabled=false;btn.textContent='🗜 重新壓縮所有圖片';}
+}
 function openLightbox(idx,gid){
   const g=db.gloves.find(x=>x.id===gid);if(!g)return;
   lbImgs=g.images||[];lbIdx=idx;
