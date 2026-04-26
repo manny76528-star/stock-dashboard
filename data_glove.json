@@ -104,8 +104,14 @@
       "pros": "尺寸非常滿意\n整體9.5成新\n接球聲音響亮",
       "cons": "無",
       "note": "",
-      "images": [],
-      "updatedAt": "2026-04-26T12:53:04.090Z",
+      "images": [
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209817458_xdoc.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209814750_ls66.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209819171_i382.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209821974_qxrp.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209835459_wwyo.jpg"
+      ],
+      "updatedAt": "2026-04-26T13:24:02.030Z",
       "createdAt": "2026-04-26T05:12:31.595Z"
     },
     {
@@ -244,5 +250,5 @@
       "createdAt": "2026-04-26T05:48:52.179Z"
     }
   ],
-  "_ts": 1777209796689
+  "_ts": 1777209845034
 }
