@@ -267,10 +267,15 @@
       "pros": "投手檔,售價6萬日幣等級\n接球聲音響亮 門柱紮實",
       "cons": "皮革老化僵硬",
       "note": "",
-      "images": [],
-      "updatedAt": "2026-04-26T13:28:30.788Z",
+      "images": [
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777210181213_hoh0.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777210184734_kjjm.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777210187060_c0nf.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777210189473_4tpi.jpg"
+      ],
+      "updatedAt": "2026-04-26T13:29:57.751Z",
       "createdAt": "2026-04-26T13:28:30.788Z"
     }
   ],
-  "_ts": 1777210113796
+  "_ts": 1777210200754
 }
