@@ -82,13 +82,12 @@
       "cons": "土手芯材軟塌且偏重\n整體手感不好",
       "note": "",
       "images": [
-        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209784308_6z3t.jpg",
-        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209775709_laj7.jpg",
-        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209778337_0sg7.jpg",
-        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209780502_q2mn.jpg",
-        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209786549_ngvg.jpg"
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209869381_c8a8.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209872286_mm94.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209874595_x9jr.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209876828_1ji9.jpg"
       ],
-      "updatedAt": "2026-04-26T13:23:13.688Z",
+      "updatedAt": "2026-04-26T13:24:45.212Z",
       "createdAt": "2026-04-26T05:09:34.907Z"
     },
     {
@@ -250,5 +249,5 @@
       "createdAt": "2026-04-26T05:48:52.179Z"
     }
   ],
-  "_ts": 1777209845034
+  "_ts": 1777209888213
 }
