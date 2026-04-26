@@ -573,6 +573,13 @@ textarea.fi{resize:vertical;min-height:80px;}
 // DATA
 // ══════════════════════════
 const DB_KEY='glove_vault_v1';
+const WORKER='https://dashboard-sync.manny76528.workers.dev';
+const GH_FILE='data_glove.json';
+const GH_API=`${WORKER}/${GH_FILE}`;
+let _ghSha='';
+let _syncTimer=null;
+let _syncEnabled=true;
+
 let db=load();
 function load(){try{return JSON.parse(localStorage.getItem(DB_KEY))||{gloves:[]};}catch{return{gloves:[]};}}
 function save(){
@@ -860,12 +867,6 @@ function deleteGlove(){
 // ══════════════════════════
 // GITHUB 雲端同步
 // ══════════════════════════
-const GH_FILE='data_glove.json';
-const GH_API=`${WORKER}/${GH_FILE}`;
-let _ghSha='';
-let _syncTimer=null;
-let _syncEnabled=true;
-
 function showSyncStatus(msg){
   let el=document.getElementById('sync-status');
   if(!el){
@@ -989,7 +990,6 @@ setInterval(async()=>{
   const updated=await ghPull();
   if(updated)renderGloves();
 },5*60*1000);
-const WORKER='https://dashboard-sync.manny76528.workers.dev';
 
 async function uploadImgToGitHub(file){
   // 讀取原始檔案
