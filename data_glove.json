@@ -223,7 +223,7 @@
       "sellDate": "2026-04-18",
       "sellPrice": 3400,
       "pros": "耕作鋼印\n美津濃最高等級金標井端弘和內野密網擋\n絕版North European Kip 北歐小牛皮",
-      "cons": "皮革老化僵硬且受損擦傷\n整體來說已不堪使用",
+      "cons": "皮革老化僵硬且受損擦傷\n刀模變形,變成投手球檔形狀\n整體來說已不堪使用",
       "note": "",
       "images": [
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209451584_9blp.jpg",
@@ -233,7 +233,7 @@
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209453663_8yb1.jpg",
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209456032_02p4.jpg"
       ],
-      "updatedAt": "2026-04-26T13:17:40.971Z",
+      "updatedAt": "2026-04-26T13:45:09.538Z",
       "createdAt": "2026-04-26T05:43:24.773Z"
     },
     {
@@ -284,5 +284,5 @@
       "createdAt": "2026-04-26T13:28:30.788Z"
     }
   ],
-  "_ts": 1777211074362
+  "_ts": 1777211112540
 }
