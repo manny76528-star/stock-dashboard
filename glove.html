@@ -522,10 +522,10 @@ textarea.fi{resize:vertical;min-height:80px;}
 
       <!-- 圖片上傳 -->
       <div class="fg">
-        <label class="fl">🖼 圖片（最多 5 張）</label>
+        <label class="fl">🖼 圖片（最多 3 張）</label>
         <label class="img-upload-zone">
           <div class="img-upload-icon">📷</div>
-          <div class="img-upload-text">點擊上傳圖片，自動壓縮</div>
+          <div class="img-upload-text">點擊上傳圖片，原始畫質儲存</div>
           <input type="file" id="g-img-input" accept="image/*" multiple style="display:none" onchange="handleImgUpload(event)">
         </label>
         <div class="img-preview-row" id="g-img-preview"></div>
@@ -833,34 +833,22 @@ function saveGlove(){
     updatedAt:new Date().toISOString()
   };
 
-  // 先把目前圖片重新壓縮（針對舊的大圖）
-  const saveBtn=document.getElementById('save-btn-main');
-  if(saveBtn){saveBtn.disabled=true;saveBtn.textContent='壓縮中...';}
-
-  recompressImgs(g.images).then(newImgs=>{
-    g.images=newImgs;
-    if(editId){
-      const idx=db.gloves.findIndex(x=>x.id===editId);
-      if(idx>=0)db.gloves[idx]={...db.gloves[idx],...g};
-    } else {
-      g.createdAt=new Date().toISOString();
-      db.gloves.push(g);
-    }
-    try{
-      save();
-      closeModal();
-      renderGloves();
-      toast(editId?'✅ 已更新！':'✅ 已新增！');
-    }catch(e){
-      if(editId){
-        const idx=db.gloves.findIndex(x=>x.id===editId);
-        if(idx>=0)db.gloves[idx]={...db.gloves[idx],images:[]};
-      } else {
-        db.gloves.pop();
-      }
-    }
-    if(saveBtn){saveBtn.disabled=false;saveBtn.textContent='儲存手套';}
-  });
+  // 直接存原圖（不壓縮，保持畫質）
+  if(editId){
+    const idx=db.gloves.findIndex(x=>x.id===editId);
+    if(idx>=0)db.gloves[idx]={...db.gloves[idx],...g};
+  } else {
+    g.createdAt=new Date().toISOString();
+    db.gloves.push(g);
+  }
+  try{
+    save();
+    closeModal();
+    renderGloves();
+    toast(editId?'✅ 已更新！':'✅ 已新增！');
+  }catch(e){
+    // save() 已顯示錯誤 toast
+  }
 }
 
 function deleteGlove(){
@@ -876,10 +864,12 @@ function deleteGlove(){
 // ══════════════════════════
 function handleImgUpload(e){
   const files=Array.from(e.target.files);
-  const remaining=5-currentImgs.length;
-  if(remaining<=0){toast('⚠️ 最多 5 張圖片');e.target.value='';return;}
+  const remaining=3-currentImgs.length;
+  if(remaining<=0){toast('⚠️ 最多 3 張圖片');e.target.value='';return;}
   files.slice(0,remaining).forEach(f=>{
-    compress(f,700,0.60).then(b64=>{currentImgs.push(b64);renderImgPreview();});
+    const r=new FileReader();
+    r.onload=ev=>{currentImgs.push(ev.target.result);renderImgPreview();};
+    r.readAsDataURL(f);
   });
   e.target.value='';
 }
