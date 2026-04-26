@@ -406,6 +406,7 @@ textarea.fi{resize:vertical;min-height:80px;}
   </div>
   <div class="topbar-actions">
     <a href="index.html" class="btn btn-ghost btn-sm">🏠 主目錄</a>
+    <button class="btn btn-ghost btn-sm" onclick="manualSync()">☁️ 雲端同步</button>
     <button class="btn btn-primary" onclick="openAddModal()">＋ 新增手套</button>
   </div>
 </div>
@@ -524,7 +525,7 @@ textarea.fi{resize:vertical;min-height:80px;}
         <label class="fl">🖼 圖片（最多 3 張）</label>
         <label class="img-upload-zone">
           <div class="img-upload-icon">📷</div>
-          <div class="img-upload-text">點擊上傳圖片，原始畫質儲存</div>
+          <div class="img-upload-text">點擊上傳圖片，存至雲端 · 原始畫質</div>
           <input type="file" id="g-img-input" accept="image/*" multiple style="display:none" onchange="handleImgUpload(event)">
         </label>
         <div class="img-preview-row" id="g-img-preview"></div>
@@ -577,11 +578,9 @@ function load(){try{return JSON.parse(localStorage.getItem(DB_KEY))||{gloves:[]}
 function save(){
   try{
     localStorage.setItem(DB_KEY,JSON.stringify(db));
+    schedulePush();
   }catch(e){
-    if(e.name==='QuotaExceededError'||e.code===22){
-      toast('⚠️ 儲存空間已滿！請減少圖片數量或降低圖片品質');
-      throw e;
-    }
+    toast('⚠️ 儲存失敗，請重試');
     throw e;
   }
 }
@@ -832,17 +831,10 @@ function saveGlove(){
     updatedAt:new Date().toISOString()
   };
 
-  // 先把這張卡的圖片清空再存（解決空間滿時刪照片仍能存檔的問題）
+  // 圖片已存 GitHub，currentImgs 裡只有 URL，直接存
   if(editId){
     const idx=db.gloves.findIndex(x=>x.id===editId);
-    if(idx>=0){
-      // 先把圖片清空存一次，釋放空間
-      const oldImages=db.gloves[idx].images||[];
-      db.gloves[idx].images=[];
-      try{localStorage.setItem(DB_KEY,JSON.stringify(db));}catch(e){}
-      // 再寫入新圖片
-      db.gloves[idx]={...db.gloves[idx],...g};
-    }
+    if(idx>=0)db.gloves[idx]={...db.gloves[idx],...g};
   } else {
     g.createdAt=new Date().toISOString();
     db.gloves.push(g);
@@ -853,7 +845,6 @@ function saveGlove(){
     renderGloves();
     toast(editId?'✅ 已更新！':'✅ 已新增！');
   }catch(e){
-    // 新增失敗就移除最後一筆
     if(!editId)db.gloves.pop();
   }
 }
@@ -867,17 +858,201 @@ function deleteGlove(){
 }
 
 // ══════════════════════════
-// IMAGE
+// GITHUB 雲端同步
 // ══════════════════════════
-function handleImgUpload(e){
+const GH_FILE='data_glove.json';
+const GH_API=`${WORKER}/${GH_FILE}`;
+let _ghSha='';
+let _syncTimer=null;
+let _syncEnabled=true;
+
+function showSyncStatus(msg){
+  let el=document.getElementById('sync-status');
+  if(!el){
+    el=document.createElement('span');
+    el.id='sync-status';
+    el.style.cssText='font-size:11px;color:var(--muted);font-family:var(--mono);margin-right:4px';
+    const actions=document.querySelector('.topbar-actions');
+    if(actions)actions.insertBefore(el,actions.firstChild);
+  }
+  el.textContent=msg;
+  clearTimeout(el._t);
+  el._t=setTimeout(()=>el.textContent='',4000);
+}
+
+async function ghPull(){
+  if(!_syncEnabled)return false;
+  try{
+    const r=await fetch(GH_API+'?t='+Date.now());
+    if(!r.ok){if(r.status===404)return false;throw new Error('Pull '+r.status);}
+    const j=await r.json();
+    _ghSha=j.sha;
+    const b64=j.content.replace(/\n/g,'');
+    const binStr=atob(b64);
+    const bytes=new Uint8Array(binStr.length);
+    for(let i=0;i<binStr.length;i++)bytes[i]=binStr.charCodeAt(i);
+    const remote=JSON.parse(new TextDecoder().decode(bytes));
+    const localTs=db._ts||0;
+    const remoteTs=remote._ts||0;
+    console.log('glove Pull: 本地ts='+localTs+' 遠端ts='+remoteTs);
+    if(remoteTs>=localTs){
+      // 保護本地較多的資料
+      if((db.gloves||[]).length>(remote.gloves||[]).length)remote.gloves=db.gloves;
+      db=remote;
+      localStorage.setItem(DB_KEY,JSON.stringify(db));
+      showSyncStatus('☁️ 已從雲端同步');
+      console.log('✅ glove Pull 成功');
+      return true;
+    }
+    console.log('本地資料較新，保留本地');
+    return false;
+  }catch(e){console.warn('Pull失敗:',e.message);return false;}
+}
+
+async function ghPush(){
+  if(!_syncEnabled)return;
+  try{
+    db._ts=Date.now();
+    localStorage.setItem(DB_KEY,JSON.stringify(db));
+    const jsonStr=JSON.stringify(db,null,2);
+    const encoder=new TextEncoder();
+    const bytes=encoder.encode(jsonStr);
+    const binStr=Array.from(bytes,b=>String.fromCharCode(b)).join('');
+    const encoded=btoa(binStr);
+    if(!_ghSha){
+      try{const chk=await fetch(GH_API);if(chk.ok){const cj=await chk.json();_ghSha=cj.sha;}}catch(e){}
+    }
+    const body={message:'glove-sync:'+Date.now(),content:encoded};
+    if(_ghSha)body.sha=_ghSha;
+    const r=await fetch(GH_API,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    if(!r.ok){
+      const e=await r.json();
+      if(e.message&&e.message.includes('does not match')){
+        try{
+          const chk2=await fetch(GH_API+'?t='+Date.now());
+          if(chk2.ok){const cj2=await chk2.json();_ghSha=cj2.sha;}
+          const body2={message:'glove-retry:'+Date.now(),content:encoded,sha:_ghSha};
+          const r2=await fetch(GH_API,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body2)});
+          if(r2.ok){const j2=await r2.json();_ghSha=j2.content.sha;showSyncStatus('✅ 已同步至雲端');return;}
+        }catch(e2){}
+      }
+      throw new Error(e.message);
+    }
+    const j=await r.json();
+    _ghSha=j.content.sha;
+    showSyncStatus('✅ 已同步至雲端');
+  }catch(e){showSyncStatus('⚠️ 同步失敗');console.warn('Push失敗:',e.message);}
+}
+
+function schedulePush(){
+  clearTimeout(_syncTimer);
+  _syncTimer=setTimeout(ghPush,3000);
+}
+
+// 離開頁面立即 Push；切回頁面強制 Pull
+document.addEventListener('visibilitychange',async function(){
+  if(document.visibilityState==='hidden'){
+    clearTimeout(_syncTimer);
+    ghPush();
+  }
+  if(document.visibilityState==='visible'){
+    if(!_syncEnabled)return;
+    _syncEnabled=false;
+    try{
+      const r=await fetch(GH_API+'?t='+Date.now());
+      if(r.ok){
+        const j=await r.json();
+        _ghSha=j.sha;
+        const b64=j.content.replace(/\n/g,'');
+        const binStr=atob(b64);
+        const bytes=new Uint8Array(binStr.length);
+        for(let i=0;i<binStr.length;i++)bytes[i]=binStr.charCodeAt(i);
+        const remote=JSON.parse(new TextDecoder().decode(bytes));
+        const remoteTs=remote._ts||0;
+        const localTs=db._ts||0;
+        if(remoteTs>=localTs){
+          if((db.gloves||[]).length>(remote.gloves||[]).length)remote.gloves=db.gloves;
+          db=remote;
+          localStorage.setItem(DB_KEY,JSON.stringify(db));
+          renderGloves();
+          showSyncStatus('☁️ 已從雲端同步');
+        }
+      }
+    }catch(e){console.warn('visibilitychange Pull失敗:',e.message);}
+    _syncEnabled=true;
+  }
+});
+
+// 每 5 分鐘自動 Pull
+setInterval(async()=>{
+  if(!_syncEnabled)return;
+  const updated=await ghPull();
+  if(updated)renderGloves();
+},5*60*1000);
+const WORKER='https://dashboard-sync.manny76528.workers.dev';
+
+async function uploadImgToGitHub(file){
+  // 讀取原始檔案
+  const b64=await new Promise(resolve=>{
+    const r=new FileReader();
+    r.onload=e=>{
+      // 去掉 data:image/xxx;base64, 前綴
+      resolve(e.target.result.split(',')[1]);
+    };
+    r.readAsDataURL(file);
+  });
+
+  // 產生唯一檔名
+  const ext=file.name.split('.').pop().toLowerCase()||'jpg';
+  const fname=`glove-images/${Date.now()}_${Math.random().toString(36).slice(2,6)}.${ext}`;
+
+  // 先取得現有 sha（如果存在）
+  let sha='';
+  try{
+    const chk=await fetch(`${WORKER}/${fname}`);
+    if(chk.ok){const j=await chk.json();sha=j.sha||'';}
+  }catch(e){}
+
+  // PUT 到 GitHub
+  const body={message:`glove-img:${Date.now()}`,content:b64};
+  if(sha)body.sha=sha;
+  const r=await fetch(`${WORKER}/${fname}`,{
+    method:'PUT',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(body)
+  });
+  if(!r.ok){
+    const e=await r.json();
+    throw new Error(e.message||'上傳失敗');
+  }
+  const j=await r.json();
+  // 回傳 GitHub raw URL
+  return `https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/${fname}`;
+}
+
+async function handleImgUpload(e){
   const files=Array.from(e.target.files);
   const remaining=3-currentImgs.length;
   if(remaining<=0){toast('⚠️ 最多 3 張圖片');e.target.value='';return;}
-  files.slice(0,remaining).forEach(f=>{
-    const r=new FileReader();
-    r.onload=ev=>{currentImgs.push(ev.target.result);renderImgPreview();};
-    r.readAsDataURL(f);
-  });
+
+  const btn=document.querySelector('.img-upload-zone');
+  if(btn){btn.style.opacity='.5';btn.style.pointerEvents='none';}
+  toast('📤 上傳中，請稍候...');
+
+  const toUpload=files.slice(0,remaining);
+  let success=0;
+  for(const f of toUpload){
+    try{
+      const url=await uploadImgToGitHub(f);
+      currentImgs.push(url);
+      renderImgPreview();
+      success++;
+    }catch(err){
+      toast(`⚠️ 第${success+1}張上傳失敗：${err.message}`);
+    }
+  }
+  if(btn){btn.style.opacity='';btn.style.pointerEvents='';}
+  if(success>0)toast(`✅ 已上傳 ${success} 張圖片到雲端！`);
   e.target.value='';
 }
 function renderImgPreview(){
@@ -1017,8 +1192,45 @@ document.addEventListener('keydown',e=>{
   if(e.key==='ArrowRight'&&document.getElementById('lightbox').classList.contains('open'))lbNext();
 });
 
-// Init
-renderGloves();
+async function manualSync(){
+  showSyncStatus('🔄 同步中...');
+  _ghSha='';
+  const updated=await ghPull();
+  if(updated)renderGloves();
+  await ghPush();
+  showSyncStatus('✅ 同步完成');
+}
+
+// ══════════════════════════
+// INIT — 啟動先 Pull
+// ══════════════════════════
+(async()=>{
+  _syncEnabled=false;
+  showSyncStatus('🔄 載入中...');
+  try{
+    const r=await fetch(GH_API+'?t='+Date.now());
+    if(r.ok){
+      const j=await r.json();
+      _ghSha=j.sha;
+      const b64=j.content.replace(/\n/g,'');
+      const binStr=atob(b64);
+      const bytes=new Uint8Array(binStr.length);
+      for(let i=0;i<binStr.length;i++)bytes[i]=binStr.charCodeAt(i);
+      const remote=JSON.parse(new TextDecoder().decode(bytes));
+      const remoteTs=remote._ts||0;
+      const localTs=db._ts||0;
+      console.log('glove 啟動Pull: 本地ts='+localTs+' 遠端ts='+remoteTs);
+      if(remoteTs>=localTs||(remote.gloves||[]).length>0&&(db.gloves||[]).length===0){
+        if((db.gloves||[]).length>(remote.gloves||[]).length)remote.gloves=db.gloves;
+        db=remote;
+        localStorage.setItem(DB_KEY,JSON.stringify(db));
+        showSyncStatus('☁️ 已從雲端同步');
+      }
+    }
+  }catch(e){console.warn('啟動Pull失敗:',e.message);}
+  _syncEnabled=true;
+  renderGloves();
+})();
 </script>
 </body>
 </html>
