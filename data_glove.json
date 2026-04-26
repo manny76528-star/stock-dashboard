@@ -152,8 +152,14 @@
       "pros": "ZETT 最高階 鈴木印\n源田刀模\n曾經最想要的手套",
       "cons": "球窩很淺,非常容易掉球\n且以游擊來說整體偏重(600g)\n皮革來說沒有很滿意 重但偏薄",
       "note": "",
-      "images": [],
-      "updatedAt": "2026-04-26T12:53:09.688Z",
+      "images": [
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209912048_0u6s.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209903580_mi65.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209906426_3f8x.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209908477_2yuk.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209914171_pxs9.jpg"
+      ],
+      "updatedAt": "2026-04-26T13:25:21.132Z",
       "createdAt": "2026-04-26T05:26:58.122Z"
     },
     {
@@ -249,5 +255,5 @@
       "createdAt": "2026-04-26T05:48:52.179Z"
     }
   ],
-  "_ts": 1777209888213
+  "_ts": 1777209924137
 }
