@@ -36,8 +36,14 @@
       "pros": "日本製",
       "cons": "軟式, 接球聲音不大",
       "note": "",
-      "images": [],
-      "updatedAt": "2026-04-26T12:52:51.396Z",
+      "images": [
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209729242_ylu5.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209732051_yxl3.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209734251_q5uh.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209736166_kng8.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209738517_iw84.jpg"
+      ],
+      "updatedAt": "2026-04-26T13:22:22.746Z",
       "createdAt": "2026-04-26T05:04:22.584Z"
     },
     {
@@ -232,5 +238,5 @@
       "createdAt": "2026-04-26T05:48:52.179Z"
     }
   ],
-  "_ts": 1777209718429
+  "_ts": 1777209745747
 }
