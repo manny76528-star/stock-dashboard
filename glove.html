@@ -522,7 +522,7 @@ textarea.fi{resize:vertical;min-height:80px;}
 
       <!-- 圖片上傳 -->
       <div class="fg">
-        <label class="fl">🖼 圖片（最多 3 張）</label>
+        <label class="fl">🖼 圖片（最多 8 張）</label>
         <label class="img-upload-zone">
           <div class="img-upload-icon">📷</div>
           <div class="img-upload-text">點擊上傳圖片，存至雲端 · 原始畫質</div>
@@ -1032,8 +1032,8 @@ async function uploadImgToGitHub(file){
 
 async function handleImgUpload(e){
   const files=Array.from(e.target.files);
-  const remaining=3-currentImgs.length;
-  if(remaining<=0){toast('⚠️ 最多 3 張圖片');e.target.value='';return;}
+  const remaining=8-currentImgs.length;
+  if(remaining<=0){toast('⚠️ 最多 8 張圖片');e.target.value='';return;}
 
   const btn=document.querySelector('.img-upload-zone');
   if(btn){btn.style.opacity='.5';btn.style.pointerEvents='none';}
