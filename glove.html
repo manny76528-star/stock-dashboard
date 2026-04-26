@@ -434,6 +434,10 @@ textarea.fi{resize:vertical;min-height:80px;}
       <div class="stat-label">📊 損益</div>
       <div class="stat-val" id="s-pnl">$0</div>
     </div>
+    <div class="stat-item">
+      <div class="stat-label">💾 儲存空間</div>
+      <div class="stat-val" id="s-storage" style="font-size:14px">—</div>
+    </div>
   </div>
 
   <!-- FILTERS -->
@@ -570,7 +574,17 @@ textarea.fi{resize:vertical;min-height:80px;}
 const DB_KEY='glove_vault_v1';
 let db=load();
 function load(){try{return JSON.parse(localStorage.getItem(DB_KEY))||{gloves:[]};}catch{return{gloves:[]};}}
-function save(){localStorage.setItem(DB_KEY,JSON.stringify(db));}
+function save(){
+  try{
+    localStorage.setItem(DB_KEY,JSON.stringify(db));
+  }catch(e){
+    if(e.name==='QuotaExceededError'||e.code===22){
+      toast('⚠️ 儲存空間已滿！請減少圖片數量或降低圖片品質');
+      throw e;
+    }
+    throw e;
+  }
+}
 
 let editId=null;
 let currentImgs=[];
@@ -671,6 +685,15 @@ function updateStats(){
   const pnlEl=el('s-pnl');
   pnlEl.textContent=(pnl>=0?'+':'')+pnl.toLocaleString();
   pnlEl.className='stat-val '+(pnl>0?'green':pnl<0?'red':'');
+  // 儲存空間
+  const storageEl=el('s-storage');
+  if(storageEl){
+    const bytes=new Blob([localStorage.getItem(DB_KEY)||'']).size;
+    const kb=Math.round(bytes/1024);
+    const pct=Math.round(kb/5120*100);
+    storageEl.textContent=kb+'KB / 5MB';
+    storageEl.style.color=pct>80?'var(--red)':pct>60?'#f59e0b':'var(--text)';
+  }
 }
 
 // ══════════════════════════
@@ -816,8 +839,14 @@ function saveGlove(){
     g.createdAt=new Date().toISOString();
     db.gloves.push(g);
   }
-  save();closeModal();renderGloves();
-  toast(editId?'✅ 已更新！':'✅ 已新增！');
+  try{
+    save();
+    closeModal();
+    renderGloves();
+    toast(editId?'✅ 已更新！':'✅ 已新增！');
+  }catch(e){
+    // save() 已顯示錯誤 toast，不需再處理
+  }
 }
 
 function deleteGlove(){
@@ -836,7 +865,7 @@ function handleImgUpload(e){
   const remaining=5-currentImgs.length;
   if(remaining<=0){toast('⚠️ 最多 5 張圖片');e.target.value='';return;}
   files.slice(0,remaining).forEach(f=>{
-    compress(f,900,0.75).then(b64=>{currentImgs.push(b64);renderImgPreview();});
+    compress(f,700,0.60).then(b64=>{currentImgs.push(b64);renderImgPreview();});
   });
   e.target.value='';
 }
