@@ -597,7 +597,7 @@ let detailId=null;
 // ══════════════════════════
 function renderGloves(){
   const q=(document.querySelector('.search-box')?.value||'').toLowerCase();
-  let list=[...db.gloves].sort((a,b)=>b.buyDate.localeCompare(a.buyDate));
+  let list=[...db.gloves].sort((a,b)=>(b.buyDate||'').localeCompare(a.buyDate||''));
   if(currentFilter==='hold')list=list.filter(g=>!g.sellDate||!g.sellPrice);
   if(currentFilter==='sold')list=list.filter(g=>g.sellDate&&g.sellPrice);
   if(q)list=list.filter(g=>
@@ -832,10 +832,17 @@ function saveGlove(){
     updatedAt:new Date().toISOString()
   };
 
-  // 直接存原圖（不壓縮，保持畫質）
+  // 先把這張卡的圖片清空再存（解決空間滿時刪照片仍能存檔的問題）
   if(editId){
     const idx=db.gloves.findIndex(x=>x.id===editId);
-    if(idx>=0)db.gloves[idx]={...db.gloves[idx],...g};
+    if(idx>=0){
+      // 先把圖片清空存一次，釋放空間
+      const oldImages=db.gloves[idx].images||[];
+      db.gloves[idx].images=[];
+      try{localStorage.setItem(DB_KEY,JSON.stringify(db));}catch(e){}
+      // 再寫入新圖片
+      db.gloves[idx]={...db.gloves[idx],...g};
+    }
   } else {
     g.createdAt=new Date().toISOString();
     db.gloves.push(g);
@@ -846,7 +853,8 @@ function saveGlove(){
     renderGloves();
     toast(editId?'✅ 已更新！':'✅ 已新增！');
   }catch(e){
-    // save() 已顯示錯誤 toast
+    // 新增失敗就移除最後一筆
+    if(!editId)db.gloves.pop();
   }
 }
 
