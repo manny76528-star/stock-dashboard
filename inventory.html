@@ -387,6 +387,18 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
       <div class="fg"><label class="fl">收款日期</label><input class="fi" type="date" id="o-paid-date"></div>
     </div>
 
+    <!-- 廠商付款 -->
+    <div class="fr" style="margin-top:4px">
+      <div class="fg">
+        <label class="fl">💸 付款給廠商</label>
+        <select class="fi" id="o-vendor-paid">
+          <option value="0">尚未付款</option>
+          <option value="1">已付款</option>
+        </select>
+      </div>
+      <div class="fg"><label class="fl">廠商付款日期</label><input class="fi" type="date" id="o-vendor-paid-date"></div>
+    </div>
+
     <!-- 圖片附件 -->
     <div class="fg">
       <label class="fl">🖼 附加圖片（選填）</label>
@@ -1006,6 +1018,7 @@ function renderOrders(){
       <td class="mono gain">${fmt(c.profit)}</td>
       <td>${hasInv?'<span class="badge badge-blue">是</span>':'<span class="badge badge-gray">否</span>'}</td>
       <td>${o.paid?'<span class="badge badge-green">已收款</span>':'<span class="badge badge-red">未收款</span>'}</td>
+      <td>${o.vendorPaid?'<span class="badge badge-green">已付廠商</span>':'<span class="badge" style="background:#fef3c7;color:#d97706;border:1px solid #fcd34d">未付廠商</span>'}</td>
       <td style="display:flex;gap:4px">
         <button class="btn btn-secondary" style="padding:4px 10px;font-size:11px" onclick="event.stopPropagation();openOrderModal('${o.id}')">編輯</button>
         <button class="btn" style="padding:4px 10px;font-size:11px;background:#0f172a;color:#fff;border:none" onclick="event.stopPropagation();showInvoice('${o.id}')">📄</button>
@@ -1024,8 +1037,9 @@ function openOrderModal(id=null){
   document.getElementById('o-date').value=initDate;
   document.getElementById('o-note').value=o?.note||'';
   document.getElementById('o-paid').value=o?(o.paid?'1':'0'):'1'; // 新訂單預設已收款
-  // 新訂單：收款日預設同出貨日；編輯訂單：保留原收款日
   document.getElementById('o-paid-date').value=o?.paidDate||initDate;
+  document.getElementById('o-vendor-paid').value=o?(o.vendorPaid?'1':'0'):'0';
+  document.getElementById('o-vendor-paid-date').value=o?.vendorPaidDate||'';
 
   // 圖片
   window._oImgs=[...(o?.images||[])];
@@ -1335,6 +1349,8 @@ function saveOrder(){
     note:document.getElementById('o-note').value,
     items,paid:document.getElementById('o-paid').value==='1',
     paidDate:document.getElementById('o-paid-date').value,
+    vendorPaid:document.getElementById('o-vendor-paid').value==='1',
+    vendorPaidDate:document.getElementById('o-vendor-paid-date').value,
     images:window._oImgs||[],
     createdAt:editOrderId?undefined:new Date().toISOString()
   };
@@ -1383,6 +1399,7 @@ function showOrderDetail(id){
       <div><div class="profit-label">稅額</div><div class="profit-val">${fmt(c.tax)}</div></div>
       <div><div class="profit-label">淨利潤</div><div class="profit-val gain">${fmt(c.profit)}</div></div>
       <div><div class="profit-label">收款</div><div>${o.paid?'<span class="badge badge-green">✓ 已收款</span>':'<span class="badge badge-red">未收款</span>'}</div></div>
+      <div><div class="profit-label">付廠商</div><div>${o.vendorPaid?'<span class="badge badge-green">✓ 已付</span>':'<span class="badge" style="background:#fef3c7;color:#d97706;border:1px solid #fcd34d">未付</span>'}</div></div>
     </div>
     ${o.note?`<div style="margin-top:8px;font-size:12px;color:var(--muted)">備註：${o.note}</div>`:''}
     ${(o.images&&o.images.length)?`

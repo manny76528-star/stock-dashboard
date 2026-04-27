@@ -2278,6 +2278,25 @@ body:not(.privacy) .privacy-mask{filter:none;}
   </div>
 </div>
 
+<!-- ══ 標的追蹤視窗 ══ -->
+<div class="sp-overlay" id="sp-stock-tracker">
+  <div class="sp-modal" style="max-width:800px">
+    <div class="sp-hdr">
+      <div class="sp-hdr-left">
+        <span class="sp-hdr-icon">🏷</span>
+        <span class="sp-hdr-title" id="st-title">—</span>
+      </div>
+      <div class="sp-hdr-right">
+        <span id="st-count" style="font-size:12px;color:rgba(255,255,255,.5);margin-right:8px"></span>
+        <button class="sp-close" onclick="closeSP('stock-tracker')">✕ 關閉</button>
+      </div>
+    </div>
+    <div class="sp-body" style="padding:0">
+      <div id="st-list" style="display:flex;flex-direction:column;gap:0"></div>
+    </div>
+  </div>
+</div>
+
 <!-- 交易日誌 Modal -->
 <div class="mo" id="journalModal">
   <div class="modal" style="max-width:640px">
@@ -2295,6 +2314,12 @@ body:not(.privacy) .privacy-mask{filter:none;}
           <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer"><input type="checkbox" id="jtag-alert" value="重大事項"> 🔔 重大事項</label>
         </div>
       </div>
+    </div>
+    <!-- 股票自訂標籤 -->
+    <div class="fg">
+      <label class="fl">🏷 追蹤標的標籤（選填，可多個，用空格分隔）</label>
+      <input class="fi" id="j-stock-tags" placeholder="例：009805 00878 台積電" style="font-family:'JetBrains Mono',monospace;letter-spacing:.5px">
+      <div style="font-size:10px;color:#94a3b8;margin-top:4px">輸入後可在日誌視窗搜尋，快速查閱該標的所有歷史記錄</div>
     </div>
     <!-- 大盤環境 -->
     <div class="fg">
@@ -6326,6 +6351,7 @@ function openJournalModal(id=null){
   const jmUrlEl=document.getElementById('j-market-url');if(jmUrlEl)jmUrlEl.value=j?.marketUrl||'';
   document.getElementById('j-mood').value=j?.mood||'';
   document.getElementById('j-content').value=j?.content||'';
+  document.getElementById('j-stock-tags').value=(j?.stockTags||[]).join(' ');
   // 標籤
   ['jtag-bull','jtag-bear','jtag-buy','jtag-sell','jtag-alert'].forEach(id2=>{
     const el=document.getElementById(id2);
@@ -6421,6 +6447,7 @@ function saveJournal(){
     marketUrl:document.getElementById('j-market-url')?.value.trim()||'',
     mood:document.getElementById('j-mood').value.trim(),
     content:document.getElementById('j-content').value.trim(),
+    stockTags:document.getElementById('j-stock-tags').value.trim().split(/\s+/).filter(Boolean),
     images:window._jImgs||[]
   };
   if(!db.journals)db.journals=[];
@@ -6477,6 +6504,47 @@ function viewJImgReadonly(journalId,imgIdx){
   nav.appendChild(close);
   overlay.appendChild(img);overlay.appendChild(nav);
   document.body.appendChild(overlay);
+}
+
+function openStockTracker(tag){
+  // 找所有含有此 tag 的日誌
+  const list=(db.journals||[])
+    .filter(j=>(j.stockTags||[]).some(t=>t.toUpperCase()===tag.toUpperCase()))
+    .sort((a,b)=>b.date.localeCompare(a.date));
+
+  document.getElementById('st-title').textContent='🏷 '+tag+' 追蹤記錄';
+  document.getElementById('st-count').textContent=list.length+' 篇';
+
+  const tagColors={'看多':'#dcfce7','看空':'#fef2f2','買入':'#dbeafe','賣出':'#fce7f3','重大事項':'#fef3c7'};
+  const tagTextColors={'看多':'#16a34a','看空':'#dc2626','買入':'#2563eb','賣出':'#db2777','重大事項':'#d97706'};
+
+  if(list.length===0){
+    document.getElementById('st-list').innerHTML=`<div style="text-align:center;padding:40px;color:#94a3b8;font-size:13px">尚無「${tag}」相關記錄</div>`;
+  } else {
+    document.getElementById('st-list').innerHTML=list.map((j,idx)=>{
+      const tags=(j.tags||[]).map(t=>`<span style="display:inline-block;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:700;background:${tagColors[t]||'#f1f5f9'};color:${tagTextColors[t]||'#475569'}">${t}</span>`).join('');
+      return`<div style="border-bottom:1px solid #f1f5f9;${idx===list.length-1?'border-bottom:none':''}">
+        <!-- header -->
+        <div style="background:linear-gradient(135deg,#0f172a,#1e3a5f);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:pointer" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none';this.querySelector('.st-arr').style.transform=this.nextElementSibling.style.display==='none'?'':'rotate(180deg)'">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <span style="font-size:13px;font-weight:700;color:#e2e8f0;font-family:'JetBrains Mono',monospace">${j.date}</span>
+            ${tags}
+            ${j.mood?`<span style="font-size:11px;color:rgba(255,255,255,.6)">${j.mood}</span>`:''}
+          </div>
+          <span class="st-arr" style="font-size:12px;color:rgba(255,255,255,.4);transition:transform .2s">▼</span>
+        </div>
+        <!-- 標題 -->
+        ${j.market?`<div style="padding:8px 16px 4px;background:#f8fafc;font-size:13px;font-weight:700;color:#1e3a5f;line-height:1.5;white-space:pre-wrap;border-bottom:1px solid #e2e8f0">${j.market}</div>`:''}
+        <!-- 內容（預設折疊）-->
+        <div style="display:none;padding:12px 16px;font-size:13px;color:#374151;line-height:1.7;white-space:pre-wrap;background:#fff">${j.content||'（無內容）'}</div>
+      </div>`;
+    }).join('');
+  }
+  // 開啟視窗（覆蓋在日誌 popup 上方）
+  const el=document.getElementById('sp-stock-tracker');
+  el.classList.add('open');
+  el.style.zIndex='1500';
+  document.body.style.overflow='hidden';
 }
 
 function updateJournalCount(){
@@ -6539,6 +6607,7 @@ function renderJournal(){
             <span style="font-size:13px;font-weight:700;color:#e2e8f0;font-family:'JetBrains Mono',monospace;white-space:nowrap">${j.date}</span>
             ${tags}
             ${j.mood?`<span style="font-size:12px;color:rgba(255,255,255,.65)">${j.mood}</span>`:''}
+            ${(j.stockTags||[]).map(t=>`<span onclick="event.stopPropagation();openStockTracker('${t}')" style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;background:rgba(56,189,248,.15);color:#38bdf8;border:1px solid rgba(56,189,248,.3);cursor:pointer;font-family:'JetBrains Mono',monospace" title="點擊查看 ${t} 所有記錄">${t}</span>`).join('')}
             ${j.marketUrl?`<a href="${j.marketUrl}" target="_blank" onclick="event.stopPropagation()" style="font-size:11px;color:#93c5fd;text-decoration:none;white-space:nowrap" title="查看原文">🔗 原文</a>`:''}
           </div>
           <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
