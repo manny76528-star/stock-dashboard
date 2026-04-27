@@ -5759,8 +5759,8 @@
           "invoice": false
         }
       ],
-      "paid": false,
-      "paidDate": "2026-04-24"
+      "paid": true,
+      "paidDate": "2026-04-27"
     },
     {
       "id": "moa30mo404bp",
@@ -6167,5 +6167,5 @@
     "bankCode": "013",
     "bankAccount": "061506186489"
   },
-  "_ts": 1777126053516
+  "_ts": 1777259452201
 }
