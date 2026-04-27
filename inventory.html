@@ -735,6 +735,24 @@ function save(){
   updateUndoRedo();
   scheduleInvPush(); // 背景同步到 GitHub
 }
+
+// 歷史訂單補填廠商已付款（只跑一次）
+function backfillVendorPaid(){
+  if(db._vendorPaidBackfilled)return;
+  let changed=0;
+  (db.orders||[]).forEach(o=>{
+    if(o.vendorPaid===undefined||o.vendorPaid===null){
+      o.vendorPaid=true;
+      o.vendorPaidDate='';
+      changed++;
+    }
+  });
+  if(changed>0){
+    db._vendorPaidBackfilled=true;
+    save();
+    console.log('✅ 已將',changed,'筆歷史訂單設為廠商已付款');
+  }
+}
 function undo(){
   if(_history.length===0)return;
   _future.push(JSON.stringify(db));
@@ -1010,7 +1028,7 @@ function renderOrders(){
       if(it.qty&&it.qty>1)s+=' ×'+it.qty;
       return s;
     }).filter(Boolean).join('、');
-    return`<tr style="cursor:pointer" onclick="showOrderDetail('${o.id}')">
+    return`<tr style="cursor:pointer;${!o.vendorPaid?'background:#fffbeb;':''}" onclick="showOrderDetail('${o.id}')">
       <td>${fmtDate(o.date)}</td>
       <td><b>${o.custName||'—'}</b></td>
       <td><div class="muted">${itemNames||'—'}</div>${o.note?'<div style="font-size:11px;color:#94a3b8;margin-top:2px">📝 '+o.note+'</div>':''}</td>
@@ -1018,7 +1036,7 @@ function renderOrders(){
       <td class="mono gain">${fmt(c.profit)}</td>
       <td>${hasInv?'<span class="badge badge-blue">是</span>':'<span class="badge badge-gray">否</span>'}</td>
       <td>${o.paid?'<span class="badge badge-green">已收款</span>':'<span class="badge badge-red">未收款</span>'}</td>
-      <td>${o.vendorPaid?'<span class="badge badge-green">已付廠商</span>':'<span class="badge" style="background:#fef3c7;color:#d97706;border:1px solid #fcd34d">未付廠商</span>'}</td>
+      <td>${o.vendorPaid?'<span class="badge badge-green">已付廠商</span>':'<span class="badge" style="background:#f59e0b;color:#fff;border:none;font-weight:700">⚠️ 未付廠商</span>'}</td>
       <td style="display:flex;gap:4px">
         <button class="btn btn-secondary" style="padding:4px 10px;font-size:11px" onclick="event.stopPropagation();openOrderModal('${o.id}')">編輯</button>
         <button class="btn" style="padding:4px 10px;font-size:11px;background:#0f172a;color:#fff;border:none" onclick="event.stopPropagation();showInvoice('${o.id}')">📄</button>
@@ -1934,9 +1952,9 @@ load();
   showInvSync('🔄 同步中...');
   const updated=await ghPullInv();
   if(updated){
-    // 重新確保必要欄位
     if(!db.products)db.products=[];
   }
+  backfillVendorPaid(); // 歷史訂單補填廠商已付款
   renderOverview();
 })();
 // 點 Modal 外面不關閉（避免填寫中意外關閉）
