@@ -2059,7 +2059,7 @@ function showImgOverlay(imgs,startIdx){
   const MASTER_TS='master_auth_ts';
   const KEY='inv_auth_v1';
   const TS_KEY='inv_auth_ts';
-  const TIMEOUT=10*60*1000;
+  const TIMEOUT=3*60*1000; // 3分鐘閒置登出
   const ls=document.getElementById('login-screen');
   const mc=document.getElementById('main-content');
   const inp=document.getElementById('pw-input');
@@ -2073,11 +2073,13 @@ function showImgOverlay(imgs,startIdx){
 
   let timer=null;
   function resetTimer(){
-    localStorage.setItem(TS_KEY,Date.now().toString());
+    const now=Date.now().toString();
+    localStorage.setItem(TS_KEY,now);
+    localStorage.setItem(MASTER_TS,now);
     clearTimeout(timer);
     timer=setTimeout(()=>{ showLogin(); },TIMEOUT);
   }
-  ['click','keydown','touchstart','scroll'].forEach(ev=>{
+  ['click','keydown','touchstart'].forEach(ev=>{
     document.addEventListener(ev,()=>{if(localStorage.getItem(KEY)==='1')resetTimer();},{passive:true});
   });
 

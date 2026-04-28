@@ -99,7 +99,7 @@ body{min-height:100vh;background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 60%,#
   const PW='113067';
   const KEY='master_auth_v1';
   const TS_KEY='master_auth_ts';
-  const TIMEOUT=10*60*1000; // 10分鐘閒置登出
+  const TIMEOUT=3*60*1000; // 3分鐘閒置登出 // 10分鐘閒置登出
   const ls=document.getElementById('login-screen');
   const inp=document.getElementById('pw-input');
 
@@ -121,7 +121,7 @@ body{min-height:100vh;background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 60%,#
     clearTimeout(timer);
     timer=setTimeout(()=>{ showLogin(); },TIMEOUT);
   }
-  ['click','keydown','touchstart','scroll'].forEach(ev=>{
+  ['click','keydown','touchstart'].forEach(ev=>{
     document.addEventListener(ev,()=>{if(localStorage.getItem(KEY)==='1')resetTimer();},{passive:true});
   });
 
