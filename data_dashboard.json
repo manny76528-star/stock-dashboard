@@ -377,6 +377,24 @@
           "date": "2026-04-23",
           "fee": 0,
           "remark": "GEV大漲12%,且展望非常的好 但當天GEV占比最多的009805 只有小漲0.5% 當下淨值都還有16.3"
+        },
+        {
+          "id": "mojw2kln1tq",
+          "type": "sell",
+          "lots": 45,
+          "price": 16.4,
+          "date": "2026-04-29",
+          "fee": 2508,
+          "lotRefs": [
+            {
+              "txnId": "mobc156abpw",
+              "lots": 45,
+              "date": "2026-04-23"
+            }
+          ],
+          "remark": "OpenAI營收成長不如預期引發AI板塊恐慌，費半指數重挫3.58%，台積電ADR跌3.12%。這波逆風連帶重挫軟銀、甲骨文與CoreWeave等合作夥伴股價，9805前四大成分股也都紛紛大跌 但這次賣出不是不看好 而且先觀察趨勢",
+          "mood": "🤔 猶豫",
+          "lossReason": ""
         }
       ],
       "order": 11
@@ -767,7 +785,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1777456997159,
+  "_ts": 1777457114250,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
