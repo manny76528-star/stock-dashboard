@@ -731,6 +731,13 @@
       "div": 72128,
       "cf": -11563,
       "debtRatio": 79.9
+    },
+    {
+      "ym": "2026-04-30",
+      "net": 3440799,
+      "div": 72128,
+      "cf": -12075,
+      "debtRatio": 80
     }
   ],
   "settings": {
@@ -808,7 +815,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1777543182811,
+  "_ts": 1777543850690,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
