@@ -2192,15 +2192,20 @@ body:not(.privacy) .privacy-mask{filter:none;}
           <div style="font-weight:700;color:#1e293b;font-size:13px;margin-bottom:10px">📈 B 富邦證券</div>
 
           <!-- 持股清單 -->
-          <div style="font-size:11px;font-weight:700;color:#475569;margin-bottom:6px">📊 持股清單（自動抓股價）</div>
-          <div id="fp-b-stocks" style="display:flex;flex-direction:column;gap:4px;margin-bottom:6px"></div>
-          <button onclick="addFpStock('b')" style="width:100%;padding:4px;border:1px dashed #cbd5e1;border-radius:6px;background:transparent;font-size:11px;color:#64748b;cursor:pointer;margin-bottom:8px">＋ 新增持股</button>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;cursor:pointer" onclick="toggleFpStocks('b')">
+            <div style="font-size:11px;font-weight:700;color:#475569">📊 持股清單（自動抓股價）</div>
+            <span id="fp-b-stocks-arrow" style="font-size:11px;color:#94a3b8">▲</span>
+          </div>
+          <div id="fp-b-stocks-wrap" style="display:block">
+            <div id="fp-b-stocks" style="display:flex;flex-direction:column;gap:4px;margin-bottom:6px"></div>
+            <button onclick="addFpStock('b')" style="width:100%;padding:4px;border:1px dashed #cbd5e1;border-radius:6px;background:transparent;font-size:11px;color:#64748b;cursor:pointer;margin-bottom:8px">＋ 新增持股</button>
+          </div>
 
           <!-- 市值顯示 -->
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">
             <div style="background:#fff;border:1px solid var(--border);border-radius:6px;padding:7px 10px">
               <div style="font-size:9px;color:#94a3b8;margin-bottom:2px">股票市值</div>
-              <div style="font-size:14px;font-weight:700;color:#2563eb" id="fp-b-mktval">$0</div>
+              <div style="font-size:14px;font-weight:700;color:#dc2626" id="fp-b-mktval">$0</div>
             </div>
             <div style="background:#fff;border:1px solid var(--border);border-radius:6px;padding:7px 10px">
               <div style="font-size:9px;color:#94a3b8;margin-bottom:2px">淨市值（扣借貸）</div>
@@ -2227,15 +2232,20 @@ body:not(.privacy) .privacy-mask{filter:none;}
           <div style="font-weight:700;color:#1e293b;font-size:13px;margin-bottom:10px">💰 C 凱基證券</div>
 
           <!-- 持股清單 -->
-          <div style="font-size:11px;font-weight:700;color:#475569;margin-bottom:6px">📊 持股清單（自動抓股價）</div>
-          <div id="fp-c-stocks" style="display:flex;flex-direction:column;gap:4px;margin-bottom:6px"></div>
-          <button onclick="addFpStock('c')" style="width:100%;padding:4px;border:1px dashed #cbd5e1;border-radius:6px;background:transparent;font-size:11px;color:#64748b;cursor:pointer;margin-bottom:8px">＋ 新增持股</button>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;cursor:pointer" onclick="toggleFpStocks('c')">
+            <div style="font-size:11px;font-weight:700;color:#475569">📊 持股清單（自動抓股價）</div>
+            <span id="fp-c-stocks-arrow" style="font-size:11px;color:#94a3b8">▲</span>
+          </div>
+          <div id="fp-c-stocks-wrap" style="display:block">
+            <div id="fp-c-stocks" style="display:flex;flex-direction:column;gap:4px;margin-bottom:6px"></div>
+            <button onclick="addFpStock('c')" style="width:100%;padding:4px;border:1px dashed #cbd5e1;border-radius:6px;background:transparent;font-size:11px;color:#64748b;cursor:pointer;margin-bottom:8px">＋ 新增持股</button>
+          </div>
 
           <!-- 市值顯示 -->
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">
             <div style="background:#fff;border:1px solid var(--border);border-radius:6px;padding:7px 10px">
               <div style="font-size:9px;color:#94a3b8;margin-bottom:2px">股票市值</div>
-              <div style="font-size:14px;font-weight:700;color:#2563eb" id="fp-c-mktval">$0</div>
+              <div style="font-size:14px;font-weight:700;color:#dc2626" id="fp-c-mktval">$0</div>
             </div>
             <div style="background:#fff;border:1px solid var(--border);border-radius:6px;padding:7px 10px">
               <div style="font-size:9px;color:#94a3b8;margin-bottom:2px">淨市值（扣借貸）</div>
@@ -5786,6 +5796,15 @@ function toggleFinPlan(){
 // ══════════════════════════════════════
 // 財務規劃 B/C 持股管理
 // ══════════════════════════════════════
+function toggleFpStocks(acct){
+  const wrap=document.getElementById('fp-'+acct+'-stocks-wrap');
+  const arrow=document.getElementById('fp-'+acct+'-stocks-arrow');
+  if(!wrap)return;
+  const isOpen=wrap.style.display!=='none';
+  wrap.style.display=isOpen?'none':'block';
+  if(arrow)arrow.textContent=isOpen?'▼':'▲';
+}
+
 function renderFpStocks(acct){
   const wrap=document.getElementById('fp-'+acct+'-stocks');
   if(!wrap)return;
@@ -5806,8 +5825,7 @@ function renderFpStocks(acct){
       const days=(Date.now()-new Date(s.buyDate).getTime())/(1000*60*60*24);
       if(days>7)annualRoi=roi*(365/days);
     }
-    const pnlColor=pnl>=0?'#16a34a':'#dc2626';
-    return`<div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin-bottom:4px">
+    const pnlColor=pnl>=0?'#dc2626':'#16a34a';
       <!-- 第一行：代號 + 張數 + 零股 + 刪除 -->
       <div style="display:flex;gap:4px;align-items:center;margin-bottom:6px">
         <input value="${s.code||''}" placeholder="代號"
@@ -5837,7 +5855,7 @@ function renderFpStocks(acct){
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px">
         <div style="background:#f8fafc;border-radius:5px;padding:4px 6px;text-align:center">
           <div style="font-size:9px;color:#94a3b8">現價</div>
-          <div style="font-size:11px;font-weight:700;color:#2563eb">${s.price?'$'+s.price:'—'}</div>
+          <div style="font-size:11px;font-weight:700;color:#dc2626">${s.price?'$'+s.price:'—'}</div>
         </div>
         <div style="background:#f8fafc;border-radius:5px;padding:4px 6px;text-align:center">
           <div style="font-size:9px;color:#94a3b8">市值</div>
@@ -5911,7 +5929,7 @@ function updateFpMktVal(acct){
   if(mktEl)mktEl.textContent='$'+Math.round(mktVal).toLocaleString();
   if(netEl){
     netEl.textContent='$'+Math.round(netVal).toLocaleString();
-    netEl.style.color=netVal>=0?'#16a34a':'#dc2626';
+    netEl.style.color=netVal>=0?'#dc2626':'#16a34a';
   }
   return netVal;
 }
@@ -5972,9 +5990,15 @@ function initFinPlan(){
   sv('fp-year2032',s.year2032||2032);
   sv('fp-target2032',s.target2032||930);
 
-  // 渲染持股清單並計算市值
+  // 渲染持股清單並計算市值（預設縮起）
   renderFpStocks('b');
   renderFpStocks('c');
+  ['b','c'].forEach(acct=>{
+    const wrap=document.getElementById('fp-'+acct+'-stocks-wrap');
+    const arrow=document.getElementById('fp-'+acct+'-stocks-arrow');
+    if(wrap)wrap.style.display='none';
+    if(arrow)arrow.textContent='▼';
+  });
   updateFpMktVal('b');
   updateFpMktVal('c');
 
@@ -6007,11 +6031,26 @@ function calcFinPlan(){
   };
   if(!db.finPlan)db.finPlan={};
   Object.assign(db.finPlan,s);
+  // 同步 loan 到 db 供 calcNetVal 直接讀取
+  db.finPlan.bLoan=s.bLoan;
+  db.finPlan.cLoan=s.cLoan;
   save();
 
-  // 計算 B/C 淨市值作為起始資產
-  const bNet=updateFpMktVal('b');
-  const cNet=updateFpMktVal('c');
+  // 計算 B/C 淨市值作為起始資產（直接從 db 讀，不依賴 DOM）
+  const calcNetVal=(acct)=>{
+    const stocks=(db.finPlan||{})[acct+'Stocks']||[];
+    const mktVal=stocks.reduce((s,st)=>{
+      const totalShares=(st.lots||0)*1000+(st.oddShares||0);
+      return s+(st.price||0)*totalShares;
+    },0);
+    const loan=(db.finPlan||{})[acct+'Loan']||gv('fp-'+acct+'-loan');
+    return mktVal-loan;
+  };
+  const bNet=Math.max(0,calcNetVal('b'));
+  const cNet=Math.max(0,calcNetVal('c'));
+  // 同步更新顯示
+  updateFpMktVal('b');
+  updateFpMktVal('c');
 
   // 抓目前淨資產和信貸餘額
   let tC=0,tM=0;
@@ -6021,30 +6060,34 @@ function calcFinPlan(){
   const cT=db.cashAccounts.reduce((ss,c)=>ss+(c.cash||0)+(c.d1||0)+(c.d2||0),0);
   const invVal=tM>0?tM:tC;
   const netNow=invVal+cT-(loanR+flexR);
-  const totalAssetNow=invVal+cT; // 總資產（含負債）
+
+  // 計算目前到目標年份的實際月數
+  const now=new Date();
+  const yr2029=parseFloat(document.getElementById('fp-year2029')?.value)||2029;
+  const yr2032=parseFloat(document.getElementById('fp-year2032')?.value)||2032;
+  const months2029=Math.max(0,Math.round((new Date(yr2029,0,1)-now)/1000/60/60/24/30.44));
+  const months2032=Math.max(0,Math.round((new Date(yr2032,0,1)-now)/1000/60/60/24/30.44));
 
   // ── A 帳戶計算 ──
-  // 2029：信貸清零，淨資產 = 現在總資產（股票+現金）- 0負債 ≈ 總資產
-  const a2029=netNow+loanR; // 2029：淨資產 + 信貸清零 = 目前淨資產 + 信貸餘額
-  // 2029-2032：配息+自提每月滾入
+  const a2029=netNow+loanR;
   const aMonthly2=(s.aDivChk?s.aDiv:0)+(s.aSaveChk?s.aSave:0);
-  const a2032=a2029+aMonthly2*36;
+  const moreMonths=Math.max(0,months2032-months2029);
+  const a2032=a2029+aMonthly2*moreMonths;
 
-  // ── B 帳戶計算（複利，起始用淨市值）──
-  let b2029=bNet>0?bNet:0;
-  for(let i=0;i<36;i++) b2029=b2029*(1+(s.bRate/100/12))+s.bMonthly;
-  // 2029-2032（再36個月）
+  // ── B 帳戶計算（複利，用實際月數）──
+  let b2029=bNet;
+  for(let i=0;i<months2029;i++) b2029=b2029*(1+(s.bRate/100/12))+s.bMonthly;
   let b2032=b2029;
-  for(let i=0;i<36;i++) b2032=b2032*(1+(s.bRate/100/12))+(s.bMonthly2||s.bMonthly);
+  for(let i=0;i<moreMonths;i++) b2032=b2032*(1+(s.bRate/100/12))+(s.bMonthly2||s.bMonthly);
 
-  // ── C 帳戶計算（複利，起始用淨市值）──
-  let c2029=cNet>0?cNet:0;
-  for(let i=0;i<36;i++){
+  // ── C 帳戶計算（複利，用實際月數）──
+  let c2029=cNet;
+  for(let i=0;i<months2029;i++){
     c2029=c2029*(1+(s.cRate/100/12))+s.cMonthly;
     if(i%12===11) c2029+=s.cAnnual;
   }
   let c2032=c2029;
-  for(let i=0;i<36;i++){
+  for(let i=0;i<moreMonths;i++){
     c2032=c2032*(1+(s.cRate/100/12))+s.cMonthly;
     if(i%12===11) c2032+=s.cAnnual;
   }
