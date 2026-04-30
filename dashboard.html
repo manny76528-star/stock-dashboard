@@ -5536,8 +5536,12 @@ runDailyProcess(false);
   const hour=today.getHours();
   // 週五 15:00 以後才執行
   if(dow!==5||hour<15)return;
-  const dateKey=today.toISOString().slice(0,10);
-  const snapshotKey='snap_done_'+dateKey+'_'+hour; // 加入小時，每小時可重新記錄
+  // 用本地時間產生 dateKey（避免 UTC 時區問題）
+  const y=today.getFullYear();
+  const m=String(today.getMonth()+1).padStart(2,'0');
+  const d=String(today.getDate()).padStart(2,'0');
+  const dateKey=`${y}-${m}-${d}`;
+  const snapshotKey='snap_done_'+dateKey+'_'+hour;
   if(localStorage.getItem(snapshotKey))return;
   localStorage.setItem(snapshotKey,'1');
   if(!db.snapshots)db.snapshots=[];
@@ -6141,9 +6145,6 @@ function renderAnalytics(){
       {label:'整體勝率',value:winRate.toFixed(1)+'%',color:winRate>=50?'var(--gain)':'var(--loss)'},
       {label:'資金年化報酬率',value:(capitalAnnualRoi>=0?'+':'')+capitalAnnualRoi.toFixed(1)+'%',color:capitalAnnualRoi>=0?'var(--gain)':'var(--loss)',sub:beatLoan?'✅ 跑贏借貸成本':'⚠️ 未跑贏借貸成本',subColor:beatLoan?'var(--gain)':'#f59e0b'},
       {label:'信貸加權利率',value:'+'+wtdLoanRate.toFixed(2)+'%',color:'var(--loss)',sub:'需超越此門檻',subColor:'#94a3b8'},
-      {label:'盈虧比',value:profitFactor.toFixed(2)+'x',color:profitFactor>=1?'var(--gain)':'var(--loss)'},
-      {label:'平均獲利/筆',value:'$'+Math.round(avgWin).toLocaleString(),color:'var(--gain)'},
-      {label:'平均虧損/筆',value:'$'+Math.round(avgLoss).toLocaleString(),color:'var(--loss)'},
       {label:'交易損益',value:(totalPnl>=0?'+':'')+Math.round(totalPnl).toLocaleString(),color:totalPnl>=0?'var(--gain)':'var(--loss)'},
     ];
     kpiEl.innerHTML=kpis.map(function(k){
