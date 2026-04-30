@@ -220,7 +220,11 @@ body:not(.privacy) .privacy-mask{filter:none;}
     window.location.href='index.html';
     return;
   }
-  document.getElementById('main-content').style.display='block';
+  // 等 DOM 完整載入再顯示
+  document.addEventListener('DOMContentLoaded',function(){
+    const mc=document.getElementById('main-content');
+    if(mc)mc.style.display='block';
+  });
   let timer=null;
   function resetTimer(){
     localStorage.setItem(MASTER_TS,Date.now().toString());

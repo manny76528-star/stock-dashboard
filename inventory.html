@@ -144,7 +144,10 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
     window.location.href='index.html';
     return;
   }
-  document.getElementById('main-content').style.display='block';
+  document.addEventListener('DOMContentLoaded',function(){
+    const mc=document.getElementById('main-content');
+    if(mc)mc.style.display='block';
+  });
   // 閒置計時
   let timer=null;
   function resetTimer(){
