@@ -815,7 +815,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1777564782961,
+  "_ts": 1777564787238,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
@@ -1057,7 +1057,16 @@
     "cAnnual": 80000,
     "cRate": 5,
     "bLoan": 0,
-    "cLoan": 1000000
+    "cLoan": 1000000,
+    "cStocks": [
+      {
+        "code": "",
+        "lots": 0,
+        "price": 0,
+        "buyDate": "2026-04-30",
+        "buyPrice": 0
+      }
+    ]
   },
   "_fpBcAdded": {
     "fp_bc_added_2026-05": true
