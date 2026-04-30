@@ -815,7 +815,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1777565277818,
+  "_ts": 1777565287303,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
@@ -1069,7 +1069,7 @@
       },
       {
         "code": "009805",
-        "lots": 0,
+        "lots": 11,
         "price": 16.42,
         "buyDate": "2026-04-30",
         "buyPrice": 0
