@@ -815,7 +815,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1777565221466,
+  "_ts": 1777565237850,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
@@ -1064,7 +1064,8 @@
         "lots": 146,
         "price": 10.37,
         "buyDate": "2026-02-02",
-        "buyPrice": 10.4
+        "buyPrice": 10.4,
+        "oddShares": 50
       }
     ]
   },
