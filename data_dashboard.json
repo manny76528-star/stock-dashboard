@@ -398,6 +398,30 @@
         }
       ],
       "order": 11
+    },
+    {
+      "id": "mol8jss6p1l",
+      "code": "009805",
+      "name": "新光美國電力基建",
+      "lots": 43,
+      "avgPrice": 16.45,
+      "divPerShare": 0,
+      "note": "現股",
+      "url": "",
+      "holdType": "short",
+      "targetRoi": 5,
+      "transactions": [
+        {
+          "id": "mol8jss67vq",
+          "type": "buy",
+          "lots": 43,
+          "price": 16.45,
+          "date": "2026-04-30",
+          "fee": 0,
+          "remark": "昨日賣出是OPENAI下修展望,今META AMZ GOOG財報展望良好 昨天的AI收縮擔憂暫時收緩,因此買回"
+        }
+      ],
+      "order": 12
     }
   ],
   "loans": [
@@ -579,10 +603,10 @@
       "ts": 1777538422949
     },
     "009805": {
-      "price": 16.43,
-      "change": -0.15,
-      "changePct": -0.9,
-      "ts": 1777456733897
+      "price": 16.42,
+      "change": -0.01,
+      "changePct": -0.06,
+      "ts": 1777538536984
     }
   },
   "dividends": [
@@ -784,7 +808,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1777538440957,
+  "_ts": 1777538539570,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
