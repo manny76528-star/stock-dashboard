@@ -815,7 +815,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1777565375794,
+  "_ts": 1777565382496,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
@@ -1079,7 +1079,7 @@
     "bStocks": [
       {
         "code": "00981A",
-        "lots": 0,
+        "lots": 1,
         "price": 28.28,
         "buyDate": "2026-04-30",
         "buyPrice": 0
