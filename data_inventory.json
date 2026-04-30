@@ -5999,7 +5999,7 @@
     },
     {
       "id": "mnpwj6s1s22u",
-      "date": "2026-04-20",
+      "date": "2026-05-04",
       "custId": "mnmofk0wpc0i",
       "custName": "訊控有限公司",
       "contact": "陳甫騁先生",
@@ -6032,7 +6032,7 @@
         }
       ],
       "paid": false,
-      "paidDate": "2026-04-20",
+      "paidDate": "2026-05-04",
       "vendorPaid": false,
       "vendorPaidDate": "",
       "images": []
@@ -6515,6 +6515,6 @@
     "bankCode": "013",
     "bankAccount": "061506186489"
   },
-  "_ts": 1777285323273,
+  "_ts": 1777542658042,
   "_vendorPaidBackfilled": true
 }
