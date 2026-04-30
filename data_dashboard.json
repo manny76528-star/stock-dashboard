@@ -815,7 +815,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1777564695423,
+  "_ts": 1777564765343,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
@@ -1057,7 +1057,7 @@
     "cAnnual": 80000,
     "cRate": 5,
     "bLoan": 0,
-    "cLoan": 0
+    "cLoan": 1000000
   },
   "_fpBcAdded": {
     "fp_bc_added_2026-05": true
