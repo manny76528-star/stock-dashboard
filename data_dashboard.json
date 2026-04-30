@@ -815,7 +815,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1777564793789,
+  "_ts": 1777564827382,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
@@ -1061,7 +1061,7 @@
     "cStocks": [
       {
         "code": "00981D",
-        "lots": 0,
+        "lots": 146,
         "price": 10.37,
         "buyDate": "2026-04-30",
         "buyPrice": 0
