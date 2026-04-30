@@ -808,7 +808,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1777538622381,
+  "_ts": 1777538646342,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
@@ -834,6 +834,21 @@
     }
   ],
   "journals": [
+    {
+      "id": "mol8m361q96",
+      "date": "2026-04-30",
+      "tags": [
+        "買入"
+      ],
+      "market": "",
+      "marketUrl": "",
+      "mood": "",
+      "content": "",
+      "stockTags": [
+        "009805"
+      ],
+      "images": []
+    },
     {
       "id": "mojw8kf4nvq",
       "date": "2026-04-29",
