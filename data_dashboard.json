@@ -483,7 +483,7 @@
     {
       "id": "mncull1439i",
       "bank": "Line Bank",
-      "cash": 5000,
+      "cash": 43400,
       "d1Date": "",
       "d1": 0,
       "d2": 0
@@ -680,7 +680,7 @@
       "lots": 800,
       "perShare": 0.048,
       "amount": 38400,
-      "pending": true
+      "pending": false
     },
     {
       "id": "mo6n0fm3kvl",
@@ -784,7 +784,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1777457441544,
+  "_ts": 1777518312227,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
