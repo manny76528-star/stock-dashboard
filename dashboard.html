@@ -5773,6 +5773,7 @@ function renderFpStocks(acct){
       if(days>7)annualRoi=roi*(365/days);
     }
     const pnlColor=pnl>=0?'#dc2626':'#16a34a';
+    return`<div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin-bottom:4px">
       <!-- 第一行：代號 + 張數 + 零股 + 刪除 -->
       <div style="display:flex;gap:4px;align-items:center;margin-bottom:6px">
         <input value="${s.code||''}" placeholder="代號"
