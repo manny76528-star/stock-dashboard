@@ -815,7 +815,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1777646232109,
+  "_ts": 1777646304854,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
@@ -1066,14 +1066,6 @@
         "buyDate": "2026-02-02",
         "buyPrice": 10.4,
         "oddShares": 50
-      },
-      {
-        "code": "009805",
-        "lots": 11,
-        "price": 16.42,
-        "buyDate": "2026-04-30",
-        "buyPrice": 16.05,
-        "oddShares": 732
       }
     ],
     "bStocks": [
