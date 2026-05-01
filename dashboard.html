@@ -2345,7 +2345,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
 </div>
 
 <!-- ══ 持股清單 Modal ══ -->
-<div class="mo" id="fp-stocks-modal" style="z-index:1100">
+<div class="mo" id="fp-stocks-modal" style="z-index:2000">
   <div class="modal" style="max-width:700px;width:100%">
     <div class="mt">
       <h3 id="fp-stocks-modal-title">📊 持股清單</h3>
@@ -5915,15 +5915,17 @@ function openFpStocksModal(acct){
   _fpModalAcct=acct;
   const title=acct==='b'?'📈 B 富邦證券 — 持股清單':'💰 C 凱基證券 — 持股清單';
   document.getElementById('fp-stocks-modal-title').textContent=title;
-  // 更新新增按鈕
   const addBtn=document.getElementById('fp-stocks-modal-add');
   if(addBtn)addBtn.onclick=()=>addFpStockModal(acct);
   renderFpStocksModal(acct);
-  openModal('fp-stocks-modal');
+  // 直接設定 style 並用超高 z-index 確保在 sp-overlay 上面
+  const modal=document.getElementById('fp-stocks-modal');
+  modal.style.display='flex';
+  modal.style.zIndex='9000';
 }
 function closeFpStocksModal(){
-  closeModal('fp-stocks-modal');
-  // 關閉時更新主畫面市值
+  const modal=document.getElementById('fp-stocks-modal');
+  modal.style.display='none';
   updateFpMktVal('b');
   updateFpMktVal('c');
   calcFinPlan();
