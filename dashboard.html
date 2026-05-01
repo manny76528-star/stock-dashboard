@@ -5798,28 +5798,45 @@ function renderFpStocks(acct){
       const pCost=(p.buyPrice||0)*ps;
       const pPnl=(s.price||0)*ps-pCost;
       const pColor=pPnl>=0?'#dc2626':'#16a34a';
+      const editId=`fp-${acct}-edit-${i}-${pi}`;
+      const viewId=`fp-${acct}-view-${i}-${pi}`;
       return`<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:7px 10px;margin-bottom:4px">
-        <div style="display:flex;gap:4px;align-items:center;margin-bottom:4px">
-          <input type="date" value="${p.buyDate||''}"
-            style="flex:2;padding:3px 6px;border:1px solid var(--border);border-radius:5px;font-size:11px"
-            onchange="updateFpPurchase('${acct}',${i},${pi},'buyDate',this.value)">
-          <input value="${p.buyPrice||''}" placeholder="買入價" type="number" step="0.01"
-            style="flex:1;padding:3px 6px;border:1px solid var(--border);border-radius:5px;font-size:11px"
-            onchange="updateFpPurchase('${acct}',${i},${pi},'buyPrice',+this.value)">
-          <span style="font-size:10px;color:#64748b">元</span>
+        <!-- 唯讀模式 -->
+        <div id="${viewId}" style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+          <div style="font-size:12px;font-weight:700;color:#1e293b;font-family:'JetBrains Mono',monospace">${p.buyDate||'—'}</div>
+          <div style="font-size:11px;color:#64748b">買入價 <b style="color:#1e293b">$${p.buyPrice||0}</b></div>
+          <div style="font-size:11px;color:#64748b">${p.lots||0}張 ${p.oddShares?p.oddShares+'股':''}</div>
+          <div style="font-size:11px;font-weight:700;color:${pColor}">${pPnl>=0?'+':''}${Math.round(pPnl).toLocaleString()}</div>
+          <div style="display:flex;gap:4px">
+            <button onclick="toggleFpPurchaseEdit('${editId}','${viewId}')"
+              style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:5px;padding:2px 8px;font-size:11px;color:#2563eb;cursor:pointer">✏️</button>
+            <button onclick="removeFpPurchase('${acct}',${i},${pi})"
+              style="background:#fef2f2;border:1px solid #fecaca;border-radius:5px;padding:2px 8px;font-size:11px;color:#dc2626;cursor:pointer">✕</button>
+          </div>
         </div>
-        <div style="display:flex;gap:4px;align-items:center">
-          <input value="${p.lots||0}" placeholder="張" type="number" min="0"
-            style="flex:1;padding:3px 6px;border:1px solid var(--border);border-radius:5px;font-size:11px;text-align:center"
-            onchange="updateFpPurchase('${acct}',${i},${pi},'lots',+this.value)">
-          <span style="font-size:10px;color:#64748b">張</span>
-          <input value="${p.oddShares||0}" placeholder="零股" type="number" min="0"
-            style="flex:1;padding:3px 6px;border:1px solid var(--border);border-radius:5px;font-size:11px;text-align:center"
-            onchange="updateFpPurchase('${acct}',${i},${pi},'oddShares',+this.value)">
-          <span style="font-size:10px;color:#64748b">股</span>
-          <span style="font-size:11px;font-weight:700;color:${pColor};min-width:60px;text-align:right">${pPnl>=0?'+':''}${Math.round(pPnl).toLocaleString()}</span>
-          <button onclick="removeFpPurchase('${acct}',${i},${pi})"
-            style="background:#fef2f2;border:1px solid #fecaca;border-radius:5px;padding:2px 7px;font-size:11px;color:#dc2626;cursor:pointer">✕</button>
+        <!-- 編輯模式（預設隱藏）-->
+        <div id="${editId}" style="display:none">
+          <div style="display:flex;gap:4px;align-items:center;margin-bottom:4px">
+            <input type="date" value="${p.buyDate||''}"
+              style="flex:2;padding:3px 6px;border:1px solid var(--border);border-radius:5px;font-size:11px"
+              onchange="updateFpPurchase('${acct}',${i},${pi},'buyDate',this.value)">
+            <input value="${p.buyPrice||''}" placeholder="買入價" type="number" step="0.01"
+              style="flex:1;padding:3px 6px;border:1px solid var(--border);border-radius:5px;font-size:11px"
+              onchange="updateFpPurchase('${acct}',${i},${pi},'buyPrice',+this.value)">
+            <span style="font-size:10px;color:#64748b">元</span>
+          </div>
+          <div style="display:flex;gap:4px;align-items:center">
+            <input value="${p.lots||0}" type="number" min="0"
+              style="flex:1;padding:3px 6px;border:1px solid var(--border);border-radius:5px;font-size:11px;text-align:center"
+              onchange="updateFpPurchase('${acct}',${i},${pi},'lots',+this.value)">
+            <span style="font-size:10px;color:#64748b">張</span>
+            <input value="${p.oddShares||0}" type="number" min="0"
+              style="flex:1;padding:3px 6px;border:1px solid var(--border);border-radius:5px;font-size:11px;text-align:center"
+              onchange="updateFpPurchase('${acct}',${i},${pi},'oddShares',+this.value)">
+            <span style="font-size:10px;color:#64748b">股</span>
+            <button onclick="toggleFpPurchaseEdit('${editId}','${viewId}')"
+              style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:5px;padding:2px 8px;font-size:11px;color:#16a34a;cursor:pointer">✓ 完成</button>
+          </div>
         </div>
       </div>`;
     }).join('');
@@ -5869,6 +5886,15 @@ function renderFpStocks(acct){
       </div>
     </div>`;
   }).join('');
+}
+
+function toggleFpPurchaseEdit(editId,viewId){
+  const edit=document.getElementById(editId);
+  const view=document.getElementById(viewId);
+  if(!edit||!view)return;
+  const isEditing=edit.style.display!=='none';
+  edit.style.display=isEditing?'none':'block';
+  view.style.display=isEditing?'flex':'none';
 }
 
 function toggleFpDetail(id){
