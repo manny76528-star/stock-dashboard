@@ -2211,16 +2211,6 @@ body:not(.privacy) .privacy-mask{filter:none;}
         <div style="border:1px solid var(--border);border-radius:10px;padding:12px;background:#f8fafc">
           <div style="font-weight:700;color:#1e293b;font-size:13px;margin-bottom:10px">📈 B 富邦證券</div>
 
-          <!-- 持股清單 -->
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;cursor:pointer" onclick="toggleFpStocks('b')">
-            <div style="font-size:11px;font-weight:700;color:#475569">📊 持股清單（自動抓股價）</div>
-            <span id="fp-b-stocks-arrow" style="font-size:11px;color:#94a3b8">▲</span>
-          </div>
-          <div id="fp-b-stocks-wrap" style="display:block">
-            <div id="fp-b-stocks" style="display:flex;flex-direction:column;gap:4px;margin-bottom:6px"></div>
-            <button onclick="addFpStock('b')" style="width:100%;padding:4px;border:1px dashed #cbd5e1;border-radius:6px;background:transparent;font-size:11px;color:#64748b;cursor:pointer;margin-bottom:8px">＋ 新增持股</button>
-          </div>
-
           <!-- 市值顯示 -->
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">
             <div style="background:#fff;border:1px solid var(--border);border-radius:6px;padding:7px 10px">
@@ -2229,9 +2219,15 @@ body:not(.privacy) .privacy-mask{filter:none;}
             </div>
             <div style="background:#fff;border:1px solid var(--border);border-radius:6px;padding:7px 10px">
               <div style="font-size:9px;color:#94a3b8;margin-bottom:2px">淨市值（扣借貸）</div>
-              <div style="font-size:14px;font-weight:700;color:#16a34a" id="fp-b-netval">$0</div>
+              <div style="font-size:14px;font-weight:700;color:#dc2626" id="fp-b-netval">$0</div>
             </div>
           </div>
+
+          <!-- 持股清單按鈕 -->
+          <button onclick="openFpStocksModal('b')"
+            style="width:100%;padding:8px;background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:8px;font-size:12px;font-weight:700;color:#2563eb;cursor:pointer;margin-bottom:8px">
+            📊 查看/編輯持股清單
+          </button>
 
           <!-- 借貸金額 -->
           <div style="font-size:11px;color:#64748b;margin-bottom:2px">💳 目前借貸金額（元）</div>
@@ -2251,16 +2247,6 @@ body:not(.privacy) .privacy-mask{filter:none;}
         <div style="border:1px solid var(--border);border-radius:10px;padding:12px;background:#f8fafc">
           <div style="font-weight:700;color:#1e293b;font-size:13px;margin-bottom:10px">💰 C 凱基證券</div>
 
-          <!-- 持股清單 -->
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;cursor:pointer" onclick="toggleFpStocks('c')">
-            <div style="font-size:11px;font-weight:700;color:#475569">📊 持股清單（自動抓股價）</div>
-            <span id="fp-c-stocks-arrow" style="font-size:11px;color:#94a3b8">▲</span>
-          </div>
-          <div id="fp-c-stocks-wrap" style="display:block">
-            <div id="fp-c-stocks" style="display:flex;flex-direction:column;gap:4px;margin-bottom:6px"></div>
-            <button onclick="addFpStock('c')" style="width:100%;padding:4px;border:1px dashed #cbd5e1;border-radius:6px;background:transparent;font-size:11px;color:#64748b;cursor:pointer;margin-bottom:8px">＋ 新增持股</button>
-          </div>
-
           <!-- 市值顯示 -->
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">
             <div style="background:#fff;border:1px solid var(--border);border-radius:6px;padding:7px 10px">
@@ -2269,9 +2255,15 @@ body:not(.privacy) .privacy-mask{filter:none;}
             </div>
             <div style="background:#fff;border:1px solid var(--border);border-radius:6px;padding:7px 10px">
               <div style="font-size:9px;color:#94a3b8;margin-bottom:2px">淨市值（扣借貸）</div>
-              <div style="font-size:14px;font-weight:700;color:#16a34a" id="fp-c-netval">$0</div>
+              <div style="font-size:14px;font-weight:700;color:#dc2626" id="fp-c-netval">$0</div>
             </div>
           </div>
+
+          <!-- 持股清單按鈕 -->
+          <button onclick="openFpStocksModal('c')"
+            style="width:100%;padding:8px;background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:8px;font-size:12px;font-weight:700;color:#2563eb;cursor:pointer;margin-bottom:8px">
+            📊 查看/編輯持股清單
+          </button>
 
           <!-- 借貸金額 -->
           <div style="font-size:11px;color:#64748b;margin-bottom:2px">💳 目前借貸金額（元）</div>
@@ -2348,6 +2340,31 @@ body:not(.privacy) .privacy-mask{filter:none;}
         </select>
       </div>
       <div id="journal-list" style="padding:12px 16px;display:flex;flex-direction:column;gap:10px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 持股清單 Modal ══ -->
+<div class="mo" id="fp-stocks-modal" style="z-index:1100">
+  <div class="modal" style="max-width:700px;width:100%">
+    <div class="mt">
+      <h3 id="fp-stocks-modal-title">📊 持股清單</h3>
+      <button onclick="closeFpStocksModal()" style="background:none;border:none;font-size:18px;cursor:pointer;color:#94a3b8">✕</button>
+    </div>
+    <!-- 彙整資訊 -->
+    <div id="fp-stocks-modal-summary" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:12px 16px;background:#f8fafc;border-bottom:1px solid var(--border)"></div>
+    <!-- 持股列表 -->
+    <div style="padding:14px 16px;max-height:60vh;overflow-y:auto">
+      <div id="fp-stocks-modal-list"></div>
+      <button id="fp-stocks-modal-add" onclick=""
+        style="width:100%;padding:10px;border:1.5px dashed #cbd5e1;border-radius:8px;background:transparent;font-size:13px;font-weight:700;color:#64748b;cursor:pointer;margin-top:8px">
+        ＋ 新增持股
+      </button>
+    </div>
+    <!-- 底部按鈕 -->
+    <div style="padding:12px 16px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+      <button onclick="refreshFpPrices()" style="padding:8px 16px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;font-size:12px;font-weight:700;color:#2563eb;cursor:pointer">🔄 重新抓股價</button>
+      <button onclick="closeFpStocksModal()" style="padding:8px 20px;background:#1e3a5f;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">完成</button>
     </div>
   </div>
 </div>
@@ -5774,6 +5791,11 @@ function toggleFpStocks(acct){
 function renderFpStocks(acct){
   const wrap=document.getElementById('fp-'+acct+'-stocks');
   if(!wrap)return;
+  // 如果 modal 開著，同步更新 summary
+  const modal=document.getElementById('fp-stocks-modal');
+  if(modal&&modal.style.display!=='none'&&_fpModalAcct===acct){
+    setTimeout(()=>renderFpStocksModal(acct),0);
+  }
   const stocks=(db.finPlan||{})[acct+'Stocks']||[];
   if(stocks.length===0){
     wrap.innerHTML='<div style="font-size:11px;color:#94a3b8;padding:4px 0">尚無持股，點下方新增</div>';
@@ -5886,6 +5908,76 @@ function renderFpStocks(acct){
       </div>
     </div>`;
   }).join('');
+}
+
+let _fpModalAcct='b';
+function openFpStocksModal(acct){
+  _fpModalAcct=acct;
+  const title=acct==='b'?'📈 B 富邦證券 — 持股清單':'💰 C 凱基證券 — 持股清單';
+  document.getElementById('fp-stocks-modal-title').textContent=title;
+  // 更新新增按鈕
+  const addBtn=document.getElementById('fp-stocks-modal-add');
+  if(addBtn)addBtn.onclick=()=>addFpStockModal(acct);
+  renderFpStocksModal(acct);
+  openModal('fp-stocks-modal');
+}
+function closeFpStocksModal(){
+  closeModal('fp-stocks-modal');
+  // 關閉時更新主畫面市值
+  updateFpMktVal('b');
+  updateFpMktVal('c');
+  calcFinPlan();
+}
+function renderFpStocksModal(acct){
+  const stocks=(db.finPlan||{})[acct+'Stocks']||[];
+  // 彙整
+  let totalMkt=0,totalCost=0;
+  stocks.forEach(s=>{
+    const purchases=s.purchases||[{lots:s.lots||0,oddShares:s.oddShares||0,buyPrice:s.buyPrice||0}];
+    const sh=purchases.reduce((a,p)=>(p.lots||0)*1000+(p.oddShares||0)+a,0);
+    totalMkt+=(s.price||0)*sh;
+    totalCost+=purchases.reduce((a,p)=>(p.buyPrice||0)*((p.lots||0)*1000+(p.oddShares||0))+a,0);
+  });
+  const loan=(db.finPlan||{})[acct+'Loan']||0;
+  const pnl=totalMkt-totalCost;
+  const pnlColor=pnl>=0?'#dc2626':'#16a34a';
+  const summary=document.getElementById('fp-stocks-modal-summary');
+  if(summary) summary.innerHTML=`
+    <div style="text-align:center;padding:8px;background:#fff;border-radius:8px;border:1px solid var(--border)">
+      <div style="font-size:10px;color:#94a3b8;margin-bottom:3px">股票市值</div>
+      <div style="font-size:16px;font-weight:800;color:#dc2626">$${Math.round(totalMkt).toLocaleString()}</div>
+    </div>
+    <div style="text-align:center;padding:8px;background:#fff;border-radius:8px;border:1px solid var(--border)">
+      <div style="font-size:10px;color:#94a3b8;margin-bottom:3px">淨市值（扣借貸）</div>
+      <div style="font-size:16px;font-weight:800;color:#dc2626">$${Math.round(totalMkt-loan).toLocaleString()}</div>
+    </div>
+    <div style="text-align:center;padding:8px;background:#fff;border-radius:8px;border:1px solid var(--border)">
+      <div style="font-size:10px;color:#94a3b8;margin-bottom:3px">總損益</div>
+      <div style="font-size:16px;font-weight:800;color:${pnlColor}">${pnl>=0?'+':''}$${Math.round(pnl).toLocaleString()}</div>
+    </div>`;
+  // 持股列表
+  const list=document.getElementById('fp-stocks-modal-list');
+  if(!list)return;
+  // 把 renderFpStocks 的結果放進這個 modal 的隱藏 div，再讀出來
+  // 用獨立的容器渲染
+  const tmp=document.createElement('div');
+  tmp.id='fp-'+acct+'-stocks';
+  tmp.style.display='none';
+  document.body.appendChild(tmp);
+  renderFpStocks(acct);
+  list.innerHTML=tmp.innerHTML;
+  document.body.removeChild(tmp);
+  // 重新設定 onclick 讓 modal 裡的操作正確綁定
+  // 直接讓 renderFpStocks 輸出到 modal list
+  list.innerHTML='';
+  const wrap=document.createElement('div');
+  wrap.id='fp-'+acct+'-stocks';
+  list.appendChild(wrap);
+  renderFpStocks(acct);
+}
+function addFpStockModal(acct){
+  addFpStock(acct);
+  renderFpStocksModal(acct);
 }
 
 function toggleFpPurchaseEdit(editId,viewId){
