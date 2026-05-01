@@ -5780,74 +5780,184 @@ function renderFpStocks(acct){
     return;
   }
   wrap.innerHTML=stocks.map((s,i)=>{
-    // 總股數 = 張數*1000 + 零股數
-    const totalShares=(s.lots||0)*1000+(s.oddShares||0);
+    // 相容舊格式：把舊的單筆轉成 purchases 陣列
+    const purchases=s.purchases||[{lots:s.lots||0,oddShares:s.oddShares||0,buyDate:s.buyDate||'',buyPrice:s.buyPrice||0}];
+    // 彙整
+    const totalShares=purchases.reduce((s,p)=>(p.lots||0)*1000+(p.oddShares||0)+s,0);
+    const totalCost=purchases.reduce((s,p)=>s+(p.buyPrice||0)*((p.lots||0)*1000+(p.oddShares||0)),0);
     const mktVal=(s.price||0)*totalShares;
-    const cost=(s.buyPrice||0)*totalShares;
-    const pnl=mktVal-cost;
-    const roi=cost>0?((mktVal-cost)/cost*100):null;
-    let annualRoi=null;
-    if(s.buyDate&&roi!==null){
-      const days=(Date.now()-new Date(s.buyDate).getTime())/(1000*60*60*24);
-      if(days>7)annualRoi=roi*(365/days);
-    }
+    const pnl=mktVal-totalCost;
+    const roi=totalCost>0?(pnl/totalCost*100):null;
     const pnlColor=pnl>=0?'#dc2626':'#16a34a';
-    return`<div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin-bottom:4px">
-      <!-- 第一行：代號 + 張數 + 零股 + 刪除 -->
-      <div style="display:flex;gap:4px;align-items:center;margin-bottom:6px">
+    const avgCost=totalShares>0?totalCost/totalShares:0;
+
+    // 各批明細 HTML
+    const detailId=`fp-${acct}-detail-${i}`;
+    const purchaseRows=purchases.map((p,pi)=>{
+      const ps=(p.lots||0)*1000+(p.oddShares||0);
+      const pCost=(p.buyPrice||0)*ps;
+      const pPnl=(s.price||0)*ps-pCost;
+      const pColor=pPnl>=0?'#dc2626':'#16a34a';
+      return`<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:7px 10px;margin-bottom:4px">
+        <div style="display:flex;gap:4px;align-items:center;margin-bottom:4px">
+          <input type="date" value="${p.buyDate||''}"
+            style="flex:2;padding:3px 6px;border:1px solid var(--border);border-radius:5px;font-size:11px"
+            onchange="updateFpPurchase('${acct}',${i},${pi},'buyDate',this.value)">
+          <input value="${p.buyPrice||''}" placeholder="買入價" type="number" step="0.01"
+            style="flex:1;padding:3px 6px;border:1px solid var(--border);border-radius:5px;font-size:11px"
+            onchange="updateFpPurchase('${acct}',${i},${pi},'buyPrice',+this.value)">
+          <span style="font-size:10px;color:#64748b">元</span>
+        </div>
+        <div style="display:flex;gap:4px;align-items:center">
+          <input value="${p.lots||0}" placeholder="張" type="number" min="0"
+            style="flex:1;padding:3px 6px;border:1px solid var(--border);border-radius:5px;font-size:11px;text-align:center"
+            onchange="updateFpPurchase('${acct}',${i},${pi},'lots',+this.value)">
+          <span style="font-size:10px;color:#64748b">張</span>
+          <input value="${p.oddShares||0}" placeholder="零股" type="number" min="0"
+            style="flex:1;padding:3px 6px;border:1px solid var(--border);border-radius:5px;font-size:11px;text-align:center"
+            onchange="updateFpPurchase('${acct}',${i},${pi},'oddShares',+this.value)">
+          <span style="font-size:10px;color:#64748b">股</span>
+          <span style="font-size:11px;font-weight:700;color:${pColor};min-width:60px;text-align:right">${pPnl>=0?'+':''}${Math.round(pPnl).toLocaleString()}</span>
+          <button onclick="removeFpPurchase('${acct}',${i},${pi})"
+            style="background:#fef2f2;border:1px solid #fecaca;border-radius:5px;padding:2px 7px;font-size:11px;color:#dc2626;cursor:pointer">✕</button>
+        </div>
+      </div>`;
+    }).join('');
+
+    return`<div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin-bottom:6px">
+      <!-- 彙整標題列 -->
+      <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px">
         <input value="${s.code||''}" placeholder="代號"
-          style="flex:2;padding:4px 6px;border:1px solid var(--border);border-radius:6px;font-size:11px;font-family:'JetBrains Mono',monospace;font-weight:700"
-          onchange="updateFpStock('${acct}',${i},'code',this.value)">
-        <input value="${s.lots||0}" placeholder="張" type="number" min="0"
-          style="flex:1;padding:4px 6px;border:1px solid var(--border);border-radius:6px;font-size:11px;text-align:center"
-          onchange="updateFpStock('${acct}',${i},'lots',+this.value)">
-        <span style="font-size:10px;color:#64748b;white-space:nowrap">張</span>
-        <input value="${s.oddShares||0}" placeholder="零股" type="number" min="0" max="999"
-          style="flex:1;padding:4px 6px;border:1px solid var(--border);border-radius:6px;font-size:11px;text-align:center"
-          onchange="updateFpStock('${acct}',${i},'oddShares',+this.value)">
-        <span style="font-size:10px;color:#64748b;white-space:nowrap">股</span>
-        <button onclick="removeFpStock('${acct}',${i})" style="background:#fef2f2;border:1px solid #fecaca;border-radius:5px;padding:2px 8px;font-size:11px;color:#dc2626;cursor:pointer">✕</button>
+          style="width:90px;padding:4px 6px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-family:'JetBrains Mono',monospace;font-weight:700"
+          onchange="updateFpStockCode('${acct}',${i},this.value)">
+        <div style="flex:1;display:grid;grid-template-columns:repeat(4,1fr);gap:4px">
+          <div style="background:#f8fafc;border-radius:5px;padding:3px 5px;text-align:center">
+            <div style="font-size:9px;color:#94a3b8">現價</div>
+            <div style="font-size:11px;font-weight:700;color:#dc2626">${s.price?'$'+s.price:'—'}</div>
+          </div>
+          <div style="background:#f8fafc;border-radius:5px;padding:3px 5px;text-align:center">
+            <div style="font-size:9px;color:#94a3b8">市值</div>
+            <div style="font-size:11px;font-weight:700;color:#1e293b">${mktVal>0?'$'+Math.round(mktVal).toLocaleString():'—'}</div>
+          </div>
+          <div style="background:#f8fafc;border-radius:5px;padding:3px 5px;text-align:center">
+            <div style="font-size:9px;color:#94a3b8">損益</div>
+            <div style="font-size:11px;font-weight:700;color:${pnlColor}">${totalCost>0?(pnl>=0?'+':'')+Math.round(pnl).toLocaleString():'—'}</div>
+          </div>
+          <div style="background:#f8fafc;border-radius:5px;padding:3px 5px;text-align:center">
+            <div style="font-size:9px;color:#94a3b8">報酬</div>
+            <div style="font-size:11px;font-weight:700;color:${pnlColor}">${roi!==null?(roi>=0?'+':'')+roi.toFixed(1)+'%':'—'}</div>
+          </div>
+        </div>
+        <button onclick="removeFpStock('${acct}',${i})"
+          style="background:#fef2f2;border:1px solid #fecaca;border-radius:5px;padding:3px 8px;font-size:11px;color:#dc2626;cursor:pointer">🗑</button>
       </div>
-      <!-- 第二行：買入日期 + 買入價格 -->
-      <div style="display:flex;gap:4px;align-items:center;margin-bottom:6px">
-        <input type="date" value="${s.buyDate||''}"
-          style="flex:2;padding:4px 6px;border:1px solid var(--border);border-radius:6px;font-size:11px"
-          onchange="updateFpStock('${acct}',${i},'buyDate',this.value)">
-        <input value="${s.buyPrice||''}" placeholder="買入價" type="number" step="0.01"
-          style="flex:1;padding:4px 6px;border:1px solid var(--border);border-radius:6px;font-size:11px"
-          onchange="updateFpStock('${acct}',${i},'buyPrice',+this.value)">
-        <span style="font-size:10px;color:#64748b">元</span>
+      <!-- 彙整資訊 -->
+      <div style="font-size:10px;color:#64748b;margin-bottom:6px">
+        共 ${totalShares.toLocaleString()} 股（${purchases.length}筆）・均成本 $${avgCost.toFixed(2)}
       </div>
-      <!-- 第三行：現價 + 市值 + 損益 + 年化 -->
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px">
-        <div style="background:#f8fafc;border-radius:5px;padding:4px 6px;text-align:center">
-          <div style="font-size:9px;color:#94a3b8">現價</div>
-          <div style="font-size:11px;font-weight:700;color:#dc2626">${s.price?'$'+s.price:'—'}</div>
+      <!-- 展開/收起明細 -->
+      <div style="border-top:1px dashed #e2e8f0;padding-top:6px">
+        <div onclick="toggleFpDetail('${detailId}')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;font-size:11px;color:#475569;font-weight:700;margin-bottom:4px">
+          <span>📋 買入明細</span>
+          <span id="${detailId}-arrow">▼ 展開</span>
         </div>
-        <div style="background:#f8fafc;border-radius:5px;padding:4px 6px;text-align:center">
-          <div style="font-size:9px;color:#94a3b8">市值</div>
-          <div style="font-size:11px;font-weight:700;color:#1e293b">${mktVal>0?'$'+Math.round(mktVal).toLocaleString():'—'}</div>
-        </div>
-        <div style="background:#f8fafc;border-radius:5px;padding:4px 6px;text-align:center">
-          <div style="font-size:9px;color:#94a3b8">損益</div>
-          <div style="font-size:11px;font-weight:700;color:${pnlColor}">${cost>0?(pnl>=0?'+':'')+Math.round(pnl).toLocaleString():'—'}</div>
-        </div>
-        <div style="background:#f8fafc;border-radius:5px;padding:4px 6px;text-align:center">
-          <div style="font-size:9px;color:#94a3b8">年化</div>
-          <div style="font-size:11px;font-weight:700;color:${pnlColor}">${annualRoi!==null?(annualRoi>=0?'+':'')+annualRoi.toFixed(1)+'%':'—'}</div>
+        <div id="${detailId}" style="display:none">
+          ${purchaseRows}
+          <button onclick="addFpPurchase('${acct}',${i})"
+            style="width:100%;padding:4px;border:1px dashed #cbd5e1;border-radius:6px;background:transparent;font-size:11px;color:#64748b;cursor:pointer;margin-top:2px">＋ 新增買入記錄</button>
         </div>
       </div>
-      <!-- 總股數提示 -->
-      <div style="font-size:10px;color:#94a3b8;margin-top:4px;text-align:right">共 ${totalShares.toLocaleString()} 股</div>
     </div>`;
   }).join('');
+}
+
+function toggleFpDetail(id){
+  const el=document.getElementById(id);
+  const arrow=document.getElementById(id+'-arrow');
+  if(!el)return;
+  const isOpen=el.style.display!=='none';
+  el.style.display=isOpen?'none':'block';
+  if(arrow)arrow.textContent=isOpen?'▼ 展開':'▲ 收起';
+}
+
+function updateFpStockCode(acct,idx,val){
+  if(!db.finPlan?.[acct+'Stocks'])return;
+  db.finPlan[acct+'Stocks'][idx].code=val;
+  save();
+  if(val.length>=4){
+    fetchPrice(val).then(p=>{
+      if(p&&p.price){
+        db.finPlan[acct+'Stocks'][idx].price=p.price;
+        save();
+        renderFpStocks(acct);
+        updateFpMktVal(acct);
+        calcFinPlan();
+      }
+    });
+  }
+}
+
+function addFpPurchase(acct,idx){
+  if(!db.finPlan?.[acct+'Stocks'])return;
+  const s=db.finPlan[acct+'Stocks'][idx];
+  if(!s.purchases){
+    // 舊格式轉換
+    s.purchases=[{lots:s.lots||0,oddShares:s.oddShares||0,buyDate:s.buyDate||'',buyPrice:s.buyPrice||0}];
+    delete s.lots;delete s.oddShares;delete s.buyDate;delete s.buyPrice;
+  }
+  const today=new Date().toISOString().slice(0,10);
+  s.purchases.push({lots:0,oddShares:0,buyDate:today,buyPrice:s.price||0});
+  save();
+  renderFpStocks(acct);
+  // 展開明細
+  setTimeout(()=>{
+    const detailId=`fp-${acct}-detail-${idx}`;
+    const el=document.getElementById(detailId);
+    const arrow=document.getElementById(detailId+'-arrow');
+    if(el)el.style.display='block';
+    if(arrow)arrow.textContent='▲ 收起';
+  },50);
+}
+
+function updateFpPurchase(acct,idx,pidx,field,val){
+  if(!db.finPlan?.[acct+'Stocks']?.[idx])return;
+  const s=db.finPlan[acct+'Stocks'][idx];
+  if(!s.purchases) s.purchases=[{lots:s.lots||0,oddShares:s.oddShares||0,buyDate:s.buyDate||'',buyPrice:s.buyPrice||0}];
+  s.purchases[pidx][field]=val;
+  save();
+  renderFpStocks(acct);
+  updateFpMktVal(acct);
+  calcFinPlan();
+}
+
+function removeFpPurchase(acct,idx,pidx){
+  if(!db.finPlan?.[acct+'Stocks']?.[idx])return;
+  const s=db.finPlan[acct+'Stocks'][idx];
+  if(!s.purchases||s.purchases.length<=1){
+    toast('⚠️ 最少要有一筆買入記錄');return;
+  }
+  doubleConfirm('確定刪除這筆買入記錄？')&&(()=>{
+    undoStack.push(JSON.stringify(db));
+    if(undoStack.length>15)undoStack.shift();
+    const _ub=document.getElementById('undoBtn');if(_ub)_ub.disabled=false;
+    s.purchases.splice(pidx,1);
+    localStorage.setItem(STORE,JSON.stringify(db));
+    schedulePush();
+    renderFpStocks(acct);
+    updateFpMktVal(acct);
+    calcFinPlan();
+    toast('已刪除，可按「← 上一步」還原');
+  })();
 }
 
 function addFpStock(acct){
   if(!db.finPlan)db.finPlan={};
   if(!db.finPlan[acct+'Stocks'])db.finPlan[acct+'Stocks']=[];
   const today=new Date().toISOString().slice(0,10);
-  db.finPlan[acct+'Stocks'].push({code:'',lots:0,price:0,buyDate:today,buyPrice:0});
+  db.finPlan[acct+'Stocks'].push({
+    code:'',price:0,
+    purchases:[{lots:0,oddShares:0,buyDate:today,buyPrice:0}]
+  });
   save();
   renderFpStocks(acct);
 }
@@ -5855,13 +5965,11 @@ function addFpStock(acct){
 function removeFpStock(acct,idx){
   if(!db.finPlan?.[acct+'Stocks'])return;
   const s=db.finPlan[acct+'Stocks'][idx];
-  const name=s.code||(acct==='b'?'B富邦':'C凱基')+'持股';
-  if(!confirm(`確定要刪除「${name}」嗎？\n\n刪除後可按左上角「← 上一步」還原`))return;
-  // 先存一次當前狀態到 undoStack，確保刪除前的狀態被記錄
+  const name=s.code||'此持股';
+  if(!doubleConfirm(`確定要刪除「${name}」所有買入記錄？`))return;
   undoStack.push(JSON.stringify(db));
   if(undoStack.length>15)undoStack.shift();
   const _ub=document.getElementById('undoBtn');if(_ub)_ub.disabled=false;
-  // 執行刪除
   db.finPlan[acct+'Stocks'].splice(idx,1);
   localStorage.setItem(STORE,JSON.stringify(db));
   schedulePush();
@@ -5895,11 +6003,12 @@ function updateFpStock(acct,idx,field,val){
 
 function updateFpMktVal(acct){
   const stocks=(db.finPlan||{})[acct+'Stocks']||[];
-  const mktVal=stocks.reduce((s,st)=>{
-    const totalShares=(st.lots||0)*1000+(st.oddShares||0);
-    return s+(st.price||0)*totalShares;
+  const mktVal=stocks.reduce((sum,st)=>{
+    const purchases=st.purchases||[{lots:st.lots||0,oddShares:st.oddShares||0}];
+    const totalShares=purchases.reduce((s,p)=>(p.lots||0)*1000+(p.oddShares||0)+s,0);
+    return sum+(st.price||0)*totalShares;
   },0);
-  const loan=parseFloat(document.getElementById('fp-'+acct+'-loan')?.value)||0;
+  const loan=parseFloat(document.getElementById('fp-'+acct+'-loan')?.value)||(db.finPlan?.[acct+'Loan']||0);
   const netVal=mktVal-loan;
   const mktEl=document.getElementById('fp-'+acct+'-mktval');
   const netEl=document.getElementById('fp-'+acct+'-netval');
@@ -6016,9 +6125,10 @@ function calcFinPlan(){
   // 計算 B/C 淨市值作為起始資產（直接從 db 讀，不依賴 DOM）
   const calcNetVal=(acct)=>{
     const stocks=(db.finPlan||{})[acct+'Stocks']||[];
-    const mktVal=stocks.reduce((s,st)=>{
-      const totalShares=(st.lots||0)*1000+(st.oddShares||0);
-      return s+(st.price||0)*totalShares;
+    const mktVal=stocks.reduce((sum,st)=>{
+      const purchases=st.purchases||[{lots:st.lots||0,oddShares:st.oddShares||0}];
+      const totalShares=purchases.reduce((s,p)=>(p.lots||0)*1000+(p.oddShares||0)+s,0);
+      return sum+(st.price||0)*totalShares;
     },0);
     const loan=(db.finPlan||{})[acct+'Loan']||gv('fp-'+acct+'-loan');
     return mktVal-loan;
