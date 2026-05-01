@@ -815,7 +815,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1777646776315,
+  "_ts": 1777646794340,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
@@ -1062,10 +1062,18 @@
       {
         "code": "00981D",
         "lots": 146,
-        "price": 10.37,
+        "oddShares": 50,
         "buyDate": "2026-02-02",
         "buyPrice": 10.4,
-        "oddShares": 50
+        "price": 10.37
+      },
+      {
+        "code": "009805",
+        "lots": 11,
+        "oddShares": 732,
+        "buyDate": "2026-04-08",
+        "buyPrice": 16.05,
+        "price": 0
       }
     ],
     "bStocks": [
