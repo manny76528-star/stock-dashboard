@@ -815,7 +815,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1777650712858,
+  "_ts": 1777650720491,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
@@ -1100,8 +1100,8 @@
         "buyPrice": 10.54
       },
       {
-        "code": "",
-        "price": 0,
+        "code": "00986a",
+        "price": 13.52,
         "purchases": [
           {
             "lots": 0,
