@@ -815,7 +815,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1777647010574,
+  "_ts": 1777647039190,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
@@ -1056,7 +1056,7 @@
     "cMonthly": 16000,
     "cAnnual": 80000,
     "cRate": 5,
-    "bLoan": 0,
+    "bLoan": 600000,
     "cLoan": 1000000,
     "cStocks": [
       {
