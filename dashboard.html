@@ -3557,20 +3557,32 @@ function renderLoans(){
         const preDivTotal=preDivs.reduce((s,d)=>s+(d.amount||0),0);
         const preDivRounded=Math.round(preDivTotal);
 
-        // 同帳戶其他貸款扣款（在本筆扣款前）
-        const in30=new Date(todayD.getTime()+30*86400000);
+        // 找這筆貸款的下次扣款日
+        const dDay2=parseInt(l.deductDay)||0;
+        const thisMonth2=new Date(todayD.getFullYear(),todayD.getMonth(),dDay2);
+        const nextDeductDate=thisMonth2>todayD
+          ?thisMonth2
+          :new Date(todayD.getFullYear(),todayD.getMonth()+1,dDay2);
+
+        // 找在今天到這筆扣款日之間所有同帳戶的扣款（包含這筆本身）
         const upcoming=[];
         db.loans.forEach(loan=>{
           if(loan.deductBank!==l.deductBank||!loan.deductDay)return;
           const d=parseInt(loan.deductDay)||0;if(!d)return;
-          for(let mo=0;mo<=1;mo++){
+          for(let mo=0;mo<=2;mo++){
             const dt=new Date(todayD.getFullYear(),todayD.getMonth()+mo,d);
-            if(dt>todayD&&dt<=in30)upcoming.push({loanId:loan.id,date:dt,monthly:loan.monthly||0});
+            if(dt>todayD&&dt<=nextDeductDate)
+              upcoming.push({loanId:loan.id,date:dt,monthly:loan.monthly||0});
           }
         });
         upcoming.sort((a,b)=>a.date-b.date);
         let runBal=accBal+preDivTotal,thisAfter=accBal+preDivTotal;
-        upcoming.forEach(item=>{runBal-=item.monthly;if(item.loanId===l.id)thisAfter=runBal;});
+        upcoming.forEach(item=>{
+          runBal-=item.monthly;
+          if(item.loanId===l.id)thisAfter=runBal;
+        });
+        // 如果這筆不在upcoming（不應發生），用最終餘額
+        if(!upcoming.find(x=>x.loanId===l.id))thisAfter=runBal;
         const isShort=thisAfter<0;
         const afterAmt=Math.round(thisAfter);
 
