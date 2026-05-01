@@ -3271,7 +3271,11 @@ function calcLoanRemain(l){
   if(!l.amount||!l.rate||!l.start||!l.monthly)return l.remain||0;
   const start=new Date(l.start);
   const today=new Date();
-  const paid=Math.max(0,(today.getFullYear()-start.getFullYear())*12+(today.getMonth()-start.getMonth()));
+  // 計算已還幾期：考慮本月扣款日是否已到
+  const deductDay=parseInt(l.deductDay)||start.getDate();
+  let paid=(today.getFullYear()-start.getFullYear())*12+(today.getMonth()-start.getMonth());
+  // 如果今天還沒到本月扣款日，則本月這期還沒扣，paid 要減1
+  if(today.getDate()<deductDay) paid=Math.max(0,paid-1);
   const mr=l.rate/100/12;
   if(mr>0){
     const rem=l.amount*Math.pow(1+mr,paid)-l.monthly*(Math.pow(1+mr,paid)-1)/mr;
@@ -5835,6 +5839,9 @@ function addFpStock(acct){
 
 function removeFpStock(acct,idx){
   if(!db.finPlan?.[acct+'Stocks'])return;
+  const s=db.finPlan[acct+'Stocks'][idx];
+  const name=s.code||(acct==='b'?'B富邦':'C凱基')+'持股';
+  if(!confirm(`確定要刪除「${name}」嗎？\n\n刪除後可按「上一步」還原`))return;
   db.finPlan[acct+'Stocks'].splice(idx,1);
   save();
   renderFpStocks(acct);
