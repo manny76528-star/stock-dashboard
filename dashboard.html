@@ -5856,12 +5856,19 @@ function removeFpStock(acct,idx){
   if(!db.finPlan?.[acct+'Stocks'])return;
   const s=db.finPlan[acct+'Stocks'][idx];
   const name=s.code||(acct==='b'?'B富邦':'C凱基')+'持股';
-  if(!confirm(`確定要刪除「${name}」嗎？\n\n刪除後可按「上一步」還原`))return;
+  if(!confirm(`確定要刪除「${name}」嗎？\n\n刪除後可按左上角「← 上一步」還原`))return;
+  // 先存一次當前狀態到 undoStack，確保刪除前的狀態被記錄
+  undoStack.push(JSON.stringify(db));
+  if(undoStack.length>15)undoStack.shift();
+  const _ub=document.getElementById('undoBtn');if(_ub)_ub.disabled=false;
+  // 執行刪除
   db.finPlan[acct+'Stocks'].splice(idx,1);
-  save();
+  localStorage.setItem(STORE,JSON.stringify(db));
+  schedulePush();
   renderFpStocks(acct);
   updateFpMktVal(acct);
   calcFinPlan();
+  toast('已刪除，可按「← 上一步」還原');
 }
 
 function updateFpStock(acct,idx,field,val){
