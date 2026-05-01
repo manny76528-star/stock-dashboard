@@ -507,7 +507,7 @@
     {
       "id": "mncull1439i",
       "bank": "Line Bank",
-      "cash": 25600,
+      "cash": 13200,
       "d1Date": "",
       "d1": 0,
       "d2": 0
@@ -815,7 +815,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1777609917143,
+  "_ts": 1777611137303,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
@@ -1103,5 +1103,8 @@
   },
   "_fpBcAdded": {
     "fp_bc_added_2026-05": true
+  },
+  "_loanDeducted": {
+    "mncujjvii0z_2026-05": true
   }
 }
