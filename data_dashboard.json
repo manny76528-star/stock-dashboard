@@ -815,7 +815,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1777648601171,
+  "_ts": 1777648613762,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
@@ -1098,13 +1098,6 @@
         "price": 11.15,
         "buyDate": "2026-04-07",
         "buyPrice": 10.54
-      },
-      {
-        "code": "1234",
-        "lots": 1,
-        "price": 35.25,
-        "buyDate": "2026-05-01",
-        "buyPrice": 30
       }
     ]
   },
