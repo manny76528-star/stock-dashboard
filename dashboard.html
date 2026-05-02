@@ -6064,6 +6064,8 @@ function confirmFpBuy(){
   calcFinPlan();
   toast(`✅ 已新增 ${code} 買入記錄`);
 }
+
+function renderFpStocksModal(acct){
   const stocks=(db.finPlan||{})[acct+'Stocks']||[];
   // 彙整
   let totalMkt=0,totalCost=0;
