@@ -145,16 +145,24 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
     window.location.href='index.html';
     return;
   }
-  document.addEventListener('DOMContentLoaded',function(){
+  function showContent(){
     const mc=document.getElementById('main-content');
     if(mc)mc.style.display='block';
-  });
-  // 閒置計時
+  }
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',showContent);
+  } else {
+    showContent();
+  }
   let timer=null;
   function resetTimer(){
     localStorage.setItem(MASTER_TS,Date.now().toString());
     clearTimeout(timer);
-    timer=setTimeout(()=>window.location.href='index.html',TIMEOUT);
+    timer=setTimeout(()=>{
+      localStorage.removeItem(MASTER_KEY);
+      localStorage.removeItem(MASTER_TS);
+      window.location.href='index.html';
+    },TIMEOUT);
   }
   ['click','keydown','touchstart'].forEach(ev=>{
     document.addEventListener(ev,resetTimer,{passive:true});

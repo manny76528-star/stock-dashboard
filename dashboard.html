@@ -222,16 +222,26 @@ body:not(.privacy) .privacy-mask{filter:none;}
     window.location.href='index.html';
     return;
   }
-  // 等 DOM 完整載入再顯示
-  document.addEventListener('DOMContentLoaded',function(){
+  // 顯示 main-content（相容 DOMContentLoaded 時機）
+  function showContent(){
     const mc=document.getElementById('main-content');
     if(mc)mc.style.display='block';
-  });
+  }
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',showContent);
+  } else {
+    showContent(); // DOM 已載入完成
+  }
+  // 閒置計時
   let timer=null;
   function resetTimer(){
     localStorage.setItem(MASTER_TS,Date.now().toString());
     clearTimeout(timer);
-    timer=setTimeout(()=>window.location.href='index.html',TIMEOUT);
+    timer=setTimeout(()=>{
+      localStorage.removeItem(MASTER_KEY);
+      localStorage.removeItem(MASTER_TS);
+      window.location.href='index.html';
+    },TIMEOUT);
   }
   ['click','keydown','touchstart'].forEach(ev=>{
     document.addEventListener(ev,resetTimer,{passive:true});
