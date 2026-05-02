@@ -2345,26 +2345,64 @@ body:not(.privacy) .privacy-mask{filter:none;}
 </div>
 
 <!-- ══ 持股清單 Modal ══ -->
-<div class="mo" id="fp-stocks-modal" style="z-index:2000">
+<div class="mo" id="fp-stocks-modal" style="z-index:9000;display:none">
   <div class="modal" style="max-width:700px;width:100%">
     <div class="mt">
       <h3 id="fp-stocks-modal-title">📊 持股清單</h3>
       <button onclick="closeFpStocksModal()" style="background:none;border:none;font-size:18px;cursor:pointer;color:#94a3b8">✕</button>
     </div>
-    <!-- 彙整資訊 -->
     <div id="fp-stocks-modal-summary" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:12px 16px;background:#f8fafc;border-bottom:1px solid var(--border)"></div>
-    <!-- 持股列表 -->
     <div style="padding:14px 16px;max-height:60vh;overflow-y:auto">
       <div id="fp-stocks-modal-list"></div>
-      <button id="fp-stocks-modal-add" onclick=""
+      <button id="fp-stocks-modal-add"
         style="width:100%;padding:10px;border:1.5px dashed #cbd5e1;border-radius:8px;background:transparent;font-size:13px;font-weight:700;color:#64748b;cursor:pointer;margin-top:8px">
         ＋ 新增持股
       </button>
     </div>
-    <!-- 底部按鈕 -->
     <div style="padding:12px 16px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
       <button onclick="refreshFpPrices()" style="padding:8px 16px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;font-size:12px;font-weight:700;color:#2563eb;cursor:pointer">🔄 重新抓股價</button>
       <button onclick="closeFpStocksModal()" style="padding:8px 20px;background:#1e3a5f;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">完成</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 買入輸入視窗 ══ -->
+<div class="mo" id="fp-buy-modal" style="z-index:9500;display:none">
+  <div class="modal" style="max-width:400px;width:100%">
+    <div class="mt">
+      <h3 id="fp-buy-modal-title">📥 新增買入</h3>
+      <button onclick="closeFpBuyModal()" style="background:none;border:none;font-size:18px;cursor:pointer;color:#94a3b8">✕</button>
+    </div>
+    <div style="padding:20px 20px 8px">
+      <div class="fg">
+        <label class="fl">股票代號</label>
+        <input class="fi" id="fp-buy-code" placeholder="例：00878" maxlength="10"
+          style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:15px;letter-spacing:1px"
+          oninput="onFpBuyCodeInput(this.value)">
+        <div id="fp-buy-code-hint" style="display:none;margin-top:6px;padding:8px 10px;background:#fffbeb;border:1px solid #fcd34d;border-radius:6px;font-size:12px;color:#92400e"></div>
+      </div>
+      <div class="fg">
+        <label class="fl">買入日期</label>
+        <input class="fi" type="date" id="fp-buy-date">
+      </div>
+      <div class="fg">
+        <label class="fl">買入價格（元/股）</label>
+        <input class="fi" type="number" step="0.01" id="fp-buy-price" placeholder="0.00">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px" class="fg">
+        <div>
+          <label class="fl">張數</label>
+          <input class="fi" type="number" min="0" id="fp-buy-lots" placeholder="0">
+        </div>
+        <div>
+          <label class="fl">零股（股）</label>
+          <input class="fi" type="number" min="0" max="999" id="fp-buy-odd" placeholder="0">
+        </div>
+      </div>
+    </div>
+    <div class="br">
+      <button class="act-btn" onclick="closeFpBuyModal()">取消</button>
+      <button class="act-btn add" onclick="confirmFpBuy()">確認買入</button>
     </div>
   </div>
 </div>
@@ -5916,12 +5954,9 @@ function openFpStocksModal(acct){
   const title=acct==='b'?'📈 B 富邦證券 — 持股清單':'💰 C 凱基證券 — 持股清單';
   document.getElementById('fp-stocks-modal-title').textContent=title;
   const addBtn=document.getElementById('fp-stocks-modal-add');
-  if(addBtn)addBtn.onclick=()=>addFpStockModal(acct);
+  if(addBtn)addBtn.onclick=()=>openFpBuyModal(acct,null,'');
   renderFpStocksModal(acct);
-  // 直接設定 style 並用超高 z-index 確保在 sp-overlay 上面
-  const modal=document.getElementById('fp-stocks-modal');
-  modal.style.display='flex';
-  modal.style.zIndex='9000';
+  document.getElementById('fp-stocks-modal').style.display='flex';
 }
 function closeFpStocksModal(){
   const modal=document.getElementById('fp-stocks-modal');
@@ -5930,7 +5965,105 @@ function closeFpStocksModal(){
   updateFpMktVal('c');
   calcFinPlan();
 }
-function renderFpStocksModal(acct){
+let _fpBuyAcct='b';
+let _fpBuyStockIdx=null; // null=新標的，number=現有標的index
+
+function openFpBuyModal(acct, stockIdx=null, prefillCode=''){
+  _fpBuyAcct=acct;
+  _fpBuyStockIdx=stockIdx;
+  // 標題
+  const title=stockIdx!==null
+    ?`📥 新增買入 — ${prefillCode}`
+    :'📥 新增持股';
+  document.getElementById('fp-buy-modal-title').textContent=title;
+  // 預填
+  const codeInput=document.getElementById('fp-buy-code');
+  codeInput.value=prefillCode;
+  codeInput.readOnly=stockIdx!==null; // 從既有標的進來，鎖定股號
+  codeInput.style.background=stockIdx!==null?'#f1f5f9':'';
+  document.getElementById('fp-buy-date').value=new Date().toISOString().slice(0,10);
+  document.getElementById('fp-buy-price').value='';
+  document.getElementById('fp-buy-lots').value='';
+  document.getElementById('fp-buy-odd').value='';
+  document.getElementById('fp-buy-code-hint').style.display='none';
+  // 如果有現價，預填
+  if(stockIdx!==null){
+    const s=db.finPlan?.[acct+'Stocks']?.[stockIdx];
+    if(s?.price) document.getElementById('fp-buy-price').value=s.price;
+  }
+  document.getElementById('fp-buy-modal').style.display='flex';
+}
+
+function closeFpBuyModal(){
+  document.getElementById('fp-buy-modal').style.display='none';
+}
+
+function onFpBuyCodeInput(val){
+  if(_fpBuyStockIdx!==null)return; // 鎖定模式不檢查
+  const hint=document.getElementById('fp-buy-code-hint');
+  if(!val||val.length<4){hint.style.display='none';return;}
+  // 檢查帳戶裡是否已有這檔
+  const stocks=db.finPlan?.[_fpBuyAcct+'Stocks']||[];
+  const existing=stocks.findIndex(s=>s.code.toUpperCase()===val.toUpperCase());
+  if(existing>=0){
+    hint.style.display='block';
+    hint.innerHTML=`⚠️ 帳戶內已有「${val.toUpperCase()}」，確認後將合併至現有持股`;
+  } else {
+    hint.style.display='none';
+  }
+}
+
+function confirmFpBuy(){
+  const code=document.getElementById('fp-buy-code').value.trim().toUpperCase();
+  const date=document.getElementById('fp-buy-date').value;
+  const price=parseFloat(document.getElementById('fp-buy-price').value)||0;
+  const lots=parseInt(document.getElementById('fp-buy-lots').value)||0;
+  const odd=parseInt(document.getElementById('fp-buy-odd').value)||0;
+
+  if(!code){toast('⚠️ 請填入股票代號');return;}
+  if(!date){toast('⚠️ 請選擇買入日期');return;}
+  if(!price){toast('⚠️ 請填入買入價格');return;}
+  if(lots===0&&odd===0){toast('⚠️ 請填入張數或零股');return;}
+
+  if(!db.finPlan)db.finPlan={};
+  if(!db.finPlan[_fpBuyAcct+'Stocks'])db.finPlan[_fpBuyAcct+'Stocks']=[];
+  const stocks=db.finPlan[_fpBuyAcct+'Stocks'];
+
+  const purchase={lots,oddShares:odd,buyDate:date,buyPrice:price};
+
+  // 找現有標的（含防呆合併）
+  let targetIdx=_fpBuyStockIdx;
+  if(targetIdx===null){
+    targetIdx=stocks.findIndex(s=>s.code.toUpperCase()===code);
+  }
+
+  if(targetIdx>=0){
+    // 合併至現有標的
+    const s=stocks[targetIdx];
+    if(!s.purchases) s.purchases=[{lots:s.lots||0,oddShares:s.oddShares||0,buyDate:s.buyDate||'',buyPrice:s.buyPrice||0}];
+    s.purchases.push(purchase);
+  } else {
+    // 新標的
+    stocks.push({code,price:0,purchases:[purchase]});
+    // 抓股價
+    targetIdx=stocks.length-1;
+    fetchPrice(code).then(p=>{
+      if(p?.price){
+        stocks[targetIdx].price=p.price;
+        save();
+        renderFpStocksModal(_fpBuyAcct);
+        updateFpMktVal(_fpBuyAcct);
+      }
+    });
+  }
+
+  save();
+  closeFpBuyModal();
+  renderFpStocksModal(_fpBuyAcct);
+  updateFpMktVal(_fpBuyAcct);
+  calcFinPlan();
+  toast(`✅ 已新增 ${code} 買入記錄`);
+}
   const stocks=(db.finPlan||{})[acct+'Stocks']||[];
   // 彙整
   let totalMkt=0,totalCost=0;
@@ -6106,21 +6239,9 @@ function removeFpPurchaseModal(acct,idx,pidx){
 }
 
 function addFpPurchaseModal(acct,idx){
-  if(!db.finPlan?.[acct+'Stocks']?.[idx])return;
-  const s=db.finPlan[acct+'Stocks'][idx];
-  if(!s.purchases) s.purchases=[{lots:s.lots||0,oddShares:s.oddShares||0,buyDate:s.buyDate||'',buyPrice:s.buyPrice||0}];
-  const today=new Date().toISOString().slice(0,10);
-  s.purchases.push({lots:0,oddShares:0,buyDate:today,buyPrice:s.price||0});
-  save();
-  renderFpStocksModal(acct);
-  // 展開明細
-  setTimeout(()=>{
-    const detailId=`fpm-${acct}-detail-${idx}`;
-    const el=document.getElementById(detailId);
-    const arrow=document.getElementById(detailId+'-arrow');
-    if(el)el.style.display='block';
-    if(arrow)arrow.textContent='▲ 收起';
-  },50);
+  const s=db.finPlan?.[acct+'Stocks']?.[idx];
+  if(!s)return;
+  openFpBuyModal(acct,idx,s.code||'');
 }
 
 function updateFpPurchaseModal(acct,idx,pidx,field,val){
