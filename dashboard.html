@@ -5943,6 +5943,8 @@ function renderFpStocksModal(acct){
   const loan=(db.finPlan||{})[acct+'Loan']||0;
   const pnl=totalMkt-totalCost;
   const pnlColor=pnl>=0?'#dc2626':'#16a34a';
+
+  // 彙整列
   const summary=document.getElementById('fp-stocks-modal-summary');
   if(summary) summary.innerHTML=`
     <div style="text-align:center;padding:8px;background:#fff;border-radius:8px;border:1px solid var(--border)">
@@ -5957,28 +5959,204 @@ function renderFpStocksModal(acct){
       <div style="font-size:10px;color:#94a3b8;margin-bottom:3px">總損益</div>
       <div style="font-size:16px;font-weight:800;color:${pnlColor}">${pnl>=0?'+':''}$${Math.round(pnl).toLocaleString()}</div>
     </div>`;
-  // 持股列表
+
+  // 持股列表（獨立渲染，不依賴外部 div id）
   const list=document.getElementById('fp-stocks-modal-list');
   if(!list)return;
-  // 把 renderFpStocks 的結果放進這個 modal 的隱藏 div，再讀出來
-  // 用獨立的容器渲染
-  const tmp=document.createElement('div');
-  tmp.id='fp-'+acct+'-stocks';
-  tmp.style.display='none';
-  document.body.appendChild(tmp);
-  renderFpStocks(acct);
-  list.innerHTML=tmp.innerHTML;
-  document.body.removeChild(tmp);
-  // 重新設定 onclick 讓 modal 裡的操作正確綁定
-  // 直接讓 renderFpStocks 輸出到 modal list
-  list.innerHTML='';
-  const wrap=document.createElement('div');
-  wrap.id='fp-'+acct+'-stocks';
-  list.appendChild(wrap);
-  renderFpStocks(acct);
+
+  if(stocks.length===0){
+    list.innerHTML='<div style="text-align:center;padding:30px;color:#94a3b8">尚無持股，點下方新增</div>';
+    return;
+  }
+
+  list.innerHTML=stocks.map((s,i)=>{
+    const purchases=s.purchases||[{lots:s.lots||0,oddShares:s.oddShares||0,buyDate:s.buyDate||'',buyPrice:s.buyPrice||0}];
+    const totalShares=purchases.reduce((a,p)=>(p.lots||0)*1000+(p.oddShares||0)+a,0);
+    const totalCostS=purchases.reduce((a,p)=>(p.buyPrice||0)*((p.lots||0)*1000+(p.oddShares||0))+a,0);
+    const mktVal=(s.price||0)*totalShares;
+    const pnlS=mktVal-totalCostS;
+    const roiS=totalCostS>0?(pnlS/totalCostS*100):null;
+    const pnlColorS=pnlS>=0?'#dc2626':'#16a34a';
+    const avgCost=totalShares>0?totalCostS/totalShares:0;
+    const detailId=`fpm-${acct}-detail-${i}`;
+
+    const purchaseRows=purchases.map((p,pi)=>{
+      const ps=(p.lots||0)*1000+(p.oddShares||0);
+      const pPnl=(s.price||0)*ps-(p.buyPrice||0)*ps;
+      const pColor=pPnl>=0?'#dc2626':'#16a34a';
+      const editId=`fpm-${acct}-edit-${i}-${pi}`;
+      const viewId=`fpm-${acct}-view-${i}-${pi}`;
+      return`<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:8px 12px;margin-bottom:4px">
+        <div id="${viewId}" style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+          <div style="font-size:12px;font-weight:700;color:#1e293b;font-family:'JetBrains Mono',monospace">${p.buyDate||'—'}</div>
+          <div style="font-size:12px;color:#64748b">買入價 <b style="color:#1e293b">$${p.buyPrice||0}</b></div>
+          <div style="font-size:12px;color:#64748b">${p.lots||0}張 ${p.oddShares?p.oddShares+'股':''}</div>
+          <div style="font-size:12px;font-weight:700;color:${pColor}">${pPnl>=0?'+':''}${Math.round(pPnl).toLocaleString()}</div>
+          <div style="display:flex;gap:4px">
+            <button onclick="toggleFpPurchaseEdit('${editId}','${viewId}')"
+              style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:5px;padding:3px 10px;font-size:12px;color:#2563eb;cursor:pointer">✏️</button>
+            <button onclick="removeFpPurchaseModal('${acct}',${i},${pi})"
+              style="background:#fef2f2;border:1px solid #fecaca;border-radius:5px;padding:3px 10px;font-size:12px;color:#dc2626;cursor:pointer">✕</button>
+          </div>
+        </div>
+        <div id="${editId}" style="display:none;margin-top:8px">
+          <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px">
+            <input type="date" value="${p.buyDate||''}"
+              style="flex:2;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px"
+              onchange="updateFpPurchaseModal('${acct}',${i},${pi},'buyDate',this.value)">
+            <input value="${p.buyPrice||''}" placeholder="買入價" type="number" step="0.01"
+              style="flex:1;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px"
+              onchange="updateFpPurchaseModal('${acct}',${i},${pi},'buyPrice',+this.value)">
+            <span style="font-size:11px;color:#64748b">元</span>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <input value="${p.lots||0}" type="number" min="0"
+              style="flex:1;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;text-align:center"
+              onchange="updateFpPurchaseModal('${acct}',${i},${pi},'lots',+this.value)">
+            <span style="font-size:11px;color:#64748b">張</span>
+            <input value="${p.oddShares||0}" type="number" min="0"
+              style="flex:1;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;text-align:center"
+              onchange="updateFpPurchaseModal('${acct}',${i},${pi},'oddShares',+this.value)">
+            <span style="font-size:11px;color:#64748b">股</span>
+            <button onclick="toggleFpPurchaseEdit('${editId}','${viewId}')"
+              style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:5px;padding:3px 10px;font-size:12px;color:#16a34a;cursor:pointer">✓ 完成</button>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+
+    return`<div style="background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px">
+      <!-- 標的標題列 -->
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+        <input value="${s.code||''}" placeholder="代號 例:00878"
+          style="width:110px;padding:6px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;font-family:'JetBrains Mono',monospace;font-weight:700"
+          onchange="updateFpStockCodeModal('${acct}',${i},this.value)">
+        <div style="flex:1;display:grid;grid-template-columns:repeat(4,1fr);gap:6px">
+          <div style="background:#f8fafc;border-radius:6px;padding:5px 8px;text-align:center">
+            <div style="font-size:9px;color:#94a3b8">現價</div>
+            <div style="font-size:13px;font-weight:700;color:#dc2626">${s.price?'$'+s.price:'—'}</div>
+          </div>
+          <div style="background:#f8fafc;border-radius:6px;padding:5px 8px;text-align:center">
+            <div style="font-size:9px;color:#94a3b8">市值</div>
+            <div style="font-size:13px;font-weight:700;color:#1e293b">${mktVal>0?'$'+Math.round(mktVal).toLocaleString():'—'}</div>
+          </div>
+          <div style="background:#f8fafc;border-radius:6px;padding:5px 8px;text-align:center">
+            <div style="font-size:9px;color:#94a3b8">損益</div>
+            <div style="font-size:13px;font-weight:700;color:${pnlColorS}">${totalCostS>0?(pnlS>=0?'+':'')+Math.round(pnlS).toLocaleString():'—'}</div>
+          </div>
+          <div style="background:#f8fafc;border-radius:6px;padding:5px 8px;text-align:center">
+            <div style="font-size:9px;color:#94a3b8">報酬</div>
+            <div style="font-size:13px;font-weight:700;color:${pnlColorS}">${roiS!==null?(roiS>=0?'+':'')+roiS.toFixed(1)+'%':'—'}</div>
+          </div>
+        </div>
+        <button onclick="removeFpStockModal('${acct}',${i})"
+          style="background:#fef2f2;border:1px solid #fecaca;border-radius:6px;padding:5px 10px;font-size:13px;color:#dc2626;cursor:pointer">🗑</button>
+      </div>
+      <div style="font-size:11px;color:#64748b;margin-bottom:8px">
+        共 ${totalShares.toLocaleString()} 股（${purchases.length}筆）・均成本 $${avgCost.toFixed(2)}
+      </div>
+      <!-- 買入明細 -->
+      <div>
+        <div onclick="toggleFpDetail('${detailId}')"
+          style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;font-size:12px;color:#475569;font-weight:700;padding:4px 0;border-top:1px dashed #e2e8f0;margin-bottom:4px">
+          <span>📋 買入明細</span>
+          <span id="${detailId}-arrow">▼ 展開</span>
+        </div>
+        <div id="${detailId}" style="display:none">
+          ${purchaseRows}
+          <button onclick="addFpPurchaseModal('${acct}',${i})"
+            style="width:100%;padding:6px;border:1.5px dashed #cbd5e1;border-radius:6px;background:transparent;font-size:12px;font-weight:700;color:#64748b;cursor:pointer;margin-top:4px">
+            ＋ 新增買入記錄
+          </button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
 }
+
+function removeFpStockModal(acct,idx){
+  if(!db.finPlan?.[acct+'Stocks'])return;
+  const s=db.finPlan[acct+'Stocks'][idx];
+  if(!doubleConfirm(`確定要刪除「${s.code||'此持股'}」所有買入記錄？`))return;
+  undoStack.push(JSON.stringify(db));
+  if(undoStack.length>15)undoStack.shift();
+  const _ub=document.getElementById('undoBtn');if(_ub)_ub.disabled=false;
+  db.finPlan[acct+'Stocks'].splice(idx,1);
+  localStorage.setItem(STORE,JSON.stringify(db));
+  schedulePush();
+  renderFpStocksModal(acct);
+  updateFpMktVal(acct);
+  toast('已刪除，可按「← 上一步」還原');
+}
+
+function removeFpPurchaseModal(acct,idx,pidx){
+  const s=db.finPlan?.[acct+'Stocks']?.[idx];
+  if(!s)return;
+  if(!s.purchases||s.purchases.length<=1){toast('⚠️ 最少要有一筆買入記錄');return;}
+  if(!doubleConfirm('確定刪除這筆買入記錄？'))return;
+  undoStack.push(JSON.stringify(db));
+  if(undoStack.length>15)undoStack.shift();
+  const _ub=document.getElementById('undoBtn');if(_ub)_ub.disabled=false;
+  s.purchases.splice(pidx,1);
+  localStorage.setItem(STORE,JSON.stringify(db));
+  schedulePush();
+  renderFpStocksModal(acct);
+  updateFpMktVal(acct);
+  toast('已刪除，可按「← 上一步」還原');
+}
+
+function addFpPurchaseModal(acct,idx){
+  if(!db.finPlan?.[acct+'Stocks']?.[idx])return;
+  const s=db.finPlan[acct+'Stocks'][idx];
+  if(!s.purchases) s.purchases=[{lots:s.lots||0,oddShares:s.oddShares||0,buyDate:s.buyDate||'',buyPrice:s.buyPrice||0}];
+  const today=new Date().toISOString().slice(0,10);
+  s.purchases.push({lots:0,oddShares:0,buyDate:today,buyPrice:s.price||0});
+  save();
+  renderFpStocksModal(acct);
+  // 展開明細
+  setTimeout(()=>{
+    const detailId=`fpm-${acct}-detail-${idx}`;
+    const el=document.getElementById(detailId);
+    const arrow=document.getElementById(detailId+'-arrow');
+    if(el)el.style.display='block';
+    if(arrow)arrow.textContent='▲ 收起';
+  },50);
+}
+
+function updateFpPurchaseModal(acct,idx,pidx,field,val){
+  const s=db.finPlan?.[acct+'Stocks']?.[idx];
+  if(!s)return;
+  if(!s.purchases) s.purchases=[{lots:s.lots||0,oddShares:s.oddShares||0,buyDate:s.buyDate||'',buyPrice:s.buyPrice||0}];
+  s.purchases[pidx][field]=val;
+  save();
+  renderFpStocksModal(acct);
+  updateFpMktVal(acct);
+  calcFinPlan();
+}
+
+function updateFpStockCodeModal(acct,idx,val){
+  if(!db.finPlan?.[acct+'Stocks'])return;
+  db.finPlan[acct+'Stocks'][idx].code=val;
+  save();
+  if(val.length>=4){
+    fetchPrice(val).then(p=>{
+      if(p&&p.price){
+        db.finPlan[acct+'Stocks'][idx].price=p.price;
+        save();
+        renderFpStocksModal(acct);
+        updateFpMktVal(acct);
+        calcFinPlan();
+      }
+    });
+  }
+}
+
 function addFpStockModal(acct){
-  addFpStock(acct);
+  if(!db.finPlan)db.finPlan={};
+  if(!db.finPlan[acct+'Stocks'])db.finPlan[acct+'Stocks']=[];
+  const today=new Date().toISOString().slice(0,10);
+  db.finPlan[acct+'Stocks'].push({code:'',price:0,purchases:[{lots:0,oddShares:0,buyDate:today,buyPrice:0}]});
+  save();
   renderFpStocksModal(acct);
 }
 
