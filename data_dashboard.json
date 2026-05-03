@@ -815,7 +815,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1777800989352,
+  "_ts": 1777801001520,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
@@ -838,6 +838,17 @@
       "priority": "高",
       "url": "",
       "addedDate": "2026-04-18"
+    },
+    {
+      "id": "mopkt9pwes0",
+      "code": "2474",
+      "name": "可成",
+      "reason": "",
+      "target": null,
+      "alertDir": "below",
+      "priority": "中",
+      "url": "",
+      "addedDate": "2026-05-03"
     }
   ],
   "journals": [
