@@ -293,7 +293,7 @@
       "buyPrice": 7300,
       "sellDate": "",
       "sellPrice": null,
-      "pros": "11.25吋 現階段最適合我的手感\n手套非常輕, 接球面和牛皮",
+      "pros": "11.25吋 現階段最適合我的手感\n手套非常輕, 接球面和牛皮\n以湯柔(豐原_湯揉型不型)",
       "cons": "有點塑膠感",
       "note": "",
       "images": [
@@ -304,9 +304,9 @@
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777889056483_5k0v.jpg",
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777889063820_44sk.jpg"
       ],
-      "updatedAt": "2026-05-04T10:04:29.944Z",
+      "updatedAt": "2026-05-04T10:05:39.735Z",
       "createdAt": "2026-05-04T10:04:29.944Z"
     }
   ],
-  "_ts": 1777889103138
+  "_ts": 1777889142738
 }
