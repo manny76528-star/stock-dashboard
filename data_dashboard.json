@@ -487,9 +487,9 @@
       "name": "永豐銀行",
       "rate": 2.92,
       "limit": 3000000,
-      "used": 2983986,
-      "remain": 16014,
-      "monthly": 7261,
+      "used": 2965986,
+      "remain": 34014,
+      "monthly": 7217,
       "note": "每個月自動扣除利息 要注意餘額"
     },
     {
@@ -821,7 +821,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1777889250902,
+  "_ts": 1777889285096,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
