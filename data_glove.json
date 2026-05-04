@@ -282,7 +282,31 @@
       ],
       "updatedAt": "2026-04-26T13:30:58.146Z",
       "createdAt": "2026-04-26T13:28:30.788Z"
+    },
+    {
+      "id": "mor18y2g4px",
+      "brand": "Rawlings",
+      "model": "GH3FHJA52",
+      "position": "二壘",
+      "size": "11.25",
+      "buyDate": "2026-05-04",
+      "buyPrice": 7300,
+      "sellDate": "",
+      "sellPrice": null,
+      "pros": "11.25吋 現階段最適合我的手感\n手套非常輕, 接球面和牛皮",
+      "cons": "有點塑膠感",
+      "note": "",
+      "images": [
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777889039259_r0be.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777889030083_34fm.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777889032834_cgio.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777889035573_aqi5.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777889056483_5k0v.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777889063820_44sk.jpg"
+      ],
+      "updatedAt": "2026-05-04T10:04:29.944Z",
+      "createdAt": "2026-05-04T10:04:29.944Z"
     }
   ],
-  "_ts": 1777889028214
+  "_ts": 1777889072953
 }
