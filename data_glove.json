@@ -199,7 +199,7 @@
       "sellDate": "2026-04-20",
       "sellPrice": 11000,
       "pros": "MIZONO PRO HAGA耕作鋼印\n尺寸重量也相當和手\n外型也非常滿意",
-      "cons": "接球面球窩沒有很清晰\n且接球面食指 無名指處會有點變形\n大拇指有時會震痛",
+      "cons": "接球面球窩沒有很清晰\n且接球面食指 無名指處會有點變形\n大拇指有時會震痛\n接球時中指,無名指皮革會變形感",
       "note": "小川湯柔($600)",
       "images": [
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209484223_cv56.jpg",
@@ -209,7 +209,7 @@
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209492294_4g2i.jpg",
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777210524576_0dr0.jpg"
       ],
-      "updatedAt": "2026-04-26T13:35:31.171Z",
+      "updatedAt": "2026-05-04T09:57:49.600Z",
       "createdAt": "2026-04-26T05:40:57.568Z"
     },
     {
@@ -284,5 +284,5 @@
       "createdAt": "2026-04-26T13:28:30.788Z"
     }
   ],
-  "_ts": 1777888663026
+  "_ts": 1777888672602
 }
