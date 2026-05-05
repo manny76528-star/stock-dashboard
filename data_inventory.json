@@ -5923,11 +5923,11 @@
           "invoice": false
         }
       ],
-      "paid": false,
+      "paid": true,
       "paidDate": "2026-03-10",
-      "createdAt": "2026-04-08T10:23:09.202Z",
       "vendorPaid": true,
-      "vendorPaidDate": ""
+      "vendorPaidDate": "",
+      "images": []
     },
     {
       "id": "mnpwhovqyvet",
@@ -6520,6 +6520,6 @@
     "bankCode": "013",
     "bankAccount": "061506186489"
   },
-  "_ts": 1777976727825,
+  "_ts": 1777976734746,
   "_vendorPaidBackfilled": true
 }
