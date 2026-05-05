@@ -821,7 +821,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1777976868079,
+  "_ts": 1777976878288,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
@@ -858,6 +858,21 @@
     }
   ],
   "journals": [
+    {
+      "id": "moshix3idr4",
+      "date": "2026-05-06",
+      "tags": [
+        "看多"
+      ],
+      "market": "AI 占美國 Q1 GDP 成長 75%，2027 五大巨頭資本支出或超過 1.1 兆美元",
+      "marketUrl": "https://abmedia.io/ai-america-q1-gdp-hyperscaler",
+      "mood": "",
+      "content": "",
+      "stockTags": [
+        "009805"
+      ],
+      "images": []
+    },
     {
       "id": "mos1f4erbob",
       "date": "2026-05-05",
