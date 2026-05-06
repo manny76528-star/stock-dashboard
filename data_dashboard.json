@@ -721,6 +721,16 @@
       "perShare": 0.07,
       "amount": 7000.000000000001,
       "pending": true
+    },
+    {
+      "id": "motx19g9wea",
+      "code": "00985B",
+      "exDate": "2026-05-06",
+      "date": "2026-05-29",
+      "lots": 840,
+      "perShare": 0.048,
+      "amount": 40320,
+      "pending": true
     }
   ],
   "snapshots": [
@@ -821,7 +831,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1778063377365,
+  "_ts": 1778063394522,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
