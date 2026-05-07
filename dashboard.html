@@ -7387,15 +7387,16 @@ function renderJournal(){
           <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
             <button data-jid="${j.id}" onclick="event.stopPropagation();openJournalModal(this.dataset.jid)"
               style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;color:rgba(255,255,255,.8);white-space:nowrap">✏️ 編輯</button>
-            ${hasBody?`<span id="arr-jc-${j.id}" style="font-size:12px;color:rgba(255,255,255,.5);display:inline-block;transition:transform .2s">▼</span>`:''}
+            ${hasBody?`<span id="arr-jc-${j.id}" style="font-size:12px;color:rgba(255,255,255,.5);display:inline-block;transition:transform .2s;${q?'transform:rotate(180deg)':''}">▼</span>`:''}
           </div>
         </div>
         ${j.market?`<div style="margin-top:7px;font-size:13px;font-weight:700;color:#93c5fd;line-height:1.55;white-space:pre-wrap;word-break:break-word">${j.market}</div>`:''}
       </div>`;
 
-    // 第二層：只顯示正文（黃框深色區塊移除，標題已在紅框顯示）
+    // 第二層：只顯示正文（搜尋時自動展開）
+    const autoExpand = q ? 'block' : 'none';
     const body = hasBody ? `
-      <div id="jc-${j.id}" style="display:none;padding:12px 14px 10px;animation:fadeIn .18s ease">
+      <div id="jc-${j.id}" style="display:${autoExpand};padding:12px 14px 10px;animation:fadeIn .18s ease">
         ${j.content?`<div style="font-size:13px;color:#1e293b;line-height:1.7;white-space:pre-wrap">${j.content}</div>`:''}
         ${(j.images&&j.images.length)?`
         <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px">
