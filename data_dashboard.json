@@ -831,7 +831,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1778235337374,
+  "_ts": 1778235344802,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
@@ -859,7 +859,7 @@
       "id": "mopkt9pwes0",
       "code": "2474",
       "name": "可成",
-      "reason": "2026/5/5 當日收盤 212元\n可成(2474)轉型大戲開幕 AI 伺服器與航太雙引擎齊發",
+      "reason": "2026/5/5 當日收盤 212元\n\n可成(2474)轉型大戲開幕 AI 伺服器與航太雙引擎齊發",
       "target": 190,
       "alertDir": "below",
       "priority": "中",
