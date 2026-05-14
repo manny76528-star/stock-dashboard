@@ -2884,21 +2884,34 @@ async function ghPull(){
     const remote=JSON.parse(new TextDecoder().decode(bytes2));
     const localTs=db._ts||0;
     const remoteTs=remote._ts||0;
-    console.log(`Pull: 本地ts=${localTs} 遠端ts=${remoteTs}`);
+    const localW=dbWeight(db);
+    const remoteW=dbWeight(remote);
+    console.log(`Pull: 本地ts=${new Date(localTs).toLocaleTimeString()} w=${localW} / 遠端ts=${new Date(remoteTs).toLocaleTimeString()} w=${remoteW}`);
+
     if(remoteTs>=localTs){
-      // 遠端較新或相同 → 合併，保護本地較多的欄位
+      // journals/watchlist 取筆數較多的
       if((db.journals||[]).length>(remote.journals||[]).length)remote.journals=db.journals;
       if((db.watchlist||[]).length>(remote.watchlist||[]).length)remote.watchlist=db.watchlist;
+      // 核心資料：若本地 weight 明顯較大，代表本地有更多資料（Push 沒成功），保留本地
+      if(localW>remoteW+50){
+        console.log('⚠️ 本地資料較完整，保留本地核心資料');
+        remote.investments=db.investments;
+        remote.loans=db.loans;
+        remote.flexLoans=db.flexLoans;
+        remote.cashAccounts=db.cashAccounts;
+        remote.dividends=db.dividends;
+        remote.finPlan=db.finPlan;
+      }
       db=remote;
       localStorage.setItem(STORE,JSON.stringify(db));
       showSyncStatus('☁️ 已從雲端同步');
-      console.log('✅ Pull 成功');
       return true;
     } else {
       console.log('本地資料較新，保留本地');
       return false;
     }
   }catch(e){console.warn('Pull失敗:',e.message);return false;}
+
 }
 
 async function ghPush(){
@@ -2953,8 +2966,14 @@ async function ghPush(){
     _ghSha=j.content.sha;
     showSyncStatus('✅ 已同步至雲端');
   }catch(e){
-    showSyncStatus('⚠️ 同步失敗: '+e.message);
+    showSyncStatus('⚠️ 同步失敗！');
     console.warn('Push失敗:',e.message);
+    // 顯示持續性警告，讓用戶知道資料沒同步
+    setTimeout(()=>{
+      const el=document.getElementById('sync-status');
+      if(el)el.textContent='⚠️ 未同步至雲端，請手動同步';
+      el&&(el.style.color='#ef4444');
+    },3000);
   }
 }
 
@@ -5529,12 +5548,23 @@ document.addEventListener('visibilitychange',async function(){
         const remote=JSON.parse(new TextDecoder().decode(bytes));
         const remoteTs=remote._ts||0;
         const localTs=db._ts||0;
+        const localW=dbWeight(db);
+        const remoteW=dbWeight(remote);
         if(remoteTs>=localTs){
           if((db.journals||[]).length>(remote.journals||[]).length)remote.journals=db.journals;
           if((db.watchlist||[]).length>(remote.watchlist||[]).length)remote.watchlist=db.watchlist;
+          if(localW>remoteW+50){
+            remote.investments=db.investments;
+            remote.loans=db.loans;
+            remote.flexLoans=db.flexLoans;
+            remote.cashAccounts=db.cashAccounts;
+            remote.dividends=db.dividends;
+            remote.finPlan=db.finPlan;
+          }
           db=remote;
           localStorage.setItem(STORE,JSON.stringify(db));
           render();
+          runDailyProcess(false);
           showSyncStatus('☁️ 已從雲端同步');
         }
       }
