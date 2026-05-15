@@ -2902,6 +2902,7 @@ async function ghPull(){
         remote.dividends=db.dividends;
         remote.finPlan=db.finPlan;
       }
+      remote.prices=db.prices||{};
       db=remote;
       localStorage.setItem(STORE,JSON.stringify(db));
       showSyncStatus('☁️ 已從雲端同步');
@@ -2921,8 +2922,14 @@ async function ghPush(){
     localStorage.setItem(STORE,JSON.stringify(db));
     const syncDb={...db};
     delete syncDb._backup;
+    delete syncDb.prices; // 股價每次自動抓，不需同步
     const jsonStr=JSON.stringify(syncDb,null,2);
-    if(jsonStr.length>950000){showSyncStatus('⚠️資料過大，請清理舊快照');return;}
+    const totalKB=Math.round(jsonStr.length/1024);
+    console.log(`📊 Push 大小: ${totalKB}KB | journals:${(db.journals||[]).length}篇 | snapshots:${(db.snapshots||[]).length}筆`);
+    if(jsonStr.length>950000){
+      showSyncStatus(`⚠️資料${totalKB}KB過大，請清理舊快照或日誌`);
+      return;
+    }
     // 正確處理中文：用 TextEncoder 轉 base64
     const encoder=new TextEncoder();
     const bytes=encoder.encode(jsonStr);
@@ -5584,6 +5591,7 @@ document.addEventListener('visibilitychange',async function(){
             remote.dividends=db.dividends;
             remote.finPlan=db.finPlan;
           }
+          remote.prices=db.prices||{};
           db=remote;
           localStorage.setItem(STORE,JSON.stringify(db));
           render();
