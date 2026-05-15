@@ -3002,15 +3002,48 @@ async function manualSync(){
 
 function schedulePush(){
   clearTimeout(_syncTimer);
-  _syncTimer=setTimeout(ghPush,3000);
+  _syncTimer=setTimeout(ghPush,1000); // 1秒後推，確保手機有足夠時間
 }
 // 頁面隱藏前（切換App、關閉）立即Push
 document.addEventListener('visibilitychange',function(){
   if(document.visibilityState==='hidden'){
     clearTimeout(_syncTimer);
-    ghPush(); // 立即同步，不等3秒
+    // 用 keepalive 確保手機關頁面前能完成 Push
+    _pushWithKeepalive();
   }
 });
+
+// pagehide 也觸發（iOS Safari 更可靠）
+window.addEventListener('pagehide',function(){
+  clearTimeout(_syncTimer);
+  _pushWithKeepalive();
+});
+
+function _pushWithKeepalive(){
+  try{
+    db._ts=Date.now();
+    localStorage.setItem(STORE,JSON.stringify(db));
+    const jsonStr=JSON.stringify(db,null,2);
+    const encoder=new TextEncoder();
+    const bytes=encoder.encode(jsonStr);
+    const binStr=Array.from(bytes,b=>String.fromCharCode(b)).join('');
+    const encoded=btoa(binStr);
+    const body=JSON.stringify({
+      message:'dash-sync:'+Date.now(),
+      content:encoded,
+      ..._ghSha?{sha:_ghSha}:{}
+    });
+    // keepalive:true 確保頁面關閉後請求仍繼續
+    fetch(GH_API,{
+      method:'PUT',
+      headers:{'Content-Type':'application/json'},
+      body,
+      keepalive:true
+    }).then(r=>{
+      if(r.ok)r.json().then(j=>{if(j.content?.sha)_ghSha=j.content.sha;});
+    }).catch(e=>console.warn('keepalive push失敗:',e.message));
+  }catch(e){console.warn('_pushWithKeepalive失敗:',e.message);}
+}
 
 function showSyncStatus(msg){
   let el=document.getElementById('sync-status');
