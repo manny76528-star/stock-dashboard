@@ -2922,12 +2922,22 @@ async function ghPush(){
     localStorage.setItem(STORE,JSON.stringify(db));
     const syncDb={...db};
     delete syncDb._backup;
-    delete syncDb.prices; // 股價每次自動抓，不需同步
+    delete syncDb.prices;
+    // 日誌圖片：只保留 URL（http開頭），移除 base64（節省空間）
+    if(syncDb.journals){
+      syncDb.journals=syncDb.journals.map(j=>({
+        ...j,
+        images:(j.images||[]).filter(img=>typeof img==='string'&&img.startsWith('http'))
+      }));
+    }
     const jsonStr=JSON.stringify(syncDb,null,2);
     const totalKB=Math.round(jsonStr.length/1024);
-    console.log(`📊 Push 大小: ${totalKB}KB | journals:${(db.journals||[]).length}篇 | snapshots:${(db.snapshots||[]).length}筆`);
+    const jKB=Math.round(JSON.stringify(syncDb.journals||[]).length/1024);
+    const sKB=Math.round(JSON.stringify(db.snapshots||[]).length/1024);
+    const iKB=Math.round(JSON.stringify(db.investments||[]).length/1024);
+    console.log(`📊 Push: 總${totalKB}KB | 日誌${jKB}KB | 快照${sKB}KB | 投資${iKB}KB`);
     if(jsonStr.length>950000){
-      showSyncStatus(`⚠️資料${totalKB}KB過大，請清理舊快照或日誌`);
+      showSyncStatus(`⚠️${totalKB}KB過大 日誌${jKB}KB 快照${sKB}KB`);
       return;
     }
     // 正確處理中文：用 TextEncoder 轉 base64
@@ -7246,11 +7256,38 @@ function viewJImg(i){
 
 function handleJImgUpload(event){
   const files=Array.from(event.target.files);
+  const btn=document.querySelector('#j-img-input')?.closest('label');
+  if(btn){btn.style.opacity='.5';btn.style.pointerEvents='none';}
+  let done=0;
   files.forEach(file=>{
-    compressImage(file,800,0.72).then(b64=>{
-      window._jImgs.push(b64);
-      renderJImgPreview();
-    });
+    // 讀取原始檔案轉 base64
+    const reader=new FileReader();
+    reader.onload=async e=>{
+      const b64=e.target.result.split(',')[1];
+      const ext=file.name.split('.').pop().toLowerCase()||'jpg';
+      const fname=`journal-images/${Date.now()}_${Math.random().toString(36).slice(2,6)}.${ext}`;
+      try{
+        // 先取得 sha（如果存在）
+        let sha='';
+        try{const chk=await fetch(CF_WORKER+'/'+fname);if(chk.ok){const cj=await chk.json();sha=cj.sha||'';}}catch(e){}
+        const body={message:'journal-img:'+Date.now(),content:b64};
+        if(sha)body.sha=sha;
+        const r=await fetch(CF_WORKER+'/'+fname,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+        if(r.ok){
+          const url=`https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/${fname}`;
+          window._jImgs.push(url);
+          renderJImgPreview();
+          toast('✅ 圖片已上傳至雲端');
+        } else {
+          toast('⚠️ 圖片上傳失敗');
+        }
+      }catch(err){
+        toast('⚠️ 圖片上傳失敗: '+err.message);
+      }
+      done++;
+      if(done===files.length&&btn){btn.style.opacity='';btn.style.pointerEvents='';}
+    };
+    reader.readAsDataURL(file);
   });
   event.target.value='';
 }
