@@ -407,7 +407,7 @@
       "avgPrice": 16.45,
       "divPerShare": 0,
       "note": "現股",
-      "url": "",
+      "url": "https://www.wantgoo.com/stock/etf/009805/dividend-policy/ex-dividend",
       "holdType": "short",
       "targetRoi": 5,
       "transactions": [
@@ -419,9 +419,85 @@
           "date": "2026-04-30",
           "fee": 0,
           "remark": "昨日賣出是OPENAI下修展望,今META AMZ GOOG財報展望良好 昨天的AI收縮擔憂暫時收緩,因此買回"
+        },
+        {
+          "id": "mp5q5nlmkmy",
+          "type": "buy",
+          "lots": 13,
+          "price": 17.1,
+          "date": "2026-05-12",
+          "fee": 89,
+          "remark": "持續看好AI資本支出跟電力需求，00403溢價5%賣出 一半資金轉移到此",
+          "mood": "💪 自信"
         }
       ],
       "order": 12
+    },
+    {
+      "id": "mp5q28zcxeq",
+      "code": "00403A",
+      "name": "主動統一升級50",
+      "lots": 63,
+      "avgPrice": 10,
+      "divPerShare": 0,
+      "note": "現股",
+      "url": "",
+      "holdType": "short",
+      "targetRoi": 5,
+      "transactions": [
+        {
+          "id": "mp5q28zblm2",
+          "type": "buy",
+          "lots": 63,
+          "price": 10,
+          "date": "2026-05-14",
+          "fee": 0,
+          "remark": "統一主動ETF評價相當優良，看好上市會有溢價"
+        },
+        {
+          "id": "mp5q3yai5se",
+          "type": "sell",
+          "lots": 63,
+          "price": 10.8,
+          "date": "2026-05-14",
+          "fee": 2312,
+          "lotRefs": [
+            {
+              "txnId": "mp5q28zblm2",
+              "lots": 63,
+              "date": "2026-05-14"
+            }
+          ],
+          "remark": "淨值10.2 市價10.8 溢價已達5% 照紀律出場",
+          "mood": "",
+          "lossReason": ""
+        }
+      ],
+      "order": 13
+    },
+    {
+      "id": "mp5q81azs4l",
+      "code": "00981A",
+      "name": "主動統一全球創新",
+      "lots": 13,
+      "avgPrice": 30.34,
+      "divPerShare": 0,
+      "note": "現股",
+      "url": "https://www.wantgoo.com/stock/etf/00981D/dividend-policy/ex-dividend",
+      "holdType": "long",
+      "targetRoi": 5,
+      "transactions": [
+        {
+          "id": "mp5q81azkl3",
+          "type": "buy",
+          "lots": 13,
+          "price": 30.34,
+          "date": "2026-05-14",
+          "fee": 0,
+          "remark": "00403溢價5%賣出，一半資金轉移到成分股相同的981等於變相省5%"
+        }
+      ],
+      "order": 14
     }
   ],
   "loans": [
@@ -487,9 +563,9 @@
       "name": "永豐銀行",
       "rate": 2.92,
       "limit": 3000000,
-      "used": 2972701,
-      "remain": 27299,
-      "monthly": 7234,
+      "used": 2924261,
+      "remain": 75739,
+      "monthly": 7116,
       "note": "每個月自動扣除利息 要注意餘額"
     },
     {
@@ -507,7 +583,7 @@
     {
       "id": "mncull1439i",
       "bank": "Line Bank",
-      "cash": 396,
+      "cash": 16396,
       "d1Date": "",
       "d1": 0,
       "d2": 0
@@ -521,9 +597,9 @@
       "d2": 0
     },
     {
-      "id": "moa36m8o0lf",
-      "bank": "國泰銀行",
-      "cash": 630000,
+      "id": "mp6ol6s87s7",
+      "bank": "台灣銀行",
+      "cash": 10,
       "d1Date": "",
       "d1": 0,
       "d2": 0
@@ -668,6 +744,13 @@
       "div": 72128,
       "cf": -12075,
       "debtRatio": 80
+    },
+    {
+      "ym": "2026-05-15",
+      "net": 3410779,
+      "div": 72128,
+      "cf": -11930,
+      "debtRatio": 80
     }
   ],
   "settings": {
@@ -745,7 +828,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1779031923072,
+  "_ts": 1779031944795,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
@@ -1113,7 +1196,7 @@
         "oddShares": 50,
         "buyDate": "2026-02-02",
         "buyPrice": 10.4,
-        "price": 10.37
+        "price": 10.34
       },
       {
         "code": "009805",
@@ -1121,7 +1204,7 @@
         "oddShares": 732,
         "buyDate": "2026-04-08",
         "buyPrice": 16.05,
-        "price": 16.42,
+        "price": 17.1,
         "purchases": [
           {
             "lots": 11,
@@ -1142,7 +1225,7 @@
       {
         "code": "00981A",
         "lots": 1,
-        "price": 28.28,
+        "price": 28.42,
         "buyDate": "2025-12-01",
         "buyPrice": 13.65,
         "oddShares": 224,
@@ -1157,20 +1240,26 @@
       },
       {
         "code": "00986A",
-        "price": 13.52,
+        "price": 14.82,
         "purchases": [
           {
             "lots": 4,
             "oddShares": 0,
             "buyDate": "2026-02-26",
             "buyPrice": 12
+          },
+          {
+            "lots": 1,
+            "oddShares": 106,
+            "buyDate": "2026-05-11",
+            "buyPrice": 14.46
           }
         ]
       },
       {
         "code": "00997a",
         "lots": 1,
-        "price": 11.15,
+        "price": 12.79,
         "buyDate": "2026-04-07",
         "buyPrice": 10.54
       }
