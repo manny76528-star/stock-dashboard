@@ -745,7 +745,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1779030433027,
+  "_ts": 1779031889016,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
@@ -782,6 +782,21 @@
     }
   ],
   "journals": [
+    {
+      "id": "mp3lm2vkqz8",
+      "date": "2026-05-12",
+      "tags": [
+        "賣出"
+      ],
+      "market": "台股史上最瘋！ 00403A單日成交爆419萬張 淨值10.24、收10.8。\n63張申購今日10.8元賣出",
+      "marketUrl": "https://udn.com/news/story/124061/9450957?from=udn-ch1_breaknews-1-cate5-news",
+      "mood": "😊 興奮",
+      "content": "台股史上最瘋！ 00403A單日成交爆419萬張 淨值10.24、收10.8。\n63張申購今日10.8元 全數賣出獲利4.9萬 並同步轉移資金到009805,00981A",
+      "stockTags": [
+        "00403A"
+      ],
+      "images": []
+    },
     {
       "id": "mp11ukxy8t8",
       "date": "2026-05-11",
