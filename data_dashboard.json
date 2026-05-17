@@ -599,7 +599,7 @@
     {
       "id": "mp6ol6s87s7",
       "bank": "台灣銀行",
-      "cash": 100,
+      "cash": 106,
       "d1Date": "",
       "d1": 0,
       "d2": 0
@@ -828,7 +828,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1779032137418,
+  "_ts": 1779032150678,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
