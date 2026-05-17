@@ -2884,24 +2884,13 @@ async function ghPull(){
     const remote=JSON.parse(new TextDecoder().decode(bytes2));
     const localTs=db._ts||0;
     const remoteTs=remote._ts||0;
-    const localW=dbWeight(db);
-    const remoteW=dbWeight(remote);
-    console.log(`Pull: 本地ts=${new Date(localTs).toLocaleTimeString()} w=${localW} / 遠端ts=${new Date(remoteTs).toLocaleTimeString()} w=${remoteW}`);
+    console.log(`Pull: 本地ts=${new Date(localTs).toLocaleTimeString()} / 遠端ts=${new Date(remoteTs).toLocaleTimeString()}`);
 
     if(remoteTs>=localTs){
-      // journals/watchlist 取筆數較多的
+      // journals/watchlist 取筆數較多的那份
       if((db.journals||[]).length>(remote.journals||[]).length)remote.journals=db.journals;
       if((db.watchlist||[]).length>(remote.watchlist||[]).length)remote.watchlist=db.watchlist;
-      // 核心資料：若本地 weight 明顯較大，代表本地有更多資料（Push 沒成功），保留本地
-      if(localW>remoteW+50){
-        console.log('⚠️ 本地資料較完整，保留本地核心資料');
-        remote.investments=db.investments;
-        remote.loans=db.loans;
-        remote.flexLoans=db.flexLoans;
-        remote.cashAccounts=db.cashAccounts;
-        remote.dividends=db.dividends;
-        remote.finPlan=db.finPlan;
-      }
+      // prices 保留本地（每次自動抓，不需同步）
       remote.prices=db.prices||{};
       db=remote;
       localStorage.setItem(STORE,JSON.stringify(db));
@@ -2912,7 +2901,6 @@ async function ghPull(){
       return false;
     }
   }catch(e){console.warn('Pull失敗:',e.message);return false;}
-
 }
 
 async function ghPush(){
@@ -5588,19 +5576,9 @@ document.addEventListener('visibilitychange',async function(){
         const remote=JSON.parse(new TextDecoder().decode(bytes));
         const remoteTs=remote._ts||0;
         const localTs=db._ts||0;
-        const localW=dbWeight(db);
-        const remoteW=dbWeight(remote);
         if(remoteTs>=localTs){
           if((db.journals||[]).length>(remote.journals||[]).length)remote.journals=db.journals;
           if((db.watchlist||[]).length>(remote.watchlist||[]).length)remote.watchlist=db.watchlist;
-          if(localW>remoteW+50){
-            remote.investments=db.investments;
-            remote.loans=db.loans;
-            remote.flexLoans=db.flexLoans;
-            remote.cashAccounts=db.cashAccounts;
-            remote.dividends=db.dividends;
-            remote.finPlan=db.finPlan;
-          }
           remote.prices=db.prices||{};
           db=remote;
           localStorage.setItem(STORE,JSON.stringify(db));
