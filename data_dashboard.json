@@ -595,14 +595,6 @@
       "d1Date": "",
       "d1": 0,
       "d2": 0
-    },
-    {
-      "id": "mp6ol6s87s7",
-      "bank": "台灣銀行",
-      "cash": 106,
-      "d1Date": "",
-      "d1": 0,
-      "d2": 0
     }
   ],
   "dividends": [
@@ -848,7 +840,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1779185822394,
+  "_ts": 1779185835959,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
