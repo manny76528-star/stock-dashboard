@@ -484,7 +484,7 @@
       "divPerShare": 0,
       "note": "現股",
       "url": "https://www.wantgoo.com/stock/etf/00981D/dividend-policy/ex-dividend",
-      "holdType": "long",
+      "holdType": "short",
       "targetRoi": 5,
       "transactions": [
         {
@@ -840,7 +840,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1779185987118,
+  "_ts": 1779186078689,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
