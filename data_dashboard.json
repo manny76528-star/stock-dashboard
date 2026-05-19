@@ -828,7 +828,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1779184240791,
+  "_ts": 1779184254952,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
@@ -1296,5 +1296,73 @@
     "mncul5vdg0j_2026-05": true,
     "mncue4nbehw_2026-05": true,
     "mncug22msvu_2026-05": true
+  },
+  "prices": {
+    "2474": {
+      "price": 184,
+      "change": 0,
+      "changePct": 0,
+      "ts": 1779184239160
+    },
+    "00864B": {
+      "price": 45.95,
+      "change": 0.02,
+      "changePct": 0.04,
+      "ts": 1779184239691
+    },
+    "009819": {
+      "price": 9.98,
+      "change": -0.08,
+      "changePct": -0.8,
+      "ts": 1779184239221
+    },
+    "00981D": {
+      "price": 10.27,
+      "change": 0,
+      "changePct": 0,
+      "ts": 1779184239160
+    },
+    "00985B": {
+      "price": 10.18,
+      "change": 0,
+      "changePct": 0,
+      "ts": 1779184239452
+    },
+    "00997A": {
+      "price": 11.7,
+      "change": -0.49,
+      "changePct": -4.02,
+      "ts": 1779184239440
+    },
+    "00981A": {
+      "price": 27.49,
+      "change": -0.75,
+      "changePct": -2.66,
+      "ts": 1779184239384
+    },
+    "009805": {
+      "price": 16.3,
+      "change": -0.63,
+      "changePct": -3.72,
+      "ts": 1779184239221
+    },
+    "00988A": {
+      "price": 18.28,
+      "change": -0.98,
+      "changePct": -5.09,
+      "ts": 1779184239301
+    },
+    "00662": {
+      "price": 117.2,
+      "change": -0.6,
+      "changePct": -0.51,
+      "ts": 1779184239787
+    },
+    "00830": {
+      "price": 78.35,
+      "change": -2.7,
+      "changePct": -3.33,
+      "ts": 1779184239174
+    }
   }
 }
