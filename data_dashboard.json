@@ -47,7 +47,7 @@
           "type": "buy",
           "lots": 128,
           "price": 46.82,
-          "date": "2025-03-18",
+          "date": "2026-04-02",
           "fee": 0,
           "remark": "初始持倉"
         }
@@ -840,7 +840,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1779271817674,
+  "_ts": 1779272000440,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
