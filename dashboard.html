@@ -1281,8 +1281,9 @@ body:not(.privacy) .privacy-mask{filter:none;}
 
 /* ═══ LAYER 3: 詳細展開 ═══ */
 .irow-l3 {
-  background:#f8fafc;
-  border-top:1px solid #e2e8f0;
+  background:#f0f7ff;
+  border-top:2px solid #bfdbfe;
+  border-bottom:3px solid #93c5fd;
   animation:fadeIn .18s ease;
 }
 
@@ -2521,6 +2522,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
       </div>
     </div>
     </div>
+    <div class="fg"><label class="fl">買入日期</label><input class="fi" type="date" id="i-buy-date"></div>
     <div class="fg"><label class="fl">每股月配息（元/股/月）</label><input class="fi" id="i-div" type="number" step="0.0001" placeholder="月配例：0.048，季配填月均"></div>
     <div class="fg">
       <label class="fl">備註（選填）</label>
@@ -4292,6 +4294,16 @@ function openInvModal(id=null){
   else{sel.value='';inp.style.display='none';inp.value='';}
   const irEl=document.getElementById('i-remark');if(irEl)irEl.value='';
   const iuEl=document.getElementById('i-url');if(iuEl)iuEl.value=inv?.url||'';
+  // 買入日期：編輯時帶入初始交易的日期，新增時預設今天
+  const ibEl=document.getElementById('i-buy-date');
+  if(ibEl){
+    if(inv){
+      const initTxn=(inv.transactions||[]).find(t=>t.isInit||t.remark==='初始持倉');
+      ibEl.value=initTxn?.date||inv.buyDate||new Date().toISOString().split('T')[0];
+    } else {
+      ibEl.value=new Date().toISOString().split('T')[0];
+    }
+  }
   // 有交易記錄時，顯示警告但仍可編輯均價
   const hasTxns2=editId&&inv&&(inv.transactions||[]).length>0;
   const avgEl=document.getElementById('i-avg');
@@ -4325,7 +4337,12 @@ function saveInv(){
       if(!confirm(`⚠️ 確認修改均買價？\n\n原本：$${inv.avgPrice}\n修改後：$${avg}\n\n注意：這只會修改初始記錄的成本，已有的買入交易記錄價格不變。`))return;
       // 同步更新初始買入記錄(isInit)的價格
       const initTxn=inv.transactions.find(t=>t.isInit||t.remark==='初始持倉');
-      if(initTxn){initTxn.price=avg;initTxn.lots=lots||initTxn.lots;}
+      if(initTxn){
+        initTxn.price=avg;
+        initTxn.lots=lots||initTxn.lots;
+        const buyDateE=document.getElementById('i-buy-date')?.value;
+        if(buyDateE)initTxn.date=buyDateE;
+      }
       inv.avgPrice=avg;inv.lots=lots;
     }
     const holdTypeE=document.querySelector('.hold-type-btn.active')?.dataset?.type||'long';
@@ -4342,7 +4359,8 @@ function saveInv(){
     const noteVal2=noteSel2==='__custom__'?document.getElementById('i-note').value.trim():noteSel2===''?'':noteSel2;
     const maxOrder=db.investments.reduce((m,x)=>Math.max(m,x.order||0),0);
     const initRemark=document.getElementById('i-remark')?.value.trim()||'';
-    const initTxns=lots>0&&avg>0?[{id:uid(),type:'buy',lots,price:avg,date:new Date().toISOString().split('T')[0],fee:0,remark:initRemark}]:[];
+    const buyDate=document.getElementById('i-buy-date')?.value||new Date().toISOString().split('T')[0];
+    const initTxns=lots>0&&avg>0?[{id:uid(),type:'buy',lots,price:avg,date:buyDate,fee:0,remark:initRemark}]:[];
     const holdType=document.querySelector('.hold-type-btn.active')?.dataset?.type||'long';
     const targetRoi=parseFloat(document.getElementById('i-target-roi')?.value)||5;
     db.investments.push({id:uid(),code,name:document.getElementById('i-name').value.trim(),lots,avgPrice:avg,
