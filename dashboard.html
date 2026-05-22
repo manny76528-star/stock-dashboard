@@ -1657,6 +1657,9 @@ body:not(.privacy) .privacy-mask{filter:none;}
       <label><input type="checkbox" id="tc-div" checked onchange="renderTrendChart()">每月股息</label>
       <label><input type="checkbox" id="tc-cf" checked onchange="renderTrendChart()">每月現金流</label>
       <label><input type="checkbox" id="tc-debt" onchange="renderTrendChart()">負債比(%)</label>
+      <select id="tc-year" onchange="renderTrendChart()" style="padding:3px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:11px;font-weight:700;color:#475569;background:#fff;cursor:pointer;outline:none;margin-left:auto">
+        <option value="all">全部年份</option>
+      </select>
     </div>
     <div style="position:relative;height:300px"><canvas id="trendCanvas"></canvas></div>
     <div id="trend-table" style="margin-top:12px;font-size:11px;overflow-x:auto"></div>
@@ -2434,6 +2437,14 @@ body:not(.privacy) .privacy-mask{filter:none;}
     <div class="sp-body" style="padding:0">
       <div id="st-list" style="display:flex;flex-direction:column;gap:0"></div>
     </div>
+  </div>
+</div>
+
+<!-- ══ 投資標的詳情 Modal ══ -->
+<div class="mo" id="inv-detail-modal" style="z-index:1600">
+  <div class="modal" style="max-width:680px;width:100%">
+    <div class="mt" id="inv-detail-modal-title">📊 標的詳情</div>
+    <div id="inv-detail-modal-body" style="padding:0"></div>
   </div>
 </div>
 
@@ -3547,14 +3558,64 @@ function renderInv(){
 }
 
 function toggleInvDetail(id){
-  const det=document.getElementById('idet-'+id);
-  const arr=document.getElementById('iarr-'+id);
-  const row=det?.closest('.irow');
-  if(!det)return;
-  const isOpen=det.style.display!=='none';
-  det.style.display=isOpen?'none':'block';
-  if(arr)arr.textContent=isOpen?'▼':'▲';
-  if(row)row.dataset.open=isOpen?'0':'1';
+  const inv=db.investments.find(i=>i.id===id);
+  if(!inv)return;
+  const c=calcInv(inv);
+  const totalMkt=db.investments.reduce((s,x)=>{const cx=calcInv(x);return s+(cx.mktVal||0);},0);
+  const portPct=totalMkt>0?(c.mktVal||0)/totalMkt*100:0;
+  const modal=document.getElementById('inv-detail-modal');
+  const title=document.getElementById('inv-detail-modal-title');
+  const body=document.getElementById('inv-detail-modal-body');
+  if(!modal)return;
+
+  title.innerHTML=`<span style="font-family:var(--mono);font-weight:800;color:#1e293b">${inv.code}</span>${inv.name?` <span style="font-size:13px;color:#64748b">${inv.name}</span>`:''}`;
+
+  body.innerHTML=
+    // 數字區
+    '<div class="irow-l3-nums" style="padding:14px 18px">'
+      +'<div class="irow-l3-kv"><span class="irow-l3-k">均買價</span><span class="irow-l3-v">$'+fmtF(c.avgCost)+'</span></div>'
+      +'<div class="irow-l3-kv"><span class="irow-l3-k">總成本</span><span class="irow-l3-v">'+fmt(c.tCost)+'</span></div>'
+      +'<div class="irow-l3-kv"><span class="irow-l3-k">市值</span><span class="irow-l3-v">'+(c.mktVal!=null?fmt(c.mktVal):'—')+'</span></div>'
+      +'<div class="irow-l3-kv"><span class="irow-l3-k">月配息</span><span class="irow-l3-v" style="color:var(--gain)">'+(c.moDivAmt>0?fmt(c.moDivAmt):'—')+'</span></div>'
+      +'<div class="irow-l3-kv"><span class="irow-l3-k">佔比</span><span class="irow-l3-v">'+portPct.toFixed(1)+'%</span></div>'
+    +'</div>'
+    // 操作按鈕
+    +'<div class="irow-l3-btns" style="padding:8px 18px">'
+      +'<button class="irow-btn buy" onclick="closeModal(\'inv-detail-modal\');openBuyModal(\''+inv.id+'\')">▲ 買入</button>'
+      +'<button class="irow-btn sell" onclick="closeModal(\'inv-detail-modal\');openSellModal(\''+inv.id+'\')">▼ 賣出</button>'
+      +'<button class="irow-btn" onclick="closeModal(\'inv-detail-modal\');openDivFor(\''+inv.code+'\')">💰 領息</button>'
+      +'<button class="irow-btn" onclick="closeModal(\'inv-detail-modal\');openInvModal(\''+inv.id+'\')">✏️ 編輯</button>'
+      +'<button class="irow-btn" onclick="closeModal(\'inv-detail-modal\');moveInv(\''+inv.id+'\',-1)">↑</button>'
+      +'<button class="irow-btn" onclick="closeModal(\'inv-detail-modal\');moveInv(\''+inv.id+'\',1)">↓</button>'
+      +'<button class="irow-btn del" onclick="closeModal(\'inv-detail-modal\');delInv(\''+inv.id+'\')">🗑 刪除</button>'
+    +'</div>'
+    // 交易記錄
+    +'<div class="irow-l3-hist" style="padding:0 18px 14px">'
+      +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">'
+        +'<div class="irow-l3-hist-title" style="cursor:default">📋 交易記錄（'+(inv.transactions||[]).length+' 筆）</div>'
+        +'<select id="txn-yr-modal-'+inv.id+'" onchange="filterTxnYearModal(\''+inv.id+'\')" style="padding:3px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:11px;font-weight:700;color:#475569;background:#fff;cursor:pointer;outline:none">'
+          +'<option value="all">全部年份</option>'
+          +(()=>{
+            const years=[...new Set((inv.transactions||[]).map(t=>(t.date||'').slice(0,4)).filter(Boolean))].sort((a,b)=>b-a);
+            return years.map(y=>'<option value="'+y+'">'+y+'年</option>').join('');
+          })()
+        +'</select>'
+      +'</div>'
+      +'<div class="irow-hist-body" id="hr-modal-'+inv.id+'">'+buildTxnRows(inv,c,'all')+'</div>'
+    +'</div>';
+
+  // 點外面不關閉（只能按 ✕）
+  modal.onclick=function(e){e.stopPropagation();};
+  openModal('inv-detail-modal');
+}
+
+function filterTxnYearModal(id){
+  const inv=db.investments.find(i=>i.id===id);
+  if(!inv)return;
+  const c=calcInv(inv);
+  const yr=document.getElementById('txn-yr-modal-'+id)?.value||'all';
+  const el=document.getElementById('hr-modal-'+id);
+  if(el)el.innerHTML=buildTxnRows(inv,c,yr);
 }
 
 function toggleInvHist(id){
@@ -5412,8 +5473,18 @@ function renderTrendChart(){
     document.getElementById('trend-table').innerHTML='<div style="color:var(--muted);text-align:center;padding:20px">尚無記錄，請按「📷 記錄本月」開始</div>';
     return;
   }
-  const snaps=db.snapshots;
-  const labels=snaps.map(s=>s.ym.length===7?s.ym:s.ym.slice(5)); // 月份顯示ym，日期顯示MM/DD
+  // 更新年份下拉
+  const yearSel=document.getElementById('tc-year');
+  if(yearSel){
+    const years=[...new Set(db.snapshots.map(s=>(s.ym||'').slice(0,4)).filter(Boolean))].sort((a,b)=>b-a);
+    const curVal=yearSel.value;
+    yearSel.innerHTML='<option value="all">全部年份</option>'+years.map(y=>`<option value="${y}">${y}年</option>`).join('');
+    if(years.includes(curVal))yearSel.value=curVal;
+  }
+  // 篩選年份
+  const selYear=yearSel?.value||'all';
+  const snaps=selYear==='all'?db.snapshots:db.snapshots.filter(s=>(s.ym||'').startsWith(selYear));
+  const labels=snaps.map(s=>s.ym.length===7?s.ym:s.ym.slice(5));
   const showNet=document.getElementById('tc-net')?.checked;
   const showDiv=document.getElementById('tc-div')?.checked;
   const showCf=document.getElementById('tc-cf')?.checked;
