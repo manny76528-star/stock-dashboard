@@ -406,7 +406,7 @@
       "lots": 43,
       "avgPrice": 16.45,
       "divPerShare": 0,
-      "note": "現股",
+      "note": "質押中",
       "url": "https://www.wantgoo.com/stock/etf/009805/dividend-policy/ex-dividend",
       "holdType": "short",
       "targetRoi": 5,
@@ -854,7 +854,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1779704151967,
+  "_ts": 1779704228769,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
