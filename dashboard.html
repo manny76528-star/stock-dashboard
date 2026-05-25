@@ -2443,8 +2443,11 @@ body:not(.privacy) .privacy-mask{filter:none;}
 <!-- ══ 投資標的詳情 Modal ══ -->
 <div class="mo" id="inv-detail-modal" style="z-index:1600">
   <div class="modal" style="max-width:680px;width:100%">
-    <div class="mt" id="inv-detail-modal-title">📊 標的詳情</div>
-    <div id="inv-detail-modal-body" style="padding:0"></div>
+    <div class="mt">
+      <div id="inv-detail-modal-title">📊 標的詳情</div>
+      <button onclick="closeModal('inv-detail-modal')" style="background:none;border:none;font-size:20px;cursor:pointer;color:#94a3b8;line-height:1">✕</button>
+    </div>
+    <div id="inv-detail-modal-body" style="padding:0;max-height:75vh;overflow-y:auto"></div>
   </div>
 </div>
 
@@ -3569,7 +3572,6 @@ function toggleInvDetail(id){
   if(!modal)return;
 
   title.innerHTML=`<span style="font-family:var(--mono);font-weight:800;color:#1e293b">${inv.code}</span>${inv.name?` <span style="font-size:13px;color:#64748b">${inv.name}</span>`:''}`;
-
   body.innerHTML=
     // 數字區
     '<div class="irow-l3-nums" style="padding:14px 18px">'
@@ -5854,7 +5856,33 @@ setInterval(()=>{const h=new Date().getHours(),m=new Date().getMinutes();if(h*60
 </script>
 
 <script>
-// Auth 已移至頁面頂部
+// 手機返回鍵攔截：關閉最上層 Modal 而不是跳頁
+(function(){
+  // 進入頁面時推一個 history state
+  history.pushState({page:'dashboard'},'','');
+  window.addEventListener('popstate',function(e){
+    // 有開著的 Modal 就關掉，否則再推一個 state 防止跳頁
+    const modals=[
+      'inv-detail-modal','invModal','buyModal','sellModal',
+      'divModal','journalModal','fp-stocks-modal','fp-buy-modal',
+      'sp-finplan','sp-journal','sp-health','sp-watch','sp-analytics','sp-flex','sp-div',
+      'sp-stock-tracker','txn-query-modal'
+    ];
+    let closed=false;
+    for(const id of modals){
+      const el=document.getElementById(id);
+      if(el&&(el.style.display==='flex'||el.style.display==='block'||el.classList.contains('open'))){
+        // 關閉這個 modal
+        if(el.classList.contains('open'))el.classList.remove('open');
+        else el.style.display='none';
+        closed=true;
+        break;
+      }
+    }
+    // 不管有沒有關 modal，都補推一個 state 防止下次返回跳出頁面
+    history.pushState({page:'dashboard'},'','');
+  });
+})();
 
 
 
