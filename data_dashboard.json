@@ -854,7 +854,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1779702966316,
+  "_ts": 1779703563960,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
@@ -913,6 +913,23 @@
     }
   ],
   "journals": [
+    {
+      "id": "mpl1jtu6ssf",
+      "date": "2026-05-25",
+      "tags": [
+        "重大事項"
+      ],
+      "market": "魯比歐：稍晚宣布美伊協議 正式結束戰爭\n台股創史上第5大漲點1376點 三天狂漲3623點收43644點新高",
+      "marketUrl": "https://news.ltn.com.tw/news/world/breakingnews/5447914",
+      "mood": "😊 興奮",
+      "content": "上週禮拜一到禮拜三 ,累計三天下跌1300多點 , 禮拜四跟五就在輝達的亮眼財報下反彈\n今天更是在美國即將抽離伊朗戰爭的前提下上演史上第五大漲幅 , 如果不是咬者AI持續資本支出的利多,早在禮拜三 00988A就差點被洗出去了 , \n00403A賣在10.8元後轉到30.4元的 00981A 上週一度累計下跌到-10% , 今天已經在創新高+5% , 反觀00403A 還沒碰到前波高點只收在30.58 , 且這三天反彈的漲幅也都遜於00981A\n目前來看轉到00981A上面是相當正確的決定",
+      "stockTags": [
+        "00403A"
+      ],
+      "images": [
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1779703488343_ts4t.jpg"
+      ]
+    },
     {
       "id": "mpgqznwgp45",
       "date": "2026-05-22",
