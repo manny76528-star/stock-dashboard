@@ -483,7 +483,7 @@
       "avgPrice": 30.34,
       "divPerShare": 0,
       "note": "現股",
-      "url": "https://www.wantgoo.com/stock/etf/00981D/dividend-policy/ex-dividend",
+      "url": "https://www.wantgoo.com/stock/etf/00981A/dividend-policy/ex-dividend",
       "holdType": "short",
       "targetRoi": 5,
       "transactions": [
@@ -854,7 +854,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1779683543423,
+  "_ts": 1779683552841,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
