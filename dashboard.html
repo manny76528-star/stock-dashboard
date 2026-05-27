@@ -3561,6 +3561,7 @@ function renderInv(){
 }
 
 function toggleInvDetail(id){
+  try{
   const inv=db.investments.find(i=>i.id===id);
   if(!inv)return;
   const c=calcInv(inv);
@@ -3569,11 +3570,16 @@ function toggleInvDetail(id){
   const modal=document.getElementById('inv-detail-modal');
   const title=document.getElementById('inv-detail-modal-title');
   const body=document.getElementById('inv-detail-modal-body');
-  if(!modal)return;
+  if(!modal||!title||!body)return;
 
   title.innerHTML=`<span style="font-family:var(--mono);font-weight:800;color:#1e293b">${inv.code}</span>${inv.name?` <span style="font-size:13px;color:#64748b">${inv.name}</span>`:''}`;
+
+  let txnRows='';
+  try{txnRows=buildTxnRows(inv,c,'all');}catch(e){txnRows='<div style="color:#94a3b8;padding:8px">（無交易記錄）</div>';}
+
+  const years=[...new Set((inv.transactions||[]).map(t=>(t.date||'').slice(0,4)).filter(Boolean))].sort((a,b)=>b-a);
+
   body.innerHTML=
-    // 數字區
     '<div class="irow-l3-nums" style="padding:14px 18px">'
       +'<div class="irow-l3-kv"><span class="irow-l3-k">均買價</span><span class="irow-l3-v">$'+fmtF(c.avgCost)+'</span></div>'
       +'<div class="irow-l3-kv"><span class="irow-l3-k">總成本</span><span class="irow-l3-v">'+fmt(c.tCost)+'</span></div>'
@@ -3581,7 +3587,6 @@ function toggleInvDetail(id){
       +'<div class="irow-l3-kv"><span class="irow-l3-k">月配息</span><span class="irow-l3-v" style="color:var(--gain)">'+(c.moDivAmt>0?fmt(c.moDivAmt):'—')+'</span></div>'
       +'<div class="irow-l3-kv"><span class="irow-l3-k">佔比</span><span class="irow-l3-v">'+portPct.toFixed(1)+'%</span></div>'
     +'</div>'
-    // 操作按鈕
     +'<div class="irow-l3-btns" style="padding:8px 18px">'
       +'<button class="irow-btn buy" onclick="closeModal(\'inv-detail-modal\');openBuyModal(\''+inv.id+'\')">▲ 買入</button>'
       +'<button class="irow-btn sell" onclick="closeModal(\'inv-detail-modal\');openSellModal(\''+inv.id+'\')">▼ 賣出</button>'
@@ -3591,24 +3596,20 @@ function toggleInvDetail(id){
       +'<button class="irow-btn" onclick="closeModal(\'inv-detail-modal\');moveInv(\''+inv.id+'\',1)">↓</button>'
       +'<button class="irow-btn del" onclick="closeModal(\'inv-detail-modal\');delInv(\''+inv.id+'\')">🗑 刪除</button>'
     +'</div>'
-    // 交易記錄
     +'<div class="irow-l3-hist" style="padding:0 18px 14px">'
       +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">'
         +'<div class="irow-l3-hist-title" style="cursor:default">📋 交易記錄（'+(inv.transactions||[]).length+' 筆）</div>'
         +'<select id="txn-yr-modal-'+inv.id+'" onchange="filterTxnYearModal(\''+inv.id+'\')" style="padding:3px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:11px;font-weight:700;color:#475569;background:#fff;cursor:pointer;outline:none">'
           +'<option value="all">全部年份</option>'
-          +(()=>{
-            const years=[...new Set((inv.transactions||[]).map(t=>(t.date||'').slice(0,4)).filter(Boolean))].sort((a,b)=>b-a);
-            return years.map(y=>'<option value="'+y+'">'+y+'年</option>').join('');
-          })()
+          +years.map(y=>'<option value="'+y+'">'+y+'年</option>').join('')
         +'</select>'
       +'</div>'
-      +'<div class="irow-hist-body" id="hr-modal-'+inv.id+'">'+buildTxnRows(inv,c,'all')+'</div>'
+      +'<div class="irow-hist-body" id="hr-modal-'+inv.id+'">'+txnRows+'</div>'
     +'</div>';
 
-  // 點外面不關閉（只能按 ✕）
   modal.onclick=function(e){e.stopPropagation();};
   openModal('inv-detail-modal');
+  }catch(e){console.error('toggleInvDetail錯誤:',e);toast('⚠️ 開啟詳情失敗: '+e.message);}
 }
 
 function filterTxnYearModal(id){
@@ -4321,17 +4322,21 @@ function renderSum(){
 
 // ═══════ MODALS ═══════
 function openModal(id){
-  document.getElementById(id).classList.add('open');
-  // 暫時移除 sp-overlay 的 backdrop-filter，避免 stacking context 把 modal 壓在後面
+  const el=document.getElementById(id);
+  if(!el)return;
+  el.classList.add('open');
+  el.style.display='flex';
   document.querySelectorAll('.sp-overlay').forEach(el=>{
     el.style.backdropFilter='none';
     el.style.webkitBackdropFilter='none';
   });
 }
 function closeModal(id){
-  document.getElementById(id).classList.remove('open');
+  const el=document.getElementById(id);
+  if(!el)return;
+  el.classList.remove('open');
+  el.style.display='none';
   editId=null;
-  // 還原 sp-overlay 的 backdrop-filter
   document.querySelectorAll('.sp-overlay').forEach(el=>{
     el.style.backdropFilter='';
     el.style.webkitBackdropFilter='';
