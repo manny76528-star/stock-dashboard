@@ -2440,6 +2440,17 @@ body:not(.privacy) .privacy-mask{filter:none;}
   </div>
 </div>
 
+<!-- ══ 快照明細 Modal ══ -->
+<div class="mo" id="snap-detail-modal" style="z-index:1600;display:none">
+  <div class="modal" style="max-width:500px;width:100%">
+    <div class="mt">
+      <h3 id="snap-detail-title">📋 當週持股明細</h3>
+      <button onclick="closeModal('snap-detail-modal')" style="background:none;border:none;font-size:20px;cursor:pointer;color:#94a3b8">✕</button>
+    </div>
+    <div id="snap-detail-body" style="padding:14px 16px;max-height:70vh;overflow-y:auto"></div>
+  </div>
+</div>
+
 <!-- ══ 投資標的詳情 Modal ══ -->
 <div class="mo" id="inv-detail-modal" style="z-index:1600">
   <div class="modal" style="max-width:680px;width:100%">
@@ -5466,7 +5477,26 @@ function recordSnapshot(manual=false){
   const fl=Math.round(tD-mO);
   const dateKey=new Date().toISOString().slice(0,10); // 完整日期 YYYY-MM-DD
   const existing=db.snapshots.findIndex(s=>s.ym===dateKey);
-  const snap={ym:dateKey,net:Math.round(net),div:Math.round(tD),cf:fl,debtRatio:dR};
+  const snap={
+    ym:dateKey,
+    net:Math.round(net),
+    div:Math.round(tD),
+    cf:fl,
+    debtRatio:dR,
+    // 各標的庫存快照
+    holdings:db.investments.map(inv=>{
+      const c=calcInv(inv);
+      const totalShares=c.tLots*1000;
+      const price=db.prices[inv.code]?.price||null;
+      return{
+        code:inv.code,
+        name:inv.name||'',
+        lots:c.tLots,
+        price:price,
+        pnl:c.mktVal!=null?Math.round(c.mktVal-c.tCost):null
+      };
+    }).filter(h=>h.lots>0)
+  };
   if(existing>=0)db.snapshots[existing]=snap;
   else db.snapshots.push(snap);
   db.snapshots.sort((a,b)=>a.ym.localeCompare(b.ym));
@@ -5573,7 +5603,10 @@ function renderTrendChart(){
     tblHtml+='<td style="padding:10px 14px;text-align:right;font-weight:600;color:#16a34a;border-bottom:1px solid #f1f5f9">$'+s.div.toLocaleString()+'</td>';
     tblHtml+='<td style="padding:10px 14px;text-align:right;font-weight:600;color:'+cfColor+';border-bottom:1px solid #f1f5f9">'+(s.cf>=0?'+':'')+s.cf.toLocaleString()+'</td>';
     tblHtml+='<td style="padding:10px 14px;text-align:right;color:#64748b;border-bottom:1px solid #f1f5f9">'+s.debtRatio+'%</td>';
-    tblHtml+='<td style="padding:10px 14px;text-align:center;border-bottom:1px solid #f1f5f9"><button onclick="deleteSnapshot(\'' +s.ym+ '\')" style="background:none;border:1px solid #fca5a5;color:#dc2626;border-radius:6px;padding:3px 8px;font-size:10px;cursor:pointer;font-weight:600">刪</button></td>';
+    tblHtml+='<td style="padding:10px 14px;text-align:center;border-bottom:1px solid #f1f5f9">';
+    tblHtml+='<button onclick="openSnapDetail(\''+s.ym+'\')" style="background:#eff6ff;border:1px solid #bfdbfe;color:#2563eb;border-radius:6px;padding:3px 8px;font-size:10px;cursor:pointer;font-weight:600;margin-right:4px">📋</button>';
+    tblHtml+='<button onclick="deleteSnapshot(\''+s.ym+'\')" style="background:none;border:1px solid #fca5a5;color:#dc2626;border-radius:6px;padding:3px 8px;font-size:10px;cursor:pointer;font-weight:600">刪</button>';
+    tblHtml+='</td>';
     tblHtml+='</tr>';
   });
   tblHtml+='</tbody></table></div>';
@@ -5589,6 +5622,42 @@ function clearAndReRecord(){
   // Force re-record with correct formula
   recordSnapshot(false);
   toast('✅ 本月快照已重算');
+}
+
+function openSnapDetail(ym){
+  const snap=db.snapshots.find(s=>s.ym===ym);
+  if(!snap)return;
+  document.getElementById('snap-detail-title').textContent='📋 '+ym+' 持股明細';
+  const body=document.getElementById('snap-detail-body');
+  const holdings=snap.holdings||[];
+  if(holdings.length===0){
+    body.innerHTML='<div style="text-align:center;padding:30px;color:#94a3b8">此快照無持股明細<br><span style="font-size:11px">（2026/05/22之後記錄的快照才有明細）</span></div>';
+  } else {
+    body.innerHTML='<table style="width:100%;border-collapse:collapse;font-size:13px">'
+      +'<thead><tr style="background:linear-gradient(135deg,#0f172a,#1e3a5f)">'
+        +'<th style="padding:8px 10px;text-align:left;color:rgba(255,255,255,.7);font-size:11px">標的</th>'
+        +'<th style="padding:8px 10px;text-align:right;color:rgba(255,255,255,.7);font-size:11px">張數</th>'
+        +'<th style="padding:8px 10px;text-align:right;color:rgba(255,255,255,.7);font-size:11px">收盤價</th>'
+        +'<th style="padding:8px 10px;text-align:right;color:rgba(255,255,255,.7);font-size:11px">損益</th>'
+      +'</tr></thead><tbody>'
+      +holdings.map((h,i)=>{
+        const pnlColor=h.pnl>=0?'#dc2626':'#16a34a';
+        const bg=i%2===0?'#fff':'#f8fafc';
+        return'<tr style="background:'+bg+'">'
+          +'<td style="padding:8px 10px;border-bottom:1px solid #f1f5f9">'
+            +'<div style="font-weight:700;color:#2563eb;font-family:monospace">'+h.code+'</div>'
+            +(h.name?'<div style="font-size:11px;color:#94a3b8">'+h.name+'</div>':'')
+          +'</td>'
+          +'<td style="padding:8px 10px;text-align:right;border-bottom:1px solid #f1f5f9;color:#1e293b;font-weight:600">'+h.lots+'張</td>'
+          +'<td style="padding:8px 10px;text-align:right;border-bottom:1px solid #f1f5f9;color:#1e293b">'+(h.price?'$'+h.price:'—')+'</td>'
+          +'<td style="padding:8px 10px;text-align:right;border-bottom:1px solid #f1f5f9;font-weight:700;color:'+pnlColor+'">'
+            +(h.pnl!=null?(h.pnl>=0?'+':'')+h.pnl.toLocaleString():'—')
+          +'</td>'
+        +'</tr>';
+      }).join('')
+      +'</tbody></table>';
+  }
+  openModal('snap-detail-modal');
 }
 
 function deleteSnapshot(ym){
