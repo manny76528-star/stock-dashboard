@@ -1654,8 +1654,8 @@ body:not(.privacy) .privacy-mask{filter:none;}
   <div class="trend-body" id="trend-body">
     <div class="trend-checks">
       <label><input type="checkbox" id="tc-net" checked onchange="renderTrendChart()">淨資產</label>
-      <label><input type="checkbox" id="tc-div" checked onchange="renderTrendChart()">每月股息</label>
-      <label><input type="checkbox" id="tc-cf" checked onchange="renderTrendChart()">每月現金流</label>
+      <label><input type="checkbox" id="tc-div" onchange="renderTrendChart()">每月股息</label>
+      <label><input type="checkbox" id="tc-cf" onchange="renderTrendChart()">每月現金流</label>
       <label><input type="checkbox" id="tc-debt" onchange="renderTrendChart()">負債比(%)</label>
       <select id="tc-year" onchange="renderTrendChart()" style="padding:3px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:11px;font-weight:700;color:#475569;background:#fff;cursor:pointer;outline:none;margin-left:auto">
         <option value="all">全部年份</option>
@@ -5664,8 +5664,12 @@ function openSnapDetail(ym){
 
 function deleteSnapshot(ym){
   if(!doubleConfirm(`確定要刪除 ${ym} 的快照記錄？`))return;
+  // 先存入 undoStack 讓上一步能還原
+  undoStack.push(JSON.stringify(db));
+  if(undoStack.length>15)undoStack.shift();
+  const _ub=document.getElementById('undoBtn');if(_ub)_ub.disabled=false;
   db.snapshots=(db.snapshots||[]).filter(s=>s.ym!==ym);
-  save();renderTrendChart();toast(`已刪除 ${ym} 快照`);
+  save();renderTrendChart();toast(`已刪除 ${ym} 快照，可按「← 上一步」還原`);
 }
 
 function editTitle(){
