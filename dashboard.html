@@ -3028,6 +3028,8 @@ async function manualSync(){
   _ghSha='';
   const updated=await ghPull();
   if(updated){render();runDailyProcess(false);}
+  // Pull 完成後才執行自動快照（確保用最新資料）
+  autoSnapshot();
   await ghPush();
   showSyncStatus('✅ 同步完成');
 }
@@ -5903,13 +5905,11 @@ runDailyProcess(false);
 
 
 // Auto snapshot on 1st of each month
-(function autoSnapshot(){
+function autoSnapshot(){
   const today=new Date();
   const dow=today.getDay();
   const hour=today.getHours();
-  // 週五 15:00 以後才執行
   if(dow!==5||hour<15)return;
-  // 用本地時間產生 dateKey（避免 UTC 時區問題）
   const y=today.getFullYear();
   const m=String(today.getMonth()+1).padStart(2,'0');
   const d=String(today.getDate()).padStart(2,'0');
@@ -5919,7 +5919,9 @@ runDailyProcess(false);
   localStorage.setItem(snapshotKey,'1');
   if(!db.snapshots)db.snapshots=[];
   setTimeout(()=>recordSnapshot(false),1500);
-})();
+}
+// 頁面載入時也試一次（如果本地已是最新就直接拍）
+autoSnapshot();
 // Restore custom title
 if(db.settings?.title){
   const td=document.getElementById('title-display');
