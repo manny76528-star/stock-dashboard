@@ -6111,7 +6111,7 @@
     },
     {
       "id": "moa30mo404bp",
-      "date": "2026-05-12",
+      "date": "2026-05-28",
       "custId": "mnmofk0wpc0i",
       "custName": "訊控有限公司",
       "contact": "陳甫騁先生",
@@ -6144,10 +6144,13 @@
         }
       ],
       "paid": false,
-      "paidDate": "2026-05-12",
+      "paidDate": "2026-05-28",
       "vendorPaid": false,
       "vendorPaidDate": "",
-      "images": []
+      "images": [
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/order-images/1780048369065_thm9.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/order-images/1780048372511_sd9b.jpg"
+      ]
     },
     {
       "id": "moatovh0vw95",
@@ -6520,6 +6523,6 @@
     "bankCode": "013",
     "bankAccount": "061506186489"
   },
-  "_ts": 1780048311441,
+  "_ts": 1780048386497,
   "_vendorPaidBackfilled": true
 }
