@@ -5866,9 +5866,9 @@
       ],
       "paid": true,
       "paidDate": "2026-03-02",
-      "createdAt": "2026-04-08T10:21:54.921Z",
       "vendorPaid": true,
-      "vendorPaidDate": ""
+      "vendorPaidDate": "",
+      "images": []
     },
     {
       "id": "mnpwg3csf6cq",
@@ -6523,6 +6523,6 @@
     "bankCode": "013",
     "bankAccount": "061506186489"
   },
-  "_ts": 1780048396990,
+  "_ts": 1780048405995,
   "_vendorPaidBackfilled": true
 }
