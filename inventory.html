@@ -2005,14 +2005,42 @@ function removeOImg(i){
   renderOImgPreview();
 }
 
-function handleOImgUpload(event){
+async function handleOImgUpload(event){
   const files=Array.from(event.target.files);
-  files.forEach(file=>{
-    compressImg(file,800,0.72).then(b64=>{
-      window._oImgs.push(b64);
-      renderOImgPreview();
+  const label=document.querySelector('label[for="o-img-input"]')||event.target.closest('label');
+  if(label){label.style.opacity='.5';label.style.pointerEvents='none';}
+  let done=0;
+  for(const file of files){
+    const reader=new FileReader();
+    await new Promise(resolve=>{
+      reader.onload=async e=>{
+        const b64=e.target.result.split(',')[1];
+        const ext=file.name.split('.').pop().toLowerCase()||'jpg';
+        const fname=`order-images/${Date.now()}_${Math.random().toString(36).slice(2,6)}.${ext}`;
+        try{
+          let sha='';
+          try{const chk=await fetch(CF_WORKER_INV+'/'+fname);if(chk.ok){const cj=await chk.json();sha=cj.sha||'';}}catch(e){}
+          const body={message:'order-img:'+Date.now(),content:b64};
+          if(sha)body.sha=sha;
+          const r=await fetch(CF_WORKER_INV+'/'+fname,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+          if(r.ok){
+            const url=`https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/${fname}`;
+            window._oImgs.push(url);
+            renderOImgPreview();
+          } else {
+            toast('⚠️ 圖片上傳失敗');
+          }
+        }catch(err){
+          toast('⚠️ 上傳失敗: '+err.message);
+        }
+        done++;
+        resolve();
+      };
+      reader.readAsDataURL(file);
     });
-  });
+  }
+  if(label){label.style.opacity='';label.style.pointerEvents='';}
+  if(done>0)toast('✅ 圖片已上傳至雲端');
   event.target.value='';
 }
 
