@@ -468,15 +468,25 @@ function updateStats(){
   if(el('top-sub'))el('top-sub').textContent=total>0?`共 ${total} 個・已完成 ${done} 個・不熟 ${weakCount} 個`:'尚未載入單字';
 }
 
-// ══════════════════════════════════════
-// BROWSE PAGE
-// ══════════════════════════════════════
+// 當前這輪的洗牌順序（翻頁時保持固定）
+let _shuffledVocab = [];
+
+function getShuffledNotDone(){
+  const notDoneIds = new Set(db.vocab.filter(v=>!db.todayDone.includes(v.id)).map(v=>v.id));
+  // 過濾掉已完成的，保留順序
+  _shuffledVocab = _shuffledVocab.filter(v=>notDoneIds.has(v.id));
+  // 加入新的（尚未在清單裡的）
+  const existing = new Set(_shuffledVocab.map(v=>v.id));
+  const newWords = shuffle(db.vocab.filter(v=>notDoneIds.has(v.id)&&!existing.has(v.id)));
+  _shuffledVocab = [..._shuffledVocab, ...newWords];
+  return _shuffledVocab;
+}
 function renderBrowsePage(){
   const list=el('browse-list');
   const allDone=el('all-done');
   if(!list)return;
 
-  const notDone=db.vocab.filter(v=>!db.todayDone.includes(v.id));
+  const notDone=getShuffledNotDone();
   const totalPages=Math.ceil(notDone.length/PAGE_SIZE);
 
   if(notDone.length===0){
@@ -542,7 +552,7 @@ function prevPage(){
 }
 
 function nextPage(){
-  const notDone=db.vocab.filter(v=>!db.todayDone.includes(v.id));
+  const notDone=getShuffledNotDone();
   const totalPages=Math.ceil(notDone.length/PAGE_SIZE);
   const start=currentPage*PAGE_SIZE;
   const pageWords=notDone.slice(start,start+PAGE_SIZE);
@@ -571,6 +581,7 @@ function restartAll(){
   db.todayDone=[];
   currentPage=0;
   db.currentPage=0;
+  _shuffledVocab=[];
   saveDB();
   renderBrowsePage();
 }
