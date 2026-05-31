@@ -236,54 +236,42 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-seri
 
   <!-- Tab -->
   <div class="tab-nav">
-    <button class="tab-btn active" onclick="switchTab('match')">🎯 配對</button>
-    <button class="tab-btn" onclick="switchTab('errors')">❌ 常錯</button>
-    <button class="tab-btn" onclick="switchTab('practice-errors')">🔥 練常錯</button>
+    <button class="tab-btn active" onclick="switchTab('match')">📖 對照瀏覽</button>
+    <button class="tab-btn" onclick="switchTab('weak')">❌ 不熟單字</button>
     <button class="tab-btn" onclick="switchTab('numbers')">🔢 數字</button>
     <button class="tab-btn" onclick="switchTab('import')">📥 匯入</button>
   </div>
 
-  <!-- ══ TAB 1: 配對練習 ══ -->
+  <!-- ══ TAB 1: 對照瀏覽 ══ -->
   <div class="view active" id="view-match">
-    <div class="round-bar">
-      <div class="round-info">第 <b id="round-num">1</b> 輪　本輪 <b>10</b> 組　<span id="round-matched">0</span>/10 已配對</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <!-- 模式切換 -->
-        <button class="btn btn-sm" id="mode-btn" onclick="toggleMode()" style="background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.4);color:#a78bfa;font-weight:700">
-          👁 看日文找中文
-        </button>
-        <button class="btn btn-ghost btn-sm" onclick="shuffleAnswers()">🔀 重排答案</button>
-        <button class="btn btn-primary btn-sm" onclick="nextRound()">下一輪 →</button>
+
+    <!-- 控制列 -->
+    <div class="round-bar" style="margin-bottom:10px">
+      <div class="round-info">第 <b id="page-num">1</b> 頁　<span id="page-range">1-20</span>　共 <b id="total-pages">0</b> 頁</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <button class="btn btn-ghost btn-sm" onclick="prevPage()">← 上一頁</button>
+        <button class="btn btn-primary btn-sm" onclick="nextPage()">下一頁 +進度 →</button>
       </div>
     </div>
 
-    <div class="match-wrap" id="match-area">
+    <!-- 對照列表 -->
+    <div id="browse-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px">
       <!-- JS 渲染 -->
     </div>
 
-    <div id="round-complete" style="display:none">
-      <div class="result-panel">
-        <div class="result-emoji">🎉</div>
-        <div class="result-title">本輪完成！</div>
-        <div class="result-sub" id="round-result-sub"></div>
-        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
-          <button class="btn btn-primary" onclick="nextRound()">繼續下一輪 →</button>
-          <button class="btn btn-ghost" onclick="restartAll()">重頭開始</button>
-        </div>
-      </div>
-    </div>
-
+    <!-- 全部完成 -->
     <div id="all-done" style="display:none">
       <div class="result-panel">
         <div class="result-emoji">🏆</div>
         <div class="result-title">全部完成！</div>
         <div class="result-sub" id="all-done-sub"></div>
         <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
-          <button class="btn btn-warn" onclick="restartAll()">再來一次</button>
-          <button class="btn btn-ghost" onclick="switchTab('errors')">查看常錯單字</button>
+          <button class="btn btn-primary" onclick="restartAll()">重頭開始</button>
+          <button class="btn btn-warn btn-sm" onclick="switchTab('weak')">❌ 練習不熟單字</button>
         </div>
       </div>
     </div>
+
   </div>
 
   <!-- ══ TAB 2: 常錯單字 ══ -->
@@ -356,6 +344,22 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-seri
     </div>
   </div>
 
+  <!-- ══ TAB: 不熟單字 ══ -->
+  <div class="view" id="view-weak">
+    <div class="round-bar" style="margin-bottom:10px">
+      <div class="round-info">不熟單字　第 <b id="weak-page-num">1</b> 頁　共 <b id="weak-total-pages">0</b> 頁</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-ghost btn-sm" onclick="prevWeakPage()">← 上一頁</button>
+        <button class="btn btn-primary btn-sm" onclick="nextWeakPage()">下一頁 →</button>
+      </div>
+    </div>
+    <div id="weak-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px"></div>
+    <div id="weak-empty" style="display:none;text-align:center;padding:40px;color:var(--muted)">
+      <div style="font-size:40px;margin-bottom:8px">🎉</div>
+      <div style="font-size:16px;font-weight:700">沒有不熟的單字！</div>
+    </div>
+  </div>
+
   <!-- ══ TAB 5: 匯入管理 ══ -->
   <div class="view" id="view-import">
     <div class="import-zone" id="drop-zone"
@@ -408,11 +412,12 @@ function loadDB(){
 }
 function newDB(){
   return {
-    vocab:[],         // [{id,q,a}]
-    errors:{},        // {id: count}
-    todayDone:[],     // [id] 今日完成
+    vocab:[],
+    weak:{},        // {id: true} 不熟單字
+    todayDone:[],   // 已完成的 id（累積）
     todayDate:'',
-    streak:0,
+    currentPage:0,  // 目前在第幾頁（0-based）
+    weakPage:0,
   };
 }
 function saveDB(){
@@ -430,414 +435,212 @@ function checkNewDay(){
 checkNewDay();
 
 // ══════════════════════════════════════
-// MATCH GAME STATE
-// ══════════════════════════════════════
-const ROUND_SIZE=10;
-let roundQueue=[];
-let roundAnswers=[];
-let roundMatchedIds=new Set();
-let selectedLeft=null;
-let selectedRight=null;
-let roundMatchedCount=0;
-let currentRound=1;
-let totalMatchedToday=0;
+// BROWSE MODE STATE
+const PAGE_SIZE = 20;
+let currentPage = 0;   // 0-based
+let weakPage = 0;
 
 // ══════════════════════════════════════
 // INIT
 // ══════════════════════════════════════
 function init(){
+  // 相容舊資料
+  if(!db.weak)db.weak={};
+  if(!db.todayDone)db.todayDone=[];
+  if(db.currentPage!==undefined)currentPage=db.currentPage;
   updateStats();
-  buildRound();
-  renderVocabPreview();
-  // 初始化模式按鈕
-  const btn=el('mode-btn');
-  if(btn){btn.textContent='📖 看中文找日文';btn.style.background='rgba(14,165,233,.15)';btn.style.borderColor='rgba(14,165,233,.4)';btn.style.color='#38bdf8';}
+  renderBrowsePage();
 }
 
 function updateStats(){
   const total=db.vocab.length;
   const done=db.todayDone.length;
+  const weakCount=Object.keys(db.weak||{}).length;
   const remain=Math.max(0,total-done);
-  const errCount=Object.values(db.errors).filter(c=>c>=2).length;
-  el('s-total').textContent=total;
-  el('s-done').textContent=done;
-  el('s-remain').textContent=remain;
-  el('s-errors').textContent=errCount;
-  el('s-streak').textContent=db.streak||0;
+  if(el('s-total'))el('s-total').textContent=total;
+  if(el('s-done'))el('s-done').textContent=done;
+  if(el('s-remain'))el('s-remain').textContent=remain;
+  if(el('s-errors'))el('s-errors').textContent=weakCount;
+  if(el('s-streak'))el('s-streak').textContent='';
   const pct=total>0?Math.round(done/total*100):0;
-  el('prog-bar').style.width=pct+'%';
-  el('prog-text').textContent=done+' / '+total;
-  el('top-sub').textContent=total>0?`共 ${total} 個單字・今日完成 ${done} 個`:'尚未載入單字';
+  if(el('prog-bar'))el('prog-bar').style.width=pct+'%';
+  if(el('prog-text'))el('prog-text').textContent=done+' / '+total;
+  if(el('top-sub'))el('top-sub').textContent=total>0?`共 ${total} 個・已完成 ${done} 個・不熟 ${weakCount} 個`:'尚未載入單字';
 }
 
 // ══════════════════════════════════════
-// ROUND BUILDER
+// BROWSE PAGE
 // ══════════════════════════════════════
-function buildRound(){
-  el('round-complete').style.display='none';
-  el('all-done').style.display='none';
-  el('match-area').style.display='';
+function renderBrowsePage(){
+  const list=el('browse-list');
+  const allDone=el('all-done');
+  if(!list)return;
 
-  // 優先挑今天還沒完成的
   const notDone=db.vocab.filter(v=>!db.todayDone.includes(v.id));
+  const totalPages=Math.ceil(notDone.length/PAGE_SIZE);
 
   if(notDone.length===0){
-    // 全部完成 → 顯示完成畫面，歸零讓下次重練
-    el('match-area').style.display='none';
-    el('all-done').style.display='block';
-    const errTotal=Object.values(db.errors).reduce((a,b)=>a+b,0);
-    el('all-done-sub').textContent=`共完成 ${db.vocab.length} 個單字！錯誤累計 ${errTotal} 次`;
-    // 歸零，下次再練時從頭開始
-    db.todayDone=[];
-    db.streak=0;
-    saveDB();
+    list.style.display='none';
+    if(allDone){
+      allDone.style.display='block';
+      if(el('all-done-sub'))el('all-done-sub').textContent=`共完成 ${db.vocab.length} 個單字！不熟單字 ${Object.keys(db.weak||{}).length} 個`;
+    }
     updateStats();
     return;
   }
 
-  // 常錯的先出
-  const withErrors=notDone.filter(v=>(db.errors[v.id]||0)>=2);
-  const normal=notDone.filter(v=>(db.errors[v.id]||0)<2);
+  if(allDone)allDone.style.display='none';
+  list.style.display='flex';
 
-  let pool=[...shuffle(withErrors),...shuffle(normal)];
-  roundQueue=pool.slice(0,ROUND_SIZE);
-  roundAnswers=shuffle([...roundQueue]);
-  roundMatchedCount=0;
-  roundMatchedIds=new Set();
+  // 確保 currentPage 在範圍內
+  if(currentPage>=totalPages)currentPage=totalPages-1;
+  if(currentPage<0)currentPage=0;
 
-  el('round-num').textContent=currentRound;
-  el('round-matched').textContent='0';
-  renderMatchArea();
-}
+  const start=currentPage*PAGE_SIZE;
+  const pageWords=notDone.slice(start,start+PAGE_SIZE);
 
-// 0 = 看中文找日文（預設）, 1 = 看日文找中文
-let practiceMode=0;
+  // 更新頁碼
+  if(el('page-num'))el('page-num').textContent=currentPage+1;
+  if(el('total-pages'))el('total-pages').textContent=totalPages;
+  if(el('page-range'))el('page-range').textContent=(start+1)+'-'+Math.min(start+pageWords.length,notDone.length);
 
-function toggleMode(){
-  practiceMode=practiceMode===0?1:0;
-  const btn=el('mode-btn');
-  if(practiceMode===0){
-    btn.textContent='📖 看中文找日文';
-    btn.style.background='rgba(14,165,233,.15)';
-    btn.style.borderColor='rgba(14,165,233,.4)';
-    btn.style.color='#38bdf8';
-  } else {
-    btn.textContent='👁 看日文找中文';
-    btn.style.background='rgba(168,85,247,.15)';
-    btn.style.borderColor='rgba(168,85,247,.4)';
-    btn.style.color='#a78bfa';
-  }
-  // 重新渲染不重置進度
-  selectedLeft=null;selectedRight=null;selectedRight_id=null;
-  renderMatchArea();
-  toast(practiceMode===0?'模式：看中文 → 找日文':'模式：看日文 → 找中文');
-}
-
-function renderMatchArea(){
-  const area=el('match-area');
-  let leftHTML='', rightHTML='', midHTML='';
-
-  roundQueue.forEach((v,i)=>{
-    const isMatched=roundMatchedIds&&roundMatchedIds.has(v.id);
-    const matchedClass=isMatched?'matched':'';
-
-    // 根據模式決定左側顯示內容
-    if(practiceMode===0){
-      // 看中文找日文：左側顯示中文題目（q欄），右側顯示日文答案（a欄）
-      const parts=v.q.split('\n');
-      leftHTML+=`<div class="match-item ${matchedClass}" id="left-${v.id}" onclick="selectLeft('${v.id}')">
-        <div>
-          <div class="match-jp">${escHtml(parts[0])}</div>
-          ${parts[1]?`<div class="match-zh">${escHtml(parts[1])}</div>`:''}
-        </div>
-      </div>`;
-    } else {
-      // 看日文找中文：左側顯示日文答案（a欄），右側顯示中文題目（q欄）
-      leftHTML+=`<div class="match-item ${matchedClass}" id="left-${v.id}" onclick="selectLeft('${v.id}')">
-        <div class="match-ans" style="font-family:'Noto Sans JP',sans-serif;font-size:16px;font-weight:700;color:var(--accent)">${escHtml(v.a)}</div>
-      </div>`;
-    }
-    midHTML+=`<div class="match-connector"><div class="conn-line"></div></div>`;
-  });
-
-  roundAnswers.forEach((v,i)=>{
-    const isMatched=roundMatchedIds&&roundMatchedIds.has(v.id);
-    const matchedClass=isMatched?'matched':'';
-
-    if(practiceMode===0){
-      // 右側顯示日文答案
-      rightHTML+=`<div class="match-item ${matchedClass}" id="right-${i}" onclick="selectRight(${i},'${v.id}')">
-        <div class="match-ans">${escHtml(v.a)}</div>
-      </div>`;
-    } else {
-      // 右側顯示中文題目
-      const parts=v.q.split('\n');
-      rightHTML+=`<div class="match-item ${matchedClass}" id="right-${i}" onclick="selectRight(${i},'${v.id}')">
-        <div>
-          <div class="match-jp" style="color:var(--text);font-size:13px">${escHtml(parts[0])}</div>
-          ${parts[1]?`<div class="match-zh">${escHtml(parts[1])}</div>`:''}
-        </div>
-      </div>`;
-    }
-  });
-
-  area.innerHTML=`
-    <div class="match-col" id="col-left">${leftHTML}</div>
-    <div class="match-center">${midHTML}</div>
-    <div class="match-col" id="col-right">${rightHTML}</div>
-  `;
-}
-
-// ══════════════════════════════════════
-// SELECTION LOGIC
-// ══════════════════════════════════════
-function selectLeft(id){
-  // deselect previous
-  if(selectedLeft){
-    const prev=el('left-'+selectedLeft);
-    if(prev)prev.classList.remove('selected');
-  }
-  selectedLeft=id;
-  const item=el('left-'+id);
-  if(item){item.classList.add('selected');item.classList.remove('wrong');}
-  tryMatch();
-}
-
-function selectRight(idx,id){
-  if(selectedRight!==null){
-    const prev=el('right-'+selectedRight);
-    if(prev)prev.classList.remove('selected');
-  }
-  selectedRight=idx;
-  selectedRight_id=id;
-  const item=el('right-'+idx);
-  if(item){item.classList.add('selected');item.classList.remove('wrong');}
-  tryMatch();
-}
-
-let selectedRight_id=null;
-
-function tryMatch(){
-  if(selectedLeft===null||selectedRight===null)return;
-
-  const leftId=selectedLeft;
-  const rightId=selectedRight_id;
-  const rightIdx=selectedRight;
-
-  // reset
-  selectedLeft=null;selectedRight=null;selectedRight_id=null;
-
-  if(leftId===rightId){
-    // ✅ 正確
-    const lEl=el('left-'+leftId);
-    const rEl=el('right-'+rightIdx);
-    if(lEl){lEl.classList.remove('selected');lEl.classList.add('matched','pop');}
-    if(rEl){rEl.classList.remove('selected');rEl.classList.add('matched','pop');}
-
-    roundMatchedCount++;
-    roundMatchedIds.add(leftId);
-    el('round-matched').textContent=roundMatchedCount;
-
-    if(!db.todayDone.includes(leftId))db.todayDone.push(leftId);
-    db.streak=(db.streak||0)+1;
-    saveDB();
-    updateStats();
-
-    if(roundMatchedCount>=roundQueue.length){
-      setTimeout(showRoundComplete,400);
-    }
-  } else {
-    // ❌ 錯誤
-    const lEl=el('left-'+leftId);
-    const rEl=el('right-'+rightIdx);
-    if(lEl){lEl.classList.remove('selected');lEl.classList.add('wrong');setTimeout(()=>lEl.classList.remove('wrong'),600);}
-    if(rEl){rEl.classList.remove('selected');rEl.classList.add('wrong');setTimeout(()=>rEl.classList.remove('wrong'),600);}
-
-    // 累計錯誤
-    db.errors[leftId]=(db.errors[leftId]||0)+1;
-    db.streak=0;
-    saveDB();
-    updateStats();
-  }
-}
-
-function showRoundComplete(){
-  el('match-area').style.display='none';
-  el('round-complete').style.display='block';
-  const notDone=db.vocab.filter(v=>!db.todayDone.includes(v.id));
-  el('round-result-sub').textContent=`還有 ${notDone.length} 個單字待複習`;
-}
-
-function nextRound(){
-  currentRound++;
-  buildRound();
-}
-
-function shuffleAnswers(){
-  roundAnswers=shuffle([...roundAnswers]);
-  // re-render right col only
-  const rightCol=el('col-right');
-  if(!rightCol)return;
-  let html='';
-  roundAnswers.forEach((v,i)=>{
-    const isMatched=document.getElementById('right-'+i)?.classList.contains('matched');
-    html+=`<div class="match-item${isMatched?' matched':''}" id="right-${i}" onclick="selectRight(${i},'${v.id}')">
-      <div class="match-ans">${escHtml(v.a)}</div>
+  // 渲染單字列表
+  list.innerHTML=pageWords.map(v=>{
+    const isWeak=!!(db.weak||{})[v.id];
+    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:${isWeak?'rgba(239,68,68,.08)':'var(--surface)'};border:1px solid ${isWeak?'rgba(239,68,68,.3)':'var(--border)'};border-radius:10px;">
+      <div style="flex:1;font-size:15px;font-weight:700;color:var(--text)">${v.q}</div>
+      <div style="flex:1;font-size:15px;color:var(--accent);font-family:'Noto Sans JP',sans-serif;text-align:center">${v.a}</div>
+      <button onclick="toggleWeak('${v.id}')" style="flex-shrink:0;padding:5px 12px;border-radius:8px;border:1px solid ${isWeak?'rgba(239,68,68,.5)':'var(--border)'};background:${isWeak?'rgba(239,68,68,.15)':'transparent'};color:${isWeak?'#ef4444':'var(--muted)'};font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap">
+        ${isWeak?'✓ 不熟':'不熟'}
+      </button>
     </div>`;
+  }).join('');
+
+  updateStats();
+}
+
+function toggleWeak(id){
+  if(!db.weak)db.weak={};
+  if(db.weak[id]){
+    delete db.weak[id];
+  } else {
+    db.weak[id]=true;
+  }
+  saveDB();
+  renderBrowsePage();
+  renderWeakPage();
+}
+
+function prevPage(){
+  if(currentPage>0){
+    currentPage--;
+    db.currentPage=currentPage;
+    saveDB();
+    renderBrowsePage();
+    window.scrollTo(0,0);
+  }
+}
+
+function nextPage(){
+  const notDone=db.vocab.filter(v=>!db.todayDone.includes(v.id));
+  const totalPages=Math.ceil(notDone.length/PAGE_SIZE);
+  const start=currentPage*PAGE_SIZE;
+  const pageWords=notDone.slice(start,start+PAGE_SIZE);
+
+  // 計算本頁進度：不熟的不計入
+  const weakIds=Object.keys(db.weak||{});
+  const doneCount=pageWords.filter(v=>!weakIds.includes(v.id)).length;
+
+  // 把本頁所有單字加入 todayDone
+  pageWords.forEach(v=>{
+    if(!db.todayDone.includes(v.id))db.todayDone.push(v.id);
   });
-  rightCol.innerHTML=html;
+
+  if(doneCount>0)toast(`✅ +${doneCount} 個單字完成！`);
+
+  if(currentPage<totalPages-1){
+    currentPage++;
+    db.currentPage=currentPage;
+  }
+  saveDB();
+  renderBrowsePage();
+  window.scrollTo(0,0);
 }
 
 function restartAll(){
-  showConfirm({
-    icon:'🔁',
-    title:'重頭開始',
-    msg:'確定要從第一輪重新開始嗎？\n累積進度會清空，但錯誤統計和單字庫不受影響。',
-    btnText:'確定重頭開始',
-    btnClass:'btn-warn',
-    onOk:()=>{
-      db.todayDone=[];
-      db.streak=0;
-      saveDB();
-      currentRound=1;
-      updateStats();
-      buildRound();
-    }
-  });
+  db.todayDone=[];
+  currentPage=0;
+  db.currentPage=0;
+  saveDB();
+  renderBrowsePage();
 }
 
 // ══════════════════════════════════════
-// PRACTICE ERRORS
+// WEAK WORDS PAGE
 // ══════════════════════════════════════
-let peQueue=[], peAnswers=[], peLeft=null, peRight=null, peRightId=null, peMatched=0;
+function renderWeakPage(){
+  const list=el('weak-list');
+  const empty=el('weak-empty');
+  if(!list)return;
 
-function startPracticeErrors(){
-  const errVocab=db.vocab.filter(v=>(db.errors[v.id]||0)>=1)
-    .sort((a,b)=>(db.errors[b.id]||0)-(db.errors[a.id]||0))
-    .slice(0,10);
+  const weakIds=Object.keys(db.weak||{});
+  const weakWords=db.vocab.filter(v=>weakIds.includes(v.id));
+  const totalPages=Math.ceil(weakWords.length/PAGE_SIZE);
 
-  el('pe-done').style.display='none';
+  if(el('weak-total-pages'))el('weak-total-pages').textContent=Math.max(1,totalPages);
 
-  if(errVocab.length===0){
-    el('pe-match-area').innerHTML='<div class="empty"><div class="empty-icon">🎊</div><div>還沒有錯誤記錄！先去做配對練習吧</div></div>';
-    el('pe-round-bar').style.display='none';
-    el('pe-sub').textContent='從常錯單字中出題';
+  if(weakWords.length===0){
+    list.innerHTML='';
+    if(empty)empty.style.display='block';
     return;
   }
+  if(empty)empty.style.display='none';
 
-  peQueue=errVocab;
-  peAnswers=shuffle([...peQueue]);
-  peLeft=null;peRight=null;peRightId=null;peMatched=0;
+  if(weakPage>=totalPages)weakPage=totalPages-1;
+  if(weakPage<0)weakPage=0;
+  if(el('weak-page-num'))el('weak-page-num').textContent=weakPage+1;
 
-  el('pe-sub').textContent=`共 ${peQueue.length} 個常錯單字`;
-  el('pe-round-bar').style.display='block';
-  el('pe-total').textContent=peQueue.length;
-  el('pe-matched').textContent=0;
+  const start=weakPage*PAGE_SIZE;
+  const pageWords=weakWords.slice(start,start+PAGE_SIZE);
 
-  renderPEArea();
-}
-
-function renderPEArea(){
-  const area=el('pe-match-area');
-  let lH='',rH='',mH='';
-  peQueue.forEach(v=>{
-    lH+=`<div class="match-item" id="pe-left-${v.id}" onclick="pSelectLeft('${v.id}')">
-      <div>
-        <div class="match-jp">${escHtml(v.q.split('\n')[0])}</div>
-        ${v.q.split('\n')[1]?`<div class="match-zh">${escHtml(v.q.split('\n')[1])}</div>`:''}
-        <span class="badge badge-red" style="margin-top:4px;font-size:9px">錯 ${db.errors[v.id]||0} 次</span>
-      </div>
+  list.innerHTML=pageWords.map(v=>{
+    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:10px;">
+      <div style="flex:1;font-size:15px;font-weight:700;color:var(--text)">${v.q}</div>
+      <div style="flex:1;font-size:15px;color:var(--accent);font-family:'Noto Sans JP',sans-serif;text-align:center">${v.a}</div>
+      <button onclick="removeWeak('${v.id}')" style="flex-shrink:0;padding:5px 12px;border-radius:8px;border:1px solid rgba(34,197,94,.4);background:rgba(34,197,94,.1);color:#22c55e;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap">
+        ✓ 已熟移除
+      </button>
     </div>`;
-    mH+=`<div class="match-connector"><div class="conn-line"></div></div>`;
-  });
-  peAnswers.forEach((v,i)=>{
-    rH+=`<div class="match-item" id="pe-right-${i}" onclick="pSelectRight(${i},'${v.id}')">
-      <div class="match-ans">${escHtml(v.a)}</div>
-    </div>`;
-  });
-  area.innerHTML=`
-    <div class="match-col">${lH}</div>
-    <div class="match-center">${mH}</div>
-    <div class="match-col">${rH}</div>`;
+  }).join('');
 }
 
-function pSelectLeft(id){
-  if(peLeft){const p=el('pe-left-'+peLeft);if(p)p.classList.remove('selected');}
-  peLeft=id;
-  const item=el('pe-left-'+id);if(item){item.classList.add('selected');item.classList.remove('wrong');}
-  pTryMatch();
-}
-function pSelectRight(idx,id){
-  if(peRight!==null){const p=el('pe-right-'+peRight);if(p)p.classList.remove('selected');}
-  peRight=idx;peRightId=id;
-  const item=el('pe-right-'+idx);if(item){item.classList.add('selected');item.classList.remove('wrong');}
-  pTryMatch();
-}
-function pTryMatch(){
-  if(peLeft===null||peRight===null)return;
-  const lId=peLeft, rId=peRightId, rIdx=peRight;
-  peLeft=null;peRight=null;peRightId=null;
-  if(lId===rId){
-    const lEl=el('pe-left-'+lId), rEl=el('pe-right-'+rIdx);
-    if(lEl){lEl.classList.remove('selected');lEl.classList.add('matched','pop');}
-    if(rEl){rEl.classList.remove('selected');rEl.classList.add('matched','pop');}
-    peMatched++;
-    el('pe-matched').textContent=peMatched;
-    if(peMatched>=peQueue.length)setTimeout(()=>{el('pe-done').style.display='block';},400);
-  } else {
-    const lEl=el('pe-left-'+lId), rEl=el('pe-right-'+rIdx);
-    if(lEl){lEl.classList.remove('selected');lEl.classList.add('wrong');setTimeout(()=>lEl.classList.remove('wrong'),600);}
-    if(rEl){rEl.classList.remove('selected');rEl.classList.add('wrong');setTimeout(()=>rEl.classList.remove('wrong'),600);}
-    db.errors[lId]=(db.errors[lId]||0)+1;
-    saveDB();updateStats();
-    // update badge
-    const badge=lEl?.querySelector('.badge');
-    if(badge)badge.textContent=`錯 ${db.errors[lId]} 次`;
-  }
+function removeWeak(id){
+  if(db.weak)delete db.weak[id];
+  saveDB();
+  renderWeakPage();
+  renderBrowsePage();
+  toast('已從不熟區移除');
 }
 
-// ══════════════════════════════════════
-// ERROR LIST RENDER
-// ══════════════════════════════════════
-function renderErrors(){
-  const wrap=el('error-list-wrap');
-  const errList=db.vocab
-    .filter(v=>(db.errors[v.id]||0)>=1)
-    .sort((a,b)=>(db.errors[b.id]||0)-(db.errors[a.id]||0));
-
-  if(errList.length===0){
-    wrap.innerHTML='<div class="empty"><div class="empty-icon">🎊</div><div>還沒有任何錯誤！繼續保持</div></div>';
-    return;
-  }
-  wrap.innerHTML='<div class="error-list">'+errList.map(v=>{
-    const cnt=db.errors[v.id]||0;
-    const cls=cnt>=3?'many':'few';
-    const parts=v.q.split('\n');
-    return `<div class="error-item ${cls}">
-      <div class="error-q">
-        <div class="error-jp">${escHtml(parts[0])}</div>
-        ${parts[1]?`<div class="error-zh">${escHtml(parts[1])}</div>`:''}
-      </div>
-      <div style="display:flex;align-items:center;gap:10px">
-        <div class="error-ans">→ ${escHtml(v.a)}</div>
-        <span class="error-cnt ${cls}">錯 ${cnt} 次</span>
-      </div>
-    </div>`;
-  }).join('')+'</div>';
+function prevWeakPage(){
+  if(weakPage>0){weakPage--;renderWeakPage();window.scrollTo(0,0);}
+}
+function nextWeakPage(){
+  const weakIds=Object.keys(db.weak||{});
+  const totalPages=Math.ceil(weakIds.length/PAGE_SIZE);
+  if(weakPage<totalPages-1){weakPage++;renderWeakPage();window.scrollTo(0,0);}
 }
 
-function clearErrors(){
-  showConfirm({
-    icon:'🗑',
-    title:'清除錯誤記錄',
-    msg:'確定清除所有錯誤次數記錄？\n常錯單字統計將會歸零。',
-    btnText:'清除',
-    btnClass:'btn-danger',
-    onOk:()=>{db.errors={};saveDB();updateStats();renderErrors();toast('已清除錯誤記錄');}
-  });
+function resetTodayProgress(){
+  if(!confirm('確定要重置今日進度？'))return;
+  db.todayDone=[];
+  currentPage=0;
+  db.currentPage=0;
+  saveDB();
+  renderBrowsePage();
+  toast('已重置進度');
 }
 
-// ══════════════════════════════════════
 // IMPORT
 // ══════════════════════════════════════
 function importFile(evt){
@@ -947,14 +750,15 @@ function resetTodayProgress(){
 // TAB
 // ══════════════════════════════════════
 function switchTab(id){
+  const ids=['match','weak','numbers','import'];
   document.querySelectorAll('.tab-btn').forEach((b,i)=>{
-    const ids=['match','errors','practice-errors','numbers','import'];
     b.classList.toggle('active',ids[i]===id);
   });
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-  el('view-'+id).classList.add('active');
-  if(id==='errors')renderErrors();
-  if(id==='practice-errors')startPracticeErrors();
+  const view=el('view-'+id);
+  if(view)view.classList.add('active');
+  if(id==='match')renderBrowsePage();
+  if(id==='weak')renderWeakPage();
   if(id==='numbers')startNumGame();
 }
 
