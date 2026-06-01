@@ -1179,7 +1179,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1780308745263,
+  "_ts": 1780308774845,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
@@ -1251,7 +1251,9 @@
       "stockTags": [
         "00981A，00988A，009805"
       ],
-      "images": []
+      "images": [
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1780308765700_fwfw.jpg"
+      ]
     },
     {
       "id": "mptfodl6dtn",
