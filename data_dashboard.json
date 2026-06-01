@@ -175,6 +175,24 @@
           "date": "2025-12-14",
           "fee": 0,
           "remark": "可隨景氣調整公債,投等,非投比例 且目前有9%殖利率"
+        },
+        {
+          "id": "mpv1agsdend",
+          "type": "sell",
+          "lots": 100,
+          "price": 10.65,
+          "date": "2026-06-01",
+          "fee": 3620,
+          "lotRefs": [
+            {
+              "txnId": "mnhnakhi8bv",
+              "lots": 100,
+              "date": "2025-12-14"
+            }
+          ],
+          "remark": "賣出價格10.27(還原股息10.65元) 這波不僅沒吃到期限議價反而應為AI大漲台股強勢而台幣拉垮ETF獲利",
+          "mood": "😌 平靜",
+          "lossReason": "判斷錯誤"
         }
       ],
       "order": 6,
@@ -1141,7 +1159,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1780307611928,
+  "_ts": 1780307788904,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
