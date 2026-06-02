@@ -554,6 +554,30 @@
         }
       ],
       "order": 14
+    },
+    {
+      "id": "mpwgvfo719c",
+      "code": "00981T",
+      "name": "平衡凱基雙核收息",
+      "lots": 17,
+      "avgPrice": 12.17,
+      "divPerShare": 0.065,
+      "note": "現股",
+      "url": "https://www.wantgoo.com/stock/etf/00981T/dividend-policy/ex-dividend",
+      "holdType": "long",
+      "targetRoi": 5,
+      "transactions": [
+        {
+          "id": "mpwgvfo78oe",
+          "type": "buy",
+          "lots": 17,
+          "price": 12.17,
+          "date": "2026-06-02",
+          "fee": 0,
+          "remark": ""
+        }
+      ],
+      "order": 15
     }
   ],
   "loans": [
@@ -1207,7 +1231,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1780394340197,
+  "_ts": 1780394427648,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
