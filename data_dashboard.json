@@ -26,6 +26,24 @@
           "date": "2026-04-08",
           "fee": 164,
           "remark": "台幣今天升值0.4% 幅度不小, 再建倉一些"
+        },
+        {
+          "id": "mpwgtk6uw6x",
+          "type": "sell",
+          "lots": 20,
+          "price": 10.11,
+          "date": "2026-06-02",
+          "fee": 688,
+          "lotRefs": [
+            {
+              "txnId": "mnpi29cqn4k",
+              "lots": 20,
+              "date": "2026-04-08"
+            }
+          ],
+          "remark": "持有近半年,整體收益並沒有達到預估的報酬率預計慢慢轉到00981T上面",
+          "mood": "😌 平靜",
+          "lossReason": "判斷錯誤"
         }
       ],
       "order": 1,
@@ -1189,7 +1207,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1780394252390,
+  "_ts": 1780394340197,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
