@@ -6034,7 +6034,7 @@
         }
       ],
       "paid": true,
-      "paidDate": "2026-05-29",
+      "paidDate": "2026-06-02",
       "vendorPaid": true,
       "vendorPaidDate": "2026-05-29",
       "images": [
@@ -6523,6 +6523,6 @@
     "bankCode": "013",
     "bankAccount": "061506186489"
   },
-  "_ts": 1780048405995,
+  "_ts": 1780383906666,
   "_vendorPaidBackfilled": true
 }
