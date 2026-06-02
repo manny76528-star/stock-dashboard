@@ -6206,8 +6206,8 @@
           "invoice": false
         }
       ],
-      "paid": false,
-      "paidDate": "2026-05-01",
+      "paid": true,
+      "paidDate": "2026-06-02",
       "vendorPaid": true,
       "vendorPaidDate": ""
     }
@@ -6523,6 +6523,6 @@
     "bankCode": "013",
     "bankAccount": "061506186489"
   },
-  "_ts": 1780383906666,
+  "_ts": 1780383918535,
   "_vendorPaidBackfilled": true
 }
