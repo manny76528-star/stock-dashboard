@@ -1259,7 +1259,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1780480192187,
+  "_ts": 1780480196302,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
@@ -1759,7 +1759,7 @@
     "cAnnual": 79999,
     "cRate": 5,
     "bLoan": 0,
-    "cLoan": 1000000,
+    "cLoan": 0,
     "cStocks": [
       {
         "code": "00981D",
