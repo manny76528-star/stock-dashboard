@@ -464,40 +464,6 @@
       "order": 11
     },
     {
-      "id": "mol8jss6p1l",
-      "code": "009805",
-      "name": "新光美國電力基建",
-      "lots": 43,
-      "avgPrice": 16.45,
-      "divPerShare": 0,
-      "note": "質押中",
-      "url": "https://www.wantgoo.com/stock/etf/009805/dividend-policy/ex-dividend",
-      "holdType": "short",
-      "targetRoi": 5,
-      "transactions": [
-        {
-          "id": "mol8jss67vq",
-          "type": "buy",
-          "lots": 43,
-          "price": 16.45,
-          "date": "2026-04-30",
-          "fee": 0,
-          "remark": "昨日賣出是OPENAI下修展望,今META AMZ GOOG財報展望良好 昨天的AI收縮擔憂暫時收緩,因此買回"
-        },
-        {
-          "id": "mp5q5nlmkmy",
-          "type": "buy",
-          "lots": 13,
-          "price": 17.1,
-          "date": "2026-05-12",
-          "fee": 89,
-          "remark": "持續看好AI資本支出跟電力需求，00403溢價5%賣出 一半資金轉移到此",
-          "mood": "💪 自信"
-        }
-      ],
-      "order": 12
-    },
-    {
       "id": "mpwgvfo719c",
       "code": "00981T",
       "name": "平衡凱基雙核收息",
@@ -527,6 +493,40 @@
           "fee": 361,
           "remark": "將領息的資金00985B轉移到這,主要是持有半年無法如預期走勢呈現",
           "mood": "😌 平靜"
+        }
+      ],
+      "order": 12
+    },
+    {
+      "id": "mol8jss6p1l",
+      "code": "009805",
+      "name": "新光美國電力基建",
+      "lots": 43,
+      "avgPrice": 16.45,
+      "divPerShare": 0,
+      "note": "質押中",
+      "url": "https://www.wantgoo.com/stock/etf/009805/dividend-policy/ex-dividend",
+      "holdType": "short",
+      "targetRoi": 5,
+      "transactions": [
+        {
+          "id": "mol8jss67vq",
+          "type": "buy",
+          "lots": 43,
+          "price": 16.45,
+          "date": "2026-04-30",
+          "fee": 0,
+          "remark": "昨日賣出是OPENAI下修展望,今META AMZ GOOG財報展望良好 昨天的AI收縮擔憂暫時收緩,因此買回"
+        },
+        {
+          "id": "mp5q5nlmkmy",
+          "type": "buy",
+          "lots": 13,
+          "price": 17.1,
+          "date": "2026-05-12",
+          "fee": 89,
+          "remark": "持續看好AI資本支出跟電力需求，00403溢價5%賣出 一半資金轉移到此",
+          "mood": "💪 自信"
         }
       ],
       "order": 13
@@ -1259,7 +1259,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1780480413359,
+  "_ts": 1780480415497,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
