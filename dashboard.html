@@ -3251,18 +3251,6 @@ async function fetchPrice(code){
   return _pm[code.toUpperCase()]?{..._pm[code.toUpperCase()],ts:Date.now()}:null;
 }
 
-async function fetchPricesBatch(codes){
-  // 批次查詢多檔股票
-  try{
-    const r=await fetch(CF_WORKER+'/prices?codes='+codes.join(',')+'&t='+Date.now());
-    if(r.ok){
-      const d=await r.json();
-      return d; // {code: {price,change,changePct,ts}, ...}
-    }
-  }catch(e){console.warn('批次股價失敗，改單檔:',e.message);}
-  return null;
-}
-
 async function refreshPrices(){
   document.getElementById('pstat').innerHTML='<span class="spin"></span> 即時更新中...';
   const activeCodes=[...new Set(db.investments.filter(inv=>calcInv(inv).tLots>0).map(i=>i.code))];
@@ -3272,26 +3260,12 @@ async function refreshPrices(){
 
   const found=[], notFound=[];
 
-  // 優先用批次查詢
-  const batchResult=await fetchPricesBatch(allCodes);
-  if(batchResult&&Object.keys(batchResult).length>0){
-    allCodes.forEach(c=>{
-      if(batchResult[c]){db.prices[c]=batchResult[c];found.push(c+'$'+batchResult[c].price);}
-      else notFound.push(c);
-    });
-    // 找不到的單檔補抓
-    await Promise.all(notFound.map(async c=>{
-      const p=await fetchPrice(c);
-      if(p){db.prices[c]=p;found.push(c+'$'+p.price);notFound.splice(notFound.indexOf(c),1);}
-    }));
-  } else {
-    // 批次失敗，全部單檔抓
-    await Promise.all(allCodes.map(async c=>{
-      const p=await fetchPrice(c);
-      if(p){db.prices[c]=p;found.push(c+'$'+p.price);}
-      else notFound.push(c);
-    }));
-  }
+  // 直接並行單檔查詢（批次 endpoint 不存在）
+  await Promise.all(allCodes.map(async c=>{
+    const p=await fetchPrice(c);
+    if(p){db.prices[c]=p;found.push(c+'$'+p.price);}
+    else notFound.push(c);
+  }));
 
   save();render();
   if(healthOpen)renderHealth();
