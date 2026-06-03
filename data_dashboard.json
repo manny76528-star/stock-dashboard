@@ -575,6 +575,16 @@
           "date": "2026-06-02",
           "fee": 0,
           "remark": ""
+        },
+        {
+          "id": "mpxvtb16sp2",
+          "type": "buy",
+          "lots": 74,
+          "price": 12.24,
+          "date": "2026-06-03",
+          "fee": 361,
+          "remark": "將領息的資金00985B轉移到這,主要是持有半年無法如預期走勢呈現",
+          "mood": "😌 平靜"
         }
       ],
       "order": 15
@@ -1231,7 +1241,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1780479969300,
+  "_ts": 1780479988741,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
