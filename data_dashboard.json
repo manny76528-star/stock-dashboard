@@ -1259,7 +1259,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1780480210735,
+  "_ts": 1780480231669,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
@@ -1761,14 +1761,6 @@
     "bLoan": 0,
     "cLoan": 0,
     "cStocks": [
-      {
-        "code": "00981D",
-        "lots": 146,
-        "oddShares": 50,
-        "buyDate": "2026-02-02",
-        "buyPrice": 10.4,
-        "price": 10.29
-      },
       {
         "code": "009805",
         "lots": 11,
