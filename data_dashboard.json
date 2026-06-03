@@ -44,6 +44,24 @@
           "remark": "持有近半年,整體收益並沒有達到預估的報酬率預計慢慢轉到00981T上面",
           "mood": "😌 平靜",
           "lossReason": "判斷錯誤"
+        },
+        {
+          "id": "mpxvul6etlq",
+          "type": "sell",
+          "lots": 90,
+          "price": 10.11,
+          "date": "2026-06-03",
+          "fee": 3093,
+          "lotRefs": [
+            {
+              "txnId": "mnpi29cqn3f",
+              "lots": 90,
+              "date": "2025-12-14"
+            }
+          ],
+          "remark": "持有半年無法如預期走勢呈現,轉移到00981T",
+          "mood": "",
+          "lossReason": "判斷錯誤"
         }
       ],
       "order": 1,
@@ -1241,7 +1259,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1780479988741,
+  "_ts": 1780480048552,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
