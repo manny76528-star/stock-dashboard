@@ -1259,7 +1259,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1780480233093,
+  "_ts": 1780480274405,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
@@ -1792,6 +1792,18 @@
             "oddShares": 450,
             "buyDate": "2026-05-29",
             "buyPrice": 16.7
+          }
+        ]
+      },
+      {
+        "code": "00997A",
+        "price": 14.02,
+        "purchases": [
+          {
+            "lots": 15,
+            "oddShares": 0,
+            "buyDate": "2026-06-03",
+            "buyPrice": 13.8
           }
         ]
       }
