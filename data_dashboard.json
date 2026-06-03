@@ -464,40 +464,6 @@
       "order": 11
     },
     {
-      "id": "mpwgvfo719c",
-      "code": "00981T",
-      "name": "平衡凱基雙核收息",
-      "lots": 17,
-      "avgPrice": 12.17,
-      "divPerShare": 0.065,
-      "note": "現股",
-      "url": "https://www.wantgoo.com/stock/etf/00981T/dividend-policy/ex-dividend",
-      "holdType": "long",
-      "targetRoi": 5,
-      "transactions": [
-        {
-          "id": "mpwgvfo78oe",
-          "type": "buy",
-          "lots": 17,
-          "price": 12.17,
-          "date": "2026-06-02",
-          "fee": 0,
-          "remark": ""
-        },
-        {
-          "id": "mpxvtb16sp2",
-          "type": "buy",
-          "lots": 74,
-          "price": 12.24,
-          "date": "2026-06-03",
-          "fee": 361,
-          "remark": "將領息的資金00985B轉移到這,主要是持有半年無法如預期走勢呈現",
-          "mood": "😌 平靜"
-        }
-      ],
-      "order": 12
-    },
-    {
       "id": "mol8jss6p1l",
       "code": "009805",
       "name": "新光美國電力基建",
@@ -527,6 +493,40 @@
           "fee": 89,
           "remark": "持續看好AI資本支出跟電力需求，00403溢價5%賣出 一半資金轉移到此",
           "mood": "💪 自信"
+        }
+      ],
+      "order": 12
+    },
+    {
+      "id": "mpwgvfo719c",
+      "code": "00981T",
+      "name": "平衡凱基雙核收息",
+      "lots": 17,
+      "avgPrice": 12.17,
+      "divPerShare": 0.065,
+      "note": "現股",
+      "url": "https://www.wantgoo.com/stock/etf/00981T/dividend-policy/ex-dividend",
+      "holdType": "long",
+      "targetRoi": 5,
+      "transactions": [
+        {
+          "id": "mpwgvfo78oe",
+          "type": "buy",
+          "lots": 17,
+          "price": 12.17,
+          "date": "2026-06-02",
+          "fee": 0,
+          "remark": ""
+        },
+        {
+          "id": "mpxvtb16sp2",
+          "type": "buy",
+          "lots": 74,
+          "price": 12.24,
+          "date": "2026-06-03",
+          "fee": 361,
+          "remark": "將領息的資金00985B轉移到這,主要是持有半年無法如預期走勢呈現",
+          "mood": "😌 平靜"
         }
       ],
       "order": 13
@@ -1259,7 +1259,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1780480446284,
+  "_ts": 1780480448494,
   "watchlist": [
     {
       "id": "mnzvrjngm5e",
