@@ -1287,7 +1287,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1780567545079,
+  "_ts": 1780567609176,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -1346,6 +1346,17 @@
     }
   ],
   "journals": [
+    {
+      "id": "mpzbzbe2bto",
+      "date": "2026-06-04",
+      "tags": [],
+      "market": "台積電法說會／魏哲家金句 「未來幾年都很好，你如果預計買股票，請繼續！」",
+      "marketUrl": "https://tw.news.yahoo.com/%E5%8F%B0%E7%A9%8D%E9%9B%BB%E6%B3%95%E8%AA%AA%E6%9C%83-%E9%AD%8F%E5%93%B2%E5%AE%B6%E9%87%91%E5%8F%A5-%E8%AB%8B%E7%B9%BC%E7%BA%8C%E8%B2%B7-%E8%82%A1%E5%83%B92415%E5%85%83%E9%9C%87%E7%9B%AA-035250022.html",
+      "mood": "😊 興奮",
+      "content": "",
+      "stockTags": [],
+      "images": []
+    },
     {
       "id": "mpwh5xizswe",
       "date": "2026-06-02",
