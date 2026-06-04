@@ -1259,7 +1259,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1780566866186,
+  "_ts": 1780566900199,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -1804,6 +1804,12 @@
             "oddShares": 0,
             "buyDate": "2026-06-03",
             "buyPrice": 13.8
+          },
+          {
+            "lots": 20,
+            "oddShares": 0,
+            "buyDate": "2026-06-04",
+            "buyPrice": 13.75
           }
         ]
       }
