@@ -1259,7 +1259,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1780566692249,
+  "_ts": 1780566824968,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -1304,6 +1304,17 @@
       "priority": "中",
       "url": "",
       "addedDate": "2026-05-17"
+    },
+    {
+      "id": "mpzbiiame7t",
+      "code": "2548",
+      "name": "華固",
+      "reason": "除息後,五個交易日含息跌了17% , 這種績優短期這種不理性跌幅\n一定事後會還他公道,主要是下跌來自高股息納入落空,非業績或是政策\n但還是要等到短期底部 或 止跌序號明顯 , 不然就是要分批",
+      "target": 97,
+      "alertDir": "below",
+      "priority": "中",
+      "url": "",
+      "addedDate": "2026-06-04"
     }
   ],
   "journals": [
