@@ -1259,7 +1259,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1780566937537,
+  "_ts": 1780566940261,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -1755,7 +1755,7 @@
     "bMonthly2": 16000,
     "bRate": 5,
     "cNow": 616000,
-    "cMonthly": 1000,
+    "cMonthly": 10000,
     "cAnnual": 79999,
     "cRate": 5,
     "bLoan": 0,
