@@ -62,6 +62,24 @@
           "remark": "持有半年無法如預期走勢呈現,轉移到00981T",
           "mood": "",
           "lossReason": "判斷錯誤"
+        },
+        {
+          "id": "mpzbmeu697i",
+          "type": "sell",
+          "lots": 25,
+          "price": 10.12,
+          "date": "2026-06-04",
+          "fee": 860,
+          "lotRefs": [
+            {
+              "txnId": "mnpi29cqn3f",
+              "lots": 25,
+              "date": "2025-12-14"
+            }
+          ],
+          "remark": "持有半年無法如預期走勢呈現,轉移到00981T",
+          "mood": "",
+          "lossReason": "判斷錯誤"
         }
       ],
       "order": 1,
@@ -1259,7 +1277,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1780566943486,
+  "_ts": 1780567007113,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
