@@ -1366,7 +1366,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1780759345773,
+  "_ts": 1780759495729,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -1425,6 +1425,22 @@
     }
   ],
   "journals": [
+    {
+      "id": "mq2i8403bbv",
+      "date": "2026-06-06",
+      "tags": [],
+      "market": "台指期夜盤一度殺逾4500點跌停、台股「多殺多」難逃！\n費城半導體指數超過10%、創2020年3月疫情以來最大單日跌幅",
+      "marketUrl": "https://ec.ltn.com.tw/article/breakingnews/5462715",
+      "mood": "😨 恐懼",
+      "content": "",
+      "stockTags": [],
+      "images": [
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1780759458696_r98b.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1780759458699_8gbi.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1780759482383_h2cg.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1780759490665_a7kt.jpg"
+      ]
+    },
     {
       "id": "mpzbzbe2bto",
       "date": "2026-06-04",
