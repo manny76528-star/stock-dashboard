@@ -330,7 +330,31 @@
       ],
       "updatedAt": "2026-06-07T09:38:52.054Z",
       "createdAt": "2026-06-07T09:37:54.495Z"
+    },
+    {
+      "id": "mq3o2evpf5a",
+      "brand": "Xanax Trust X",
+      "model": "硬式日製最高皆",
+      "position": "游擊",
+      "size": "11.5",
+      "buyDate": "2026-06-07",
+      "buyPrice": 5600,
+      "sellDate": "",
+      "sellPrice": null,
+      "pros": "硬式日製最高皆 內裏滾邊完整無龜裂 \n絕版茶色荷蘭小牛皮，皮革極優，手套仍有相當硬度",
+      "cons": "",
+      "note": "",
+      "images": [
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1780829757107_7osx.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1780829749120_t23h.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1780829751957_mhvq.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1780829754377_3c9k.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1780829759302_n8jo.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1780829761578_yi6e.jpg"
+      ],
+      "updatedAt": "2026-06-07T10:56:12.757Z",
+      "createdAt": "2026-06-07T10:56:12.757Z"
     }
   ],
-  "_ts": 1780829700946
+  "_ts": 1780829775757
 }
