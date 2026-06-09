@@ -315,8 +315,8 @@
       "size": "11.8",
       "buyDate": "2026-06-02",
       "buyPrice": 6000,
-      "sellDate": "",
-      "sellPrice": null,
+      "sellDate": "2026-06-09",
+      "sellPrice": 5200,
       "pros": "石井琢朗 今が大切限定款手套\n盒子,袋子皆有 售價72000日幣等級\n重量545g 完美",
       "cons": "刀模不適合自己,有點斜口容易接到大拇指處\n被操過整體偏軟爛,且皮革有有點油膩感導致守備時容易掉球",
       "note": "",
@@ -328,7 +328,7 @@
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1780824949509_iv7u.jpg",
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1780824952620_cgle.jpg"
       ],
-      "updatedAt": "2026-06-07T09:38:52.054Z",
+      "updatedAt": "2026-06-09T14:15:23.445Z",
       "createdAt": "2026-06-07T09:37:54.495Z"
     },
     {
@@ -356,5 +356,5 @@
       "createdAt": "2026-06-07T10:56:12.757Z"
     }
   ],
-  "_ts": 1780998441809
+  "_ts": 1781014526447
 }
