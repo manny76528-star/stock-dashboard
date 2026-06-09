@@ -118,6 +118,24 @@
           "lossReason": "判斷錯誤"
         },
         {
+          "id": "mq6gvo1ujbk",
+          "type": "sell",
+          "lots": 1,
+          "price": 10.25,
+          "date": "2026-06-08",
+          "fee": 35,
+          "lotRefs": [
+            {
+              "txnId": "mnpi29cqn4k",
+              "lots": 1,
+              "date": "2026-04-08"
+            }
+          ],
+          "remark": "",
+          "mood": "",
+          "lossReason": ""
+        },
+        {
           "id": "mq6glva8twu",
           "type": "sell",
           "lots": 90,
@@ -1422,7 +1440,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1780998901412,
+  "_ts": 1780999100273,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
