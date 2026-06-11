@@ -6516,6 +6516,14 @@
       "name": "100*100珠光紙",
       "spec": "100*100珠光紙",
       "cost": 140
+    },
+    {
+      "id": "mq945wpp8l7a",
+      "type": "device",
+      "sub": "掃描器",
+      "name": "CINO A688BT",
+      "spec": "USB",
+      "cost": 1
     }
   ],
   "settings": {
@@ -6523,6 +6531,6 @@
     "bankCode": "013",
     "bankAccount": "061506186489"
   },
-  "_ts": 1780383918535,
+  "_ts": 1781159143589,
   "_vendorPaidBackfilled": true
 }
