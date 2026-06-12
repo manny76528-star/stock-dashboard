@@ -877,7 +877,7 @@
     {
       "id": "mncull1439i",
       "bank": "Line Bank",
-      "cash": 12012,
+      "cash": 81197,
       "d1Date": "",
       "d1": 0,
       "d2": 0
@@ -1016,7 +1016,7 @@
       "lots": 100,
       "perShare": 0.07,
       "amount": 7000.000000000001,
-      "pending": true
+      "pending": false
     },
     {
       "id": "mpcgf26jv58",
@@ -1026,7 +1026,7 @@
       "lots": 128,
       "perShare": 0.56,
       "amount": 71680,
-      "pending": true
+      "pending": false
     },
     {
       "id": "mpvyjda0874",
@@ -1496,7 +1496,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1781171641484,
+  "_ts": 1781243579918,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -2154,6 +2154,7 @@
     "mncue4nbehw_2026-05": true,
     "mncug22msvu_2026-05": true,
     "mncujjvii0z_2026-06": true,
-    "mncui6prd6f_2026-06": true
+    "mncui6prd6f_2026-06": true,
+    "mncul5vdg0j_2026-06": true
   }
 }
