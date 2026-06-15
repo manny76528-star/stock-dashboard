@@ -6237,12 +6237,11 @@
       ],
       "paid": false,
       "paidDate": "2026-06-11",
-      "vendorPaid": false,
+      "vendorPaid": true,
       "vendorPaidDate": "",
       "images": [
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/order-images/1781159242284_uw22.jpg"
-      ],
-      "createdAt": "2026-06-11T06:27:50.291Z"
+      ]
     }
   ],
   "customers": [
@@ -6564,6 +6563,6 @@
     "bankCode": "013",
     "bankAccount": "061506186489"
   },
-  "_ts": 1781159273309,
+  "_ts": 1781486450438,
   "_vendorPaidBackfilled": true
 }
