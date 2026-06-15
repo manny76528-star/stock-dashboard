@@ -6242,6 +6242,37 @@
       "images": [
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/order-images/1781159242284_uw22.jpg"
       ]
+    },
+    {
+      "id": "mqej2keeyasw",
+      "date": "2026-06-15",
+      "custId": "mnmofk0wvucy",
+      "custName": "騰亦資訊",
+      "contact": "Jack歐",
+      "phone": "07-5885038",
+      "note": "",
+      "items": [
+        {
+          "name": "掃描器 CINO A680 USB",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "CINO A680 USB",
+          "qty": 1,
+          "sn": "C6122795",
+          "sns": [
+            "C6122795"
+          ],
+          "cost": 100,
+          "price": 2351,
+          "invoice": false
+        }
+      ],
+      "paid": false,
+      "paidDate": "2026-06-15",
+      "vendorPaid": true,
+      "vendorPaidDate": "",
+      "images": [],
+      "createdAt": "2026-06-15T01:21:49.766Z"
     }
   ],
   "customers": [
@@ -6563,6 +6594,6 @@
     "bankCode": "013",
     "bankAccount": "061506186489"
   },
-  "_ts": 1781486462292,
+  "_ts": 1781486512775,
   "_vendorPaidBackfilled": true
 }
