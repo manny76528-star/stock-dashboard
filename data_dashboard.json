@@ -831,16 +831,6 @@
           "fee": 277,
           "remark": "將領息的資金00985B轉移到這,主要是持有半年無法如預期走勢呈現",
           "mood": "😌 平靜"
-        },
-        {
-          "id": "mqgfux4salk",
-          "type": "buy",
-          "lots": 100,
-          "price": 1,
-          "date": "2026-06-16",
-          "fee": 40,
-          "remark": "",
-          "mood": ""
         }
       ],
       "order": 14
@@ -1641,7 +1631,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1781602047528,
+  "_ts": 1781602053194,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
