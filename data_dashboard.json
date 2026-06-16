@@ -1131,6 +1131,16 @@
       "perShare": 0.071,
       "amount": 34719,
       "pending": true
+    },
+    {
+      "id": "mqgfxhd1lzp",
+      "code": "00981A",
+      "exDate": "2026-06-16",
+      "date": "2026-07-09",
+      "lots": 29,
+      "perShare": 0.63,
+      "amount": 18270,
+      "pending": true
     }
   ],
   "snapshots": [
@@ -1641,7 +1651,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1781602107519,
+  "_ts": 1781602167056,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
