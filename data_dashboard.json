@@ -754,7 +754,7 @@
       "lots": 17,
       "avgPrice": 12.17,
       "divPerShare": 0.065,
-      "note": "現股",
+      "note": "質押中",
       "url": "https://www.wantgoo.com/stock/etf/00981T/dividend-policy/ex-dividend",
       "holdType": "long",
       "targetRoi": 5,
@@ -1758,7 +1758,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1781768316637,
+  "_ts": 1781768514322,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
