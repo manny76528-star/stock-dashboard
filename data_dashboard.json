@@ -325,6 +325,24 @@
           "date": "2026-04-02",
           "fee": 0,
           "remark": "初始持倉"
+        },
+        {
+          "id": "mqp01wrwqc3",
+          "type": "sell",
+          "lots": 12,
+          "price": 45.94,
+          "date": "2026-06-22",
+          "fee": 1874,
+          "lotRefs": [
+            {
+              "txnId": "init-00864B",
+              "lots": 12,
+              "date": "2026-04-02"
+            }
+          ],
+          "remark": "持有半年無法如預期走勢呈現,轉移到00981T",
+          "mood": "😌 平靜",
+          "lossReason": "判斷錯誤"
         }
       ],
       "order": 2,
@@ -1781,7 +1799,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1782119656641,
+  "_ts": 1782119695383,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
