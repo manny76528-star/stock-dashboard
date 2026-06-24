@@ -1039,6 +1039,30 @@
         }
       ],
       "order": 15
+    },
+    {
+      "id": "mqrwg04lfdk",
+      "code": "2548",
+      "name": "華固",
+      "lots": 5,
+      "avgPrice": 101.5,
+      "divPerShare": 0,
+      "note": "現股",
+      "url": "",
+      "holdType": "short",
+      "targetRoi": 5,
+      "transactions": [
+        {
+          "id": "mqrwg04lgfa",
+          "type": "buy",
+          "lots": 5,
+          "price": 101.5,
+          "date": "2026-06-24",
+          "fee": 0,
+          "remark": "因配息不佳,高點除息後回落30%,這種優質績優股大跌都是機會且目前底部99.5 試錯空間較小"
+        }
+      ],
+      "order": 16
     }
   ],
   "loans": [
@@ -1909,7 +1933,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1782294931823,
+  "_ts": 1782295032980,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
