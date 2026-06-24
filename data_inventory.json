@@ -6212,38 +6212,6 @@
       "vendorPaidDate": ""
     },
     {
-      "id": "mq948osz9wkp",
-      "date": "2026-06-11",
-      "custId": "mnmofk0wess9",
-      "custName": "王強條碼企業社",
-      "contact": "王銘裕",
-      "phone": "0952668663",
-      "note": "CINO A688BT 黑貨",
-      "items": [
-        {
-          "name": "掃描器 USB",
-          "type": "device",
-          "subtype": "掃描器",
-          "spec": "USB",
-          "qty": 1,
-          "sn": "C4490055",
-          "sns": [
-            "C4490055"
-          ],
-          "cost": 1,
-          "price": 6300,
-          "invoice": false
-        }
-      ],
-      "paid": false,
-      "paidDate": "2026-06-11",
-      "vendorPaid": true,
-      "vendorPaidDate": "",
-      "images": [
-        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/order-images/1781159242284_uw22.jpg"
-      ]
-    },
-    {
       "id": "mqej2keeyasw",
       "date": "2026-06-15",
       "custId": "mnmofk0wvucy",
@@ -6267,8 +6235,8 @@
           "invoice": false
         }
       ],
-      "paid": false,
-      "paidDate": "2026-06-15",
+      "paid": true,
+      "paidDate": "2026-06-24",
       "vendorPaid": true,
       "vendorPaidDate": "",
       "images": [],
@@ -6594,6 +6562,6 @@
     "bankCode": "013",
     "bankAccount": "061506186489"
   },
-  "_ts": 1781486512775,
+  "_ts": 1782295107108,
   "_vendorPaidBackfilled": true
 }
