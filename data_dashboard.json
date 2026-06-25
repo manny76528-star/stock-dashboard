@@ -1078,6 +1078,24 @@
           "date": "2026-06-24",
           "fee": 0,
           "remark": "因配息不佳,高點除息後回落30%,這種優質績優股大跌都是機會且目前底部99.5 試錯空間較小"
+        },
+        {
+          "id": "mqtb8la3n9s",
+          "type": "sell",
+          "lots": 5,
+          "price": 102.9,
+          "date": "2026-06-25",
+          "fee": 1749,
+          "lotRefs": [
+            {
+              "txnId": "mqrwg04lgfa",
+              "lots": 5,
+              "date": "2026-06-24"
+            }
+          ],
+          "remark": "吃豆腐成功",
+          "mood": "😊 興奮",
+          "lossReason": "紀律問題"
         }
       ],
       "order": 16
@@ -1951,7 +1969,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1782380297538,
+  "_ts": 1782380347563,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
