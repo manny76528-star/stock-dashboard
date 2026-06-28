@@ -1922,10 +1922,10 @@ body:not(.privacy) .privacy-mask{filter:none;}
 .mini-card-row{
   max-width:1300px;margin:0 auto 24px;
   display:grid;
-  grid-template-columns:repeat(7,1fr);
+  grid-template-columns:repeat(6,1fr);
   gap:12px;
 }
-@media(max-width:1100px){.mini-card-row{grid-template-columns:repeat(4,1fr);}}
+@media(max-width:1100px){.mini-card-row{grid-template-columns:repeat(3,1fr);}}
 @media(max-width:700px){.mini-card-row{grid-template-columns:repeat(3,1fr);}}
 @media(max-width:480px){.mini-card-row{grid-template-columns:repeat(2,1fr);}}
 
@@ -2336,8 +2336,8 @@ body:not(.privacy) .privacy-mask{filter:none;}
           <option value="">全部標籤</option>
           <option value="看多">📈 看多</option>
           <option value="看空">📉 看空</option>
-          <option value="買入">▲ 買入</option>
-          <option value="賣出">▼ 賣出</option>
+          <option value="買入">💰 買入</option>
+          <option value="賣出">💸 賣出</option>
           <option value="重大事項">🔔 重大事項</option>
           <option value="極度恐慌">😱 極度恐慌(PTSD)</option>
         </select>
@@ -2476,8 +2476,8 @@ body:not(.privacy) .privacy-mask{filter:none;}
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
           <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer"><input type="checkbox" id="jtag-bull" value="看多"> 📈 看多</label>
           <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer"><input type="checkbox" id="jtag-bear" value="看空"> 📉 看空</label>
-          <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer"><input type="checkbox" id="jtag-buy" value="買入"> ▲ 買入</label>
-          <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer"><input type="checkbox" id="jtag-sell" value="賣出"> ▼ 賣出</label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer"><input type="checkbox" id="jtag-buy" value="買入"> 💰 買入</label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer"><input type="checkbox" id="jtag-sell" value="賣出"> 💸 賣出</label>
           <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer"><input type="checkbox" id="jtag-alert" value="重大事項"> 🔔 重大事項</label>
           <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer"><input type="checkbox" id="jtag-panic" value="極度恐慌"> 😱 極度恐慌(觸發PTSD)</label>
         </div>
@@ -2777,11 +2777,11 @@ body:not(.privacy) .privacy-mask{filter:none;}
     <div style="display:flex;gap:12px;margin-bottom:12px;font-size:12px">
       <label style="display:flex;align-items:center;gap:5px;cursor:pointer">
         <input type="checkbox" id="sf-buy" checked onchange="runSearch()" style="accent-color:var(--gain);width:14px;height:14px">
-        <span style="color:var(--gain);font-weight:600">▲ 買入</span>
+        <span style="color:var(--gain);font-weight:600">💰 買入</span>
       </label>
       <label style="display:flex;align-items:center;gap:5px;cursor:pointer">
         <input type="checkbox" id="sf-sell" checked onchange="runSearch()" style="accent-color:var(--loss);width:14px;height:14px">
-        <span style="color:var(--loss);font-weight:600">▼ 賣出</span>
+        <span style="color:var(--loss);font-weight:600">💸 賣出</span>
       </label>
     </div>
     <div id="search-results" style="max-height:450px;overflow-y:auto"></div>
@@ -3444,7 +3444,7 @@ function renderInv(){
         const isB=t.type==='buy';
         const refs=t.lotRefs?t.lotRefs.map(r=>'<span class="ltag">'+r.lots+'張 '+r.date+'</span>').join(''):'';
         return '<div class="irow-txn '+(isB?'irow-txn-buy':'irow-txn-sell')+'">'
-          +'<span class="irow-txn-type">'+(isB?'▲ 買入':'▼ 賣出')+'</span>'
+          +'<span class="irow-txn-type">'+(isB?'💰 買入':'💸 賣出')+'</span>'
           +'<span>'+t.date+'</span>'
           +'<span>'+t.lots+'張</span>'
           +'<span>$'+t.price.toFixed(2)+'</span>'
@@ -3500,8 +3500,8 @@ function renderInv(){
         +'</div>'
         // 操作按鈕
         +'<div class="irow-l3-btns">'
-          +'<button class="irow-btn buy" onclick="openBuyModal(\''+inv.id+'\')">▲ 買入</button>'
-          +'<button class="irow-btn sell" onclick="openSellModal(\''+inv.id+'\')">▼ 賣出</button>'
+          +'<button class="irow-btn buy" onclick="openBuyModal(\''+inv.id+'\')">💰 買入</button>'
+          +'<button class="irow-btn sell" onclick="openSellModal(\''+inv.id+'\')">💸 賣出</button>'
           +'<button class="irow-btn" onclick="openDivFor(\''+inv.code+'\')">💰 領息</button>'
           +'<button class="irow-btn" onclick="openInvModal(\''+inv.id+'\')">✏️ 編輯</button>'
           +'<button class="irow-btn" onclick="moveInv(\''+inv.id+'\',-1)">↑</button>'
@@ -3568,8 +3568,8 @@ function toggleInvDetail(id){
       +'<div class="irow-l3-kv"><span class="irow-l3-k">佔比</span><span class="irow-l3-v">'+portPct.toFixed(1)+'%</span></div>'
     +'</div>'
     +'<div class="irow-l3-btns" style="padding:8px 18px">'
-      +'<button class="irow-btn buy" onclick="closeModal(\'inv-detail-modal\');openBuyModal(\''+inv.id+'\')">▲ 買入</button>'
-      +'<button class="irow-btn sell" onclick="closeModal(\'inv-detail-modal\');openSellModal(\''+inv.id+'\')">▼ 賣出</button>'
+      +'<button class="irow-btn buy" onclick="closeModal(\'inv-detail-modal\');openBuyModal(\''+inv.id+'\')">💰 買入</button>'
+      +'<button class="irow-btn sell" onclick="closeModal(\'inv-detail-modal\');openSellModal(\''+inv.id+'\')">💸 賣出</button>'
       +'<button class="irow-btn" onclick="closeModal(\'inv-detail-modal\');openDivFor(\''+inv.code+'\')">💰 領息</button>'
       +'<button class="irow-btn" onclick="closeModal(\'inv-detail-modal\');openInvModal(\''+inv.id+'\')">✏️ 編輯</button>'
       +'<button class="irow-btn" onclick="closeModal(\'inv-detail-modal\');moveInv(\''+inv.id+'\',-1)">↑</button>'
@@ -4974,7 +4974,7 @@ function buildTxnRows(inv,c,yearFilter){
     let l1='<div class="irow-txn '+(isB?'irow-txn-buy':'irow-txn-sell')+'"';
     if(canExpand)l1+=' style="cursor:pointer" onclick="toggleTxnDetail(\''+tid+'\')"';
     l1+='>';
-    l1+='<span class="irow-txn-type">'+(isB?'▲ 買入':'▼ 賣出')+'</span>';
+    l1+='<span class="irow-txn-type">'+(isB?'💰 買入':'💸 賣出')+'</span>';
     l1+='<span>'+t.date+'</span>';
     l1+='<span>'+t.lots+'張</span>';
     l1+='<span style="font-family:\'JetBrains Mono\',monospace">$'+t.price.toFixed(2)+'</span>';
@@ -5196,7 +5196,7 @@ function runSearch(){
       const bd=!isB?breakdown.find(function(b){return b.txnId===t.id;}):null;
       const rowBg=t.archived?'#fffbe6':'#fff';
       html+='<tr style="background:'+rowBg+';border-bottom:1px solid #f1f5f9">';
-      html+='<td style="padding:6px 10px;font-weight:700;color:'+(isB?'#dc2626':'#16a34a')+'">'+(isB?'▲ 買入':'▼ 賣出')+(t.archived?' (已刪)':'')+'</td>';
+      html+='<td style="padding:6px 10px;font-weight:700;color:'+(isB?'#dc2626':'#16a34a')+'">'+(isB?'💰 買入':'💸 賣出')+(t.archived?' (已刪)':'')+'</td>';
       html+='<td style="padding:6px 10px;font-family:monospace">'+t.date+'</td>';
       html+='<td style="padding:6px 10px;font-family:monospace">'+t.lots+'張</td>';
       html+='<td style="padding:6px 10px;font-family:monospace">$'+t.price.toFixed(2)+'</td>';
@@ -7378,7 +7378,11 @@ function renderJournalChart(){
       <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px;font-weight:700;color:#475569">
         <input type="checkbox" ${_journalChartChecks[k]?'checked':''} onchange="toggleJournalChartKey('${k}',this.checked)">
         ${k==='大盤'?'📊':''} ${k}
-      </label>`).join('');
+      </label>`).join('')
+    + `<label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px;font-weight:700;color:#475569;margin-left:12px;border-left:1px solid #e2e8f0;padding-left:12px">
+        <input type="checkbox" id="jchart-show-tags" ${_journalChartChecks['__tags__']!==false?'checked':''} onchange="toggleJournalChartKey('__tags__',this.checked)">
+        🏷 顯示標籤圖示
+      </label>`;
   }
 
   const sorted=[...journals].sort((a,b)=>a.date.localeCompare(b.date));
@@ -7402,9 +7406,35 @@ function renderJournalChart(){
     };
   });
 
+  const tagEmojiMap={'看多':'📈','看空':'📉','買入':'💰','賣出':'💸','重大事項':'🔔','極度恐慌':'😱'};
+
+  // 自訂 plugin：在資料點上顯示標籤 emoji
+  const tagPlugin={
+    id:'tagEmoji',
+    afterDatasetsDraw(chart){
+      if(_journalChartChecks['__tags__']===false)return;
+      const ctx=chart.ctx;
+      const meta=chart.getDatasetMeta(0); // 用第一個 dataset 的 x 座標
+      if(!meta||!meta.data)return;
+      sorted.forEach((j,idx)=>{
+        const tags=(j.tags||[]).filter(t=>tagEmojiMap[t]);
+        if(!tags.length)return;
+        const point=meta.data[idx];
+        if(!point)return;
+        const emojis=tags.map(t=>tagEmojiMap[t]).join('');
+        ctx.save();
+        ctx.font='14px serif';
+        ctx.textAlign='center';
+        ctx.fillText(emojis,point.x,point.y-14);
+        ctx.restore();
+      });
+    }
+  };
+
   if(_journalChart)_journalChart.destroy();
   _journalChart=new Chart(canvas,{
     type:'line',data:{labels,datasets},
+    plugins:[tagPlugin],
     options:{
       responsive:true,interaction:{mode:'index',intersect:false},
       plugins:{
