@@ -2350,6 +2350,19 @@ body:not(.privacy) .privacy-mask{filter:none;}
           <option value="極度恐慌">😱 極度恐慌(PTSD)</option>
         </select>
       </div>
+      <!-- 走勢圖折疊區 -->
+      <div id="journal-chart-section" style="border-bottom:1px solid var(--border)">
+        <div onclick="toggleJournalChart()" style="cursor:pointer;padding:8px 14px;display:flex;align-items:center;justify-content:space-between;background:#f1f5f9;user-select:none">
+          <span style="font-size:12px;font-weight:700;color:#475569">📈 走勢圖（點擊展開）</span>
+          <span id="journal-chart-arrow" style="font-size:11px;color:#94a3b8">▼</span>
+        </div>
+        <div id="journal-chart-body" style="display:none;padding:12px 14px;background:#fff">
+          <!-- 勾選框動態產生 -->
+          <div id="journal-chart-checks" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;font-size:12px"></div>
+          <canvas id="journal-chart-canvas" height="200" style="width:100%;max-height:220px"></canvas>
+          <div id="journal-chart-empty" style="display:none;text-align:center;padding:30px;color:#94a3b8;font-size:12px">尚無走勢資料，新增日誌時填入大盤指數或個股價格即可</div>
+        </div>
+      </div>
       <div id="journal-list" style="padding:12px 16px;display:flex;flex-direction:column;gap:10px"></div>
     </div>
   </div>
@@ -2478,11 +2491,18 @@ body:not(.privacy) .privacy-mask{filter:none;}
         </div>
       </div>
     </div>
+    <!-- 大盤指數 -->
+    <div class="fg">
+      <label class="fl">📊 今日大盤收盤指數（選填）</label>
+      <input class="fi" type="number" id="j-index" placeholder="例：22185" step="1">
+    </div>
     <!-- 股票自訂標籤 -->
     <div class="fg">
       <label class="fl">🏷 追蹤標的標籤（選填，可多個，用空格分隔）</label>
-      <input class="fi" id="j-stock-tags" placeholder="例：009805 00878 台積電" style="font-family:'JetBrains Mono',monospace;letter-spacing:.5px">
+      <input class="fi" id="j-stock-tags" placeholder="例：009805 00878 台積電" style="font-family:'JetBrains Mono',monospace;letter-spacing:.5px" oninput="updateStockPriceInputs()">
       <div style="font-size:10px;color:#94a3b8;margin-top:4px">輸入後可在日誌視窗搜尋，快速查閱該標的所有歷史記錄</div>
+      <!-- 動態個股價格輸入框 -->
+      <div id="j-stock-prices" style="display:flex;flex-direction:column;gap:6px;margin-top:8px"></div>
     </div>
     <!-- 大盤環境 -->
     <div class="fg">
@@ -7334,6 +7354,135 @@ function setJournalTag(btn){
   renderJournal();
 }
 
+// ══════════════════════════════════════
+// 日誌走勢圖
+// ══════════════════════════════════════
+let _journalChart=null;
+let _journalChartChecks={};
+
+function toggleJournalChart(){
+  const body=document.getElementById('journal-chart-body');
+  const arrow=document.getElementById('journal-chart-arrow');
+  if(!body)return;
+  const isOpen=body.style.display!=='none';
+  body.style.display=isOpen?'none':'block';
+  if(arrow)arrow.textContent=isOpen?'▼':'▲';
+  if(!isOpen)renderJournalChart();
+}
+
+function renderJournalChart(){
+  const journals=(db.journals||[]).filter(j=>j.indexVal||Object.keys(j.stockPrices||{}).length>0);
+  const empty=document.getElementById('journal-chart-empty');
+  const canvas=document.getElementById('journal-chart-canvas');
+  if(journals.length===0){
+    if(empty)empty.style.display='block';
+    if(canvas)canvas.style.display='none';
+    return;
+  }
+  if(empty)empty.style.display='none';
+  if(canvas)canvas.style.display='block';
+
+  const allKeys=new Set();
+  journals.forEach(j=>{
+    if(j.indexVal)allKeys.add('大盤');
+    Object.keys(j.stockPrices||{}).forEach(k=>allKeys.add(k));
+  });
+  allKeys.forEach(k=>{if(_journalChartChecks[k]===undefined)_journalChartChecks[k]=true;});
+
+  const checksEl=document.getElementById('journal-chart-checks');
+  if(checksEl){
+    checksEl.innerHTML=[...allKeys].map(k=>`
+      <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px;font-weight:700;color:#475569">
+        <input type="checkbox" ${_journalChartChecks[k]?'checked':''} onchange="toggleJournalChartKey('${k}',this.checked)">
+        ${k==='大盤'?'📊':''} ${k}
+      </label>`).join('');
+  }
+
+  const sorted=[...journals].sort((a,b)=>a.date.localeCompare(b.date));
+  const labels=sorted.map(j=>j.date);
+  const colors=['#3b82f6','#dc2626','#16a34a','#f59e0b','#8b5cf6','#0891b2','#db2777'];
+  let ci=0;
+  const datasets=[...allKeys].filter(k=>_journalChartChecks[k]).map(k=>{
+    const color=colors[ci++%colors.length];
+    return{label:k,data:sorted.map(j=>k==='大盤'?j.indexVal||null:(j.stockPrices||{})[k]||null),
+      borderColor:color,backgroundColor:color+'22',tension:0.3,spanGaps:true,pointRadius:5,pointHoverRadius:8,fill:false};
+  });
+
+  if(_journalChart)_journalChart.destroy();
+  _journalChart=new Chart(canvas,{
+    type:'line',data:{labels,datasets},
+    options:{
+      responsive:true,interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{afterBody(items){
+          const date=labels[items[0].dataIndex];
+          const j=sorted.find(x=>x.date===date);
+          if(!j)return[];
+          const lines=[];
+          if(j.market)lines.push('📰 '+j.market.slice(0,50)+(j.market.length>50?'...':''));
+          if(j.content)lines.push('📝 '+j.content.slice(0,60)+(j.content.length>60?'...':''));
+          return lines;
+        }}}
+      },
+      scales:{x:{ticks:{font:{size:10},maxTicksLimit:10}},y:{ticks:{font:{size:10}}}},
+      onClick(evt,elements){
+        if(!elements.length)return;
+        const idx=elements[0].index;
+        const j=sorted[idx];
+        if(j)showJournalChartPopup(j,evt);
+      }
+    }
+  });
+}
+
+function toggleJournalChartKey(key,checked){
+  _journalChartChecks[key]=checked;
+  renderJournalChart();
+}
+
+function showJournalChartPopup(j,evt){
+  let popup=document.getElementById('jchart-popup');
+  if(!popup){
+    popup=document.createElement('div');
+    popup.id='jchart-popup';
+    popup.style.cssText='position:fixed;z-index:9999;background:#1e293b;color:#e2e8f0;border-radius:10px;padding:12px 16px;max-width:300px;font-size:12px;line-height:1.6;box-shadow:0 8px 32px rgba(0,0,0,.4)';
+    document.body.appendChild(popup);
+  }
+  const tags=(j.tags||[]).map(t=>`<span style="background:rgba(255,255,255,.15);padding:1px 6px;border-radius:10px;font-size:10px">${t}</span>`).join(' ');
+  popup.innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+      <span style="font-weight:800;color:#93c5fd">${j.date}</span>
+      <button onclick="document.getElementById('jchart-popup').style.display='none'" style="background:none;border:none;color:#94a3b8;cursor:pointer;font-size:14px">✕</button>
+    </div>
+    ${tags?`<div style="margin-bottom:6px">${tags}</div>`:''}
+    ${j.market?`<div style="color:#94a3b8;margin-bottom:4px;font-size:11px">📰 ${j.market.slice(0,80)}</div>`:''}
+    ${j.content?`<div style="margin-bottom:8px">${j.content.slice(0,120)}${j.content.length>120?'...':''}</div>`:''}
+    <button onclick="openJournalModal('${j.id}');document.getElementById('jchart-popup').style.display='none'" style="width:100%;background:#3b82f6;color:#fff;border:none;border-radius:6px;padding:5px;font-size:11px;cursor:pointer">✏️ 開啟完整日誌</button>`;
+  const x=Math.min((evt.native?.clientX||200)+10,window.innerWidth-320);
+  const y=Math.min((evt.native?.clientY||200)-20,window.innerHeight-220);
+  popup.style.left=x+'px';
+  popup.style.top=y+'px';
+  popup.style.display='block';
+}
+
+function updateStockPriceInputs(){
+  const tags=document.getElementById('j-stock-tags')?.value.trim().split(/\s+/).filter(Boolean)||[];
+  const wrap=document.getElementById('j-stock-prices');
+  if(!wrap)return;
+  const existing={};
+  wrap.querySelectorAll('input[data-code]').forEach(el=>{existing[el.dataset.code]=el.value;});
+  const codes=tags.filter(t=>/^[A-Za-z0-9]{4,7}$/.test(t));
+  if(codes.length===0){wrap.innerHTML='';return;}
+  wrap.innerHTML=codes.map(code=>`
+    <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
+      <span style="font-size:12px;font-weight:700;color:#1e293b;font-family:'JetBrains Mono',monospace;min-width:80px">${code}</span>
+      <input type="number" step="0.01" data-code="${code}" placeholder="今日收盤價" value="${existing[code]||''}"
+        style="flex:1;padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:12px;outline:none">
+      <span style="font-size:11px;color:#94a3b8">元</span>
+    </div>`).join('');
+}
+
 function setJournalTagSel(sel){
   journalTagFilter=sel.value;
   renderJournal();
@@ -7348,6 +7497,19 @@ function openJournalModal(id=null){
   const jmUrlEl=document.getElementById('j-market-url');if(jmUrlEl)jmUrlEl.value=j?.marketUrl||'';
   document.getElementById('j-content').value=j?.content||'';
   document.getElementById('j-stock-tags').value=(j?.stockTags||[]).join(' ');
+  // 大盤指數
+  const idxEl=document.getElementById('j-index');
+  if(idxEl)idxEl.value=j?.indexVal||'';
+  // 更新個股價格框（帶入已存的值）
+  updateStockPriceInputs();
+  setTimeout(()=>{
+    const wrap=document.getElementById('j-stock-prices');
+    if(wrap&&j?.stockPrices){
+      wrap.querySelectorAll('input[data-code]').forEach(el=>{
+        if(j.stockPrices[el.dataset.code])el.value=j.stockPrices[el.dataset.code];
+      });
+    }
+  },50);
   // 標籤
   ['jtag-bull','jtag-bear','jtag-buy','jtag-sell','jtag-alert','jtag-panic'].forEach(id2=>{
     const el=document.getElementById(id2);
@@ -7466,6 +7628,14 @@ function saveJournal(){
     marketUrl:document.getElementById('j-market-url')?.value.trim()||'',
     content:document.getElementById('j-content').value.trim(),
     stockTags:document.getElementById('j-stock-tags').value.trim().split(/\s+/).filter(Boolean),
+    indexVal:parseFloat(document.getElementById('j-index')?.value)||null,
+    stockPrices:(()=>{
+      const prices={};
+      document.querySelectorAll('#j-stock-prices input[data-code]').forEach(el=>{
+        if(el.value)prices[el.dataset.code]=parseFloat(el.value);
+      });
+      return Object.keys(prices).length>0?prices:null;
+    })(),
     images:window._jImgs||[]
   };
   if(!db.journals)db.journals=[];
