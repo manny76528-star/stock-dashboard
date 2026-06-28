@@ -7368,7 +7368,8 @@ function renderJournalChart(){
   });
   const stockKeys=[...allKeys].filter(k=>k!=='大盤').sort();
   if(_journalChartChecks['大盤']===undefined)_journalChartChecks['大盤']=true;
-  if(_journalChartChecks['__stock__']===undefined)_journalChartChecks['__stock__']=stockKeys[0]||'';
+  // 個股複選（預設全不選）
+  stockKeys.forEach(k=>{if(_journalChartChecks['stk_'+k]===undefined)_journalChartChecks['stk_'+k]=false;});
   const tagKeys=['看多','看空','買入','賣出','重大事項','極度恐慌'];
   const tagEmojiMap2={'看多':'📈','看空':'📉','買入':'💰','賣出':'💸','重大事項':'🚨','極度恐慌':'😱'};
   tagKeys.forEach(t=>{if(_journalChartChecks['tag_'+t]===undefined)_journalChartChecks['tag_'+t]=false;});
@@ -7376,21 +7377,28 @@ function renderJournalChart(){
 
   const checksEl=document.getElementById('journal-chart-checks');
   if(checksEl){
-    const selStock=_journalChartChecks['__stock__']||'';
     checksEl.innerHTML=
+      // 大盤 checkbox
       `<label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px;font-weight:700;color:#475569">
         <input type="checkbox" ${_journalChartChecks['大盤']?'checked':''} onchange="toggleJournalChartKey('大盤',this.checked)">📊 大盤
       </label>`
-      +(stockKeys.length>0?`<select onchange="selectJournalStock(this.value)" style="padding:3px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:700;color:#475569;background:#fff;cursor:pointer;outline:none">
-        <option value="">— 個股 —</option>
-        ${stockKeys.map(k=>`<option value="${k}" ${selStock===k?'selected':''}>${k}</option>`).join('')}
-      </select>`:'')
+      // 個股複選
+      +(stockKeys.length>0?
+        `<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;border-left:1px solid #e2e8f0;padding-left:10px;margin-left:4px">`
+        +stockKeys.map(k=>`<label style="display:flex;align-items:center;gap:3px;cursor:pointer;font-size:12px;font-weight:700;color:#475569">
+          <input type="checkbox" ${_journalChartChecks['stk_'+k]?'checked':''} onchange="toggleJournalChartKey('stk_'+${JSON.stringify(k)},this.checked)">${k}
+        </label>`).join('')
+        +'</div>'
+      :'')
+      // 標籤 emoji 勾選
       +'<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;border-left:1px solid #e2e8f0;padding-left:10px;margin-left:4px">'
-      +tagKeys.map(t=>`<label style="display:flex;align-items:center;gap:3px;cursor:pointer;font-size:12px"><input type="checkbox" ${_journalChartChecks['tag_'+t]?'checked':''} onchange="toggleJournalChartKey('tag_'+${JSON.stringify(t)},this.checked)">${tagEmojiMap2[t]}</label>`).join('')
-      +'</div>'
-      +`<label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px;font-weight:700;color:#475569;border-left:1px solid #e2e8f0;padding-left:10px;margin-left:4px">
-        <input type="checkbox" ${_journalChartChecks['__tags__']!==false?'checked':''} onchange="toggleJournalChartKey('__tags__',this.checked)">🏷 標籤圖示
-      </label>`;
+      +`<label style="display:flex;align-items:center;gap:3px;cursor:pointer;font-size:12px;font-weight:700;color:#475569">
+        <input type="checkbox" ${_journalChartChecks['__tags__']?'checked':''} onchange="toggleJournalChartKey('__tags__',this.checked)">🏷
+      </label>`
+      +tagKeys.map(t=>`<label style="display:flex;align-items:center;gap:2px;cursor:pointer;font-size:13px">
+        <input type="checkbox" ${_journalChartChecks['tag_'+t]?'checked':''} onchange="toggleJournalChartKey('tag_'+${JSON.stringify(t)},this.checked)">${tagEmojiMap2[t]}
+      </label>`).join('')
+      +'</div>';
   }
 
   const sorted=[...journals].sort((a,b)=>a.date.localeCompare(b.date));
@@ -7404,13 +7412,14 @@ function renderJournalChart(){
       tension:0.3,spanGaps:true,pointRadius:5,pointHoverRadius:8,fill:false,yAxisID:'yLeft'});
     ci++;
   }
-  const activeStk=_journalChartChecks['__stock__'];
-  if(activeStk){
+  // 複選個股
+  stockKeys.filter(k=>_journalChartChecks['stk_'+k]).forEach(k=>{
     const color=colors[ci%colors.length];
-    datasets.push({label:activeStk,data:sorted.map(j=>(j.stockPrices||{})[activeStk]||null),
+    datasets.push({label:k,data:sorted.map(j=>(j.stockPrices||{})[k]||null),
       borderColor:color,backgroundColor:color+'22',
       tension:0.3,spanGaps:true,pointRadius:5,pointHoverRadius:8,fill:false,yAxisID:'yRight'});
-  }
+    ci++;
+  });
 
   const tagEmojiMap={'看多':'📈','看空':'📉','買入':'💰','賣出':'💸','重大事項':'🚨','極度恐慌':'😱'};
 
