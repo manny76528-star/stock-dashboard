@@ -2338,7 +2338,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
           <option value="看空">📉 看空</option>
           <option value="買入">💰 買入</option>
           <option value="賣出">💸 賣出</option>
-          <option value="重大事項">🔔 重大事項</option>
+          <option value="重大事項">🚨 重大事項</option>
           <option value="極度恐慌">😱 極度恐慌(PTSD)</option>
         </select>
       </div>
@@ -2478,7 +2478,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
           <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer"><input type="checkbox" id="jtag-bear" value="看空"> 📉 看空</label>
           <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer"><input type="checkbox" id="jtag-buy" value="買入"> 💰 買入</label>
           <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer"><input type="checkbox" id="jtag-sell" value="賣出"> 💸 賣出</label>
-          <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer"><input type="checkbox" id="jtag-alert" value="重大事項"> 🔔 重大事項</label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer"><input type="checkbox" id="jtag-alert" value="重大事項"> 🚨 重大事項</label>
           <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer"><input type="checkbox" id="jtag-panic" value="極度恐慌"> 😱 極度恐慌(觸發PTSD)</label>
         </div>
       </div>
@@ -7366,22 +7366,30 @@ function renderJournalChart(){
     if(j.indexVal)allKeys.add('大盤');
     Object.keys(j.stockPrices||{}).forEach(k=>allKeys.add(k));
   });
-  allKeys.forEach(k=>{
-    if(_journalChartChecks[k]===undefined){
-      _journalChartChecks[k] = (k==='大盤'); // 只有大盤預設打勾
-    }
-  });
+  const stockKeys=[...allKeys].filter(k=>k!=='大盤').sort();
+  if(_journalChartChecks['大盤']===undefined)_journalChartChecks['大盤']=true;
+  if(_journalChartChecks['__stock__']===undefined)_journalChartChecks['__stock__']=stockKeys[0]||'';
+  const tagKeys=['看多','看空','買入','賣出','重大事項','極度恐慌'];
+  const tagEmojiMap2={'看多':'📈','看空':'📉','買入':'💰','賣出':'💸','重大事項':'🚨','極度恐慌':'😱'};
+  tagKeys.forEach(t=>{if(_journalChartChecks['tag_'+t]===undefined)_journalChartChecks['tag_'+t]=false;});
+  if(_journalChartChecks['__tags__']===undefined)_journalChartChecks['__tags__']=true;
 
   const checksEl=document.getElementById('journal-chart-checks');
   if(checksEl){
-    checksEl.innerHTML=[...allKeys].map(k=>`
-      <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px;font-weight:700;color:#475569">
-        <input type="checkbox" ${_journalChartChecks[k]?'checked':''} onchange="toggleJournalChartKey('${k}',this.checked)">
-        ${k==='大盤'?'📊':''} ${k}
-      </label>`).join('')
-    + `<label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px;font-weight:700;color:#475569;margin-left:12px;border-left:1px solid #e2e8f0;padding-left:12px">
-        <input type="checkbox" id="jchart-show-tags" ${_journalChartChecks['__tags__']!==false?'checked':''} onchange="toggleJournalChartKey('__tags__',this.checked)">
-        🏷 顯示標籤圖示
+    const selStock=_journalChartChecks['__stock__']||'';
+    checksEl.innerHTML=
+      `<label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px;font-weight:700;color:#475569">
+        <input type="checkbox" ${_journalChartChecks['大盤']?'checked':''} onchange="toggleJournalChartKey('大盤',this.checked)">📊 大盤
+      </label>`
+      +(stockKeys.length>0?`<select onchange="selectJournalStock(this.value)" style="padding:3px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:700;color:#475569;background:#fff;cursor:pointer;outline:none">
+        <option value="">— 個股 —</option>
+        ${stockKeys.map(k=>`<option value="${k}" ${selStock===k?'selected':''}>${k}</option>`).join('')}
+      </select>`:'')
+      +'<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;border-left:1px solid #e2e8f0;padding-left:10px;margin-left:4px">'
+      +tagKeys.map(t=>`<label style="display:flex;align-items:center;gap:3px;cursor:pointer;font-size:12px"><input type="checkbox" ${_journalChartChecks['tag_'+t]?'checked':''} onchange="toggleJournalChartKey('tag_'+${JSON.stringify(t)},this.checked)">${tagEmojiMap2[t]}</label>`).join('')
+      +'</div>'
+      +`<label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px;font-weight:700;color:#475569;border-left:1px solid #e2e8f0;padding-left:10px;margin-left:4px">
+        <input type="checkbox" ${_journalChartChecks['__tags__']!==false?'checked':''} onchange="toggleJournalChartKey('__tags__',this.checked)">🏷 標籤圖示
       </label>`;
   }
 
@@ -7389,24 +7397,22 @@ function renderJournalChart(){
   const labels=sorted.map(j=>j.date);
   const colors=['#3b82f6','#dc2626','#16a34a','#f59e0b','#8b5cf6','#0891b2','#db2777'];
   let ci=0;
-  const datasets=[...allKeys].filter(k=>_journalChartChecks[k]).map(k=>{
-    const color=colors[ci++%colors.length];
-    const isMarket=(k==='大盤');
-    return{
-      label:k,
-      data:sorted.map(j=>isMarket?j.indexVal||null:(j.stockPrices||{})[k]||null),
-      borderColor:color,
-      backgroundColor:color+'22',
-      tension:0.3,
-      spanGaps:true,
-      pointRadius:5,
-      pointHoverRadius:8,
-      fill:false,
-      yAxisID: isMarket?'yLeft':'yRight',
-    };
-  });
+  const datasets=[];
+  if(_journalChartChecks['大盤']){
+    datasets.push({label:'大盤',data:sorted.map(j=>j.indexVal||null),
+      borderColor:colors[ci],backgroundColor:colors[ci]+'22',
+      tension:0.3,spanGaps:true,pointRadius:5,pointHoverRadius:8,fill:false,yAxisID:'yLeft'});
+    ci++;
+  }
+  const activeStk=_journalChartChecks['__stock__'];
+  if(activeStk){
+    const color=colors[ci%colors.length];
+    datasets.push({label:activeStk,data:sorted.map(j=>(j.stockPrices||{})[activeStk]||null),
+      borderColor:color,backgroundColor:color+'22',
+      tension:0.3,spanGaps:true,pointRadius:5,pointHoverRadius:8,fill:false,yAxisID:'yRight'});
+  }
 
-  const tagEmojiMap={'看多':'📈','看空':'📉','買入':'💰','賣出':'💸','重大事項':'🔔','極度恐慌':'😱'};
+  const tagEmojiMap={'看多':'📈','看空':'📉','買入':'💰','賣出':'💸','重大事項':'🚨','極度恐慌':'😱'};
 
   // 自訂 plugin：在資料點上顯示標籤 emoji
   const tagPlugin={
@@ -7414,10 +7420,11 @@ function renderJournalChart(){
     afterDatasetsDraw(chart){
       if(_journalChartChecks['__tags__']===false)return;
       const ctx=chart.ctx;
-      const meta=chart.getDatasetMeta(0); // 用第一個 dataset 的 x 座標
+      const meta=chart.getDatasetMeta(0);
       if(!meta||!meta.data)return;
       sorted.forEach((j,idx)=>{
-        const tags=(j.tags||[]).filter(t=>tagEmojiMap[t]);
+        // 只顯示有勾選的標籤
+        const tags=(j.tags||[]).filter(t=>tagEmojiMap[t]&&_journalChartChecks['tag_'+t]);
         if(!tags.length)return;
         const point=meta.data[idx];
         if(!point)return;
@@ -7472,6 +7479,11 @@ function renderJournalChart(){
       }
     }
   });
+}
+
+function selectJournalStock(val){
+  _journalChartChecks['__stock__']=val;
+  renderJournalChart();
 }
 
 function toggleJournalChartKey(key,checked){
