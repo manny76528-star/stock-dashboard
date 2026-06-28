@@ -7374,11 +7374,11 @@ function renderJournalChart(){
   if(checksEl){
     const selCount=stockKeys.filter(k=>_journalChartChecks['stk_'+k]).length;
     const optHtml=stockKeys.map(k=>`
-      <label style="display:flex;align-items:center;gap:6px;padding:6px 12px;cursor:pointer;font-size:12px;font-weight:700;color:#475569;white-space:nowrap;hover:background:#f1f5f9"
+      <label style="display:flex;align-items:center;gap:6px;padding:6px 12px;cursor:pointer;font-size:12px;font-weight:700;color:#475569;white-space:nowrap"
         onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background=''"
         onclick="event.stopPropagation()">
         <input type="checkbox" ${_journalChartChecks['stk_'+k]?'checked':''}
-          onchange="toggleJournalChartKey('stk_'+${JSON.stringify(k)},this.checked)"> ${k}
+          onchange="toggleJournalChartKey('stk_${k}',this.checked)"> ${k}
       </label>`).join('');
 
     checksEl.innerHTML=
