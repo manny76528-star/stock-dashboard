@@ -7368,37 +7368,22 @@ function renderJournalChart(){
   });
   const stockKeys=[...allKeys].filter(k=>k!=='大盤').sort();
   if(_journalChartChecks['大盤']===undefined)_journalChartChecks['大盤']=true;
-  // 個股複選（預設全不選）
   stockKeys.forEach(k=>{if(_journalChartChecks['stk_'+k]===undefined)_journalChartChecks['stk_'+k]=false;});
-  const tagKeys=['看多','看空','買入','賣出','重大事項','極度恐慌'];
-  const tagEmojiMap2={'看多':'📈','看空':'📉','買入':'💰','賣出':'💸','重大事項':'🚨','極度恐慌':'😱'};
-  tagKeys.forEach(t=>{if(_journalChartChecks['tag_'+t]===undefined)_journalChartChecks['tag_'+t]=false;});
-  if(_journalChartChecks['__tags__']===undefined)_journalChartChecks['__tags__']=true;
 
   const checksEl=document.getElementById('journal-chart-checks');
   if(checksEl){
+    const optHtml=stockKeys.map(k=>`
+      <option value="${k}" ${_journalChartChecks['stk_'+k]?'selected':''}>${k}</option>`).join('');
     checksEl.innerHTML=
-      // 大盤 checkbox
       `<label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px;font-weight:700;color:#475569">
         <input type="checkbox" ${_journalChartChecks['大盤']?'checked':''} onchange="toggleJournalChartKey('大盤',this.checked)">📊 大盤
       </label>`
-      // 個股複選
-      +(stockKeys.length>0?
-        `<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;border-left:1px solid #e2e8f0;padding-left:10px;margin-left:4px">`
-        +stockKeys.map(k=>`<label style="display:flex;align-items:center;gap:3px;cursor:pointer;font-size:12px;font-weight:700;color:#475569">
-          <input type="checkbox" ${_journalChartChecks['stk_'+k]?'checked':''} onchange="toggleJournalChartKey('stk_'+${JSON.stringify(k)},this.checked)">${k}
-        </label>`).join('')
-        +'</div>'
-      :'')
-      // 標籤 emoji 勾選
-      +'<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;border-left:1px solid #e2e8f0;padding-left:10px;margin-left:4px">'
-      +`<label style="display:flex;align-items:center;gap:3px;cursor:pointer;font-size:12px;font-weight:700;color:#475569">
-        <input type="checkbox" ${_journalChartChecks['__tags__']?'checked':''} onchange="toggleJournalChartKey('__tags__',this.checked)">🏷
-      </label>`
-      +tagKeys.map(t=>`<label style="display:flex;align-items:center;gap:2px;cursor:pointer;font-size:13px">
-        <input type="checkbox" ${_journalChartChecks['tag_'+t]?'checked':''} onchange="toggleJournalChartKey('tag_'+${JSON.stringify(t)},this.checked)">${tagEmojiMap2[t]}
-      </label>`).join('')
-      +'</div>';
+      +(stockKeys.length>0?`
+      <select multiple onchange="onJournalStockSelect(this)"
+        style="padding:3px 6px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:700;color:#475569;background:#fff;cursor:pointer;outline:none;min-width:120px;max-height:80px">
+        ${optHtml}
+      </select>
+      <span style="font-size:10px;color:#94a3b8">（可多選）</span>`:'');
   }
 
   const sorted=[...journals].sort((a,b)=>a.date.localeCompare(b.date));
@@ -7412,7 +7397,6 @@ function renderJournalChart(){
       tension:0.3,spanGaps:true,pointRadius:5,pointHoverRadius:8,fill:false,yAxisID:'yLeft'});
     ci++;
   }
-  // 複選個股
   stockKeys.filter(k=>_journalChartChecks['stk_'+k]).forEach(k=>{
     const color=colors[ci%colors.length];
     datasets.push({label:k,data:sorted.map(j=>(j.stockPrices||{})[k]||null),
@@ -7423,25 +7407,30 @@ function renderJournalChart(){
 
   const tagEmojiMap={'看多':'📈','看空':'📉','買入':'💰','賣出':'💸','重大事項':'🚨','極度恐慌':'😱'};
 
-  // 自訂 plugin：在資料點上顯示標籤 emoji
+  // 取得目前「全部標籤」篩選的值
+  const activeLabelFilter=(document.getElementById('journal-tag-sel')?.value)||'';
+
+  // 自訂 plugin：在走勢圖對應日期顯示 emoji，連動標籤篩選
   const tagPlugin={
     id:'tagEmoji',
     afterDatasetsDraw(chart){
-      if(_journalChartChecks['__tags__']===false)return;
+      if(!activeLabelFilter)return; // 沒有篩選標籤就不顯示
       const ctx=chart.ctx;
-      const meta=chart.getDatasetMeta(0);
-      if(!meta||!meta.data)return;
+      // 用 x scale 直接算位置，不依賴 dataset meta
+      const xScale=chart.scales.x;
+      const yScale=chart.scales.yLeft||chart.scales.yRight||Object.values(chart.scales).find(s=>s.axis==='y');
+      if(!xScale||!yScale)return;
       sorted.forEach((j,idx)=>{
-        // 只顯示有勾選的標籤
-        const tags=(j.tags||[]).filter(t=>tagEmojiMap[t]&&_journalChartChecks['tag_'+t]);
+        const tags=(j.tags||[]).filter(t=>t===activeLabelFilter&&tagEmojiMap[t]);
         if(!tags.length)return;
-        const point=meta.data[idx];
-        if(!point)return;
+        const x=xScale.getPixelForValue(idx);
+        // y 放在圖表頂部偏下一點
+        const y=chart.chartArea.top+10;
         const emojis=tags.map(t=>tagEmojiMap[t]).join('');
         ctx.save();
-        ctx.font='14px serif';
+        ctx.font='16px serif';
         ctx.textAlign='center';
-        ctx.fillText(emojis,point.x,point.y-14);
+        ctx.fillText(emojis,x,y);
         ctx.restore();
       });
     }
@@ -7488,6 +7477,15 @@ function renderJournalChart(){
       }
     }
   });
+}
+
+function onJournalStockSelect(sel){
+  // 更新所有個股的勾選狀態
+  const options=[...sel.options];
+  options.forEach(o=>{
+    _journalChartChecks['stk_'+o.value]=o.selected;
+  });
+  renderJournalChart();
 }
 
 function selectJournalStock(val){
@@ -7570,6 +7568,9 @@ function updateStockPriceInputs(){
 function setJournalTagSel(sel){
   journalTagFilter=sel.value;
   renderJournal();
+  // 走勢圖開著的話同步重繪 emoji
+  const chartBody=document.getElementById('journal-chart-body');
+  if(chartBody&&chartBody.style.display!=='none')renderJournalChart();
 }
 
 function openJournalModal(id=null){
