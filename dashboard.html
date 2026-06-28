@@ -7339,12 +7339,6 @@ function setJournalTagSel(sel){
   renderJournal();
 }
 
-function setMood(btn){
-  document.querySelectorAll('.j-mood-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('j-mood').value=btn.dataset.mood;
-}
-
 function openJournalModal(id=null){
   editJournalId=id;
   const j=id?(db.journals||[]).find(x=>x.id===id):null;
@@ -7352,17 +7346,12 @@ function openJournalModal(id=null){
   document.getElementById('j-date').value=j?.date||new Date().toISOString().split('T')[0];
   document.getElementById('j-market').value=j?.market||'';
   const jmUrlEl=document.getElementById('j-market-url');if(jmUrlEl)jmUrlEl.value=j?.marketUrl||'';
-  document.getElementById('j-mood').value=j?.mood||'';
   document.getElementById('j-content').value=j?.content||'';
   document.getElementById('j-stock-tags').value=(j?.stockTags||[]).join(' ');
   // 標籤
-  ['jtag-bull','jtag-bear','jtag-buy','jtag-sell','jtag-alert'].forEach(id2=>{
+  ['jtag-bull','jtag-bear','jtag-buy','jtag-sell','jtag-alert','jtag-panic'].forEach(id2=>{
     const el=document.getElementById(id2);
     if(el)el.checked=j?.tags?.includes(el.value)||false;
-  });
-  // 情緒按鈕
-  document.querySelectorAll('.j-mood-btn').forEach(b=>{
-    b.classList.toggle('active',j?.mood===b.dataset.mood);
   });
   // 圖片
   window._jImgs=[...(j?.images||[])];
@@ -7465,7 +7454,7 @@ function saveJournal(){
   const date=document.getElementById('j-date').value;
   if(!date){toast('請填寫日期');return;}
   const tags=[];
-  ['jtag-bull','jtag-bear','jtag-buy','jtag-sell','jtag-alert'].forEach(id2=>{
+  ['jtag-bull','jtag-bear','jtag-buy','jtag-sell','jtag-alert','jtag-panic'].forEach(id2=>{
     const el=document.getElementById(id2);
     if(el&&el.checked)tags.push(el.value);
   });
@@ -7475,7 +7464,6 @@ function saveJournal(){
     tags,
     market:document.getElementById('j-market').value.trim(),
     marketUrl:document.getElementById('j-market-url')?.value.trim()||'',
-    mood:document.getElementById('j-mood').value.trim(),
     content:document.getElementById('j-content').value.trim(),
     stockTags:document.getElementById('j-stock-tags').value.trim().split(/\s+/).filter(Boolean),
     images:window._jImgs||[]
@@ -7627,7 +7615,7 @@ function renderJournal(){
           <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;flex:1;min-width:0">
             <span style="font-size:13px;font-weight:700;color:#e2e8f0;font-family:'JetBrains Mono',monospace;white-space:nowrap">${j.date}</span>
             ${tags}
-            ${j.mood?`<span style="font-size:12px;color:rgba(255,255,255,.65)">${j.mood}</span>`:''}
+            ${j.mood?`<span style="font-size:12px;color:rgba(255,255,255,.65)"></span>`:''}
             ${(j.stockTags||[]).map(t=>`<span onclick="event.stopPropagation();openStockTracker('${t}')" style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;background:rgba(56,189,248,.15);color:#38bdf8;border:1px solid rgba(56,189,248,.3);cursor:pointer;font-family:'JetBrains Mono',monospace" title="點擊查看 ${t} 所有記錄">${t}</span>`).join('')}
             ${j.marketUrl?`<a href="${j.marketUrl}" target="_blank" onclick="event.stopPropagation()" style="font-size:11px;color:#93c5fd;text-decoration:none;white-space:nowrap" title="查看原文">🔗 原文</a>`:''}
           </div>
