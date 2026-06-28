@@ -2017,14 +2017,6 @@ body:not(.privacy) .privacy-mask{filter:none;}
     <div class="mini-card-open-hint">點擊查看 ›</div>
   </div>
 
-  <!-- 3. 持倉健康檢查 -->
-  <div class="mini-card" onclick="openSP('health')">
-    <div class="mini-card-icon">💎</div>
-    <div class="mini-card-title">持倉健康檢查</div>
-    <div class="mini-card-badge blue" id="mc-health-badge">—</div>
-    <div class="mini-card-open-hint">點擊查看 ›</div>
-  </div>
-
   <!-- 4. 觀察股區 -->
   <div class="mini-card" onclick="openSP('watch')">
     <div class="mini-card-icon">👁</div>
@@ -2565,19 +2557,6 @@ body:not(.privacy) .privacy-mask{filter:none;}
     </div>
     <div class="fg"><label class="fl">自定義連結（選填，點名稱可跳轉）</label><input class="fi" id="i-url" placeholder="例：https://www.moneydj.com/ETF/X/Basic/Basic0.xdjhtm?etfid=00985B"></div>
     <div class="fg"><label class="fl">初始買入原因（選填）</label><input class="fi" id="i-remark" placeholder="例：看好升息循環結束，布局債券ETF"></div>
-    <div class="fr">
-      <div class="fg">
-        <label class="fl">持有類型</label>
-        <div style="display:flex;gap:8px;margin-top:4px">
-          <button type="button" class="hold-type-btn active" data-type="long" onclick="selectHoldType(this)">📦 長期持有</button>
-          <button type="button" class="hold-type-btn" data-type="short" onclick="selectHoldType(this)">⚡ 短期交易</button>
-        </div>
-      </div>
-      <div class="fg" id="i-target-wrap">
-        <label class="fl">年化目標報酬（%）</label>
-        <input class="fi" id="i-target-roi" type="number" step="0.5" value="5" placeholder="例：5">
-      </div>
-    </div>
     <div class="fg" id="i-mood-wrap">
       <label class="fl">下單情緒（選填）</label>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
@@ -7387,7 +7366,11 @@ function renderJournalChart(){
     if(j.indexVal)allKeys.add('大盤');
     Object.keys(j.stockPrices||{}).forEach(k=>allKeys.add(k));
   });
-  allKeys.forEach(k=>{if(_journalChartChecks[k]===undefined)_journalChartChecks[k]=true;});
+  allKeys.forEach(k=>{
+    if(_journalChartChecks[k]===undefined){
+      _journalChartChecks[k] = (k==='大盤'); // 只有大盤預設打勾
+    }
+  });
 
   const checksEl=document.getElementById('journal-chart-checks');
   if(checksEl){
@@ -7404,8 +7387,19 @@ function renderJournalChart(){
   let ci=0;
   const datasets=[...allKeys].filter(k=>_journalChartChecks[k]).map(k=>{
     const color=colors[ci++%colors.length];
-    return{label:k,data:sorted.map(j=>k==='大盤'?j.indexVal||null:(j.stockPrices||{})[k]||null),
-      borderColor:color,backgroundColor:color+'22',tension:0.3,spanGaps:true,pointRadius:5,pointHoverRadius:8,fill:false};
+    const isMarket=(k==='大盤');
+    return{
+      label:k,
+      data:sorted.map(j=>isMarket?j.indexVal||null:(j.stockPrices||{})[k]||null),
+      borderColor:color,
+      backgroundColor:color+'22',
+      tension:0.3,
+      spanGaps:true,
+      pointRadius:5,
+      pointHoverRadius:8,
+      fill:false,
+      yAxisID: isMarket?'yLeft':'yRight',
+    };
   });
 
   if(_journalChart)_journalChart.destroy();
@@ -7425,7 +7419,21 @@ function renderJournalChart(){
           return lines;
         }}}
       },
-      scales:{x:{ticks:{font:{size:10},maxTicksLimit:10}},y:{ticks:{font:{size:10}}}},
+      scales:{
+        x:{ticks:{font:{size:10},maxTicksLimit:10}},
+        yLeft:{
+          type:'linear',position:'left',
+          ticks:{font:{size:10}},
+          title:{display:true,text:'大盤',font:{size:10},color:'#3b82f6'},
+          grid:{drawOnChartArea:true},
+        },
+        yRight:{
+          type:'linear',position:'right',
+          ticks:{font:{size:10}},
+          title:{display:true,text:'個股',font:{size:10},color:'#dc2626'},
+          grid:{drawOnChartArea:false},
+        }
+      },
       onClick(evt,elements){
         if(!elements.length)return;
         const idx=elements[0].index;
@@ -7466,6 +7474,29 @@ function showJournalChartPopup(j,evt){
   popup.style.display='block';
 }
 
+async function autoFetchJournalPrices(){
+  // 自動抓大盤
+  const idxEl=document.getElementById('j-index');
+  if(idxEl&&!idxEl.value){
+    try{
+      const r=await fetch(CF_WORKER+'/index?t='+Date.now());
+      if(r.ok){const d=await r.json();if(d.price)idxEl.value=Math.round(d.price);}
+    }catch(e){}
+  }
+  // 自動抓個股
+  const wrap=document.getElementById('j-stock-prices');
+  if(!wrap)return;
+  const inputs=wrap.querySelectorAll('input[data-code]');
+  await Promise.all([...inputs].map(async el=>{
+    if(el.value)return; // 已有值不覆蓋
+    const code=el.dataset.code;
+    try{
+      const p=await fetchPrice(code);
+      if(p&&p.price)el.value=p.price;
+    }catch(e){}
+  }));
+}
+
 function updateStockPriceInputs(){
   const tags=document.getElementById('j-stock-tags')?.value.trim().split(/[\s,，]+/).filter(Boolean)||[];
   const wrap=document.getElementById('j-stock-prices');
@@ -7477,10 +7508,12 @@ function updateStockPriceInputs(){
   wrap.innerHTML=codes.map(code=>`
     <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
       <span style="font-size:12px;font-weight:700;color:#1e293b;font-family:'JetBrains Mono',monospace;min-width:80px">${code}</span>
-      <input type="number" step="0.01" data-code="${code}" placeholder="今日收盤價" value="${existing[code]||''}"
+      <input type="number" step="0.01" data-code="${code}" placeholder="抓取中..." value="${existing[code]||''}"
         style="flex:1;padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:12px;outline:none">
       <span style="font-size:11px;color:#94a3b8">元</span>
     </div>`).join('');
+  // 自動抓尚未有值的個股
+  setTimeout(()=>autoFetchJournalPrices(),100);
 }
 
 function setJournalTagSel(sel){
@@ -7508,6 +7541,10 @@ function openJournalModal(id=null){
       wrap.querySelectorAll('input[data-code]').forEach(el=>{
         if(j.stockPrices[el.dataset.code])el.value=j.stockPrices[el.dataset.code];
       });
+    }
+    // 新增模式才自動抓
+    if(!id){
+      autoFetchJournalPrices();
     }
   },50);
   // 標籤
