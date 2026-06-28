@@ -7467,7 +7467,7 @@ function showJournalChartPopup(j,evt){
 }
 
 function updateStockPriceInputs(){
-  const tags=document.getElementById('j-stock-tags')?.value.trim().split(/\s+/).filter(Boolean)||[];
+  const tags=document.getElementById('j-stock-tags')?.value.trim().split(/[\s,，]+/).filter(Boolean)||[];
   const wrap=document.getElementById('j-stock-prices');
   if(!wrap)return;
   const existing={};
@@ -7627,7 +7627,7 @@ function saveJournal(){
     market:document.getElementById('j-market').value.trim(),
     marketUrl:document.getElementById('j-market-url')?.value.trim()||'',
     content:document.getElementById('j-content').value.trim(),
-    stockTags:document.getElementById('j-stock-tags').value.trim().split(/\s+/).filter(Boolean),
+    stockTags:document.getElementById('j-stock-tags').value.trim().split(/[\s,，]+/).filter(Boolean),
     indexVal:parseFloat(document.getElementById('j-index')?.value)||null,
     stockPrices:(()=>{
       const prices={};
