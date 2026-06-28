@@ -2347,10 +2347,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
           <option value="買入">▲ 買入</option>
           <option value="賣出">▼ 賣出</option>
           <option value="重大事項">🔔 重大事項</option>
-        </select>
-        <!-- 心情下拉（動態） -->
-        <select id="journal-mood-sel" onchange="renderJournal()" style="padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:700;color:#475569;background:#fff;cursor:pointer;outline:none;min-width:110px">
-          <option value="">全部心情</option>
+          <option value="極度恐慌">😱 極度恐慌(PTSD)</option>
         </select>
       </div>
       <div id="journal-list" style="padding:12px 16px;display:flex;flex-direction:column;gap:10px"></div>
@@ -3029,8 +3026,18 @@ async function manualSync(){
   _ghSha='';
   const updated=await ghPull();
   if(updated){render();runDailyProcess(false);}
-  // Pull 完成後才執行自動快照（確保用最新資料）
-  autoSnapshot();
+  // Pull 完成後執行自動快照
+  const _now=new Date();
+  if(_now.getDay()===5&&_now.getHours()>=15){
+    // 週五下午，強制重新檢查（清掉小時 key 讓它重拍）
+    const _y=_now.getFullYear(),_m=String(_now.getMonth()+1).padStart(2,'0'),_d=String(_now.getDate()).padStart(2,'0');
+    const _dk=`${_y}-${_m}-${_d}`;
+    // 只清掉「未到這個小時」的 key，確保同一小時只拍一次
+    const _hk='snap_done_'+_dk+'_'+_now.getHours();
+    if(!localStorage.getItem(_hk)) autoSnapshot();
+  } else {
+    autoSnapshot();
+  }
   await ghPush();
   showSyncStatus('✅ 同步完成');
 }
@@ -3490,9 +3497,9 @@ function renderInv(){
       '<div class="irow-l2" onclick="toggleInvDetail(\''+inv.id+'\')">'
         +codeHtml
         +'<span class="irow-l2-pnl-amt privacy-mask" style="color:'+pnColor+'">'+pnlTxt+'</span>'
-        +'<span class="irow-l2-price" style="color:'+prColor+'">'+priceTxt+'</span>'
+        +'<span class="irow-l2-price privacy-mask" style="color:'+prColor+'">'+priceTxt+'</span>'
         +noteHtml
-        +'<span class="irow-l2-pnl-pct" style="color:'+pnColor+'">'+pctTxt+'</span>'
+        +'<span class="irow-l2-pnl-pct privacy-mask" style="color:'+pnColor+'">'+pctTxt+'</span>'
         +'<span class="irow-l2-arrow" id="iarr-'+inv.id+'">'+(isOpen?'▲':'▼')+'</span>'
         +(inv.name?'<span class="irow-l2-name">'+inv.name+'</span>':'')
       +'</div>'
@@ -5867,6 +5874,12 @@ function forceDailyProcess(){
   const now=new Date();
   const twNow=new Date(now.getTime()+8*3600000);
   const todayStr=twNow.toISOString().slice(0,10);
+  const FORCE_KEY='force_daily_'+todayStr;
+  if(localStorage.getItem(FORCE_KEY)){
+    toast('⚠️ 今日已執行過強制連動，不重複扣款');
+    return;
+  }
+  localStorage.setItem(FORCE_KEY,'1');
   // 清除今日所有交割和股息的 key，讓它重新執行
   localStorage.removeItem('div_done_'+todayStr);
   db.cashAccounts.forEach(acc=>{
