@@ -7472,7 +7472,7 @@ function updateStockPriceInputs(){
   if(!wrap)return;
   const existing={};
   wrap.querySelectorAll('input[data-code]').forEach(el=>{existing[el.dataset.code]=el.value;});
-  const codes=tags.filter(t=>/^[A-Za-z0-9]{4,7}$/.test(t));
+  const codes=tags.filter(t=>/^[A-Za-z0-9]{3,8}$/.test(t));
   if(codes.length===0){wrap.innerHTML='';return;}
   wrap.innerHTML=codes.map(code=>`
     <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
