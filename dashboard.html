@@ -7372,18 +7372,40 @@ function renderJournalChart(){
 
   const checksEl=document.getElementById('journal-chart-checks');
   if(checksEl){
+    const selCount=stockKeys.filter(k=>_journalChartChecks['stk_'+k]).length;
     const optHtml=stockKeys.map(k=>`
-      <option value="${k}" ${_journalChartChecks['stk_'+k]?'selected':''}>${k}</option>`).join('');
+      <label style="display:flex;align-items:center;gap:6px;padding:6px 12px;cursor:pointer;font-size:12px;font-weight:700;color:#475569;white-space:nowrap;hover:background:#f1f5f9"
+        onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background=''"
+        onclick="event.stopPropagation()">
+        <input type="checkbox" ${_journalChartChecks['stk_'+k]?'checked':''}
+          onchange="toggleJournalChartKey('stk_'+${JSON.stringify(k)},this.checked)"> ${k}
+      </label>`).join('');
+
     checksEl.innerHTML=
+      // 大盤 checkbox
       `<label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px;font-weight:700;color:#475569">
         <input type="checkbox" ${_journalChartChecks['大盤']?'checked':''} onchange="toggleJournalChartKey('大盤',this.checked)">📊 大盤
       </label>`
+      // 個股自訂下拉
       +(stockKeys.length>0?`
-      <select multiple onchange="onJournalStockSelect(this)"
-        style="padding:3px 6px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:700;color:#475569;background:#fff;cursor:pointer;outline:none;min-width:120px;max-height:80px">
-        ${optHtml}
-      </select>
-      <span style="font-size:10px;color:#94a3b8">（可多選）</span>`:'');
+      <div style="position:relative;display:inline-block">
+        <button onclick="toggleJournalStockDropdown(event)"
+          style="padding:4px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:700;color:#475569;background:#fff;cursor:pointer;display:flex;align-items:center;gap:6px;outline:none">
+          個股${selCount>0?` (${selCount})`:''}  ▾
+        </button>
+        <div id="journal-stock-dropdown" style="display:none;position:absolute;top:110%;left:0;background:#fff;border:1.5px solid var(--border);border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:999;min-width:130px;padding:4px 0;max-height:240px;overflow-y:auto">
+          ${optHtml}
+        </div>
+      </div>`:'');
+
+    // 點外面關閉下拉
+    document.addEventListener('click', function closeDD(e){
+      const dd=document.getElementById('journal-stock-dropdown');
+      if(dd&&dd.style.display!=='none'){
+        dd.style.display='none';
+        document.removeEventListener('click',closeDD);
+      }
+    });
   }
 
   const sorted=[...journals].sort((a,b)=>a.date.localeCompare(b.date));
@@ -7406,31 +7428,31 @@ function renderJournalChart(){
   });
 
   const tagEmojiMap={'看多':'📈','看空':'📉','買入':'💰','賣出':'💸','重大事項':'🚨','極度恐慌':'😱'};
-
-  // 取得目前「全部標籤」篩選的值
   const activeLabelFilter=(document.getElementById('journal-tag-sel')?.value)||'';
 
-  // 自訂 plugin：在走勢圖對應日期顯示 emoji，連動標籤篩選
+  // emoji plugin：跟著大盤點（或第一條線）上方顯示
   const tagPlugin={
     id:'tagEmoji',
     afterDatasetsDraw(chart){
-      if(!activeLabelFilter)return; // 沒有篩選標籤就不顯示
+      if(!activeLabelFilter)return;
       const ctx=chart.ctx;
-      // 用 x scale 直接算位置，不依賴 dataset meta
-      const xScale=chart.scales.x;
-      const yScale=chart.scales.yLeft||chart.scales.yRight||Object.values(chart.scales).find(s=>s.axis==='y');
-      if(!xScale||!yScale)return;
+      // 優先用大盤 dataset，沒有就用第一個
+      let refMeta=null;
+      chart.data.datasets.forEach((ds,i)=>{
+        if(ds.label==='大盤'&&!refMeta)refMeta=chart.getDatasetMeta(i);
+      });
+      if(!refMeta)refMeta=chart.getDatasetMeta(0);
+      if(!refMeta||!refMeta.data)return;
       sorted.forEach((j,idx)=>{
         const tags=(j.tags||[]).filter(t=>t===activeLabelFilter&&tagEmojiMap[t]);
         if(!tags.length)return;
-        const x=xScale.getPixelForValue(idx);
-        // y 放在圖表頂部偏下一點
-        const y=chart.chartArea.top+10;
+        const point=refMeta.data[idx];
+        if(!point||point.x===undefined)return;
         const emojis=tags.map(t=>tagEmojiMap[t]).join('');
         ctx.save();
         ctx.font='16px serif';
         ctx.textAlign='center';
-        ctx.fillText(emojis,x,y);
+        ctx.fillText(emojis, point.x, point.y-16);
         ctx.restore();
       });
     }
@@ -7477,6 +7499,13 @@ function renderJournalChart(){
       }
     }
   });
+}
+
+function toggleJournalStockDropdown(e){
+  e.stopPropagation();
+  const dd=document.getElementById('journal-stock-dropdown');
+  if(!dd)return;
+  dd.style.display=dd.style.display==='none'?'block':'none';
 }
 
 function onJournalStockSelect(sel){
