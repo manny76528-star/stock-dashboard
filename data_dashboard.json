@@ -2069,7 +2069,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1782742405902,
+  "_ts": 1782742673994,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -2215,6 +2215,26 @@
       "images": [
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1782381814232_0ti9.jpg"
       ]
+    },
+    {
+      "id": "mqzayi55559",
+      "date": "2026-06-22",
+      "tags": [
+        "重大事項"
+      ],
+      "market": "00985B全數轉換完成置00981T",
+      "marketUrl": "",
+      "content": "主要原因是 00985B持有半年無法完全反應且受匯率影響很嚴重\n加上AI賽道尚在起跑線15%左右 後面還有很大空間\n以及台幣匯率跟大盤指數完全成反比,大盤一漲00985B上漲空間完全被匯率抵銷",
+      "stockTags": [
+        "00981T",
+        "00985B"
+      ],
+      "indexVal": 47741,
+      "stockPrices": {
+        "00981T": 12.32,
+        "00985B": 10.19
+      },
+      "images": []
     },
     {
       "id": "mqejusutlqc",
