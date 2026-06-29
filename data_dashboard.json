@@ -1249,9 +1249,9 @@
       "id": "mneeom9dzod",
       "bank": "統一券商",
       "cash": 800,
-      "d1Date": "",
-      "d1": 0,
-      "d2": 0
+      "d1Date": "2026-06-26",
+      "d1": 462916,
+      "d2": -206802
     }
   ],
   "dividends": [
@@ -2069,7 +2069,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1782725318456,
+  "_ts": 1782725398850,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
