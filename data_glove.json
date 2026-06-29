@@ -281,15 +281,16 @@
       "sellPrice": 3300,
       "pros": "投手檔,售價6萬日幣等級\n接球聲音響亮 門柱紮實",
       "cons": "皮革老化僵硬",
-      "note": "",
+      "note": "整個皮革偏僵硬,但用料不錯",
       "images": [
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777210181213_hoh0.jpg",
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777210184734_kjjm.jpg",
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777210187060_c0nf.jpg",
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777210189473_4tpi.jpg"
       ],
-      "updatedAt": "2026-04-26T13:30:58.146Z",
-      "createdAt": "2026-04-26T13:28:30.788Z"
+      "updatedAt": "2026-06-29T09:18:07.331Z",
+      "createdAt": "2026-04-26T13:28:30.788Z",
+      "stars": 2
     },
     {
       "id": "mor18y2g4px",
@@ -366,5 +367,5 @@
       "stars": 5
     }
   ],
-  "_ts": 1782724661503
+  "_ts": 1782724690332
 }
