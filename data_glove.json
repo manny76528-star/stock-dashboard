@@ -260,8 +260,9 @@
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777210586227_llkc.jpg",
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777210589553_y8n4.jpg"
       ],
-      "updatedAt": "2026-06-03T15:05:46.335Z",
-      "createdAt": "2026-04-26T05:48:52.179Z"
+      "updatedAt": "2026-06-29T09:15:23.139Z",
+      "createdAt": "2026-04-26T05:48:52.179Z",
+      "stars": 2
     },
     {
       "id": "moft0htwi01",
@@ -360,5 +361,5 @@
       "stars": 5
     }
   ],
-  "_ts": 1782724510505
+  "_ts": 1782724526154
 }
