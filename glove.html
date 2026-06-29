@@ -525,6 +525,22 @@ textarea.fi{resize:vertical;min-height:80px;}
         <textarea class="fi" id="g-note" rows="2" placeholder="其他補充說明..."></textarea>
       </div>
 
+      <!-- 星星評分 -->
+      <div class="fg">
+        <label class="fl">⭐ 個人評分</label>
+        <div style="display:flex;gap:8px;align-items:center;margin-top:4px">
+          <div style="display:flex;gap:4px">
+            <span id="gstar-1" onclick="setModalStar(1)" style="font-size:28px;cursor:pointer;opacity:.25;transition:opacity .15s">★</span>
+            <span id="gstar-2" onclick="setModalStar(2)" style="font-size:28px;cursor:pointer;opacity:.25;transition:opacity .15s">★</span>
+            <span id="gstar-3" onclick="setModalStar(3)" style="font-size:28px;cursor:pointer;opacity:.25;transition:opacity .15s">★</span>
+            <span id="gstar-4" onclick="setModalStar(4)" style="font-size:28px;cursor:pointer;opacity:.25;transition:opacity .15s">★</span>
+            <span id="gstar-5" onclick="setModalStar(5)" style="font-size:28px;cursor:pointer;opacity:.25;transition:opacity .15s">★</span>
+          </div>
+          <span id="g-stars-label" style="font-size:12px;color:#94a3b8;margin-left:4px">尚未評分</span>
+          <button type="button" onclick="setModalStar(0)" style="font-size:11px;color:#94a3b8;background:none;border:none;cursor:pointer;padding:2px 6px">清除</button>
+        </div>
+      </div>
+
       <!-- 圖片上傳 -->
       <div class="fg">
         <label class="fl">🖼 圖片（最多 8 張）</label>
@@ -615,10 +631,22 @@ function toggleStarSort(){
   renderGloves();
 }
 
+let _modalStars=0;
+
+function setModalStar(n){
+  _modalStars=n;
+  const labels=['尚未評分','⭐ 1星','⭐⭐ 2星','⭐⭐⭐ 3星','⭐⭐⭐⭐ 4星','⭐⭐⭐⭐⭐ 5星'];
+  const lbl=document.getElementById('g-stars-label');
+  if(lbl)lbl.textContent=labels[n]||'尚未評分';
+  [1,2,3,4,5].forEach(i=>{
+    const s=document.getElementById('gstar-'+i);
+    if(s)s.style.opacity=i<=n?'1':'0.25';
+  });
+}
+
 function setGloveStar(id,n){
   const g=db.gloves.find(x=>x.id===id);
   if(!g)return;
-  // 再點同一顆取消
   g.stars=(g.stars===n)?0:n;
   saveDB();
   renderGloves();
@@ -702,8 +730,8 @@ function renderGloves(){
           <span class="pnl-tag ${pnlClass}">${pnl!==null?(pnl>=0?'▲':'▼')+' ':''} ${pnlTxt}</span>
           <span style="font-size:10px;color:var(--muted)">${sold?fmtDate(g.sellDate):'未售出'}</span>
         </div>
-        <div class="star-rating" onclick="event.stopPropagation()">
-          ${[1,2,3,4,5].map(n=>`<span class="${(g.stars||0)>=n?'on':''}" onclick="setGloveStar('${g.id}',${n})">★</span>`).join('')}
+        <div class="star-rating">
+          ${[1,2,3,4,5].map(n=>`<span class="${(g.stars||0)>=n?'on':''}">★</span>`).join('')}
         </div>
       </div>
     </div>`;
@@ -825,6 +853,7 @@ function openAddModal(){
   document.getElementById('g-size').value='';
   const inp=document.getElementById('g-img-input');if(inp)inp.value='';
   renderImgPreview();
+  setModalStar(0); // 清除星星
   document.getElementById('add-modal').classList.add('open');
 }
 function openEditModal(id){
@@ -844,6 +873,7 @@ function openEditModal(id){
   document.getElementById('g-pros').value=g.pros||'';
   document.getElementById('g-cons').value=g.cons||'';
   document.getElementById('g-note').value=g.note||'';
+  setModalStar(g.stars||0); // 載入星星
   renderImgPreview();
   document.getElementById('add-modal').classList.add('open');
 }
@@ -869,6 +899,7 @@ function saveGlove(){
     pros:document.getElementById('g-pros').value.trim(),
     cons:document.getElementById('g-cons').value.trim(),
     note:document.getElementById('g-note').value.trim(),
+    stars:_modalStars||0,
     images:[...currentImgs],
     updatedAt:new Date().toISOString()
   };
