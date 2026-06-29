@@ -60,15 +60,16 @@
       "sellPrice": 2600,
       "pros": "久保田 日本製\n手感不錯,球窩清晰",
       "cons": "手套品項不佳\n軟式手套 沒接到球點會很痛",
-      "note": "",
+      "note": "皮革軟爛,不然手感不錯刀膜也還可以",
       "images": [
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209707299_luft.jpg",
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209703118_ogd8.jpg",
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209705267_8wm4.jpg",
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209708932_kc62.jpg"
       ],
-      "updatedAt": "2026-04-26T13:21:55.426Z",
-      "createdAt": "2026-04-26T05:07:08.356Z"
+      "updatedAt": "2026-06-29T09:18:45.098Z",
+      "createdAt": "2026-04-26T05:07:08.356Z",
+      "stars": 3
     },
     {
       "id": "mofb6v5nx88",
@@ -368,5 +369,5 @@
       "stars": 5
     }
   ],
-  "_ts": 1782724707770
+  "_ts": 1782724728102
 }
