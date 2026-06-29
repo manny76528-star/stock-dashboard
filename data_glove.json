@@ -81,7 +81,7 @@
       "sellPrice": 4800,
       "pros": "ZETT 日本製最高階 PROSTATUS 鈴木印系列",
       "cons": "土手芯材軟塌且偏重\n整體手感不好",
-      "note": "",
+      "note": "軟爛感很嚴重加笨重",
       "images": [
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209869381_c8a8.jpg",
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209872286_mm94.jpg",
@@ -89,8 +89,9 @@
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209876828_1ji9.jpg",
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777210807547_f61g.jpg"
       ],
-      "updatedAt": "2026-04-26T13:40:12.511Z",
-      "createdAt": "2026-04-26T05:09:34.907Z"
+      "updatedAt": "2026-06-29T09:17:38.498Z",
+      "createdAt": "2026-04-26T05:09:34.907Z",
+      "stars": 2
     },
     {
       "id": "mofbanhmqef",
@@ -365,5 +366,5 @@
       "stars": 5
     }
   ],
-  "_ts": 1782724646542
+  "_ts": 1782724661503
 }
