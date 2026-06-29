@@ -399,6 +399,24 @@
           "lossReason": "判斷錯誤"
         },
         {
+          "id": "mqz0miisfgz",
+          "type": "sell",
+          "lots": 10,
+          "price": 46.65,
+          "date": "2026-06-26",
+          "fee": 1586,
+          "lotRefs": [
+            {
+              "txnId": "init-00864B",
+              "lots": 10,
+              "date": "2026-04-02"
+            }
+          ],
+          "remark": "持有半年無法如預期走勢呈現,轉移到00981T",
+          "mood": "",
+          "lossReason": "紀律問題"
+        },
+        {
           "id": "mqz0f5ht0v7",
           "type": "sell",
           "lots": 23,
@@ -2051,7 +2069,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1782725021154,
+  "_ts": 1782725318456,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
