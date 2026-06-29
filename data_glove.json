@@ -184,7 +184,7 @@
       "sellPrice": 4500,
       "pros": "11.25小手套尺寸很合手\n球檔很適合我,守備練習很合手",
       "cons": "接球面牛油膠以乾固\n導致接球面僵硬變形\n接球面皮革擦傷嚴重",
-      "note": "",
+      "note": "接球面皮革受損嚴重,不然整體尺寸跟刀膜都很滿意",
       "images": [
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209529066_923l.jpg",
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209531692_9x2r.jpg",
@@ -192,9 +192,9 @@
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777210549969_rdas.jpg",
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777210554642_sdwt.jpg"
       ],
-      "updatedAt": "2026-04-26T13:35:59.514Z",
+      "updatedAt": "2026-06-29T09:20:02.012Z",
       "createdAt": "2026-04-26T05:30:41.165Z",
-      "stars": 0
+      "stars": 4
     },
     {
       "id": "mofcb7sn24w",
@@ -370,5 +370,5 @@
       "stars": 5
     }
   ],
-  "_ts": 1782724780809
+  "_ts": 1782724805012
 }
