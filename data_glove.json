@@ -104,7 +104,7 @@
       "sellPrice": 5500,
       "pros": "尺寸非常滿意\n整體9.5成新\n接球聲音響亮",
       "cons": "無",
-      "note": "",
+      "note": "完美尺寸,接球聲音響亮",
       "images": [
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209817458_xdoc.jpg",
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209814750_ls66.jpg",
@@ -112,8 +112,9 @@
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209821974_qxrp.jpg",
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209835459_wwyo.jpg"
       ],
-      "updatedAt": "2026-04-26T13:24:02.030Z",
-      "createdAt": "2026-04-26T05:12:31.595Z"
+      "updatedAt": "2026-06-29T09:17:23.539Z",
+      "createdAt": "2026-04-26T05:12:31.595Z",
+      "stars": 5
     },
     {
       "id": "mofbewaajt1",
@@ -364,5 +365,5 @@
       "stars": 5
     }
   ],
-  "_ts": 1782724631420
+  "_ts": 1782724646542
 }
