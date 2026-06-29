@@ -259,6 +259,15 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-seri
       <!-- JS 渲染 -->
     </div>
 
+    <!-- 底部導航（同上） -->
+    <div class="round-bar" id="browse-nav-bottom" style="margin-top:4px;margin-bottom:16px;display:none">
+      <div class="round-info">第 <b id="page-num-b">1</b> 頁　<span id="page-range-b">1-60</span>　共 <b id="total-pages-b">0</b> 頁</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <button class="btn btn-ghost btn-sm" onclick="prevPage()">← 上一頁</button>
+        <button class="btn btn-primary btn-sm" onclick="nextPage()">下一頁 +進度 →</button>
+      </div>
+    </div>
+
     <!-- 全部完成 -->
     <div id="all-done" style="display:none">
       <div class="result-panel">
@@ -509,10 +518,16 @@ function renderBrowsePage(){
   const start=currentPage*PAGE_SIZE;
   const pageWords=notDone.slice(start,start+PAGE_SIZE);
 
-  // 更新頁碼
+  // 更新頁碼（上下兩組同步）
   if(el('page-num'))el('page-num').textContent=currentPage+1;
   if(el('total-pages'))el('total-pages').textContent=totalPages;
   if(el('page-range'))el('page-range').textContent=(start+1)+'-'+Math.min(start+pageWords.length,notDone.length);
+  // 底部導航同步
+  const bottomNav=el('browse-nav-bottom');
+  if(bottomNav)bottomNav.style.display='flex';
+  if(el('page-num-b'))el('page-num-b').textContent=currentPage+1;
+  if(el('total-pages-b'))el('total-pages-b').textContent=totalPages;
+  if(el('page-range-b'))el('page-range-b').textContent=(start+1)+'-'+Math.min(start+pageWords.length,notDone.length);
 
   // 渲染單字列表
   list.innerHTML=pageWords.map(v=>{

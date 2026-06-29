@@ -149,6 +149,10 @@ body{
   box-shadow:0 12px 40px rgba(0,0,0,.5),0 0 0 1px rgba(232,160,32,.15);
 }
 .glove-card.sold{opacity:.75;}
+.star-rating{display:flex;gap:3px;margin-top:6px;}
+.star-rating span{font-size:18px;cursor:pointer;opacity:.3;transition:opacity .15s;}
+.star-rating span.on{opacity:1;}
+.star-rating span:hover,.star-rating span:hover~span{opacity:.6;}
 .glove-card.sold .card-img-wrap::after{
   content:'已售出';
   position:absolute;top:12px;right:12px;
@@ -447,6 +451,7 @@ textarea.fi{resize:vertical;min-height:80px;}
     <button class="filter-chip active" data-filter="all" onclick="setFilter(this)">全部</button>
     <button class="filter-chip" data-filter="hold" onclick="setFilter(this)">持有中</button>
     <button class="filter-chip" data-filter="sold" onclick="setFilter(this)">已售出</button>
+    <button class="filter-chip" id="sort-star-btn" onclick="toggleStarSort()" style="margin-left:auto">⭐ 評分排序</button>
   </div>
 
   <!-- GRID -->
@@ -595,6 +600,29 @@ function save(){
 let editId=null;
 let currentImgs=[];
 let currentFilter='all';
+let starSort=0; // 0=不排星 1=高到低 2=低到高
+
+function toggleStarSort(){
+  starSort=(starSort+1)%3;
+  const btn=document.getElementById('sort-star-btn');
+  if(btn){
+    if(starSort===0)btn.textContent='⭐ 評分排序';
+    else if(starSort===1)btn.textContent='⭐ 高→低';
+    else btn.textContent='⭐ 低→高';
+    btn.style.background=starSort>0?'#fef3c7':'';
+    btn.style.borderColor=starSort>0?'#f59e0b':'';
+  }
+  renderGloves();
+}
+
+function setGloveStar(id,n){
+  const g=db.gloves.find(x=>x.id===id);
+  if(!g)return;
+  // 再點同一顆取消
+  g.stars=(g.stars===n)?0:n;
+  saveDB();
+  renderGloves();
+}
 let lbImgs=[];let lbIdx=0;
 let detailId=null;
 
@@ -603,7 +631,11 @@ let detailId=null;
 // ══════════════════════════
 function renderGloves(){
   const q=(document.querySelector('.search-box')?.value||'').toLowerCase();
-  let list=[...db.gloves].sort((a,b)=>(b.buyDate||'').localeCompare(a.buyDate||''));
+  let list=[...db.gloves];
+  // 排序：有星星排序優先，否則按日期
+  if(starSort===1) list.sort((a,b)=>(b.stars||0)-(a.stars||0));
+  else if(starSort===2) list.sort((a,b)=>(a.stars||0)-(b.stars||0));
+  else list.sort((a,b)=>(b.buyDate||'').localeCompare(a.buyDate||''));
   if(currentFilter==='hold')list=list.filter(g=>!g.sellDate||!g.sellPrice);
   if(currentFilter==='sold')list=list.filter(g=>g.sellDate&&g.sellPrice);
   if(q)list=list.filter(g=>
@@ -669,6 +701,9 @@ function renderGloves(){
         <div class="card-pnl">
           <span class="pnl-tag ${pnlClass}">${pnl!==null?(pnl>=0?'▲':'▼')+' ':''} ${pnlTxt}</span>
           <span style="font-size:10px;color:var(--muted)">${sold?fmtDate(g.sellDate):'未售出'}</span>
+        </div>
+        <div class="star-rating" onclick="event.stopPropagation()">
+          ${[1,2,3,4,5].map(n=>`<span class="${(g.stars||0)>=n?'on':''}" onclick="setGloveStar('${g.id}',${n})">★</span>`).join('')}
         </div>
       </div>
     </div>`;
