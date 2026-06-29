@@ -127,7 +127,7 @@
       "sellPrice": 8000,
       "pros": "尺寸完美\n全新含盒裝袋子",
       "cons": "品牌小眾,得標後顏色不太喜歡",
-      "note": "小川湯柔($600)",
+      "note": "尺寸完美, 顏色稍屬不好看\n小川湯柔($600)",
       "images": [
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209595929_ccdz.jpg",
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209588728_4l3m.jpg",
@@ -138,8 +138,9 @@
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209602408_rg36.jpg",
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1777209604964_nfs3.jpg"
       ],
-      "updatedAt": "2026-04-26T13:20:14.536Z",
-      "createdAt": "2026-04-26T05:15:49.618Z"
+      "updatedAt": "2026-06-29T09:16:41.616Z",
+      "createdAt": "2026-04-26T05:15:49.618Z",
+      "stars": 4
     },
     {
       "id": "mofbt83ulwp",
@@ -362,5 +363,5 @@
       "stars": 5
     }
   ],
-  "_ts": 1782724566911
+  "_ts": 1782724604622
 }
