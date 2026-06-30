@@ -5429,7 +5429,7 @@ function toggleTrend(){
   if(open)renderTrendChart();
 }
 
-function recordSnapshot(manual=false){
+async function recordSnapshot(manual=false){
   if(!db.snapshots)db.snapshots=[];
   // 完全與 renderSum 使用相同公式
   let tC=0,tM=0,tD=0,tDivTot=0,tR=0;
@@ -5445,6 +5445,14 @@ function recordSnapshot(manual=false){
   const dR=tot>0?Math.round(lR/tot*1000)/10:0;
   const fl=Math.round(tD-mO);
   const dateKey=new Date().toISOString().slice(0,10); // 完整日期 YYYY-MM-DD
+
+  // 抓大盤收盤指數
+  let indexVal=null;
+  try{
+    const r=await fetch(CF_WORKER+'/index?t='+Date.now());
+    if(r.ok){const d=await r.json();if(d.price)indexVal=Math.round(d.price);}
+  }catch(e){console.warn('快照抓大盤失敗:',e.message);}
+
   const existing=db.snapshots.findIndex(s=>s.ym===dateKey);
   const snap={
     ym:dateKey,
@@ -5452,6 +5460,7 @@ function recordSnapshot(manual=false){
     div:Math.round(tD),
     cf:fl,
     debtRatio:dR,
+    indexVal:indexVal,
     // 各標的庫存快照
     holdings:db.investments.map(inv=>{
       const c=calcInv(inv);
@@ -5471,7 +5480,7 @@ function recordSnapshot(manual=false){
   db.snapshots.sort((a,b)=>a.ym.localeCompare(b.ym));
   save();renderTrendChart();
   if(manual)toast('✅ 已記錄 '+dateKey+' 快照（淨資產:$'+Math.round(net).toLocaleString()+'）');
-  else console.log('Auto snapshot:',dateKey,'net:',Math.round(net));
+  else console.log('Auto snapshot:',dateKey,'net:',Math.round(net),'index:',indexVal);
 }
 
 function renderTrendChart(){
@@ -5557,6 +5566,7 @@ function renderTrendChart(){
   var tblHtml='<div style="overflow-x:auto;margin-top:4px"><table style="width:100%;border-collapse:separate;border-spacing:0;font-size:13px">';
   tblHtml+='<thead><tr style="background:linear-gradient(135deg,#0f172a,#1e3a5f)">';
   tblHtml+='<th style="padding:10px 14px;text-align:left;color:rgba(255,255,255,.7);font-size:11px;font-weight:600">月份</th>';
+  tblHtml+='<th style="padding:10px 14px;text-align:right;color:rgba(255,255,255,.7);font-size:11px;font-weight:600">大盤</th>';
   tblHtml+='<th style="padding:10px 14px;text-align:right;color:rgba(255,255,255,.7);font-size:11px;font-weight:600">淨資產</th>';
   tblHtml+='<th style="padding:10px 14px;text-align:right;color:rgba(255,255,255,.7);font-size:11px;font-weight:600">每月股息</th>';
   tblHtml+='<th style="padding:10px 14px;text-align:right;color:rgba(255,255,255,.7);font-size:11px;font-weight:600">每月現金流</th>';
@@ -5568,6 +5578,7 @@ function renderTrendChart(){
     var cfColor=s.cf>=0?'#16a34a':'#dc2626';
     tblHtml+='<tr style="background:'+bg+'">';
     tblHtml+='<td style="padding:10px 14px;font-weight:700;color:#1e293b;border-bottom:1px solid #f1f5f9">'+( s.ym.length>7?s.ym:s.ym)+'</td>';
+    tblHtml+='<td style="padding:10px 14px;text-align:right;font-weight:600;color:#7c3aed;border-bottom:1px solid #f1f5f9">'+(s.indexVal?s.indexVal.toLocaleString():'—')+'</td>';
     tblHtml+='<td style="padding:10px 14px;text-align:right;font-weight:600;color:'+netColor+';border-bottom:1px solid #f1f5f9">$'+s.net.toLocaleString()+'</td>';
     tblHtml+='<td style="padding:10px 14px;text-align:right;font-weight:600;color:#16a34a;border-bottom:1px solid #f1f5f9">$'+s.div.toLocaleString()+'</td>';
     tblHtml+='<td style="padding:10px 14px;text-align:right;font-weight:600;color:'+cfColor+';border-bottom:1px solid #f1f5f9">'+(s.cf>=0?'+':'')+s.cf.toLocaleString()+'</td>';
@@ -5599,7 +5610,7 @@ function openSnapDetail(ym){
   document.getElementById('snap-detail-title').textContent='📋 '+ym+' 持股明細';
   const body=document.getElementById('snap-detail-body');
   const holdings=snap.holdings||[];
-  if(holdings.length===0){
+  if(holdings.length===0 && !snap.indexVal){
     body.innerHTML='<div style="text-align:center;padding:30px;color:#94a3b8">此快照無持股明細<br><span style="font-size:11px">（2026/05/22之後記錄的快照才有明細）</span></div>';
   } else {
     body.innerHTML='<table style="width:100%;border-collapse:collapse;font-size:13px">'
@@ -5609,6 +5620,18 @@ function openSnapDetail(ym){
         +'<th style="padding:8px 10px;text-align:right;color:rgba(255,255,255,.7);font-size:11px">收盤價</th>'
         +'<th style="padding:8px 10px;text-align:right;color:rgba(255,255,255,.7);font-size:11px">損益</th>'
       +'</tr></thead><tbody>'
+      // 大盤放最上面
+      +(snap.indexVal?(
+        '<tr style="background:#f5f3ff">'
+          +'<td style="padding:8px 10px;border-bottom:1px solid #f1f5f9">'
+            +'<div style="font-weight:700;color:#7c3aed">📊 大盤</div>'
+            +'<div style="font-size:11px;color:#94a3b8">台股加權指數</div>'
+          +'</td>'
+          +'<td style="padding:8px 10px;text-align:right;border-bottom:1px solid #f1f5f9;color:#94a3b8">—</td>'
+          +'<td style="padding:8px 10px;text-align:right;border-bottom:1px solid #f1f5f9;color:#7c3aed;font-weight:700">'+snap.indexVal.toLocaleString()+'</td>'
+          +'<td style="padding:8px 10px;text-align:right;border-bottom:1px solid #f1f5f9;color:#94a3b8">—</td>'
+        +'</tr>'
+      ):'')
       +holdings.map((h,i)=>{
         const pnlColor=h.pnl>=0?'#dc2626':'#16a34a';
         const bg=i%2===0?'#fff':'#f8fafc';
