@@ -6128,7 +6128,7 @@
           "sns": [],
           "cost": 170,
           "price": 220,
-          "invoice": false
+          "invoice": true
         },
         {
           "name": "抗刮碳帶 TRR03 100*300米 外捲",
@@ -6146,7 +6146,7 @@
       "paid": true,
       "paidDate": "2026-06-30",
       "vendorPaid": true,
-      "vendorPaidDate": "",
+      "vendorPaidDate": "2026-06-30",
       "images": [
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/order-images/1780048369065_thm9.jpg",
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/order-images/1780048372511_sd9b.jpg"
@@ -6562,6 +6562,6 @@
     "bankCode": "013",
     "bankAccount": "061506186489"
   },
-  "_ts": 1782839372391,
+  "_ts": 1782839417556,
   "_vendorPaidBackfilled": true
 }
