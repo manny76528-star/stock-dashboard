@@ -475,6 +475,7 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
     <!-- 固定底部按鈕 -->
     <div style="padding:12px 22px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;background:#fff;flex-shrink:0">
       <button class="btn btn-danger" id="detail-del-btn">🗑 刪除</button>
+      <button class="btn btn-secondary" id="detail-edit-btn">✏️ 編輯</button>
       <button class="btn btn-primary" id="detail-paid-btn">標記已收款</button>
     </div>
   </div>
@@ -1461,6 +1462,10 @@ function showOrderDetail(id){
   const paidBtn=document.getElementById('detail-paid-btn');
   paidBtn.textContent=o.paid?'取消收款':'標記已收款';
   paidBtn.onclick=()=>{o.paid=!o.paid;if(o.paid)o.paidDate=today();else o.paidDate='';save();showOrderDetail(id);renderOrders();renderReceivable();};
+  document.getElementById('detail-edit-btn').onclick=()=>{
+    closeModal('detail-modal');
+    openOrderModal(id);
+  };
   document.getElementById('detail-del-btn').onclick=()=>{
     if(!confirm('確定刪除此訂單？\n客戶：'+( o.custName||'—')+'\n出貨日：'+fmtDate(o.date)))return;
     if(!confirm('再次確認：刪除後無法復原！'))return;
