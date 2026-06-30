@@ -6145,7 +6145,7 @@
       ],
       "paid": true,
       "paidDate": "2026-06-30",
-      "vendorPaid": false,
+      "vendorPaid": true,
       "vendorPaidDate": "",
       "images": [
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/order-images/1780048369065_thm9.jpg",
@@ -6562,6 +6562,6 @@
     "bankCode": "013",
     "bankAccount": "061506186489"
   },
-  "_ts": 1782834362687,
+  "_ts": 1782839372391,
   "_vendorPaidBackfilled": true
 }
