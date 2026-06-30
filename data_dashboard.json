@@ -1953,6 +1953,7 @@
       "div": 73078,
       "cf": -11097,
       "debtRatio": 78.7,
+      "indexVal": 46126,
       "holdings": [
         {
           "code": "00864B",
@@ -2067,7 +2068,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1782814756491,
+  "_ts": 1782814764651,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
