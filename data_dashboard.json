@@ -1252,6 +1252,14 @@
       "d1Date": "",
       "d1": 0,
       "d2": 0
+    },
+    {
+      "id": "mr1iz7mm2ls",
+      "bank": "期貨",
+      "cash": 100000,
+      "d1Date": "",
+      "d1": 0,
+      "d2": 0
     }
   ],
   "dividends": [
@@ -2069,7 +2077,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1782877066441,
+  "_ts": 1782877076300,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
