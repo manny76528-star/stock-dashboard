@@ -1653,6 +1653,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
   </div>
   <div class="trend-body" id="trend-body">
     <div class="trend-checks">
+      <label><input type="checkbox" id="tc-index" checked onchange="renderTrendChart()">📊 大盤指數</label>
       <label><input type="checkbox" id="tc-net" checked onchange="renderTrendChart()">淨資產</label>
       <label><input type="checkbox" id="tc-div" onchange="renderTrendChart()">每月股息</label>
       <label><input type="checkbox" id="tc-cf" onchange="renderTrendChart()">每月現金流</label>
@@ -5500,14 +5501,18 @@ function renderTrendChart(){
   const selYear=yearSel?.value||'all';
   const snaps=selYear==='all'?db.snapshots:db.snapshots.filter(s=>(s.ym||'').startsWith(selYear));
   const labels=snaps.map(s=>s.ym.length===7?s.ym:s.ym.slice(5));
+  const showIndex=document.getElementById('tc-index')?.checked;
   const showNet=document.getElementById('tc-net')?.checked;
   const showDiv=document.getElementById('tc-div')?.checked;
   const showCf=document.getElementById('tc-cf')?.checked;
   const showDebt=document.getElementById('tc-debt')?.checked;
   const datasets=[];
-  if(showNet)datasets.push({label:'淨資產',data:snaps.map(s=>s.net),borderColor:'#e74c3c',backgroundColor:'rgba(231,76,60,0.1)',tension:0.3,yAxisID:'y'});
-  if(showDiv)datasets.push({label:'每月股息',data:snaps.map(s=>s.div),borderColor:'#3498db',backgroundColor:'rgba(52,152,219,0.1)',tension:0.3,yAxisID:'y'});
-  if(showCf)datasets.push({label:'每月現金流',data:snaps.map(s=>s.cf),borderColor:'#2ecc71',backgroundColor:'rgba(46,204,113,0.1)',tension:0.3,yAxisID:'y'});
+  // 大盤指數 → 左軸（yIndex）
+  if(showIndex)datasets.push({label:'大盤指數',data:snaps.map(s=>s.indexVal||null),borderColor:'#7c3aed',backgroundColor:'rgba(124,58,237,0.08)',tension:0.3,spanGaps:true,yAxisID:'yIndex',pointRadius:4,borderWidth:2});
+  // 淨資產 → 右軸（yNet）
+  if(showNet)datasets.push({label:'淨資產',data:snaps.map(s=>s.net),borderColor:'#e74c3c',backgroundColor:'rgba(231,76,60,0.1)',tension:0.3,yAxisID:'yNet'});
+  if(showDiv)datasets.push({label:'每月股息',data:snaps.map(s=>s.div),borderColor:'#3498db',backgroundColor:'rgba(52,152,219,0.1)',tension:0.3,yAxisID:'yNet'});
+  if(showCf)datasets.push({label:'每月現金流',data:snaps.map(s=>s.cf),borderColor:'#2ecc71',backgroundColor:'rgba(46,204,113,0.1)',tension:0.3,yAxisID:'yNet'});
   if(showDebt)datasets.push({label:'負債比(%)',data:snaps.map(s=>s.debtRatio),borderColor:'#f39c12',backgroundColor:'rgba(243,156,18,0.1)',tension:0.3,yAxisID:'y2'});
   const ctx=document.getElementById('trendCanvas').getContext('2d');
   if(_trendChart)_trendChart.destroy();
@@ -5535,6 +5540,7 @@ function renderTrendChart(){
             label:function(ctx){
               const v=ctx.parsed.y;
               if(ctx.dataset.yAxisID==='y2')return ' '+ctx.dataset.label+': '+v.toFixed(1)+'%';
+              if(ctx.dataset.yAxisID==='yIndex')return ' '+ctx.dataset.label+': '+Math.round(v).toLocaleString()+' 點';
               return ' '+ctx.dataset.label+': '+(v>=1000000?'$'+(v/1000000).toFixed(2)+'M':v>=1000?'$'+(v/1000).toFixed(0)+'K':'$'+v.toLocaleString());
             }
           }
@@ -5545,13 +5551,25 @@ function renderTrendChart(){
           grid:{color:'rgba(148,163,184,0.1)'},
           ticks:{font:{family:"'Noto Sans TC',sans-serif",size:11},color:'#94a3b8'}
         },
-        y:{
+        yIndex:{
           position:'left',
-          grid:{color:'rgba(148,163,184,0.12)'},
+          display:!!showIndex,
+          grid:{color:'rgba(124,58,237,0.08)'},
+          ticks:{
+            font:{family:"'JetBrains Mono',monospace",size:11},color:'#7c3aed',
+            callback:v=>Math.round(v).toLocaleString()
+          },
+          title:{display:!!showIndex,text:'大盤指數',color:'#7c3aed',font:{size:10}}
+        },
+        yNet:{
+          position:'right',
+          display:!!(showNet||showDiv||showCf),
+          grid:{drawOnChartArea:!showIndex, color:'rgba(148,163,184,0.12)'},
           ticks:{
             font:{family:"'JetBrains Mono',monospace",size:11},color:'#64748b',
             callback:v=>v>=1000000?'$'+(v/1000000).toFixed(1)+'M':v>=1000?'$'+(v/1000).toFixed(0)+'K':'$'+v
-          }
+          },
+          title:{display:!!(showNet||showDiv||showCf),text:'金額',color:'#64748b',font:{size:10}}
         },
         y2:{
           position:'right',display:showDebt,
