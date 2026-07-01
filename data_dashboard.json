@@ -1240,7 +1240,7 @@
     {
       "id": "mncull1439i",
       "bank": "Line Bank",
-      "cash": 85320,
+      "cash": 72920,
       "d1Date": "",
       "d1": 0,
       "d2": 0
@@ -1248,10 +1248,11 @@
     {
       "id": "mneeom9dzod",
       "bank": "統一券商",
-      "cash": 800,
+      "cash": 463716,
       "d1Date": "2026-06-26",
-      "d1": 462916,
-      "d2": -206802
+      "d1": -206802,
+      "d2": 0,
+      "d1SettleDate": "2026-07-01"
     }
   ],
   "dividends": [
@@ -2069,7 +2070,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1782876924321,
+  "_ts": 1782876941708,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -2794,11 +2795,11 @@
     "aDivChk": false,
     "aSave": 25000,
     "aSaveChk": false,
-    "bNow": 81000,
+    "bNow": 97000,
     "bMonthly": 16000,
     "bMonthly2": 16000,
     "bRate": 5,
-    "cNow": 616000,
+    "cNow": 617000,
     "cMonthly": 1000,
     "cAnnual": 20000,
     "cRate": 5,
