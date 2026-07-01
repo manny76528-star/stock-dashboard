@@ -6241,6 +6241,35 @@
       "vendorPaidDate": "",
       "images": [],
       "createdAt": "2026-06-15T01:21:49.766Z"
+    },
+    {
+      "id": "mr1vjq1c3xtl",
+      "date": "2026-07-03",
+      "custId": "mnmofk0wbk4k",
+      "custName": "御富健康事業股份有限公司",
+      "contact": "黃崇師先生",
+      "phone": "",
+      "note": "GD200 / GD208  11*300米",
+      "items": [
+        {
+          "name": "一般碳帶",
+          "type": "ribbon",
+          "subtype": "一般碳帶",
+          "spec": "",
+          "qty": 3,
+          "sn": "",
+          "sns": [],
+          "cost": 3,
+          "price": 210,
+          "invoice": false
+        }
+      ],
+      "paid": false,
+      "paidDate": "2026-07-03",
+      "vendorPaid": false,
+      "vendorPaidDate": "",
+      "images": [],
+      "createdAt": "2026-07-01T09:29:47.665Z"
     }
   ],
   "customers": [
@@ -6562,6 +6591,6 @@
     "bankCode": "013",
     "bankAccount": "061506186489"
   },
-  "_ts": 1782839417556,
+  "_ts": 1782898190684,
   "_vendorPaidBackfilled": true
 }
