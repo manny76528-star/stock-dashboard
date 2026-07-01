@@ -6252,10 +6252,10 @@
       "note": "GD200 / GD208  11*300米",
       "items": [
         {
-          "name": "一般碳帶",
+          "name": "一般碳帶 GD208  11*300米",
           "type": "ribbon",
           "subtype": "一般碳帶",
-          "spec": "",
+          "spec": "GD208  11*300米",
           "qty": 3,
           "sn": "",
           "sns": [],
@@ -6268,8 +6268,7 @@
       "paidDate": "2026-07-03",
       "vendorPaid": false,
       "vendorPaidDate": "",
-      "images": [],
-      "createdAt": "2026-07-01T09:29:47.665Z"
+      "images": []
     }
   ],
   "customers": [
@@ -6591,6 +6590,6 @@
     "bankCode": "013",
     "bankAccount": "061506186489"
   },
-  "_ts": 1782898190684,
+  "_ts": 1782899481893,
   "_vendorPaidBackfilled": true
 }
