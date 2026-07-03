@@ -2213,7 +2213,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1783067722450,
+  "_ts": 1783067726891,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -2643,7 +2643,11 @@
       },
       "images": [
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1779703488343_ts4t.jpg"
-      ]
+      ],
+      "backtest": {
+        "t5": 7.19,
+        "note": ""
+      }
     },
     {
       "id": "mpgqznwgp45",
