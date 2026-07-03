@@ -2213,7 +2213,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1783069859633,
+  "_ts": 1783069870151,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -2626,7 +2626,12 @@
         "00981A": 31.54,
         "00988A": 22.11
       },
-      "images": []
+      "images": [],
+      "backtest": {
+        "ret": 4.58,
+        "retDate": "2026-07-03",
+        "note": ""
+      }
     },
     {
       "id": "mpp9ne00k5o",
