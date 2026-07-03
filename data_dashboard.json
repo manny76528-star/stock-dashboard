@@ -2213,7 +2213,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1783065231404,
+  "_ts": 1783065248106,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -2444,11 +2444,14 @@
         "00981A",
         "00988A"
       ],
+      "eventCat": "政治面",
+      "behavior": "逆向加碼",
       "indexVal": 45397,
       "stockPrices": {
         "00981A": 31.47,
         "00988A": 22.36
       },
+      "aiAnalysis": null,
       "images": [
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1781506530190_lqa5.jpg"
       ]
