@@ -2518,6 +2518,16 @@ body:not(.privacy) .privacy-mask{filter:none;}
       </label>
       <div style="font-size:10px;color:#94a3b8;margin-top:4px">支援 JPG、PNG、GIF，自動壓縮，建議每張 5MB 以內</div>
     </div>
+
+    <!-- AI 分析區 -->
+    <div style="padding:0 20px 12px">
+      <button onclick="runJournalAI()" id="j-ai-btn"
+        style="width:100%;padding:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
+        🤖 AI 分析日誌（提取關鍵字 + 恐慌指數）
+      </button>
+      <div id="j-ai-result" style="display:none;margin-top:10px;padding:12px 14px;background:#f8f7ff;border:1.5px solid #c4b5fd;border-radius:10px;font-size:12px;line-height:1.7"></div>
+    </div>
+
     <div class="br">
       <button class="act-btn" onclick="closeModal('journalModal')">取消</button>
       <button class="act-btn del" id="j-del-btn" style="display:none" onclick="deleteJournal()">🗑 刪除</button>
@@ -7635,6 +7645,85 @@ function updateStockPriceInputs(){
   setTimeout(()=>autoFetchJournalPrices(),100);
 }
 
+// ══════════════════════════════════════
+// AI 日誌分析
+// ══════════════════════════════════════
+async function runJournalAI(){
+  const market=document.getElementById('j-market')?.value.trim()||'';
+  const content=document.getElementById('j-content')?.value.trim()||'';
+  if(!market&&!content){toast('⚠️ 請先填寫日誌內容');return;}
+
+  const btn=document.getElementById('j-ai-btn');
+  const result=document.getElementById('j-ai-result');
+  btn.disabled=true;
+  btn.textContent='🤖 AI 分析中...';
+  result.style.display='none';
+
+  const prompt=`你是一個專業的投資日誌分析師。請分析以下投資日誌內容，用繁體中文回答，格式要簡潔清楚。
+
+【市場標題/新聞】
+${market||'（無）'}
+
+【日誌內容】
+${content||'（無）'}
+
+請提供：
+1. **核心關鍵字**（3-8個，用逗號分隔，例如：AI算力、費半大跌、恐慌賣出）
+2. **事件分類**（從以下選1-2個：總經面、消息面、政治面、技術面、個股操作、無特定事件）
+3. **個人行為**（從以下選1-2個：停損離場、逆向加碼、死抱不動、盤中手癢、觀望不動、獲利了結）
+4. **恐慌指數**（0-100分，0=完全冷靜，100=極度恐慌崩潰，給出數字並簡短說明原因）
+5. **一句話總結**（用一句話描述這天的核心事件與心態）
+
+格式範例：
+關鍵字：AI算力、費半大跌7%、META財報、恐慌賣出
+事件分類：消息面、技術面
+個人行為：恐慌停損、盤中手癢
+恐慌指數：85分（文字中出現多次「崩潰」、「撐不住」，明顯情緒失控）
+一句話總結：META財報利空引發AI板塊恐慌，情緒失控下停損出場。`;
+
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-6',
+        max_tokens:1000,
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    const data=await resp.json();
+    const text=data.content?.[0]?.text||'AI 無法分析，請稍後再試';
+
+    // 解析恐慌指數
+    const panicMatch=text.match(/恐慌指數[：:]\s*(\d+)/);
+    const panicScore=panicMatch?parseInt(panicMatch[1]):null;
+    const panicColor=panicScore>=80?'#dc2626':panicScore>=50?'#f59e0b':'#16a34a';
+
+    // 格式化顯示
+    const html=text
+      .replace(/\*\*(.*?)\*\*/g,'<b>$1</b>')
+      .replace(/關鍵字[：:]/g,'🏷 <b>關鍵字：</b>')
+      .replace(/事件分類[：:]/g,'📂 <b>事件分類：</b>')
+      .replace(/個人行為[：:]/g,'🎯 <b>個人行為：</b>')
+      .replace(/恐慌指數[：:]/g,'😰 <b>恐慌指數：</b>')
+      .replace(/一句話總結[：:]/g,'💡 <b>一句話總結：</b>')
+      .split('\n').filter(Boolean).join('<br>');
+
+    result.style.display='block';
+    result.innerHTML=html+(panicScore!==null?`<div style="margin-top:8px;padding:6px 10px;background:${panicColor}22;border-radius:6px;color:${panicColor};font-weight:700;font-size:13px">恐慌指數 ${panicScore}/100</div>`:'');
+
+    // 儲存 AI 分析結果到暫存（saveJournal 時會一起存）
+    window._jAiAnalysis={text, panicScore};
+
+  }catch(e){
+    result.style.display='block';
+    result.innerHTML='❌ AI 分析失敗：'+e.message;
+  }finally{
+    btn.disabled=false;
+    btn.innerHTML='🤖 AI 分析日誌（提取關鍵字 + 恐慌指數）';
+  }
+}
+
 function setJournalTagSel(sel){
   journalTagFilter=sel.value;
   renderJournal();
@@ -7652,8 +7741,28 @@ function openJournalModal(id=null){
   const jmUrlEl=document.getElementById('j-market-url');if(jmUrlEl)jmUrlEl.value=j?.marketUrl||'';
   document.getElementById('j-content').value=j?.content||'';
   document.getElementById('j-stock-tags').value=(j?.stockTags||[]).join(' ');
-  // 大盤指數
-  const idxEl=document.getElementById('j-index');
+  // 清除 AI 分析暫存
+  window._jAiAnalysis = j?.aiAnalysis||null;
+  const aiResult=document.getElementById('j-ai-result');
+  if(aiResult){
+    if(j?.aiAnalysis){
+      const panicScore=j.aiAnalysis.panicScore;
+      const panicColor=panicScore>=80?'#dc2626':panicScore>=50?'#f59e0b':'#16a34a';
+      const html=(j.aiAnalysis.text||'')
+        .replace(/\*\*(.*?)\*\*/g,'<b>$1</b>')
+        .replace(/關鍵字[：:]/g,'🏷 <b>關鍵字：</b>')
+        .replace(/事件分類[：:]/g,'📂 <b>事件分類：</b>')
+        .replace(/個人行為[：:]/g,'🎯 <b>個人行為：</b>')
+        .replace(/恐慌指數[：:]/g,'😰 <b>恐慌指數：</b>')
+        .replace(/一句話總結[：:]/g,'💡 <b>一句話總結：</b>')
+        .split('\n').filter(Boolean).join('<br>');
+      aiResult.style.display='block';
+      aiResult.innerHTML=html+(panicScore!=null?`<div style="margin-top:8px;padding:6px 10px;background:${panicColor}22;border-radius:6px;color:${panicColor};font-weight:700;font-size:13px">恐慌指數 ${panicScore}/100</div>`:'');
+    } else {
+      aiResult.style.display='none';
+      aiResult.innerHTML='';
+    }
+  }
   if(idxEl)idxEl.value=j?.indexVal||'';
   // 更新個股價格框（帶入已存的值）
   updateStockPriceInputs();
@@ -7795,6 +7904,7 @@ function saveJournal(){
       });
       return Object.keys(prices).length>0?prices:null;
     })(),
+    aiAnalysis:window._jAiAnalysis||null,
     images:window._jImgs||[]
   };
   if(!db.journals)db.journals=[];
