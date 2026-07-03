@@ -8166,19 +8166,39 @@ function renderJournal(){
         </div>`:''}
         <!-- 回測追蹤 -->
         <div style="margin-top:12px;padding:10px 12px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0">
-          <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:8px">📊 事後回測（打臉情緒偏誤）</div>
-          <div style="display:flex;align-items:center;gap:10px">
-            <div style="flex:1;text-align:center;background:#fff;border-radius:6px;padding:8px;border:1px solid #e2e8f0">
-              <div style="font-size:10px;color:#94a3b8;margin-bottom:4px">現在回頭看漲跌幅</div>
-              <div style="font-size:18px;font-weight:800;color:${(j.backtest?.ret)!=null?(j.backtest.ret>=0?'#dc2626':'#16a34a'):'#94a3b8'}">
-                ${j.backtest?.ret!=null?(j.backtest.ret>=0?'+':'')+j.backtest.ret.toFixed(1)+'%':'—'}
-              </div>
-              ${j.backtest?.retDate?`<div style="font-size:10px;color:#94a3b8;margin-top:2px">📅 ${j.backtest.retDate}</div>`:''}
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <div style="font-size:11px;font-weight:700;color:#64748b">📊 事後回測（打臉情緒偏誤）</div>
+            <div style="display:flex;align-items:center;gap:6px">
+              ${j.backtest?.retDate?`<span style="font-size:10px;color:#94a3b8">📅 ${j.backtest.retDate}</span>`:''}
+              <button onclick="event.stopPropagation();openBacktestInput('${j.id}')"
+                style="font-size:10px;padding:2px 8px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;color:#2563eb;cursor:pointer;font-weight:700">
+                🔄 更新
+              </button>
             </div>
-            <button onclick="event.stopPropagation();openBacktestInput('${j.id}')"
-              style="padding:6px 14px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;font-size:12px;font-weight:700;color:#2563eb;cursor:pointer;white-space:nowrap">
-              ${j.backtest?.ret!=null?'✏️ 修改':'填入'}
-            </button>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            ${(()=>{
+              const cards=[];
+              // 大盤
+              if(j.indexVal){
+                const v=j.backtest?.ret;
+                const c=v==null?'#94a3b8':v>=0?'#dc2626':'#16a34a';
+                cards.push(`<div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:5px 10px;text-align:center;min-width:70px">
+                  <div style="font-size:9px;color:#94a3b8;margin-bottom:2px">大盤</div>
+                  <div style="font-size:14px;font-weight:800;color:${c}">${v==null?'—':(v>=0?'+':'')+v.toFixed(1)+'%'}</div>
+                </div>`);
+              }
+              // 個股
+              Object.keys(j.stockPrices||{}).forEach(code=>{
+                const v=j.backtest?.stocks?.[code];
+                const c=v==null?'#94a3b8':v>=0?'#dc2626':'#16a34a';
+                cards.push(`<div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:5px 10px;text-align:center;min-width:70px">
+                  <div style="font-size:9px;color:#94a3b8;margin-bottom:2px;font-family:'JetBrains Mono',monospace">${code}</div>
+                  <div style="font-size:14px;font-weight:800;color:${c}">${v==null?'—':(v>=0?'+':'')+v.toFixed(1)+'%'}</div>
+                </div>`);
+              });
+              return cards.length?cards.join(''):`<div style="font-size:11px;color:#94a3b8">尚未填入回測（需記錄大盤或個股股價）</div>`;
+            })()}
           </div>
           ${j.backtest?.note?`<div style="margin-top:8px;font-size:11px;color:#64748b;font-style:italic;background:#fffbeb;padding:6px 8px;border-radius:6px">💡 ${j.backtest.note}</div>`:''}
         </div>
@@ -8194,34 +8214,58 @@ function renderJournal(){
 
 async function batchUpdateBacktest(){
   const btn=document.querySelector('[onclick="batchUpdateBacktest()"]');
-  if(btn){btn.disabled=true;btn.textContent='📡 抓取中...';}
+  if(btn){btn.disabled=true;btn.textContent='📡 更新中...';}
   try{
+    const today=new Date().toISOString().slice(0,10);
     // 抓今天大盤
     let todayIndex=null;
     const r=await fetch(CF_WORKER+'/index?t='+Date.now());
     if(r.ok){const d=await r.json();if(d.price)todayIndex=Math.round(d.price);}
-    if(!todayIndex){toast('⚠️ 無法抓取今日大盤');return;}
 
-    const today=new Date().toISOString().slice(0,10);
+    // 收集所有個股代號
+    const allCodes=new Set();
+    (db.journals||[]).forEach(j=>Object.keys(j.stockPrices||{}).forEach(c=>allCodes.add(c)));
+    // 並行抓所有個股今日股價
+    const todayStocks={};
+    await Promise.all([...allCodes].map(async code=>{
+      const p=await fetchPrice(code);
+      if(p&&p.price)todayStocks[code]=p.price;
+    }));
+
     let count=0;
     (db.journals||[]).forEach(j=>{
-      if(!j.indexVal)return; // 沒有記錄基準大盤的跳過
-      const pct=(todayIndex-j.indexVal)/j.indexVal*100;
-      const ret=Math.round(pct*100)/100;
       if(!j.backtest)j.backtest={};
-      j.backtest.ret=ret;
-      j.backtest.retDate=today;
-      // 自動打臉文字
-      const hasPanic=(j.tags||[]).includes('極度恐慌')||(j.tags||[]).includes('看空');
-      if(hasPanic&&ret>5)j.backtest.note=`事後證明：當時恐慌，但後來漲了 +${ret.toFixed(1)}%，恐慌是過度的！`;
-      else if(hasPanic&&ret<-5)j.backtest.note=`這次恐慌是有道理的，市場確實下跌 ${ret.toFixed(1)}%。`;
-      else if(ret>10)j.backtest.note=`從寫日誌到現在已上漲 +${ret.toFixed(1)}%！`;
-      else j.backtest.note='';
-      count++;
+      let updated=false;
+      // 大盤
+      if(j.indexVal&&todayIndex){
+        j.backtest.ret=Math.round((todayIndex-j.indexVal)/j.indexVal*10000)/100;
+        updated=true;
+      }
+      // 個股
+      if(!j.backtest.stocks)j.backtest.stocks={};
+      Object.entries(j.stockPrices||{}).forEach(([code,base])=>{
+        if(todayStocks[code]){
+          j.backtest.stocks[code]=Math.round((todayStocks[code]-base)/base*10000)/100;
+          updated=true;
+        }
+      });
+      if(updated){
+        j.backtest.retDate=today;
+        // 打臉文字
+        const hasPanic=(j.tags||[]).includes('極度恐慌')||(j.tags||[]).includes('看空');
+        const ret=j.backtest.ret;
+        if(ret!=null){
+          if(hasPanic&&ret>5)j.backtest.note=`事後證明：當時恐慌，但後來漲了 +${ret.toFixed(1)}%，恐慌是過度的！`;
+          else if(hasPanic&&ret<-5)j.backtest.note=`這次恐慌是有道理的，市場確實下跌 ${ret.toFixed(1)}%。`;
+          else if(ret>10)j.backtest.note=`從寫日誌到現在已上漲 +${ret.toFixed(1)}%！`;
+          else j.backtest.note='';
+        }
+        count++;
+      }
     });
     save();
     renderJournal();
-    toast(`✅ 已更新 ${count} 篇日誌的回測（今日大盤：${todayIndex.toLocaleString()}點）`);
+    toast(`✅ 已更新 ${count} 篇回測（大盤：${todayIndex?.toLocaleString()||'—'}點）`);
   }catch(e){
     toast('⚠️ 更新失敗：'+e.message);
   }finally{
@@ -8280,45 +8324,66 @@ async function openBacktestInput(journalId){
   const baseIndex=j.indexVal||null;
   const stockPrices=j.stockPrices||{};
   const stockCodes=Object.keys(stockPrices);
+  const today=new Date().toISOString().slice(0,10);
+  const daysSince=Math.round((new Date()-new Date(j.date))/(1000*60*60*24));
 
-  let autoVal=null, autoText='';
+  // 自動抓今天大盤和個股
+  let todayIndex=null;
+  const todayStocks={};
   try{
     if(baseIndex){
       const r=await fetch(CF_WORKER+'/index?t='+Date.now());
-      if(r.ok){const d=await r.json();if(d.price){const pct=(d.price-baseIndex)/baseIndex*100;autoVal=Math.round(pct*100)/100;autoText=`大盤：${baseIndex}→${Math.round(d.price)}（${autoVal>=0?'+':''}${autoVal.toFixed(2)}%）`;}}
-    } else if(stockCodes.length>0){
-      const code=stockCodes[0];const basePrice=stockPrices[code];
-      const p=await fetchPrice(code);
-      if(p&&p.price){const pct=(p.price-basePrice)/basePrice*100;autoVal=Math.round(pct*100)/100;autoText=`${code}：$${basePrice}→$${p.price}（${autoVal>=0?'+':''}${autoVal.toFixed(2)}%）`;}
+      if(r.ok){const d=await r.json();if(d.price)todayIndex=Math.round(d.price);}
     }
+    await Promise.all(stockCodes.map(async code=>{
+      const p=await fetchPrice(code);
+      if(p&&p.price)todayStocks[code]=p.price;
+    }));
   }catch(e){}
-
-  const today=new Date().toISOString().slice(0,10);
-  const daysSince=Math.round((new Date()-new Date(j.date))/(1000*60*60*24));
 
   let modal=document.getElementById('backtest-modal');
   if(!modal){modal=document.createElement('div');modal.id='backtest-modal';modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px';document.body.appendChild(modal);}
 
   const bt=j.backtest||{};
+
+  // 建立各標的的輸入行
+  const rows=[];
+  if(baseIndex){
+    const auto=todayIndex?Math.round((todayIndex-baseIndex)/baseIndex*10000)/100:null;
+    rows.push({key:'index',label:'大盤',base:baseIndex,todayVal:todayIndex,auto,cur:bt.ret});
+  }
+  stockCodes.forEach(code=>{
+    const base=stockPrices[code];
+    const todayVal=todayStocks[code]||null;
+    const auto=todayVal?Math.round((todayVal-base)/base*10000)/100:null;
+    rows.push({key:'stk_'+code,label:code,base,todayVal,auto,cur:bt.stocks?.[code]});
+  });
+
   modal.innerHTML=`
-    <div style="background:#fff;border-radius:16px;padding:20px;max-width:380px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3)">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-        <div style="font-size:15px;font-weight:800;color:#1e293b">📊 事後回測填入</div>
+    <div style="background:#fff;border-radius:16px;padding:20px;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3);max-height:85vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div style="font-size:15px;font-weight:800;color:#1e293b">📊 事後回測更新</div>
         <button onclick="document.getElementById('backtest-modal').style.display='none'" style="background:none;border:none;font-size:18px;cursor:pointer;color:#94a3b8">✕</button>
       </div>
-      <div style="font-size:12px;color:#64748b;margin-bottom:4px">📅 ${j.date}（${daysSince}天前）・${(j.tags||[]).join('、')||'無標籤'}</div>
-      ${autoText?`<div style="font-size:12px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:8px 10px;margin:10px 0;color:#16a34a;font-weight:700">📡 自動計算（從寫日誌到今天）：<br>${autoText}</div>`:''}
-      <div style="margin:12px 0">
-        <label style="font-size:11px;font-weight:700;color:#475569;display:block;margin-bottom:6px">回頭看漲跌幅（今日 ${today}）</label>
-        <div style="display:flex;align-items:center;gap:8px">
-          <input type="number" id="bt-ret" value="${bt.ret!=null?bt.ret:''}" placeholder="如：8.5 或 -3.2"
-            step="0.01" style="flex:1;padding:8px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:15px;outline:none;font-weight:700">
-          <span style="font-size:13px;color:#94a3b8;font-weight:700">%</span>
-          ${autoVal!=null?`<button onclick="document.getElementById('bt-ret').value='${autoVal.toFixed(2)}'" style="padding:6px 10px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;font-size:12px;color:#2563eb;cursor:pointer;font-weight:700">套用</button>`:''}
-        </div>
-      </div>
+      <div style="font-size:12px;color:#64748b;margin-bottom:12px">📅 ${j.date}（${daysSince}天前）・${(j.tags||[]).join('、')||'無標籤'}</div>
+      ${rows.length===0?'<div style="color:#94a3b8;font-size:12px;padding:10px 0">此篇日誌未記錄大盤或個股股價，無法自動計算</div>':
+        rows.map(row=>`
+        <div style="background:#f8fafc;border-radius:8px;padding:8px 10px;margin-bottom:8px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+            <span style="font-size:12px;font-weight:700;color:#1e293b;font-family:'JetBrains Mono',monospace">${row.label}</span>
+            ${row.auto!=null?`<span style="font-size:11px;color:${row.auto>=0?'#16a34a':'#dc2626'};font-weight:700">今日自動：${row.auto>=0?'+':''}${row.auto.toFixed(2)}%</span>`:'<span style="font-size:10px;color:#94a3b8">抓不到今日股價</span>'}
+          </div>
+          <div style="font-size:10px;color:#94a3b8;margin-bottom:6px">基準：$${row.base} → 今日：${row.todayVal?'$'+row.todayVal:'—'}</div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <input type="number" id="bt-${row.key}" value="${row.cur!=null?row.cur:row.auto!=null?row.auto.toFixed(2):''}"
+              step="0.01" placeholder="漲跌幅 %"
+              style="flex:1;padding:6px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-weight:700;outline:none">
+            <span style="font-size:12px;color:#94a3b8">%</span>
+            ${row.auto!=null?`<button onclick="document.getElementById('bt-${row.key}').value='${row.auto.toFixed(2)}'" style="padding:4px 8px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;font-size:11px;color:#2563eb;cursor:pointer;font-weight:700">套用</button>`:''}
+          </div>
+        </div>`).join('')}
       <button onclick="saveBacktestAll('${journalId}')"
-        style="width:100%;padding:10px;background:linear-gradient(135deg,#1e3a5f,#2563eb);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer">
+        style="width:100%;padding:10px;background:linear-gradient(135deg,#1e3a5f,#2563eb);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;margin-top:4px">
         ✅ 儲存回測
       </button>
     </div>`;
@@ -8329,20 +8394,36 @@ function saveBacktestAll(journalId){
   const j=(db.journals||[]).find(x=>x.id===journalId);
   if(!j)return;
   if(!j.backtest)j.backtest={};
-  const v=parseFloat(document.getElementById('bt-ret')?.value);
-  if(isNaN(v)){toast('⚠️ 請填入數字');return;}
-  j.backtest.ret=v;
-  j.backtest.retDate=new Date().toISOString().slice(0,10);
-  // 自動打臉文字
+  const today=new Date().toISOString().slice(0,10);
+  j.backtest.retDate=today;
+  // 大盤
+  const indexEl=document.getElementById('bt-index');
+  if(indexEl&&indexEl.value!==''){
+    const v=parseFloat(indexEl.value);
+    if(!isNaN(v))j.backtest.ret=v;
+  }
+  // 個股
+  if(!j.backtest.stocks)j.backtest.stocks={};
+  Object.keys(j.stockPrices||{}).forEach(code=>{
+    const el=document.getElementById('bt-stk_'+code);
+    if(el&&el.value!==''){
+      const v=parseFloat(el.value);
+      if(!isNaN(v))j.backtest.stocks[code]=v;
+    }
+  });
+  // 打臉文字（以大盤為主）
   const hasPanic=(j.tags||[]).includes('極度恐慌')||(j.tags||[]).includes('看空');
-  if(hasPanic&&v>5)j.backtest.note=`事後證明：當時恐慌，但後來漲了 +${v.toFixed(1)}%，恐慌是過度的！`;
-  else if(hasPanic&&v<-5)j.backtest.note=`這次恐慌是有道理的，市場確實下跌 ${v.toFixed(1)}%。`;
-  else if(v>10)j.backtest.note=`從寫日誌到現在已上漲 +${v.toFixed(1)}%！`;
-  else j.backtest.note='';
+  const ret=j.backtest.ret;
+  if(ret!=null){
+    if(hasPanic&&ret>5)j.backtest.note=`事後證明：當時恐慌，但後來漲了 +${ret.toFixed(1)}%，恐慌是過度的！`;
+    else if(hasPanic&&ret<-5)j.backtest.note=`這次恐慌是有道理的，市場確實下跌 ${ret.toFixed(1)}%。`;
+    else if(ret>10)j.backtest.note=`從寫日誌到現在已上漲 +${ret.toFixed(1)}%！`;
+    else j.backtest.note='';
+  }
   save();
   renderJournal();
   document.getElementById('backtest-modal').style.display='none';
-  toast(`✅ 回測已儲存：${v>=0?'+':''}${v.toFixed(1)}%`);
+  toast('✅ 回測已儲存');
 }
 
 function toggleJCard(id){
