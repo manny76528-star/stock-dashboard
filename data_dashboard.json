@@ -2213,7 +2213,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1783067712006,
+  "_ts": 1783067722450,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -2491,7 +2491,11 @@
         "009805": 15.9
       },
       "aiAnalysis": null,
-      "images": []
+      "images": [],
+      "backtest": {
+        "t5": 8.22,
+        "note": "事後證明：最高漲幅 +8.2%，當時的恐慌是過度的！"
+      }
     },
     {
       "id": "mq2i8403bbv",
