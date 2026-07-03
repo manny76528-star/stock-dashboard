@@ -2370,7 +2370,11 @@ body:not(.privacy) .privacy-mask{filter:none;}
         </div>
         <div id="journal-chart-body" style="display:none;padding:12px 14px;background:#fff">
           <!-- 勾選框動態產生 -->
-          <div id="journal-chart-checks" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;font-size:12px"></div>
+          <div id="journal-chart-checks" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;font-size:12px;align-items:center"></div>
+          <label style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:700;color:#7c3aed;margin-bottom:10px;cursor:pointer">
+            <input type="checkbox" id="jchart-backtest-toggle" onchange="renderJournalChart()">
+            📊 回測 Hover
+          </label>
           <canvas id="journal-chart-canvas" height="200" style="width:100%;max-height:220px"></canvas>
           <div id="journal-chart-empty" style="display:none;text-align:center;padding:30px;color:#94a3b8;font-size:12px">尚無走勢資料，新增日誌時填入大盤指數或個股價格即可</div>
         </div>
@@ -7436,6 +7440,7 @@ function setJournalTag(btn){
 // ══════════════════════════════════════
 let _journalChart=null;
 let _journalChartChecks={};
+let _backtestHoverIdx=null;
 
 function toggleJournalChart(){
   const body=document.getElementById('journal-chart-body');
@@ -7611,8 +7616,88 @@ function renderJournalChart(){
         const idx=elements[0].index;
         const j=sorted[idx];
         if(j)showJournalChartPopup(j,evt);
+      },
+      onHover(evt,elements){
+        const showBacktest=document.getElementById('jchart-backtest-toggle')?.checked;
+        if(!showBacktest){
+          _backtestHoverIdx=null;
+          if(_journalChart)_journalChart.update('none');
+          return;
+        }
+        if(elements.length>0){
+          const idx=elements[0].index;
+          if(_backtestHoverIdx!==idx){
+            _backtestHoverIdx=idx;
+            if(_journalChart)_journalChart.update('none');
+          }
+        } else {
+          if(_backtestHoverIdx!==null){
+            _backtestHoverIdx=null;
+            if(_journalChart)_journalChart.update('none');
+          }
+        }
       }
-    }
+    },
+    plugins:[tagPlugin,{
+      id:'backtestHover',
+      afterDatasetsDraw(chart){
+        const showBacktest=document.getElementById('jchart-backtest-toggle')?.checked;
+        if(!showBacktest||_backtestHoverIdx===null)return;
+        const idx=_backtestHoverIdx;
+        const j=sorted[idx];
+        if(!j||(!j.backtest?.ret&&!j.backtest?.stocks))return;
+
+        const ctx=chart.ctx;
+        const xScale=chart.scales.x;
+        const chartArea=chart.chartArea;
+
+        const startX=xScale.getPixelForValue(idx);
+        const endX=chartArea.right;
+
+        // 淡綠色陰影
+        ctx.save();
+        ctx.fillStyle='rgba(34,197,94,0.08)';
+        ctx.fillRect(startX,chartArea.top,endX-startX,chartArea.bottom-chartArea.top);
+
+        // 起點垂直線
+        ctx.strokeStyle='rgba(34,197,94,0.4)';
+        ctx.lineWidth=1.5;
+        ctx.setLineDash([4,4]);
+        ctx.beginPath();
+        ctx.moveTo(startX,chartArea.top);
+        ctx.lineTo(startX,chartArea.bottom);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // 右側 Tooltip
+        const lines=[`【事後回測】${j.date} → 今天`];
+        if(j.backtest.ret!=null)lines.push(`大盤：${j.backtest.ret>=0?'+':''}${j.backtest.ret.toFixed(1)}%`);
+        Object.entries(j.backtest.stocks||{}).forEach(([code,v])=>{
+          lines.push(`${code}：${v>=0?'+':''}${v.toFixed(1)}%`);
+        });
+
+        const boxW=140, lineH=16, pad=8;
+        const boxH=lines.length*lineH+pad*2;
+        const bx=Math.min(endX-boxW-6, endX-boxW);
+        const by=chartArea.top+8;
+
+        ctx.fillStyle='rgba(15,23,42,0.88)';
+        ctx.beginPath();
+        ctx.roundRect(bx,by,boxW,boxH,6);
+        ctx.fill();
+
+        ctx.fillStyle='#e2e8f0';
+        ctx.font='bold 10px sans-serif';
+        ctx.textAlign='left';
+        lines.forEach((line,i)=>{
+          if(i===0)ctx.fillStyle='#93c5fd';
+          else if(line.includes('-'))ctx.fillStyle='#4ade80';
+          else ctx.fillStyle='#fca5a5';
+          ctx.fillText(line,bx+pad,by+pad+i*lineH+10);
+        });
+        ctx.restore();
+      }
+    }]
   });
 }
 
