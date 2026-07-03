@@ -2213,7 +2213,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1783066761606,
+  "_ts": 1783066904734,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -2837,7 +2837,11 @@
       "stockPrices": {
         "009805": 16.43
       },
-      "images": []
+      "images": [],
+      "backtest": {
+        "t5": 19.03,
+        "note": ""
+      }
     },
     {
       "id": "moh1faad29g",
