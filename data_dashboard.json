@@ -2213,7 +2213,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1783091643184,
+  "_ts": 1783091676069,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -2995,13 +2995,18 @@
       "tags": [],
       "market": "台積電：創2330元新天價 市值破60兆元新高\n009819 回歸淨值 , 兩天跌幅27%溢價",
       "marketUrl": "https://ec.ltn.com.tw/article/breakingnews/5416926",
-      "mood": "😌 平靜",
       "content": "台積電大漲6.64% , 股價盤中來到最高2330 , 股市4萬點\nOTC則下跌1.18% 標準的拉積盤 跌幅股片甚至比上漲股票還要多\n今天並沒有出現萬頭齊漲, 很多強勢族群都下殺跌停甚至許多主動式ETF都下跌翻黑\n\n009819 回歸淨值 兩天收斂27%溢價 , 證實不管在熱門的ETF終究要往淨值靠攏\n因為市場有太多方式可以淨值套現。",
       "stockTags": [
         "009819"
       ],
-      "images": [],
-      "backtest": {}
+      "eventCat": "",
+      "behavior": "",
+      "indexVal": 39616,
+      "stockPrices": {
+        "009819": 10.1
+      },
+      "aiAnalysis": null,
+      "images": []
     },
     {
       "id": "moh1j593i7q",
