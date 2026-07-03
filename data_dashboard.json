@@ -2213,7 +2213,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1783065248106,
+  "_ts": 1783065296209,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -2380,12 +2380,15 @@
         "00988A",
         "009805"
       ],
+      "eventCat": "消息面",
+      "behavior": "觀望不動",
       "indexVal": 46255,
       "stockPrices": {
         "00981A": 31.5,
         "00988A": 23.07,
         "009805": 17.1
       },
+      "aiAnalysis": null,
       "images": []
     },
     {
