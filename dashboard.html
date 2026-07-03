@@ -2342,7 +2342,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
           <option value="重大事項">🚨 重大事項</option>
           <option value="極度恐慌">😱 極度恐慌(PTSD)</option>
         </select>
-        <select id="journal-event-sel" onchange="renderJournal()" style="padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:700;color:#475569;background:#fff;cursor:pointer;outline:none;min-width:110px">
+        <select id="journal-event-sel" onchange="onJournalFilterChange()" style="padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:700;color:#475569;background:#fff;cursor:pointer;outline:none;min-width:110px">
           <option value="">全部事件</option>
           <option value="總經面">🌐 總經面</option>
           <option value="消息面">📰 消息面</option>
@@ -2351,7 +2351,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
           <option value="個股操作">💹 個股操作</option>
           <option value="無特定事件">😶 無特定事件</option>
         </select>
-        <select id="journal-behavior-sel" onchange="renderJournal()" style="padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:700;color:#475569;background:#fff;cursor:pointer;outline:none;min-width:110px">
+        <select id="journal-behavior-sel" onchange="onJournalFilterChange()" style="padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:700;color:#475569;background:#fff;cursor:pointer;outline:none;min-width:110px">
           <option value="">全部行為</option>
           <option value="停損離場">🚪 停損離場</option>
           <option value="逆向加碼">💪 逆向加碼</option>
@@ -7525,15 +7525,16 @@ function renderJournalChart(){
   });
 
   const tagEmojiMap={'看多':'📈','看空':'📉','買入':'💰','賣出':'💸','重大事項':'🚨','極度恐慌':'😱'};
+  const eventEmojiMap={'總經面':'🌐','消息面':'📰','政治面':'🏛','技術面':'📊','個股操作':'💹'};
+  const behaviorEmojiMap={'停損離場':'🚪','逆向加碼':'💪','死抱不動':'🪨','盤中手癢':'🤌','觀望不動':'👀','獲利了結':'🎯'};
   const activeLabelFilter=(document.getElementById('journal-tag-sel')?.value)||'';
+  const activeEventFilter=(document.getElementById('journal-event-sel')?.value)||'';
+  const activeBehaviorFilter=(document.getElementById('journal-behavior-sel')?.value)||'';
 
-  // emoji plugin：跟著大盤點（或第一條線）上方顯示
   const tagPlugin={
     id:'tagEmoji',
     afterDatasetsDraw(chart){
-      if(!activeLabelFilter)return;
       const ctx=chart.ctx;
-      // 優先用大盤 dataset，沒有就用第一個
       let refMeta=null;
       chart.data.datasets.forEach((ds,i)=>{
         if(ds.label==='大盤'&&!refMeta)refMeta=chart.getDatasetMeta(i);
@@ -7541,15 +7542,27 @@ function renderJournalChart(){
       if(!refMeta)refMeta=chart.getDatasetMeta(0);
       if(!refMeta||!refMeta.data)return;
       sorted.forEach((j,idx)=>{
-        const tags=(j.tags||[]).filter(t=>t===activeLabelFilter&&tagEmojiMap[t]);
-        if(!tags.length)return;
         const point=refMeta.data[idx];
         if(!point||point.x===undefined)return;
-        const emojis=tags.map(t=>tagEmojiMap[t]).join('');
+        const emojis=[];
+        // 標籤篩選
+        if(activeLabelFilter){
+          const tags=(j.tags||[]).filter(t=>t===activeLabelFilter&&tagEmojiMap[t]);
+          tags.forEach(t=>emojis.push(tagEmojiMap[t]));
+        }
+        // 事件分類篩選
+        if(activeEventFilter&&j.eventCat===activeEventFilter&&eventEmojiMap[j.eventCat]){
+          emojis.push(eventEmojiMap[j.eventCat]);
+        }
+        // 個人行為篩選
+        if(activeBehaviorFilter&&j.behavior===activeBehaviorFilter&&behaviorEmojiMap[j.behavior]){
+          emojis.push(behaviorEmojiMap[j.behavior]);
+        }
+        if(!emojis.length)return;
         ctx.save();
-        ctx.font='16px serif';
+        ctx.font='15px serif';
         ctx.textAlign='center';
-        ctx.fillText(emojis, point.x, point.y-16);
+        ctx.fillText(emojis.join(''),point.x,point.y-16);
         ctx.restore();
       });
     }
@@ -7773,7 +7786,13 @@ ${content||'（無）'}
 function setJournalTagSel(sel){
   journalTagFilter=sel.value;
   renderJournal();
-  // 走勢圖開著的話同步重繪 emoji
+  const chartBody=document.getElementById('journal-chart-body');
+  if(chartBody&&chartBody.style.display!=='none')renderJournalChart();
+}
+
+// 事件/行為篩選也連動走勢圖
+function onJournalFilterChange(){
+  renderJournal();
   const chartBody=document.getElementById('journal-chart-body');
   if(chartBody&&chartBody.style.display!=='none')renderJournalChart();
 }
@@ -8173,24 +8192,105 @@ function renderJournal(){
   updateJournalCount();
 }
 
-function openBacktestInput(journalId, key, label){
+function checkBacktestReminders(){
+  const today=new Date();
+  const toTradingDays=(date1,date2)=>{
+    let count=0;
+    const d=new Date(date1);
+    while(d<date2){
+      d.setDate(d.getDate()+1);
+      const dow=d.getDay();
+      if(dow!==0&&dow!==6)count++;
+    }
+    return count;
+  };
+  const pending=[];
+  (db.journals||[]).forEach(j=>{
+    if(!j.date)return;
+    const jDate=new Date(j.date);
+    const days=toTradingDays(jDate,today);
+    if(days>=5&&!j.backtest?.t5)pending.push({id:j.id,date:j.date,key:'t5',label:'T+5天'});
+    else if(days>=20&&!j.backtest?.t20)pending.push({id:j.id,date:j.date,key:'t20',label:'T+20天'});
+    else if(days>=60&&!j.backtest?.t60)pending.push({id:j.id,date:j.date,key:'t60',label:'T+60天'});
+  });
+  if(pending.length===0)return;
+  // 顯示提醒
+  let reminder=document.getElementById('backtest-reminder');
+  if(!reminder){
+    reminder=document.createElement('div');
+    reminder.id='backtest-reminder';
+    const journalBody=document.getElementById('journal-body');
+    if(journalBody)journalBody.prepend(reminder);
+  }
+  reminder.innerHTML=`<div style="margin:8px 14px;padding:10px 14px;background:#fffbeb;border:1.5px solid #fcd34d;border-radius:10px;font-size:12px">
+    <div style="font-weight:700;color:#92400e;margin-bottom:6px">⏰ 有 ${pending.length} 篇日誌待填回測資料</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px">
+      ${pending.slice(0,5).map(p=>`
+        <button onclick="scrollToJournal('${p.id}')"
+          style="padding:3px 10px;background:#fef3c7;border:1px solid #fcd34d;border-radius:6px;font-size:11px;font-weight:700;color:#92400e;cursor:pointer">
+          ${p.date} ${p.label}
+        </button>`).join('')}
+      ${pending.length>5?`<span style="color:#92400e;font-size:11px;align-self:center">...還有 ${pending.length-5} 篇</span>`:''}
+    </div>
+  </div>`;
+}
+
+function scrollToJournal(id){
+  const el=document.getElementById('jc-'+id)?.closest('.j-card');
+  if(el){el.scrollIntoView({behavior:'smooth',block:'center'});el.style.outline='2px solid #fcd34d';setTimeout(()=>el.style.outline='',2000);}
+}
+
+async function openBacktestInput(journalId, key, label){
   const j=(db.journals||[]).find(x=>x.id===journalId);
   if(!j)return;
+  const baseIndex=j.indexVal||null;
+  const stockPrices=j.stockPrices||{};
+  const stockCodes=Object.keys(stockPrices);
+
+  // 自動抓當天大盤
+  let autoText='';
+  let autoVal=null;
+  try{
+    toast('📡 抓取當天價格中...');
+    // 抓大盤
+    if(baseIndex){
+      const r=await fetch(CF_WORKER+'/index?t='+Date.now());
+      if(r.ok){
+        const d=await r.json();
+        if(d.price){
+          const pct=(d.price-baseIndex)/baseIndex*100;
+          autoVal=Math.round(pct*100)/100;
+          autoText+=`大盤：${baseIndex}→${Math.round(d.price)}（${autoVal>=0?'+':''}${autoVal.toFixed(2)}%）`;
+        }
+      }
+    }
+    // 如果有個股也抓
+    if(stockCodes.length>0&&!baseIndex){
+      const code=stockCodes[0];
+      const basePrice=stockPrices[code];
+      const p=await fetchPrice(code);
+      if(p&&p.price){
+        const pct=(p.price-basePrice)/basePrice*100;
+        autoVal=Math.round(pct*100)/100;
+        autoText+=`${code}：$${basePrice}→$${p.price}（${autoVal>=0?'+':''}${autoVal.toFixed(2)}%）`;
+      }
+    }
+  }catch(e){}
+
+  const suggestion=autoVal!=null?`\n\n📊 自動計算結果：\n${autoText}\n建議填入：${autoVal>=0?'+':''}${autoVal.toFixed(2)}`:'';
   const cur=j.backtest?.[key];
-  const val=prompt(`📊 ${label} 漲跌幅（%）\n例如：上漲填 8.5，下跌填 -3.2\n\n當時你的情緒：${(j.tags||[]).join('、')||'未標記'}`, cur!=null?cur:'');
+  const val=prompt(`📊 ${label} 漲跌幅（%）\n當時標記：${(j.tags||[]).join('、')||'未標記'}${suggestion}\n\n直接按確定採用自動計算，或手動輸入：`, autoVal!=null?autoVal.toFixed(2):cur!=null?cur:'');
   if(val===null)return;
   const num=parseFloat(val);
   if(isNaN(num)){toast('⚠️ 請輸入數字');return;}
   if(!j.backtest)j.backtest={};
   j.backtest[key]=num;
   // 自動產生打臉文字
-  if(j.backtest.t5!=null||j.backtest.t20!=null||j.backtest.t60!=null){
-    const hasPanic=(j.tags||[]).includes('極度恐慌')||(j.tags||[]).includes('看空');
-    const best=Math.max(j.backtest.t5??-999,j.backtest.t20??-999,j.backtest.t60??-999);
-    if(hasPanic&&best>5)j.backtest.note=`事後證明：最高漲幅 +${best.toFixed(1)}%，當時的恐慌是過度的！`;
-    else if(hasPanic&&best<-5)j.backtest.note=`這次恐慌是有道理的，市場確實繼續下跌 ${best.toFixed(1)}%。`;
-    else j.backtest.note='';
-  }
+  const hasPanic=(j.tags||[]).includes('極度恐慌')||(j.tags||[]).includes('看空');
+  const best=Math.max(j.backtest.t5??-999,j.backtest.t20??-999,j.backtest.t60??-999);
+  if(hasPanic&&best>5)j.backtest.note=`事後證明：最高漲幅 +${best.toFixed(1)}%，當時的恐慌是過度的！`;
+  else if(hasPanic&&best<-5)j.backtest.note=`這次恐慌是有道理的，市場確實繼續下跌 ${best.toFixed(1)}%。`;
+  else j.backtest.note='';
   save();
   renderJournal();
   toast(`✅ 已記錄 ${label} 漲跌幅：${num>=0?'+':''}${num}%`);
@@ -8242,7 +8342,12 @@ function openSP(id){
   if(id==='watch'  && typeof renderWatchlist==='function') renderWatchlist();
   if(id==='analytics' && typeof renderAnalytics==='function') renderAnalytics();
   if(id==='finplan' && typeof initFinPlan==='function') initFinPlan();
-  if(id==='journal'){ if(typeof renderJournal==='function') renderJournal(); updateJournalCount(); }
+  if(id==='journal'){
+    if(typeof renderJournal==='function') renderJournal();
+    updateJournalCount();
+    // 檢查未填回測提醒
+    setTimeout(checkBacktestReminders, 500);
+  }
   if(id==='flex'){
     if(typeof renderFlex==='function') renderFlex();
   }
