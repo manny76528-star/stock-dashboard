@@ -2213,7 +2213,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1783065201412,
+  "_ts": 1783065220622,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -2489,12 +2489,15 @@
         "00988A",
         "009805"
       ],
+      "eventCat": "總經面",
+      "behavior": "觀望不動",
       "indexVal": 45071,
       "stockPrices": {
         "00981A": 30.81,
         "00988A": 21.46,
         "009805": 16.6
       },
+      "aiAnalysis": null,
       "images": [
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1780759458696_r98b.jpg",
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1780759458699_8gbi.jpg",
