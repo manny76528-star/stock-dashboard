@@ -2213,7 +2213,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1783070509136,
+  "_ts": 1783070557578,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -3000,7 +3000,8 @@
       "stockTags": [
         "009819"
       ],
-      "images": []
+      "images": [],
+      "backtest": {}
     },
     {
       "id": "moh1j593i7q",
