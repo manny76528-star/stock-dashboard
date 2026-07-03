@@ -2322,6 +2322,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
       </div>
       <div class="sp-hdr-right">
         <button onclick="openJournalModal()" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif">＋ 新增日誌</button>
+        <button onclick="batchUpdateBacktest()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#e2e8f0;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif">🔄 更新回測</button>
         <button class="sp-close" onclick="closeSP('journal')">✕ 關閉</button>
       </div>
     </div>
@@ -8189,6 +8190,43 @@ function renderJournal(){
   }).join('');
 
   updateJournalCount();
+}
+
+async function batchUpdateBacktest(){
+  const btn=document.querySelector('[onclick="batchUpdateBacktest()"]');
+  if(btn){btn.disabled=true;btn.textContent='📡 抓取中...';}
+  try{
+    // 抓今天大盤
+    let todayIndex=null;
+    const r=await fetch(CF_WORKER+'/index?t='+Date.now());
+    if(r.ok){const d=await r.json();if(d.price)todayIndex=Math.round(d.price);}
+    if(!todayIndex){toast('⚠️ 無法抓取今日大盤');return;}
+
+    const today=new Date().toISOString().slice(0,10);
+    let count=0;
+    (db.journals||[]).forEach(j=>{
+      if(!j.indexVal)return; // 沒有記錄基準大盤的跳過
+      const pct=(todayIndex-j.indexVal)/j.indexVal*100;
+      const ret=Math.round(pct*100)/100;
+      if(!j.backtest)j.backtest={};
+      j.backtest.ret=ret;
+      j.backtest.retDate=today;
+      // 自動打臉文字
+      const hasPanic=(j.tags||[]).includes('極度恐慌')||(j.tags||[]).includes('看空');
+      if(hasPanic&&ret>5)j.backtest.note=`事後證明：當時恐慌，但後來漲了 +${ret.toFixed(1)}%，恐慌是過度的！`;
+      else if(hasPanic&&ret<-5)j.backtest.note=`這次恐慌是有道理的，市場確實下跌 ${ret.toFixed(1)}%。`;
+      else if(ret>10)j.backtest.note=`從寫日誌到現在已上漲 +${ret.toFixed(1)}%！`;
+      else j.backtest.note='';
+      count++;
+    });
+    save();
+    renderJournal();
+    toast(`✅ 已更新 ${count} 篇日誌的回測（今日大盤：${todayIndex.toLocaleString()}點）`);
+  }catch(e){
+    toast('⚠️ 更新失敗：'+e.message);
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent='🔄 更新回測';}
+  }
 }
 
 function checkBacktestReminders(){
