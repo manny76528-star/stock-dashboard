@@ -2213,7 +2213,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1783069879665,
+  "_ts": 1783069883307,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -3063,7 +3063,12 @@
       "stockPrices": {
         "00864B": 46.31
       },
-      "images": []
+      "images": [],
+      "backtest": {
+        "ret": 27.39,
+        "retDate": "2026-07-03",
+        "note": "事後證明：當時恐慌，但後來漲了 +27.4%，恐慌是過度的！"
+      }
     },
     {
       "id": "mnzuszjkwdb",
