@@ -2213,7 +2213,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1783066936394,
+  "_ts": 1783066944624,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -3050,7 +3050,11 @@
       "indexVal": 34861,
       "stockPrices": null,
       "aiAnalysis": null,
-      "images": []
+      "images": [],
+      "backtest": {
+        "t5": 34.19,
+        "note": ""
+      }
     }
   ],
   "finPlan": {
