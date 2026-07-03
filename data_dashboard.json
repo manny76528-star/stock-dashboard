@@ -2213,7 +2213,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1783070013350,
+  "_ts": 1783070016611,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -2777,7 +2777,12 @@
       "stockPrices": {
         "009805": 16.6
       },
-      "images": []
+      "images": [],
+      "backtest": {
+        "ret": 11.94,
+        "retDate": "2026-07-03",
+        "note": "從寫日誌到現在已上漲 +11.9%！"
+      }
     },
     {
       "id": "mowqohh2ku2",
