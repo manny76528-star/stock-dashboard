@@ -8141,6 +8141,28 @@ function renderJournal(){
               onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform=''">
           `).join('')}
         </div>`:''}
+        <!-- T+N 回測追蹤 -->
+        <div style="margin-top:12px;padding:10px 12px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0">
+          <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:8px">📊 回測追蹤（事後填入，打臉情緒偏誤）</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+            ${['t5','t20','t60'].map((k,ki)=>{
+              const label=['T+5天','T+20天','T+60天'][ki];
+              const v=j.backtest?.[k];
+              const color=v==null?'#94a3b8':v>=0?'#dc2626':'#16a34a';
+              return `<div style="text-align:center;background:#fff;border-radius:6px;padding:6px 4px;border:1px solid #e2e8f0">
+                <div style="font-size:10px;color:#94a3b8;margin-bottom:4px">${label}</div>
+                <div style="font-size:14px;font-weight:800;color:${color}">
+                  ${v==null?'—':(v>=0?'+':'')+v.toFixed(1)+'%'}
+                </div>
+                <button onclick="event.stopPropagation();openBacktestInput('${j.id}','${k}','${label}')"
+                  style="margin-top:4px;font-size:10px;color:#94a3b8;background:none;border:1px solid #e2e8f0;border-radius:4px;padding:1px 6px;cursor:pointer">
+                  ${v==null?'填入':'修改'}
+                </button>
+              </div>`;
+            }).join('')}
+          </div>
+          ${j.backtest?.note?`<div style="margin-top:6px;font-size:11px;color:#64748b;font-style:italic">💡 ${j.backtest.note}</div>`:''}
+        </div>
       </div>` : '';
 
     return `<div class="j-card" style="padding:0;overflow:hidden;border-radius:10px;border:1px solid rgba(255,255,255,.08);margin-bottom:0">
@@ -8149,6 +8171,29 @@ function renderJournal(){
   }).join('');
 
   updateJournalCount();
+}
+
+function openBacktestInput(journalId, key, label){
+  const j=(db.journals||[]).find(x=>x.id===journalId);
+  if(!j)return;
+  const cur=j.backtest?.[key];
+  const val=prompt(`📊 ${label} 漲跌幅（%）\n例如：上漲填 8.5，下跌填 -3.2\n\n當時你的情緒：${(j.tags||[]).join('、')||'未標記'}`, cur!=null?cur:'');
+  if(val===null)return;
+  const num=parseFloat(val);
+  if(isNaN(num)){toast('⚠️ 請輸入數字');return;}
+  if(!j.backtest)j.backtest={};
+  j.backtest[key]=num;
+  // 自動產生打臉文字
+  if(j.backtest.t5!=null||j.backtest.t20!=null||j.backtest.t60!=null){
+    const hasPanic=(j.tags||[]).includes('極度恐慌')||(j.tags||[]).includes('看空');
+    const best=Math.max(j.backtest.t5??-999,j.backtest.t20??-999,j.backtest.t60??-999);
+    if(hasPanic&&best>5)j.backtest.note=`事後證明：最高漲幅 +${best.toFixed(1)}%，當時的恐慌是過度的！`;
+    else if(hasPanic&&best<-5)j.backtest.note=`這次恐慌是有道理的，市場確實繼續下跌 ${best.toFixed(1)}%。`;
+    else j.backtest.note='';
+  }
+  save();
+  renderJournal();
+  toast(`✅ 已記錄 ${label} 漲跌幅：${num>=0?'+':''}${num}%`);
 }
 
 function toggleJCard(id){
