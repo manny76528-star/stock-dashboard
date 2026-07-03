@@ -2213,7 +2213,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1783070019941,
+  "_ts": 1783070024553,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -2737,7 +2737,12 @@
       },
       "images": [
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1779269089530_i8vz.jpg"
-      ]
+      ],
+      "backtest": {
+        "ret": 16.44,
+        "retDate": "2026-07-03",
+        "note": "從寫日誌到現在已上漲 +16.4%！"
+      }
     },
     {
       "id": "mp3lm2vkqz8",
