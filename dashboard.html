@@ -2522,8 +2522,9 @@ body:not(.privacy) .privacy-mask{filter:none;}
     <!-- AI 分析區 -->
     <div style="padding:0 20px 12px">
       <button onclick="runJournalAI()" id="j-ai-btn"
-        style="width:100%;padding:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
-        🤖 AI 分析日誌（提取關鍵字 + 恐慌指數）
+        style="width:100%;padding:10px;background:#e2e8f0;color:#94a3b8;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:not-allowed;display:flex;align-items:center;justify-content:center;gap:8px"
+        title="需要設定 Anthropic API Key 才能使用">
+        🤖 AI 分析（設定 API Key 後開啟）
       </button>
       <div id="j-ai-result" style="display:none;margin-top:10px;padding:12px 14px;background:#f8f7ff;border:1.5px solid #c4b5fd;border-radius:10px;font-size:12px;line-height:1.7"></div>
     </div>
@@ -7682,7 +7683,7 @@ ${content||'（無）'}
 一句話總結：META財報利空引發AI板塊恐慌，情緒失控下停損出場。`;
 
   try{
-    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+    const resp=await fetch(CF_WORKER+'/ai',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
