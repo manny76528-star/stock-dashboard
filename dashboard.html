@@ -7582,7 +7582,6 @@ function renderJournalChart(){
           if(!j)return[];
           const lines=[];
           if(j.market)lines.push('📰 '+j.market.slice(0,50)+(j.market.length>50?'...':''));
-          if(j.content)lines.push('📝 '+j.content.slice(0,60)+(j.content.length>60?'...':''));
           return lines;
         }}}
       },
@@ -7652,8 +7651,7 @@ function showJournalChartPopup(j,evt){
       <button onclick="document.getElementById('jchart-popup').style.display='none'" style="background:none;border:none;color:#94a3b8;cursor:pointer;font-size:14px">✕</button>
     </div>
     ${tags?`<div style="margin-bottom:6px">${tags}</div>`:''}
-    ${j.market?`<div style="color:#94a3b8;margin-bottom:4px;font-size:11px">📰 ${j.market.slice(0,80)}</div>`:''}
-    ${j.content?`<div style="margin-bottom:8px">${j.content.slice(0,120)}${j.content.length>120?'...':''}</div>`:''}
+    ${j.market?`<div style="color:#e2e8f0;font-size:12px;margin-bottom:8px">📰 ${j.market.slice(0,80)}</div>`:''}
     <button onclick="openJournalModal('${j.id}');document.getElementById('jchart-popup').style.display='none'" style="width:100%;background:#3b82f6;color:#fff;border:none;border-radius:6px;padding:5px;font-size:11px;cursor:pointer">✏️ 開啟完整日誌</button>`;
   const x=Math.min((evt.native?.clientX||200)+10,window.innerWidth-320);
   const y=Math.min((evt.native?.clientY||200)-20,window.innerHeight-220);
@@ -8219,8 +8217,8 @@ function checkBacktestReminders(){
   if(!reminder){
     reminder=document.createElement('div');
     reminder.id='backtest-reminder';
-    const journalBody=document.getElementById('journal-body');
-    if(journalBody)journalBody.prepend(reminder);
+    const journalList=document.getElementById('journal-list');
+    if(journalList&&journalList.parentNode)journalList.parentNode.insertBefore(reminder,journalList);
   }
   reminder.innerHTML=`<div style="margin:8px 14px;padding:10px 14px;background:#fffbeb;border:1.5px solid #fcd34d;border-radius:10px;font-size:12px">
     <div style="font-weight:700;color:#92400e;margin-bottom:6px">⏰ 有 ${pending.length} 篇日誌待填回測資料</div>
