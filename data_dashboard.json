@@ -2213,7 +2213,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1783067680501,
+  "_ts": 1783067688471,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -2370,7 +2370,8 @@
       "images": [],
       "backtest": {
         "t5": 4.96,
-        "note": ""
+        "note": "",
+        "t20": 4.96
       }
     },
     {
