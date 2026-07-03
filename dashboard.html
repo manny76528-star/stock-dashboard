@@ -7763,7 +7763,8 @@ function openJournalModal(id=null){
       aiResult.innerHTML='';
     }
   }
-  if(idxEl)idxEl.value=j?.indexVal||'';
+  const jIdxEl=document.getElementById('j-index');
+  if(jIdxEl)jIdxEl.value=j?.indexVal||'';
   // 更新個股價格框（帶入已存的值）
   updateStockPriceInputs();
   setTimeout(()=>{
