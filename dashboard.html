@@ -2342,6 +2342,24 @@ body:not(.privacy) .privacy-mask{filter:none;}
           <option value="重大事項">🚨 重大事項</option>
           <option value="極度恐慌">😱 極度恐慌(PTSD)</option>
         </select>
+        <select id="journal-event-sel" onchange="renderJournal()" style="padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:700;color:#475569;background:#fff;cursor:pointer;outline:none;min-width:110px">
+          <option value="">全部事件</option>
+          <option value="總經面">🌐 總經面</option>
+          <option value="消息面">📰 消息面</option>
+          <option value="政治面">🏛 政治面</option>
+          <option value="技術面">📊 技術面</option>
+          <option value="個股操作">💹 個股操作</option>
+          <option value="無特定事件">😶 無特定事件</option>
+        </select>
+        <select id="journal-behavior-sel" onchange="renderJournal()" style="padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:700;color:#475569;background:#fff;cursor:pointer;outline:none;min-width:110px">
+          <option value="">全部行為</option>
+          <option value="停損離場">🚪 停損離場</option>
+          <option value="逆向加碼">💪 逆向加碼</option>
+          <option value="死抱不動">🪨 死抱不動</option>
+          <option value="盤中手癢">🤌 盤中手癢</option>
+          <option value="觀望不動">👀 觀望不動</option>
+          <option value="獲利了結">🎯 獲利了結</option>
+        </select>
       </div>
       <!-- 走勢圖折疊區 -->
       <div id="journal-chart-section" style="border-bottom:1px solid var(--border)">
@@ -2481,6 +2499,33 @@ body:not(.privacy) .privacy-mask{filter:none;}
           <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer"><input type="checkbox" id="jtag-sell" value="賣出"> 💸 賣出</label>
           <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer"><input type="checkbox" id="jtag-alert" value="重大事項"> 🚨 重大事項</label>
           <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer"><input type="checkbox" id="jtag-panic" value="極度恐慌"> 😱 極度恐慌(觸發PTSD)</label>
+        </div>
+        <!-- 雙層標籤 -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+          <div>
+            <div style="font-size:10px;color:#94a3b8;margin-bottom:3px">📂 事件分類</div>
+            <select id="j-event-cat" class="fi" style="padding:5px 8px;font-size:12px">
+              <option value="">— 選擇事件分類 —</option>
+              <option value="總經面">🌐 總經面（升息/通膨/非農）</option>
+              <option value="消息面">📰 消息面（財報/砍單/利空）</option>
+              <option value="政治面">🏛 政治面（關稅/地緣政治）</option>
+              <option value="技術面">📊 技術面（突破/跌破）</option>
+              <option value="個股操作">💹 個股操作</option>
+              <option value="無特定事件">😶 無特定事件</option>
+            </select>
+          </div>
+          <div>
+            <div style="font-size:10px;color:#94a3b8;margin-bottom:3px">🎯 個人行為</div>
+            <select id="j-behavior" class="fi" style="padding:5px 8px;font-size:12px">
+              <option value="">— 選擇個人行為 —</option>
+              <option value="停損離場">🚪 停損離場</option>
+              <option value="逆向加碼">💪 逆向加碼</option>
+              <option value="死抱不動">🪨 死抱不動</option>
+              <option value="盤中手癢">🤌 盤中手癢</option>
+              <option value="觀望不動">👀 觀望不動</option>
+              <option value="獲利了結">🎯 獲利了結</option>
+            </select>
+          </div>
         </div>
       </div>
     </div>
@@ -7785,6 +7830,11 @@ function openJournalModal(id=null){
     const el=document.getElementById(id2);
     if(el)el.checked=j?.tags?.includes(el.value)||false;
   });
+  // 雙層標籤
+  const evCatEl=document.getElementById('j-event-cat');
+  if(evCatEl)evCatEl.value=j?.eventCat||'';
+  const behaviorEl=document.getElementById('j-behavior');
+  if(behaviorEl)behaviorEl.value=j?.behavior||'';
   // 圖片
   window._jImgs=[...(j?.images||[])];
   renderJImgPreview();
@@ -7898,6 +7948,8 @@ function saveJournal(){
     marketUrl:document.getElementById('j-market-url')?.value.trim()||'',
     content:document.getElementById('j-content').value.trim(),
     stockTags:document.getElementById('j-stock-tags').value.trim().split(/[\s,，]+/).filter(Boolean),
+    eventCat:document.getElementById('j-event-cat')?.value||'',
+    behavior:document.getElementById('j-behavior')?.value||'',
     indexVal:parseFloat(document.getElementById('j-index')?.value)||null,
     stockPrices:(()=>{
       const prices={};
@@ -8029,6 +8081,11 @@ function renderJournal(){
   if(journalTagFilter)list=list.filter(j=>(j.tags||[]).includes(journalTagFilter));
   if(selYear&&selYear!=='all')list=list.filter(j=>(j.date||'').startsWith(selYear));
   if(selMood)list=list.filter(j=>(j.mood||'')==selMood);
+  // 雙層標籤篩選
+  const selEvent=document.getElementById('journal-event-sel')?.value||'';
+  const selBehavior=document.getElementById('journal-behavior-sel')?.value||'';
+  if(selEvent)list=list.filter(j=>j.eventCat===selEvent);
+  if(selBehavior)list=list.filter(j=>j.behavior===selBehavior);
   if(q)list=list.filter(j=>
     (j.content||'').toLowerCase().includes(q)||
     (j.market||'').toLowerCase().includes(q)||
@@ -8057,6 +8114,8 @@ function renderJournal(){
             <span style="font-size:13px;font-weight:700;color:#e2e8f0;font-family:'JetBrains Mono',monospace;white-space:nowrap">${j.date}</span>
             ${tags}
             ${j.mood?`<span style="font-size:12px;color:rgba(255,255,255,.65)"></span>`:''}
+            ${j.eventCat?`<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;background:rgba(251,191,36,.15);color:#fbbf24;border:1px solid rgba(251,191,36,.3)">${j.eventCat}</span>`:''}
+            ${j.behavior?`<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;background:rgba(167,139,250,.15);color:#a78bfa;border:1px solid rgba(167,139,250,.3)">${j.behavior}</span>`:''}
             ${(j.stockTags||[]).map(t=>`<span onclick="event.stopPropagation();openStockTracker('${t}')" style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;background:rgba(56,189,248,.15);color:#38bdf8;border:1px solid rgba(56,189,248,.3);cursor:pointer;font-family:'JetBrains Mono',monospace" title="點擊查看 ${t} 所有記錄">${t}</span>`).join('')}
             ${j.marketUrl?`<a href="${j.marketUrl}" target="_blank" onclick="event.stopPropagation()" style="font-size:11px;color:#93c5fd;text-decoration:none;white-space:nowrap" title="查看原文">🔗 原文</a>`:''}
           </div>
