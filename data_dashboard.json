@@ -2213,7 +2213,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1783065193727,
+  "_ts": 1783065201412,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -2423,11 +2423,14 @@
         "00981T",
         "00985B"
       ],
+      "eventCat": "個股操作",
+      "behavior": "",
       "indexVal": 47741,
       "stockPrices": {
         "00981T": 12.32,
         "00985B": 10.19
       },
+      "aiAnalysis": null,
       "images": []
     },
     {
