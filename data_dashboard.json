@@ -1106,6 +1106,16 @@
           "fee": 49,
           "remark": "將短期債券資金轉移到這,主要是AI競賽目前尚在百公尺比賽 15公尺左右",
           "mood": "😌 平靜"
+        },
+        {
+          "id": "mr4k82k5fro",
+          "type": "buy",
+          "lots": 4,
+          "price": 12.36,
+          "date": "2026-07-03",
+          "fee": 20,
+          "remark": "",
+          "mood": ""
         }
       ],
       "order": 14
@@ -2165,7 +2175,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1783060549819,
+  "_ts": 1783060567779,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
