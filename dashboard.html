@@ -7576,14 +7576,19 @@ function renderJournalChart(){
       responsive:true,interaction:{mode:'index',intersect:false},
       plugins:{
         legend:{display:false},
-        tooltip:{callbacks:{afterBody(items){
-          const date=labels[items[0].dataIndex];
-          const j=sorted.find(x=>x.date===date);
-          if(!j)return[];
-          const lines=[];
-          if(j.market)lines.push('📰 '+j.market.slice(0,50)+(j.market.length>50?'...':''));
-          return lines;
-        }}}
+        tooltip:{
+          callbacks:{afterBody(items){
+            const date=labels[items[0].dataIndex];
+            const j=sorted.find(x=>x.date===date);
+            if(!j)return[];
+            const lines=[];
+            if(j.market)lines.push('📰 '+j.market);
+            return lines;
+          }},
+          bodyMaxWidth:320,
+          padding:10,
+          boxWidth:10,
+        }
       },
       scales:{
         x:{ticks:{font:{size:10},maxTicksLimit:10}},
