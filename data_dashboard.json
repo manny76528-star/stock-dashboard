@@ -2213,7 +2213,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1783070032262,
+  "_ts": 1783070036759,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -2660,7 +2660,12 @@
       "stockPrices": {
         "00981A": 30.72
       },
-      "images": []
+      "images": [],
+      "backtest": {
+        "ret": 7.21,
+        "retDate": "2026-07-03",
+        "note": ""
+      }
     },
     {
       "id": "mpl1jtu6ssf",
