@@ -2213,7 +2213,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1783070016611,
+  "_ts": 1783070019941,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -2759,7 +2759,12 @@
         "00403A": 10.8
       },
       "aiAnalysis": null,
-      "images": []
+      "images": [],
+      "backtest": {
+        "ret": 11.65,
+        "retDate": "2026-07-03",
+        "note": "從寫日誌到現在已上漲 +11.7%！"
+      }
     },
     {
       "id": "mp11ukxy8t8",
