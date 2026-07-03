@@ -8289,7 +8289,7 @@ async function openBacktestInput(journalId, key, label){
               <input type="number" id="bt-${k}" value="${bt[k]!=null?bt[k]:''}" placeholder="漲跌幅 %（如：8.5 或 -3.2）"
                 step="0.01" style="flex:1;padding:7px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none">
               <span style="font-size:12px;color:#94a3b8">%</span>
-              ${autoVal!=null&&k===key?`<button onclick="document.getElementById('bt-${k}').value='${autoVal.toFixed(2)}'" style="padding:4px 8px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;font-size:11px;color:#2563eb;cursor:pointer;white-space:nowrap">套用</button>`:''}
+              ${autoVal!=null?`<button onclick="document.getElementById('bt-${k}').value='${autoVal.toFixed(2)}'" style="padding:4px 8px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;font-size:11px;color:#2563eb;cursor:pointer;white-space:nowrap">套用</button>`:''}
             </div>
           </div>`).join('')}
       </div>
