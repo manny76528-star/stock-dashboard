@@ -2213,7 +2213,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1783069844612,
+  "_ts": 1783069852260,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -2476,7 +2476,12 @@
       "aiAnalysis": null,
       "images": [
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1781506530190_lqa5.jpg"
-      ]
+      ],
+      "backtest": {
+        "ret": 3.05,
+        "retDate": "2026-07-03",
+        "note": ""
+      }
     },
     {
       "id": "mq7we3xct66",
