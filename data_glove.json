@@ -368,7 +368,32 @@
       "updatedAt": "2026-06-29T09:13:56.068Z",
       "createdAt": "2026-06-07T10:56:12.757Z",
       "stars": 5
+    },
+    {
+      "id": "mr5wzrwas9r",
+      "brand": "久保田SLUGGER",
+      "model": "T9S",
+      "position": "二壘",
+      "size": "11",
+      "buyDate": "2026-06-22",
+      "buyPrice": 8000,
+      "sellDate": "",
+      "sellPrice": null,
+      "pros": "尺寸11吋(接球面27cm) , 重量502g\n完美尺寸 , 絕版噴火牛",
+      "cons": "",
+      "note": "",
+      "stars": 5,
+      "images": [
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1783142461788_5d70.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1783142464648_bgs5.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1783142467492_oa3b.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1783142470524_lrwr.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1783142473359_xxxd.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1783142476176_sp34.jpg"
+      ],
+      "updatedAt": "2026-07-04T05:21:20.890Z",
+      "createdAt": "2026-07-04T05:21:20.890Z"
     }
   ],
-  "_ts": 1782839573988
+  "_ts": 1783142483897
 }
