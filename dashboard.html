@@ -7583,17 +7583,7 @@ function renderJournalChart(){
       plugins:{
         legend:{display:false},
         tooltip:{
-          callbacks:{afterBody(items){
-            const date=labels[items[0].dataIndex];
-            const j=sorted.find(x=>x.date===date);
-            if(!j)return[];
-            const lines=[];
-            if(j.market)lines.push('📰 '+j.market);
-            return lines;
-          }},
-          bodyMaxWidth:320,
-          padding:10,
-          boxWidth:10,
+          enabled:false,
         }
       },
       scales:{
