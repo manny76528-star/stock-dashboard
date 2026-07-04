@@ -7676,10 +7676,11 @@ function renderJournalChart(){
           lines.push(`${code}：${v>=0?'+':''}${v.toFixed(1)}%`);
         });
 
-        const boxW=140, lineH=16, pad=8;
+        const boxW=150, lineH=17, pad=8;
         const boxH=lines.length*lineH+pad*2;
-        const bx=Math.min(endX-boxW-6, endX-boxW);
-        const by=chartArea.top+8;
+        const bx=endX-boxW-10;
+        // 放在圖表上方1/3處
+        const by=chartArea.top+(chartArea.bottom-chartArea.top)*0.15;
 
         ctx.fillStyle='rgba(15,23,42,0.88)';
         ctx.beginPath();
@@ -7732,7 +7733,7 @@ function showJournalChartPopup(j,evt){
   if(!popup){
     popup=document.createElement('div');
     popup.id='jchart-popup';
-    popup.style.cssText='position:fixed;z-index:9999;background:#1e293b;color:#e2e8f0;border-radius:10px;padding:12px 16px;max-width:300px;font-size:12px;line-height:1.6;box-shadow:0 8px 32px rgba(0,0,0,.4)';
+    popup.style.cssText='position:fixed;z-index:9999;background:#1e293b;color:#e2e8f0;border-radius:10px;padding:12px 16px;max-width:240px;width:240px;font-size:12px;line-height:1.6;box-shadow:0 8px 32px rgba(0,0,0,.4);word-break:break-word;white-space:normal';
     document.body.appendChild(popup);
   }
   const tags=(j.tags||[]).map(t=>`<span style="background:rgba(255,255,255,.15);padding:1px 6px;border-radius:10px;font-size:10px">${t}</span>`).join(' ');
