@@ -7583,7 +7583,19 @@ function renderJournalChart(){
       plugins:{
         legend:{display:false},
         tooltip:{
-          enabled:false,
+          enabled:true,
+          callbacks:{afterBody(items){
+            const date=labels[items[0].dataIndex];
+            const j=sorted.find(x=>x.date===date);
+            if(!j)return[];
+            const lines=[];
+            if(j.market)lines.push('📰 '+j.market);
+            return lines;
+          }},
+          maxWidth:200,
+          padding:10,
+          boxWidth:10,
+          bodyFont:{size:11},
         }
       },
       scales:{
@@ -7668,9 +7680,9 @@ function renderJournalChart(){
 
         const boxW=150, lineH=17, pad=8;
         const boxH=lines.length*lineH+pad*2;
-        const bx=endX-boxW-10;
-        // 放在圖表上方1/3處
-        const by=chartArea.top+(chartArea.bottom-chartArea.top)*0.15;
+        // 放在圖表左上角，跟右側的 Chart.js tooltip 不衝突
+        const bx=chartArea.left+8;
+        const by=chartArea.top+8;
 
         ctx.fillStyle='rgba(15,23,42,0.88)';
         ctx.beginPath();
