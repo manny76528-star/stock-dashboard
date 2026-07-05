@@ -5545,6 +5545,39 @@ async function recordSnapshot(manual=false){
   else console.log('Auto snapshot:',dateKey,'net:',Math.round(net),'index:',indexVal);
 }
 
+// ── 大盤折線分段顏色（漲=紅 跌=綠）──
+function buildIndexSegments(dataArr, yAxisID='yIndex'){
+  // dataArr: [{x: label, y: value}, ...]，null 跳過
+  const segments=[];
+  const valid=dataArr.map((v,i)=>v!=null?{i,v}:null).filter(Boolean);
+  for(let k=0;k<valid.length-1;k++){
+    const a=valid[k], b=valid[k+1];
+    const rising=b.v>=a.v;
+    const color=rising?'#dc2626':'#16a34a';
+    const data=dataArr.map((v,i)=>(i===a.i||i===b.i)?v:null);
+    segments.push({
+      label: k===0?'大盤':'',
+      data,
+      borderColor:color,
+      backgroundColor:color+'22',
+      borderWidth:2,
+      pointRadius:dataArr.map((v,i)=>i===a.i||i===b.i?4:0),
+      pointBackgroundColor:color,
+      tension:0.3,
+      spanGaps:false,
+      fill:false,
+      yAxisID,
+    });
+  }
+  // 只有一個點時單獨顯示
+  if(valid.length===1){
+    const color='#94a3b8';
+    const data=dataArr.map((v,i)=>i===valid[0].i?v:null);
+    segments.push({label:'大盤',data,borderColor:color,backgroundColor:color+'22',borderWidth:2,pointRadius:dataArr.map((_,i)=>i===valid[0].i?4:0),tension:0.3,spanGaps:false,fill:false,yAxisID});
+  }
+  return segments;
+}
+
 function renderTrendChart(){
   if(!db.snapshots||db.snapshots.length===0){
     document.getElementById('trend-table').innerHTML='<div style="color:var(--muted);text-align:center;padding:20px">尚無記錄，請按「📷 記錄本月」開始</div>';
@@ -5568,8 +5601,11 @@ function renderTrendChart(){
   const showCf=document.getElementById('tc-cf')?.checked;
   const showDebt=document.getElementById('tc-debt')?.checked;
   const datasets=[];
-  // 大盤指數 → 左軸（yIndex）
-  if(showIndex)datasets.push({label:'大盤指數',data:snaps.map(s=>s.indexVal||null),borderColor:'#7c3aed',backgroundColor:'rgba(124,58,237,0.08)',tension:0.3,spanGaps:true,yAxisID:'yIndex',pointRadius:4,borderWidth:2});
+  // 大盤指數 → 左軸（分段紅綠色）
+  if(showIndex){
+    const indexData=snaps.map(s=>s.indexVal||null);
+    buildIndexSegments(indexData,'yIndex').forEach(seg=>datasets.push(seg));
+  }
   // 淨資產 → 右軸（yNet）
   if(showNet)datasets.push({label:'淨資產',data:snaps.map(s=>s.net),borderColor:'#e74c3c',backgroundColor:'rgba(231,76,60,0.1)',tension:0.3,yAxisID:'yNet'});
   if(showDiv)datasets.push({label:'每月股息',data:snaps.map(s=>s.div),borderColor:'#3498db',backgroundColor:'rgba(52,152,219,0.1)',tension:0.3,yAxisID:'yNet'});
@@ -7517,9 +7553,8 @@ function renderJournalChart(){
   let ci=0;
   const datasets=[];
   if(_journalChartChecks['大盤']){
-    datasets.push({label:'大盤',data:sorted.map(j=>j.indexVal||null),
-      borderColor:colors[ci],backgroundColor:colors[ci]+'22',
-      tension:0.3,spanGaps:true,pointRadius:5,pointHoverRadius:8,fill:false,yAxisID:'yLeft'});
+    const indexData=sorted.map(j=>j.indexVal||null);
+    buildIndexSegments(indexData,'yLeft').forEach(seg=>datasets.push(seg));
     ci++;
   }
   stockKeys.filter(k=>_journalChartChecks['stk_'+k]).forEach(k=>{
