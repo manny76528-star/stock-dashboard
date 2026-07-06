@@ -222,7 +222,6 @@ body:not(.privacy) .privacy-mask{filter:none;}
     window.location.href='index.html';
     return;
   }
-  // 顯示 main-content（相容 DOMContentLoaded 時機）
   function showContent(){
     const mc=document.getElementById('main-content');
     if(mc)mc.style.display='block';
@@ -230,14 +229,27 @@ body:not(.privacy) .privacy-mask{filter:none;}
   if(document.readyState==='loading'){
     document.addEventListener('DOMContentLoaded',showContent);
   } else {
-    showContent(); // DOM 已載入完成
+    showContent();
   }
-  // 閒置計時
+  // 閒置計時（Modal 開著時不登出）
   let timer=null;
+  function isModalOpen(){
+    // 檢查日誌 Modal 或任何 .mo.open 是否開著
+    const journalModal=document.getElementById('journalModal');
+    if(journalModal&&journalModal.classList.contains('open'))return true;
+    const openModals=document.querySelectorAll('.mo.open');
+    if(openModals.length>0)return true;
+    return false;
+  }
   function resetTimer(){
     localStorage.setItem(MASTER_TS,Date.now().toString());
     clearTimeout(timer);
     timer=setTimeout(()=>{
+      // 如果 Modal 開著，延後 1 分鐘再檢查
+      if(isModalOpen()){
+        resetTimer();
+        return;
+      }
       localStorage.removeItem(MASTER_KEY);
       localStorage.removeItem(MASTER_TS);
       window.location.href='index.html';
@@ -2550,13 +2562,13 @@ body:not(.privacy) .privacy-mask{filter:none;}
     <!-- 大盤環境 -->
     <div class="fg">
       <label class="fl">🌐 大盤環境 / 重大新聞</label>
-      <textarea class="fi" id="j-market" rows="3" placeholder="今日大盤走勢、重要新聞、總體經濟事件..." style="resize:vertical"></textarea>
+      <textarea class="fi" id="j-market" rows="3" placeholder="今日大盤走勢、重要新聞、總體經濟事件..." style="resize:vertical" oninput="autoSaveJournalDraft()"></textarea>
       <input class="fi" id="j-market-url" placeholder="🔗 新聞連結（選填，可點擊回看原文）" style="margin-top:6px">
     </div>
     <!-- 交易日誌 -->
     <div class="fg">
       <label class="fl">📝 交易日誌</label>
-      <textarea class="fi" id="j-content" rows="5" placeholder="記錄今日的操作邏輯、反思、策略調整..." style="resize:vertical"></textarea>
+      <textarea class="fi" id="j-content" rows="5" placeholder="記錄今日的操作邏輯、反思、策略調整..." style="resize:vertical" oninput="autoSaveJournalDraft()"></textarea>
     </div>
     <!-- 圖片上傳 -->
     <div class="fg">
@@ -7925,6 +7937,28 @@ function onJournalFilterChange(){
   if(chartBody&&chartBody.style.display!=='none')renderJournalChart();
 }
 
+// ── 日誌草稿自動儲存 ──
+const DRAFT_KEY='journal_draft_v1';
+
+function autoSaveJournalDraft(){
+  const draft={
+    market:document.getElementById('j-market')?.value||'',
+    content:document.getElementById('j-content')?.value||'',
+    date:document.getElementById('j-date')?.value||'',
+    savedAt:new Date().toISOString()
+  };
+  localStorage.setItem(DRAFT_KEY,JSON.stringify(draft));
+}
+
+function loadJournalDraft(){
+  try{return JSON.parse(localStorage.getItem(DRAFT_KEY)||'null');}
+  catch{return null;}
+}
+
+function clearJournalDraft(){
+  localStorage.removeItem(DRAFT_KEY);
+}
+
 function openJournalModal(id=null){
   editJournalId=id;
   const j=id?(db.journals||[]).find(x=>x.id===id):null;
@@ -7934,6 +7968,21 @@ function openJournalModal(id=null){
   const jmUrlEl=document.getElementById('j-market-url');if(jmUrlEl)jmUrlEl.value=j?.marketUrl||'';
   document.getElementById('j-content').value=j?.content||'';
   document.getElementById('j-stock-tags').value=(j?.stockTags||[]).join(' ');
+
+  // 新增模式：嘗試還原草稿
+  if(!id){
+    const draft=loadJournalDraft();
+    if(draft&&(draft.market||draft.content)){
+      const ago=Math.round((Date.now()-new Date(draft.savedAt).getTime())/60000);
+      if(confirm(`📝 發現 ${ago} 分鐘前的未儲存草稿：\n\n「${(draft.market||draft.content||'').slice(0,60)}...」\n\n要還原嗎？`)){
+        if(draft.market)document.getElementById('j-market').value=draft.market;
+        if(draft.content)document.getElementById('j-content').value=draft.content;
+        if(draft.date)document.getElementById('j-date').value=draft.date;
+      } else {
+        clearJournalDraft();
+      }
+    }
+  }
   // 清除 AI 分析暫存
   window._jAiAnalysis = j?.aiAnalysis||null;
   const aiResult=document.getElementById('j-ai-result');
@@ -8127,7 +8176,7 @@ function deleteJournal(){
   if(!editJournalId)return;
   if(!confirm('確定刪除這篇日誌？'))return;
   db.journals=(db.journals||[]).filter(x=>x.id!==editJournalId);
-  save();closeModal('journalModal');renderJournal();updateJournalCount();
+  save();clearJournalDraft();closeModal('journalModal');renderJournal();updateJournalCount();
   toast('已刪除');
 }
 
