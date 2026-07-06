@@ -5625,7 +5625,8 @@ function renderTrendChart(){
           labels:{
             font:{family:"'Noto Sans TC',sans-serif",size:12,weight:'600'},
             boxWidth:12,boxHeight:12,borderRadius:6,padding:16,
-            color:'#475569'
+            color:'#475569',
+            filter:(item)=>item.text!==''  // 只顯示有名稱的（分段線只有第一段有名稱）
           }
         },
         tooltip:{
@@ -8427,9 +8428,9 @@ function checkBacktestReminders(){
     <div style="font-weight:700;color:#92400e;margin-bottom:6px">⏰ 有 ${pending.length} 篇日誌可填回測（已超過5個交易日）</div>
     <div style="display:flex;flex-wrap:wrap;gap:6px">
       ${pending.slice(0,5).map(p=>`
-        <button onclick="scrollToJournal('${p.id}')"
+        <button onclick="openJournalModal('${p.id}')"
           style="padding:3px 10px;background:#fef3c7;border:1px solid #fcd34d;border-radius:6px;font-size:11px;font-weight:700;color:#92400e;cursor:pointer">
-          ${p.date}
+          ${p.date} ✏️
         </button>`).join('')}
       ${pending.length>5?`<span style="color:#92400e;font-size:11px;align-self:center">...還有 ${pending.length-5} 篇</span>`:''}
     </div>
