@@ -4967,19 +4967,23 @@ function delDiv(id){
 
 // TOAST
 function moveInv(id,dir){
-  // Ensure all have order
-  db.investments.forEach((inv,i)=>{if(inv.order==null||inv.order===undefined)inv.order=i+1;});
-  // Sort by order
+  db.investments.forEach((inv,i)=>{if(inv.order==null)inv.order=i+1;});
   db.investments.sort((a,b)=>a.order-b.order);
-  const idx=db.investments.findIndex(i=>i.id===id);
-  const newIdx=idx+dir;
-  if(newIdx<0||newIdx>=db.investments.length)return;
-  // Swap positions in array directly and reassign order
-  const tmp=db.investments[idx];
-  db.investments[idx]=db.investments[newIdx];
-  db.investments[newIdx]=tmp;
-  // Reassign clean order values
-  db.investments.forEach((inv,i)=>inv.order=i+1);
+
+  // 只對有持倉的標的操作
+  const activeInvs=db.investments.filter(inv=>calcInv(inv).tLots>0);
+  const activeIdx=activeInvs.findIndex(i=>i.id===id);
+  if(activeIdx<0)return;
+  const newActiveIdx=activeIdx+dir;
+  if(newActiveIdx<0||newActiveIdx>=activeInvs.length)return;
+
+  // 找這兩個在 db.investments 的實際 index，並交換 order
+  const aOrder=activeInvs[activeIdx].order;
+  const bOrder=activeInvs[newActiveIdx].order;
+  activeInvs[activeIdx].order=bOrder;
+  activeInvs[newActiveIdx].order=aOrder;
+
+  db.investments.sort((a,b)=>a.order-b.order);
   save();renderInv();
   toast(dir<0?'↑ 上移':'↓ 下移');
 }
