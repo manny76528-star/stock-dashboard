@@ -2213,7 +2213,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1783330199234,
+  "_ts": 1783330202864,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -2297,7 +2297,19 @@
         "00864B": 46.59
       },
       "aiAnalysis": null,
-      "images": []
+      "images": [],
+      "backtest": {
+        "retDate": "2026-07-06",
+        "ret": 0,
+        "stocks": {
+          "00981A": 0,
+          "00988A": 0,
+          "009805": 0,
+          "00981T": 0,
+          "00864B": 0
+        },
+        "note": ""
+      }
     },
     {
       "id": "mr3c1nmyqcp",
