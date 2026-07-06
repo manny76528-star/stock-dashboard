@@ -829,63 +829,6 @@
       "order": 11
     },
     {
-      "id": "mol8jss6p1l",
-      "code": "009805",
-      "name": "新光美國電力基建",
-      "lots": 43,
-      "avgPrice": 16.45,
-      "divPerShare": 0,
-      "note": "質押中",
-      "url": "https://www.wantgoo.com/stock/etf/009805/dividend-policy/ex-dividend",
-      "holdType": "short",
-      "targetRoi": 5,
-      "transactions": [
-        {
-          "id": "mol8jss67vq",
-          "type": "buy",
-          "lots": 43,
-          "price": 16.45,
-          "date": "2026-04-30",
-          "fee": 0,
-          "remark": "昨日賣出是OPENAI下修展望,今META AMZ GOOG財報展望良好 昨天的AI收縮擔憂暫時收緩,因此買回"
-        },
-        {
-          "id": "mp5q5nlmkmy",
-          "type": "buy",
-          "lots": 13,
-          "price": 17.1,
-          "date": "2026-05-12",
-          "fee": 89,
-          "remark": "持續看好AI資本支出跟電力需求，00403溢價5%賣出 一半資金轉移到此",
-          "mood": "💪 自信"
-        },
-        {
-          "id": "mr90uuw5zo4",
-          "type": "sell",
-          "lots": 56,
-          "price": 16.81,
-          "date": "2026-07-06",
-          "fee": 3200,
-          "lotRefs": [
-            {
-              "txnId": "mol8jss67vq",
-              "lots": 43,
-              "date": "2026-04-30"
-            },
-            {
-              "txnId": "mp5q5nlmkmy",
-              "lots": 13,
-              "date": "2026-05-12"
-            }
-          ],
-          "remark": "與AI連動太深,但跟漲幅度又小,加上近期META算力導致盤不穩",
-          "mood": "",
-          "lossReason": ""
-        }
-      ],
-      "order": 12
-    },
-    {
       "id": "mpwgvfo719c",
       "code": "00981T",
       "name": "平衡凱基雙核收息",
@@ -1115,6 +1058,63 @@
           "fee": 371,
           "remark": "009805資金賣出16.83後轉移到這,主要是降低進攻增加防禦",
           "mood": "😌 平靜"
+        }
+      ],
+      "order": 12
+    },
+    {
+      "id": "mol8jss6p1l",
+      "code": "009805",
+      "name": "新光美國電力基建",
+      "lots": 43,
+      "avgPrice": 16.45,
+      "divPerShare": 0,
+      "note": "質押中",
+      "url": "https://www.wantgoo.com/stock/etf/009805/dividend-policy/ex-dividend",
+      "holdType": "short",
+      "targetRoi": 5,
+      "transactions": [
+        {
+          "id": "mol8jss67vq",
+          "type": "buy",
+          "lots": 43,
+          "price": 16.45,
+          "date": "2026-04-30",
+          "fee": 0,
+          "remark": "昨日賣出是OPENAI下修展望,今META AMZ GOOG財報展望良好 昨天的AI收縮擔憂暫時收緩,因此買回"
+        },
+        {
+          "id": "mp5q5nlmkmy",
+          "type": "buy",
+          "lots": 13,
+          "price": 17.1,
+          "date": "2026-05-12",
+          "fee": 89,
+          "remark": "持續看好AI資本支出跟電力需求，00403溢價5%賣出 一半資金轉移到此",
+          "mood": "💪 自信"
+        },
+        {
+          "id": "mr90uuw5zo4",
+          "type": "sell",
+          "lots": 56,
+          "price": 16.81,
+          "date": "2026-07-06",
+          "fee": 3200,
+          "lotRefs": [
+            {
+              "txnId": "mol8jss67vq",
+              "lots": 43,
+              "date": "2026-04-30"
+            },
+            {
+              "txnId": "mp5q5nlmkmy",
+              "lots": 13,
+              "date": "2026-05-12"
+            }
+          ],
+          "remark": "與AI連動太深,但跟漲幅度又小,加上近期META算力導致盤不穩",
+          "mood": "",
+          "lossReason": ""
         }
       ],
       "order": 13
@@ -2246,7 +2246,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1783332151944,
+  "_ts": 1783332154118,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
