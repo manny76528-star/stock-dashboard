@@ -2213,7 +2213,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1783327850293,
+  "_ts": 1783327900126,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -2272,6 +2272,31 @@
     }
   ],
   "journals": [
+    {
+      "id": "mr8zdxiq8j6",
+      "date": "2026-07-06",
+      "tags": [],
+      "market": "",
+      "marketUrl": "",
+      "content": "",
+      "stockTags": [
+        "00981A",
+        "00988A",
+        "009805",
+        "00981T"
+      ],
+      "eventCat": "消息面",
+      "behavior": "停損離場",
+      "indexVal": 46556,
+      "stockPrices": {
+        "00981A": 31.2,
+        "00988A": 20.83,
+        "009805": 16.8,
+        "00981T": 12.39
+      },
+      "aiAnalysis": null,
+      "images": []
+    },
     {
       "id": "mr3c1nmyqcp",
       "date": "2026-07-02",
