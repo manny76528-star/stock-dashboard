@@ -858,6 +858,29 @@
           "fee": 89,
           "remark": "持續看好AI資本支出跟電力需求，00403溢價5%賣出 一半資金轉移到此",
           "mood": "💪 自信"
+        },
+        {
+          "id": "mr90uuw5zo4",
+          "type": "sell",
+          "lots": 56,
+          "price": 16.81,
+          "date": "2026-07-06",
+          "fee": 3200,
+          "lotRefs": [
+            {
+              "txnId": "mol8jss67vq",
+              "lots": 43,
+              "date": "2026-04-30"
+            },
+            {
+              "txnId": "mp5q5nlmkmy",
+              "lots": 13,
+              "date": "2026-05-12"
+            }
+          ],
+          "remark": "與AI連動太深,但跟漲幅度又小,加上近期META算力導致盤不穩",
+          "mood": "",
+          "lossReason": ""
         }
       ],
       "order": 12
@@ -2213,7 +2236,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1783330202864,
+  "_ts": 1783330369488,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
