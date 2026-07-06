@@ -2213,7 +2213,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1783327290527,
+  "_ts": 1783327410460,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -2537,7 +2537,16 @@
       "aiAnalysis": null,
       "images": [
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1781506530190_lqa5.jpg"
-      ]
+      ],
+      "backtest": {
+        "retDate": "2026-07-06",
+        "ret": 2.55,
+        "stocks": {
+          "00981A": -0.86,
+          "00988A": -6.84
+        },
+        "note": ""
+      }
     },
     {
       "id": "mq7we3xct66",
