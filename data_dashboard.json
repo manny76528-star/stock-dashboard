@@ -2213,7 +2213,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1783327410460,
+  "_ts": 1783327417784,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -2616,7 +2616,17 @@
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1780760184414_lpxq.jpg",
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1780998890270_1vwv.jpg",
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1780998890271_prnw.jpg"
-      ]
+      ],
+      "backtest": {
+        "retDate": "2026-07-06",
+        "ret": 3.29,
+        "stocks": {
+          "00981A": 1.27,
+          "00988A": -2.94,
+          "009805": 1.2
+        },
+        "note": ""
+      }
     },
     {
       "id": "mpzbzbe2bto",
