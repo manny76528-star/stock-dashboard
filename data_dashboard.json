@@ -1139,6 +1139,16 @@
           "fee": 20,
           "remark": "",
           "mood": ""
+        },
+        {
+          "id": "mr90w4swolh",
+          "type": "buy",
+          "lots": 75,
+          "price": 12.41,
+          "date": "2026-07-06",
+          "fee": 371,
+          "remark": "009805資金賣出16.83後轉移到這,主要是降低進攻增加防禦",
+          "mood": "😌 平靜"
         }
       ],
       "order": 14
@@ -2236,7 +2246,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1783330369488,
+  "_ts": 1783330428988,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
