@@ -1058,6 +1058,29 @@
           "fee": 203,
           "remark": "將981D資金一半轉移到這,主要是AI競賽目前尚在百公尺比賽 15公尺左右",
           "mood": "🤔 猶豫"
+        },
+        {
+          "id": "mrahhafuov4",
+          "type": "sell",
+          "lots": 24,
+          "price": 20.09,
+          "date": "2026-07-07",
+          "fee": 1638,
+          "lotRefs": [
+            {
+              "txnId": "mo0uor250ti",
+              "lots": 10,
+              "date": "2026-04-16"
+            },
+            {
+              "txnId": "mpv1dgqgpns",
+              "lots": 14,
+              "date": "2026-06-01"
+            }
+          ],
+          "remark": "META販售算力引起的回檔",
+          "mood": "🤔 猶豫",
+          "lossReason": "黑天鵝事件"
         }
       ],
       "order": 12
@@ -2246,7 +2269,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1783418312109,
+  "_ts": 1783418756110,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
