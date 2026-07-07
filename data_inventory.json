@@ -6269,6 +6269,40 @@
       "vendorPaid": false,
       "vendorPaidDate": "",
       "images": []
+    },
+    {
+      "id": "mrahuokvkpv9",
+      "date": "2026-07-07",
+      "custId": "mnmofk0wvucy",
+      "custName": "騰亦資訊",
+      "contact": "Jack歐",
+      "phone": "07-5885038",
+      "note": "CINO A680SR 黑貨",
+      "items": [
+        {
+          "name": "掃描器 CINO A680 USB",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "CINO A680 USB",
+          "qty": 4,
+          "sn": "C5122414",
+          "sns": [
+            "C5122414",
+            "C5122415",
+            "C5122416",
+            "C5122417"
+          ],
+          "cost": 2300,
+          "price": 2351,
+          "invoice": false
+        }
+      ],
+      "paid": false,
+      "paidDate": "2026-07-07",
+      "vendorPaid": false,
+      "vendorPaidDate": "",
+      "images": [],
+      "createdAt": "2026-07-07T10:16:19.951Z"
     }
   ],
   "customers": [
@@ -6590,6 +6624,6 @@
     "bankCode": "013",
     "bankAccount": "061506186489"
   },
-  "_ts": 1782899481893,
+  "_ts": 1783419382964,
   "_vendorPaidBackfilled": true
 }
