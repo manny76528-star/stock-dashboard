@@ -2246,7 +2246,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1783416514809,
+  "_ts": 1783416936926,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -2305,6 +2305,31 @@
     }
   ],
   "journals": [
+    {
+      "id": "mragear2ne6",
+      "date": "2026-07-07",
+      "tags": [
+        "極度恐慌"
+      ],
+      "market": "美國費半出現反彈上漲2% , 但韓股再三星財報後記憶體持續重挫度觸發第六次熔斷\n連帶台股上演開高走低，一度挑戰4萬7千點大關，午盤重挫2.3% OTC更是-4.7%",
+      "marketUrl": "https://money.udn.com/money/story/5599/9612284",
+      "content": "",
+      "stockTags": [
+        "00981A",
+        "00988A",
+        "00981T"
+      ],
+      "eventCat": "",
+      "behavior": "",
+      "indexVal": 45479,
+      "stockPrices": {
+        "00981A": 29.84,
+        "00988A": 19.62,
+        "00981T": 12.32
+      },
+      "aiAnalysis": null,
+      "images": []
+    },
     {
       "id": "mr8zdxiq8j6",
       "date": "2026-07-06",
