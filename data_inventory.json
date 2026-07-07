@@ -6292,7 +6292,7 @@
             "C5122416",
             "C5122417"
           ],
-          "cost": 2300,
+          "cost": 1,
           "price": 2351,
           "invoice": false
         }
@@ -6623,6 +6623,6 @@
     "bankCode": "013",
     "bankAccount": "061506186489"
   },
-  "_ts": 1783419401375,
+  "_ts": 1783419429255,
   "_vendorPaidBackfilled": true
 }
