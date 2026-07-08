@@ -2279,7 +2279,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1783503469428,
+  "_ts": 1783503736824,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -2338,6 +2338,29 @@
     }
   ],
   "journals": [
+    {
+      "id": "mrbw2pzhsfm",
+      "date": "2026-07-08",
+      "tags": [],
+      "market": "韓股從6/20創裡史新高後,遭遇META算力出售 2週跌逾20％落入熊市",
+      "marketUrl": "https://ec.ltn.com.tw/article/breakingnews/5498397",
+      "content": "這一兩週的跌幅主要是發生在AI設備應用,跌的是又深又重\n但回到我以前所說的,股市可以漲到你無法想像,但一定也能跌到你哭爹喊娘\n但驅使股票上漲的永遠就是基本面,如果確定他的需求未滿足且動能還在持續\n那抱住也是一種應對方法,現階段",
+      "stockTags": [
+        "00981A",
+        "00988A",
+        "00981T"
+      ],
+      "eventCat": "技術面",
+      "behavior": "觀望不動",
+      "indexVal": 45734,
+      "stockPrices": {
+        "00981A": 29.75,
+        "00988A": 19.15,
+        "00981T": 12.25
+      },
+      "aiAnalysis": null,
+      "images": []
+    },
     {
       "id": "mragear2ne6",
       "date": "2026-07-07",
