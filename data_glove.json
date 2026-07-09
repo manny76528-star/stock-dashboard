@@ -393,7 +393,33 @@
       ],
       "updatedAt": "2026-07-04T05:28:55.091Z",
       "createdAt": "2026-07-04T05:21:20.890Z"
+    },
+    {
+      "id": "mrdcsh9eewg",
+      "brand": "Amazing  アメイジング",
+      "model": "AG2-7",
+      "position": "二壘",
+      "size": "11.25",
+      "buyDate": "2026-07-06",
+      "buyPrice": 5500,
+      "sellDate": "",
+      "sellPrice": null,
+      "pros": "62000日幣等級\n11.25吋  , 非常喜歡的刀膜\n9成9新  , 皮革等級也很優異",
+      "cons": "",
+      "note": "",
+      "stars": 5,
+      "images": [
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1783592251593_mmaw.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1783592244960_5jj6.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1783592248558_64w5.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1783592255007_e2n6.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1783592258033_mpw7.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1783592261078_samz.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1783592270023_zqip.jpg"
+      ],
+      "updatedAt": "2026-07-09T10:17:57.602Z",
+      "createdAt": "2026-07-09T10:17:57.603Z"
     }
   ],
-  "_ts": 1783592090463
+  "_ts": 1783592280605
 }
