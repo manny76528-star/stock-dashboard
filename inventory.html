@@ -311,7 +311,7 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
         </div>
         <div style="font-size:32px;opacity:.3">💵</div>
       </div>
-      <div style="background:linear-gradient(135deg,#065f46,#16a34a);border-radius:12px;padding:16px 20px;display:flex;justify-content:space-between;align-items:center">
+      <div style="background:linear-gradient(135deg,#9d174d,#ec4899);border-radius:12px;padding:16px 20px;display:flex;justify-content:space-between;align-items:center">
         <div>
           <div style="font-size:11px;color:rgba(255,255,255,.7);font-weight:600;margin-bottom:4px">💰 累積總利潤</div>
           <div style="font-size:24px;font-weight:800;color:#fff;font-family:var(--mono)" id="kpi-total-profit">$0</div>
@@ -396,7 +396,13 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
     <!-- 客戶佔比 + 訂單明細 -->
     <div style="display:grid;grid-template-columns:320px 1fr;gap:16px;align-items:start">
       <div class="chart-wrap">
-        <div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:14px">🥧 各客戶營收佔比</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <div style="font-size:13px;font-weight:700;color:#1e293b">🥧 <span id="pie-title">各客戶營收佔比</span></div>
+          <div style="display:flex;background:#f1f5f9;border-radius:6px;padding:2px;gap:1px">
+            <button id="pie-btn-rev" onclick="setPieMode('revenue')" style="padding:3px 10px;border:none;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;background:#2563eb;color:#fff">營收</button>
+            <button id="pie-btn-profit" onclick="setPieMode('profit')" style="padding:3px 10px;border:none;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;background:transparent;color:#64748b">利潤</button>
+          </div>
+        </div>
         <canvas id="pie-chart" height="220"></canvas>
         <div id="pie-legend" style="margin-top:12px;display:flex;flex-direction:column;gap:5px"></div>
       </div>
@@ -1193,8 +1199,20 @@ function showOrderDetailFromAlert(orderId){
   setTimeout(()=>showOrderDetail(orderId),100);
 }
 
-let _reportMode='month'; // 'month' or 'year'
+let _reportMode='month';
+let _pieMode='revenue'; // 'revenue' or 'profit'
 let _pieChart=null, _trendChart=null;
+
+function setPieMode(mode){
+  _pieMode=mode;
+  const rBtn=document.getElementById('pie-btn-rev');
+  const pBtn=document.getElementById('pie-btn-profit');
+  const title=document.getElementById('pie-title');
+  if(rBtn){rBtn.style.background=mode==='revenue'?'#2563eb':'transparent';rBtn.style.color=mode==='revenue'?'#fff':'#64748b';}
+  if(pBtn){pBtn.style.background=mode==='profit'?'#2563eb':'transparent';pBtn.style.color=mode==='profit'?'#fff':'#64748b';}
+  if(title)title.textContent=mode==='revenue'?'各客戶營收佔比':'各客戶利潤佔比';
+  renderReports();
+}
 
 function setReportMode(mode){
   _reportMode=mode;
@@ -1277,14 +1295,17 @@ function renderReports(){
       }).join('');
   }
 
-  // 圓餅圖（依客戶）
+  // 圓餅圖（依客戶，支援營收/利潤切換）
   const custMap={};
   filteredOrders.forEach(o=>{
     const key=o.custName||'未知';
-    if(!custMap[key])custMap[key]=0;
-    custMap[key]+=calcOrder(o).revenue;
+    if(!custMap[key])custMap[key]={revenue:0,profit:0};
+    const c=calcOrder(o);
+    custMap[key].revenue+=c.revenue;
+    custMap[key].profit+=c.profit;
   });
-  const pieRows=Object.entries(custMap).sort((a,b)=>b[1]-a[1]);
+  const pieRows=Object.entries(custMap).sort((a,b)=>b[1][_pieMode]-a[1][_pieMode]);
+  const pieTotal=pieRows.reduce((s,[,v])=>s+v[_pieMode],0);
   const pieCanvas=document.getElementById('pie-chart');
   if(pieCanvas){
     if(_pieChart)_pieChart.destroy();
@@ -1292,7 +1313,7 @@ function renderReports(){
       const colors=['#2563eb','#16a34a','#dc2626','#f59e0b','#8b5cf6','#0891b2','#db2777','#059669'];
       _pieChart=new Chart(pieCanvas,{
         type:'doughnut',
-        data:{labels:pieRows.map(r=>r[0]),datasets:[{data:pieRows.map(r=>r[1]),backgroundColor:colors.slice(0,pieRows.length),borderWidth:2,borderColor:'#fff'}]},
+        data:{labels:pieRows.map(r=>r[0]),datasets:[{data:pieRows.map(r=>r[1][_pieMode]),backgroundColor:colors.slice(0,pieRows.length),borderWidth:2,borderColor:'#fff'}]},
         options:{plugins:{legend:{display:false}},cutout:'60%'}
       });
       const leg=document.getElementById('pie-legend');
@@ -1300,9 +1321,12 @@ function renderReports(){
         <div style="display:flex;align-items:center;gap:8px;font-size:12px">
           <span style="width:10px;height:10px;border-radius:50%;background:${colors[i]};flex-shrink:0"></span>
           <span style="flex:1">${name}</span>
-          <span style="font-weight:700;font-family:var(--mono)">${fmt(val)}</span>
-          <span style="color:#94a3b8">${rev>0?Math.round(val/rev*100)+'%':'—'}</span>
+          <span style="font-weight:700;font-family:var(--mono)">${fmt(val[_pieMode])}</span>
+          <span style="color:#94a3b8">${pieTotal>0?Math.round(val[_pieMode]/pieTotal*100)+'%':'—'}</span>
         </div>`).join('');
+    } else {
+      const leg=document.getElementById('pie-legend');
+      if(leg)leg.innerHTML='<div style="color:#94a3b8;font-size:12px;text-align:center;padding:20px">此期間尚無資料</div>';
     }
   }
 
