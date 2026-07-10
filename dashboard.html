@@ -3433,6 +3433,7 @@ function calcInv(inv){
       realized+=rev-cost;
     }
   });
+  if(!db.prices)db.prices={};
   const cp=db.prices[inv.code];
   const curPrice=cp?cp.price:null;
   const mktVal=curPrice?tLots*1000*curPrice:null;
@@ -5850,6 +5851,7 @@ setInterval(async()=>{
   if(!_syncEnabled)return;
   const updated=await ghPull();
   if(updated){render();runDailyProcess(false);showSyncStatus('☁️ 已從雲端同步');}
+  autoSnapshot(); // 週五15:00後自動拍照
 },5*60*1000);
 
 // 頁面重新顯示時（從背景切回來）強制 Pull
