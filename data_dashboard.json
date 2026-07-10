@@ -1426,14 +1426,6 @@
       "amount": 8000
     },
     {
-      "id": "mnedi6s413l",
-      "code": "00981D",
-      "date": "2025-12-16",
-      "lots": 100,
-      "perShare": 0.08,
-      "amount": 8000
-    },
-    {
       "id": "mnhiz4ky761",
       "code": "00985B",
       "exDate": "2026-03-12",
@@ -2310,7 +2302,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1783702398410,
+  "_ts": 1783702468204,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
