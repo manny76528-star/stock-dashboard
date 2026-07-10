@@ -2310,7 +2310,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1783702362909,
+  "_ts": 1783702366913,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -3637,7 +3637,7 @@
     "aSave": 25000,
     "aSaveChk": false,
     "bNow": 97000,
-    "bMonthly": 16000,
+    "bMonthly": 20000,
     "bMonthly2": 16000,
     "bRate": 5,
     "cNow": 617000,
