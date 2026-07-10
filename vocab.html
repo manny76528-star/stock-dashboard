@@ -729,7 +729,7 @@ function processRows(rows){
   saveDB();updateStats();renderVocabPreview();
   toast(`✅ 新增 ${added} 個・跳過重複 ${skipped} 個`);
   switchTab('match');
-  buildRound();
+  renderBrowsePage();
 }
 
 function renderVocabPreview(){
@@ -748,7 +748,7 @@ function clearAllVocab(){
     msg:'確定要刪除全部單字庫嗎？\n所有單字、學習記錄、錯誤統計都會一併清除，且無法恢復！',
     btnText:'確定清除',
     btnClass:'btn-danger',
-    onOk:()=>{db.vocab=[];db.errors={};db.todayDone=[];saveDB();updateStats();renderVocabPreview();buildRound();toast('已清除所有單字');}
+    onOk:()=>{db.vocab=[];db.errors={};db.todayDone=[];saveDB();updateStats();renderVocabPreview();renderBrowsePage();toast('已清除所有單字');}
   });
 }
 function clearAllProgress(){
@@ -758,7 +758,7 @@ function clearAllProgress(){
     msg:'確定清除所有學習記錄（含今日進度與錯誤次數）？\n單字庫不會受影響。',
     btnText:'清除記錄',
     btnClass:'btn-warn',
-    onOk:()=>{db.errors={};db.todayDone=[];db.streak=0;saveDB();updateStats();buildRound();toast('已清除學習記錄');}
+    onOk:()=>{db.errors={};db.todayDone=[];db.streak=0;saveDB();updateStats();renderBrowsePage();toast('已清除學習記錄');}
   });
 }
 function resetTodayProgress(){
@@ -768,7 +768,7 @@ function resetTodayProgress(){
     msg:'確定要重置練習進度嗎？\n\n已完成的累積進度會清空，從頭開始練習。\n但錯誤統計和單字庫不受影響。\n\n⚠️ 還沒全部完成的話建議不要重置！',
     btnText:'確定重置',
     btnClass:'btn-warn',
-    onOk:()=>{db.todayDone=[];saveDB();updateStats();currentRound=1;buildRound();toast('進度已重置');}
+    onOk:()=>{db.todayDone=[];saveDB();updateStats();currentRound=1;renderBrowsePage();toast('進度已重置');}
   });
 }
 
@@ -1060,7 +1060,7 @@ async function manualSync(){
   showSyncStatus('🔄 同步中...');
   _ghSha='';
   const updated=await ghPull();
-  if(updated){updateStats();buildRound();renderVocabPreview();}
+  if(updated){updateStats();renderBrowsePage();renderVocabPreview();}
   await ghPush();
   showSyncStatus('✅ 同步完成');
 }
@@ -1092,7 +1092,7 @@ document.addEventListener('visibilitychange',async function(){
           if(Object.keys(db.errors||{}).length>Object.keys(remote.errors||{}).length)remote.errors=db.errors;
           db=remote;
           localStorage.setItem(DB_KEY,JSON.stringify(db));
-          updateStats();buildRound();renderVocabPreview();
+          updateStats();renderBrowsePage();renderVocabPreview();
           showSyncStatus('☁️ 已從雲端同步');
         }
       }
@@ -1105,7 +1105,7 @@ document.addEventListener('visibilitychange',async function(){
 setInterval(async()=>{
   if(!_syncEnabled)return;
   const updated=await ghPull();
-  if(updated){updateStats();buildRound();renderVocabPreview();showSyncStatus('☁️ 已從雲端同步');}
+  if(updated){updateStats();renderBrowsePage();renderVocabPreview();showSyncStatus('☁️ 已從雲端同步');}
 },5*60*1000);
 
 // ══════════════════════════════════════
