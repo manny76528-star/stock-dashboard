@@ -2310,7 +2310,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1783678547216,
+  "_ts": 1783678590755,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -2369,6 +2369,21 @@
     }
   ],
   "journals": [
+    {
+      "id": "mres6g52ug5",
+      "date": "2026-07-10",
+      "tags": [],
+      "market": "美銀上調三大 CSP 資本支出預測 示警資料中心建置成本升高",
+      "marketUrl": "https://money.udn.com/money/story/123398/9614709?utm_source=ednlinemobile&utm_medium=share",
+      "content": "",
+      "stockTags": [],
+      "eventCat": "",
+      "behavior": "",
+      "indexVal": 45355,
+      "stockPrices": null,
+      "aiAnalysis": null,
+      "images": []
+    },
     {
       "id": "mrbw2pzhsfm",
       "date": "2026-07-08",
