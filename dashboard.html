@@ -4955,7 +4955,7 @@ function saveDiv(){
   if(!lots||lots<=0)return toast('請輸入張數');if(!ps||ps<=0)return toast('請輸入每股配息');
   const exDate=document.getElementById('d-exdate')?.value||'';
   const today=new Date().toISOString().split('T')[0];
-  const isPending=exDate&&date&&date>today; // 發放日在未來 = 準備入帳
+  const isPending=date>today; // 發放日在未來 = 待入帳
   db.dividends.push({id:uid(),code,exDate,date,lots,perShare:ps,amount:lots*1000*ps,pending:isPending});
   save();closeModal('divModal');renderDivs();toast(`領息 $${Math.round(lots*1000*ps).toLocaleString()} 已記錄`);
 }
