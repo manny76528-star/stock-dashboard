@@ -29,23 +29,55 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
 .hdr-btn.primary{background:#2563eb;border-color:#2563eb;}
 .hdr-btn.primary:hover{background:#1d4ed8;}
 
-/* ── Nav Tabs ── */
-.nav{background:#fff;border-bottom:1px solid var(--border);padding:0 20px;display:flex;gap:0;overflow-x:auto;}
-.nav-tab{padding:14px 20px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;transition:all .15s;}
-.nav-tab:hover{color:#1e293b;}
-.nav-tab.active{color:var(--accent2);border-bottom-color:var(--accent2);}
+/* ── Sidebar Layout ── */
+.app-layout{display:flex;min-height:calc(100vh - 56px);}
+.sidebar{width:200px;flex-shrink:0;background:#fff;border-right:1px solid var(--border);padding:16px 0;position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto;}
+.sidebar-item{display:flex;align-items:center;gap:10px;padding:11px 20px;font-size:13px;font-weight:600;color:#475569;cursor:pointer;transition:all .15s;border-left:3px solid transparent;}
+.sidebar-item:hover{background:#f8fafc;color:#1e293b;}
+.sidebar-item.active{background:#eff6ff;color:#2563eb;border-left-color:#2563eb;}
+.sidebar-section{font-size:10px;font-weight:700;color:#94a3b8;padding:12px 20px 4px;letter-spacing:.5px;text-transform:uppercase;}
 
-/* ── Main ── */
-.main{max-width:1100px;margin:0 auto;padding:24px 16px;}
+/* ── Main Content ── */
+.main{flex:1;padding:24px;overflow-x:auto;min-width:0;}
 
-/* ── Cards ── */
-.stat-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px;}
-.stat-card{background:#fff;border-radius:14px;padding:16px 18px;box-shadow:var(--card-shadow);border:1px solid var(--border);}
-.stat-label{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.3px;margin-bottom:6px;}
-.stat-val{font-size:22px;font-weight:800;font-family:var(--mono);color:#1e293b;}
-.stat-val.gain{color:var(--gain);}
-.stat-val.loss{color:var(--loss);}
-.stat-val.blue{color:var(--accent2);}
+/* ── Page Header ── */
+.page-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.page-title{font-size:20px;font-weight:800;color:#1e293b;}
+.page-actions{display:flex;gap:8px;}
+
+/* ── New Stat Cards ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px;}
+.kpi-card{background:#fff;border-radius:14px;padding:20px;box-shadow:var(--card-shadow);border:1px solid var(--border);display:flex;align-items:center;gap:16px;}
+.kpi-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.kpi-icon.blue{background:#dbeafe;}
+.kpi-icon.green{background:#dcfce7;}
+.kpi-icon.orange{background:#fef3c7;}
+.kpi-icon.red{background:#fee2e2;}
+.kpi-info{flex:1;min-width:0;}
+.kpi-label{font-size:11px;color:#94a3b8;font-weight:600;margin-bottom:4px;}
+.kpi-val{font-size:22px;font-weight:800;font-family:var(--mono);color:#1e293b;white-space:nowrap;}
+.kpi-sub{font-size:11px;margin-top:2px;}
+.kpi-sub.up{color:#dc2626;}
+.kpi-sub.down{color:#16a34a;}
+
+/* ── Customer Month Table ── */
+.cust-month-table{width:100%;border-collapse:collapse;font-size:13px;}
+.cust-month-table th{background:#f8fafc;padding:10px 14px;text-align:left;font-weight:700;color:#475569;font-size:11px;border-bottom:2px solid var(--border);}
+.cust-month-table td{padding:10px 14px;border-bottom:1px solid #f1f5f9;color:#1e293b;}
+.cust-month-table tr:hover td{background:#f8fafc;}
+
+/* ── Alert Cards ── */
+.alert-list{display:flex;flex-direction:column;gap:6px;}
+.alert-item{display:flex;align-items:center;gap:10px;padding:8px 12px;background:#fff;border-radius:8px;border:1px solid var(--border);font-size:12px;}
+.alert-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.alert-dot.red{background:#dc2626;}
+.alert-dot.orange{background:#f59e0b;}
+
+/* ── Month Report ── */
+.month-sel{display:flex;align-items:center;gap:8px;margin-bottom:20px;}
+.chart-wrap{background:#fff;border-radius:12px;padding:20px;border:1px solid var(--border);margin-bottom:16px;}
+.pie-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+
 
 /* ── Section ── */
 .sec{background:#fff;border-radius:14px;box-shadow:var(--card-shadow);border:1px solid var(--border);margin-bottom:20px;overflow:hidden;}
@@ -130,6 +162,7 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
 }
 #main-content{display:none;}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 </head>
 <body>
 
@@ -205,54 +238,170 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
   </div>
 </div>
 
-<!-- Nav Tabs -->
-<div class="nav">
-  <div class="nav-tab active" onclick="showTab('overview')">📊 業績總覽</div>
-  <div class="nav-tab" onclick="showTab('orders')">📋 訂單記錄</div>
-  <div class="nav-tab" onclick="showTab('customers')">👥 客戶管理</div>
-  <div class="nav-tab" onclick="showTab('receivable')">💰 應收帳款</div>
-  <div class="nav-tab" onclick="showTab('warranty')">🔍 序號查詢</div>
-  <div class="nav-tab" onclick="showTab('products')">📦 商品管理</div>
+<!-- Sidebar + Main Layout -->
+<div class="app-layout">
+
+<!-- Sidebar -->
+<div class="sidebar">
+  <div class="sidebar-section">主要功能</div>
+  <div class="sidebar-item active" onclick="showTab('overview')" id="nav-overview">📊 總覽</div>
+  <div class="sidebar-item" onclick="showTab('orders')" id="nav-orders">📋 訂單記錄</div>
+  <div class="sidebar-item" onclick="showTab('monthly')" id="nav-monthly">📈 月報表</div>
+  <div class="sidebar-section">管理</div>
+  <div class="sidebar-item" onclick="showTab('customers')" id="nav-customers">👥 客戶管理</div>
+  <div class="sidebar-item" onclick="showTab('receivable')" id="nav-receivable">💰 應收帳款</div>
+  <div class="sidebar-item" onclick="showTab('products')" id="nav-products">📦 商品管理</div>
+  <div class="sidebar-item" onclick="showTab('warranty')" id="nav-warranty">🔍 序號查詢</div>
 </div>
 
 <div class="main">
 
-  <!-- ══ 業績總覽 ══ -->
+  <!-- ══ 總覽 ══ -->
   <div id="tab-overview">
-    <div class="stat-strip">
-      <div class="stat-card"><div class="stat-label">📦 總訂單數</div><div class="stat-val blue" id="st-orders">0</div></div>
-      <div class="stat-card"><div class="stat-label">💵 總營收</div><div class="stat-val" id="st-revenue">$0</div></div>
-      <div class="stat-card"><div class="stat-label">💰 總利潤</div><div class="stat-val gain" id="st-profit">$0</div></div>
-      <div class="stat-card"><div class="stat-label">📬 未收款</div><div class="stat-val loss" id="st-unpaid">$0</div></div>
+    <div class="page-hdr">
+      <div class="page-title">📊 總覽</div>
+      <div class="page-actions">
+        <span id="ov-month-label" style="font-size:13px;color:#64748b;font-weight:600"></span>
+        <button class="hdr-btn primary" onclick="openOrderModal()">＋ 新增訂單</button>
+      </div>
     </div>
 
-    <div class="sec">
-      <div class="sec-hdr">
-        <span class="sec-title">📅 月度業績</span>
-        <div class="filter-bar">
-          <button class="filter-btn" onclick="setPeriod('year',this)">近一年</button>
-          <button class="filter-btn active" onclick="setPeriod('all',this)">全部</button>
-          <select id="year-select" style="margin-left:8px;padding:5px 10px;border:1.5px solid var(--border);border-radius:20px;font-size:12px;font-weight:600;color:#475569;background:#fff;cursor:pointer;outline:none" onchange="setPeriodYear(this.value)">
-            <option value="">選擇年份...</option>
-          </select>
+    <!-- KPI 卡片 -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-icon blue">💵</div>
+        <div class="kpi-info">
+          <div class="kpi-label">本月總營收</div>
+          <div class="kpi-val" id="kpi-revenue">$0</div>
+          <div class="kpi-sub" id="kpi-revenue-sub"></div>
         </div>
       </div>
-      <div class="sec-body">
-        <table class="tbl" id="monthly-tbl">
-          <thead><tr><th>月份</th><th>訂單數</th><th>營收</th><th>利潤</th><th>利潤率</th><th>未收款</th></tr></thead>
-          <tbody id="monthly-body"></tbody>
-        </table>
+      <div class="kpi-card">
+        <div class="kpi-icon green">💰</div>
+        <div class="kpi-info">
+          <div class="kpi-label">本月總利潤</div>
+          <div class="kpi-val" id="kpi-profit">$0</div>
+          <div class="kpi-sub" id="kpi-profit-sub"></div>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon orange">📬</div>
+        <div class="kpi-info">
+          <div class="kpi-label">未收款金額</div>
+          <div class="kpi-val" id="kpi-unpaid">$0</div>
+          <div class="kpi-sub" id="kpi-unpaid-sub" style="color:#f59e0b"></div>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon red">📦</div>
+        <div class="kpi-info">
+          <div class="kpi-label">本月訂單數</div>
+          <div class="kpi-val" id="kpi-orders">0</div>
+          <div class="kpi-sub" id="kpi-orders-sub"></div>
+        </div>
       </div>
     </div>
 
-    <div class="sec">
-      <div class="sec-hdr"><span class="sec-title">🏆 客戶利潤排行</span></div>
-      <div class="sec-body">
-        <table class="tbl">
-          <thead><tr><th>客戶名稱</th><th>訂單數</th><th>累積利潤</th><th>最後往來</th></tr></thead>
-          <tbody id="cust-rank-body"></tbody>
-        </table>
+    <!-- 本月客戶營收表 + 系統提醒 -->
+    <div style="display:grid;grid-template-columns:1fr 340px;gap:16px;align-items:start">
+
+      <!-- 本月客戶表 -->
+      <div class="sec">
+        <div class="sec-hdr">
+          <span class="sec-title" id="cust-month-title">本月客戶營收分潤</span>
+        </div>
+        <div class="sec-body" style="padding:0;overflow-x:auto">
+          <table class="cust-month-table" id="cust-month-tbl">
+            <thead>
+              <tr>
+                <th>客戶名稱</th>
+                <th>總營收</th>
+                <th>總利潤</th>
+                <th>已收款</th>
+                <th>已開發票</th>
+                <th>最後更新</th>
+              </tr>
+            </thead>
+            <tbody id="cust-month-body"></tbody>
+          </table>
+        </div>
       </div>
+
+      <!-- 右側：系統提醒 -->
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="sec">
+          <div class="sec-hdr"><span class="sec-title">⚠️ 系統提醒</span></div>
+          <div class="sec-body">
+            <div class="alert-list" id="alert-list">
+              <div style="color:#94a3b8;font-size:12px;text-align:center;padding:8px">無待處理項目</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 快速統計 -->
+        <div class="sec">
+          <div class="sec-hdr"><span class="sec-title">📈 本月利潤率</span></div>
+          <div class="sec-body" style="text-align:center">
+            <div style="font-size:40px;font-weight:800;font-family:var(--mono);color:#2563eb" id="kpi-margin">—</div>
+            <div style="font-size:12px;color:#94a3b8;margin-top:4px">利潤 / 營收</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 月報表 ══ -->
+  <div id="tab-monthly" style="display:none">
+    <div class="page-hdr">
+      <div class="page-title">📈 月報表</div>
+      <div class="page-actions">
+        <select id="monthly-year-sel" onchange="renderMonthly()" style="padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-weight:600;color:#475569;background:#fff;cursor:pointer;outline:none"></select>
+        <select id="monthly-month-sel" onchange="renderMonthly()" style="padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-weight:600;color:#475569;background:#fff;cursor:pointer;outline:none"></select>
+      </div>
+    </div>
+
+    <!-- 本月KPI -->
+    <div class="kpi-grid" id="monthly-kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-icon blue">💵</div>
+        <div class="kpi-info"><div class="kpi-label">本月營收</div><div class="kpi-val" id="m-revenue">$0</div></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon green">💰</div>
+        <div class="kpi-info"><div class="kpi-label">本月利潤</div><div class="kpi-val" id="m-profit">$0</div></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon orange">📊</div>
+        <div class="kpi-info"><div class="kpi-label">利潤率</div><div class="kpi-val" id="m-margin">—</div></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon red">📦</div>
+        <div class="kpi-info"><div class="kpi-label">訂單數</div><div class="kpi-val" id="m-orders">0</div></div>
+      </div>
+    </div>
+
+    <!-- 客戶佔比 + 明細 -->
+    <div style="display:grid;grid-template-columns:320px 1fr;gap:16px;align-items:start">
+      <div class="chart-wrap">
+        <div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:14px">🥧 各客戶營收佔比</div>
+        <canvas id="pie-chart" height="220"></canvas>
+        <div id="pie-legend" style="margin-top:12px;display:flex;flex-direction:column;gap:5px"></div>
+      </div>
+      <div class="sec">
+        <div class="sec-hdr"><span class="sec-title">📋 本月客戶明細</span></div>
+        <div class="sec-body" style="padding:0;overflow-x:auto">
+          <table class="cust-month-table" id="monthly-cust-tbl">
+            <thead><tr><th>客戶名稱</th><th>訂單數</th><th>營收</th><th>利潤</th><th>利潤率</th><th>未收款</th></tr></thead>
+            <tbody id="monthly-cust-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 月度趨勢圖 -->
+    <div class="chart-wrap" style="margin-top:16px">
+      <div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:14px">📈 近12個月趨勢</div>
+      <canvas id="trend-chart" height="120"></canvas>
     </div>
   </div>
 
@@ -352,6 +501,8 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
   </div>
 
 </div><!-- /main -->
+
+</div><!-- /app-layout -->
 
 </div><!-- /main-content -->
 
@@ -828,13 +979,16 @@ function closeModal(id){document.getElementById(id).classList.remove('open');}
 
 // ── Tab ──
 function showTab(t){
-  ['overview','orders','customers','receivable','warranty','products'].forEach(id=>{
-    document.getElementById('tab-'+id).style.display=id===t?'':'none';
+  ['overview','monthly','orders','customers','receivable','warranty','products'].forEach(id=>{
+    const el=document.getElementById('tab-'+id);
+    if(el)el.style.display=id===t?'':'none';
   });
-  document.querySelectorAll('.nav-tab').forEach((el,i)=>{
-    el.classList.toggle('active',['overview','orders','customers','receivable','warranty'][i]===t);
+  document.querySelectorAll('.sidebar-item').forEach(el=>{
+    const nav=el.id?.replace('nav-','');
+    el.classList.toggle('active',nav===t);
   });
   if(t==='overview')renderOverview();
+  if(t==='monthly'){initMonthlySelectors();renderMonthly();}
   if(t==='orders')renderOrders();
   if(t==='customers')renderCustomers();
   if(t==='receivable')renderReceivable();
@@ -927,97 +1081,200 @@ function setPeriodYear(yr){
 }
 function renderOverview(){
   const now=new Date();
-  const oneYearAgo=new Date(now.getFullYear()-1,now.getMonth(),now.getDate()).toISOString().split('T')[0];
-  // 動態產生年份按鈕（依實際訂單年份）
-  const allYears=[...new Set(db.orders.map(o=>o.date?.slice(0,4)).filter(Boolean))].sort().reverse();
-  const yearBtns=document.getElementById('year-btns');
-  const yearSel=document.getElementById('year-select');
-  if(yearSel){
-    const curVal=yearSel.value;
-    yearSel.innerHTML='<option value="">選擇年份...</option>'
-      +allYears.map(yr=>'<option value="'+yr+'"'+(overviewYear===yr?' selected':'')+'>'+yr+'</option>').join('');
-    if(overviewYear)yearSel.value=overviewYear;
-  }
+  const ym=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  const monthLabel=now.getFullYear()+'年'+( now.getMonth()+1)+'月';
+  const ovLabel=document.getElementById('ov-month-label');
+  if(ovLabel)ovLabel.textContent=monthLabel;
+  const custMonthTitle=document.getElementById('cust-month-title');
+  if(custMonthTitle)custMonthTitle.textContent=monthLabel+' 客戶營收分潤';
 
-  // 依選擇過濾訂單
-  let orders;
-  if(overviewPeriod==='year') orders=db.orders.filter(o=>o.date>=oneYearAgo);
-  else if(overviewPeriod==='year-pick') orders=db.orders.filter(o=>o.date&&o.date.startsWith(overviewYear));
-  else orders=db.orders;
+  // 本月訂單
+  const thisMonthOrders=db.orders.filter(o=>o.date&&o.date.startsWith(ym));
+  const lastYm=now.getMonth()===0
+    ?(now.getFullYear()-1)+'-12'
+    :now.getFullYear()+'-'+String(now.getMonth()).padStart(2,'0');
+  const lastMonthOrders=db.orders.filter(o=>o.date&&o.date.startsWith(lastYm));
 
-  let totRev=0,totProfit=0,totUnpaid=0;
-  orders.forEach(o=>{const c=calcOrder(o);totRev+=c.revenue;totProfit+=c.profit;if(!o.paid)totUnpaid+=c.revenue;});
-  document.getElementById('st-orders').textContent=orders.length;
-  document.getElementById('st-revenue').textContent=fmt(totRev);
-  document.getElementById('st-profit').textContent=fmt(totProfit);
-  document.getElementById('st-unpaid').textContent=fmt(totUnpaid);
+  let rev=0,profit=0;
+  thisMonthOrders.forEach(o=>{const c=calcOrder(o);rev+=c.revenue;profit+=c.profit;});
+  let lastRev=0,lastProfit=0;
+  lastMonthOrders.forEach(o=>{const c=calcOrder(o);lastRev+=c.revenue;lastProfit+=c.profit;});
+  const unpaidOrders=db.orders.filter(o=>!o.paid);
+  let unpaid=0;
+  unpaidOrders.forEach(o=>{const c=calcOrder(o);unpaid+=c.revenue;});
 
-  // Monthly breakdown
-  const monthly={};
-  orders.forEach(o=>{
-    if(!o.date)return;
-    const ym=o.date.slice(0,7);
-    if(!monthly[ym])monthly[ym]={orders:0,revenue:0,profit:0,unpaid:0};
-    const c=calcOrder(o);
-    monthly[ym].orders++;monthly[ym].revenue+=c.revenue;monthly[ym].profit+=c.profit;
-    if(!o.paid)monthly[ym].unpaid+=c.revenue;
-  });
-  const mons=Object.keys(monthly).sort().reverse();
-  const mb=document.getElementById('monthly-body');
-  mb.innerHTML=mons.length===0?'<tr><td colspan="6" class="empty">尚無資料</td></tr>':
-    mons.map(ym=>{
-      const m=monthly[ym];const rate=m.revenue?Math.round(m.profit/m.revenue*100):0;
-      return'<tr class="month-row" data-ym="'+ym+'" style="cursor:pointer">'
-        +'<td>'+ym+'</td>'
-        +'<td><span style="color:var(--accent2);font-weight:700">'+m.orders+'</span>'
-        +' <span class="md-arrow-'+ym+'" style="font-size:10px;color:#94a3b8">▼</span></td>'
-        +'<td class="mono">'+fmt(m.revenue)+'</td>'
-        +'<td class="mono gain">'+fmt(m.profit)+'</td>'
-        +'<td><span class="badge badge-blue">'+rate+'%</span></td>'
-        +'<td class="mono loss">'+(m.unpaid>0?fmt(m.unpaid):'—')+'</td>'
-        +'</tr>';
-    }).join('');
-  // 注意：詳細列另外用 JS 動態插入，不寫在 innerHTML 裡
-  // 觸發後由 toggleMonthDetail 按需建立
+  // KPI 卡片
+  const setKpi=(id,val,subId,subVal,isUp)=>{
+    const el=document.getElementById(id);if(el)el.textContent=val;
+    const sub=document.getElementById(subId);
+    if(sub&&subVal!==null){sub.textContent=subVal;sub.className='kpi-sub '+(isUp?'up':'down');}
+  };
+  const pctChg=(a,b)=>b>0?((a-b)/b*100).toFixed(1)+'%':'—';
+  const upDown=(a,b)=>a>=b?'↑ ':'↓ ';
+  setKpi('kpi-revenue',fmt(rev),'kpi-revenue-sub',upDown(rev,lastRev)+pctChg(rev,lastRev)+'（較上月）',rev>=lastRev);
+  setKpi('kpi-profit',fmt(profit),'kpi-profit-sub',upDown(profit,lastProfit)+pctChg(profit,lastProfit)+'（較上月）',profit>=lastProfit);
+  const unpaidEl=document.getElementById('kpi-unpaid');if(unpaidEl)unpaidEl.textContent=fmt(unpaid);
+  const unpaidSub=document.getElementById('kpi-unpaid-sub');if(unpaidSub)unpaidSub.textContent=unpaidOrders.length+'張未收款訂單';
+  const ordEl=document.getElementById('kpi-orders');if(ordEl)ordEl.textContent=thisMonthOrders.length;
+  const ordSub=document.getElementById('kpi-orders-sub');if(ordSub){ordSub.textContent='上月 '+lastMonthOrders.length+' 張';ordSub.className='kpi-sub'+(thisMonthOrders.length>=lastMonthOrders.length?' up':' down');}
+  const marginEl=document.getElementById('kpi-margin');if(marginEl)marginEl.textContent=rev>0?Math.round(profit/rev*100)+'%':'—';
 
-  // 月度業績 click delegation
-  const mb2=document.getElementById('monthly-body');
-  if(mb2){
-    mb2.onclick=function(e){
-      const tr=e.target.closest('.month-row');
-      if(tr)toggleMonthDetail(tr.dataset.ym);
-    };
-  }
-
-  // Customer rank
-  // 客戶排行（用全部訂單）
+  // 本月客戶表
   const custMap={};
-  db.orders.forEach(o=>{
+  thisMonthOrders.forEach(o=>{
     const key=o.custId||o.custName||'未知';
     const name=o.custName||'未知';
-    if(!custMap[key])custMap[key]={name,cnt:0,profit:0,revenue:0,last:'',custId:o.custId};
+    if(!custMap[key])custMap[key]={name,revenue:0,profit:0,paid:true,invoice:true,last:''};
     const c=calcOrder(o);
-    custMap[key].cnt++;custMap[key].profit+=c.profit;custMap[key].revenue+=c.revenue+c.tax;
+    custMap[key].revenue+=c.revenue;custMap[key].profit+=c.profit;
+    if(!o.paid)custMap[key].paid=false;
+    if(!(o.items||[]).some(it=>it.invoice))custMap[key].invoice=false;
     if(!custMap[key].last||o.date>custMap[key].last)custMap[key].last=o.date;
   });
-  const nowStr=new Date().toISOString().split('T')[0];
-  const ranked=Object.entries(custMap).sort((a,b)=>b[1].profit-a[1].profit);
-  const rankHdr=document.querySelector('#tab-overview .sec-hdr:last-of-type');
-  document.getElementById('cust-rank-body').closest('table').querySelector('thead tr').innerHTML=
-    '<th>客戶名稱</th><th>訂單數</th><th>累積利潤</th><th>最後往來</th><th>距今</th>';
-  document.getElementById('cust-rank-body').innerHTML=ranked.length===0?'<tr><td colspan="5" class="empty">尚無資料</td></tr>':
-    ranked.map(([key,d])=>{
-      const daysSince=d.last?Math.floor((new Date(nowStr)-new Date(d.last))/86400000):null;
-      const daysColor=daysSince===null?'#94a3b8':daysSince>365?'#dc2626':daysSince>180?'#d97706':'#16a34a';
-      const daysStr=daysSince===null?'—':daysSince===0?'今天':daysSince+'天前';
-      return`<tr style="cursor:pointer" onclick="showCustDetail('${key}')">
+  const custBody=document.getElementById('cust-month-body');
+  if(custBody){
+    const rows=Object.values(custMap).sort((a,b)=>b.revenue-a.revenue);
+    custBody.innerHTML=rows.length===0?'<tr><td colspan="6" class="empty" style="padding:20px;text-align:center;color:#94a3b8">本月尚無訂單</td></tr>':
+      rows.map(d=>`<tr>
         <td><b>${d.name}</b></td>
-        <td>${d.cnt}</td>
+        <td class="mono">${fmt(d.revenue)}</td>
         <td class="mono gain">${fmt(d.profit)}</td>
+        <td style="text-align:center">${d.paid?'<span style="color:#16a34a;font-weight:700">✓</span>':'<span style="color:#dc2626;font-weight:700">✗</span>'}</td>
+        <td style="text-align:center">${d.invoice?'<span style="color:#16a34a;font-weight:700">✓</span>':'<span style="color:#94a3b8">—</span>'}</td>
         <td class="muted">${fmtDate(d.last)}</td>
-        <td><span style="color:${daysColor};font-weight:600;font-size:12px">${daysStr}</span></td>
-      </tr>`;
-    }).join('');
+      </tr>`).join('');
+  }
+
+  // 系統提醒
+  const alerts=[];
+  db.orders.filter(o=>!o.paid).forEach(o=>{
+    const days=o.date?Math.floor((new Date()-new Date(o.date))/86400000):0;
+    if(days>30)alerts.push({type:'red',msg:`${o.custName||'—'} 已逾期 ${days} 天未收款`,date:o.date});
+    else alerts.push({type:'orange',msg:`${o.custName||'—'} 尚未收款`,date:o.date});
+  });
+  db.orders.filter(o=>!(o.items||[]).some(it=>it.invoice)&&!o.paid).forEach(o=>{
+    alerts.push({type:'orange',msg:`${o.custName||'—'} 尚未開發票`,date:o.date});
+  });
+  const alertList=document.getElementById('alert-list');
+  if(alertList){
+    alertList.innerHTML=alerts.length===0
+      ?'<div style="color:#94a3b8;font-size:12px;text-align:center;padding:8px">🎉 無待處理項目</div>'
+      :alerts.slice(0,8).map(a=>`<div class="alert-item">
+        <div class="alert-dot ${a.type}"></div>
+        <div style="flex:1;font-size:12px">${a.msg}</div>
+        <div style="font-size:10px;color:#94a3b8">${fmtDate(a.date)}</div>
+      </div>`).join('');
+  }
+}
+
+// ── 月報表 ──
+let _pieChart=null, _trendChart=null;
+
+function initMonthlySelectors(){
+  const yrSel=document.getElementById('monthly-year-sel');
+  const moSel=document.getElementById('monthly-month-sel');
+  if(!yrSel||!moSel)return;
+  const now=new Date();
+  const years=[...new Set(db.orders.map(o=>o.date?.slice(0,4)).filter(Boolean))].sort().reverse();
+  if(years.indexOf(String(now.getFullYear()))<0)years.unshift(String(now.getFullYear()));
+  const curYr=yrSel.value||String(now.getFullYear());
+  yrSel.innerHTML=years.map(y=>`<option value="${y}" ${y===curYr?'selected':''}>${y}年</option>`).join('');
+  const curMo=moSel.value||String(now.getMonth()+1).padStart(2,'0');
+  moSel.innerHTML=Array.from({length:12},(_,i)=>{const m=String(i+1).padStart(2,'0');return`<option value="${m}" ${m===curMo?'selected':''}>${i+1}月</option>`}).join('');
+}
+
+function renderMonthly(){
+  const yrSel=document.getElementById('monthly-year-sel');
+  const moSel=document.getElementById('monthly-month-sel');
+  if(!yrSel||!moSel)return;
+  const yr=yrSel.value||String(new Date().getFullYear());
+  const mo=moSel.value||String(new Date().getMonth()+1).padStart(2,'0');
+  const ym=yr+'-'+mo;
+
+  const monthOrders=db.orders.filter(o=>o.date&&o.date.startsWith(ym));
+  let rev=0,profit=0,unpaid=0;
+  monthOrders.forEach(o=>{const c=calcOrder(o);rev+=c.revenue;profit+=c.profit;if(!o.paid)unpaid+=c.revenue;});
+
+  // KPI
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  set('m-revenue',fmt(rev));set('m-profit',fmt(profit));
+  set('m-margin',rev>0?Math.round(profit/rev*100)+'%':'—');
+  set('m-orders',monthOrders.length);
+
+  // 客戶明細
+  const custMap={};
+  monthOrders.forEach(o=>{
+    const key=o.custName||'未知';
+    if(!custMap[key])custMap[key]={name:key,cnt:0,revenue:0,profit:0,unpaid:0};
+    const c=calcOrder(o);
+    custMap[key].cnt++;custMap[key].revenue+=c.revenue;custMap[key].profit+=c.profit;
+    if(!o.paid)custMap[key].unpaid+=c.revenue;
+  });
+  const rows=Object.values(custMap).sort((a,b)=>b.revenue-a.revenue);
+  const cb=document.getElementById('monthly-cust-body');
+  if(cb)cb.innerHTML=rows.length===0?'<tr><td colspan="6" class="empty" style="padding:20px;text-align:center;color:#94a3b8">本月尚無資料</td></tr>':
+    rows.map(d=>`<tr>
+      <td><b>${d.name}</b></td>
+      <td style="text-align:center">${d.cnt}</td>
+      <td class="mono">${fmt(d.revenue)}</td>
+      <td class="mono gain">${fmt(d.profit)}</td>
+      <td style="text-align:center">${d.revenue>0?Math.round(d.profit/d.revenue*100)+'%':'—'}</td>
+      <td class="mono ${d.unpaid>0?'loss':'muted'}">${d.unpaid>0?fmt(d.unpaid):'—'}</td>
+    </tr>`).join('');
+
+  // 圓餅圖
+  const pieCanvas=document.getElementById('pie-chart');
+  if(pieCanvas&&rows.length>0){
+    if(_pieChart)_pieChart.destroy();
+    const colors=['#2563eb','#16a34a','#dc2626','#f59e0b','#8b5cf6','#0891b2','#db2777','#059669'];
+    _pieChart=new Chart(pieCanvas,{
+      type:'doughnut',
+      data:{
+        labels:rows.map(r=>r.name),
+        datasets:[{data:rows.map(r=>r.revenue),backgroundColor:colors.slice(0,rows.length),borderWidth:2,borderColor:'#fff'}]
+      },
+      options:{plugins:{legend:{display:false}},cutout:'60%'}
+    });
+    const leg=document.getElementById('pie-legend');
+    if(leg)leg.innerHTML=rows.map((r,i)=>`
+      <div style="display:flex;align-items:center;gap:8px;font-size:12px">
+        <span style="width:10px;height:10px;border-radius:50%;background:${colors[i]};flex-shrink:0"></span>
+        <span style="flex:1">${r.name}</span>
+        <span style="font-weight:700;font-family:var(--mono)">${fmt(r.revenue)}</span>
+        <span style="color:#94a3b8">${rev>0?Math.round(r.revenue/rev*100)+'%':'—'}</span>
+      </div>`).join('');
+  } else {
+    const leg=document.getElementById('pie-legend');
+    if(leg)leg.innerHTML='<div style="color:#94a3b8;font-size:12px;text-align:center;padding:20px">本月尚無資料</div>';
+  }
+
+  // 近12個月趨勢圖
+  const trendCanvas=document.getElementById('trend-chart');
+  if(trendCanvas){
+    const months=[];
+    for(let i=11;i>=0;i--){
+      const d=new Date(parseInt(yr),parseInt(mo)-1-i,1);
+      months.push(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'));
+    }
+    const trendRev=months.map(m=>{let s=0;db.orders.filter(o=>o.date?.startsWith(m)).forEach(o=>{s+=calcOrder(o).revenue;});return s;});
+    const trendProfit=months.map(m=>{let s=0;db.orders.filter(o=>o.date?.startsWith(m)).forEach(o=>{s+=calcOrder(o).profit;});return s;});
+    if(_trendChart)_trendChart.destroy();
+    _trendChart=new Chart(trendCanvas,{
+      type:'bar',
+      data:{
+        labels:months.map(m=>m.slice(5)+'月'),
+        datasets:[
+          {label:'營收',data:trendRev,backgroundColor:'#bfdbfe',borderRadius:4},
+          {label:'利潤',data:trendProfit,backgroundColor:'#bbf7d0',borderRadius:4}
+        ]
+      },
+      options:{
+        responsive:true,
+        plugins:{legend:{position:'top',labels:{font:{size:11},boxWidth:10}}},
+        scales:{x:{ticks:{font:{size:11}}},y:{ticks:{callback:v=>v>=1000?'$'+(v/1000).toFixed(0)+'K':'$'+v,font:{size:10}}}}
+      }
+    });
+  }
 }
 
 // ── 訂單 ──
