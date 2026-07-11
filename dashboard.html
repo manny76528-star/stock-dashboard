@@ -6449,35 +6449,30 @@ async function recordSnapshot(manual=false){
 
 // ── 大盤折線分段顏色（漲=紅 跌=綠）──
 function buildIndexSegments(dataArr, yAxisID='yIndex'){
-  // dataArr: [{x: label, y: value}, ...]，null 跳過
-  const segments=[];
-  const valid=dataArr.map((v,i)=>v!=null?{i,v}:null).filter(Boolean);
-  for(let k=0;k<valid.length-1;k++){
-    const a=valid[k], b=valid[k+1];
-    const rising=b.v>=a.v;
-    const color=rising?'#dc2626':'#16a34a';
-    const data=dataArr.map((v,i)=>(i===a.i||i===b.i)?v:null);
-    segments.push({
-      label: k===0?'大盤':'',
-      data,
-      borderColor:color,
-      backgroundColor:color+'22',
-      borderWidth:2,
-      pointRadius:dataArr.map((v,i)=>i===a.i||i===b.i?4:0),
-      pointBackgroundColor:color,
-      tension:0.3,
-      spanGaps:false,
-      fill:false,
-      yAxisID,
-    });
-  }
-  // 只有一個點時單獨顯示
-  if(valid.length===1){
-    const color='#94a3b8';
-    const data=dataArr.map((v,i)=>i===valid[0].i?v:null);
-    segments.push({label:'大盤',data,borderColor:color,backgroundColor:color+'22',borderWidth:2,pointRadius:dataArr.map((_,i)=>i===valid[0].i?4:0),tension:0.3,spanGaps:false,fill:false,yAxisID});
-  }
-  return segments;
+  // 改用單一 dataset + scriptable segment 顏色，避免 tooltip 重複
+  return [{
+    label:'大盤',
+    data:dataArr,
+    borderColor:'#dc2626', // 預設紅，實際由 segment 控制
+    backgroundColor:'rgba(220,38,38,.08)',
+    borderWidth:2,
+    pointRadius:4,
+    pointBackgroundColor:dataArr.map((v,i)=>{
+      const next=dataArr.slice(i+1).find(x=>x!=null);
+      return (next!=null&&v!=null&&next>=v)?'#dc2626':'#16a34a';
+    }),
+    tension:0.3,
+    spanGaps:true,
+    fill:false,
+    yAxisID,
+    segment:{
+      borderColor:ctx=>{
+        const prev=ctx.p0.parsed.y;
+        const curr=ctx.p1.parsed.y;
+        return curr>=prev?'#dc2626':'#16a34a';
+      }
+    }
+  }];
 }
 
 function renderTrendChart(){
@@ -8526,29 +8521,17 @@ function renderJournalChart(){
           enabled:true,
           callbacks:{
             label(ctx){
-              // 分段大盤線只顯示第一段（label='大盤'），其他段跳過
-              if(ctx.dataset.label===''||ctx.dataset.label===undefined)return null;
-              const v=ctx.parsed.y;
-              if(v==null)return null;
-              return ` ${ctx.dataset.label}: ${Math.round(v).toLocaleString()}`;
+              if(ctx.parsed.y==null)return null;
+              return ` ${ctx.dataset.label}: ${Math.round(ctx.parsed.y).toLocaleString()}`;
             },
             afterBody(items){
               const date=labels[items[0].dataIndex];
               const j=sorted.find(x=>x.date===date);
               if(!j)return[];
-              const lines=[];
-              if(j.market)lines.push('📰 '+j.market);
-              return lines;
+              return j.market?['📰 '+j.market]:[];
             }
           },
-          filter(item){
-            // 過濾掉 label 為空的分段線（只保留第一段）
-            return item.dataset.label!=='';
-          },
-          maxWidth:200,
-          padding:10,
-          boxWidth:10,
-          bodyFont:{size:11},
+          maxWidth:200,padding:10,boxWidth:10,bodyFont:{size:11},
         }
       },
       scales:{
@@ -9837,11 +9820,11 @@ function renderDivDrawer(){
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
       <div style="background:#f0fdf4;border-radius:12px;padding:16px;text-align:center">
         <div style="font-size:11px;color:#9ca3af;font-weight:600;margin-bottom:4px">今年股息</div>
-        <div style="font-size:20px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#15803d" class="privacy-mask">$${Math.round(yrTot).toLocaleString()}</div>
+        <div style="font-size:20px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#15803d">$${Math.round(yrTot).toLocaleString()}</div>
       </div>
       <div style="background:#f0f4ff;border-radius:12px;padding:16px;text-align:center">
         <div style="font-size:11px;color:#9ca3af;font-weight:600;margin-bottom:4px">累計總股息</div>
-        <div style="font-size:20px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#2563eb" class="privacy-mask">$${Math.round(allTot).toLocaleString()}</div>
+        <div style="font-size:20px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#2563eb">$${Math.round(allTot).toLocaleString()}</div>
       </div>
     </div>
 
@@ -9851,7 +9834,7 @@ function renderDivDrawer(){
       ${pending.map(d=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f0f2f5">
         <div style="font-size:13px;font-weight:700;color:#1e293b;min-width:72px;font-family:'JetBrains Mono',monospace">${d.code||'—'}</div>
         <div style="font-size:11px;color:#9ca3af">${d.date}</div>
-        <div style="margin-left:auto;font-size:13px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#15803d" class="privacy-mask">$${Math.round(d.amount||0).toLocaleString()}</div>
+        <div style="margin-left:auto;font-size:13px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#15803d">$${Math.round(d.amount||0).toLocaleString()}</div>
         <span style="font-size:10px;background:#fef3c7;color:#92400e;padding:2px 7px;border-radius:5px;font-weight:700">待入帳</span>
       </div>`).join('')}
     </div>`:''}
@@ -9867,7 +9850,7 @@ function renderDivDrawer(){
       <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f5f5f5">
         <div style="font-size:12px;font-weight:700;color:#1e293b;min-width:72px;font-family:'JetBrains Mono',monospace">${d.code||'—'}</div>
         <div style="font-size:11px;color:#9ca3af">${d.date}</div>
-        <div style="margin-left:auto;font-size:13px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#15803d" class="privacy-mask">$${Math.round(d.amount||0).toLocaleString()}</div>
+        <div style="margin-left:auto;font-size:13px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#15803d">$${Math.round(d.amount||0).toLocaleString()}</div>
       </div>`).join('')}
   `;
   if(typeof applyPrivacy==='function')applyPrivacy();
