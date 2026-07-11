@@ -9614,29 +9614,76 @@ function renderAssetsPage(){
   set('as-cash-badge',db.cashAccounts.length+' 個帳戶');
   set('as-cash-sub','含待入帳');
 
-  // 信貸列表
+  // 信貸列表（顯示2筆扣款提醒）
   const lb=document.getElementById('as-loan-body');
   if(lb){
-    lb.innerHTML=db.loans.length===0?
-      '<div style="padding:20px;text-align:center;color:#9ca3af;font-size:12px">尚無信貸記錄</div>':
-      db.loans.map(l=>{
+    if(db.loans.length===0){
+      lb.innerHTML='<div style="padding:20px;text-align:center;color:#9ca3af;font-size:12px">尚無信貸記錄</div>';
+    } else {
+      const today=new Date();
+      const todayStr=today.toISOString().slice(0,10);
+      // 計算每筆信貸最近扣款日和預估餘額
+      const loanRows=db.loans.map(l=>{
         const rem=calcLoanRemain(l);
         const pct=l.amount>0?Math.round((1-rem/l.amount)*100):0;
-        const days=daysUntilDeduct(parseInt(l.deductDay)||null);
-        const urgent=days!==null&&days<=5;
-        return`<div class="as-row" onclick="openSP('health')">
-          <div class="as-row-icon" style="background:${urgent?'#fee2e2':'#f0f4ff'}">${urgent?'🔴':'🏦'}</div>
-          <div>
-            <div class="as-row-name">${l.bank||l.name||'信貸'}</div>
-            <div class="as-row-sub">每月 $${Math.round(l.monthly||0).toLocaleString()}・${l.deductDay||'—'}號扣款${days!==null?'（'+days+'天後）':''}</div>
-            <div class="as-prog-bar"><div class="as-prog-fill" style="width:${pct}%;background:${urgent?'#f87171':'#8fa8c8'}"></div></div>
-          </div>
-          <div class="as-row-right">
-            <div class="as-row-val privacy-mask">$${Math.round(rem/10000)/100}萬</div>
-            <div class="as-row-meta">還清 ${pct}%</div>
-          </div>
-        </div>`;
-      }).join('');
+        // 找最近兩筆扣款
+        const deducts=[];
+        const day=parseInt(l.deductDay||0);
+        if(day>0){
+          for(let mo=0;mo<=1;mo++){
+            try{
+              const d=new Date(today.getFullYear(),today.getMonth()+mo,day);
+              if(isNaN(d.getTime()))continue;
+              const ds=d.toISOString().slice(0,10);
+              const daysLeft=Math.round((d-today)/86400000);
+              if(ds>=todayStr&&deducts.length<2){
+                // 計算扣款後餘額
+                let afterBal=null;
+                if(l.deductBank){
+                  const acc=db.cashAccounts.find(c=>c.bank===l.deductBank);
+                  if(acc){
+                    const accBal=(acc.cash||0)+(acc.d1||0)+(acc.d2||0);
+                    const preDivs=(db.dividends||[]).filter(dv=>dv.date&&dv.date>todayStr&&dv.date<=ds&&!dv.pending);
+                    const preDivTotal=preDivs.reduce((s,dv)=>s+(dv.amount||0),0);
+                    afterBal=Math.round(accBal+preDivTotal-(l.monthly||0));
+                  }
+                }
+                deducts.push({ds,daysLeft,afterBal});
+              }
+            }catch(e){}
+          }
+        }
+        return{l,rem,pct,deducts};
+      });
+
+      lb.innerHTML=`<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;padding:16px">
+        ${loanRows.map(({l,rem,pct,deducts})=>{
+          const urgent=deducts[0]&&deducts[0].daysLeft<=5;
+          return`<div style="background:#fff;border-radius:12px;border:1px solid ${urgent?'#fca5a5':'#eaecf0'};padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.04);cursor:pointer" onclick="openSP('health')">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+              <div style="font-size:13px;font-weight:800;color:#1e293b">${l.bank||l.name||'信貸'}</div>
+              <div style="font-size:10px;${urgent?'background:#fee2e2;color:#b91c1c':'background:#f0f4ff;color:#4338ca'};padding:2px 8px;border-radius:6px;font-weight:700">${urgent?'⚠️ 緊急':'💳 信貸'}</div>
+            </div>
+            <div style="font-size:11px;color:#9ca3af;margin-bottom:2px">尚餘本金</div>
+            <div style="font-size:16px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#1e293b;margin-bottom:8px" class="privacy-mask">$${Math.round(rem).toLocaleString()}</div>
+            <div style="height:4px;background:#f0f2f5;border-radius:2px;margin-bottom:10px;overflow:hidden">
+              <div style="height:100%;border-radius:2px;background:${urgent?'#f87171':'#8fa8c8'};width:${pct}%"></div>
+            </div>
+            ${deducts.map((d,i)=>`
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;${i>0?'border-top:1px solid #f5f5f5;margin-top:4px':''}">
+                <div>
+                  <div style="font-size:11px;color:#374151;font-weight:700">${d.ds} <span style="${d.daysLeft<=5?'color:#b91c1c':'color:#2563eb'};font-weight:800">(${d.daysLeft===0?'今天':d.daysLeft+'天後'})</span></div>
+                  <div style="font-size:10px;color:#9ca3af">月繳 $${Math.round(l.monthly||0).toLocaleString()}</div>
+                </div>
+                ${d.afterBal!=null?`<div style="text-align:right">
+                  <div style="font-size:10px;color:#9ca3af">扣後預估</div>
+                  <div style="font-size:12px;font-weight:800;font-family:'JetBrains Mono',monospace;${d.afterBal<0?'color:#b91c1c':'color:#15803d'}" class="privacy-mask">$${Math.abs(d.afterBal).toLocaleString()}${d.afterBal<0?' ⚠️':''}</div>
+                </div>`:''}
+              </div>`).join('')}
+          </div>`;
+        }).join('')}
+      </div>`;
+    }
   }
 
   // 不限用途列表
@@ -9644,45 +9691,60 @@ function renderAssetsPage(){
   if(fb){
     fb.innerHTML=(db.flexLoans||[]).length===0?
       '<div style="padding:20px;text-align:center;color:#9ca3af;font-size:12px">尚無不限用途記錄</div>':
+      `<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;padding:16px">`+
       (db.flexLoans||[]).map(f=>{
         const used=f.used||f.remain||0;
         const limit=f.limit||0;
         const pct=limit>0?Math.round(used/limit*100):0;
-        return`<div class="as-row">
-          <div class="as-row-icon" style="background:#fef3c7">💳</div>
-          <div>
-            <div class="as-row-name">${f.name||f.bank||'不限用途'}</div>
-            <div class="as-row-sub">額度 $${Math.round(limit/10000)/100}萬・已用 ${pct}%</div>
-            <div class="as-prog-bar"><div class="as-prog-fill" style="width:${pct}%;background:#c9a99a"></div></div>
+        return`<div style="background:#fff;border-radius:12px;border:1px solid #eaecf0;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.04)">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <div style="font-size:13px;font-weight:800;color:#1e293b">${f.name||f.bank||'不限用途'}</div>
+            <div style="font-size:10px;background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:6px;font-weight:700">💳 額度</div>
           </div>
-          <div class="as-row-right">
-            <div class="as-row-val privacy-mask">$${Math.round(used/10000)/100}萬</div>
-            <div class="as-row-meta">每月 $${Math.round(f.monthly||0).toLocaleString()}</div>
+          <div style="font-size:11px;color:#9ca3af;margin-bottom:2px">已使用</div>
+          <div style="font-size:16px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#1e293b;margin-bottom:8px" class="privacy-mask">$${Math.round(used).toLocaleString()}</div>
+          <div style="height:4px;background:#f0f2f5;border-radius:2px;margin-bottom:10px;overflow:hidden">
+            <div style="height:100%;border-radius:2px;background:#c9a99a;width:${pct}%"></div>
           </div>
+          <div style="font-size:11px;color:#64748b">額度 $${Math.round(limit).toLocaleString()}・已用 ${pct}%</div>
+          <div style="font-size:11px;color:#9ca3af;margin-top:2px">月繳 $${Math.round(f.monthly||0).toLocaleString()}</div>
         </div>`;
-      }).join('');
+      }).join('')+'</div>';
   }
 
-  // 現金帳戶
+  // 現金帳戶 Grid 卡片
   const cb=document.getElementById('as-cash-body');
   if(cb){
     cb.innerHTML=db.cashAccounts.length===0?
       '<div style="padding:20px;text-align:center;color:#9ca3af;font-size:12px">尚無現金帳戶</div>':
+      `<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;padding:16px">`+
       db.cashAccounts.map(acc=>{
         const total=(acc.cash||0)+(acc.d1||0)+(acc.d2||0);
-        return`<div class="as-row" style="flex-direction:column;align-items:flex-start;gap:6px">
-          <div style="display:flex;align-items:center;gap:10px;width:100%">
-            <div class="as-row-icon" style="background:#f0fdf4">🏧</div>
-            <div>
-              <div class="as-row-name">${acc.name||'帳戶'}</div>
-              <div class="as-row-sub">${acc.d1?'含待交割 $'+Math.round(acc.d1).toLocaleString():''}</div>
-            </div>
-            <div class="as-row-right">
-              <div class="as-row-val privacy-mask">$${Math.round(total).toLocaleString()}</div>
+        const hasPending=(acc.d1||0)+(acc.d2||0)>0;
+        return`<div style="background:#fff;border-radius:12px;border:1px solid #eaecf0;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.04)">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <div style="font-size:13px;font-weight:800;color:#1e293b">${acc.name||'帳戶'}</div>
+            <div style="display:flex;gap:6px">
+              <button onclick="event.stopPropagation();openEditCash('${acc.id}')" style="width:28px;height:28px;background:#f8f9fa;border:1px solid #e2e8f0;border-radius:7px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center">✏️</button>
+              <button onclick="event.stopPropagation();deleteCash('${acc.id}')" style="width:28px;height:28px;background:#fff;border:1px solid #fca5a5;border-radius:7px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center">🗑</button>
             </div>
           </div>
+          <div style="font-size:11px;color:#9ca3af;margin-bottom:2px">總餘額</div>
+          <div style="font-size:18px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#15803d;margin-bottom:8px" class="privacy-mask">$${Math.round(total).toLocaleString()}</div>
+          ${acc.cash?`<div style="display:flex;justify-content:space-between;font-size:11px;padding:4px 0;border-top:1px solid #f5f5f5">
+            <span style="color:#9ca3af">可用現金</span>
+            <span style="font-weight:700;font-family:'JetBrains Mono',monospace" class="privacy-mask">$${Math.round(acc.cash).toLocaleString()}</span>
+          </div>`:''}
+          ${acc.d1?`<div style="display:flex;justify-content:space-between;font-size:11px;padding:4px 0;border-top:1px solid #f5f5f5">
+            <span style="color:#9ca3af">待交割(D+1)</span>
+            <span style="font-weight:700;font-family:'JetBrains Mono',monospace;color:#2563eb" class="privacy-mask">$${Math.round(acc.d1).toLocaleString()}</span>
+          </div>`:''}
+          ${acc.d2?`<div style="display:flex;justify-content:space-between;font-size:11px;padding:4px 0;border-top:1px solid #f5f5f5">
+            <span style="color:#9ca3af">待交割(D+2)</span>
+            <span style="font-weight:700;font-family:'JetBrains Mono',monospace;color:#7c3aed" class="privacy-mask">$${Math.round(acc.d2).toLocaleString()}</span>
+          </div>`:''}
         </div>`;
-      }).join('');
+      }).join('')+'</div>';
   }
 }
 
