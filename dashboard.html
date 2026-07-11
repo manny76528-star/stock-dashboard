@@ -4363,7 +4363,7 @@ function renderInvDonut(){
 
   // 更新圓心總額
   if(totalEl)totalEl.textContent=items.length>0?
-    '$'+(Math.round(useTotal/10000)/100)+'萬':
+    '$'+Math.round(useTotal).toLocaleString():
     '（示範）';
 
   const labels=useItems.map(i=>i.name);
@@ -4390,7 +4390,7 @@ function renderInvDonut(){
               const v=ctx.parsed;
               const tot=ctx.dataset.data.reduce((a,b)=>a+b,0);
               const pct=Math.round(v/tot*1000)/10;
-              return ` $${Math.round(v/10000).toLocaleString()} 萬  （${pct}%）`;
+              return ` $${Math.round(v).toLocaleString()} （${pct}%）`;
             }
           }
         }
@@ -4401,12 +4401,12 @@ function renderInvDonut(){
   // 圖例
   legendEl.innerHTML=useItems.map((item,i)=>{
     const pct=Math.round(item.val/useTotal*1000)/10;
-    const valTW=Math.round(item.val/10000);
+    const valFull=Math.round(item.val);
     return`<div style="display:flex;align-items:center;gap:10px">
       <span style="width:10px;height:10px;border-radius:50%;background:${colors[i]};flex-shrink:0"></span>
       <div style="flex:1;min-width:0">
         <div style="font-size:12px;font-weight:700;color:#374151;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${item.name}</div>
-        <div style="font-size:11px;color:#9ca3af;font-family:'JetBrains Mono',monospace">$${valTW.toLocaleString()}萬・${pct}%</div>
+        <div style="font-size:11px;color:#9ca3af;font-family:'JetBrains Mono',monospace">$${valFull.toLocaleString()}・${pct}%</div>
       </div>
     </div>`;
   }).join('');
@@ -9604,7 +9604,7 @@ function renderAssetsPage(){
   const cT=db.cashAccounts.reduce((s,c)=>s+(c.cash||0)+(c.d1||0)+(c.d2||0),0);
   const fmtM=v=>'$'+Math.round(v).toLocaleString();
   const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
-  set('as-loan-total',fmtM(lR));
+  set('as-loan-total','$'+Math.round(lR).toLocaleString());
   set('as-loan-monthly','月繳 '+fmtM(lM));
   set('as-loan-badge',db.loans.length+' 筆');
   set('as-flex-total',fmtM(fU));
@@ -9753,7 +9753,7 @@ function renderInvestPage(){
     });
     if(items.length>0){
       const colors=items.map((_,i)=>MORANDI_OV[i%MORANDI_OV.length]);
-      if(totalEl)totalEl.textContent='$'+(Math.round(tot/10000)/100)+'萬';
+      if(totalEl)totalEl.textContent='$'+Math.round(tot).toLocaleString();
       if(_investMiniDonut)_investMiniDonut.destroy();
       _investMiniDonut=new Chart(canvas,{
         type:'doughnut',
@@ -9970,7 +9970,7 @@ function renderOvKpi(){
 
   const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
   const setC=(id,v,cls)=>{const el=document.getElementById(id);if(el){el.textContent=v;el.className='ov-kpi-sub '+(cls||'');}};
-  const fmtM=v=>v>=1000000?'$'+(v/1000000).toFixed(2)+'M':'$'+Math.round(v).toLocaleString();
+  const fmtM=v=>'$'+Math.round(v).toLocaleString();
 
   set('ov-net',fmtM(net));
   setC('ov-net-sub','較上週快照'+( (()=>{
@@ -9988,7 +9988,7 @@ function renderOvKpi(){
   set('ov-div','$'+Math.round(tD).toLocaleString());
   setC('ov-div-sub','年化 $'+Math.round(tD*12).toLocaleString(),'');
 
-  set('ov-loan','$'+Math.round(lR/10000)/100+'萬');
+  set('ov-loan','$'+Math.round(lR).toLocaleString());
   setC('ov-dr','負債比 '+dR+'%',dR>85?'dn':dR>70?'':'up');
 }
 
@@ -10097,7 +10097,7 @@ function renderOvDonut(){
   const useTotal=items.length>0?totalMkt:2700000;
 
   if(totalEl)totalEl.textContent=items.length>0?
-    '$'+(Math.round(useTotal/10000)/100)+'萬':'—';
+    '$'+Math.round(useTotal).toLocaleString():'—';
 
   const data=useItems.map(i=>i.val);
   const colors=useItems.map((_,i)=>MORANDI_OV[i%MORANDI_OV.length]);
