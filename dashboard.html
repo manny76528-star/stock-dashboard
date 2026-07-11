@@ -2950,13 +2950,13 @@ body:not(.privacy) .privacy-mask{filter:none;}
         </div>
         <div id="journal-chart-body" style="display:none;padding:12px 14px;background:#fff">
           <!-- 勾選框動態產生 -->
-          <div id="journal-chart-checks" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;font-size:12px;align-items:center"></div>
+          <div id="journal-chart-checks-legacy" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;font-size:12px;align-items:center"></div>
           <label style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:700;color:#7c3aed;margin-bottom:10px;cursor:pointer">
-            <input type="checkbox" id="jchart-backtest-toggle" onchange="renderJournalChart()">
+            <input type="checkbox" id="jchart-backtest-toggle-legacy" onchange="renderJournalChart()">
             📊 回測 Hover
           </label>
-          <canvas id="journal-chart-canvas" height="200" style="width:100%;max-height:220px"></canvas>
-          <div id="journal-chart-empty" style="display:none;text-align:center;padding:30px;color:#94a3b8;font-size:12px">尚無走勢資料，新增日誌時填入大盤指數或個股價格即可</div>
+          <canvas id="journal-chart-canvas-legacy" height="200" style="width:100%;max-height:220px"></canvas>
+          <div id="journal-chart-empty-legacy" style="display:none;text-align:center;padding:30px;color:#94a3b8;font-size:12px">尚無走勢資料，新增日誌時填入大盤指數或個股價格即可</div>
         </div>
       </div>
       <div id="journal-list" style="padding:12px 16px;display:flex;flex-direction:column;gap:10px"></div>
@@ -8524,14 +8524,27 @@ function renderJournalChart(){
         legend:{display:false},
         tooltip:{
           enabled:true,
-          callbacks:{afterBody(items){
-            const date=labels[items[0].dataIndex];
-            const j=sorted.find(x=>x.date===date);
-            if(!j)return[];
-            const lines=[];
-            if(j.market)lines.push('📰 '+j.market);
-            return lines;
-          }},
+          callbacks:{
+            label(ctx){
+              // 分段大盤線只顯示第一段（label='大盤'），其他段跳過
+              if(ctx.dataset.label===''||ctx.dataset.label===undefined)return null;
+              const v=ctx.parsed.y;
+              if(v==null)return null;
+              return ` ${ctx.dataset.label}: ${Math.round(v).toLocaleString()}`;
+            },
+            afterBody(items){
+              const date=labels[items[0].dataIndex];
+              const j=sorted.find(x=>x.date===date);
+              if(!j)return[];
+              const lines=[];
+              if(j.market)lines.push('📰 '+j.market);
+              return lines;
+            }
+          },
+          filter(item){
+            // 過濾掉 label 為空的分段線（只保留第一段）
+            return item.dataset.label!=='';
+          },
           maxWidth:200,
           padding:10,
           boxWidth:10,
