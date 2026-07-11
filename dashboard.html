@@ -3280,8 +3280,22 @@ body:not(.privacy) .privacy-mask{filter:none;}
     <div class="div-section-hdr" style="background:#ccfbf1;color:#0f766e" onclick="toggleDivYear()">
       <span>📋 今年明細</span><span id="div-yr-hint">▼ 展開</span>
     </div>
-    <div id="div-yr-tbl" style="display:none"></div>
+    <div id="div-yr-tbl" style="display:none;overflow-x:auto">
+      <table class="dt" style="min-width:400px">
+        <thead><tr><th>標的</th><th>領息日期</th><th>張數</th><th>每股配息</th><th>本次金額</th><th>操作</th></tr></thead>
+        <tbody id="div-body-yr"></tbody>
+      </table>
+    </div>
     <!-- 歷史年份 -->
+    <div id="div-hist-sec" style="display:none">
+      <div style="padding:6px 12px;background:#e8edf5;font-size:11px;font-weight:700;color:#2563eb">📚 歷史記錄</div>
+      <div style="overflow-x:auto">
+        <table class="dt" style="min-width:400px">
+          <thead><tr><th>標的</th><th>領息日期</th><th>張數</th><th>每股配息</th><th>本次金額</th><th>操作</th></tr></thead>
+          <tbody id="div-body-hist"></tbody>
+        </table>
+      </div>
+    </div>
     <div id="div-hist-area"></div>
   </div>
 </div>
@@ -5137,8 +5151,8 @@ function renderDivs(){
   const allTot=db.dividends
     .filter(d=>!d.pending&&(!d.date||d.date<=today2))
     .reduce((s,d)=>s+d.amount,0);
-  document.getElementById('d-yr').textContent='$'+Math.round(yrTot).toLocaleString();
-  document.getElementById('d-tot').textContent='$'+Math.round(allTot).toLocaleString();
+  const dyrEl=document.getElementById('d-yr');if(dyrEl)dyrEl.textContent='$'+Math.round(yrTot).toLocaleString();
+  const dtotEl=document.getElementById('d-tot');if(dtotEl)dtotEl.textContent='$'+Math.round(allTot).toLocaleString();
   // Update header badges
   const dyb=document.getElementById('d-yr-badge');if(dyb)dyb.textContent='$'+Math.round(yrTot).toLocaleString();
   const dtb=document.getElementById('d-tot-badge');if(dtb)dtb.textContent='$'+Math.round(allTot).toLocaleString();
@@ -5181,7 +5195,8 @@ function renderDivs(){
     if(!divs.length)tbody.innerHTML='<tr><td colspan="6" style="color:var(--muted);text-align:center;padding:10px">無記錄</td></tr>';
   }
   renderRows(yrDivs,'div-body-yr');
-  document.getElementById('div-hist-sec').style.display=showHist?'block':'none';
+  const histSec=document.getElementById('div-hist-sec');
+  if(histSec)histSec.style.display=showHist?'block':'none';
   if(showHist)renderRows(histDivs,'div-body-hist');
 }
 
@@ -5208,11 +5223,12 @@ function confirmDivPaid(id){
 }
 
 function toggleDivYear(){
-  const b=document.getElementById('div-yr-body');
+  const b=document.getElementById('div-yr-tbl')||document.getElementById('div-yr-body-sp');
   const h=document.getElementById('div-yr-hint');
-  const open=b.style.display==='none';
+  if(!b)return;
+  const open=b.style.display==='none'||b.style.display==='';
   b.style.display=open?'block':'none';
-  h.textContent=open?'▲ 收起':'▼ 展開';
+  if(h)h.textContent=open?'▲ 收起':'▼ 展開';
 }
 
 function renderSum(){
