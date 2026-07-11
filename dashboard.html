@@ -1953,16 +1953,16 @@ body:not(.privacy) .privacy-mask{filter:none;}
       <span class="nav-icon">📓</span>交易日誌
       <span class="db-nav-badge" id="nav-journal-badge" style="background:#dbeafe;color:#1d4ed8"></span>
     </div>
-    <div class="db-nav-item" id="nav-dividend" onclick="openSP('div')">
+    <div class="db-nav-item" id="nav-dividend" onclick="openDivDrawer()">
       <span class="nav-icon">💰</span>股息管理
       <span class="db-nav-badge" id="nav-div-badge" style="background:#dcfce7;color:#15803d"></span>
     </div>
 
     <div class="db-nav-section">分析與規劃</div>
-    <div class="db-nav-item" id="nav-analytics" onclick="openSP('analytics')">
+    <div class="db-nav-item" id="nav-analytics" onclick="openAnalyticsDrawer()">
       <span class="nav-icon">📈</span>投資分析
     </div>
-    <div class="db-nav-item" id="nav-finplan" onclick="openSP('finplan')">
+    <div class="db-nav-item" id="nav-finplan" onclick="openFinPlanDrawer()">
       <span class="nav-icon">📐</span>財務規劃
     </div>
     <div class="db-nav-item" id="nav-trend" onclick="dbShowPage('trend')">
@@ -3225,6 +3225,62 @@ body:not(.privacy) .privacy-mask{filter:none;}
 
   </div>
 </div>
+<!-- ══ 股息管理 Drawer ══ -->
+<div id="div-drawer" class="side-drawer">
+  <div class="side-drawer-hdr">
+    <div class="side-drawer-title"><span>💰</span><span>股息管理</span></div>
+    <div class="side-drawer-actions">
+      <button onclick="openSP('div')" style="padding:7px 12px;background:#f8f9fa;border:1px solid #e2e8f0;color:#374151;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">完整視窗 ↗</button>
+      <button class="side-drawer-close" onclick="closeDrawer()">✕</button>
+    </div>
+  </div>
+  <div class="side-drawer-body" id="div-drawer-body">
+    <div style="color:#9ca3af;text-align:center;padding:40px">載入中...</div>
+  </div>
+</div>
+
+<!-- ══ 財務規劃 Drawer ══ -->
+<div id="finplan-drawer" class="side-drawer">
+  <div class="side-drawer-hdr">
+    <div class="side-drawer-title"><span>📐</span><span>財務規劃</span></div>
+    <div class="side-drawer-actions">
+      <button onclick="openSP('finplan')" style="padding:7px 12px;background:#f8f9fa;border:1px solid #e2e8f0;color:#374151;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">完整視窗 ↗</button>
+      <button class="side-drawer-close" onclick="closeDrawer()">✕</button>
+    </div>
+  </div>
+  <div class="side-drawer-body" id="finplan-drawer-body">
+    <div style="color:#9ca3af;text-align:center;padding:40px">載入中...</div>
+  </div>
+</div>
+
+<!-- ══ 投資分析 Drawer ══ -->
+<div id="analytics-drawer" class="side-drawer">
+  <div class="side-drawer-hdr">
+    <div class="side-drawer-title"><span>📈</span><span>投資分析</span></div>
+    <div class="side-drawer-actions">
+      <button onclick="openSP('analytics')" style="padding:7px 12px;background:#f8f9fa;border:1px solid #e2e8f0;color:#374151;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">完整視窗 ↗</button>
+      <button class="side-drawer-close" onclick="closeDrawer()">✕</button>
+    </div>
+  </div>
+  <div class="side-drawer-body" id="analytics-drawer-body">
+    <div style="color:#9ca3af;text-align:center;padding:40px">載入中...</div>
+  </div>
+</div>
+
+<!-- ══ 觀察股 Drawer ══ -->
+<div id="watch-drawer" class="side-drawer">
+  <div class="side-drawer-hdr">
+    <div class="side-drawer-title"><span>👁</span><span>觀察股區</span></div>
+    <div class="side-drawer-actions">
+      <button onclick="openSP('watch')" style="padding:7px 12px;background:#f8f9fa;border:1px solid #e2e8f0;color:#374151;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">完整視窗 ↗</button>
+      <button class="side-drawer-close" onclick="closeDrawer()">✕</button>
+    </div>
+  </div>
+  <div class="side-drawer-body" id="watch-drawer-body">
+    <div style="color:#9ca3af;text-align:center;padding:40px">載入中...</div>
+  </div>
+</div>
+
 <!-- ══ 原有 Modal（保留備用） ══ -->
   <div class="modal" style="max-width:640px">
     <div class="mt"><h3 id="journal-modal-title">📓 新增交易日誌</h3><button onclick="closeModal('journalModal')" style="background:none;border:none;font-size:18px;cursor:pointer;color:#94a3b8">✕</button></div>
@@ -9724,6 +9780,148 @@ function renderTrendPageTable(){
       </td>
     </tr>`).join('')}</tbody>
   </table>`;
+}
+
+// ══════════════════════════════════════
+// 股息管理 Drawer
+// ══════════════════════════════════════
+function openDivDrawer(){
+  openDrawer('div-drawer');
+  renderDivDrawer();
+}
+
+function renderDivDrawer(){
+  const body=document.getElementById('div-drawer-body');
+  if(!body)return;
+
+  const now=new Date();
+  const yrStr=String(now.getFullYear());
+  const divs=(db.dividends||[]).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  const yrTot=divs.filter(d=>d.date?.startsWith(yrStr)).reduce((s,d)=>s+(d.amount||0),0);
+  const allTot=divs.reduce((s,d)=>s+(d.amount||0),0);
+  const pending=divs.filter(d=>d.pending||d.date>now.toISOString().slice(0,10));
+
+  body.innerHTML=`
+    <!-- 統計 -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
+      <div style="background:#f0fdf4;border-radius:12px;padding:16px;text-align:center">
+        <div style="font-size:11px;color:#9ca3af;font-weight:600;margin-bottom:4px">今年股息</div>
+        <div style="font-size:20px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#15803d" class="privacy-mask">$${Math.round(yrTot).toLocaleString()}</div>
+      </div>
+      <div style="background:#f0f4ff;border-radius:12px;padding:16px;text-align:center">
+        <div style="font-size:11px;color:#9ca3af;font-weight:600;margin-bottom:4px">累計總股息</div>
+        <div style="font-size:20px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#2563eb" class="privacy-mask">$${Math.round(allTot).toLocaleString()}</div>
+      </div>
+    </div>
+
+    <!-- 待入帳 -->
+    ${pending.length>0?`<div style="margin-bottom:16px">
+      <div style="font-size:11px;font-weight:700;color:#9ca3af;letter-spacing:.5px;margin-bottom:8px">⏳ 待入帳</div>
+      ${pending.map(d=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f0f2f5">
+        <div style="font-size:13px;font-weight:700;color:#1e293b;min-width:72px;font-family:'JetBrains Mono',monospace">${d.code||'—'}</div>
+        <div style="font-size:11px;color:#9ca3af">${d.date}</div>
+        <div style="margin-left:auto;font-size:13px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#15803d" class="privacy-mask">$${Math.round(d.amount||0).toLocaleString()}</div>
+        <span style="font-size:10px;background:#fef3c7;color:#92400e;padding:2px 7px;border-radius:5px;font-weight:700">待入帳</span>
+      </div>`).join('')}
+    </div>`:''}
+
+    <!-- 新增按鈕 -->
+    <button onclick="openSP('div')" style="width:100%;padding:10px;background:#eff6ff;border:1.5px dashed #bfdbfe;color:#2563eb;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:16px">
+      ＋ 新增股息記錄（完整視窗）
+    </button>
+
+    <!-- 歷史記錄 -->
+    <div style="font-size:11px;font-weight:700;color:#9ca3af;letter-spacing:.5px;margin-bottom:8px">📋 歷史記錄</div>
+    ${divs.filter(d=>!d.pending&&d.date<=now.toISOString().slice(0,10)).slice(0,20).map(d=>`
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f5f5f5">
+        <div style="font-size:12px;font-weight:700;color:#1e293b;min-width:72px;font-family:'JetBrains Mono',monospace">${d.code||'—'}</div>
+        <div style="font-size:11px;color:#9ca3af">${d.date}</div>
+        <div style="margin-left:auto;font-size:13px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#15803d" class="privacy-mask">$${Math.round(d.amount||0).toLocaleString()}</div>
+      </div>`).join('')}
+  `;
+  if(typeof applyPrivacy==='function')applyPrivacy();
+}
+
+// ══════════════════════════════════════
+// 財務規劃 Drawer
+// ══════════════════════════════════════
+function openFinPlanDrawer(){
+  openDrawer('finplan-drawer');
+  renderFinPlanDrawer();
+}
+
+function renderFinPlanDrawer(){
+  const body=document.getElementById('finplan-drawer-body');
+  if(!body)return;
+  // 取得原本 sp-finplan 的內容直接複製過來
+  const orig=document.getElementById('sp-finplan');
+  if(!orig){body.innerHTML='<div style="color:#9ca3af;text-align:center;padding:40px">請使用完整視窗</div>';return;}
+  // 複製 sp-body 的內容
+  const origBody=orig.querySelector('.sp-body');
+  if(origBody){
+    body.innerHTML=origBody.innerHTML;
+    // 重新初始化
+    if(typeof initFinPlan==='function')initFinPlan();
+  }
+}
+
+// ══════════════════════════════════════
+// 投資分析 Drawer
+// ══════════════════════════════════════
+function openAnalyticsDrawer(){
+  openDrawer('analytics-drawer');
+  renderAnalyticsDrawer();
+}
+
+function renderAnalyticsDrawer(){
+  const body=document.getElementById('analytics-drawer-body');
+  if(!body)return;
+  const orig=document.getElementById('sp-analytics');
+  if(!orig){body.innerHTML='<div style="color:#9ca3af;text-align:center;padding:40px">請使用完整視窗</div>';return;}
+  const origBody=orig.querySelector('.sp-body');
+  if(origBody){
+    body.innerHTML=origBody.innerHTML;
+    if(typeof renderAnalytics==='function')renderAnalytics();
+  }
+}
+
+// ══════════════════════════════════════
+// 觀察股 Drawer
+// ══════════════════════════════════════
+function openWatchDrawer(){
+  openDrawer('watch-drawer');
+  renderWatchDrawer();
+}
+
+function renderWatchDrawer(){
+  const body=document.getElementById('watch-drawer-body');
+  if(!body)return;
+  const watchlist=db.watchlist||[];
+
+  body.innerHTML=`
+    <div style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">
+      <div style="font-size:12px;color:#64748b;font-weight:600">${watchlist.length} 檔觀察中</div>
+      <button onclick="openSP('watch')" style="padding:6px 14px;background:#eff6ff;border:1px solid #bfdbfe;color:#2563eb;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">管理完整列表 ↗</button>
+    </div>
+    ${watchlist.length===0?'<div style="color:#9ca3af;text-align:center;padding:40px;font-size:13px">尚無觀察股<br><button onclick="openSP(\'watch\')" style="margin-top:12px;padding:8px 20px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">＋ 新增觀察股</button></div>':
+    watchlist.map(w=>{
+      const p=db.prices[w.code];
+      const chg=p?.changePct;
+      const chgColor=chg==null?'#9ca3af':chg>=0?'#dc2626':'#16a34a';
+      return`<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #f5f5f5">
+        <div>
+          <div style="font-size:13px;font-weight:800;color:#2563eb;font-family:'JetBrains Mono',monospace">${w.code}</div>
+          <div style="font-size:11px;color:#9ca3af;margin-top:1px">${w.name||''}</div>
+        </div>
+        <div style="margin-left:auto;text-align:right">
+          <div style="font-size:14px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#111827" class="privacy-mask">${p?'$'+p.price:'—'}</div>
+          <div style="font-size:11px;font-weight:700;color:${chgColor}">${chg!=null?(chg>=0?'+':'')+chg+'%':''}</div>
+        </div>
+        ${w.targetPrice?`<div style="padding:4px 10px;background:#fef3c7;border-radius:6px;font-size:11px;font-weight:700;color:#92400e">目標 $${w.targetPrice}</div>`:''}
+      </div>`;
+    }).join('')}
+  `;
+  if(typeof applyPrivacy==='function')applyPrivacy();
 }
 
 function renderOvDashboard(){
