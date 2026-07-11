@@ -1984,11 +1984,26 @@ body:not(.privacy) .privacy-mask{filter:none;}
     </div>
     <div class="big5-detail" id="inv-detail" style="display:none">
       <div class="irow-list" id="inv-body"></div>
-      <!-- 佔位符：第二階段實作圖表 -->
-      <div style="margin:16px;padding:24px;border:2px dashed #e2e8f0;border-radius:10px;text-align:center;color:#94a3b8;background:#fafafa">
-        <div style="font-size:20px;margin-bottom:8px">📊</div>
-        <div style="font-size:12px;font-weight:600;color:#cbd5e1">【第二階段】</div>
-        <div style="font-size:11px;margin-top:4px;line-height:1.6">此處將實作持股比例圓餅圖<br>與資產走勢迷你圖</div>
+
+      <!-- 資產分佈甜甜圈圖 -->
+      <div id="inv-donut-section" style="padding:20px 24px;border-top:1px solid #f0f2f5;background:#fff">
+        <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:16px;display:flex;align-items:center;gap:8px">
+          <span>📊 資產分佈</span>
+          <span style="font-size:10px;font-weight:500;color:#9ca3af">依持股市值計算</span>
+        </div>
+        <div style="display:grid;grid-template-columns:200px 1fr;gap:24px;align-items:center">
+          <!-- 甜甜圈圖 -->
+          <div style="position:relative;width:200px;height:200px">
+            <canvas id="inv-donut-chart" width="200" height="200"></canvas>
+            <!-- 圓心文字 -->
+            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none">
+              <div style="font-size:10px;color:#9ca3af;font-weight:600;letter-spacing:.3px">投資總市值</div>
+              <div id="inv-donut-total" style="font-size:15px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#111827;margin-top:2px" class="privacy-mask">—</div>
+            </div>
+          </div>
+          <!-- 圖例 -->
+          <div id="inv-donut-legend" style="display:flex;flex-direction:column;gap:10px"></div>
+        </div>
       </div>
     </div>
     </div><!-- /b5-inv -->
@@ -3701,6 +3716,89 @@ let showDivRoi=false;
 
 function render(){renderInv();renderLoans();renderFlex();renderCash();renderDivs();renderSum();}
 
+// ── 資產分佈甜甜圈圖 ──
+let _invDonutChart=null;
+
+function renderInvDonut(){
+  const canvas=document.getElementById('inv-donut-chart');
+  const legendEl=document.getElementById('inv-donut-legend');
+  const totalEl=document.getElementById('inv-donut-total');
+  if(!canvas||!legendEl)return;
+
+  // 莫蘭迪色系
+  const MORANDI=['#8fa8c8','#a8c5a0','#c9a99a','#b5adc4','#c4b89a','#9bbfbf','#d4a9b5','#a3b5a3'];
+
+  // 從實際持倉計算市值
+  const items=[];
+  let totalMkt=0;
+  db.investments.forEach(inv=>{
+    const c=calcInv(inv);
+    if(c.tLots<=0)return;
+    const val=c.mktVal??c.tCost;
+    if(val<=0)return;
+    totalMkt+=val;
+    items.push({name:inv.name||inv.code, code:inv.code, val});
+  });
+
+  // 若無真實資料用 Mock
+  const useItems=items.length>0?items:[
+    {name:'台股ETF', code:'mock', val:1200000},
+    {name:'債券ETF', code:'mock', val:900000},
+    {name:'現金部位', code:'mock', val:600000},
+  ];
+  const useTotal=items.length>0?totalMkt:2700000;
+
+  // 更新圓心總額
+  if(totalEl)totalEl.textContent=items.length>0?
+    '$'+(Math.round(useTotal/10000)/100)+'萬':
+    '（示範）';
+
+  const labels=useItems.map(i=>i.name);
+  const data=useItems.map(i=>i.val);
+  const colors=useItems.map((_,i)=>MORANDI[i%MORANDI.length]);
+
+  if(_invDonutChart)_invDonutChart.destroy();
+  _invDonutChart=new Chart(canvas,{
+    type:'doughnut',
+    data:{labels,datasets:[{data,backgroundColor:colors,borderWidth:3,borderColor:'#fff',hoverBorderWidth:0,hoverOffset:6}]},
+    options:{
+      cutout:'68%',
+      responsive:false,
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          backgroundColor:'rgba(17,24,39,.88)',
+          titleFont:{family:"'Noto Sans TC',sans-serif",size:12,weight:'700'},
+          bodyFont:{family:"'JetBrains Mono',monospace",size:12},
+          padding:10,
+          cornerRadius:8,
+          callbacks:{
+            label(ctx){
+              const v=ctx.parsed;
+              const tot=ctx.dataset.data.reduce((a,b)=>a+b,0);
+              const pct=Math.round(v/tot*1000)/10;
+              return ` $${Math.round(v/10000).toLocaleString()} 萬  （${pct}%）`;
+            }
+          }
+        }
+      }
+    }
+  });
+
+  // 圖例
+  legendEl.innerHTML=useItems.map((item,i)=>{
+    const pct=Math.round(item.val/useTotal*1000)/10;
+    const valTW=Math.round(item.val/10000);
+    return`<div style="display:flex;align-items:center;gap:10px">
+      <span style="width:10px;height:10px;border-radius:50%;background:${colors[i]};flex-shrink:0"></span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:700;color:#374151;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${item.name}</div>
+        <div style="font-size:11px;color:#9ca3af;font-family:'JetBrains Mono',monospace">$${valTW.toLocaleString()}萬・${pct}%</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
 function renderInv(){
   const grid=document.getElementById('inv-body');
   const openIds=new Set();
@@ -3922,10 +4020,11 @@ function toggleSection(id){
   if(!detail)return;
   const isOpen=detail.style.display!=='none';
   detail.style.display=isOpen?'none':'block';
-  // Support both big5-toggle span and sec-toggle-btn
   const card=detail.closest('.big5-card')||detail.closest('.sec-collapsible')||detail.closest('.db-card');
   const btn=card?.querySelector('.big5-toggle-btn,.sec-toggle-btn');
   if(btn)btn.textContent=isOpen?'展開 ▼':'收起 ▲';
+  // 展開投資標的時渲染甜甜圈圖
+  if(id==='inv-detail'&&!isOpen)setTimeout(renderInvDonut,50);
 }
 
 function toggleHist(id){
