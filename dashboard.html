@@ -6237,7 +6237,7 @@ undoStack=[JSON.stringify(db)];
 (function(){const r=document.getElementById('redoBtn');if(r)r.disabled=true;})();
 // 啟動時直接 render（不自動 Pull 避免覆蓋本地資料）
 render();
-setTimeout(renderOvDashboard,300);
+setTimeout(renderOvDashboard,2500); // Pull 約 1.5 秒完成，2.5 秒後確保資料已載入
 checkBkWarn();
 // 啟動時先強制 Pull，確保拿到最新雲端資料後才開始
 _syncEnabled=false; // 先停用 Push，等 Pull 完再開
@@ -6264,6 +6264,7 @@ setTimeout(async()=>{
         render();
         runDailyProcess(false); // Pull 後重跑交割連動
         showSyncStatus('☁️ 已從雲端同步');
+        setTimeout(renderOvDashboard,100); // Pull完有資料才渲染總覽
       }
     }
   }catch(e){console.warn('啟動Pull失敗:',e.message);}
@@ -6275,7 +6276,7 @@ setTimeout(async()=>{
 setInterval(async()=>{
   if(!_syncEnabled)return;
   const updated=await ghPull();
-  if(updated){render();runDailyProcess(false);showSyncStatus('☁️ 已從雲端同步');}
+  if(updated){render();runDailyProcess(false);showSyncStatus('☁️ 已從雲端同步');setTimeout(renderOvDashboard,100);}
   autoSnapshot(); // 週五15:00後自動拍照
 },5*60*1000);
 
