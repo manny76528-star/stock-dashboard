@@ -2595,7 +2595,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
 .sp-overlay{
   display:none;position:fixed;inset:0;
   background:rgba(0,0,0,.6);
-  z-index:1200;align-items:flex-start;justify-content:center;
+  z-index:3500;align-items:flex-start;justify-content:center;
   padding:20px;overflow-y:auto;
 }
 .sp-overlay.open{display:flex;}
@@ -10505,7 +10505,18 @@ function renderJournalPage(){
   }).join('');
 }
 
+function smoothScrollTo(id, offset=24){
+  const el=document.getElementById(id);
+  if(!el)return;
+  const top=el.getBoundingClientRect().top+window.scrollY-offset;
+  window.scrollTo({top,behavior:'smooth'});
+}
+
 function dbShowPage(id){
+  // 如果目前在總覽頁，部分功能只需滾動
+  const overviewActive=document.getElementById('dbpage-overview')?.classList.contains('active');
+
+  // 切換頁面
   document.querySelectorAll('.db-page').forEach(p=>p.classList.remove('active'));
   const page=document.getElementById('dbpage-'+id);
   if(page)page.classList.add('active');
@@ -10514,11 +10525,20 @@ function dbShowPage(id){
   });
   const nameEl=document.getElementById('db-page-name');
   if(nameEl)nameEl.textContent=DB_PAGE_NAMES[id]||id;
-  if(id==='overview'){render();setTimeout(renderOvDashboard,100);}
-  if(id==='assets')renderAssetsPage();
-  if(id==='invest')renderInvestPage();
-  if(id==='trend')renderTrendPage();
-  if(id==='journal')renderJournalPage();
+
+  // 各頁面邏輯
+  if(id==='overview'){
+    render();setTimeout(renderOvDashboard,100);
+    window.scrollTo({top:0,behavior:'smooth'});
+    return;
+  }
+  if(id==='assets'){renderAssetsPage();}
+  if(id==='invest'){renderInvestPage();}
+  if(id==='trend'){renderTrendPage();}
+  if(id==='journal'){renderJournalPage();}
+
+  // 切換後滾回頂部
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 
 // 更多選單（移到側欄 footer 按鈕觸發）
@@ -10554,6 +10574,8 @@ function showSyncStatus(msg){
 }
 
 function openSP(id){
+  // 先關閉 Drawer（避免衝突）
+  if(_currentDrawer)closeDrawer();
   const el=document.getElementById('sp-'+id);
   if(!el)return;
   el.classList.add('open');
@@ -10565,14 +10587,12 @@ function openSP(id){
   if(id==='journal'){
     if(typeof renderJournal==='function') renderJournal();
     updateJournalCount();
-    // 檢查未填回測提醒
     setTimeout(checkBacktestReminders, 500);
   }
   if(id==='flex'){
     if(typeof renderFlex==='function') renderFlex();
   }
   if(id==='div'){
-    // 重新渲染股息（DOM 元素已在 popup 裡，直接觸發）
     if(typeof renderDivs==='function') renderDivs();
   }
 }
