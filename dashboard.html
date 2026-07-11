@@ -6404,8 +6404,9 @@ setTimeout(async()=>{
         render();
         runDailyProcess(false); // Pull 後重跑交割連動
         showSyncStatus('☁️ 已從雲端同步');
-        setTimeout(renderOvDashboard,100); // Pull完有資料才渲染總覽
       }
+      // Pull完無論是否更新，都重新渲染總覽（確保有資料）
+      setTimeout(renderOvDashboard,100);
     }
   }catch(e){console.warn('啟動Pull失敗:',e.message);}
   _syncEnabled=true; // Pull 完才允許 Push
