@@ -1249,6 +1249,34 @@ body:not(.privacy) .privacy-mask{filter:none;}
 /* ════════════════════════════════════════
    BIG5 CARDS - 五大項深色卡片
 ════════════════════════════════════════ */
+/* ══ 三段式總覽 Dashboard ══ */
+.ov-kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px;}
+.ov-kpi-card{background:#fff;border-radius:14px;border:1px solid #eaecf0;padding:18px 20px;box-shadow:0 2px 8px rgba(0,0,0,.04);position:relative;overflow:hidden;}
+.ov-kpi-accent{position:absolute;top:0;left:0;width:4px;height:100%;border-radius:2px;}
+.ov-kpi-label{font-size:11px;font-weight:600;color:#9ca3af;letter-spacing:.3px;margin-bottom:6px;}
+.ov-kpi-val{font-size:22px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#111827;}
+.ov-kpi-sub{font-size:11px;margin-top:5px;color:#9ca3af;}
+.ov-kpi-sub.up{color:#15803d;}.ov-kpi-sub.dn{color:#b91c1c;}
+.ov-mid-grid{display:grid;grid-template-columns:1fr 320px;gap:16px;margin-bottom:20px;align-items:stretch;}
+.ov-chart-card{background:#fff;border-radius:14px;border:1px solid #eaecf0;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.04);display:flex;flex-direction:column;}
+.ov-chart-title{font-size:12px;font-weight:700;color:#374151;margin-bottom:14px;display:flex;align-items:center;gap:6px;}
+.ov-bot-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.ov-bot-card{background:#fff;border-radius:14px;border:1px solid #eaecf0;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.ov-bot-title{font-size:12px;font-weight:700;color:#374151;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;}
+.ov-bot-link{font-size:11px;color:#2563eb;cursor:pointer;font-weight:600;}
+.ov-loan-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #f0f2f5;}
+.ov-loan-item:last-child{border-bottom:none;}
+.ov-loan-bank{font-size:12px;font-weight:700;color:#1e293b;}
+.ov-loan-date{font-size:10px;color:#9ca3af;margin-top:1px;}
+.ov-loan-amt{font-size:13px;font-weight:800;font-family:'JetBrains Mono',monospace;margin-left:auto;color:#111827;}
+.ov-loan-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px;margin-left:8px;white-space:nowrap;}
+.ov-j-item{padding:9px 0;border-bottom:1px solid #f0f2f5;cursor:pointer;transition:background .12s;}
+.ov-j-item:last-child{border-bottom:none;}
+.ov-j-date{font-size:10px;color:#9ca3af;font-weight:600;}
+.ov-j-title{font-size:12px;font-weight:600;color:#374151;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ov-j-tags{display:flex;gap:4px;margin-top:4px;flex-wrap:wrap;}
+.ov-j-tag{font-size:10px;padding:1px 6px;border-radius:4px;font-weight:600;}
+
 /* ══ 雙欄 Grid 佈局 ══ */
 .big5-grid{
   display:grid;
@@ -2156,6 +2184,86 @@ body:not(.privacy) .privacy-mask{filter:none;}
 <!-- ═══ BOTTOM STATUS BAR ═══ -->
 
 </div><!-- /db-root (legacy content inside overview page) -->
+
+    <!-- ══ 三段式新總覽 ══ -->
+    <div id="ov-dashboard" style="margin-top:20px">
+
+      <!-- 上層：KPI 卡片 -->
+      <div class="ov-kpi-grid">
+        <div class="ov-kpi-card">
+          <div class="ov-kpi-accent" style="background:#8fa8c8"></div>
+          <div class="ov-kpi-label" style="padding-left:8px">淨資產</div>
+          <div class="ov-kpi-val privacy-mask" id="ov-net" style="padding-left:8px">—</div>
+          <div class="ov-kpi-sub" id="ov-net-sub" style="padding-left:8px"></div>
+        </div>
+        <div class="ov-kpi-card">
+          <div class="ov-kpi-accent" style="background:#a8c5a0"></div>
+          <div class="ov-kpi-label" style="padding-left:8px">投資總損益</div>
+          <div class="ov-kpi-val privacy-mask" id="ov-pnl" style="padding-left:8px">—</div>
+          <div class="ov-kpi-sub privacy-mask" id="ov-roi" style="padding-left:8px"></div>
+        </div>
+        <div class="ov-kpi-card">
+          <div class="ov-kpi-accent" style="background:#c9a99a"></div>
+          <div class="ov-kpi-label" style="padding-left:8px">每月股息</div>
+          <div class="ov-kpi-val privacy-mask" id="ov-div" style="padding-left:8px">—</div>
+          <div class="ov-kpi-sub" id="ov-div-sub" style="padding-left:8px"></div>
+        </div>
+        <div class="ov-kpi-card">
+          <div class="ov-kpi-accent" style="background:#b5adc4"></div>
+          <div class="ov-kpi-label" style="padding-left:8px">信貸負債 / 負債比</div>
+          <div class="ov-kpi-val privacy-mask" id="ov-loan" style="padding-left:8px">—</div>
+          <div class="ov-kpi-sub privacy-mask" id="ov-dr" style="padding-left:8px"></div>
+        </div>
+      </div>
+
+      <!-- 中層：趨勢圖 + 甜甜圈圖 -->
+      <div class="ov-mid-grid">
+        <!-- 左：資產趨勢折線圖 -->
+        <div class="ov-chart-card">
+          <div class="ov-chart-title">📈 資產趨勢 <span style="font-size:10px;color:#9ca3af;font-weight:500">（每週五快照）</span></div>
+          <div style="flex:1;position:relative;min-height:220px">
+            <canvas id="ov-trend-canvas"></canvas>
+          </div>
+        </div>
+        <!-- 右：資產分佈甜甜圈圖 -->
+        <div class="ov-chart-card">
+          <div class="ov-chart-title">🥧 資產分佈</div>
+          <div style="position:relative;width:160px;height:160px;margin:0 auto">
+            <canvas id="ov-donut-canvas" width="160" height="160"></canvas>
+            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none">
+              <div style="font-size:9px;color:#9ca3af;font-weight:600">市值</div>
+              <div id="ov-donut-total" class="privacy-mask" style="font-size:13px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#111827">—</div>
+            </div>
+          </div>
+          <div id="ov-donut-legend" style="margin-top:14px;display:flex;flex-direction:column;gap:7px"></div>
+        </div>
+      </div>
+
+      <!-- 下層：信貸提醒 + 最新日誌 -->
+      <div class="ov-bot-grid">
+        <!-- 左：近期扣款提醒 -->
+        <div class="ov-bot-card">
+          <div class="ov-bot-title">
+            <span>🏦 近期扣款提醒</span>
+            <span class="ov-bot-link" onclick="openSP('flex')">查看全部 ↗</span>
+          </div>
+          <div id="ov-loan-list">
+            <div style="color:#9ca3af;font-size:12px;text-align:center;padding:20px">載入中...</div>
+          </div>
+        </div>
+        <!-- 右：最新交易日誌 -->
+        <div class="ov-bot-card">
+          <div class="ov-bot-title">
+            <span>📓 最新日誌</span>
+            <span class="ov-bot-link" onclick="openSP('journal')">查看全部 ↗</span>
+          </div>
+          <div id="ov-journal-list">
+            <div style="color:#9ca3af;font-size:12px;text-align:center;padding:20px">載入中...</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /ov-dashboard -->
 
     </div><!-- /dbpage-overview -->
 
@@ -6129,6 +6237,7 @@ undoStack=[JSON.stringify(db)];
 (function(){const r=document.getElementById('redoBtn');if(r)r.disabled=true;})();
 // 啟動時直接 render（不自動 Pull 避免覆蓋本地資料）
 render();
+setTimeout(renderOvDashboard,300);
 checkBkWarn();
 // 啟動時先強制 Pull，確保拿到最新雲端資料後才開始
 _syncEnabled=false; // 先停用 Push，等 Pull 完再開
@@ -8967,6 +9076,259 @@ const DB_PAGE_NAMES={
   overview:'數據總覽',assets:'資產與負債',invest:'投資與觀察',
   journal:'交易日誌',dividend:'股息管理',finplan:'財務規劃',trend:'資產趨勢'
 };
+// ══════════════════════════════════════
+// 三段式總覽 Dashboard
+// ══════════════════════════════════════
+let _ovTrendChart=null, _ovDonutChart=null;
+const MORANDI_OV=['#8fa8c8','#a8c5a0','#c9a99a','#b5adc4','#c4b89a','#9bbfbf','#d4a9b5','#a3b5a3'];
+
+function renderOvDashboard(){
+  renderOvKpi();
+  renderOvTrend();
+  renderOvDonut();
+  renderOvLoans();
+  renderOvJournal();
+}
+
+// ── KPI ──
+function renderOvKpi(){
+  let tC=0,tM=0,tD=0,tPnl=0;
+  db.investments.forEach(inv=>{
+    const c=calcInv(inv);
+    tC+=c.tCost;
+    if(c.mktVal)tM+=c.mktVal;
+    tD+=c.moDivAmt||0;
+    if(c.mktVal!=null)tPnl+=(c.mktVal-c.tCost);
+  });
+  const lR=db.loans.reduce((s,l)=>s+calcLoanRemain(l),0)
+           +db.flexLoans.reduce((s,f)=>s+(f.used||f.remain||0),0);
+  const cT=db.cashAccounts.reduce((s,c)=>s+(c.cash||0)+(c.d1||0)+(c.d2||0),0);
+  const mktV=tM>0?tM:tC;
+  const net=mktV+cT-lR;
+  const dR=net>0?Math.round(lR/(mktV+cT)*1000)/10:0;
+  const roi=tC>0?Math.round(tPnl/tC*1000)/10:0;
+
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  const setC=(id,v,cls)=>{const el=document.getElementById(id);if(el){el.textContent=v;el.className='ov-kpi-sub '+(cls||'');}};
+  const fmtM=v=>v>=1000000?'$'+(v/1000000).toFixed(2)+'M':'$'+Math.round(v).toLocaleString();
+
+  set('ov-net',fmtM(net));
+  setC('ov-net-sub','較上週快照'+( (()=>{
+    const snaps=(db.snapshots||[]).sort((a,b)=>a.ym.localeCompare(b.ym));
+    if(snaps.length<2)return '—';
+    const prev=snaps[snaps.length-2].net;
+    const diff=Math.round(net)-prev;
+    return (diff>=0?'+':'')+fmtM(diff);
+  })()), net>0?'up':'');
+
+  set('ov-pnl',(tPnl>=0?'+':'')+fmtM(tPnl));
+  setC('ov-roi','投報率 '+(roi>=0?'+':'')+roi+'%',tPnl>=0?'up':'dn');
+  const netEl=document.getElementById('ov-pnl');if(netEl)netEl.style.color=tPnl>=0?'#dc2626':'#16a34a';
+
+  set('ov-div','$'+Math.round(tD).toLocaleString());
+  setC('ov-div-sub','年化 $'+Math.round(tD*12).toLocaleString(),'');
+
+  set('ov-loan','$'+Math.round(lR/10000)/100+'萬');
+  setC('ov-dr','負債比 '+dR+'%',dR>85?'dn':dR>70?'':'up');
+}
+
+// ── 資產趨勢折線圖 ──
+function renderOvTrend(){
+  const canvas=document.getElementById('ov-trend-canvas');
+  if(!canvas)return;
+  const snaps=(db.snapshots||[]).sort((a,b)=>a.ym.localeCompare(b.ym));
+  if(snaps.length===0){canvas.style.display='none';return;}
+
+  // 設定 canvas 大小
+  const parent=canvas.parentElement;
+  canvas.width=parent.offsetWidth||400;
+  canvas.height=220;
+
+  const labels=snaps.map(s=>s.ym.length>7?s.ym.slice(5):s.ym);
+  const data=snaps.map(s=>s.net);
+
+  const ctx2=canvas.getContext('2d');
+  // 霧藍漸層
+  const grad=ctx2.createLinearGradient(0,0,0,220);
+  grad.addColorStop(0,'rgba(143,168,200,.25)');
+  grad.addColorStop(1,'rgba(143,168,200,.01)');
+
+  if(_ovTrendChart)_ovTrendChart.destroy();
+  _ovTrendChart=new Chart(canvas,{
+    type:'line',
+    data:{labels,datasets:[{
+      label:'淨資產',data,
+      borderColor:'#8fa8c8',borderWidth:2.5,
+      backgroundColor:grad,
+      tension:0.4,fill:true,
+      pointRadius:3,pointBackgroundColor:'#8fa8c8',
+      pointHoverRadius:6,pointHoverBackgroundColor:'#fff',
+      pointHoverBorderColor:'#8fa8c8',pointHoverBorderWidth:2
+    }]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          backgroundColor:'rgba(17,24,39,.88)',
+          titleFont:{family:"'Noto Sans TC',sans-serif",size:11},
+          bodyFont:{family:"'JetBrains Mono',monospace",size:12},
+          padding:10,cornerRadius:8,
+          callbacks:{
+            label(ctx){
+              const v=ctx.parsed.y;
+              return ' $'+(v>=1000000?(v/1000000).toFixed(2)+'M':Math.round(v).toLocaleString());
+            }
+          }
+        }
+      },
+      scales:{
+        x:{grid:{color:'rgba(0,0,0,.04)'},ticks:{font:{size:10},color:'#9ca3af',maxTicksLimit:8}},
+        y:{
+          position:'right',
+          grid:{color:'rgba(0,0,0,.04)'},
+          ticks:{
+            font:{size:10},color:'#9ca3af',
+            callback:v=>v>=1000000?'$'+(v/1000000).toFixed(1)+'M':'$'+(v/1000).toFixed(0)+'K'
+          }
+        }
+      }
+    }
+  });
+}
+
+// ── 資產分佈甜甜圈（總覽版）──
+function renderOvDonut(){
+  const canvas=document.getElementById('ov-donut-canvas');
+  const legendEl=document.getElementById('ov-donut-legend');
+  const totalEl=document.getElementById('ov-donut-total');
+  if(!canvas||!legendEl)return;
+
+  const items=[];let totalMkt=0;
+  db.investments.forEach(inv=>{
+    const c=calcInv(inv);
+    if(c.tLots<=0)return;
+    const val=c.mktVal??c.tCost;
+    if(val<=0)return;
+    totalMkt+=val;
+    items.push({name:inv.name||inv.code,val});
+  });
+  const useItems=items.length>0?items:[
+    {name:'台股ETF',val:1200000},{name:'債券ETF',val:900000},{name:'現金',val:600000}
+  ];
+  const useTotal=items.length>0?totalMkt:2700000;
+
+  if(totalEl)totalEl.textContent=items.length>0?
+    '$'+(Math.round(useTotal/10000)/100)+'萬':'—';
+
+  const data=useItems.map(i=>i.val);
+  const colors=useItems.map((_,i)=>MORANDI_OV[i%MORANDI_OV.length]);
+
+  if(_ovDonutChart)_ovDonutChart.destroy();
+  _ovDonutChart=new Chart(canvas,{
+    type:'doughnut',
+    data:{labels:useItems.map(i=>i.name),datasets:[{data,backgroundColor:colors,borderWidth:3,borderColor:'#fff',hoverOffset:5}]},
+    options:{
+      cutout:'68%',responsive:false,
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          backgroundColor:'rgba(17,24,39,.88)',
+          bodyFont:{family:"'JetBrains Mono',monospace",size:11},
+          padding:8,cornerRadius:8,
+          callbacks:{
+            label(ctx){
+              const v=ctx.parsed;const tot=ctx.dataset.data.reduce((a,b)=>a+b,0);
+              return ` $${Math.round(v/10000).toLocaleString()}萬 (${Math.round(v/tot*1000)/10}%)`;
+            }
+          }
+        }
+      }
+    }
+  });
+
+  legendEl.innerHTML=useItems.map((item,i)=>{
+    const pct=Math.round(item.val/useTotal*1000)/10;
+    return`<div style="display:flex;align-items:center;gap:8px">
+      <span style="width:8px;height:8px;border-radius:50%;background:${colors[i]};flex-shrink:0"></span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:11px;font-weight:700;color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${item.name}</div>
+      </div>
+      <span style="font-size:11px;color:#6b7280;font-family:'JetBrains Mono',monospace;flex-shrink:0">${pct}%</span>
+    </div>`;
+  }).join('');
+}
+
+// ── 近期扣款提醒 ──
+function renderOvLoans(){
+  const el=document.getElementById('ov-loan-list');
+  if(!el)return;
+  const today=new Date();
+  const todayStr=today.toISOString().slice(0,10);
+
+  // 收集未來30天內要扣款的項目
+  const upcoming=[];
+  [...db.loans,...(db.flexLoans||[])].forEach(loan=>{
+    if(!loan.deductDay&&!loan.monthly)return;
+    const day=loan.deductDay||1;
+    // 本月扣款日
+    for(let mo=0;mo<=1;mo++){
+      const d=new Date(today.getFullYear(),today.getMonth()+mo,day);
+      const ds=d.toISOString().slice(0,10);
+      if(ds>=todayStr){
+        const daysLeft=Math.round((d-today)/86400000);
+        if(daysLeft<=30)upcoming.push({
+          name:loan.name||loan.bank||'信貸',
+          date:ds,days:daysLeft,
+          amt:loan.monthly||0,
+          urgent:daysLeft<=7
+        });
+        break;
+      }
+    }
+  });
+  upcoming.sort((a,b)=>a.days-b.days);
+
+  if(upcoming.length===0){
+    el.innerHTML='<div style="color:#9ca3af;font-size:12px;text-align:center;padding:20px">近30天無扣款</div>';
+    return;
+  }
+  el.innerHTML=upcoming.slice(0,5).map(item=>`
+    <div class="ov-loan-item">
+      <div>
+        <div class="ov-loan-bank">${item.name}</div>
+        <div class="ov-loan-date">${item.date}</div>
+      </div>
+      <div class="ov-loan-amt privacy-mask">$${Math.round(item.amt).toLocaleString()}</div>
+      <span class="ov-loan-badge" style="${item.urgent?'background:#fee2e2;color:#b91c1c':'background:#f0fdf4;color:#15803d'}">
+        ${item.days===0?'今天':item.days+'天後'}
+      </span>
+    </div>`).join('');
+}
+
+// ── 最新日誌 ──
+function renderOvJournal(){
+  const el=document.getElementById('ov-journal-list');
+  if(!el)return;
+  const journals=(db.journals||[]).sort((a,b)=>(b.date||'').localeCompare(a.date||'')).slice(0,5);
+  if(journals.length===0){
+    el.innerHTML='<div style="color:#9ca3af;font-size:12px;text-align:center;padding:20px">尚無日誌</div>';
+    return;
+  }
+  const tagColors={'看多':'#dbeafe;color:#1d4ed8','看空':'#dcfce7;color:#15803d',
+    '買入':'#fef3c7;color:#92400e','賣出':'#fce7f3;color:#9d174d',
+    '重大事項':'#fee2e2;color:#b91c1c','極度恐慌':'#f3e8ff;color:#7e22ce'};
+  el.innerHTML=journals.map(j=>{
+    const tags=(j.tags||[]).slice(0,3).map(t=>`<span class="ov-j-tag" style="background:${(tagColors[t]||'#f1f5f9;color:#374151').split(';')[0].replace('background:','')};color:${(tagColors[t]||'color:#374151').split('color:')[1]}">${t}</span>`).join('');
+    return`<div class="ov-j-item" onclick="openSP('journal')">
+      <div class="ov-j-date">${j.date}</div>
+      <div class="ov-j-title">${j.market||j.content||'（無標題）'}</div>
+      ${tags?`<div class="ov-j-tags">${tags}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
 function dbShowPage(id){
   document.querySelectorAll('.db-page').forEach(p=>p.classList.remove('active'));
   const page=document.getElementById('dbpage-'+id);
@@ -8976,8 +9338,7 @@ function dbShowPage(id){
   });
   const nameEl=document.getElementById('db-page-name');
   if(nameEl)nameEl.textContent=DB_PAGE_NAMES[id]||id;
-  // 切到總覽時更新資料
-  if(id==='overview'){render();}
+  if(id==='overview'){render();setTimeout(renderOvDashboard,100);}
 }
 
 // 更多選單（移到側欄 footer 按鈕觸發）
