@@ -1960,6 +1960,8 @@ body:not(.privacy) .privacy-mask{filter:none;}
     <!-- ══ 頁面：數據總覽 ══ -->
     <div class="db-page active" id="dbpage-overview">
 
+<!-- 舊版資產總覽（保留顯示） -->
+<div>
 <!-- 資產總覽 KPI 卡片 -->
 <div class="db-card" style="margin-bottom:12px">
   <div class="db-card-header" style="justify-content:space-between">
@@ -2226,6 +2228,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
 <!-- ═══ BOTTOM STATUS BAR ═══ -->
 
 </div><!-- /db-root (legacy content inside overview page) -->
+</div><!-- /hidden legacy -->
 
     <!-- ══ 三段式新總覽 ══ -->
     <div id="ov-dashboard" style="margin-top:20px">
@@ -6377,16 +6380,15 @@ undoStack=[JSON.stringify(db)];
 (function(){const r=document.getElementById('redoBtn');if(r)r.disabled=true;})();
 // 啟動時直接 render（不自動 Pull 避免覆蓋本地資料）
 render();
-setTimeout(renderOvDashboard,2500); // Pull 約 1.5 秒完成，2.5 秒後確保資料已載入
 checkBkWarn();
 // 啟動時先強制 Pull，確保拿到最新雲端資料後才開始
-_syncEnabled=false; // 先停用 Push，等 Pull 完再開
+_syncEnabled=false;
 setTimeout(async()=>{
   try{
     const r=await fetch(GH_API+'?t='+Date.now());
     if(r.ok){
       const j=await r.json();
-      _ghSha=j.sha; // 啟動時記錄最新 SHA
+      _ghSha=j.sha;
       const b64=j.content.replace(/\n/g,'');
       const binStr=atob(b64);
       const bytes=new Uint8Array(binStr.length);
@@ -6396,20 +6398,20 @@ setTimeout(async()=>{
       const localTs=db._ts||0;
       console.log('啟動Pull: 本地ts='+localTs+' 遠端ts='+remoteTs);
       if(remoteTs>=localTs){
-        // 雲端較新或一樣 → 用雲端（保護journals/watchlist）
         if((db.journals||[]).length>(remote.journals||[]).length)remote.journals=db.journals;
         if((db.watchlist||[]).length>(remote.watchlist||[]).length)remote.watchlist=db.watchlist;
         db=remote;
         localStorage.setItem(STORE,JSON.stringify(db));
         render();
-        runDailyProcess(false); // Pull 後重跑交割連動
+        runDailyProcess(false);
         showSyncStatus('☁️ 已從雲端同步');
-        setTimeout(renderOvDashboard,100); // Pull完有資料才渲染總覽
       }
     }
   }catch(e){console.warn('啟動Pull失敗:',e.message);}
-  _syncEnabled=true; // Pull 完才允許 Push
+  _syncEnabled=true;
   refreshPrices();
+  // Pull完成後才渲染總覽（確保資料已載入）
+  renderOvDashboard();
 },1500);
 
 // 每 5 分鐘自動 Pull 一次（手機長時間開著也能更新）
@@ -9657,30 +9659,31 @@ function renderOvLoans(){
   if(!el)return;
   const today=new Date();
   const todayStr=today.toISOString().slice(0,10);
-
-  // 收集未來30天內要扣款的項目
   const upcoming=[];
-  [...db.loans,...(db.flexLoans||[])].forEach(loan=>{
-    if(!loan.deductDay&&!loan.monthly)return;
-    const day=loan.deductDay||1;
-    // 本月扣款日
-    for(let mo=0;mo<=1;mo++){
-      const d=new Date(today.getFullYear(),today.getMonth()+mo,day);
-      const ds=d.toISOString().slice(0,10);
-      if(ds>=todayStr){
-        const daysLeft=Math.round((d-today)/86400000);
-        if(daysLeft<=30)upcoming.push({
-          name:loan.name||loan.bank||'信貸',
-          date:ds,days:daysLeft,
-          amt:loan.monthly||0,
-          urgent:daysLeft<=7
-        });
-        break;
+  [...(db.loans||[]),...(db.flexLoans||[])].forEach(loan=>{
+    const monthly=loan.monthly||0;
+    if(!monthly)return;
+    const day=parseInt(loan.deductDay||loan.payDay||0);
+    if(!day||day<1||day>31)return;
+    try{
+      for(let mo=0;mo<=1;mo++){
+        const d=new Date(today.getFullYear(),today.getMonth()+mo,day);
+        if(isNaN(d.getTime()))continue;
+        const ds=d.toISOString().slice(0,10);
+        if(ds>=todayStr){
+          const daysLeft=Math.round((d-today)/86400000);
+          if(daysLeft<=30)upcoming.push({
+            name:loan.name||loan.bank||'信貸',
+            date:ds,days:daysLeft,
+            amt:monthly,
+            urgent:daysLeft<=7
+          });
+          break;
+        }
       }
-    }
+    }catch(e){}
   });
   upcoming.sort((a,b)=>a.days-b.days);
-
   if(upcoming.length===0){
     el.innerHTML='<div style="color:#9ca3af;font-size:12px;text-align:center;padding:20px">近30天無扣款</div>';
     return;
@@ -9707,15 +9710,24 @@ function renderOvJournal(){
     el.innerHTML='<div style="color:#9ca3af;font-size:12px;text-align:center;padding:20px">尚無日誌</div>';
     return;
   }
-  const tagColors={'看多':'#dbeafe;color:#1d4ed8','看空':'#dcfce7;color:#15803d',
-    '買入':'#fef3c7;color:#92400e','賣出':'#fce7f3;color:#9d174d',
-    '重大事項':'#fee2e2;color:#b91c1c','極度恐慌':'#f3e8ff;color:#7e22ce'};
+  const tagColors={
+    '看多':'background:#dbeafe;color:#1d4ed8',
+    '看空':'background:#dcfce7;color:#15803d',
+    '買入':'background:#fef3c7;color:#92400e',
+    '賣出':'background:#fce7f3;color:#9d174d',
+    '重大事項':'background:#fee2e2;color:#b91c1c',
+    '極度恐慌':'background:#f3e8ff;color:#7e22ce'
+  };
   el.innerHTML=journals.map(j=>{
-    const tags=(j.tags||[]).slice(0,3).map(t=>`<span class="ov-j-tag" style="background:${(tagColors[t]||'#f1f5f9;color:#374151').split(';')[0].replace('background:','')};color:${(tagColors[t]||'color:#374151').split('color:')[1]}">${t}</span>`).join('');
+    const tags=(j.tags||[]).slice(0,3).map(t=>{
+      const style=tagColors[t]||'background:#f1f5f9;color:#374151';
+      return`<span style="${style};padding:1px 6px;border-radius:4px;font-size:10px;font-weight:600">${t}</span>`;
+    }).join('');
+    const title=(j.market||j.content||'（無標題）').slice(0,50);
     return`<div class="ov-j-item" onclick="openSP('journal')">
       <div class="ov-j-date">${j.date}</div>
-      <div class="ov-j-title">${j.market||j.content||'（無標題）'}</div>
-      ${tags?`<div class="ov-j-tags">${tags}</div>`:''}
+      <div class="ov-j-title">${title}</div>
+      ${tags?`<div class="ov-j-tags" style="display:flex;gap:4px;margin-top:4px;flex-wrap:wrap">${tags}</div>`:''}
     </div>`;
   }).join('');
 }
