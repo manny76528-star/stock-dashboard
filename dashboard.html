@@ -581,15 +581,14 @@ body:not(.privacy) .privacy-mask{filter:none;}
 
 /* STATUS BAR */
 .db-status-bar{
-  display:flex;gap:24px;flex-wrap:wrap;
-  padding:12px 20px;
-  background:#fff;color:#64748b;
+  padding:16px 24px;
+  background:#fff;
   border-radius:12px;font-size:13px;
   border:1px solid #eaecf0;
   box-shadow:0 2px 8px rgba(0,0,0,.04);
   margin-bottom:20px;
 }
-.db-status-bar strong{color:#1e293b;font-family:'JetBrains Mono',monospace;}
+.db-status-bar strong{color:#1e293b;font-family:'JetBrains Mono',monospace;font-weight:700;}
 
 @media(max-width:768px){
   .db-row{flex-direction:column;}
@@ -1241,6 +1240,19 @@ body:not(.privacy) .privacy-mask{filter:none;}
 /* ════════════════════════════════════════
    BIG5 CARDS - 五大項深色卡片
 ════════════════════════════════════════ */
+/* ══ 雙欄 Grid 佈局 ══ */
+.big5-grid{
+  display:grid;
+  grid-template-columns:58% 1fr;
+  gap:24px;
+  align-items:start;
+}
+.big5-col-left{display:flex;flex-direction:column;gap:0;}
+.big5-col-right{display:flex;flex-direction:column;gap:20px;}
+@media(max-width:900px){
+  .big5-grid{grid-template-columns:1fr;}
+}
+
 .big5-wrap {
   display: flex;
   flex-direction: column;
@@ -1907,8 +1919,13 @@ body:not(.privacy) .privacy-mask{filter:none;}
 <!-- ═══ 五大項卡片 ═══ -->
 <div class="big5-wrap">
 
-  <!-- 1. 投資標的 -->
-  <div class="big5-card" id="b5-inv">
+  <!-- 第二排：左右雙欄 -->
+  <div class="big5-grid">
+
+    <!-- 左欄：投資標的 -->
+    <div class="big5-col-left">
+      <!-- 1. 投資標的 -->
+      <div class="big5-card" id="b5-inv">
     <div class="big5-header">
       <div class="big5-left">
         <span class="big5-icon">📈</span>
@@ -1931,10 +1948,14 @@ body:not(.privacy) .privacy-mask{filter:none;}
     <div class="big5-detail" id="inv-detail" style="display:none">
       <div class="irow-list" id="inv-body"></div>
     </div>
-  </div>
+    </div><!-- /b5-inv -->
+    </div><!-- /big5-col-left -->
 
-  <!-- 2. 信貸管理 -->
-  <div class="big5-card" id="b5-loan">
+    <!-- 右欄：信貸管理 + 現金帳戶 -->
+    <div class="big5-col-right">
+
+      <!-- 2. 信貸管理 -->
+      <div class="big5-card" id="b5-loan">
     <div class="big5-header">
       <div class="big5-left">
         <span class="big5-icon">🏦</span>
@@ -1956,14 +1977,13 @@ body:not(.privacy) .privacy-mask{filter:none;}
     <div class="big5-detail" id="loan-detail" style="display:none">
       <div class="loan-card-grid" id="loan-body"></div>
     </div>
-  </div>
+    </div><!-- /b5-loan -->
 
+      <!-- hidden containers -->
+      <div style="display:none"><div class="flex-card-grid" id="flex-body"></div></div>
 
-  <!-- hidden containers for flex and div rendering (不顯示在 big5，改為小卡片) -->
-  <div style="display:none"><div class="flex-card-grid" id="flex-body"></div></div>
-
-  <!-- 4. 現金帳戶 -->
-  <div class="big5-card" id="b5-cash">
+      <!-- 4. 現金帳戶 -->
+      <div class="big5-card" id="b5-cash">
     <div class="big5-header">
       <div class="big5-left">
         <span class="big5-icon">💰</span>
@@ -1983,7 +2003,10 @@ body:not(.privacy) .privacy-mask{filter:none;}
     <div class="big5-detail" id="cash-detail" style="display:none">
       <div class="cash-card-grid" id="cash-body"></div>
     </div>
-  </div>
+  </div><!-- /b5-cash -->
+
+    </div><!-- /big5-col-right -->
+  </div><!-- /big5-grid -->
 
 <table id="cash-tbl" style="display:none"><tbody id="cash-body-compat"></tbody></table>
 <table id="loan-tbl" style="display:none"><tbody></tbody></table>
@@ -2074,10 +2097,13 @@ body:not(.privacy) .privacy-mask{filter:none;}
 
 <!-- ═══ BOTTOM STATUS BAR ═══ -->
 <div class="db-status-bar">
-  <span>每月淨現金流：<strong class="privacy-mask" id="sb-cf">—</strong></span>
-  <span>每月股息：<strong class="privacy-mask" id="sb-div">—</strong></span>
-  <span>負債比：<strong class="privacy-mask" id="sb-dr">—</strong></span>
-  <span>信貸尚餘：<strong class="privacy-mask" id="sb-loan">—</strong></span>
+  <div style="font-size:10px;font-weight:700;color:#94a3b8;letter-spacing:.5px;text-transform:uppercase;margin-bottom:2px">每月概況</div>
+  <div style="display:flex;gap:32px;flex-wrap:wrap">
+    <div><div style="font-size:10px;color:#94a3b8;margin-bottom:2px">淨現金流</div><strong class="privacy-mask" id="sb-cf" style="font-size:16px">—</strong></div>
+    <div><div style="font-size:10px;color:#94a3b8;margin-bottom:2px">每月股息</div><strong class="privacy-mask" id="sb-div" style="font-size:16px">—</strong></div>
+    <div><div style="font-size:10px;color:#94a3b8;margin-bottom:2px">負債比</div><strong class="privacy-mask" id="sb-dr" style="font-size:16px">—</strong></div>
+    <div><div style="font-size:10px;color:#94a3b8;margin-bottom:2px">信貸尚餘</div><strong class="privacy-mask" id="sb-loan" style="font-size:16px">—</strong></div>
+  </div>
 </div>
 
 </div><!-- /db-root (legacy content inside overview page) -->
