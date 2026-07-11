@@ -1814,26 +1814,35 @@ body:not(.privacy) .privacy-mask{filter:none;}
     <div class="db-nav-item active" id="nav-overview" onclick="dbShowPage('overview')">
       <span class="nav-icon">🏠</span>數據總覽
     </div>
+
     <div class="db-nav-section">資產管理</div>
     <div class="db-nav-item" id="nav-assets" onclick="dbShowPage('assets')">
       <span class="nav-icon">🏦</span>資產與負債
+      <span class="db-nav-badge" id="nav-flex-badge" style="display:none"></span>
     </div>
     <div class="db-nav-item" id="nav-invest" onclick="dbShowPage('invest')">
       <span class="nav-icon">💼</span>投資與觀察
     </div>
+
     <div class="db-nav-section">記錄</div>
-    <div class="db-nav-item" id="nav-journal" onclick="dbShowPage('journal')">
+    <div class="db-nav-item" id="nav-journal" onclick="openSP('journal')" style="position:relative">
       <span class="nav-icon">📓</span>交易日誌
+      <span class="db-nav-badge" id="nav-journal-badge" style="background:#dbeafe;color:#1d4ed8"></span>
     </div>
-    <div class="db-nav-item" id="nav-dividend" onclick="dbShowPage('dividend')">
+    <div class="db-nav-item" id="nav-dividend" onclick="openSP('div')">
       <span class="nav-icon">💰</span>股息管理
+      <span class="db-nav-badge" id="nav-div-badge" style="background:#dcfce7;color:#15803d"></span>
     </div>
-    <div class="db-nav-section">規劃</div>
-    <div class="db-nav-item" id="nav-finplan" onclick="dbShowPage('finplan')">
+
+    <div class="db-nav-section">分析與規劃</div>
+    <div class="db-nav-item" id="nav-analytics" onclick="openSP('analytics')">
+      <span class="nav-icon">📈</span>投資分析
+    </div>
+    <div class="db-nav-item" id="nav-finplan" onclick="openSP('finplan')">
       <span class="nav-icon">📐</span>財務規劃
     </div>
     <div class="db-nav-item" id="nav-trend" onclick="dbShowPage('trend')">
-      <span class="nav-icon">📈</span>資產趨勢
+      <span class="nav-icon">📊</span>資產趨勢
     </div>
   </nav>
   <div class="db-sidebar-footer">
@@ -2247,60 +2256,13 @@ body:not(.privacy) .privacy-mask{filter:none;}
 .sp-body{padding:20px;max-height:88vh;overflow-y:auto;}
 </style>
 
-<div class="mini-card-row">
-
-  <!-- 1. 不限用途額度 -->
-  <div class="mini-card" onclick="openSP('flex')">
-    <div class="mini-card-icon">💳</div>
-    <div class="mini-card-title">不限用途</div>
-    <div class="mini-card-badge red"><span id="f-rem-mc">—</span></div>
-    <div class="mini-card-open-hint">點擊查看 ›</div>
-  </div>
-
-  <!-- 2. 股息記錄 -->
-  <div class="mini-card" onclick="openSP('div')">
-    <div class="mini-card-icon">🎯</div>
-    <div class="mini-card-title">股息記錄</div>
-    <div class="mini-card-badge green"><span id="d-yr-badge-mc">—</span></div>
-    <div class="mini-card-open-hint">點擊查看 ›</div>
-  </div>
-
-  <!-- 4. 觀察股區 -->
-  <div class="mini-card" onclick="openSP('watch')">
-    <div class="mini-card-icon">👁</div>
-    <div class="mini-card-title">觀察股區</div>
-    <div class="mini-card-badge yellow">
-      <span id="watch-count">0 檔</span>
-    </div>
-    <div class="mini-card-open-hint">點擊查看 ›</div>
-  </div>
-
-  <!-- 5. 投資分析儀表板 -->
-  <div class="mini-card" onclick="openSP('analytics')">
-    <div class="mini-card-icon">📊</div>
-    <div class="mini-card-title">投資分析</div>
-    <div class="mini-card-badge green">分析報告</div>
-    <div class="mini-card-open-hint">點擊查看 ›</div>
-  </div>
-
-  <!-- 6. 財務規劃 -->
-  <div class="mini-card" onclick="openSP('finplan')">
-    <div class="mini-card-icon">🎯</div>
-    <div class="mini-card-title">財務規劃</div>
-    <div class="mini-card-badge yellow">目標試算</div>
-    <div class="mini-card-open-hint">點擊查看 ›</div>
-  </div>
-
-  <!-- 7. 交易日誌 -->
-  <div class="mini-card" onclick="openSP('journal')">
-    <div class="mini-card-icon">📓</div>
-    <div class="mini-card-title">交易日誌</div>
-    <div class="mini-card-badge blue">
-      <span id="journal-count">0 篇</span>
-    </div>
-    <div class="mini-card-open-hint">點擊查看 ›</div>
-  </div>
-
+<!-- mini-card 移除：功能已整合至左側導航各分頁 -->
+<!-- 保留隱藏 badge span 供 JS 更新使用 -->
+<div style="display:none">
+  <span id="f-rem-mc">—</span>
+  <span id="d-yr-badge-mc">—</span>
+  <span id="watch-count">0 檔</span>
+  <span id="journal-count">0 篇</span>
 </div>
 
 <!-- ══════════════════════════════════════
@@ -4466,6 +4428,9 @@ function renderDivs(){
   const dyb=document.getElementById('d-yr-badge');if(dyb)dyb.textContent='$'+Math.round(yrTot).toLocaleString();
   const dtb=document.getElementById('d-tot-badge');if(dtb)dtb.textContent='$'+Math.round(allTot).toLocaleString();
   const dmc=document.getElementById('d-yr-badge-mc');if(dmc)dmc.textContent='今年 $'+Math.round(yrTot).toLocaleString();
+  // 同步側欄 badge
+  const divNb=document.getElementById('nav-div-badge');
+  if(divNb){divNb.textContent='$'+Math.round(yrTot).toLocaleString();divNb.style.display=yrTot>0?'':'none';}
   const dpb=document.getElementById('d-pend-badge');
   if(dpb){
     dpb.textContent=pendingTotal>0?'$'+Math.round(pendingTotal).toLocaleString():'—';
@@ -8488,7 +8453,11 @@ function openStockTracker(tag){
 
 function updateJournalCount(){
   const el=document.getElementById('journal-count');
-  if(el)el.textContent=(db.journals||[]).length+' 篇';
+  const cnt=(db.journals||[]).length;
+  if(el)el.textContent=cnt+' 篇';
+  // 同步更新側欄 badge
+  const nb=document.getElementById('nav-journal-badge');
+  if(nb){nb.textContent=cnt+' 篇';nb.style.display=cnt>0?'':'none';}
 }
 
 function renderJournal(){
