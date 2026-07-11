@@ -1302,6 +1302,59 @@ body:not(.privacy) .privacy-mask{filter:none;}
 .as-add-btn{display:flex;align-items:center;gap:6px;padding:10px 18px;color:#2563eb;font-size:12px;font-weight:700;cursor:pointer;border-top:1px solid #f0f2f5;transition:background .12s;}
 .as-add-btn:hover{background:#eff6ff;}
 
+/* ══ 通用右側 Drawer ══ */
+.side-drawer{
+  position:fixed;top:0;right:0;height:100vh;
+  width:580px;max-width:92vw;
+  background:#fff;
+  box-shadow:-8px 0 40px rgba(0,0,0,.12);
+  z-index:3000;
+  display:flex;flex-direction:column;
+  transform:translateX(100%);
+  transition:transform .3s cubic-bezier(.4,0,.2,1);
+}
+.side-drawer.open{transform:translateX(0);}
+.side-drawer-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.3);
+  z-index:2999;opacity:0;pointer-events:none;
+  transition:opacity .3s ease;
+}
+.side-drawer-overlay.open{opacity:1;pointer-events:all;}
+.side-drawer-hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 22px;
+  border-bottom:1px solid #eaecf0;
+  background:#fff;
+  flex-shrink:0;
+}
+.side-drawer-title{font-size:16px;font-weight:800;color:#1e293b;display:flex;align-items:center;gap:10px;}
+.side-drawer-actions{display:flex;align-items:center;gap:8px;}
+.side-drawer-close{background:none;border:none;font-size:20px;cursor:pointer;color:#9ca3af;padding:4px;line-height:1;transition:color .15s;}
+.side-drawer-close:hover{color:#374151;}
+.side-drawer-body{flex:1;overflow-y:auto;padding:20px 24px;}
+
+/* ══ 日誌分頁 ══ */
+.journal-page-card{background:#fff;border-radius:14px;border:1px solid #eaecf0;box-shadow:0 2px 8px rgba(0,0,0,.04);overflow:hidden;}
+.journal-page-toolbar{padding:12px 16px;background:#f8f9fa;border-bottom:1px solid #eaecf0;display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+
+/* ══ Drawer 表單樣式 ══ */
+.drawer-section{margin-bottom:20px;}
+.drawer-section-title{font-size:11px;font-weight:700;color:#9ca3af;letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #f0f2f5;}
+.drawer-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.drawer-label{font-size:11px;font-weight:600;color:#374151;margin-bottom:4px;display:block;}
+.drawer-input{width:100%;padding:8px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none;font-family:'Noto Sans TC',sans-serif;transition:border-color .15s;box-sizing:border-box;}
+.drawer-input:focus{border-color:#2563eb;}
+.drawer-textarea{width:100%;padding:8px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none;font-family:'Noto Sans TC',sans-serif;resize:vertical;min-height:80px;transition:border-color .15s;box-sizing:border-box;}
+.drawer-textarea:focus{border-color:#2563eb;}
+.drawer-select{width:100%;padding:8px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none;background:#fff;cursor:pointer;box-sizing:border-box;}
+.drawer-tag-row{display:flex;gap:8px;flex-wrap:wrap;}
+.drawer-tag-label{display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;padding:4px 10px;border:1.5px solid #e2e8f0;border-radius:20px;transition:all .15s;}
+.drawer-tag-label:hover{border-color:#2563eb;color:#2563eb;}
+.drawer-tag-label input{display:none;}
+.drawer-tag-label.checked{background:#eff6ff;border-color:#2563eb;color:#2563eb;font-weight:700;}
+.drawer-save-btn{width:100%;padding:12px;background:linear-gradient(135deg,#1e3a5f,#2563eb);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:opacity .15s;}
+.drawer-save-btn:hover{opacity:.9;}
+
 /* ══ 投資與觀察分頁 ══ */
 .inv-page-grid{display:grid;grid-template-columns:1fr 300px;gap:16px;}
 .inv-page-card{background:#fff;border-radius:14px;border:1px solid #eaecf0;box-shadow:0 2px 8px rgba(0,0,0,.04);overflow:hidden;}
@@ -1896,7 +1949,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
     </div>
 
     <div class="db-nav-section">記錄</div>
-    <div class="db-nav-item" id="nav-journal" onclick="openSP('journal')" style="position:relative">
+    <div class="db-nav-item" id="nav-journal" onclick="dbShowPage('journal')" style="position:relative">
       <span class="nav-icon">📓</span>交易日誌
       <span class="db-nav-badge" id="nav-journal-badge" style="background:#dbeafe;color:#1d4ed8"></span>
     </div>
@@ -2300,7 +2353,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
         <div class="ov-bot-card">
           <div class="ov-bot-title">
             <span>📓 最新日誌</span>
-            <span class="ov-bot-link" onclick="openSP('journal')">查看全部 ↗</span>
+            <span class="ov-bot-link" onclick="dbShowPage('journal')">查看全部 ↗</span>
           </div>
           <div id="ov-journal-list">
             <div style="color:#9ca3af;font-size:12px;text-align:center;padding:20px">載入中...</div>
@@ -2407,8 +2460,25 @@ body:not(.privacy) .privacy-mask{filter:none;}
 
     <!-- ══ 頁面：交易日誌 ══ -->
     <div class="db-page" id="dbpage-journal">
-      <div style="color:#94a3b8;padding:40px;text-align:center;font-size:14px">
-        交易日誌頁面（第三階段實作）
+      <div class="journal-page-card">
+        <div class="journal-page-toolbar">
+          <input id="journal-search-page" type="text" placeholder="搜尋日誌..." class="drawer-input" style="flex:1;min-width:120px" oninput="renderJournalPage()">
+          <select id="journal-year-page" onchange="renderJournalPage()" class="drawer-select" style="width:auto">
+            <option value="all">全部年份</option>
+          </select>
+          <select id="journal-tag-page" onchange="renderJournalPage()" class="drawer-select" style="width:auto">
+            <option value="">全部標籤</option>
+            <option value="看多">📈 看多</option>
+            <option value="看空">📉 看空</option>
+            <option value="買入">💰 買入</option>
+            <option value="賣出">💸 賣出</option>
+            <option value="重大事項">🚨 重大事項</option>
+            <option value="極度恐慌">😱 極度恐慌</option>
+          </select>
+          <button onclick="openJournalDrawer()" style="padding:8px 16px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">＋ 新增日誌</button>
+          <button onclick="batchUpdateBacktest()" style="padding:8px 14px;background:#f8f9fa;border:1px solid #e2e8f0;color:#374151;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">🔄 更新回測</button>
+        </div>
+        <div id="journal-page-list" style="padding:8px 0"></div>
       </div>
     </div>
 
@@ -2981,7 +3051,128 @@ body:not(.privacy) .privacy-mask{filter:none;}
 </div>
 
 <!-- 交易日誌 Modal -->
-<div class="mo" id="journalModal">
+<!-- ══ Drawer Overlay ══ -->
+<div id="drawer-overlay" class="side-drawer-overlay" onclick="closeDrawer()"></div>
+
+<!-- ══ 交易日誌 Drawer（新增/編輯） ══ -->
+<div id="journal-drawer" class="side-drawer">
+  <div class="side-drawer-hdr">
+    <div class="side-drawer-title">
+      <span>📓</span>
+      <span id="journal-drawer-title">新增交易日誌</span>
+    </div>
+    <div class="side-drawer-actions">
+      <button onclick="saveJournal()" class="drawer-save-btn" style="width:auto;padding:8px 20px;font-size:13px">💾 儲存</button>
+      <button class="side-drawer-close" onclick="closeDrawer()">✕</button>
+    </div>
+  </div>
+  <div class="side-drawer-body">
+
+    <!-- 區塊1：基本資料 -->
+    <div class="drawer-section">
+      <div class="drawer-section-title">基本資料</div>
+      <div class="drawer-grid-2" style="margin-bottom:12px">
+        <div>
+          <span class="drawer-label">日期</span>
+          <input class="drawer-input" type="date" id="j-date">
+        </div>
+        <div>
+          <span class="drawer-label">大盤收盤指數（選填）</span>
+          <input class="drawer-input" type="number" id="j-index" placeholder="例：46781">
+        </div>
+      </div>
+      <div style="margin-bottom:12px">
+        <span class="drawer-label">大盤環境 / 重大新聞</span>
+        <textarea class="drawer-textarea" id="j-market" rows="3" placeholder="今日大盤走勢、重要新聞..." oninput="autoSaveJournalDraft()"></textarea>
+      </div>
+      <div>
+        <span class="drawer-label">個人操作記錄 / 心得</span>
+        <textarea class="drawer-textarea" id="j-content" rows="5" placeholder="記錄今日的操作邏輯、反思、策略調整..." oninput="autoSaveJournalDraft()"></textarea>
+      </div>
+    </div>
+
+    <!-- 區塊2：標籤 -->
+    <div class="drawer-section">
+      <div class="drawer-section-title">標籤</div>
+      <div class="drawer-tag-row" style="margin-bottom:10px">
+        <label class="drawer-tag-label" id="dtag-bull"><input type="checkbox" id="jtag-bull" value="看多">📈 看多</label>
+        <label class="drawer-tag-label" id="dtag-bear"><input type="checkbox" id="jtag-bear" value="看空">📉 看空</label>
+        <label class="drawer-tag-label" id="dtag-buy"><input type="checkbox" id="jtag-buy" value="買入">💰 買入</label>
+        <label class="drawer-tag-label" id="dtag-sell"><input type="checkbox" id="jtag-sell" value="賣出">💸 賣出</label>
+        <label class="drawer-tag-label" id="dtag-alert"><input type="checkbox" id="jtag-alert" value="重大事項">🚨 重大事項</label>
+        <label class="drawer-tag-label" id="dtag-panic"><input type="checkbox" id="jtag-panic" value="極度恐慌">😱 極度恐慌</label>
+      </div>
+      <div class="drawer-grid-2">
+        <div>
+          <span class="drawer-label">📂 事件分類</span>
+          <select class="drawer-select" id="j-event-cat">
+            <option value="">— 選擇事件分類 —</option>
+            <option value="總經面">🌐 總經面</option>
+            <option value="消息面">📰 消息面</option>
+            <option value="政治面">🏛 政治面</option>
+            <option value="技術面">📊 技術面</option>
+            <option value="個股操作">💹 個股操作</option>
+            <option value="無特定事件">😶 無特定事件</option>
+          </select>
+        </div>
+        <div>
+          <span class="drawer-label">🎯 個人行為</span>
+          <select class="drawer-select" id="j-behavior">
+            <option value="">— 選擇個人行為 —</option>
+            <option value="停損離場">🚪 停損離場</option>
+            <option value="逆向加碼">💪 逆向加碼</option>
+            <option value="死抱不動">🪨 死抱不動</option>
+            <option value="盤中手癢">🤌 盤中手癢</option>
+            <option value="觀望不動">👀 觀望不動</option>
+            <option value="獲利了結">🎯 獲利了結</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- 區塊3：個股追蹤 -->
+    <div class="drawer-section">
+      <div class="drawer-section-title">個股追蹤（選填）</div>
+      <div>
+        <span class="drawer-label">追蹤標的（空格分隔，例：00988A 00981T）</span>
+        <input class="drawer-input" type="text" id="j-stock-tags" placeholder="輸入股票代號...">
+      </div>
+      <div id="j-stock-prices-container" style="margin-top:10px;display:flex;flex-direction:column;gap:6px"></div>
+    </div>
+
+    <!-- 區塊4：原文連結 -->
+    <div class="drawer-section">
+      <div class="drawer-section-title">原文連結（選填）</div>
+      <input class="drawer-input" type="url" id="j-market-url" placeholder="https://...">
+    </div>
+
+    <!-- 區塊5：圖片 -->
+    <div class="drawer-section">
+      <div class="drawer-section-title">附圖</div>
+      <div id="j-img-preview" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px"></div>
+      <label style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:#f8f9fa;border:1.5px dashed #d1d5db;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;color:#374151">
+        📎 上傳圖片
+        <input type="file" id="j-img-input" accept="image/*" multiple style="display:none" onchange="handleJImgUpload(event)">
+      </label>
+    </div>
+
+    <!-- AI 分析（灰色停用） -->
+    <div style="padding:0 0 12px">
+      <button id="j-ai-btn" onclick="runJournalAI()"
+        style="width:100%;padding:10px;background:#e2e8f0;color:#94a3b8;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:not-allowed"
+        title="需要設定 Anthropic API Key 才能使用">
+        🤖 AI 分析（設定 API Key 後開啟）
+      </button>
+      <div id="j-ai-result" style="display:none;margin-top:10px;padding:12px 14px;background:#f8f7ff;border:1.5px solid #c4b5fd;border-radius:10px;font-size:12px;line-height:1.7"></div>
+    </div>
+
+    <!-- 底部儲存按鈕 -->
+    <button onclick="saveJournal()" class="drawer-save-btn">💾 儲存日誌</button>
+    <div style="height:24px"></div>
+  </div>
+</div>
+
+<!-- ══ 原有 Modal（保留備用） ══ -->
   <div class="modal" style="max-width:640px">
     <div class="mt"><h3 id="journal-modal-title">📓 新增交易日誌</h3><button onclick="closeModal('journalModal')" style="background:none;border:none;font-size:18px;cursor:pointer;color:#94a3b8">✕</button></div>
     <!-- 日期 + 標籤 -->
@@ -8534,6 +8725,10 @@ function clearJournalDraft(){
 }
 
 function openJournalModal(id=null){
+  // 改用 Drawer
+  openJournalDrawer(id);
+}
+function _openJournalModalLegacy(id=null){
   editJournalId=id;
   const j=id?(db.journals||[]).find(x=>x.id===id):null;
   document.getElementById('journal-modal-title').textContent=id?'✏️ 編輯日誌':'📓 新增交易日誌';
@@ -8703,6 +8898,9 @@ function compressImage(file,maxW,quality){
 }
 
 function saveJournal(){
+  // 從 Drawer 讀取 editId
+  const drawerEditId=document.getElementById('journal-drawer')?.dataset.editId||null;
+  if(drawerEditId)editJournalId=drawerEditId||null;
   const date=document.getElementById('j-date').value;
   if(!date){toast('請填寫日期');return;}
   const tags=[];
@@ -8750,7 +8948,7 @@ function deleteJournal(){
   if(!editJournalId)return;
   if(!confirm('確定刪除這篇日誌？'))return;
   db.journals=(db.journals||[]).filter(x=>x.id!==editJournalId);
-  save();clearJournalDraft();closeModal('journalModal');renderJournal();updateJournalCount();
+  save();clearJournalDraft();closeDrawer();closeModal('journalModal');renderJournal();renderJournalPage();updateJournalCount();
   toast('已刪除');
 }
 
@@ -9754,6 +9952,147 @@ function renderOvJournal(){
   }).join('');
 }
 
+// ══════════════════════════════════════
+// 通用 Drawer 控制
+// ══════════════════════════════════════
+let _currentDrawer=null;
+
+function openDrawer(id){
+  if(_currentDrawer)closeDrawer();
+  const drawer=document.getElementById(id);
+  const overlay=document.getElementById('drawer-overlay');
+  if(!drawer)return;
+  drawer.classList.add('open');
+  if(overlay)overlay.classList.add('open');
+  _currentDrawer=id;
+  document.body.style.overflow='hidden';
+}
+
+function closeDrawer(){
+  if(!_currentDrawer)return;
+  const drawer=document.getElementById(_currentDrawer);
+  const overlay=document.getElementById('drawer-overlay');
+  if(drawer)drawer.classList.remove('open');
+  if(overlay)overlay.classList.remove('open');
+  _currentDrawer=null;
+  document.body.style.overflow='';
+  clearJournalDraft();
+}
+
+// ══════════════════════════════════════
+// 交易日誌 Drawer
+// ══════════════════════════════════════
+function openJournalDrawer(id=null){
+  const titleEl=document.getElementById('journal-drawer-title');
+  if(titleEl)titleEl.textContent=id?'編輯日誌':'新增交易日誌';
+
+  const j=id?(db.journals||[]).find(x=>x.id===id):null;
+
+  // 填入欄位
+  const sv=(elId,val)=>{const el=document.getElementById(elId);if(el)el.value=val||'';};
+  sv('j-date',j?.date||new Date().toISOString().split('T')[0]);
+  sv('j-market',j?.market||'');
+  sv('j-market-url',j?.marketUrl||'');
+  sv('j-content',j?.content||'');
+  sv('j-stock-tags',(j?.stockTags||[]).join(' '));
+  sv('j-index',j?.indexVal||'');
+  sv('j-event-cat',j?.eventCat||'');
+  sv('j-behavior',j?.behavior||'');
+
+  // 標籤 checkbox
+  ['bull','bear','buy','sell','alert','panic'].forEach(t=>{
+    const tagMap={bull:'看多',bear:'看空',buy:'買入',sell:'賣出',alert:'重大事項',panic:'極度恐慌'};
+    const cb=document.getElementById('jtag-'+t);
+    const lb=document.getElementById('dtag-'+t);
+    if(cb){cb.checked=(j?.tags||[]).includes(tagMap[t]);}
+    if(lb){lb.classList.toggle('checked',cb?.checked||false);}
+  });
+
+  // checkbox 即時更新樣式
+  ['bull','bear','buy','sell','alert','panic'].forEach(t=>{
+    const cb=document.getElementById('jtag-'+t);
+    const lb=document.getElementById('dtag-'+t);
+    if(cb&&lb){
+      cb.onchange=()=>lb.classList.toggle('checked',cb.checked);
+    }
+  });
+
+  // 圖片預覽
+  const preview=document.getElementById('j-img-preview');
+  if(preview)preview.innerHTML=(j?.images||[]).map((img,i)=>`
+    <div style="position:relative">
+      <img src="${img}" style="width:70px;height:70px;object-fit:cover;border-radius:8px;border:1.5px solid #e2e8f0">
+      <button onclick="removeJImg(${i})" style="position:absolute;top:-4px;right:-4px;background:#dc2626;color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
+    </div>`).join('');
+
+  // 儲存編輯 id
+  document.getElementById('journal-drawer').dataset.editId=id||'';
+
+  // 草稿還原（新增模式）
+  if(!id){
+    const draft=loadJournalDraft();
+    if(draft&&(draft.market||draft.content)){
+      const ago=Math.round((Date.now()-new Date(draft.savedAt).getTime())/60000);
+      if(confirm(`📝 發現 ${ago} 分鐘前的未儲存草稿，要還原嗎？`)){
+        if(draft.market)sv('j-market',draft.market);
+        if(draft.content)sv('j-content',draft.content);
+        if(draft.date)sv('j-date',draft.date);
+      } else {
+        clearJournalDraft();
+      }
+    }
+  }
+
+  openDrawer('journal-drawer');
+}
+
+// 日誌分頁渲染
+function renderJournalPage(){
+  const container=document.getElementById('journal-page-list');
+  if(!container)return;
+
+  const q=(document.getElementById('journal-search-page')?.value||'').toLowerCase();
+  const selYear=document.getElementById('journal-year-page')?.value||'all';
+  const selTag=document.getElementById('journal-tag-page')?.value||'';
+
+  // 更新年份選單
+  const yrSel=document.getElementById('journal-year-page');
+  if(yrSel&&yrSel.options.length<=1){
+    const years=[...new Set((db.journals||[]).map(j=>(j.date||'').slice(0,4)).filter(Boolean))].sort().reverse();
+    years.forEach(y=>{const o=document.createElement('option');o.value=y;o.textContent=y+'年';yrSel.appendChild(o);});
+  }
+
+  let list=[...(db.journals||[])].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  if(selYear!=='all')list=list.filter(j=>(j.date||'').startsWith(selYear));
+  if(selTag)list=list.filter(j=>(j.tags||[]).includes(selTag));
+  if(q)list=list.filter(j=>(j.market||'').toLowerCase().includes(q)||(j.content||'').toLowerCase().includes(q));
+
+  const tagColors={'看多':'background:#dbeafe;color:#1d4ed8','看空':'background:#dcfce7;color:#15803d',
+    '買入':'background:#fef3c7;color:#92400e','賣出':'background:#fce7f3;color:#9d174d',
+    '重大事項':'background:#fee2e2;color:#b91c1c','極度恐慌':'background:#f3e8ff;color:#7e22ce'};
+
+  if(list.length===0){
+    container.innerHTML='<div style="padding:40px;text-align:center;color:#9ca3af;font-size:13px">尚無日誌記錄</div>';
+    return;
+  }
+
+  container.innerHTML=list.map(j=>{
+    const tags=(j.tags||[]).map(t=>`<span style="${tagColors[t]||'background:#f1f5f9;color:#374151'};padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600">${t}</span>`).join('');
+    const title=(j.market||j.content||'（無標題）').slice(0,80);
+    const hasBt=j.backtest?.ret!=null;
+    const btColor=hasBt?(j.backtest.ret>=0?'#dc2626':'#16a34a'):'#9ca3af';
+    return`<div style="display:flex;align-items:flex-start;gap:12px;padding:12px 18px;border-bottom:1px solid #f5f5f5;cursor:pointer;transition:background .12s" onclick="openJournalDrawer('${j.id}')" onmouseover="this.style.background='#fafbff'" onmouseout="this.style.background=''">
+      <div style="font-size:11px;font-weight:700;color:#9ca3af;white-space:nowrap;margin-top:2px;min-width:68px">${j.date}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600;color:#1e293b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:4px">${title}</div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap">${tags}${j.eventCat?`<span style="background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600">${j.eventCat}</span>`:''}${j.behavior?`<span style="background:#f3e8ff;color:#7e22ce;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600">${j.behavior}</span>`:''}</div>
+      </div>
+      ${hasBt?`<div style="font-size:12px;font-weight:800;color:${btColor};white-space:nowrap;font-family:'JetBrains Mono',monospace">${j.backtest.ret>=0?'+':''}${j.backtest.ret.toFixed(1)}%</div>`:''}
+      <button onclick="event.stopPropagation();deleteJournal('${j.id}')" style="padding:4px 8px;background:#fff;border:1px solid #fca5a5;color:#dc2626;border-radius:6px;font-size:11px;cursor:pointer;opacity:.6;transition:opacity .15s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.6'">刪</button>
+    </div>`;
+  }).join('');
+}
+
 function dbShowPage(id){
   document.querySelectorAll('.db-page').forEach(p=>p.classList.remove('active'));
   const page=document.getElementById('dbpage-'+id);
@@ -9767,6 +10106,7 @@ function dbShowPage(id){
   if(id==='assets')renderAssetsPage();
   if(id==='invest')renderInvestPage();
   if(id==='trend')renderTrendPage();
+  if(id==='journal')renderJournalPage();
 }
 
 // 更多選單（移到側欄 footer 按鈕觸發）
