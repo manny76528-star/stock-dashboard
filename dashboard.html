@@ -9657,30 +9657,31 @@ function renderOvLoans(){
   if(!el)return;
   const today=new Date();
   const todayStr=today.toISOString().slice(0,10);
-
-  // 收集未來30天內要扣款的項目
   const upcoming=[];
-  [...db.loans,...(db.flexLoans||[])].forEach(loan=>{
-    if(!loan.deductDay&&!loan.monthly)return;
-    const day=loan.deductDay||1;
-    // 本月扣款日
-    for(let mo=0;mo<=1;mo++){
-      const d=new Date(today.getFullYear(),today.getMonth()+mo,day);
-      const ds=d.toISOString().slice(0,10);
-      if(ds>=todayStr){
-        const daysLeft=Math.round((d-today)/86400000);
-        if(daysLeft<=30)upcoming.push({
-          name:loan.name||loan.bank||'信貸',
-          date:ds,days:daysLeft,
-          amt:loan.monthly||0,
-          urgent:daysLeft<=7
-        });
-        break;
+  [...(db.loans||[]),...(db.flexLoans||[])].forEach(loan=>{
+    const monthly=loan.monthly||0;
+    if(!monthly)return;
+    const day=parseInt(loan.deductDay||loan.payDay||0);
+    if(!day||day<1||day>31)return;
+    try{
+      for(let mo=0;mo<=1;mo++){
+        const d=new Date(today.getFullYear(),today.getMonth()+mo,day);
+        if(isNaN(d.getTime()))continue;
+        const ds=d.toISOString().slice(0,10);
+        if(ds>=todayStr){
+          const daysLeft=Math.round((d-today)/86400000);
+          if(daysLeft<=30)upcoming.push({
+            name:loan.name||loan.bank||'信貸',
+            date:ds,days:daysLeft,
+            amt:monthly,
+            urgent:daysLeft<=7
+          });
+          break;
+        }
       }
-    }
+    }catch(e){}
   });
   upcoming.sort((a,b)=>a.days-b.days);
-
   if(upcoming.length===0){
     el.innerHTML='<div style="color:#9ca3af;font-size:12px;text-align:center;padding:20px">近30天無扣款</div>';
     return;
@@ -9707,15 +9708,24 @@ function renderOvJournal(){
     el.innerHTML='<div style="color:#9ca3af;font-size:12px;text-align:center;padding:20px">尚無日誌</div>';
     return;
   }
-  const tagColors={'看多':'#dbeafe;color:#1d4ed8','看空':'#dcfce7;color:#15803d',
-    '買入':'#fef3c7;color:#92400e','賣出':'#fce7f3;color:#9d174d',
-    '重大事項':'#fee2e2;color:#b91c1c','極度恐慌':'#f3e8ff;color:#7e22ce'};
+  const tagColors={
+    '看多':'background:#dbeafe;color:#1d4ed8',
+    '看空':'background:#dcfce7;color:#15803d',
+    '買入':'background:#fef3c7;color:#92400e',
+    '賣出':'background:#fce7f3;color:#9d174d',
+    '重大事項':'background:#fee2e2;color:#b91c1c',
+    '極度恐慌':'background:#f3e8ff;color:#7e22ce'
+  };
   el.innerHTML=journals.map(j=>{
-    const tags=(j.tags||[]).slice(0,3).map(t=>`<span class="ov-j-tag" style="background:${(tagColors[t]||'#f1f5f9;color:#374151').split(';')[0].replace('background:','')};color:${(tagColors[t]||'color:#374151').split('color:')[1]}">${t}</span>`).join('');
+    const tags=(j.tags||[]).slice(0,3).map(t=>{
+      const style=tagColors[t]||'background:#f1f5f9;color:#374151';
+      return`<span style="${style};padding:1px 6px;border-radius:4px;font-size:10px;font-weight:600">${t}</span>`;
+    }).join('');
+    const title=(j.market||j.content||'（無標題）').slice(0,50);
     return`<div class="ov-j-item" onclick="openSP('journal')">
       <div class="ov-j-date">${j.date}</div>
-      <div class="ov-j-title">${j.market||j.content||'（無標題）'}</div>
-      ${tags?`<div class="ov-j-tags">${tags}</div>`:''}
+      <div class="ov-j-title">${title}</div>
+      ${tags?`<div class="ov-j-tags" style="display:flex;gap:4px;margin-top:4px;flex-wrap:wrap">${tags}</div>`:''}
     </div>`;
   }).join('');
 }
