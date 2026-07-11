@@ -1378,108 +1378,30 @@
   ],
   "dividends": [
     {
-      "id": "mned4chlfe4",
-      "code": "00950B",
-      "date": "2026-01-02",
-      "lots": 750,
-      "perShare": 0.054,
-      "amount": 40500
-    },
-    {
-      "id": "mned647hfso",
-      "code": "00950B",
-      "date": "2026-02-02",
-      "lots": 750,
-      "perShare": 0.063,
-      "amount": 47250
-    },
-    {
-      "id": "mnedb6brthz",
-      "code": "00985B",
-      "date": "2026-01-06",
-      "lots": 505,
-      "perShare": 0.048,
-      "amount": 24240
-    },
-    {
-      "id": "mnedc2fy052",
-      "code": "00985B",
-      "date": "2026-02-03",
-      "lots": 534,
-      "perShare": 0.048,
-      "amount": 25632
-    },
-    {
-      "id": "mnedg7hklxp",
-      "code": "00981D",
-      "date": "2026-01-19",
-      "lots": 100,
-      "perShare": 0.08,
-      "amount": 8000
-    },
-    {
-      "id": "mnedgwqn6fo",
-      "code": "00981D",
-      "date": "2026-02-26",
-      "lots": 100,
-      "perShare": 0.08,
-      "amount": 8000
-    },
-    {
-      "id": "mnhiz4ky761",
-      "code": "00985B",
-      "exDate": "2026-03-12",
-      "date": "2026-04-09",
-      "lots": 535,
-      "perShare": 0.048,
-      "amount": 25680,
+      "id": "mqgfw7f8h8n",
+      "code": "00981T",
+      "exDate": "2026-06-16",
+      "date": "2026-07-10",
+      "lots": 489,
+      "perShare": 0.071,
+      "amount": 34719,
       "pending": false
     },
     {
-      "id": "mnhj089sdem",
-      "code": "00950B",
-      "exDate": "2026-03-12",
-      "date": "2026-04-09",
-      "lots": 750,
-      "perShare": 0.065,
-      "amount": 48750,
+      "id": "mqgfxhd1lzp",
+      "code": "00981A",
+      "exDate": "2026-06-16",
+      "date": "2026-07-09",
+      "lots": 29,
+      "perShare": 0.63,
+      "amount": 18270,
       "pending": false
     },
     {
-      "id": "mnhj1bzbhtd",
-      "code": "00981D",
-      "exDate": "2026-04-17",
-      "date": "2026-04-14",
-      "lots": 100,
-      "perShare": 0.08,
-      "amount": 8000,
-      "pending": false
-    },
-    {
-      "id": "mnho1i0yn7i",
+      "id": "mpvyjda0874",
       "code": "00985B",
-      "exDate": "2026-04-02",
-      "date": "2026-04-30",
-      "lots": 800,
-      "perShare": 0.048,
-      "amount": 38400,
-      "pending": false
-    },
-    {
-      "id": "mo6n0fm3kvl",
-      "code": "00981D",
-      "exDate": "2026-04-20",
-      "date": "2026-05-15",
-      "lots": 100,
-      "perShare": 0.07,
-      "amount": 7000.000000000001,
-      "pending": false
-    },
-    {
-      "id": "motx19g9wea",
-      "code": "00985B",
-      "exDate": "2026-05-06",
-      "date": "2026-05-29",
+      "exDate": "2026-06-02",
+      "date": "2026-06-29",
       "lots": 840,
       "perShare": 0.048,
       "amount": 40320,
@@ -1506,34 +1428,112 @@
       "pending": false
     },
     {
-      "id": "mpvyjda0874",
+      "id": "motx19g9wea",
       "code": "00985B",
-      "exDate": "2026-06-02",
-      "date": "2026-06-29",
+      "exDate": "2026-05-06",
+      "date": "2026-05-29",
       "lots": 840,
       "perShare": 0.048,
       "amount": 40320,
       "pending": false
     },
     {
-      "id": "mqgfw7f8h8n",
-      "code": "00981T",
-      "exDate": "2026-06-16",
-      "date": "2026-07-10",
-      "lots": 489,
-      "perShare": 0.071,
-      "amount": 34719,
+      "id": "mo6n0fm3kvl",
+      "code": "00981D",
+      "exDate": "2026-04-20",
+      "date": "2026-05-15",
+      "lots": 100,
+      "perShare": 0.07,
+      "amount": 7000.000000000001,
       "pending": false
     },
     {
-      "id": "mqgfxhd1lzp",
-      "code": "00981A",
-      "exDate": "2026-06-16",
-      "date": "2026-07-09",
-      "lots": 29,
-      "perShare": 0.63,
-      "amount": 18270,
+      "id": "mnho1i0yn7i",
+      "code": "00985B",
+      "exDate": "2026-04-02",
+      "date": "2026-04-30",
+      "lots": 800,
+      "perShare": 0.048,
+      "amount": 38400,
       "pending": false
+    },
+    {
+      "id": "mnhj1bzbhtd",
+      "code": "00981D",
+      "exDate": "2026-04-17",
+      "date": "2026-04-14",
+      "lots": 100,
+      "perShare": 0.08,
+      "amount": 8000,
+      "pending": false
+    },
+    {
+      "id": "mnhiz4ky761",
+      "code": "00985B",
+      "exDate": "2026-03-12",
+      "date": "2026-04-09",
+      "lots": 535,
+      "perShare": 0.048,
+      "amount": 25680,
+      "pending": false
+    },
+    {
+      "id": "mnhj089sdem",
+      "code": "00950B",
+      "exDate": "2026-03-12",
+      "date": "2026-04-09",
+      "lots": 750,
+      "perShare": 0.065,
+      "amount": 48750,
+      "pending": false
+    },
+    {
+      "id": "mnedgwqn6fo",
+      "code": "00981D",
+      "date": "2026-02-26",
+      "lots": 100,
+      "perShare": 0.08,
+      "amount": 8000
+    },
+    {
+      "id": "mnedc2fy052",
+      "code": "00985B",
+      "date": "2026-02-03",
+      "lots": 534,
+      "perShare": 0.048,
+      "amount": 25632
+    },
+    {
+      "id": "mned647hfso",
+      "code": "00950B",
+      "date": "2026-02-02",
+      "lots": 750,
+      "perShare": 0.063,
+      "amount": 47250
+    },
+    {
+      "id": "mnedg7hklxp",
+      "code": "00981D",
+      "date": "2026-01-19",
+      "lots": 100,
+      "perShare": 0.08,
+      "amount": 8000
+    },
+    {
+      "id": "mnedb6brthz",
+      "code": "00985B",
+      "date": "2026-01-06",
+      "lots": 505,
+      "perShare": 0.048,
+      "amount": 24240
+    },
+    {
+      "id": "mned4chlfe4",
+      "code": "00950B",
+      "date": "2026-01-02",
+      "lots": 750,
+      "perShare": 0.054,
+      "amount": 40500
     }
   ],
   "snapshots": [
@@ -2302,7 +2302,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1783772300327,
+  "_ts": 1783781974847,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
