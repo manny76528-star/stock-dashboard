@@ -579,16 +579,24 @@ body:not(.privacy) .privacy-mask{filter:none;}
 .sum-lbl{background:#f8fafc;font-weight:500;width:140px;text-align:left;color:#64748b;font-size:12px;padding-left:16px!important;}
 .sum-val{background:#fff;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:15px;}
 
-/* STATUS BAR */
+/* STATUS BAR - 底部月度概況卡片 */
 .db-status-bar{
-  padding:16px 24px;
+  padding:20px 28px;
   background:#fff;
-  border-radius:12px;font-size:13px;
+  border-radius:14px;
   border:1px solid #eaecf0;
   box-shadow:0 2px 8px rgba(0,0,0,.04);
-  margin-bottom:20px;
+  margin-top:8px;
+  margin-bottom:0;
 }
-.db-status-bar strong{color:#1e293b;font-family:'JetBrains Mono',monospace;font-weight:700;}
+.db-status-bar strong{
+  font-size:18px;
+  font-weight:800;
+  color:#111827;
+  font-family:'JetBrains Mono',monospace;
+  display:block;
+  margin-top:4px;
+}
 
 @media(max-width:768px){
   .db-row{flex-direction:column;}
@@ -668,9 +676,9 @@ body:not(.privacy) .privacy-mask{filter:none;}
   display:flex;justify-content:space-between;align-items:center;
   padding:8px 12px;background:#fafbfc;border-top:1px solid #f1f5f9;
 }
-.loan-badge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;}
-.loan-badge.ok{background:#f0fdf4;color:#16a34a;}
-.loan-badge.danger{background:#fef2f2;color:#dc2626;}
+.loan-badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:6px;letter-spacing:.2px;}
+.loan-badge.ok{background:#dcfce7;color:#15803d;}
+.loan-badge.danger{background:#fee2e2;color:#b91c1c;}
 .loan-due{font-size:11px;color:#94a3b8;}
 .loan-due-warn{color:#d97706;font-weight:600;}
 
@@ -871,15 +879,15 @@ body:not(.privacy) .privacy-mask{filter:none;}
   --sp4: 32px;
   --fs-primary: 24px;
   --fs-secondary: 18px;
-  --fs-title: 16px;
+  --fs-title: 15px;
   --fs-detail: 14px;
-  --fs-label: 12px;
-  --fw-primary: 700;
-  --fw-secondary: 600;
-  --fw-title: 600;
-  --fw-detail: 500;
-  --fw-label: 400;
-  --c-label: #6b7280;
+  --fs-label: 11px;
+  --fw-primary: 800;
+  --fw-secondary: 700;
+  --fw-title: 700;
+  --fw-detail: 600;
+  --fw-label: 500;
+  --c-label: #9ca3af;
   --mono: 'JetBrains Mono', 'Courier New', monospace;
 }
 
@@ -1245,12 +1253,15 @@ body:not(.privacy) .privacy-mask{filter:none;}
   display:grid;
   grid-template-columns:58% 1fr;
   gap:24px;
-  align-items:start;
+  align-items:stretch;
 }
 .big5-col-left{display:flex;flex-direction:column;gap:0;}
+.big5-col-left .big5-card{flex:1;display:flex;flex-direction:column;}
+.big5-col-left .big5-detail{flex:1;}
 .big5-col-right{display:flex;flex-direction:column;gap:20px;}
 @media(max-width:900px){
   .big5-grid{grid-template-columns:1fr;}
+  .big5-col-left .big5-card{flex:none;}
 }
 
 .big5-wrap {
@@ -1304,15 +1315,16 @@ body:not(.privacy) .privacy-mask{filter:none;}
   flex-wrap: wrap;
 }
 .big5-meta span {
-  font-size: 12px;
-  color: #64748b;
+  font-size: 11px;
+  color: #9ca3af;
+  font-weight: 500;
 }
 .big5-meta b {
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 15px;
+  font-weight: 800;
   font-family: var(--mono);
-  color: #1e293b;
-  margin-left: 3px;
+  color: #111827;
+  margin-left: 4px;
 }
 
 .big5-right {
@@ -1505,9 +1517,9 @@ body:not(.privacy) .privacy-mask{filter:none;}
 .lrow-l3-nums { display:flex;flex-wrap:wrap; }
 
 /* Layer3 badges */
-.l3-badge { font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;border:1px solid;margin-top:3px;display:inline-block; }
-.l3-badge.ok { background:#f0fdf4;color:#16a34a;border-color:#86efac; }
-.l3-badge.danger { background:#fef2f2;color:#dc2626;border-color:#fca5a5; }
+.l3-badge { font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;display:inline-block; }
+.l3-badge.ok { background:#dcfce7;color:#15803d; }
+.l3-badge.danger { background:#fee2e2;color:#b91c1c; }
 
 /* 現金待入帳 */
 .cash-prow { display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #f8fafc; }
@@ -1748,12 +1760,8 @@ body:not(.privacy) .privacy-mask{filter:none;}
 }
 
 /* ═══ 信貸預估餘額 ═══ */
-.lc-ok {
-  background:#fff0f0;color:#dc2626;border-color:#fca5a5;
-}
-.lc-short {
-  background:#f0fdf4;color:#16a34a;border-color:#86efac;
-}
+.lc-ok{background:#fee2e2;color:#b91c1c;}
+.lc-short{background:#dcfce7;color:#15803d;}
 .lc-after-detail {
   display:flex;flex-direction:column;gap:2px;
   font-family:var(--mono);
