@@ -3054,124 +3054,177 @@ body:not(.privacy) .privacy-mask{filter:none;}
 <!-- ══ Drawer Overlay ══ -->
 <div id="drawer-overlay" class="side-drawer-overlay" onclick="closeDrawer()"></div>
 
-<!-- ══ 交易日誌 Drawer（新增/編輯） ══ -->
+<!-- ══ 交易日誌 Drawer（閱讀/編輯雙模式） ══ -->
 <div id="journal-drawer" class="side-drawer">
+  <!-- Header -->
   <div class="side-drawer-hdr">
     <div class="side-drawer-title">
       <span>📓</span>
-      <span id="journal-drawer-title">新增交易日誌</span>
+      <span id="journal-drawer-title">交易日誌</span>
     </div>
     <div class="side-drawer-actions">
-      <button onclick="saveJournal()" class="drawer-save-btn" style="width:auto;padding:8px 20px;font-size:13px">💾 儲存</button>
+      <!-- 閱讀模式按鈕 -->
+      <div id="jd-read-actions" style="display:flex;gap:8px">
+        <button onclick="switchJournalDrawerMode('edit')"
+          style="padding:7px 14px;background:#f8f9fa;border:1px solid #e2e8f0;color:#374151;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">
+          ✏️ 編輯日誌
+        </button>
+        <button onclick="deleteJournalFromDrawer()"
+          style="padding:7px 10px;background:#fff;border:1px solid #fca5a5;color:#dc2626;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">
+          🗑
+        </button>
+      </div>
+      <!-- 編輯模式按鈕 -->
+      <div id="jd-edit-actions" style="display:none;gap:8px">
+        <button onclick="saveJournal()"
+          style="padding:7px 16px;background:linear-gradient(135deg,#1e3a5f,#2563eb);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">
+          💾 儲存
+        </button>
+        <button onclick="switchJournalDrawerMode('read')"
+          style="padding:7px 12px;background:#f8f9fa;border:1px solid #e2e8f0;color:#374151;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">
+          取消
+        </button>
+      </div>
       <button class="side-drawer-close" onclick="closeDrawer()">✕</button>
     </div>
   </div>
-  <div class="side-drawer-body">
 
-    <!-- 區塊1：基本資料 -->
-    <div class="drawer-section">
-      <div class="drawer-section-title">基本資料</div>
-      <div class="drawer-grid-2" style="margin-bottom:12px">
-        <div>
-          <span class="drawer-label">日期</span>
-          <input class="drawer-input" type="date" id="j-date">
+  <div class="side-drawer-body" style="padding:0">
+
+    <!-- ══ 閱讀模式 ══ -->
+    <div id="jd-read-mode" style="padding:24px">
+
+      <!-- 日期 + 標籤 -->
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px">
+        <span id="jdr-date" style="font-size:12px;font-weight:700;color:#9ca3af;font-family:'JetBrains Mono',monospace"></span>
+        <div id="jdr-tags" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+      </div>
+
+      <!-- 大盤環境標題（大） -->
+      <div id="jdr-market" style="font-size:16px;font-weight:700;color:#1e293b;line-height:1.6;margin-bottom:16px;white-space:pre-wrap"></div>
+
+      <!-- 操作記錄 -->
+      <div id="jdr-content" style="font-size:13px;color:#374151;line-height:1.8;margin-bottom:20px;white-space:pre-wrap;padding:16px;background:#f8f9fa;border-radius:10px;border-left:3px solid #8fa8c8"></div>
+
+      <!-- 大盤 + 個股數據 -->
+      <div id="jdr-data" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px"></div>
+
+      <!-- 事件/行為標籤 -->
+      <div id="jdr-meta" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px"></div>
+
+      <!-- 回測 -->
+      <div id="jdr-backtest" style="margin-bottom:20px"></div>
+
+      <!-- 圖片 -->
+      <div id="jdr-images" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px"></div>
+
+      <!-- 原文連結 -->
+      <div id="jdr-link" style="margin-bottom:8px"></div>
+    </div>
+
+    <!-- ══ 編輯模式 ══ -->
+    <div id="jd-edit-mode" style="display:none;padding:20px 24px">
+
+      <!-- 基本資料 -->
+      <div class="drawer-section">
+        <div class="drawer-section-title">基本資料</div>
+        <div class="drawer-grid-2" style="margin-bottom:12px">
+          <div>
+            <span class="drawer-label">日期</span>
+            <input class="drawer-input" type="date" id="j-date">
+          </div>
+          <div>
+            <span class="drawer-label">大盤收盤指數（選填）</span>
+            <input class="drawer-input" type="number" id="j-index" placeholder="例：46781">
+          </div>
+        </div>
+        <div style="margin-bottom:12px">
+          <span class="drawer-label">大盤環境 / 重大新聞</span>
+          <textarea class="drawer-textarea" id="j-market" rows="3" placeholder="今日大盤走勢、重要新聞..." oninput="autoSaveJournalDraft()"></textarea>
         </div>
         <div>
-          <span class="drawer-label">大盤收盤指數（選填）</span>
-          <input class="drawer-input" type="number" id="j-index" placeholder="例：46781">
+          <span class="drawer-label">個人操作記錄 / 心得</span>
+          <textarea class="drawer-textarea" id="j-content" rows="5" placeholder="記錄今日的操作邏輯、反思、策略調整..." oninput="autoSaveJournalDraft()"></textarea>
         </div>
       </div>
-      <div style="margin-bottom:12px">
-        <span class="drawer-label">大盤環境 / 重大新聞</span>
-        <textarea class="drawer-textarea" id="j-market" rows="3" placeholder="今日大盤走勢、重要新聞..." oninput="autoSaveJournalDraft()"></textarea>
-      </div>
-      <div>
-        <span class="drawer-label">個人操作記錄 / 心得</span>
-        <textarea class="drawer-textarea" id="j-content" rows="5" placeholder="記錄今日的操作邏輯、反思、策略調整..." oninput="autoSaveJournalDraft()"></textarea>
-      </div>
-    </div>
 
-    <!-- 區塊2：標籤 -->
-    <div class="drawer-section">
-      <div class="drawer-section-title">標籤</div>
-      <div class="drawer-tag-row" style="margin-bottom:10px">
-        <label class="drawer-tag-label" id="dtag-bull"><input type="checkbox" id="jtag-bull" value="看多">📈 看多</label>
-        <label class="drawer-tag-label" id="dtag-bear"><input type="checkbox" id="jtag-bear" value="看空">📉 看空</label>
-        <label class="drawer-tag-label" id="dtag-buy"><input type="checkbox" id="jtag-buy" value="買入">💰 買入</label>
-        <label class="drawer-tag-label" id="dtag-sell"><input type="checkbox" id="jtag-sell" value="賣出">💸 賣出</label>
-        <label class="drawer-tag-label" id="dtag-alert"><input type="checkbox" id="jtag-alert" value="重大事項">🚨 重大事項</label>
-        <label class="drawer-tag-label" id="dtag-panic"><input type="checkbox" id="jtag-panic" value="極度恐慌">😱 極度恐慌</label>
-      </div>
-      <div class="drawer-grid-2">
-        <div>
-          <span class="drawer-label">📂 事件分類</span>
-          <select class="drawer-select" id="j-event-cat">
-            <option value="">— 選擇事件分類 —</option>
-            <option value="總經面">🌐 總經面</option>
-            <option value="消息面">📰 消息面</option>
-            <option value="政治面">🏛 政治面</option>
-            <option value="技術面">📊 技術面</option>
-            <option value="個股操作">💹 個股操作</option>
-            <option value="無特定事件">😶 無特定事件</option>
-          </select>
+      <!-- 標籤 -->
+      <div class="drawer-section">
+        <div class="drawer-section-title">標籤</div>
+        <div class="drawer-tag-row" style="margin-bottom:10px">
+          <label class="drawer-tag-label" id="dtag-bull"><input type="checkbox" id="jtag-bull" value="看多">📈 看多</label>
+          <label class="drawer-tag-label" id="dtag-bear"><input type="checkbox" id="jtag-bear" value="看空">📉 看空</label>
+          <label class="drawer-tag-label" id="dtag-buy"><input type="checkbox" id="jtag-buy" value="買入">💰 買入</label>
+          <label class="drawer-tag-label" id="dtag-sell"><input type="checkbox" id="jtag-sell" value="賣出">💸 賣出</label>
+          <label class="drawer-tag-label" id="dtag-alert"><input type="checkbox" id="jtag-alert" value="重大事項">🚨 重大事項</label>
+          <label class="drawer-tag-label" id="dtag-panic"><input type="checkbox" id="jtag-panic" value="極度恐慌">😱 極度恐慌</label>
         </div>
-        <div>
-          <span class="drawer-label">🎯 個人行為</span>
-          <select class="drawer-select" id="j-behavior">
-            <option value="">— 選擇個人行為 —</option>
-            <option value="停損離場">🚪 停損離場</option>
-            <option value="逆向加碼">💪 逆向加碼</option>
-            <option value="死抱不動">🪨 死抱不動</option>
-            <option value="盤中手癢">🤌 盤中手癢</option>
-            <option value="觀望不動">👀 觀望不動</option>
-            <option value="獲利了結">🎯 獲利了結</option>
-          </select>
+        <div class="drawer-grid-2">
+          <div>
+            <span class="drawer-label">📂 事件分類</span>
+            <select class="drawer-select" id="j-event-cat">
+              <option value="">— 選擇事件分類 —</option>
+              <option value="總經面">🌐 總經面</option>
+              <option value="消息面">📰 消息面</option>
+              <option value="政治面">🏛 政治面</option>
+              <option value="技術面">📊 技術面</option>
+              <option value="個股操作">💹 個股操作</option>
+              <option value="無特定事件">😶 無特定事件</option>
+            </select>
+          </div>
+          <div>
+            <span class="drawer-label">🎯 個人行為</span>
+            <select class="drawer-select" id="j-behavior">
+              <option value="">— 選擇個人行為 —</option>
+              <option value="停損離場">🚪 停損離場</option>
+              <option value="逆向加碼">💪 逆向加碼</option>
+              <option value="死抱不動">🪨 死抱不動</option>
+              <option value="盤中手癢">🤌 盤中手癢</option>
+              <option value="觀望不動">👀 觀望不動</option>
+              <option value="獲利了結">🎯 獲利了結</option>
+            </select>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- 區塊3：個股追蹤 -->
-    <div class="drawer-section">
-      <div class="drawer-section-title">個股追蹤（選填）</div>
-      <div>
-        <span class="drawer-label">追蹤標的（空格分隔，例：00988A 00981T）</span>
-        <input class="drawer-input" type="text" id="j-stock-tags" placeholder="輸入股票代號...">
+      <!-- 個股追蹤 -->
+      <div class="drawer-section">
+        <div class="drawer-section-title">個股追蹤（選填）</div>
+        <input class="drawer-input" type="text" id="j-stock-tags" placeholder="股票代號，空格分隔">
+        <div id="j-stock-prices-container" style="margin-top:10px;display:flex;flex-direction:column;gap:6px"></div>
       </div>
-      <div id="j-stock-prices-container" style="margin-top:10px;display:flex;flex-direction:column;gap:6px"></div>
+
+      <!-- 原文連結 -->
+      <div class="drawer-section">
+        <div class="drawer-section-title">原文連結（選填）</div>
+        <input class="drawer-input" type="url" id="j-market-url" placeholder="https://...">
+      </div>
+
+      <!-- 圖片 -->
+      <div class="drawer-section">
+        <div class="drawer-section-title">附圖</div>
+        <div id="j-img-preview" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px"></div>
+        <label style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:#f8f9fa;border:1.5px dashed #d1d5db;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;color:#374151">
+          📎 上傳圖片
+          <input type="file" id="j-img-input" accept="image/*" multiple style="display:none" onchange="handleJImgUpload(event)">
+        </label>
+      </div>
+
+      <!-- AI -->
+      <div class="drawer-section">
+        <button id="j-ai-btn" onclick="runJournalAI()"
+          style="width:100%;padding:10px;background:#e2e8f0;color:#94a3b8;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:not-allowed">
+          🤖 AI 分析（設定 API Key 後開啟）
+        </button>
+        <div id="j-ai-result" style="display:none;margin-top:10px;padding:12px;background:#f8f7ff;border:1.5px solid #c4b5fd;border-radius:10px;font-size:12px;line-height:1.7"></div>
+      </div>
+
+      <button onclick="saveJournal()" class="drawer-save-btn">💾 儲存日誌</button>
+      <div style="height:24px"></div>
     </div>
 
-    <!-- 區塊4：原文連結 -->
-    <div class="drawer-section">
-      <div class="drawer-section-title">原文連結（選填）</div>
-      <input class="drawer-input" type="url" id="j-market-url" placeholder="https://...">
-    </div>
-
-    <!-- 區塊5：圖片 -->
-    <div class="drawer-section">
-      <div class="drawer-section-title">附圖</div>
-      <div id="j-img-preview" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px"></div>
-      <label style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:#f8f9fa;border:1.5px dashed #d1d5db;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;color:#374151">
-        📎 上傳圖片
-        <input type="file" id="j-img-input" accept="image/*" multiple style="display:none" onchange="handleJImgUpload(event)">
-      </label>
-    </div>
-
-    <!-- AI 分析（灰色停用） -->
-    <div style="padding:0 0 12px">
-      <button id="j-ai-btn" onclick="runJournalAI()"
-        style="width:100%;padding:10px;background:#e2e8f0;color:#94a3b8;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:not-allowed"
-        title="需要設定 Anthropic API Key 才能使用">
-        🤖 AI 分析（設定 API Key 後開啟）
-      </button>
-      <div id="j-ai-result" style="display:none;margin-top:10px;padding:12px 14px;background:#f8f7ff;border:1.5px solid #c4b5fd;border-radius:10px;font-size:12px;line-height:1.7"></div>
-    </div>
-
-    <!-- 底部儲存按鈕 -->
-    <button onclick="saveJournal()" class="drawer-save-btn">💾 儲存日誌</button>
-    <div style="height:24px"></div>
   </div>
 </div>
-
 <!-- ══ 原有 Modal（保留備用） ══ -->
   <div class="modal" style="max-width:640px">
     <div class="mt"><h3 id="journal-modal-title">📓 新增交易日誌</h3><button onclick="closeModal('journalModal')" style="background:none;border:none;font-size:18px;cursor:pointer;color:#94a3b8">✕</button></div>
@@ -9983,12 +10036,139 @@ function closeDrawer(){
 // 交易日誌 Drawer
 // ══════════════════════════════════════
 function openJournalDrawer(id=null){
-  const titleEl=document.getElementById('journal-drawer-title');
-  if(titleEl)titleEl.textContent=id?'編輯日誌':'新增交易日誌';
+  const drawer=document.getElementById('journal-drawer');
+  drawer.dataset.editId=id||'';
 
+  if(id){
+    // 閱讀模式
+    renderJournalReadMode(id);
+    switchJournalDrawerMode('read');
+  } else {
+    // 新增模式直接進編輯
+    fillJournalEditForm(null);
+    switchJournalDrawerMode('edit');
+  }
+  openDrawer('journal-drawer');
+}
+
+function switchJournalDrawerMode(mode){
+  const readMode=document.getElementById('jd-read-mode');
+  const editMode=document.getElementById('jd-edit-mode');
+  const readActions=document.getElementById('jd-read-actions');
+  const editActions=document.getElementById('jd-edit-actions');
+  const title=document.getElementById('journal-drawer-title');
+
+  if(mode==='read'){
+    if(readMode)readMode.style.display='';
+    if(editMode)editMode.style.display='none';
+    if(readActions)readActions.style.display='flex';
+    if(editActions)editActions.style.display='none';
+    if(title)title.textContent='交易日誌';
+  } else {
+    if(readMode)readMode.style.display='none';
+    if(editMode)editMode.style.display='';
+    if(readActions)readActions.style.display='none';
+    if(editActions)editActions.style.display='flex';
+    if(title)title.textContent='編輯日誌';
+    // 填入編輯表單
+    const id=document.getElementById('journal-drawer')?.dataset.editId||null;
+    fillJournalEditForm(id||null);
+  }
+}
+
+function renderJournalReadMode(id){
+  const j=(db.journals||[]).find(x=>x.id===id);
+  if(!j)return;
+
+  const tagColors={'看多':'background:#dbeafe;color:#1d4ed8','看空':'background:#dcfce7;color:#15803d',
+    '買入':'background:#fef3c7;color:#92400e','賣出':'background:#fce7f3;color:#9d174d',
+    '重大事項':'background:#fee2e2;color:#b91c1c','極度恐慌':'background:#f3e8ff;color:#7e22ce'};
+
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.innerHTML=v;};
+
+  // 日期
+  set('jdr-date',j.date||'');
+
+  // 標籤
+  const tags=(j.tags||[]).map(t=>`<span style="${tagColors[t]||'background:#f1f5f9;color:#374151'};padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700">${t}</span>`).join('');
+  set('jdr-tags',tags);
+
+  // 大盤環境（大標題）
+  const marketEl=document.getElementById('jdr-market');
+  if(marketEl){
+    marketEl.textContent=j.market||'';
+    marketEl.style.display=j.market?'':'none';
+  }
+
+  // 內容
+  const contentEl=document.getElementById('jdr-content');
+  if(contentEl){
+    contentEl.textContent=j.content||'';
+    contentEl.style.display=j.content?'':'none';
+  }
+
+  // 大盤 + 個股數據
+  const dataEl=document.getElementById('jdr-data');
+  if(dataEl){
+    let html='';
+    if(j.indexVal)html+=`<div style="padding:8px 14px;background:#f0f4ff;border-radius:8px;font-size:12px"><div style="color:#9ca3af;font-size:10px;margin-bottom:2px">大盤指數</div><div style="font-weight:800;font-family:'JetBrains Mono',monospace;color:#2563eb">${Math.round(j.indexVal).toLocaleString()}</div></div>`;
+    Object.entries(j.stockPrices||{}).forEach(([code,price])=>{
+      html+=`<div style="padding:8px 14px;background:#f0fdf4;border-radius:8px;font-size:12px"><div style="color:#9ca3af;font-size:10px;margin-bottom:2px">${code}</div><div style="font-weight:800;font-family:'JetBrains Mono',monospace;color:#15803d">$${price}</div></div>`;
+    });
+    dataEl.innerHTML=html;
+    dataEl.style.display=html?'flex':'none';
+  }
+
+  // 事件/行為
+  const metaEl=document.getElementById('jdr-meta');
+  if(metaEl){
+    let html='';
+    if(j.eventCat)html+=`<span style="background:#fef3c7;color:#92400e;padding:4px 12px;border-radius:6px;font-size:12px;font-weight:700">📂 ${j.eventCat}</span>`;
+    if(j.behavior)html+=`<span style="background:#f3e8ff;color:#7e22ce;padding:4px 12px;border-radius:6px;font-size:12px;font-weight:700">🎯 ${j.behavior}</span>`;
+    (j.stockTags||[]).forEach(t=>html+=`<span style="background:#eff6ff;color:#2563eb;padding:4px 12px;border-radius:6px;font-size:12px;font-weight:700">${t}</span>`);
+    metaEl.innerHTML=html;
+    metaEl.style.display=html?'flex':'none';
+  }
+
+  // 回測
+  const btEl=document.getElementById('jdr-backtest');
+  if(btEl&&j.backtest?.ret!=null){
+    const color=j.backtest.ret>=0?'#dc2626':'#16a34a';
+    btEl.innerHTML=`<div style="background:#f8f9fa;border-radius:10px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between">
+      <span style="font-size:12px;font-weight:700;color:#374151">📊 事後回測</span>
+      <span style="font-size:18px;font-weight:800;font-family:'JetBrains Mono',monospace;color:${color}">${j.backtest.ret>=0?'+':''}${j.backtest.ret.toFixed(1)}%</span>
+      <button onclick="openBacktestInput('${j.id}')" style="padding:4px 10px;background:#eff6ff;border:1px solid #bfdbfe;color:#2563eb;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer">更新</button>
+    </div>${j.backtest.note?`<div style="font-size:11px;color:#64748b;font-style:italic;margin-top:6px;padding:6px 10px;background:#fffbeb;border-radius:6px">💡 ${j.backtest.note}</div>`:''}`;
+    btEl.style.display='';
+  } else if(btEl){
+    btEl.innerHTML=`<div style="background:#f8f9fa;border-radius:10px;padding:10px 16px;display:flex;align-items:center;justify-content:space-between">
+      <span style="font-size:12px;color:#9ca3af">📊 尚無回測資料</span>
+      <button onclick="openBacktestInput('${j.id}')" style="padding:4px 10px;background:#eff6ff;border:1px solid #bfdbfe;color:#2563eb;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer">填入</button>
+    </div>`;
+    btEl.style.display='';
+  }
+
+  // 圖片
+  const imgEl=document.getElementById('jdr-images');
+  if(imgEl){
+    imgEl.innerHTML=(j.images||[]).map((img,i)=>`<img src="${img}" onclick="viewJImgReadonly('${j.id}',${i})" style="width:100px;height:100px;object-fit:cover;border-radius:8px;border:1.5px solid #e2e8f0;cursor:zoom-in">`).join('');
+    imgEl.style.display=(j.images||[]).length?'flex':'none';
+  }
+
+  // 原文連結
+  const linkEl=document.getElementById('jdr-link');
+  if(linkEl){
+    if(j.marketUrl){
+      linkEl.innerHTML=`<a href="${j.marketUrl}" target="_blank" style="font-size:12px;color:#2563eb;text-decoration:none;display:flex;align-items:center;gap:6px">🔗 查看原文 <span style="font-size:10px">↗</span></a>`;
+      linkEl.style.display='';
+    } else {
+      linkEl.style.display='none';
+    }
+  }
+}
+
+function fillJournalEditForm(id){
   const j=id?(db.journals||[]).find(x=>x.id===id):null;
-
-  // 填入欄位
   const sv=(elId,val)=>{const el=document.getElementById(elId);if(el)el.value=val||'';};
   sv('j-date',j?.date||new Date().toISOString().split('T')[0]);
   sv('j-market',j?.market||'');
@@ -9999,34 +10179,20 @@ function openJournalDrawer(id=null){
   sv('j-event-cat',j?.eventCat||'');
   sv('j-behavior',j?.behavior||'');
 
-  // 標籤 checkbox
   ['bull','bear','buy','sell','alert','panic'].forEach(t=>{
     const tagMap={bull:'看多',bear:'看空',buy:'買入',sell:'賣出',alert:'重大事項',panic:'極度恐慌'};
     const cb=document.getElementById('jtag-'+t);
     const lb=document.getElementById('dtag-'+t);
     if(cb){cb.checked=(j?.tags||[]).includes(tagMap[t]);}
-    if(lb){lb.classList.toggle('checked',cb?.checked||false);}
+    if(lb){lb.classList.toggle('checked',cb?.checked||false);cb.onchange=()=>lb.classList.toggle('checked',cb.checked);}
   });
 
-  // checkbox 即時更新樣式
-  ['bull','bear','buy','sell','alert','panic'].forEach(t=>{
-    const cb=document.getElementById('jtag-'+t);
-    const lb=document.getElementById('dtag-'+t);
-    if(cb&&lb){
-      cb.onchange=()=>lb.classList.toggle('checked',cb.checked);
-    }
-  });
-
-  // 圖片預覽
   const preview=document.getElementById('j-img-preview');
   if(preview)preview.innerHTML=(j?.images||[]).map((img,i)=>`
     <div style="position:relative">
       <img src="${img}" style="width:70px;height:70px;object-fit:cover;border-radius:8px;border:1.5px solid #e2e8f0">
-      <button onclick="removeJImg(${i})" style="position:absolute;top:-4px;right:-4px;background:#dc2626;color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
+      <button onclick="removeJImg(${i})" style="position:absolute;top:-4px;right:-4px;background:#dc2626;color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:10px;cursor:pointer">✕</button>
     </div>`).join('');
-
-  // 儲存編輯 id
-  document.getElementById('journal-drawer').dataset.editId=id||'';
 
   // 草稿還原（新增模式）
   if(!id){
@@ -10037,13 +10203,19 @@ function openJournalDrawer(id=null){
         if(draft.market)sv('j-market',draft.market);
         if(draft.content)sv('j-content',draft.content);
         if(draft.date)sv('j-date',draft.date);
-      } else {
-        clearJournalDraft();
-      }
+      } else clearJournalDraft();
     }
   }
+}
 
-  openDrawer('journal-drawer');
+function deleteJournalFromDrawer(){
+  const id=document.getElementById('journal-drawer')?.dataset.editId;
+  if(!id)return;
+  if(!confirm('確定刪除這篇日誌？'))return;
+  db.journals=(db.journals||[]).filter(x=>x.id!==id);
+  save();renderJournal();renderJournalPage();updateJournalCount();
+  closeDrawer();
+  toast('已刪除日誌');
 }
 
 // 日誌分頁渲染
