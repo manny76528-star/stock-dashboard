@@ -9605,7 +9605,7 @@ function renderOvDonut(){
     const val=c.mktVal??c.tCost;
     if(val<=0)return;
     totalMkt+=val;
-    items.push({name:inv.name||inv.code,val});
+    items.push({name:inv.name||inv.code, id:inv.id, val});
   });
   const useItems=items.length>0?items:[
     {name:'台股ETF',val:1200000},{name:'債券ETF',val:900000},{name:'現金',val:600000}
@@ -9643,12 +9643,14 @@ function renderOvDonut(){
 
   legendEl.innerHTML=useItems.map((item,i)=>{
     const pct=Math.round(item.val/useTotal*1000)/10;
-    return`<div style="display:flex;align-items:center;gap:8px">
+    const clickable=item.id?`onclick="toggleInvDetail('${item.id}')" style="cursor:pointer"`:'';
+    return`<div style="display:flex;align-items:center;gap:8px;padding:3px 0;border-radius:6px;transition:background .12s" ${clickable} onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background=''">
       <span style="width:8px;height:8px;border-radius:50%;background:${colors[i]};flex-shrink:0"></span>
       <div style="flex:1;min-width:0">
         <div style="font-size:11px;font-weight:700;color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${item.name}</div>
       </div>
       <span style="font-size:11px;color:#6b7280;font-family:'JetBrains Mono',monospace;flex-shrink:0">${pct}%</span>
+      ${item.id?'<span style="font-size:10px;color:#9ca3af">›</span>':''}
     </div>`;
   }).join('');
 }
@@ -9660,6 +9662,7 @@ function renderOvLoans(){
   const today=new Date();
   const todayStr=today.toISOString().slice(0,10);
   const upcoming=[];
+
   [...(db.loans||[]),...(db.flexLoans||[])].forEach(loan=>{
     const monthly=loan.monthly||0;
     if(!monthly)return;
@@ -9672,33 +9675,52 @@ function renderOvLoans(){
         const ds=d.toISOString().slice(0,10);
         if(ds>=todayStr){
           const daysLeft=Math.round((d-today)/86400000);
-          if(daysLeft<=30)upcoming.push({
-            name:loan.name||loan.bank||'信貸',
-            date:ds,days:daysLeft,
-            amt:monthly,
-            urgent:daysLeft<=7
-          });
+          if(daysLeft<=30){
+            // 計算扣款後餘額（含未來股息）
+            let afterBal=null;
+            let divNote='';
+            if(loan.deductBank){
+              const acc=db.cashAccounts.find(c=>c.bank===loan.deductBank);
+              if(acc){
+                const accBal=(acc.cash||0)+(acc.d1||0)+(acc.d2||0);
+                const preDivs=(db.dividends||[]).filter(dv=>dv.date&&dv.date>todayStr&&dv.date<=ds);
+                const preDivTotal=preDivs.reduce((s,dv)=>s+(dv.amount||0),0);
+                afterBal=Math.round(accBal+preDivTotal-monthly);
+                if(preDivTotal>0)divNote='+$'+Math.round(preDivTotal).toLocaleString()+'股息';
+              }
+            }
+            upcoming.push({
+              name:loan.name||loan.bank||'信貸',
+              date:ds,days:daysLeft,amt:monthly,
+              urgent:daysLeft<=7,afterBal,divNote
+            });
+          }
           break;
         }
       }
     }catch(e){}
   });
+
   upcoming.sort((a,b)=>a.days-b.days);
   if(upcoming.length===0){
     el.innerHTML='<div style="color:#9ca3af;font-size:12px;text-align:center;padding:20px">近30天無扣款</div>';
     return;
   }
-  el.innerHTML=upcoming.slice(0,5).map(item=>`
-    <div class="ov-loan-item">
-      <div>
+  el.innerHTML=upcoming.slice(0,5).map(item=>{
+    const afterColor=item.afterBal==null?'':item.afterBal>=0?'#15803d':'#b91c1c';
+    const afterText=item.afterBal==null?'':`扣後 $${Math.abs(item.afterBal).toLocaleString()}${item.afterBal<0?' ⚠️':''}`;
+    return`<div class="ov-loan-item">
+      <div style="flex:1;min-width:0">
         <div class="ov-loan-bank">${item.name}</div>
-        <div class="ov-loan-date">${item.date}</div>
+        <div class="ov-loan-date">${item.date}${item.divNote?` ・ <span style="color:#2563eb">${item.divNote}</span>`:''}</div>
+        ${afterText?`<div style="font-size:10px;font-weight:700;color:${afterColor};margin-top:1px">${afterText}</div>`:''}
       </div>
       <div class="ov-loan-amt privacy-mask">$${Math.round(item.amt).toLocaleString()}</div>
-      <span class="ov-loan-badge" style="${item.urgent?'background:#fee2e2;color:#b91c1c':'background:#f0fdf4;color:#15803d'}">
+      <span class="ov-loan-badge" style="margin-left:8px;${item.urgent?'background:#fee2e2;color:#b91c1c':'background:#f0fdf4;color:#15803d'}">
         ${item.days===0?'今天':item.days+'天後'}
       </span>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 // ── 最新日誌 ──
@@ -9724,7 +9746,7 @@ function renderOvJournal(){
       return`<span style="${style};padding:1px 6px;border-radius:4px;font-size:10px;font-weight:600">${t}</span>`;
     }).join('');
     const title=(j.market||j.content||'（無標題）').slice(0,50);
-    return`<div class="ov-j-item" onclick="openSP('journal')">
+    return`<div class="ov-j-item" onclick="openSP('journal');setTimeout(()=>openJournalModal('${j.id}'),300)">
       <div class="ov-j-date">${j.date}</div>
       <div class="ov-j-title">${title}</div>
       ${tags?`<div class="ov-j-tags" style="display:flex;gap:4px;margin-top:4px;flex-wrap:wrap">${tags}</div>`:''}
