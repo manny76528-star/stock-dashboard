@@ -17,7 +17,7 @@
   --yellow:#fefce8;--teal:#0d9488;--teal-lt:#f0fdfa;
   --pink:#db2777;--pink-lt:#fdf2f8;--sh:#f8fafc;
   --card-shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
-  --section-header:#1e293b;
+  --section-header:#f8f9fa;
 }
 body{background:#f0f2f5;color:var(--text);font-family:'Noto Sans TC',sans-serif;font-size:13px;min-height:100vh;}
 
@@ -133,7 +133,7 @@ body{background:#f0f2f5;color:var(--text);font-family:'Noto Sans TC',sans-serif;
 .sec{background:var(--white);border-radius:12px;overflow:hidden;box-shadow:var(--card-shadow);margin-bottom:10px;border:1px solid var(--border);display:block;}
 .sec:last-child{margin-bottom:0;}
 .sec-lbl{display:none;} /* replaced by .sec-header */
-.sec-header{background:var(--section-header);color:#fff;padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:1px;display:flex;align-items:center;gap:8px;}
+.sec-header{background:#f8f9fa;color:#374151;padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.5px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #eaecf0;}
 .sec-header .sec-icon{font-size:15px;}
 .sec-content{flex:1;overflow-x:auto;-webkit-overflow-scrolling:touch;min-width:0;}
 
@@ -377,7 +377,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
 .j-mood-btn.active{background:#fef3c7;border-color:#f59e0b;color:#92400e;}
 .j-card{background:#fff;border-radius:10px;border:1px solid var(--border);padding:14px 16px;transition:box-shadow .2s;}
 .j-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.08);}
-.trend-hdr{background:var(--section-header);color:#fff;padding:10px 16px;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:space-between;}
+.trend-hdr{background:#f8f9fa;color:#374151;padding:10px 16px;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #eaecf0;}
 .trend-body{display:none;padding:14px;}.trend-body.open{display:block;}
 .trend-checks{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:12px;font-size:12px;}
 .trend-checks label{display:flex;align-items:center;gap:5px;cursor:pointer;font-weight:500;}
@@ -539,22 +539,26 @@ body:not(.privacy) .privacy-mask{filter:none;}
 .db-row > *{min-width:0;}
 
 /* CARDS */
+/* ══ 現代白色卡片換裝 ══ */
 .db-card{
-  background:#fff;border-radius:12px;
-  border:1px solid #e2e8f0;
-  box-shadow:0 1px 4px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.05);
+  background:#fff;border-radius:14px;
+  border:1px solid #eaecf0;
+  box-shadow:0 2px 8px rgba(0,0,0,.04),0 1px 2px rgba(0,0,0,.03);
   overflow:hidden;
+  margin-bottom:20px;
 }
 .db-card-header{
   display:flex;align-items:center;
-  padding:11px 16px;
-  background:#1e293b;color:#fff;
-  font-size:13px;font-weight:700;letter-spacing:.5px;
+  padding:14px 20px;
+  background:#fff;
+  color:#1e293b;
+  font-size:13px;font-weight:700;letter-spacing:.3px;
+  border-bottom:1px solid #f0f2f5;
 }
-.db-hdr-navy{background:#1e3a5f;}
-.db-hdr-green{background:#14532d;}
-.db-hdr-rust{background:#7c2d12;}
-.db-hdr-slate{background:#334155;}
+.db-hdr-navy{background:#fff;color:#1e293b;}
+.db-hdr-green{background:#fff;color:#1e293b;}
+.db-hdr-rust{background:#fff;color:#1e293b;}
+.db-hdr-slate{background:#fff;color:#1e293b;}
 
 /* ROI CARDS */
 .db-roi-card{
@@ -579,10 +583,13 @@ body:not(.privacy) .privacy-mask{filter:none;}
 .db-status-bar{
   display:flex;gap:24px;flex-wrap:wrap;
   padding:12px 20px;
-  background:#1e293b;color:#94a3b8;
-  border-radius:10px;font-size:13px;
+  background:#fff;color:#64748b;
+  border-radius:12px;font-size:13px;
+  border:1px solid #eaecf0;
+  box-shadow:0 2px 8px rgba(0,0,0,.04);
+  margin-bottom:20px;
 }
-.db-status-bar strong{color:#fff;font-family:'JetBrains Mono',monospace;}
+.db-status-bar strong{color:#1e293b;font-family:'JetBrains Mono',monospace;}
 
 @media(max-width:768px){
   .db-row{flex-direction:column;}
@@ -747,16 +754,16 @@ body:not(.privacy) .privacy-mask{filter:none;}
 /* ═══ SECTION QUICK BAR ═══ */
 .sec-quick-bar{
   display:flex;flex-wrap:wrap;gap:0;
-  background:#1e293b;border-bottom:1px solid rgba(255,255,255,.08);
+  background:#f8f9fa;border-bottom:1px solid #eaecf0;
 }
 .sec-quick-bar span{
-  padding:8px 16px;font-size:12px;color:rgba(255,255,255,.6);
-  border-right:1px solid rgba(255,255,255,.08);
+  padding:8px 16px;font-size:12px;color:#64748b;
+  border-right:1px solid #eaecf0;
 }
 .sec-quick-bar span:last-child{border-right:none;}
-.sec-quick-bar strong{color:#fff;font-family:'JetBrains Mono',monospace;font-size:13px;margin-left:4px;}
-.sec-quick-navy{background:#1e3a5f;}
-.sec-quick-green{background:#075985;}
+.sec-quick-bar strong{color:#1e293b;font-family:'JetBrains Mono',monospace;font-size:13px;margin-left:4px;}
+.sec-quick-navy{background:#f0f4ff;}
+.sec-quick-green{background:#f0fdf4;}
 /* Investment hero quick bar */
 #inv-quick-bar{
   display:grid;grid-template-columns:repeat(4,1fr);
@@ -2132,38 +2139,38 @@ body:not(.privacy) .privacy-mask{filter:none;}
 @media(max-width:480px){.mini-card-row{grid-template-columns:repeat(2,1fr);}}
 
 .mini-card{
-  background:#1e293b;
+  background:#fff;
   border-radius:14px;
   padding:18px 16px 14px;
   cursor:pointer;
-  border:2px solid transparent;
+  border:1.5px solid #eaecf0;
   transition:all .2s;
   display:flex;flex-direction:column;align-items:center;
   text-align:center;gap:8px;
   position:relative;
-  box-shadow:0 2px 8px rgba(0,0,0,.15);
+  box-shadow:0 2px 8px rgba(0,0,0,.04);
 }
 .mini-card:hover{
-  background:#1e3a5f;
-  border-color:rgba(255,255,255,.2);
-  transform:translateY(-3px);
-  box-shadow:0 8px 24px rgba(0,0,0,.25);
+  border-color:#c7d2fe;
+  transform:translateY(-2px);
+  box-shadow:0 6px 20px rgba(0,0,0,.08);
+  background:#fafbff;
 }
 .mini-card-icon{font-size:28px;line-height:1;}
-.mini-card-title{font-size:12px;font-weight:700;color:#fff;letter-spacing:.5px;white-space:nowrap;}
+.mini-card-title{font-size:12px;font-weight:700;color:#374151;letter-spacing:.3px;white-space:nowrap;}
 .mini-card-badge{
   font-size:10px;font-weight:600;
   padding:2px 9px;border-radius:20px;
-  background:rgba(255,255,255,.12);
-  color:rgba(255,255,255,.75);
+  background:#f1f5f9;
+  color:#64748b;
   white-space:nowrap;
 }
-.mini-card-badge.green{background:rgba(16,185,129,.2);color:#6ee7b7;}
-.mini-card-badge.blue{background:rgba(96,165,250,.2);color:#93c5fd;}
-.mini-card-badge.yellow{background:rgba(251,191,36,.2);color:#fcd34d;}
-.mini-card-badge.red{background:rgba(239,68,68,.2);color:#fca5a5;}
+.mini-card-badge.green{background:#dcfce7;color:#16a34a;}
+.mini-card-badge.blue{background:#dbeafe;color:#2563eb;}
+.mini-card-badge.yellow{background:#fef9c3;color:#ca8a04;}
+.mini-card-badge.red{background:#fee2e2;color:#dc2626;}
 .mini-card-open-hint{
-  font-size:9px;color:rgba(255,255,255,.35);margin-top:2px;letter-spacing:.3px;
+  font-size:9px;color:#94a3b8;margin-top:2px;letter-spacing:.3px;
 }
 
 /* Popup overlay */
@@ -2183,7 +2190,8 @@ body:not(.privacy) .privacy-mask{filter:none;}
 }
 @keyframes spPop{from{opacity:0;transform:scale(.95) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
 .sp-hdr{
-  background:#1e293b;color:#fff;
+  background:#fff;color:#1e293b;
+  border-bottom:1px solid #eaecf0;
   display:flex;align-items:center;justify-content:space-between;
   padding:16px 22px;
 }
@@ -2192,12 +2200,12 @@ body:not(.privacy) .privacy-mask{filter:none;}
 .sp-hdr-title{font-size:16px;font-weight:700;letter-spacing:.3px;}
 .sp-hdr-right{display:flex;align-items:center;gap:8px;}
 .sp-close{
-  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);
-  color:#fff;border-radius:8px;padding:6px 14px;
+  background:#f1f5f9;border:1px solid #e2e8f0;
+  color:#475569;border-radius:8px;padding:6px 14px;
   font-size:13px;cursor:pointer;font-weight:600;
   transition:background .15s;font-family:'Noto Sans TC',sans-serif;
 }
-.sp-close:hover{background:rgba(255,255,255,.25);}
+.sp-close:hover{background:#e2e8f0;}
 .sp-body{padding:20px;max-height:88vh;overflow-y:auto;}
 </style>
 
@@ -5517,7 +5525,7 @@ function runSearch(){
   let summaryHtml='';
   if(Object.keys(realizedByCode).some(k=>realizedByCode[k]!==0)){
     summaryHtml=`
-    <div style="background:linear-gradient(135deg,#0f172a,#1e3a5f);border-radius:12px;padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+    <div style="background:#f8f9fa;border-radius:12px;padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
       <div>
         <div style="font-size:11px;color:rgba(255,255,255,.6);font-weight:600;margin-bottom:4px">📅 ${yearLabel} 已實現損益</div>
         <div style="font-size:24px;font-weight:800;color:${pnlColor2};font-family:'JetBrains Mono',monospace">${totalRealized>=0?'+':''}${Math.round(totalRealized).toLocaleString()}</div>
@@ -5886,13 +5894,13 @@ function renderTrendChart(){
   // 美化表格
   // 趨勢表格（用字串拼接避免引號衝突）
   var tblHtml='<div style="overflow-x:auto;margin-top:4px"><table style="width:100%;border-collapse:separate;border-spacing:0;font-size:13px">';
-  tblHtml+='<thead><tr style="background:linear-gradient(135deg,#0f172a,#1e3a5f)">';
-  tblHtml+='<th style="padding:10px 14px;text-align:left;color:rgba(255,255,255,.7);font-size:11px;font-weight:600">月份</th>';
-  tblHtml+='<th style="padding:10px 14px;text-align:right;color:rgba(255,255,255,.7);font-size:11px;font-weight:600">大盤</th>';
-  tblHtml+='<th style="padding:10px 14px;text-align:right;color:rgba(255,255,255,.7);font-size:11px;font-weight:600">淨資產</th>';
-  tblHtml+='<th style="padding:10px 14px;text-align:right;color:rgba(255,255,255,.7);font-size:11px;font-weight:600">每月股息</th>';
-  tblHtml+='<th style="padding:10px 14px;text-align:right;color:rgba(255,255,255,.7);font-size:11px;font-weight:600">每月現金流</th>';
-  tblHtml+='<th style="padding:10px 14px;text-align:right;color:rgba(255,255,255,.7);font-size:11px;font-weight:600">負債比</th>';
+  tblHtml+='<thead><tr style="background:#f8f9fa">';
+  tblHtml+='<th style="padding:10px 14px;text-align:left;color:#374151;font-size:11px;font-weight:600">月份</th>';
+  tblHtml+='<th style="padding:10px 14px;text-align:right;color:#374151;font-size:11px;font-weight:600">大盤</th>';
+  tblHtml+='<th style="padding:10px 14px;text-align:right;color:#374151;font-size:11px;font-weight:600">淨資產</th>';
+  tblHtml+='<th style="padding:10px 14px;text-align:right;color:#374151;font-size:11px;font-weight:600">每月股息</th>';
+  tblHtml+='<th style="padding:10px 14px;text-align:right;color:#374151;font-size:11px;font-weight:600">每月現金流</th>';
+  tblHtml+='<th style="padding:10px 14px;text-align:right;color:#374151;font-size:11px;font-weight:600">負債比</th>';
   tblHtml+='<th style="padding:10px 14px"></th></tr></thead><tbody>';
   snaps.slice().reverse().forEach(function(s,i){
     var bg=i%2===0?'#fff':'#f8fafc';
@@ -5936,11 +5944,11 @@ function openSnapDetail(ym){
     body.innerHTML='<div style="text-align:center;padding:30px;color:#94a3b8">此快照無持股明細<br><span style="font-size:11px">（2026/05/22之後記錄的快照才有明細）</span></div>';
   } else {
     body.innerHTML='<table style="width:100%;border-collapse:collapse;font-size:13px">'
-      +'<thead><tr style="background:linear-gradient(135deg,#0f172a,#1e3a5f)">'
-        +'<th style="padding:8px 10px;text-align:left;color:rgba(255,255,255,.7);font-size:11px">標的</th>'
-        +'<th style="padding:8px 10px;text-align:right;color:rgba(255,255,255,.7);font-size:11px">張數</th>'
-        +'<th style="padding:8px 10px;text-align:right;color:rgba(255,255,255,.7);font-size:11px">收盤價</th>'
-        +'<th style="padding:8px 10px;text-align:right;color:rgba(255,255,255,.7);font-size:11px">損益</th>'
+      +'<thead><tr style="background:#f8f9fa">'
+        +'<th style="padding:8px 10px;text-align:left;color:#374151;font-size:11px">標的</th>'
+        +'<th style="padding:8px 10px;text-align:right;color:#374151;font-size:11px">張數</th>'
+        +'<th style="padding:8px 10px;text-align:right;color:#374151;font-size:11px">收盤價</th>'
+        +'<th style="padding:8px 10px;text-align:right;color:#374151;font-size:11px">損益</th>'
       +'</tr></thead><tbody>'
       // 大盤放最上面
       +(snap.indexVal?(
@@ -8397,7 +8405,7 @@ function viewJImgReadonly(journalId,imgIdx){
     next.onclick=e=>{e.stopPropagation();curIdx=(curIdx+1)%j.images.length;img.src=j.images[curIdx];counter.textContent=(curIdx+1)+'/'+j.images.length;};
     const counter=document.createElement('span');
     counter.textContent=(curIdx+1)+'/'+j.images.length;
-    counter.style.cssText='color:rgba(255,255,255,.7);font-size:13px';
+    counter.style.cssText='color:#64748b;font-size:13px';
     nav.appendChild(prev);nav.appendChild(counter);nav.appendChild(next);
   }
   const close=document.createElement('button');
@@ -8496,7 +8504,7 @@ function renderJournal(){
 
     // 紅框 header：日期、標籤、情緒、完整標題、連結
     const header = `<div onclick="toggleJCard('jc-${j.id}')" style="
-        background:linear-gradient(135deg,#0f172a,#1e3a5f);
+        background:#f8f9fa;
         border-radius:10px;padding:12px 14px;
         cursor:${hasBody?'pointer':'default'};user-select:none;
       ">
