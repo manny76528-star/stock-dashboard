@@ -10196,7 +10196,7 @@ function renderOvLoans(){
         <div class="ov-loan-date">${item.date}${item.divNote?` ・ <span style="color:#2563eb">${item.divNote}</span>`:''}</div>
         ${afterText?`<div style="font-size:10px;font-weight:700;color:${afterColor};margin-top:1px">${afterText}</div>`:''}
       </div>
-      <div class="ov-loan-amt privacy-mask">$${Math.round(item.amt).toLocaleString()}</div>
+      <div class="ov-loan-amt">$${Math.round(item.amt).toLocaleString()}</div>
       <span class="ov-loan-badge" style="margin-left:8px;${item.urgent?'background:#fee2e2;color:#b91c1c':'background:#f0fdf4;color:#15803d'}">
         ${item.days===0?'今天':item.days+'天後'}
       </span>
