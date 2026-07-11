@@ -1277,6 +1277,48 @@ body:not(.privacy) .privacy-mask{filter:none;}
 .ov-j-tags{display:flex;gap:4px;margin-top:4px;flex-wrap:wrap;}
 .ov-j-tag{font-size:10px;padding:1px 6px;border-radius:4px;font-weight:600;}
 
+/* ══ 資產與負債分頁 ══ */
+.as-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+.as-card{background:#fff;border-radius:14px;border:1px solid #eaecf0;box-shadow:0 2px 8px rgba(0,0,0,.04);overflow:hidden;}
+.as-card-hdr{padding:14px 18px;border-bottom:1px solid #f0f2f5;display:flex;align-items:center;justify-content:space-between;}
+.as-card-title{font-size:13px;font-weight:700;color:#1e293b;}
+.as-card-badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:6px;font-family:'JetBrains Mono',monospace;}
+.as-row{display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid #f8f9fa;transition:background .12s;}
+.as-row:last-child{border-bottom:none;}
+.as-row:hover{background:#fafbff;}
+.as-row-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.as-row-name{font-size:13px;font-weight:700;color:#1e293b;}
+.as-row-sub{font-size:11px;color:#9ca3af;margin-top:1px;}
+.as-row-right{margin-left:auto;text-align:right;}
+.as-row-val{font-size:14px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#111827;}
+.as-row-meta{font-size:10px;color:#9ca3af;margin-top:2px;}
+.as-prog-bar{height:4px;background:#f0f2f5;border-radius:2px;margin-top:6px;overflow:hidden;}
+.as-prog-fill{height:100%;border-radius:2px;transition:width .4s;}
+.as-summary{display:flex;gap:0;border-top:1px solid #f0f2f5;background:#f8f9fa;}
+.as-summary-item{flex:1;padding:10px 14px;border-right:1px solid #f0f2f5;text-align:center;}
+.as-summary-item:last-child{border-right:none;}
+.as-summary-label{font-size:10px;color:#9ca3af;font-weight:600;}
+.as-summary-val{font-size:13px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#111827;margin-top:2px;}
+.as-add-btn{display:flex;align-items:center;gap:6px;padding:10px 18px;color:#2563eb;font-size:12px;font-weight:700;cursor:pointer;border-top:1px solid #f0f2f5;transition:background .12s;}
+.as-add-btn:hover{background:#eff6ff;}
+
+/* ══ 投資與觀察分頁 ══ */
+.inv-page-grid{display:grid;grid-template-columns:1fr 300px;gap:16px;}
+.inv-page-card{background:#fff;border-radius:14px;border:1px solid #eaecf0;box-shadow:0 2px 8px rgba(0,0,0,.04);overflow:hidden;}
+.inv-page-hdr{padding:14px 18px;border-bottom:1px solid #f0f2f5;display:flex;align-items:center;justify-content:space-between;}
+.inv-page-title{font-size:13px;font-weight:700;color:#1e293b;}
+.inv-stock-row{display:flex;align-items:center;gap:12px;padding:11px 18px;border-bottom:1px solid #f8f9fa;cursor:pointer;transition:background .12s;}
+.inv-stock-row:last-child{border-bottom:none;}
+.inv-stock-row:hover{background:#fafbff;}
+.inv-stock-code{font-size:13px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#2563eb;min-width:72px;}
+.inv-stock-name{font-size:11px;color:#9ca3af;margin-top:1px;}
+.inv-stock-price{font-size:13px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#111827;margin-left:auto;}
+.inv-stock-pnl{font-size:11px;font-weight:700;margin-top:1px;text-align:right;}
+
+/* ══ 資產趨勢分頁 ══ */
+.trend-page-card{background:#fff;border-radius:14px;border:1px solid #eaecf0;box-shadow:0 2px 8px rgba(0,0,0,.04);padding:20px;margin-bottom:16px;}
+.trend-page-hdr{font-size:13px;font-weight:700;color:#1e293b;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;}
+
 /* ══ 雙欄 Grid 佈局 ══ */
 .big5-grid{
   display:grid;
@@ -2269,15 +2311,94 @@ body:not(.privacy) .privacy-mask{filter:none;}
 
     <!-- ══ 頁面：資產與負債 ══ -->
     <div class="db-page" id="dbpage-assets">
-      <div style="color:#94a3b8;padding:40px;text-align:center;font-size:14px">
-        資產與負債頁面（第二階段實作）
+      <!-- 上方 KPI 摘要 -->
+      <div class="ov-kpi-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px">
+        <div class="ov-kpi-card">
+          <div class="ov-kpi-accent" style="background:#c9a99a"></div>
+          <div class="ov-kpi-label" style="padding-left:8px">信貸總負債</div>
+          <div class="ov-kpi-val privacy-mask" id="as-loan-total" style="padding-left:8px">—</div>
+          <div class="ov-kpi-sub" id="as-loan-monthly" style="padding-left:8px"></div>
+        </div>
+        <div class="ov-kpi-card">
+          <div class="ov-kpi-accent" style="background:#b5adc4"></div>
+          <div class="ov-kpi-label" style="padding-left:8px">不限用途（已用）</div>
+          <div class="ov-kpi-val privacy-mask" id="as-flex-total" style="padding-left:8px">—</div>
+          <div class="ov-kpi-sub" id="as-flex-sub" style="padding-left:8px"></div>
+        </div>
+        <div class="ov-kpi-card">
+          <div class="ov-kpi-accent" style="background:#a8c5a0"></div>
+          <div class="ov-kpi-label" style="padding-left:8px">現金帳戶總計</div>
+          <div class="ov-kpi-val privacy-mask" id="as-cash-total" style="padding-left:8px">—</div>
+          <div class="ov-kpi-sub" id="as-cash-sub" style="padding-left:8px"></div>
+        </div>
+      </div>
+
+      <!-- 信貸 + 不限用途 -->
+      <div class="as-grid">
+        <!-- 信貸管理 -->
+        <div class="as-card">
+          <div class="as-card-hdr">
+            <div class="as-card-title">🏦 信貸管理</div>
+            <button onclick="openSP('health')" style="display:none"></button>
+            <span class="as-card-badge" id="as-loan-badge" style="background:#fee2e2;color:#b91c1c"></span>
+          </div>
+          <div id="as-loan-body"></div>
+          <div class="as-add-btn" onclick="addLoan()">＋ 新增信貸</div>
+        </div>
+
+        <!-- 不限用途 -->
+        <div class="as-card">
+          <div class="as-card-hdr">
+            <div class="as-card-title">💳 不限用途額度</div>
+            <span class="as-card-badge" id="as-flex-badge" style="background:#dbeafe;color:#1d4ed8"></span>
+          </div>
+          <div id="as-flex-body"></div>
+          <div class="as-add-btn" onclick="openSP('flex')">✏️ 管理額度</div>
+        </div>
+      </div>
+
+      <!-- 現金帳戶 -->
+      <div class="as-card" style="margin-bottom:16px">
+        <div class="as-card-hdr">
+          <div class="as-card-title">💵 現金帳戶</div>
+          <span class="as-card-badge" id="as-cash-badge" style="background:#dcfce7;color:#15803d"></span>
+        </div>
+        <div id="as-cash-body" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:0"></div>
+        <div class="as-add-btn" onclick="openAddCash()">＋ 新增帳戶</div>
       </div>
     </div>
 
     <!-- ══ 頁面：投資與觀察 ══ -->
     <div class="db-page" id="dbpage-invest">
-      <div style="color:#94a3b8;padding:40px;text-align:center;font-size:14px">
-        投資與觀察頁面（第二階段實作）
+      <div class="inv-page-grid">
+        <!-- 左：持股清單 -->
+        <div class="inv-page-card">
+          <div class="inv-page-hdr">
+            <div class="inv-page-title">💼 目前持股</div>
+            <button onclick="openInvModal()" style="padding:5px 12px;background:#eff6ff;border:1px solid #bfdbfe;color:#2563eb;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">＋ 新增</button>
+          </div>
+          <div id="invest-page-body"></div>
+        </div>
+        <!-- 右：觀察股 + 甜甜圈 -->
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div class="inv-page-card">
+            <div class="inv-page-hdr">
+              <div class="inv-page-title">👁 觀察股區</div>
+              <button onclick="openSP('watch')" style="padding:5px 12px;background:#f8f9fa;border:1px solid #eaecf0;color:#374151;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">管理 ↗</button>
+            </div>
+            <div id="invest-watch-body"></div>
+          </div>
+          <div class="inv-page-card" style="padding:16px">
+            <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:12px">🥧 持股佔比</div>
+            <div style="position:relative;width:140px;height:140px;margin:0 auto">
+              <canvas id="invest-donut-mini" width="140" height="140"></canvas>
+              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none">
+                <div style="font-size:11px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#111827;text-align:center" id="invest-donut-mini-total" class="privacy-mask">—</div>
+              </div>
+            </div>
+            <div id="invest-donut-mini-legend" style="margin-top:12px;display:flex;flex-direction:column;gap:5px"></div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -2304,8 +2425,27 @@ body:not(.privacy) .privacy-mask{filter:none;}
 
     <!-- ══ 頁面：資產趨勢 ══ -->
     <div class="db-page" id="dbpage-trend">
-      <div style="color:#94a3b8;padding:40px;text-align:center;font-size:14px">
-        資產趨勢頁面（第二階段實作）
+      <!-- 趨勢圖 -->
+      <div class="trend-page-card">
+        <div class="trend-page-hdr">
+          <span>📈 淨資產趨勢（每週五快照）</span>
+          <button onclick="recordSnapshot(true)" style="padding:5px 12px;background:#eff6ff;border:1px solid #bfdbfe;color:#2563eb;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer">📷 手動記錄</button>
+        </div>
+        <div style="position:relative;height:280px">
+          <canvas id="trend-page-canvas"></canvas>
+        </div>
+      </div>
+      <!-- 快照表格 -->
+      <div class="trend-page-card">
+        <div class="trend-page-hdr">
+          <span>📋 歷史快照記錄</span>
+          <div style="display:flex;gap:6px">
+            <label style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:#374151;cursor:pointer"><input type="checkbox" id="tp-tc-net" checked onchange="renderTrendPageChart()">淨資產</label>
+            <label style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:#374151;cursor:pointer"><input type="checkbox" id="tp-tc-index" checked onchange="renderTrendPageChart()">大盤</label>
+            <label style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:#374151;cursor:pointer"><input type="checkbox" id="tp-tc-div" onchange="renderTrendPageChart()">股息</label>
+          </div>
+        </div>
+        <div id="trend-page-table" style="overflow-x:auto"></div>
       </div>
     </div>
 
@@ -9083,6 +9223,256 @@ const DB_PAGE_NAMES={
 let _ovTrendChart=null, _ovDonutChart=null;
 const MORANDI_OV=['#8fa8c8','#a8c5a0','#c9a99a','#b5adc4','#c4b89a','#9bbfbf','#d4a9b5','#a3b5a3'];
 
+// ══════════════════════════════════════
+// 資產與負債分頁
+// ══════════════════════════════════════
+function renderAssetsPage(){
+  // KPI
+  const lR=db.loans.reduce((s,l)=>s+calcLoanRemain(l),0);
+  const lM=db.loans.reduce((s,l)=>s+(l.monthly||0),0);
+  const fU=db.flexLoans.reduce((s,f)=>s+(f.used||f.remain||0),0);
+  const fL=db.flexLoans.reduce((s,f)=>s+(f.limit||0),0);
+  const cT=db.cashAccounts.reduce((s,c)=>s+(c.cash||0)+(c.d1||0)+(c.d2||0),0);
+  const fmtM=v=>'$'+Math.round(v).toLocaleString();
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  set('as-loan-total',fmtM(lR));
+  set('as-loan-monthly','月繳 '+fmtM(lM));
+  set('as-loan-badge',db.loans.length+' 筆');
+  set('as-flex-total',fmtM(fU));
+  set('as-flex-sub','額度 '+fmtM(fL)+'，已用 '+Math.round(fU/fL*100)+'%');
+  set('as-flex-badge',fmtM(fL-fU)+' 可用');
+  set('as-cash-total',fmtM(cT));
+  set('as-cash-badge',db.cashAccounts.length+' 個帳戶');
+  set('as-cash-sub','含待入帳');
+
+  // 信貸列表
+  const lb=document.getElementById('as-loan-body');
+  if(lb){
+    lb.innerHTML=db.loans.length===0?
+      '<div style="padding:20px;text-align:center;color:#9ca3af;font-size:12px">尚無信貸記錄</div>':
+      db.loans.map(l=>{
+        const rem=calcLoanRemain(l);
+        const pct=l.amount>0?Math.round((1-rem/l.amount)*100):0;
+        const days=daysUntilDeduct(parseInt(l.deductDay)||null);
+        const urgent=days!==null&&days<=5;
+        return`<div class="as-row" onclick="openSP('health')">
+          <div class="as-row-icon" style="background:${urgent?'#fee2e2':'#f0f4ff'}">${urgent?'🔴':'🏦'}</div>
+          <div>
+            <div class="as-row-name">${l.bank||l.name||'信貸'}</div>
+            <div class="as-row-sub">每月 $${Math.round(l.monthly||0).toLocaleString()}・${l.deductDay||'—'}號扣款${days!==null?'（'+days+'天後）':''}</div>
+            <div class="as-prog-bar"><div class="as-prog-fill" style="width:${pct}%;background:${urgent?'#f87171':'#8fa8c8'}"></div></div>
+          </div>
+          <div class="as-row-right">
+            <div class="as-row-val privacy-mask">$${Math.round(rem/10000)/100}萬</div>
+            <div class="as-row-meta">還清 ${pct}%</div>
+          </div>
+        </div>`;
+      }).join('');
+  }
+
+  // 不限用途列表
+  const fb=document.getElementById('as-flex-body');
+  if(fb){
+    fb.innerHTML=(db.flexLoans||[]).length===0?
+      '<div style="padding:20px;text-align:center;color:#9ca3af;font-size:12px">尚無不限用途記錄</div>':
+      (db.flexLoans||[]).map(f=>{
+        const used=f.used||f.remain||0;
+        const limit=f.limit||0;
+        const pct=limit>0?Math.round(used/limit*100):0;
+        return`<div class="as-row">
+          <div class="as-row-icon" style="background:#fef3c7">💳</div>
+          <div>
+            <div class="as-row-name">${f.name||f.bank||'不限用途'}</div>
+            <div class="as-row-sub">額度 $${Math.round(limit/10000)/100}萬・已用 ${pct}%</div>
+            <div class="as-prog-bar"><div class="as-prog-fill" style="width:${pct}%;background:#c9a99a"></div></div>
+          </div>
+          <div class="as-row-right">
+            <div class="as-row-val privacy-mask">$${Math.round(used/10000)/100}萬</div>
+            <div class="as-row-meta">每月 $${Math.round(f.monthly||0).toLocaleString()}</div>
+          </div>
+        </div>`;
+      }).join('');
+  }
+
+  // 現金帳戶
+  const cb=document.getElementById('as-cash-body');
+  if(cb){
+    cb.innerHTML=db.cashAccounts.length===0?
+      '<div style="padding:20px;text-align:center;color:#9ca3af;font-size:12px">尚無現金帳戶</div>':
+      db.cashAccounts.map(acc=>{
+        const total=(acc.cash||0)+(acc.d1||0)+(acc.d2||0);
+        return`<div class="as-row" style="flex-direction:column;align-items:flex-start;gap:6px">
+          <div style="display:flex;align-items:center;gap:10px;width:100%">
+            <div class="as-row-icon" style="background:#f0fdf4">🏧</div>
+            <div>
+              <div class="as-row-name">${acc.name||'帳戶'}</div>
+              <div class="as-row-sub">${acc.d1?'含待交割 $'+Math.round(acc.d1).toLocaleString():''}</div>
+            </div>
+            <div class="as-row-right">
+              <div class="as-row-val privacy-mask">$${Math.round(total).toLocaleString()}</div>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+  }
+}
+
+// ══════════════════════════════════════
+// 投資與觀察分頁
+// ══════════════════════════════════════
+let _investMiniDonut=null;
+function renderInvestPage(){
+  // 持股清單
+  const body=document.getElementById('invest-page-body');
+  if(body){
+    const active=db.investments.filter(inv=>calcInv(inv).tLots>0)
+      .sort((a,b)=>(a.order||0)-(b.order||0));
+    body.innerHTML=active.length===0?
+      '<div style="padding:24px;text-align:center;color:#9ca3af;font-size:12px">尚無持股</div>':
+      active.map(inv=>{
+        const c=calcInv(inv);
+        const price=db.prices[inv.code]?.price;
+        const pnl=c.mktVal!=null?c.mktVal-c.tCost:null;
+        const pnlPct=c.tCost>0&&pnl!=null?Math.round(pnl/c.tCost*1000)/10:null;
+        const pnlColor=pnl==null?'#9ca3af':pnl>=0?'#dc2626':'#16a34a';
+        return`<div class="inv-stock-row" onclick="openInvDetail('${inv.id}')">
+          <div>
+            <div class="inv-stock-code">${inv.code}</div>
+            <div class="inv-stock-name">${inv.name||''}</div>
+          </div>
+          <div style="font-size:11px;color:#64748b;font-weight:600">${c.tLots}張</div>
+          <div style="margin-left:auto;text-align:right">
+            <div class="inv-stock-price privacy-mask">${price?'$'+price:'—'}</div>
+            <div class="inv-stock-pnl privacy-mask" style="color:${pnlColor}">${pnl!=null?(pnl>=0?'+':'')+Math.round(pnl).toLocaleString():''} ${pnlPct!=null?'('+pnlPct+'%)':''}</div>
+          </div>
+        </div>`;
+      }).join('');
+  }
+
+  // 觀察股
+  const wb=document.getElementById('invest-watch-body');
+  if(wb){
+    const watchlist=db.watchlist||[];
+    wb.innerHTML=watchlist.length===0?
+      '<div style="padding:16px;text-align:center;color:#9ca3af;font-size:12px">尚無觀察股</div>':
+      watchlist.slice(0,6).map(w=>{
+        const p=db.prices[w.code];
+        const chgColor=p&&p.changePct>=0?'#dc2626':'#16a34a';
+        return`<div class="inv-stock-row">
+          <div>
+            <div class="inv-stock-code" style="font-size:12px">${w.code}</div>
+            <div class="inv-stock-name">${w.name||''}</div>
+          </div>
+          <div style="margin-left:auto;text-align:right">
+            <div class="inv-stock-price privacy-mask">${p?'$'+p.price:'—'}</div>
+            <div class="inv-stock-pnl privacy-mask" style="color:${chgColor}">${p?(p.changePct>=0?'+':'')+p.changePct+'%':''}</div>
+          </div>
+        </div>`;
+      }).join('');
+  }
+
+  // 迷你甜甜圈
+  const canvas=document.getElementById('invest-donut-mini');
+  const legendEl=document.getElementById('invest-donut-mini-legend');
+  const totalEl=document.getElementById('invest-donut-mini-total');
+  if(canvas){
+    const items=[];let tot=0;
+    db.investments.forEach(inv=>{
+      const c=calcInv(inv);if(c.tLots<=0)return;
+      const val=c.mktVal??c.tCost;if(val<=0)return;
+      tot+=val;items.push({name:inv.code,val});
+    });
+    if(items.length>0){
+      const colors=items.map((_,i)=>MORANDI_OV[i%MORANDI_OV.length]);
+      if(totalEl)totalEl.textContent='$'+(Math.round(tot/10000)/100)+'萬';
+      if(_investMiniDonut)_investMiniDonut.destroy();
+      _investMiniDonut=new Chart(canvas,{
+        type:'doughnut',
+        data:{labels:items.map(i=>i.name),datasets:[{data:items.map(i=>i.val),backgroundColor:colors,borderWidth:2,borderColor:'#fff'}]},
+        options:{cutout:'65%',responsive:false,plugins:{legend:{display:false},tooltip:{callbacks:{label(ctx){const t=ctx.dataset.data.reduce((a,b)=>a+b,0);return ` ${Math.round(ctx.parsed/t*100)}%`;}}}}
+      }});
+      if(legendEl)legendEl.innerHTML=items.map((item,i)=>`
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px">
+          <span style="width:8px;height:8px;border-radius:50%;background:${colors[i]};flex-shrink:0"></span>
+          <span style="font-weight:700;color:#374151">${item.name}</span>
+          <span style="color:#9ca3af;margin-left:auto">${Math.round(item.val/tot*100)}%</span>
+        </div>`).join('');
+    }
+  }
+}
+
+// ══════════════════════════════════════
+// 資產趨勢分頁
+// ══════════════════════════════════════
+let _trendPageChart=null;
+function renderTrendPage(){
+  renderTrendPageChart();
+  renderTrendPageTable();
+}
+
+function renderTrendPageChart(){
+  const canvas=document.getElementById('trend-page-canvas');
+  if(!canvas)return;
+  const snaps=(db.snapshots||[]).sort((a,b)=>a.ym.localeCompare(b.ym));
+  if(snaps.length===0)return;
+  const showNet=document.getElementById('tp-tc-net')?.checked;
+  const showIndex=document.getElementById('tp-tc-index')?.checked;
+  const showDiv=document.getElementById('tp-tc-div')?.checked;
+  const labels=snaps.map(s=>s.ym.length>7?s.ym.slice(5):s.ym);
+  const parent=canvas.parentElement;
+  canvas.width=parent.offsetWidth||600;canvas.height=280;
+  const ctx=canvas.getContext('2d');
+  const grad=ctx.createLinearGradient(0,0,0,280);
+  grad.addColorStop(0,'rgba(143,168,200,.2)');grad.addColorStop(1,'rgba(143,168,200,.01)');
+  const datasets=[];
+  if(showNet)datasets.push({label:'淨資產',data:snaps.map(s=>s.net),borderColor:'#8fa8c8',backgroundColor:grad,borderWidth:2,tension:0.4,fill:true,pointRadius:3,yAxisID:'yL'});
+  if(showIndex)datasets.push({label:'大盤',data:snaps.map(s=>s.indexVal||null),borderColor:'#a8c5a0',borderWidth:2,tension:0.4,spanGaps:true,fill:false,pointRadius:3,yAxisID:'yR'});
+  if(showDiv)datasets.push({label:'每月股息',data:snaps.map(s=>s.div),borderColor:'#c9a99a',borderWidth:2,tension:0.4,fill:false,pointRadius:3,yAxisID:'yL'});
+  if(_trendPageChart)_trendPageChart.destroy();
+  _trendPageChart=new Chart(canvas,{
+    type:'line',data:{labels,datasets},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{legend:{position:'top',labels:{font:{size:11},boxWidth:10,padding:12}},
+        tooltip:{backgroundColor:'rgba(17,24,39,.88)',padding:10,cornerRadius:8,bodyFont:{family:"'JetBrains Mono',monospace",size:11}}},
+      scales:{
+        x:{grid:{color:'rgba(0,0,0,.04)'},ticks:{font:{size:10},color:'#9ca3af'}},
+        yL:{position:'left',grid:{color:'rgba(0,0,0,.04)'},ticks:{font:{size:10},color:'#9ca3af',callback:v=>v>=1000000?'$'+(v/1000000).toFixed(1)+'M':'$'+(v/1000).toFixed(0)+'K'}},
+        yR:{position:'right',display:!!showIndex,grid:{drawOnChartArea:false},ticks:{font:{size:10},color:'#a8c5a0',callback:v=>Math.round(v/1000)+'K'}}
+      }
+    }
+  });
+}
+
+function renderTrendPageTable(){
+  const el=document.getElementById('trend-page-table');
+  if(!el)return;
+  const snaps=(db.snapshots||[]).sort((a,b)=>b.ym.localeCompare(a.ym));
+  if(snaps.length===0){el.innerHTML='<div style="padding:20px;text-align:center;color:#9ca3af;font-size:12px">尚無快照記錄</div>';return;}
+  el.innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:12px">
+    <thead><tr style="background:#f8f9fa">
+      <th style="padding:10px 14px;text-align:left;font-weight:700;color:#374151;border-bottom:1px solid #eaecf0">日期</th>
+      <th style="padding:10px 14px;text-align:right;font-weight:700;color:#374151;border-bottom:1px solid #eaecf0">大盤</th>
+      <th style="padding:10px 14px;text-align:right;font-weight:700;color:#374151;border-bottom:1px solid #eaecf0">淨資產</th>
+      <th style="padding:10px 14px;text-align:right;font-weight:700;color:#374151;border-bottom:1px solid #eaecf0">每月股息</th>
+      <th style="padding:10px 14px;text-align:right;font-weight:700;color:#374151;border-bottom:1px solid #eaecf0">負債比</th>
+      <th style="padding:10px 14px;border-bottom:1px solid #eaecf0"></th>
+    </tr></thead>
+    <tbody>${snaps.map((s,i)=>`<tr style="background:${i%2===0?'#fff':'#fafafa'}">
+      <td style="padding:10px 14px;font-weight:700;color:#374151;border-bottom:1px solid #f5f5f5">${s.ym}</td>
+      <td style="padding:10px 14px;text-align:right;font-family:'JetBrains Mono',monospace;color:#a8c5a0;border-bottom:1px solid #f5f5f5">${s.indexVal?s.indexVal.toLocaleString():'—'}</td>
+      <td style="padding:10px 14px;text-align:right;font-family:'JetBrains Mono',monospace;font-weight:700;color:#2563eb;border-bottom:1px solid #f5f5f5" class="privacy-mask">$${Math.round(s.net).toLocaleString()}</td>
+      <td style="padding:10px 14px;text-align:right;font-family:'JetBrains Mono',monospace;color:#15803d;border-bottom:1px solid #f5f5f5" class="privacy-mask">$${Math.round(s.div).toLocaleString()}</td>
+      <td style="padding:10px 14px;text-align:right;color:#64748b;border-bottom:1px solid #f5f5f5">${s.debtRatio}%</td>
+      <td style="padding:10px 14px;text-align:right;border-bottom:1px solid #f5f5f5">
+        <button onclick="openSnapDetail('${s.ym}')" style="padding:3px 8px;background:#eff6ff;border:1px solid #bfdbfe;color:#2563eb;border-radius:5px;font-size:10px;cursor:pointer;font-weight:700">📋</button>
+        <button onclick="deleteSnapshot('${s.ym}')" style="padding:3px 8px;background:#fff;border:1px solid #fca5a5;color:#dc2626;border-radius:5px;font-size:10px;cursor:pointer;margin-left:4px;font-weight:700">刪</button>
+      </td>
+    </tr>`).join('')}</tbody>
+  </table>`;
+}
+
 function renderOvDashboard(){
   renderOvKpi();
   renderOvTrend();
@@ -9340,6 +9730,9 @@ function dbShowPage(id){
   const nameEl=document.getElementById('db-page-name');
   if(nameEl)nameEl.textContent=DB_PAGE_NAMES[id]||id;
   if(id==='overview'){render();setTimeout(renderOvDashboard,100);}
+  if(id==='assets')renderAssetsPage();
+  if(id==='invest')renderInvestPage();
+  if(id==='trend')renderTrendPage();
 }
 
 // 更多選單（移到側欄 footer 按鈕觸發）
