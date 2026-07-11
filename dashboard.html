@@ -2460,6 +2460,24 @@ body:not(.privacy) .privacy-mask{filter:none;}
 
     <!-- ══ 頁面：交易日誌 ══ -->
     <div class="db-page" id="dbpage-journal">
+      <!-- 走勢圖 -->
+      <div class="journal-page-card" style="margin-bottom:16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;cursor:pointer;user-select:none" onclick="toggleJournalPageChart()">
+          <span style="font-size:12px;font-weight:700;color:#374151">📈 走勢圖</span>
+          <span id="journal-page-chart-arrow" style="font-size:11px;color:#94a3b8">▼ 點擊展開</span>
+        </div>
+        <div id="journal-page-chart-body" style="display:none;padding:12px 16px;border-top:1px solid #f0f2f5">
+          <div id="journal-chart-checks" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;font-size:12px;align-items:center"></div>
+          <label style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:700;color:#7c3aed;margin-bottom:10px;cursor:pointer">
+            <input type="checkbox" id="jchart-backtest-toggle" onchange="renderJournalChart()">
+            📊 回測 Hover
+          </label>
+          <canvas id="journal-chart-canvas" height="200" style="width:100%;max-height:220px"></canvas>
+          <div id="journal-chart-empty" style="display:none;text-align:center;padding:30px;color:#94a3b8;font-size:12px">尚無走勢資料</div>
+        </div>
+      </div>
+
+      <!-- 日誌列表 -->
       <div class="journal-page-card">
         <div class="journal-page-toolbar">
           <input id="journal-search-page" type="text" placeholder="搜尋日誌..." class="drawer-input" style="flex:1;min-width:120px" oninput="renderJournalPage()">
@@ -9996,22 +10014,34 @@ function renderOvTrend(){
   grad.addColorStop(1,'rgba(143,168,200,.01)');
 
   if(_ovTrendChart)_ovTrendChart.destroy();
+
+  // 大盤分段紅綠線
+  const indexData=snaps.map(s=>s.indexVal||null);
+  const indexSegs=buildIndexSegments(indexData,'yR');
+
   _ovTrendChart=new Chart(canvas,{
     type:'line',
-    data:{labels,datasets:[{
-      label:'淨資產',data,
-      borderColor:'#8fa8c8',borderWidth:2.5,
-      backgroundColor:grad,
-      tension:0.4,fill:true,
-      pointRadius:3,pointBackgroundColor:'#8fa8c8',
-      pointHoverRadius:6,pointHoverBackgroundColor:'#fff',
-      pointHoverBorderColor:'#8fa8c8',pointHoverBorderWidth:2
-    }]},
+    data:{labels,datasets:[
+      {label:'淨資產',data,
+       borderColor:'#8fa8c8',backgroundColor:grad,borderWidth:2.5,
+       tension:0.4,fill:true,
+       pointRadius:3,pointBackgroundColor:'#8fa8c8',
+       pointHoverRadius:6,pointHoverBackgroundColor:'#fff',
+       pointHoverBorderColor:'#8fa8c8',pointHoverBorderWidth:2,
+       yAxisID:'yL'},
+      ...indexSegs
+    ]},
     options:{
       responsive:true,maintainAspectRatio:false,
       interaction:{mode:'index',intersect:false},
       plugins:{
-        legend:{display:false},
+        legend:{
+          display:true,position:'top',
+          labels:{
+            font:{size:10},boxWidth:10,padding:12,
+            filter:item=>item.text!==''
+          }
+        },
         tooltip:{
           backgroundColor:'rgba(17,24,39,.88)',
           titleFont:{family:"'Noto Sans TC',sans-serif",size:11},
@@ -10020,6 +10050,7 @@ function renderOvTrend(){
           callbacks:{
             label(ctx){
               const v=ctx.parsed.y;
+              if(!v)return null;
               return ' $'+(v>=1000000?(v/1000000).toFixed(2)+'M':Math.round(v).toLocaleString());
             }
           }
@@ -10027,13 +10058,17 @@ function renderOvTrend(){
       },
       scales:{
         x:{grid:{color:'rgba(0,0,0,.04)'},ticks:{font:{size:10},color:'#9ca3af',maxTicksLimit:8}},
-        y:{
-          position:'right',
+        yL:{
+          position:'left',
           grid:{color:'rgba(0,0,0,.04)'},
-          ticks:{
-            font:{size:10},color:'#9ca3af',
-            callback:v=>v>=1000000?'$'+(v/1000000).toFixed(1)+'M':'$'+(v/1000).toFixed(0)+'K'
-          }
+          ticks:{font:{size:10},color:'#9ca3af',
+            callback:v=>v>=1000000?'$'+(v/1000000).toFixed(1)+'M':'$'+(v/1000).toFixed(0)+'K'}
+        },
+        yR:{
+          position:'right',
+          grid:{drawOnChartArea:false},
+          ticks:{font:{size:10},color:'#9ca3af',
+            callback:v=>Math.round(v/1000)+'K'}
         }
       }
     }
@@ -10417,6 +10452,16 @@ function deleteJournalFromDrawer(){
 }
 
 // 日誌分頁渲染
+function toggleJournalPageChart(){
+  const body=document.getElementById('journal-page-chart-body');
+  const arrow=document.getElementById('journal-page-chart-arrow');
+  if(!body)return;
+  const isOpen=body.style.display!=='none';
+  body.style.display=isOpen?'none':'';
+  if(arrow)arrow.textContent=isOpen?'▼ 點擊展開':'▲ 收起';
+  if(!isOpen)renderJournalChart();
+}
+
 function renderJournalPage(){
   const container=document.getElementById('journal-page-list');
   if(!container)return;
