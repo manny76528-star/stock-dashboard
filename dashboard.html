@@ -1846,8 +1846,8 @@ body:not(.privacy) .privacy-mask{filter:none;}
 
 
 
-<!-- TREND CHART -->
-<div class="trend-section">
+<!-- TREND CHART（移至資產趨勢分頁，這裡隱藏保留 JS） -->
+<div class="trend-section" style="display:none">
   <div class="trend-hdr" onclick="toggleTrend()">
     <span>📈 資產趨勢圖</span>
     <div style="display:flex;gap:8px;align-items:center">
@@ -1960,6 +1960,8 @@ body:not(.privacy) .privacy-mask{filter:none;}
     <!-- ══ 頁面：數據總覽 ══ -->
     <div class="db-page active" id="dbpage-overview">
 
+<!-- 舊版資產總覽（隱藏，保留 JS 所需的 DOM id） -->
+<div style="display:none">
 <!-- 資產總覽 KPI 卡片 -->
 <div class="db-card" style="margin-bottom:12px">
   <div class="db-card-header" style="justify-content:space-between">
@@ -2226,6 +2228,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
 <!-- ═══ BOTTOM STATUS BAR ═══ -->
 
 </div><!-- /db-root (legacy content inside overview page) -->
+</div><!-- /hidden legacy -->
 
     <!-- ══ 三段式新總覽 ══ -->
     <div id="ov-dashboard" style="margin-top:20px">
