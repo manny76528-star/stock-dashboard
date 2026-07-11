@@ -67,6 +67,8 @@ body{background:#f0f2f5;color:var(--text);font-family:'Noto Sans TC',sans-serif;
   flex:1;
   min-width:0;
   display:flex;flex-direction:column;
+  height:100vh;
+  overflow-y:auto;
 }
 
 /* 頂部欄 */
@@ -2231,46 +2233,46 @@ body:not(.privacy) .privacy-mask{filter:none;}
     </div>
     <div class="sp-body" style="padding:0">
       <!-- 卡片速覽 -->
-      <div class="div-cards" id="div-cards" style="padding:14px 16px;background:#f0fdfa;border-bottom:1px solid #99f6e4"><span style="color:var(--muted);font-size:11px">尚無領息記錄</span></div>
+      <div class="div-cards" id="div-cards-sp" style="padding:14px 16px;background:#f0fdfa;border-bottom:1px solid #99f6e4"><span style="color:var(--muted);font-size:11px">尚無領息記錄</span></div>
       <!-- 準備入帳 -->
-      <div id="div-pending-bar" style="display:none">
+      <div id="div-pending-bar-sp" style="display:none">
         <div style="padding:8px 14px 4px;background:#eff6ff;border-bottom:1px solid #bfdbfe;display:flex;align-items:center;justify-content:space-between">
           <span style="font-size:12px;font-weight:700;color:#1d4ed8">⏳ 準備入帳</span>
-          <span style="font-size:14px;font-weight:800;color:#2563eb" id="d-pending">$0</span>
+          <span style="font-size:14px;font-weight:800;color:#2563eb" id="d-pending-sp">$0</span>
         </div>
-        <div class="pending-card-grid" id="d-pending-cards"></div>
+        <div class="pending-card-grid" id="d-pending-cards-sp"></div>
       </div>
       <!-- 年份統計列 -->
       <div class="div-yr-bar">
         <div style="font-size:13px;font-weight:700">
-          📅 今年：<span class="gain mono" id="d-yr" style="font-size:16px">$0</span>
-          &nbsp;｜&nbsp;🏆 累積：<span class="gain mono" id="d-tot" style="font-size:15px">$0</span>
+          📅 今年：<span class="gain mono" id="d-yr-sp" style="font-size:16px">$0</span>
+          &nbsp;｜&nbsp;🏆 累積：<span class="gain mono" id="d-tot-sp" style="font-size:15px">$0</span>
         </div>
         <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;color:var(--muted)">
-          <select id="div-year-sel" onchange="renderDivs()" style="padding:4px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;color:#475569;background:#fff;cursor:pointer;outline:none">
+          <select id="div-year-sel-sp" onchange="renderDivs()" style="padding:4px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;color:#475569;background:#fff;cursor:pointer;outline:none">
             <option value="cur">今年</option>
             <option value="all">全部</option>
           </select>
-          <input type="checkbox" id="div-hist-chk" style="display:none">
+          <input type="checkbox" id="div-hist-chk-sp" style="display:none">
         </label>
       </div>
       <!-- 今年明細 -->
       <div class="div-section-hdr" style="background:#ccfbf1;color:#0f766e" onclick="toggleDivYear()">
-        <span>📋 今年明細</span><span id="div-yr-hint">▼ 展開</span>
+        <span>📋 今年明細</span><span id="div-yr-hint-sp">▼ 展開</span>
       </div>
-      <div id="div-yr-body" style="display:none;overflow-x:auto">
+      <div id="div-yr-body-sp" style="display:none;overflow-x:auto">
         <table class="dt" style="min-width:400px">
           <thead><tr><th>標的</th><th>領息日期</th><th>張數</th><th>每股配息</th><th>本次金額</th><th>操作</th></tr></thead>
-          <tbody id="div-body-yr"></tbody>
+          <tbody id="div-body-yr-sp"></tbody>
         </table>
       </div>
       <!-- 歷史記錄 -->
-      <div id="div-hist-sec" style="display:none">
+      <div id="div-hist-sec-sp" style="display:none">
         <div style="padding:6px 12px;background:#e8edf5;font-size:11px;font-weight:700;color:var(--accent)">📚 歷史記錄</div>
         <div style="overflow-x:auto">
           <table class="dt" style="min-width:400px">
             <thead><tr><th>標的</th><th>領息日期</th><th>張數</th><th>每股配息</th><th>本次金額</th><th>操作</th></tr></thead>
-            <tbody id="div-body-hist"></tbody>
+            <tbody id="div-body-hist-sp"></tbody>
           </table>
         </div>
       </div>
@@ -3244,16 +3246,43 @@ body:not(.privacy) .privacy-mask{filter:none;}
   </div>
 </div>
 <!-- ══ 股息管理 Drawer ══ -->
-<div id="div-drawer" class="side-drawer">
+<div id="div-drawer" class="side-drawer" style="width:700px;max-width:95vw">
   <div class="side-drawer-hdr">
     <div class="side-drawer-title"><span>💰</span><span>股息管理</span></div>
     <div class="side-drawer-actions">
-      <button onclick="openSP('div')" style="padding:7px 12px;background:#f8f9fa;border:1px solid #e2e8f0;color:#374151;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">完整視窗 ↗</button>
+      <button onclick="openDivModal()" style="padding:7px 14px;background:#dcfce7;border:1px solid #86efac;color:#15803d;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">＋ 新增股息</button>
       <button class="side-drawer-close" onclick="closeDrawer()">✕</button>
     </div>
   </div>
-  <div class="side-drawer-body" id="div-drawer-body">
-    <div style="color:#9ca3af;text-align:center;padding:40px">載入中...</div>
+  <div class="side-drawer-body" style="padding:0" id="div-drawer-body">
+    <!-- 卡片速覽 -->
+    <div class="div-cards" id="div-cards" style="padding:14px 16px;background:#f0fdfa;border-bottom:1px solid #99f6e4"><span style="color:var(--muted);font-size:11px">尚無領息記錄</span></div>
+    <!-- 準備入帳 -->
+    <div id="div-pending-bar" style="display:none">
+      <div style="padding:8px 14px 4px;background:#eff6ff;border-bottom:1px solid #bfdbfe;display:flex;align-items:center;justify-content:space-between">
+        <span style="font-size:12px;font-weight:700;color:#1d4ed8">⏳ 準備入帳</span>
+        <span style="font-size:14px;font-weight:800;color:#2563eb" id="d-pending">$0</span>
+      </div>
+      <div class="pending-card-grid" id="d-pending-cards"></div>
+    </div>
+    <!-- 年份統計列 -->
+    <div class="div-yr-bar">
+      <div style="font-size:13px;font-weight:700">
+        📅 今年：<span class="gain mono" id="d-yr" style="font-size:16px">$0</span>
+        &nbsp;｜&nbsp;🏆 累積：<span class="gain mono" id="d-tot" style="font-size:15px">$0</span>
+      </div>
+      <select id="div-year-sel" onchange="renderDivs()" style="padding:4px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;color:#475569;background:#fff;cursor:pointer;outline:none">
+        <option value="cur">今年</option>
+        <option value="all">全部</option>
+      </select>
+    </div>
+    <!-- 今年明細 -->
+    <div class="div-section-hdr" style="background:#ccfbf1;color:#0f766e" onclick="toggleDivYear()">
+      <span>📋 今年明細</span><span id="div-yr-hint">▼ 展開</span>
+    </div>
+    <div id="div-yr-tbl" style="display:none"></div>
+    <!-- 歷史年份 -->
+    <div id="div-hist-area"></div>
   </div>
 </div>
 
@@ -9802,60 +9831,14 @@ function renderTrendPageTable(){
 // ══════════════════════════════════════
 function openDivDrawer(){
   openDrawer('div-drawer');
-  renderDivDrawer();
+  if(typeof renderDivs==='function')renderDivs();
 }
 
 function renderDivDrawer(){
-  const body=document.getElementById('div-drawer-body');
-  if(!body)return;
-
-  const now=new Date();
-  const yrStr=String(now.getFullYear());
-  const divs=(db.dividends||[]).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-  const yrTot=divs.filter(d=>d.date?.startsWith(yrStr)).reduce((s,d)=>s+(d.amount||0),0);
-  const allTot=divs.reduce((s,d)=>s+(d.amount||0),0);
-  const pending=divs.filter(d=>d.pending||d.date>now.toISOString().slice(0,10));
-
-  body.innerHTML=`
-    <!-- 統計 -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
-      <div style="background:#f0fdf4;border-radius:12px;padding:16px;text-align:center">
-        <div style="font-size:11px;color:#9ca3af;font-weight:600;margin-bottom:4px">今年股息</div>
-        <div style="font-size:20px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#15803d">$${Math.round(yrTot).toLocaleString()}</div>
-      </div>
-      <div style="background:#f0f4ff;border-radius:12px;padding:16px;text-align:center">
-        <div style="font-size:11px;color:#9ca3af;font-weight:600;margin-bottom:4px">累計總股息</div>
-        <div style="font-size:20px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#2563eb">$${Math.round(allTot).toLocaleString()}</div>
-      </div>
-    </div>
-
-    <!-- 待入帳 -->
-    ${pending.length>0?`<div style="margin-bottom:16px">
-      <div style="font-size:11px;font-weight:700;color:#9ca3af;letter-spacing:.5px;margin-bottom:8px">⏳ 待入帳</div>
-      ${pending.map(d=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f0f2f5">
-        <div style="font-size:13px;font-weight:700;color:#1e293b;min-width:72px;font-family:'JetBrains Mono',monospace">${d.code||'—'}</div>
-        <div style="font-size:11px;color:#9ca3af">${d.date}</div>
-        <div style="margin-left:auto;font-size:13px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#15803d">$${Math.round(d.amount||0).toLocaleString()}</div>
-        <span style="font-size:10px;background:#fef3c7;color:#92400e;padding:2px 7px;border-radius:5px;font-weight:700">待入帳</span>
-      </div>`).join('')}
-    </div>`:''}
-
-    <!-- 新增按鈕 -->
-    <button onclick="openSP('div')" style="width:100%;padding:10px;background:#eff6ff;border:1.5px dashed #bfdbfe;color:#2563eb;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:16px">
-      ＋ 新增股息記錄（完整視窗）
-    </button>
-
-    <!-- 歷史記錄 -->
-    <div style="font-size:11px;font-weight:700;color:#9ca3af;letter-spacing:.5px;margin-bottom:8px">📋 歷史記錄</div>
-    ${divs.filter(d=>!d.pending&&d.date<=now.toISOString().slice(0,10)).slice(0,20).map(d=>`
-      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f5f5f5">
-        <div style="font-size:12px;font-weight:700;color:#1e293b;min-width:72px;font-family:'JetBrains Mono',monospace">${d.code||'—'}</div>
-        <div style="font-size:11px;color:#9ca3af">${d.date}</div>
-        <div style="margin-left:auto;font-size:13px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#15803d">$${Math.round(d.amount||0).toLocaleString()}</div>
-      </div>`).join('')}
-  `;
-  if(typeof applyPrivacy==='function')applyPrivacy();
+  // 已由 renderDivs 直接更新 DOM，不需要額外邏輯
+  if(typeof renderDivs==='function')renderDivs();
 }
+
 
 // ══════════════════════════════════════
 // 財務規劃 Drawer
@@ -10538,7 +10521,9 @@ function dbShowPage(id){
   if(id==='journal'){renderJournalPage();}
 
   // 切換後滾回頂部
-  window.scrollTo({top:0,behavior:'smooth'});
+  const mainEl=document.querySelector('.db-main');
+  if(mainEl)mainEl.scrollTo({top:0,behavior:'smooth'});
+  else window.scrollTo({top:0,behavior:'smooth'});
 }
 
 // 更多選單（移到側欄 footer 按鈕觸發）
