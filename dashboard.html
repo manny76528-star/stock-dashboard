@@ -19,7 +19,98 @@
   --card-shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
   --section-header:#1e293b;
 }
-body{background:#eef2f7;color:var(--text);font-family:'Noto Sans TC',sans-serif;font-size:13px;padding:12px;min-height:100vh;}
+body{background:#f0f2f5;color:var(--text);font-family:'Noto Sans TC',sans-serif;font-size:13px;min-height:100vh;}
+
+/* ── 新版側欄佈局 ── */
+.db-app{display:flex;min-height:100vh;}
+
+/* 側欄 */
+.db-sidebar{
+  width:220px;flex-shrink:0;
+  background:#fff;
+  border-right:1px solid #e8ecf0;
+  display:flex;flex-direction:column;
+  position:fixed;top:0;left:0;bottom:0;
+  z-index:100;
+  box-shadow:2px 0 8px rgba(0,0,0,.04);
+}
+.db-sidebar-logo{
+  padding:20px 20px 16px;
+  border-bottom:1px solid #f0f2f5;
+}
+.db-sidebar-title{font-size:14px;font-weight:800;color:#1e293b;line-height:1.3;}
+.db-sidebar-sub{font-size:10px;color:#94a3b8;margin-top:2px;}
+.db-sidebar-nav{flex:1;padding:12px 0;overflow-y:auto;}
+.db-nav-section{font-size:9px;font-weight:700;color:#cbd5e1;padding:12px 20px 4px;letter-spacing:.8px;text-transform:uppercase;}
+.db-nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 20px;
+  font-size:13px;font-weight:600;color:#64748b;
+  cursor:pointer;transition:all .15s;
+  border-left:3px solid transparent;
+  user-select:none;
+}
+.db-nav-item:hover{background:#f8fafc;color:#1e293b;}
+.db-nav-item.active{background:#eff6ff;color:#2563eb;border-left-color:#2563eb;}
+.db-nav-item .nav-icon{font-size:16px;width:20px;text-align:center;}
+.db-nav-badge{margin-left:auto;background:#fee2e2;color:#dc2626;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;}
+.db-sidebar-footer{
+  padding:14px 20px;border-top:1px solid #f0f2f5;
+  display:flex;flex-direction:column;gap:6px;
+}
+.db-sidebar-sync{font-size:11px;color:#94a3b8;display:flex;align-items:center;gap:6px;}
+
+/* 主內容區 */
+.db-main{
+  margin-left:220px;
+  flex:1;
+  min-width:0;
+  display:flex;flex-direction:column;
+}
+
+/* 頂部欄 */
+.db-topbar{
+  background:#fff;
+  border-bottom:1px solid #e8ecf0;
+  padding:0 28px;
+  height:56px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:90;
+  box-shadow:0 1px 4px rgba(0,0,0,.04);
+}
+.db-topbar-left{display:flex;align-items:center;gap:12px;}
+.db-page-name{font-size:16px;font-weight:800;color:#1e293b;}
+.db-topbar-right{display:flex;align-items:center;gap:8px;}
+
+/* 內容區域 */
+.db-content{padding:24px 28px;flex:1;}
+
+/* 新版卡片 */
+.db-card-v2{
+  background:#fff;
+  border-radius:12px;
+  border:1px solid #e8ecf0;
+  box-shadow:0 1px 4px rgba(0,0,0,.05);
+  overflow:hidden;
+}
+.db-card-v2-header{
+  padding:16px 20px;
+  border-bottom:1px solid #f0f2f5;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.db-card-v2-title{font-size:14px;font-weight:700;color:#1e293b;}
+.db-card-v2-body{padding:16px 20px;}
+
+/* KPI 卡片 */
+.db-kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px;}
+.db-kpi-card{background:#fff;border-radius:12px;border:1px solid #e8ecf0;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.05);}
+.db-kpi-label{font-size:11px;font-weight:600;color:#94a3b8;letter-spacing:.3px;margin-bottom:8px;}
+.db-kpi-val{font-size:22px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#1e293b;}
+.db-kpi-sub{font-size:11px;margin-top:4px;color:#94a3b8;}
+
+/* 頁面標籤頁（用於各功能區切換） */
+.db-page{display:none;}
+.db-page.active{display:block;}
 .mono{font-family:'JetBrains Mono',monospace;}
 .gain{color:var(--gain);}.loss{color:var(--loss);}.bold{font-weight:700;}
 .teal-bg{background:var(--teal-lt)!important;color:var(--teal);font-weight:700;}
@@ -1679,34 +1770,84 @@ body:not(.privacy) .privacy-mask{filter:none;}
   </div>
 </div>
 
-<div class="db-root">
+<div class="db-app">
 
-<!-- ═══ PAGE HEADER ═══ -->
-<div class="db-page-header">
-  <div class="db-page-title" id="main-title-text" onclick="editTitle()" title="點擊修改標題">
-    <span class="db-title-icon">📊</span>
-    <span id="title-display">２０２６ 資產損益表</span>
+<!-- ═══ 左側導航欄 ═══ -->
+<div class="db-sidebar">
+  <div class="db-sidebar-logo">
+    <div class="db-sidebar-title">📊 資產損益表</div>
+    <div class="db-sidebar-sub" id="sidebar-year">2026</div>
   </div>
-  <div class="db-topbar-actions">
-    <a href="index.html" class="db-btn neutral">🏠 主目錄</a>
-    <button class="db-btn purple" onclick="undoLast()" id="undoBtn" disabled>← 上一步</button>
-    <button class="db-btn indigo" onclick="redoLast()" id="redoBtn" disabled>→ 下一步</button>
-    <!-- ⋯ 下拉選單 -->
-    <div style="position:relative;display:inline-block" id="more-menu-wrap">
-      <button class="db-btn neutral" onclick="toggleMoreMenu()" style="font-size:15px;letter-spacing:2px;padding:5px 12px">···</button>
-      <div id="more-menu" style="display:none;position:absolute;right:0;top:calc(100% + 6px);background:#1e293b;border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:6px;min-width:140px;z-index:999;box-shadow:0 8px 24px rgba(0,0,0,.3)">
-        <button onclick="manualSync();toggleMoreMenu()" style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 12px;background:none;border:none;color:#fff;font-size:13px;font-weight:600;cursor:pointer;border-radius:6px;font-family:'Noto Sans TC',sans-serif;text-align:left" onmouseover="this.style.background='rgba(255,255,255,.1)'" onmouseout="this.style.background='none'">☁️ 雲端同步</button>
-        <button onclick="exportData();toggleMoreMenu()" style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 12px;background:none;border:none;color:#fff;font-size:13px;font-weight:600;cursor:pointer;border-radius:6px;font-family:'Noto Sans TC',sans-serif;text-align:left" onmouseover="this.style.background='rgba(255,255,255,.1)'" onmouseout="this.style.background='none'">📤 備份</button>
-        <label style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 12px;background:none;border:none;color:#fff;font-size:13px;font-weight:600;cursor:pointer;border-radius:6px;font-family:'Noto Sans TC',sans-serif" onmouseover="this.style.background='rgba(255,255,255,.1)'" onmouseout="this.style.background='none'">📥 還原<input type="file" accept=".json" style="display:none" onchange="importData(event);toggleMoreMenu()"></label>
-        <button onclick="forceDailyProcess();toggleMoreMenu()" style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 12px;background:none;border:none;color:#fbbf24;font-size:13px;font-weight:600;cursor:pointer;border-radius:6px;font-family:'Noto Sans TC',sans-serif;text-align:left" onmouseover="this.style.background='rgba(255,255,255,.1)'" onmouseout="this.style.background='none'">⚡ 強制今日連動</button>
-        <div style="height:1px;background:rgba(255,255,255,.1);margin:4px 0"></div>
-        <button onclick="manualLogout();toggleMoreMenu()" style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 12px;background:none;border:none;color:#fca5a5;font-size:13px;font-weight:600;cursor:pointer;border-radius:6px;font-family:'Noto Sans TC',sans-serif;text-align:left" onmouseover="this.style.background='rgba(255,255,255,.1)'" onmouseout="this.style.background='none'">🔒 登出</button>
-      </div>
+  <nav class="db-sidebar-nav">
+    <div class="db-nav-section">主要</div>
+    <div class="db-nav-item active" id="nav-overview" onclick="dbShowPage('overview')">
+      <span class="nav-icon">🏠</span>數據總覽
+    </div>
+    <div class="db-nav-section">資產管理</div>
+    <div class="db-nav-item" id="nav-assets" onclick="dbShowPage('assets')">
+      <span class="nav-icon">🏦</span>資產與負債
+    </div>
+    <div class="db-nav-item" id="nav-invest" onclick="dbShowPage('invest')">
+      <span class="nav-icon">💼</span>投資與觀察
+    </div>
+    <div class="db-nav-section">記錄</div>
+    <div class="db-nav-item" id="nav-journal" onclick="dbShowPage('journal')">
+      <span class="nav-icon">📓</span>交易日誌
+    </div>
+    <div class="db-nav-item" id="nav-dividend" onclick="dbShowPage('dividend')">
+      <span class="nav-icon">💰</span>股息管理
+    </div>
+    <div class="db-nav-section">規劃</div>
+    <div class="db-nav-item" id="nav-finplan" onclick="dbShowPage('finplan')">
+      <span class="nav-icon">📐</span>財務規劃
+    </div>
+    <div class="db-nav-item" id="nav-trend" onclick="dbShowPage('trend')">
+      <span class="nav-icon">📈</span>資產趨勢
+    </div>
+  </nav>
+  <div class="db-sidebar-footer">
+    <div class="db-sidebar-sync" id="sidebar-sync-status">
+      <span>●</span><span id="pstat-mini">同步中...</span>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      <button onclick="togglePrivacy()" id="privacy-btn-side"
+        style="flex:1;padding:5px 8px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;color:#475569">
+        👁 顯示金額
+      </button>
+      <button onclick="toggleMoreMenu()"
+        style="padding:5px 10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;color:#475569">
+        ···
+      </button>
     </div>
   </div>
 </div>
 
-<div class="db-price-bar" id="pstat">—</div>
+<!-- ═══ 主內容區 ═══ -->
+<div class="db-main">
+
+  <!-- 頂部欄 -->
+  <div class="db-topbar">
+    <div class="db-topbar-left">
+      <div class="db-page-name" id="db-page-name">數據總覽</div>
+    </div>
+    <div class="db-topbar-right">
+      <span id="pstat" style="font-size:11px;color:#94a3b8;font-weight:600"></span>
+      <button class="db-btn indigo" onclick="refreshPrices()" style="font-size:11px;padding:5px 12px">🔄 更新股價</button>
+      <label class="div-roi-toggle" onclick="showDivRoi=!document.getElementById('roi-chk-sum').checked;document.getElementById('roi-chk-sum').checked=showDivRoi;renderSum();renderInv()">
+        <input type="checkbox" id="roi-chk-sum" style="display:none">
+        <span class="div-roi-icon">💹</span>
+        <span class="div-roi-label">含息</span>
+        <span class="div-roi-switch" id="roi-switch-dot"></span>
+      </label>
+      <a href="index.html" class="db-btn neutral" style="font-size:11px;padding:5px 12px">🏠 主目錄</a>
+    </div>
+  </div>
+
+  <!-- 內容區域 -->
+  <div class="db-content">
+
+    <!-- ══ 頁面：數據總覽 ══ -->
+    <div class="db-page active" id="dbpage-overview">
 
 <!-- 資產總覽 KPI 卡片 -->
 <div class="db-card" style="margin-bottom:12px">
@@ -1928,7 +2069,55 @@ body:not(.privacy) .privacy-mask{filter:none;}
   <span>信貸尚餘：<strong class="privacy-mask" id="sb-loan">—</strong></span>
 </div>
 
-</div><!-- /db-root -->
+</div><!-- /db-root (legacy content inside overview page) -->
+
+    </div><!-- /dbpage-overview -->
+
+    <!-- ══ 頁面：資產與負債 ══ -->
+    <div class="db-page" id="dbpage-assets">
+      <div style="color:#94a3b8;padding:40px;text-align:center;font-size:14px">
+        資產與負債頁面（第二階段實作）
+      </div>
+    </div>
+
+    <!-- ══ 頁面：投資與觀察 ══ -->
+    <div class="db-page" id="dbpage-invest">
+      <div style="color:#94a3b8;padding:40px;text-align:center;font-size:14px">
+        投資與觀察頁面（第二階段實作）
+      </div>
+    </div>
+
+    <!-- ══ 頁面：交易日誌 ══ -->
+    <div class="db-page" id="dbpage-journal">
+      <div style="color:#94a3b8;padding:40px;text-align:center;font-size:14px">
+        交易日誌頁面（第三階段實作）
+      </div>
+    </div>
+
+    <!-- ══ 頁面：股息管理 ══ -->
+    <div class="db-page" id="dbpage-dividend">
+      <div style="color:#94a3b8;padding:40px;text-align:center;font-size:14px">
+        股息管理頁面（第二階段實作）
+      </div>
+    </div>
+
+    <!-- ══ 頁面：財務規劃 ══ -->
+    <div class="db-page" id="dbpage-finplan">
+      <div style="color:#94a3b8;padding:40px;text-align:center;font-size:14px">
+        財務規劃頁面（第二階段實作）
+      </div>
+    </div>
+
+    <!-- ══ 頁面：資產趨勢 ══ -->
+    <div class="db-page" id="dbpage-trend">
+      <div style="color:#94a3b8;padding:40px;text-align:center;font-size:14px">
+        資產趨勢頁面（第二階段實作）
+      </div>
+    </div>
+
+  </div><!-- /db-content -->
+</div><!-- /db-main -->
+</div><!-- /db-app -->
 
 <!-- ═══ 5個功能小卡片橫排 ═══ -->
 <style>
@@ -8642,6 +8831,56 @@ setTimeout(()=>applyPrivacy(),500); // 確保元素都渲染完
 // ═══════════════════════════════════════════
 // 小卡片 Popup 開關
 // ═══════════════════════════════════════════
+// ── 新版頁面導航 ──
+const DB_PAGE_NAMES={
+  overview:'數據總覽',assets:'資產與負債',invest:'投資與觀察',
+  journal:'交易日誌',dividend:'股息管理',finplan:'財務規劃',trend:'資產趨勢'
+};
+function dbShowPage(id){
+  document.querySelectorAll('.db-page').forEach(p=>p.classList.remove('active'));
+  const page=document.getElementById('dbpage-'+id);
+  if(page)page.classList.add('active');
+  document.querySelectorAll('.db-nav-item').forEach(el=>{
+    el.classList.toggle('active',el.id==='nav-'+id);
+  });
+  const nameEl=document.getElementById('db-page-name');
+  if(nameEl)nameEl.textContent=DB_PAGE_NAMES[id]||id;
+  // 切到總覽時更新資料
+  if(id==='overview'){render();}
+}
+
+// 更多選單（移到側欄 footer 按鈕觸發）
+function toggleMoreMenu(){
+  let menu=document.getElementById('more-menu');
+  if(!menu){
+    menu=document.createElement('div');
+    menu.id='more-menu';
+    menu.style.cssText='position:fixed;bottom:80px;left:16px;background:#1e293b;border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:6px;min-width:160px;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.3)';
+    menu.innerHTML=`
+      <button onclick="manualSync();toggleMoreMenu()" style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 12px;background:none;border:none;color:#fff;font-size:13px;font-weight:600;cursor:pointer;border-radius:6px;font-family:'Noto Sans TC',sans-serif">☁️ 雲端同步</button>
+      <button onclick="exportData();toggleMoreMenu()" style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 12px;background:none;border:none;color:#fff;font-size:13px;font-weight:600;cursor:pointer;border-radius:6px;font-family:'Noto Sans TC',sans-serif">📤 備份</button>
+      <label style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 12px;background:none;border:none;color:#fff;font-size:13px;font-weight:600;cursor:pointer;border-radius:6px;font-family:'Noto Sans TC',sans-serif">📥 還原<input type="file" accept=".json" style="display:none" onchange="importData(event);toggleMoreMenu()"></label>
+      <button onclick="forceDailyProcess();toggleMoreMenu()" style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 12px;background:none;border:none;color:#fbbf24;font-size:13px;font-weight:600;cursor:pointer;border-radius:6px;font-family:'Noto Sans TC',sans-serif">⚡ 強制今日連動</button>
+      <button onclick="undoLast();toggleMoreMenu()" id="undoBtn" style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 12px;background:none;border:none;color:#93c5fd;font-size:13px;font-weight:600;cursor:pointer;border-radius:6px;font-family:'Noto Sans TC',sans-serif">← 上一步</button>
+      <div style="height:1px;background:rgba(255,255,255,.1);margin:4px 0"></div>
+      <button onclick="manualLogout();toggleMoreMenu()" style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 12px;background:none;border:none;color:#fca5a5;font-size:13px;font-weight:600;cursor:pointer;border-radius:6px;font-family:'Noto Sans TC',sans-serif">🔒 登出</button>`;
+    document.body.appendChild(menu);
+    setTimeout(()=>document.addEventListener('click',function closeMenu(e){
+      if(!menu.contains(e.target)&&e.target.textContent!=='···'){menu.remove();document.removeEventListener('click',closeMenu);}
+    }),10);
+  } else {
+    menu.remove();
+  }
+}
+
+// 同步狀態顯示到側欄
+function showSyncStatus(msg){
+  const el=document.getElementById('pstat');
+  const mini=document.getElementById('pstat-mini');
+  if(el)el.textContent=msg;
+  if(mini)mini.textContent=msg;
+}
+
 function openSP(id){
   const el=document.getElementById('sp-'+id);
   if(!el)return;
