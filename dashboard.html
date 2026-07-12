@@ -2046,7 +2046,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
       <div class="ov-kpi-label" style="padding-left:0">投資總損益</div>
       <div style="display:flex;gap:4px;flex-shrink:0">
         <button onclick="refreshPrices()" style="background:#f3f4f6;color:#4b5563;border:none;border-radius:6px;font-size:11px;padding:3px 8px;cursor:pointer;font-weight:600;transition:background .15s" onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#f3f4f6'">🔄 股價</button>
-        <button onclick="showDivRoi=!showDivRoi;document.getElementById('roi-chk-sum').checked=showDivRoi;renderSum();renderInv()" id="roi-toggle-btn" style="background:#f3f4f6;color:#4b5563;border:none;border-radius:6px;font-size:11px;padding:3px 8px;cursor:pointer;font-weight:600;transition:background .15s" onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#f3f4f6'">💹 含息</button>
+        <button id="roi-toggle-btn" onclick="showDivRoi=!showDivRoi;document.getElementById('roi-chk-sum').checked=showDivRoi;renderSum();renderInv();renderOvKpi();updateRoiBtn()" style="border:none;border-radius:6px;font-size:11px;padding:3px 8px;cursor:pointer;font-weight:600;transition:all .2s">💹 含息</button>
       </div>
     </div>
     <!-- 隱藏的 roi-chk-sum 供 JS 使用 -->
@@ -2204,7 +2204,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
             <div class="ov-kpi-label" style="padding-left:0">投資總損益</div>
             <div style="display:flex;gap:4px;flex-shrink:0">
               <button onclick="refreshPrices()" style="background:#f3f4f6;color:#4b5563;border:none;border-radius:6px;font-size:11px;padding:3px 8px;cursor:pointer;font-weight:600" onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#f3f4f6'">🔄 股價</button>
-              <button id="inv-roi-btn" onclick="showDivRoi=!showDivRoi;document.getElementById('roi-chk-sum').checked=showDivRoi;renderSum();renderInv();renderInvestPage()" style="border:none;border-radius:6px;font-size:11px;padding:3px 8px;cursor:pointer;font-weight:600;transition:all .2s">💹 含息</button>
+              <button id="inv-roi-btn" onclick="showDivRoi=!showDivRoi;document.getElementById('roi-chk-sum').checked=showDivRoi;renderSum();renderInv();renderInvestPage();renderOvKpi();updateRoiBtn()" style="border:none;border-radius:6px;font-size:11px;padding:3px 8px;cursor:pointer;font-weight:600;transition:all .2s">💹 含息</button>
             </div>
           </div>
           <div class="ov-kpi-val privacy-mask" id="inv-kpi-pnl" style="padding-left:8px">—</div>
@@ -9762,14 +9762,19 @@ function renderAssetsPage(){
 // 投資與觀察分頁
 // ══════════════════════════════════════
 let _investMiniDonut=null;
+function updateRoiBtn(){
+  ['roi-toggle-btn','inv-roi-btn'].forEach(id=>{
+    const btn=document.getElementById(id);
+    if(!btn)return;
+    btn.textContent=showDivRoi?'💹 含息 ✓':'💹 含息';
+    btn.style.background=showDivRoi?'#2563eb':'#f3f4f6';
+    btn.style.color=showDivRoi?'#fff':'#4b5563';
+  });
+}
+
 function renderInvestPage(){
   // 更新含息按鈕狀態
-  const roiBtn=document.getElementById('inv-roi-btn');
-  if(roiBtn){
-    roiBtn.textContent=showDivRoi?'💹 含息 ✓':'💹 含息';
-    roiBtn.style.background=showDivRoi?'#2563eb':'#f3f4f6';
-    roiBtn.style.color=showDivRoi?'#fff':'#4b5563';
-  }
+  updateRoiBtn();
 
   // 更新頂部 KPI
   let tPnl=0,tMkt=0,tCost=0,tReal=0,tDiv=0;
