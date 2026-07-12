@@ -1316,7 +1316,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
   width:580px;max-width:92vw;
   background:#fff;
   box-shadow:-8px 0 40px rgba(0,0,0,.12);
-  z-index:3000;
+  z-index:9000;
   display:flex;flex-direction:column;
   transform:translateX(100%);
   transition:transform .3s cubic-bezier(.4,0,.2,1);
@@ -1324,7 +1324,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
 .side-drawer.open{transform:translateX(0);}
 .side-drawer-overlay{
   position:fixed;inset:0;background:rgba(0,0,0,.3);
-  z-index:2999;opacity:0;pointer-events:none;
+  z-index:8999;opacity:0;pointer-events:none;
   transition:opacity .3s ease;
 }
 .side-drawer-overlay.open{opacity:1;pointer-events:all;}
@@ -9698,7 +9698,7 @@ function renderInvestPage(){
         const pnl=c.mktVal!=null?c.mktVal-c.tCost:null;
         const pnlPct=c.tCost>0&&pnl!=null?Math.round(pnl/c.tCost*1000)/10:null;
         const pnlColor=pnl==null?'#9ca3af':pnl>=0?'#dc2626':'#16a34a';
-        return`<div class="inv-stock-row" onclick="openInvDetail('${inv.id}')">
+        return`<div class="inv-stock-row" onclick="toggleInvDetail('${inv.id}')">
           <div>
             <div class="inv-stock-code">${inv.code}</div>
             <div class="inv-stock-name">${inv.name||''}</div>
@@ -9721,7 +9721,7 @@ function renderInvestPage(){
       watchlist.slice(0,6).map(w=>{
         const p=db.prices[w.code];
         const chgColor=p&&p.changePct>=0?'#dc2626':'#16a34a';
-        return`<div class="inv-stock-row">
+        return`<div class="inv-stock-row" onclick="openSP('watch')" style="cursor:pointer">
           <div>
             <div class="inv-stock-code" style="font-size:12px">${w.code}</div>
             <div class="inv-stock-name">${w.name||''}</div>
@@ -9892,7 +9892,10 @@ function renderAnalyticsDrawer(){
   if(!orig){body.innerHTML='<div style="color:#9ca3af;text-align:center;padding:40px">請使用完整視窗</div>';return;}
   const origBody=orig.querySelector('.sp-body');
   if(origBody){
-    body.innerHTML=origBody.innerHTML;
+    // 用 cloneNode 保留事件綁定
+    body.innerHTML='';
+    const clone=origBody.cloneNode(true);
+    Array.from(clone.children).forEach(c=>body.appendChild(c));
     if(typeof renderAnalytics==='function')renderAnalytics();
   }
 }
