@@ -710,8 +710,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
   gap:16px !important;
   padding:16px !important;
   background:transparent !important;
-}
-.cash-card{
+}.cash-card{
   background:#fff;border-radius:14px;overflow:hidden;
   border:1px solid #eaecf0;
   box-shadow:0 2px 8px rgba(0,0,0,.04);
@@ -2196,10 +2195,45 @@ body:not(.privacy) .privacy-mask{filter:none;}
 
     <!-- ══ 頁面：投資與觀察 ══ -->
     <div class="db-page" id="dbpage-invest">
+
+      <!-- KPI 頂部列 -->
+      <div class="ov-kpi-grid" style="margin-bottom:16px">
+        <div class="ov-kpi-card">
+          <div class="ov-kpi-accent" style="background:#a8c5a0"></div>
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;padding-left:8px">
+            <div class="ov-kpi-label" style="padding-left:0">投資總損益</div>
+            <div style="display:flex;gap:4px;flex-shrink:0">
+              <button onclick="refreshPrices()" style="background:#f3f4f6;color:#4b5563;border:none;border-radius:6px;font-size:11px;padding:3px 8px;cursor:pointer;font-weight:600" onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#f3f4f6'">🔄 股價</button>
+              <button onclick="showDivRoi=!showDivRoi;document.getElementById('roi-chk-sum').checked=showDivRoi;renderSum();renderInv();renderInvestPage()" style="background:#f3f4f6;color:#4b5563;border:none;border-radius:6px;font-size:11px;padding:3px 8px;cursor:pointer;font-weight:600" onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#f3f4f6'">💹 含息</button>
+            </div>
+          </div>
+          <div class="ov-kpi-val privacy-mask" id="inv-kpi-pnl" style="padding-left:8px">—</div>
+          <div class="ov-kpi-sub privacy-mask" id="inv-kpi-roi" style="padding-left:8px"></div>
+        </div>
+        <div class="ov-kpi-card">
+          <div class="ov-kpi-accent" style="background:#8fa8c8"></div>
+          <div class="ov-kpi-label" style="padding-left:8px">股票市值</div>
+          <div class="ov-kpi-val privacy-mask" id="inv-kpi-mkt" style="padding-left:8px">—</div>
+          <div class="ov-kpi-sub" style="padding-left:8px">持倉總市值</div>
+        </div>
+        <div class="ov-kpi-card">
+          <div class="ov-kpi-accent" style="background:#c9a99a"></div>
+          <div class="ov-kpi-label" style="padding-left:8px">已實現損益</div>
+          <div class="ov-kpi-val privacy-mask" id="inv-kpi-real" style="padding-left:8px">—</div>
+          <div class="ov-kpi-sub" style="padding-left:8px">歷史賣出</div>
+        </div>
+        <div class="ov-kpi-card">
+          <div class="ov-kpi-accent" style="background:#b5adc4"></div>
+          <div class="ov-kpi-label" style="padding-left:8px">累積股息</div>
+          <div class="ov-kpi-val privacy-mask" id="inv-kpi-div" style="padding-left:8px">—</div>
+          <div class="ov-kpi-sub" style="padding-left:8px">實際入帳</div>
+        </div>
+      </div>
+
       <div class="inv-page-grid">
         <!-- 左：持股清單 -->
-        <div class="inv-page-card">
-          <div class="inv-page-hdr">
+        <div class="inv-page-card" style="padding:0;overflow:hidden">
+          <div class="inv-page-hdr" style="padding:12px 16px;border-bottom:1px solid #f0f2f5">
             <div class="inv-page-title">💼 目前持股</div>
             <button onclick="openInvModal()" style="padding:5px 12px;background:#eff6ff;border:1px solid #bfdbfe;color:#2563eb;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">＋ 新增</button>
           </div>
@@ -9717,7 +9751,29 @@ function renderAssetsPage(){
 // ══════════════════════════════════════
 let _investMiniDonut=null;
 function renderInvestPage(){
-  // 持股清單
+  // 更新頂部 KPI
+  let tPnl=0,tMkt=0,tCost=0,tReal=0,tDiv=0;
+  db.investments.forEach(inv=>{
+    const c=calcInv(inv);
+    if(c.tLots>0){
+      if(c.mktVal!=null)tMkt+=c.mktVal;
+      tCost+=c.tCost;
+      const p=showDivRoi?c.pnlWithDiv:c.pnl;
+      if(p!=null)tPnl+=p;
+    }
+    tReal+=c.realized||0;
+    tDiv+=c.divTot||0;
+  });
+  const roi=tCost>0?Math.round(tPnl/tCost*1000)/10:0;
+  const setKpi=(id,v,color)=>{const el=document.getElementById(id);if(el){el.textContent=v;if(color)el.style.color=color;}};
+  const pnlColor=tPnl>=0?'#dc2626':'#16a34a';
+  setKpi('inv-kpi-pnl',(tPnl>=0?'+':'')+fmtM(tPnl),pnlColor);
+  setKpi('inv-kpi-roi','投報率 '+(roi>=0?'+':'')+roi+'%');
+  setKpi('inv-kpi-mkt',fmtM(tMkt));
+  setKpi('inv-kpi-real',(tReal>=0?'+':'')+fmtM(tReal),tReal>=0?'#dc2626':'#16a34a');
+  setKpi('inv-kpi-div',fmtM(tDiv));
+
+  // 持股清單（豐富版）
   const body=document.getElementById('invest-page-body');
   if(body){
     const active=db.investments.filter(inv=>calcInv(inv).tLots>0)
@@ -9727,21 +9783,34 @@ function renderInvestPage(){
       active.map(inv=>{
         const c=calcInv(inv);
         const price=db.prices[inv.code]?.price;
-        const pnl=c.mktVal!=null?c.mktVal-c.tCost:null;
-        const pnlPct=c.tCost>0&&pnl!=null?Math.round(pnl/c.tCost*1000)/10:null;
+        const chg=db.prices[inv.code]?.changePct;
+        const pnl=showDivRoi?c.pnlWithDiv:c.pnl;
+        const pnlPct=showDivRoi?c.pnlPctWithDiv:c.pnlPct;
         const pnlColor=pnl==null?'#9ca3af':pnl>=0?'#dc2626':'#16a34a';
-        return`<div class="inv-stock-row" onclick="toggleInvDetail('${inv.id}')">
-          <div>
-            <div class="inv-stock-code">${inv.code}</div>
-            <div class="inv-stock-name">${inv.name||''}</div>
+        const chgColor=chg==null?'#9ca3af':chg>=0?'#dc2626':'#16a34a';
+        const mkt=c.mktVal??c.tCost;
+        return`<div onclick="toggleInvDetail('${inv.id}')" style="padding:12px 16px;border-bottom:1px solid #f5f7fa;cursor:pointer;transition:background .12s" onmouseover="this.style.background='#fafbff'" onmouseout="this.style.background=''">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="font-size:14px;font-weight:800;color:#1e293b">${inv.code}</div>
+              <div style="font-size:11px;color:#94a3b8">${inv.name||''}</div>
+              ${chg!=null?`<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px;background:${chg>=0?'#fee2e2':'#dcfce7'};color:${chgColor}">${chg>=0?'+':''}${chg}%</span>`:''}
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:14px;font-weight:800;font-family:'JetBrains Mono',monospace;color:${pnlColor}" class="privacy-mask">${pnl!=null?(pnl>=0?'+':'')+Math.round(pnl).toLocaleString():'—'}</div>
+              <div style="font-size:10px;color:${pnlColor};font-weight:600">${pnlPct!=null?(pnlPct>=0?'+':'')+Math.round(pnlPct*10)/10+'%':''}</div>
+            </div>
           </div>
-          <div style="font-size:11px;color:#64748b;font-weight:600">${c.tLots}張</div>
-          <div style="margin-left:auto;text-align:right">
-            <div class="inv-stock-price privacy-mask">${price?'$'+price:'—'}</div>
-            <div class="inv-stock-pnl privacy-mask" style="color:${pnlColor}">${pnl!=null?(pnl>=0?'+':'')+Math.round(pnl).toLocaleString():''} ${pnlPct!=null?'('+pnlPct+'%)':''}</div>
+          <div style="display:flex;gap:16px">
+            <div style="font-size:11px;color:#64748b"><span style="color:#9ca3af">張數</span> <b>${c.tLots}</b></div>
+            <div style="font-size:11px;color:#64748b"><span style="color:#9ca3af">均成本</span> <b class="privacy-mask">$${Math.round(c.avgCost).toLocaleString()}</b></div>
+            <div style="font-size:11px;color:#64748b"><span style="color:#9ca3af">現價</span> <b>${price?'$'+price:'—'}</b></div>
+            <div style="font-size:11px;color:#64748b;margin-left:auto"><span style="color:#9ca3af">市值</span> <b class="privacy-mask">$${Math.round(mkt/10000)/100}萬</b></div>
+            ${c.divTot>0?`<div style="font-size:11px;color:#15803d"><span style="color:#9ca3af">股息</span> <b class="privacy-mask">+$${Math.round(c.divTot).toLocaleString()}</b></div>`:''}
           </div>
         </div>`;
       }).join('');
+    if(typeof applyPrivacy==='function')applyPrivacy();
   }
 
   // 觀察股
