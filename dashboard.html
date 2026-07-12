@@ -10556,18 +10556,22 @@ function dbShowPage(id){
   // 各頁面邏輯
   if(id==='overview'){
     render();setTimeout(renderOvDashboard,100);
-    window.scrollTo({top:0,behavior:'smooth'});
+    const mainEl=document.querySelector('.db-main');
+    if(mainEl)mainEl.scrollTo({top:0,behavior:'smooth'});
+    else window.scrollTo({top:0,behavior:'smooth'});
     return;
   }
-  if(id==='assets'){renderAssetsPage();}
-  if(id==='invest'){renderInvestPage();}
-  if(id==='trend'){renderTrendPage();}
-  if(id==='journal'){renderJournalPage();}
+  if(id==='assets')renderAssetsPage();
+  if(id==='invest')renderInvestPage();
+  if(id==='trend')renderTrendPage();
+  if(id==='journal')renderJournalPage();
 
-  // 切換後滾回頂部
-  const mainEl=document.querySelector('.db-main');
-  if(mainEl)mainEl.scrollTo({top:0,behavior:'smooth'});
-  else window.scrollTo({top:0,behavior:'smooth'});
+  // 渲染完後滾回頂部
+  setTimeout(()=>{
+    const mainEl=document.querySelector('.db-main');
+    if(mainEl)mainEl.scrollTo({top:0,behavior:'smooth'});
+    else window.scrollTo({top:0,behavior:'smooth'});
+  },50);
 }
 
 // 更多選單（移到側欄 footer 按鈕觸發）
