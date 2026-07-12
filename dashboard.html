@@ -64,11 +64,12 @@ html,body{margin:0;padding:0;width:100%;min-height:100vh;}
 
 /* 主內容區 */
 .db-main{
-  position:fixed;
-  top:0;left:220px;right:0;bottom:0;
+  margin-left:220px;
+  flex:1;
+  min-width:0;
   display:flex;flex-direction:column;
+  height:100vh;
   overflow-y:auto;
-  background:var(--bg,#f8f9fa);
 }
 
 /* 頂部欄 */
@@ -2002,7 +2003,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
 </div>
 
 <!-- ═══ 主內容區 ═══ -->
-<div class="db-main" style="position:fixed!important;top:0!important;left:220px!important;right:0!important;bottom:0!important;width:auto!important;margin:0!important;overflow-y:auto;display:flex;flex-direction:column;background:#f8f9fa">
+<div class="db-main">
 
   <!-- 頂部欄 -->
   <div class="db-topbar">
