@@ -2135,219 +2135,6 @@ body:not(.privacy) .privacy-mask{filter:none;}
     </div><!-- /ov-dashboard -->
 
     </div><!-- /dbpage-overview -->
-<!-- ═══ POPUP：不限用途額度 ═══ -->
-<div class="sp-overlay" id="sp-flex">
-  <div class="sp-modal" style="max-width:1100px">
-    <div class="sp-hdr">
-      <div class="sp-hdr-left">
-        <span class="sp-hdr-icon">💳</span>
-        <span class="sp-hdr-title">不限用途額度</span>
-      </div>
-      <div class="sp-hdr-right">
-        <button onclick="openFlexModal()" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif">＋ 新增</button>
-        <button class="sp-close" onclick="closeSP('flex')">✕ 關閉</button>
-      </div>
-    </div>
-    <div class="sp-body" style="padding:12px">
-      <div class="flex-card-grid" id="flex-body-popup"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ POPUP：股息記錄 ═══ -->
-<div class="sp-overlay" id="sp-div">
-  <div class="sp-modal" style="max-width:1100px">
-    <div class="sp-hdr">
-      <div class="sp-hdr-left">
-        <span class="sp-hdr-icon">🎯</span>
-        <span class="sp-hdr-title">股息記錄</span>
-      </div>
-      <div class="sp-hdr-right">
-        <button onclick="openDivModal()" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif">＋ 新增股息</button>
-        <button class="sp-close" onclick="closeSP('div')">✕ 關閉</button>
-      </div>
-    </div>
-    <div class="sp-body" style="padding:0">
-      <!-- 卡片速覽 -->
-      <div class="div-cards" id="div-cards-sp" style="padding:14px 16px;background:#f0fdfa;border-bottom:1px solid #99f6e4"><span style="color:var(--muted);font-size:11px">尚無領息記錄</span></div>
-      <!-- 準備入帳 -->
-      <div id="div-pending-bar-sp" style="display:none">
-        <div style="padding:8px 14px 4px;background:#eff6ff;border-bottom:1px solid #bfdbfe;display:flex;align-items:center;justify-content:space-between">
-          <span style="font-size:12px;font-weight:700;color:#1d4ed8">⏳ 準備入帳</span>
-          <span style="font-size:14px;font-weight:800;color:#2563eb" id="d-pending-sp">$0</span>
-        </div>
-        <div class="pending-card-grid" id="d-pending-cards-sp"></div>
-      </div>
-      <!-- 年份統計列 -->
-      <div class="div-yr-bar">
-        <div style="font-size:13px;font-weight:700">
-          📅 今年：<span class="gain mono" id="d-yr-sp" style="font-size:16px">$0</span>
-          &nbsp;｜&nbsp;🏆 累積：<span class="gain mono" id="d-tot-sp" style="font-size:15px">$0</span>
-        </div>
-        <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;color:var(--muted)">
-          <select id="div-year-sel-sp" onchange="renderDivs()" style="padding:4px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;color:#475569;background:#fff;cursor:pointer;outline:none">
-            <option value="cur">今年</option>
-            <option value="all">全部</option>
-          </select>
-          <input type="checkbox" id="div-hist-chk-sp" style="display:none">
-        </label>
-      </div>
-      <!-- 今年明細 -->
-      <div class="div-section-hdr" style="background:#ccfbf1;color:#0f766e" onclick="toggleDivYear()">
-        <span>📋 今年明細</span><span id="div-yr-hint-sp">▼ 展開</span>
-      </div>
-      <div id="div-yr-body-sp" style="display:none;overflow-x:auto">
-        <table class="dt" style="min-width:400px">
-          <thead><tr><th>標的</th><th>領息日期</th><th>張數</th><th>每股配息</th><th>本次金額</th><th>操作</th></tr></thead>
-          <tbody id="div-body-yr-sp"></tbody>
-        </table>
-      </div>
-      <!-- 歷史記錄 -->
-      <div id="div-hist-sec-sp" style="display:none">
-        <div style="padding:6px 12px;background:#e8edf5;font-size:11px;font-weight:700;color:var(--accent)">📚 歷史記錄</div>
-        <div style="overflow-x:auto">
-          <table class="dt" style="min-width:400px">
-            <thead><tr><th>標的</th><th>領息日期</th><th>張數</th><th>每股配息</th><th>本次金額</th><th>操作</th></tr></thead>
-            <tbody id="div-body-hist-sp"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ BOTTOM STATUS BAR ═══ -->
-
-</div><!-- /db-root (legacy content inside overview page) -->
-
-
-<!-- big5-wrap 隱藏（JS 仍需要這些 DOM id） -->
-<div style="display:none">
-<div class="big5-wrap">
-
-  <!-- 第二排：左右雙欄 -->
-  <div class="big5-grid">
-
-    <!-- 左欄：投資標的 -->
-    <div class="big5-col-left">
-      <!-- 1. 投資標的 -->
-      <div class="big5-card" id="b5-inv">
-    <div class="big5-header">
-      <div class="big5-left">
-        <span class="big5-icon">📈</span>
-        <span class="big5-title">投資標的</span>
-        <div class="big5-meta">
-          <span>損益 <b class="privacy-mask" id="t-pnl" style="color:var(--gain)">—</b></span>
-          <span>報酬 <b class="privacy-mask" id="t-roi" style="color:var(--gain)">—</b></span>
-          <span>月息 <b class="privacy-mask" id="t-div" style="color:var(--gain)">—</b></span>
-        </div>
-        <span style="display:none" id="t-cost">—</span>
-        <span style="display:none" id="t-mkt">—</span>
-      </div>
-      <div class="big5-right">
-        <button class="big5-add-btn" onclick="event.stopPropagation();openInvModal()">＋</button>
-        <button class="big5-add-btn" onclick="event.stopPropagation();openSearchModal()">🔍</button>
-        <button class="big5-toggle-btn" id="tog-inv" onclick="toggleSection('inv-detail')">展開 ▼</button>
-      </div>
-    </div>
-    <!-- 收合預覽：Top 3 持股 -->
-    <div id="inv-collapsed-preview" style="padding:14px 20px;border-top:1px solid #f0f2f5">
-      <div style="font-size:10px;font-weight:700;color:#9ca3af;letter-spacing:.5px;margin-bottom:10px">📊 市值前三大持股</div>
-      <div id="inv-top3-body" style="display:flex;flex-direction:column;gap:8px"></div>
-    </div>
-
-    <div class="big5-detail" id="inv-detail" style="display:none">
-      <div class="irow-list" id="inv-body"></div>
-
-      <!-- 資產分佈甜甜圈圖 -->
-      <div id="inv-donut-section" style="padding:20px 24px;border-top:1px solid #f0f2f5;background:#fff">
-        <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:16px;display:flex;align-items:center;gap:8px">
-          <span>📊 資產分佈</span>
-          <span style="font-size:10px;font-weight:500;color:#9ca3af">依持股市值計算</span>
-        </div>
-        <div style="display:grid;grid-template-columns:200px 1fr;gap:24px;align-items:center">
-          <!-- 甜甜圈圖 -->
-          <div style="position:relative;width:200px;height:200px">
-            <canvas id="inv-donut-chart" width="200" height="200"></canvas>
-            <!-- 圓心文字 -->
-            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none">
-              <div style="font-size:10px;color:#9ca3af;font-weight:600;letter-spacing:.3px">投資總市值</div>
-              <div id="inv-donut-total" style="font-size:15px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#111827;margin-top:2px" class="privacy-mask">—</div>
-            </div>
-          </div>
-          <!-- 圖例 -->
-          <div id="inv-donut-legend" style="display:flex;flex-direction:column;gap:10px"></div>
-        </div>
-      </div>
-    </div>
-    </div><!-- /b5-inv -->
-    </div><!-- /big5-col-left -->
-
-    <!-- 右欄：信貸管理 + 現金帳戶 -->
-    <div class="big5-col-right">
-
-      <!-- 2. 信貸管理 -->
-      <div class="big5-card" id="b5-loan">
-    <div class="big5-header">
-      <div class="big5-left">
-        <span class="big5-icon">🏦</span>
-        <span class="big5-title">信貸管理</span>
-        <div class="big5-meta">
-          <span>尚餘本金 <b id="l-rem">—</b></span>
-          <span>月還款 <b id="l-mo">—</b></span>
-          <span>最近扣款 <b id="l-next-deduct">—</b></span>
-          <span id="l-bal-status"></span>
-          <span style="display:none" id="l-amt">—</span>
-        </div>
-      </div>
-      <div class="big5-right">
-        <button class="big5-add-btn" onclick="event.stopPropagation();openLoanModal()">＋</button>
-        <button class="big5-add-btn" onclick="event.stopPropagation();openLoanHist()">📚</button>
-        <button class="big5-toggle-btn" id="tog-loan" onclick="toggleSection('loan-detail')">展開 ▼</button>
-      </div>
-    </div>
-    <div class="big5-detail" id="loan-detail" style="display:none">
-      <div class="loan-card-grid" id="loan-body"></div>
-    </div>
-    </div><!-- /b5-loan -->
-
-      <!-- hidden containers -->
-      <div style="display:none"><div class="flex-card-grid" id="flex-body"></div></div>
-
-      <!-- 4. 現金帳戶 -->
-      <div class="big5-card" id="b5-cash">
-    <div class="big5-header">
-      <div class="big5-left">
-        <span class="big5-icon">💰</span>
-        <span class="big5-title">現金帳戶</span>
-        <div class="big5-meta">
-          <span>總餘額 <b id="cash-tot-badge" style="color:#2563eb">—</b></span>
-          <span>待入帳 <b id="cash-pending-badge" style="color:#7c3aed">—</b><span id="cash-next-div" style="font-size:11px;color:#d97706;font-weight:600;font-family:'JetBrains Mono',monospace;margin-left:4px"></span></span>
-          <div id="cash-acct-summary" style="display:none"></div>
-        </div>
-        <span style="display:none" id="c-tot">—</span>
-      </div>
-      <div class="big5-right">
-        <button class="big5-add-btn" onclick="event.stopPropagation();openCashModal()">＋</button>
-        <button class="big5-toggle-btn" id="tog-cash" onclick="toggleSection('cash-detail')">展開 ▼</button>
-      </div>
-    </div>
-    <div class="big5-detail" id="cash-detail" style="display:none">
-      <div class="cash-card-grid" id="cash-body"></div>
-    </div>
-  </div><!-- /b5-cash -->
-
-    </div><!-- /big5-col-right -->
-  </div><!-- /big5-grid -->
-
-<table id="cash-tbl" style="display:none"><tbody id="cash-body-compat"></tbody></table>
-<table id="loan-tbl" style="display:none"><tbody></tbody></table>
-<table id="flex-tbl" style="display:none"><tbody></tbody></table>
-
-</div><!-- /big5-wrap -->
-</div><!-- /hidden legacy -->
-
-
     <!-- ══ 頁面：資產與負債 ══ -->
     <div class="db-page" id="dbpage-assets">
       <!-- 上方 KPI 摘要 -->
@@ -2601,6 +2388,220 @@ body:not(.privacy) .privacy-mask{filter:none;}
 
   </div><!-- /db-content -->
 </div><!-- /db-main -->
+
+<!-- ═══ POPUP：不限用途額度 ═══ -->
+<div class="sp-overlay" id="sp-flex">
+  <div class="sp-modal" style="max-width:1100px">
+    <div class="sp-hdr">
+      <div class="sp-hdr-left">
+        <span class="sp-hdr-icon">💳</span>
+        <span class="sp-hdr-title">不限用途額度</span>
+      </div>
+      <div class="sp-hdr-right">
+        <button onclick="openFlexModal()" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif">＋ 新增</button>
+        <button class="sp-close" onclick="closeSP('flex')">✕ 關閉</button>
+      </div>
+    </div>
+    <div class="sp-body" style="padding:12px">
+      <div class="flex-card-grid" id="flex-body-popup"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ POPUP：股息記錄 ═══ -->
+<div class="sp-overlay" id="sp-div">
+  <div class="sp-modal" style="max-width:1100px">
+    <div class="sp-hdr">
+      <div class="sp-hdr-left">
+        <span class="sp-hdr-icon">🎯</span>
+        <span class="sp-hdr-title">股息記錄</span>
+      </div>
+      <div class="sp-hdr-right">
+        <button onclick="openDivModal()" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif">＋ 新增股息</button>
+        <button class="sp-close" onclick="closeSP('div')">✕ 關閉</button>
+      </div>
+    </div>
+    <div class="sp-body" style="padding:0">
+      <!-- 卡片速覽 -->
+      <div class="div-cards" id="div-cards-sp" style="padding:14px 16px;background:#f0fdfa;border-bottom:1px solid #99f6e4"><span style="color:var(--muted);font-size:11px">尚無領息記錄</span></div>
+      <!-- 準備入帳 -->
+      <div id="div-pending-bar-sp" style="display:none">
+        <div style="padding:8px 14px 4px;background:#eff6ff;border-bottom:1px solid #bfdbfe;display:flex;align-items:center;justify-content:space-between">
+          <span style="font-size:12px;font-weight:700;color:#1d4ed8">⏳ 準備入帳</span>
+          <span style="font-size:14px;font-weight:800;color:#2563eb" id="d-pending-sp">$0</span>
+        </div>
+        <div class="pending-card-grid" id="d-pending-cards-sp"></div>
+      </div>
+      <!-- 年份統計列 -->
+      <div class="div-yr-bar">
+        <div style="font-size:13px;font-weight:700">
+          📅 今年：<span class="gain mono" id="d-yr-sp" style="font-size:16px">$0</span>
+          &nbsp;｜&nbsp;🏆 累積：<span class="gain mono" id="d-tot-sp" style="font-size:15px">$0</span>
+        </div>
+        <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;color:var(--muted)">
+          <select id="div-year-sel-sp" onchange="renderDivs()" style="padding:4px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;color:#475569;background:#fff;cursor:pointer;outline:none">
+            <option value="cur">今年</option>
+            <option value="all">全部</option>
+          </select>
+          <input type="checkbox" id="div-hist-chk-sp" style="display:none">
+        </label>
+      </div>
+      <!-- 今年明細 -->
+      <div class="div-section-hdr" style="background:#ccfbf1;color:#0f766e" onclick="toggleDivYear()">
+        <span>📋 今年明細</span><span id="div-yr-hint-sp">▼ 展開</span>
+      </div>
+      <div id="div-yr-body-sp" style="display:none;overflow-x:auto">
+        <table class="dt" style="min-width:400px">
+          <thead><tr><th>標的</th><th>領息日期</th><th>張數</th><th>每股配息</th><th>本次金額</th><th>操作</th></tr></thead>
+          <tbody id="div-body-yr-sp"></tbody>
+        </table>
+      </div>
+      <!-- 歷史記錄 -->
+      <div id="div-hist-sec-sp" style="display:none">
+        <div style="padding:6px 12px;background:#e8edf5;font-size:11px;font-weight:700;color:var(--accent)">📚 歷史記錄</div>
+        <div style="overflow-x:auto">
+          <table class="dt" style="min-width:400px">
+            <thead><tr><th>標的</th><th>領息日期</th><th>張數</th><th>每股配息</th><th>本次金額</th><th>操作</th></tr></thead>
+            <tbody id="div-body-hist-sp"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ BOTTOM STATUS BAR ═══ -->
+
+</div><!-- /db-root (legacy content inside overview page) -->
+
+
+<!-- big5-wrap 隱藏（JS 仍需要這些 DOM id） -->
+<div style="display:none">
+<div class="big5-wrap">
+
+  <!-- 第二排：左右雙欄 -->
+  <div class="big5-grid">
+
+    <!-- 左欄：投資標的 -->
+    <div class="big5-col-left">
+      <!-- 1. 投資標的 -->
+      <div class="big5-card" id="b5-inv">
+    <div class="big5-header">
+      <div class="big5-left">
+        <span class="big5-icon">📈</span>
+        <span class="big5-title">投資標的</span>
+        <div class="big5-meta">
+          <span>損益 <b class="privacy-mask" id="t-pnl" style="color:var(--gain)">—</b></span>
+          <span>報酬 <b class="privacy-mask" id="t-roi" style="color:var(--gain)">—</b></span>
+          <span>月息 <b class="privacy-mask" id="t-div" style="color:var(--gain)">—</b></span>
+        </div>
+        <span style="display:none" id="t-cost">—</span>
+        <span style="display:none" id="t-mkt">—</span>
+      </div>
+      <div class="big5-right">
+        <button class="big5-add-btn" onclick="event.stopPropagation();openInvModal()">＋</button>
+        <button class="big5-add-btn" onclick="event.stopPropagation();openSearchModal()">🔍</button>
+        <button class="big5-toggle-btn" id="tog-inv" onclick="toggleSection('inv-detail')">展開 ▼</button>
+      </div>
+    </div>
+    <!-- 收合預覽：Top 3 持股 -->
+    <div id="inv-collapsed-preview" style="padding:14px 20px;border-top:1px solid #f0f2f5">
+      <div style="font-size:10px;font-weight:700;color:#9ca3af;letter-spacing:.5px;margin-bottom:10px">📊 市值前三大持股</div>
+      <div id="inv-top3-body" style="display:flex;flex-direction:column;gap:8px"></div>
+    </div>
+
+    <div class="big5-detail" id="inv-detail" style="display:none">
+      <div class="irow-list" id="inv-body"></div>
+
+      <!-- 資產分佈甜甜圈圖 -->
+      <div id="inv-donut-section" style="padding:20px 24px;border-top:1px solid #f0f2f5;background:#fff">
+        <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:16px;display:flex;align-items:center;gap:8px">
+          <span>📊 資產分佈</span>
+          <span style="font-size:10px;font-weight:500;color:#9ca3af">依持股市值計算</span>
+        </div>
+        <div style="display:grid;grid-template-columns:200px 1fr;gap:24px;align-items:center">
+          <!-- 甜甜圈圖 -->
+          <div style="position:relative;width:200px;height:200px">
+            <canvas id="inv-donut-chart" width="200" height="200"></canvas>
+            <!-- 圓心文字 -->
+            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none">
+              <div style="font-size:10px;color:#9ca3af;font-weight:600;letter-spacing:.3px">投資總市值</div>
+              <div id="inv-donut-total" style="font-size:15px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#111827;margin-top:2px" class="privacy-mask">—</div>
+            </div>
+          </div>
+          <!-- 圖例 -->
+          <div id="inv-donut-legend" style="display:flex;flex-direction:column;gap:10px"></div>
+        </div>
+      </div>
+    </div>
+    </div><!-- /b5-inv -->
+    </div><!-- /big5-col-left -->
+
+    <!-- 右欄：信貸管理 + 現金帳戶 -->
+    <div class="big5-col-right">
+
+      <!-- 2. 信貸管理 -->
+      <div class="big5-card" id="b5-loan">
+    <div class="big5-header">
+      <div class="big5-left">
+        <span class="big5-icon">🏦</span>
+        <span class="big5-title">信貸管理</span>
+        <div class="big5-meta">
+          <span>尚餘本金 <b id="l-rem">—</b></span>
+          <span>月還款 <b id="l-mo">—</b></span>
+          <span>最近扣款 <b id="l-next-deduct">—</b></span>
+          <span id="l-bal-status"></span>
+          <span style="display:none" id="l-amt">—</span>
+        </div>
+      </div>
+      <div class="big5-right">
+        <button class="big5-add-btn" onclick="event.stopPropagation();openLoanModal()">＋</button>
+        <button class="big5-add-btn" onclick="event.stopPropagation();openLoanHist()">📚</button>
+        <button class="big5-toggle-btn" id="tog-loan" onclick="toggleSection('loan-detail')">展開 ▼</button>
+      </div>
+    </div>
+    <div class="big5-detail" id="loan-detail" style="display:none">
+      <div class="loan-card-grid" id="loan-body"></div>
+    </div>
+    </div><!-- /b5-loan -->
+
+      <!-- hidden containers -->
+      <div style="display:none"><div class="flex-card-grid" id="flex-body"></div></div>
+
+      <!-- 4. 現金帳戶 -->
+      <div class="big5-card" id="b5-cash">
+    <div class="big5-header">
+      <div class="big5-left">
+        <span class="big5-icon">💰</span>
+        <span class="big5-title">現金帳戶</span>
+        <div class="big5-meta">
+          <span>總餘額 <b id="cash-tot-badge" style="color:#2563eb">—</b></span>
+          <span>待入帳 <b id="cash-pending-badge" style="color:#7c3aed">—</b><span id="cash-next-div" style="font-size:11px;color:#d97706;font-weight:600;font-family:'JetBrains Mono',monospace;margin-left:4px"></span></span>
+          <div id="cash-acct-summary" style="display:none"></div>
+        </div>
+        <span style="display:none" id="c-tot">—</span>
+      </div>
+      <div class="big5-right">
+        <button class="big5-add-btn" onclick="event.stopPropagation();openCashModal()">＋</button>
+        <button class="big5-toggle-btn" id="tog-cash" onclick="toggleSection('cash-detail')">展開 ▼</button>
+      </div>
+    </div>
+    <div class="big5-detail" id="cash-detail" style="display:none">
+      <div class="cash-card-grid" id="cash-body"></div>
+    </div>
+  </div><!-- /b5-cash -->
+
+    </div><!-- /big5-col-right -->
+  </div><!-- /big5-grid -->
+
+<table id="cash-tbl" style="display:none"><tbody id="cash-body-compat"></tbody></table>
+<table id="loan-tbl" style="display:none"><tbody></tbody></table>
+<table id="flex-tbl" style="display:none"><tbody></tbody></table>
+
+</div><!-- /big5-wrap -->
+</div><!-- /hidden legacy -->
+
+
 </div><!-- /db-app -->
 
 <!-- ═══ 5個功能小卡片橫排 ═══ -->
