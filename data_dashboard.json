@@ -711,6 +711,124 @@
       "order": 8
     },
     {
+      "id": "mp5q81azs4l",
+      "code": "00981A",
+      "name": "主動統一全球創新",
+      "lots": 13,
+      "avgPrice": 30.34,
+      "divPerShare": 0,
+      "note": "質押中",
+      "url": "https://www.wantgoo.com/stock/etf/00981A/dividend-policy/ex-dividend",
+      "holdType": "short",
+      "targetRoi": 5,
+      "transactions": [
+        {
+          "id": "mp5q81azkl3",
+          "type": "buy",
+          "lots": 13,
+          "price": 30.34,
+          "date": "2026-05-14",
+          "fee": 0,
+          "remark": "00403溢價5%賣出，一半資金轉移到成分股相同的981等於變相省5%"
+        },
+        {
+          "id": "mpv1f287u7l",
+          "type": "buy",
+          "lots": 16,
+          "price": 31.92,
+          "date": "2026-06-01",
+          "fee": 204,
+          "remark": "將981D資金一半轉移到這,主要是AI競賽目前尚在百公尺比賽 15公尺左右",
+          "mood": "🤔 猶豫"
+        }
+      ],
+      "order": 9
+    },
+    {
+      "id": "moa352cbuvc",
+      "code": "009819",
+      "name": "中信數據及電力",
+      "lots": 60,
+      "avgPrice": 10,
+      "divPerShare": 0,
+      "note": "現股",
+      "url": "https://www.wantgoo.com/stock/etf/009819/dividend-policy/ex-dividend",
+      "holdType": "short",
+      "targetRoi": 5,
+      "transactions": [
+        {
+          "id": "moa352cbx7f",
+          "type": "buy",
+          "lots": 60,
+          "price": 10,
+          "date": "2026-04-22",
+          "fee": 0,
+          "remark": "2027年49 GW 缺口：Morgan Stanley 預測，2028年美國資料中心需求達74 GW，供給短缺約49 GW（數十座大型電廠規模）。 趨勢：2026–2027加速成長，2030年全球用電較2023年增165%–220%。AI吃電主導。 且用電需求不會突然斷崖：效率提升慢於需求爆炸，CapEx鎖定3–5年高成長。黃仁勳：電力是AI最大瓶頸, 電力供不應求是確定的。"
+        },
+        {
+          "id": "mobbycbzs6q",
+          "type": "sell",
+          "lots": 60,
+          "price": 11.84,
+          "date": "2026-04-23",
+          "fee": 2414,
+          "lotRefs": [
+            {
+              "txnId": "moa352cbx7f",
+              "lots": 60,
+              "date": "2026-04-22"
+            }
+          ],
+          "remark": "首發日淨受惠GEV大漲 淨值只有10.12 溢價盡然高達25% , 停利轉單到GEV占比更多但漲幅更少的009805",
+          "mood": "😊 興奮",
+          "lossReason": "停利出場"
+        }
+      ],
+      "order": 10
+    },
+    {
+      "id": "mobc156a3js",
+      "code": "009805",
+      "name": "新光美國電力基建",
+      "lots": 45,
+      "avgPrice": 16.08,
+      "divPerShare": 0,
+      "note": "質押中",
+      "url": "https://www.wantgoo.com/stock/etf/009805/dividend-policy/ex-dividend",
+      "holdType": "long",
+      "targetRoi": 10,
+      "transactions": [
+        {
+          "id": "mobc156abpw",
+          "type": "buy",
+          "lots": 45,
+          "price": 16.08,
+          "date": "2026-04-23",
+          "fee": 0,
+          "remark": "GEV大漲12%,且展望非常的好 但當天GEV占比最多的009805 只有小漲0.5% 當下淨值都還有16.3"
+        },
+        {
+          "id": "mojw2kln1tq",
+          "type": "sell",
+          "lots": 45,
+          "price": 16.4,
+          "date": "2026-04-29",
+          "fee": 2508,
+          "lotRefs": [
+            {
+              "txnId": "mobc156abpw",
+              "lots": 45,
+              "date": "2026-04-23"
+            }
+          ],
+          "remark": "OpenAI營收成長不如預期引發AI板塊恐慌，費半指數重挫3.58%，台積電ADR跌3.12%。這波逆風連帶重挫軟銀、甲骨文與CoreWeave等合作夥伴股價，9805前四大成分股也都紛紛大跌 但這次賣出不是不看好 而且先觀察趨勢",
+          "mood": "🤔 猶豫",
+          "lossReason": ""
+        }
+      ],
+      "order": 11
+    },
+    {
       "id": "mpwgvfo719c",
       "code": "00981T",
       "name": "平衡凱基雙核收息",
@@ -952,147 +1070,6 @@
           "mood": "😰 焦慮"
         }
       ],
-      "order": 9
-    },
-    {
-      "id": "moa352cbuvc",
-      "code": "009819",
-      "name": "中信數據及電力",
-      "lots": 60,
-      "avgPrice": 10,
-      "divPerShare": 0,
-      "note": "現股",
-      "url": "https://www.wantgoo.com/stock/etf/009819/dividend-policy/ex-dividend",
-      "holdType": "short",
-      "targetRoi": 5,
-      "transactions": [
-        {
-          "id": "moa352cbx7f",
-          "type": "buy",
-          "lots": 60,
-          "price": 10,
-          "date": "2026-04-22",
-          "fee": 0,
-          "remark": "2027年49 GW 缺口：Morgan Stanley 預測，2028年美國資料中心需求達74 GW，供給短缺約49 GW（數十座大型電廠規模）。 趨勢：2026–2027加速成長，2030年全球用電較2023年增165%–220%。AI吃電主導。 且用電需求不會突然斷崖：效率提升慢於需求爆炸，CapEx鎖定3–5年高成長。黃仁勳：電力是AI最大瓶頸, 電力供不應求是確定的。"
-        },
-        {
-          "id": "mobbycbzs6q",
-          "type": "sell",
-          "lots": 60,
-          "price": 11.84,
-          "date": "2026-04-23",
-          "fee": 2414,
-          "lotRefs": [
-            {
-              "txnId": "moa352cbx7f",
-              "lots": 60,
-              "date": "2026-04-22"
-            }
-          ],
-          "remark": "首發日淨受惠GEV大漲 淨值只有10.12 溢價盡然高達25% , 停利轉單到GEV占比更多但漲幅更少的009805",
-          "mood": "😊 興奮",
-          "lossReason": "停利出場"
-        }
-      ],
-      "order": 10
-    },
-    {
-      "id": "mobc156a3js",
-      "code": "009805",
-      "name": "新光美國電力基建",
-      "lots": 45,
-      "avgPrice": 16.08,
-      "divPerShare": 0,
-      "note": "質押中",
-      "url": "https://www.wantgoo.com/stock/etf/009805/dividend-policy/ex-dividend",
-      "holdType": "long",
-      "targetRoi": 10,
-      "transactions": [
-        {
-          "id": "mobc156abpw",
-          "type": "buy",
-          "lots": 45,
-          "price": 16.08,
-          "date": "2026-04-23",
-          "fee": 0,
-          "remark": "GEV大漲12%,且展望非常的好 但當天GEV占比最多的009805 只有小漲0.5% 當下淨值都還有16.3"
-        },
-        {
-          "id": "mojw2kln1tq",
-          "type": "sell",
-          "lots": 45,
-          "price": 16.4,
-          "date": "2026-04-29",
-          "fee": 2508,
-          "lotRefs": [
-            {
-              "txnId": "mobc156abpw",
-              "lots": 45,
-              "date": "2026-04-23"
-            }
-          ],
-          "remark": "OpenAI營收成長不如預期引發AI板塊恐慌，費半指數重挫3.58%，台積電ADR跌3.12%。這波逆風連帶重挫軟銀、甲骨文與CoreWeave等合作夥伴股價，9805前四大成分股也都紛紛大跌 但這次賣出不是不看好 而且先觀察趨勢",
-          "mood": "🤔 猶豫",
-          "lossReason": ""
-        }
-      ],
-      "order": 11
-    },
-    {
-      "id": "mo0uor25iej",
-      "code": "00988A",
-      "name": "主動統一全球創新",
-      "lots": 10,
-      "avgPrice": 15.37,
-      "divPerShare": 0,
-      "note": "質押中",
-      "url": "https://www.wantgoo.com/stock/etf/00988A/dividend-policy/ex-dividend",
-      "holdType": "short",
-      "targetRoi": 5,
-      "transactions": [
-        {
-          "id": "mo0uor250ti",
-          "type": "buy",
-          "lots": 10,
-          "price": 15.37,
-          "date": "2026-04-16",
-          "fee": 0,
-          "remark": "台股美股都創新高，但00988A連續兩天下跌 主要是記憶體族群影響 先健倉分批買進"
-        },
-        {
-          "id": "mpv1dgqgpns",
-          "type": "buy",
-          "lots": 23,
-          "price": 22.1,
-          "date": "2026-06-01",
-          "fee": 203,
-          "remark": "將981D資金一半轉移到這,主要是AI競賽目前尚在百公尺比賽 15公尺左右",
-          "mood": "🤔 猶豫"
-        },
-        {
-          "id": "mrahhafuov4",
-          "type": "sell",
-          "lots": 24,
-          "price": 20.09,
-          "date": "2026-07-07",
-          "fee": 1638,
-          "lotRefs": [
-            {
-              "txnId": "mo0uor250ti",
-              "lots": 10,
-              "date": "2026-04-16"
-            },
-            {
-              "txnId": "mpv1dgqgpns",
-              "lots": 14,
-              "date": "2026-06-01"
-            }
-          ],
-          "remark": "META販售算力引起的回檔",
-          "mood": "🤔 猶豫",
-          "lossReason": "黑天鵝事件"
-        }
-      ],
       "order": 12
     },
     {
@@ -1153,35 +1130,58 @@
       "order": 13
     },
     {
-      "id": "mp5q81azs4l",
-      "code": "00981A",
+      "id": "mo0uor25iej",
+      "code": "00988A",
       "name": "主動統一全球創新",
-      "lots": 13,
-      "avgPrice": 30.34,
+      "lots": 10,
+      "avgPrice": 15.37,
       "divPerShare": 0,
       "note": "質押中",
-      "url": "https://www.wantgoo.com/stock/etf/00981A/dividend-policy/ex-dividend",
+      "url": "https://www.wantgoo.com/stock/etf/00988A/dividend-policy/ex-dividend",
       "holdType": "short",
       "targetRoi": 5,
       "transactions": [
         {
-          "id": "mp5q81azkl3",
+          "id": "mo0uor250ti",
           "type": "buy",
-          "lots": 13,
-          "price": 30.34,
-          "date": "2026-05-14",
+          "lots": 10,
+          "price": 15.37,
+          "date": "2026-04-16",
           "fee": 0,
-          "remark": "00403溢價5%賣出，一半資金轉移到成分股相同的981等於變相省5%"
+          "remark": "台股美股都創新高，但00988A連續兩天下跌 主要是記憶體族群影響 先健倉分批買進"
         },
         {
-          "id": "mpv1f287u7l",
+          "id": "mpv1dgqgpns",
           "type": "buy",
-          "lots": 16,
-          "price": 31.92,
+          "lots": 23,
+          "price": 22.1,
           "date": "2026-06-01",
-          "fee": 204,
+          "fee": 203,
           "remark": "將981D資金一半轉移到這,主要是AI競賽目前尚在百公尺比賽 15公尺左右",
           "mood": "🤔 猶豫"
+        },
+        {
+          "id": "mrahhafuov4",
+          "type": "sell",
+          "lots": 24,
+          "price": 20.09,
+          "date": "2026-07-07",
+          "fee": 1638,
+          "lotRefs": [
+            {
+              "txnId": "mo0uor250ti",
+              "lots": 10,
+              "date": "2026-04-16"
+            },
+            {
+              "txnId": "mpv1dgqgpns",
+              "lots": 14,
+              "date": "2026-06-01"
+            }
+          ],
+          "remark": "META販售算力引起的回檔",
+          "mood": "🤔 猶豫",
+          "lossReason": "黑天鵝事件"
         }
       ],
       "order": 14
@@ -2302,7 +2302,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1783874842741,
+  "_ts": 1783874836950,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
