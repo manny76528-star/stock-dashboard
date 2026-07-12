@@ -1377,7 +1377,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
 .inv-stock-pnl{font-size:11px;font-weight:700;margin-top:1px;text-align:right;}
 
 /* ══ 資產趨勢分頁 ══ */
-.trend-page-card{background:#fff;border-radius:14px;border:1px solid #eaecf0;box-shadow:0 2px 8px rgba(0,0,0,.04);padding:20px;margin-bottom:16px;}
+.trend-page-card{background:#fff;border-radius:14px;border:1px solid #eaecf0;box-shadow:0 2px 8px rgba(0,0,0,.04);padding:20px;margin-bottom:16px;width:100%;box-sizing:border-box;}
 .trend-page-hdr{font-size:13px;font-weight:700;color:#1e293b;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;}
 
 /* ══ 雙欄 Grid 佈局 ══ */
@@ -2492,7 +2492,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
           <span>📈 淨資產趨勢（每週五快照）</span>
           <button onclick="recordSnapshot(true)" style="padding:5px 12px;background:#eff6ff;border:1px solid #bfdbfe;color:#2563eb;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer">📷 手動記錄</button>
         </div>
-        <div style="position:relative;height:280px">
+        <div style="position:relative;height:380px">
           <canvas id="trend-page-canvas"></canvas>
         </div>
       </div>
@@ -2593,7 +2593,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
         <div class="trend-page-hdr" style="padding:14px 18px;border-bottom:1px solid #f0f2f5">
           <span>📐 財務規劃</span>
         </div>
-        <div id="finplan-page-body" style="padding:16px">
+        <div id="finplan-page-body" style="padding:20px;width:100%;box-sizing:border-box">
           <div style="color:#9ca3af;text-align:center;padding:40px">載入中...</div>
         </div>
       </div>
@@ -10573,10 +10573,9 @@ function renderFinPlanPage(){
   if(origBody){
     body.innerHTML='';
     const clone=origBody.cloneNode(true);
-    // 把三欄 grid 改成可換行
-    clone.querySelectorAll('[style*="grid-template-columns:1fr 1fr 1fr"]').forEach(el=>{
-      el.style.gridTemplateColumns='repeat(auto-fill,minmax(280px,1fr))';
-    });
+    // 頁面有足夠寬度，直接用三欄 grid
+    clone.style.maxHeight='none';
+    clone.style.overflow='visible';
     Array.from(clone.children).forEach(c=>body.appendChild(c));
     if(typeof initFinPlan==='function')initFinPlan();
   }
