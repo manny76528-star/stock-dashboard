@@ -9674,39 +9674,56 @@ function renderAssetsPage(){
       }).join('')+'</div>';
   }
 
-  // 現金帳戶 Grid 卡片
+  // 現金帳戶 — 直接呼叫原本的 renderCash()，它會更新 cash-body
+  // 同時用相同資料更新 as-cash-body（Grid 版本）
   const cb=document.getElementById('as-cash-body');
   if(cb){
-    cb.innerHTML=db.cashAccounts.length===0?
-      '<div style="padding:20px;text-align:center;color:#9ca3af;font-size:12px">尚無現金帳戶</div>':
-      `<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;padding:16px">`+
+    if(db.cashAccounts.length===0){
+      cb.innerHTML='<div style="padding:20px;text-align:center;color:#9ca3af;font-size:12px">尚無現金帳戶</div>';
+    } else {
+      // 用 renderCash 相同的待入帳股息計算
+      const todayStr=new Date().toISOString().split('T')[0];
+      const in30Str=new Date(Date.now()+30*86400000).toISOString().split('T')[0];
+      const pendingDivs30=(db.dividends||[])
+        .filter(d=>d.date&&d.date>todayStr&&d.date<=in30Str&&
+          (d.pending||(d.exDate&&d.exDate<=todayStr&&d.date>todayStr)||(!d.exDate&&d.date>todayStr)))
+        .sort((a,b)=>a.date.localeCompare(b.date));
+      const pendingTotal30=pendingDivs30.reduce((s,d)=>s+d.amount,0);
+
+      cb.innerHTML=`<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;padding:16px">`+
       db.cashAccounts.map(acc=>{
-        const total=(acc.cash||0)+(acc.d1||0)+(acc.d2||0);
-        const hasPending=(acc.d1||0)+(acc.d2||0)>0;
+        const bal=(acc.cash||0)+(acc.d1||0)+(acc.d2||0);
+        const hasD1=acc.d1&&acc.d1!==0, hasD2=acc.d2&&acc.d2!==0;
+        const isLineBank=acc.bank==='Line Bank';
         return`<div style="background:#fff;border-radius:12px;border:1px solid #eaecf0;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.04)">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-            <div style="font-size:13px;font-weight:800;color:#1e293b">${acc.name||'帳戶'}</div>
+            <div style="font-size:13px;font-weight:800;color:#1e293b">${acc.bank||acc.name||'帳戶'}</div>
             <div style="display:flex;gap:6px">
-              <button onclick="event.stopPropagation();openCashModal('${acc.id}')" style="width:28px;height:28px;background:#f8f9fa;border:1px solid #e2e8f0;border-radius:7px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center">✏️</button>
-              <button onclick="event.stopPropagation();deleteCash('${acc.id}')" style="width:28px;height:28px;background:#fff;border:1px solid #fca5a5;border-radius:7px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center">🗑</button>
+              <button onclick="event.stopPropagation();editCash('${acc.id}')" style="width:28px;height:28px;background:#f8f9fa;border:1px solid #e2e8f0;border-radius:7px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center">✏️</button>
+              <button onclick="event.stopPropagation();delCash('${acc.id}')" style="width:28px;height:28px;background:#fff;border:1px solid #fca5a5;border-radius:7px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center">🗑</button>
             </div>
           </div>
           <div style="font-size:11px;color:#9ca3af;margin-bottom:2px">總餘額</div>
-          <div style="font-size:18px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#dc2626;margin-bottom:8px">$${Math.round(total).toLocaleString()}</div>
-          ${acc.cash?`<div style="display:flex;justify-content:space-between;font-size:11px;padding:4px 0;border-top:1px solid #f5f5f5">
-            <span style="color:#9ca3af">可用現金</span>
-            <span style="font-weight:700;font-family:'JetBrains Mono',monospace">$${Math.round(acc.cash).toLocaleString()}</span>
+          <div style="font-size:18px;font-weight:800;font-family:'JetBrains Mono',monospace;${bal>=0?'color:#dc2626':'color:#16a34a'};margin-bottom:8px">$${Math.abs(bal).toLocaleString()}</div>
+          <div style="font-size:11px;padding:4px 0;border-top:1px solid #f5f5f5;display:flex;justify-content:space-between">
+            <span style="color:#9ca3af">現金</span>
+            <span style="font-weight:700">$${(acc.cash||0).toLocaleString()}</span>
+          </div>
+          ${hasD1?`<div style="font-size:11px;padding:4px 0;border-top:1px solid #f5f5f5;display:flex;justify-content:space-between">
+            <span style="color:#9ca3af">交割 D+1</span>
+            <span style="font-weight:700;${acc.d1<0?'color:#16a34a':'color:#dc2626'}">$${acc.d1.toLocaleString()}</span>
           </div>`:''}
-          ${acc.d1?`<div style="display:flex;justify-content:space-between;font-size:11px;padding:4px 0;border-top:1px solid #f5f5f5">
-            <span style="color:#9ca3af">待交割(D+1)</span>
-            <span style="font-weight:700;font-family:'JetBrains Mono',monospace;color:#2563eb">$${Math.round(acc.d1).toLocaleString()}</span>
+          ${hasD2?`<div style="font-size:11px;padding:4px 0;border-top:1px solid #f5f5f5;display:flex;justify-content:space-between">
+            <span style="color:#9ca3af">交割 D+2</span>
+            <span style="font-weight:700;${acc.d2<0?'color:#16a34a':'color:#dc2626'}">$${acc.d2.toLocaleString()}</span>
           </div>`:''}
-          ${acc.d2?`<div style="display:flex;justify-content:space-between;font-size:11px;padding:4px 0;border-top:1px solid #f5f5f5">
-            <span style="color:#9ca3af">待交割(D+2)</span>
-            <span style="font-weight:700;font-family:'JetBrains Mono',monospace;color:#7c3aed">$${Math.round(acc.d2).toLocaleString()}</span>
+          ${isLineBank&&pendingTotal30>0?`<div style="font-size:11px;padding:4px 0;border-top:1px solid #f5f5f5;display:flex;justify-content:space-between">
+            <span style="color:#2563eb">⏳ 待入帳(30天)</span>
+            <span style="font-weight:700;color:#2563eb">$${Math.round(pendingTotal30).toLocaleString()}</span>
           </div>`:''}
         </div>`;
       }).join('')+'</div>';
+    }
   }
 }
 
