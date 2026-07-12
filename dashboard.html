@@ -2355,7 +2355,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
             <span class="as-card-badge" id="as-loan-badge" style="background:#fee2e2;color:#b91c1c"></span>
           </div>
           <div id="as-loan-body"></div>
-          <div class="as-add-btn" onclick="addLoan()">＋ 新增信貸</div>
+          <div class="as-add-btn" onclick="openLoanModal()">＋ 新增信貸</div>
         </div>
 
         <!-- 不限用途 -->
@@ -2365,7 +2365,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
             <span class="as-card-badge" id="as-flex-badge" style="background:#dbeafe;color:#1d4ed8"></span>
           </div>
           <div id="as-flex-body"></div>
-          <div class="as-add-btn" onclick="openSP('flex')">✏️ 管理額度</div>
+          <div class="as-add-btn" onclick="openFlexModal()">＋ 新增不限用途</div>
         </div>
       </div>
 
@@ -2376,7 +2376,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
           <span class="as-card-badge" id="as-cash-badge" style="background:#dcfce7;color:#15803d"></span>
         </div>
         <div id="as-cash-body" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:0"></div>
-        <div class="as-add-btn" onclick="openAddCash()">＋ 新增帳戶</div>
+        <div class="as-add-btn" onclick="openCashModal()">＋ 新增帳戶</div>
       </div>
     </div>
 
@@ -9613,13 +9613,13 @@ function renderAssetsPage(){
       lb.innerHTML=`<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;padding:16px">
         ${loanRows.map(({l,rem,pct,deducts})=>{
           const urgent=deducts[0]&&deducts[0].daysLeft<=5;
-          return`<div style="background:#fff;border-radius:12px;border:1px solid ${urgent?'#fca5a5':'#eaecf0'};padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.04);cursor:pointer" onclick="openSP('health')">
+          return`<div style="background:#fff;border-radius:12px;border:1px solid ${urgent?'#fca5a5':'#eaecf0'};padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.04);cursor:pointer" onclick="openLoanModal()">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
               <div style="font-size:13px;font-weight:800;color:#1e293b">${l.bank||l.name||'信貸'}</div>
               <div style="font-size:10px;${urgent?'background:#fee2e2;color:#b91c1c':'background:#f0f4ff;color:#4338ca'};padding:2px 8px;border-radius:6px;font-weight:700">${urgent?'⚠️ 緊急':'💳 信貸'}</div>
             </div>
             <div style="font-size:11px;color:#9ca3af;margin-bottom:2px">尚餘本金</div>
-            <div style="font-size:16px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#1e293b;margin-bottom:8px" class="privacy-mask">$${Math.round(rem).toLocaleString()}</div>
+            <div style="font-size:16px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#1e293b;margin-bottom:8px">$${Math.round(rem).toLocaleString()}</div>
             <div style="height:4px;background:#f0f2f5;border-radius:2px;margin-bottom:10px;overflow:hidden">
               <div style="height:100%;border-radius:2px;background:${urgent?'#f87171':'#8fa8c8'};width:${pct}%"></div>
             </div>
@@ -9631,7 +9631,7 @@ function renderAssetsPage(){
                 </div>
                 ${d.afterBal!=null?`<div style="text-align:right">
                   <div style="font-size:10px;color:#9ca3af">扣後預估</div>
-                  <div style="font-size:12px;font-weight:800;font-family:'JetBrains Mono',monospace;${d.afterBal<0?'color:#b91c1c':'color:#15803d'}" class="privacy-mask">$${Math.abs(d.afterBal).toLocaleString()}${d.afterBal<0?' ⚠️':''}</div>
+                  <div style="font-size:12px;font-weight:800;font-family:'JetBrains Mono',monospace;${d.afterBal<0?'color:#b91c1c':'color:#15803d'}">$${Math.abs(d.afterBal).toLocaleString()}${d.afterBal<0?' ⚠️':''}</div>
                 </div>`:''}
               </div>`).join('')}
           </div>`;
@@ -9653,10 +9653,13 @@ function renderAssetsPage(){
         return`<div style="background:#fff;border-radius:12px;border:1px solid #eaecf0;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.04)">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
             <div style="font-size:13px;font-weight:800;color:#1e293b">${f.name||f.bank||'不限用途'}</div>
-            <div style="font-size:10px;background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:6px;font-weight:700">💳 額度</div>
+            <div style="display:flex;gap:6px">
+              <button onclick="editFlex('${f.id}')" style="width:28px;height:28px;background:#f8f9fa;border:1px solid #e2e8f0;border-radius:7px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center">✏️</button>
+              <button onclick="delFlex('${f.id}')" style="width:28px;height:28px;background:#fff;border:1px solid #fca5a5;border-radius:7px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center">🗑</button>
+            </div>
           </div>
           <div style="font-size:11px;color:#9ca3af;margin-bottom:2px">已使用</div>
-          <div style="font-size:16px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#1e293b;margin-bottom:8px" class="privacy-mask">$${Math.round(used).toLocaleString()}</div>
+          <div style="font-size:16px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#1e293b;margin-bottom:8px">$${Math.round(used).toLocaleString()}</div>
           <div style="height:4px;background:#f0f2f5;border-radius:2px;margin-bottom:10px;overflow:hidden">
             <div style="height:100%;border-radius:2px;background:#c9a99a;width:${pct}%"></div>
           </div>
@@ -9679,23 +9682,23 @@ function renderAssetsPage(){
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
             <div style="font-size:13px;font-weight:800;color:#1e293b">${acc.name||'帳戶'}</div>
             <div style="display:flex;gap:6px">
-              <button onclick="event.stopPropagation();openEditCash('${acc.id}')" style="width:28px;height:28px;background:#f8f9fa;border:1px solid #e2e8f0;border-radius:7px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center">✏️</button>
+              <button onclick="event.stopPropagation();openCashModal('${acc.id}')" style="width:28px;height:28px;background:#f8f9fa;border:1px solid #e2e8f0;border-radius:7px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center">✏️</button>
               <button onclick="event.stopPropagation();deleteCash('${acc.id}')" style="width:28px;height:28px;background:#fff;border:1px solid #fca5a5;border-radius:7px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center">🗑</button>
             </div>
           </div>
           <div style="font-size:11px;color:#9ca3af;margin-bottom:2px">總餘額</div>
-          <div style="font-size:18px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#15803d;margin-bottom:8px" class="privacy-mask">$${Math.round(total).toLocaleString()}</div>
+          <div style="font-size:18px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#15803d;margin-bottom:8px">$${Math.round(total).toLocaleString()}</div>
           ${acc.cash?`<div style="display:flex;justify-content:space-between;font-size:11px;padding:4px 0;border-top:1px solid #f5f5f5">
             <span style="color:#9ca3af">可用現金</span>
-            <span style="font-weight:700;font-family:'JetBrains Mono',monospace" class="privacy-mask">$${Math.round(acc.cash).toLocaleString()}</span>
+            <span style="font-weight:700;font-family:'JetBrains Mono',monospace">$${Math.round(acc.cash).toLocaleString()}</span>
           </div>`:''}
           ${acc.d1?`<div style="display:flex;justify-content:space-between;font-size:11px;padding:4px 0;border-top:1px solid #f5f5f5">
             <span style="color:#9ca3af">待交割(D+1)</span>
-            <span style="font-weight:700;font-family:'JetBrains Mono',monospace;color:#2563eb" class="privacy-mask">$${Math.round(acc.d1).toLocaleString()}</span>
+            <span style="font-weight:700;font-family:'JetBrains Mono',monospace;color:#2563eb">$${Math.round(acc.d1).toLocaleString()}</span>
           </div>`:''}
           ${acc.d2?`<div style="display:flex;justify-content:space-between;font-size:11px;padding:4px 0;border-top:1px solid #f5f5f5">
             <span style="color:#9ca3af">待交割(D+2)</span>
-            <span style="font-weight:700;font-family:'JetBrains Mono',monospace;color:#7c3aed" class="privacy-mask">$${Math.round(acc.d2).toLocaleString()}</span>
+            <span style="font-weight:700;font-family:'JetBrains Mono',monospace;color:#7c3aed">$${Math.round(acc.d2).toLocaleString()}</span>
           </div>`:''}
         </div>`;
       }).join('')+'</div>';
