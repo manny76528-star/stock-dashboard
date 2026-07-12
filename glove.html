@@ -3,596 +3,881 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>⚾ 手套收藏</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<title>⚾ Glove Vault</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
+*{margin:0;padding:0;box-sizing:border-box;}
 :root{
-  --bg:#0d0d0d;
-  --surface:#161616;
-  --surface2:#1f1f1f;
-  --border:#2a2a2a;
-  --accent:#e8a020;
-  --accent2:#c47f00;
-  --red:#e05252;
-  --green:#4caf7d;
-  --text:#f0ebe3;
-  --muted:#7a7570;
-  --card-bg:#181510;
-  --leather:#2a1f0e;
+  --sidebar:240px;
+  --bg:#f8f9fa;
+  --white:#ffffff;
+  --border:#eaecf0;
+  --text:#1e293b;
+  --muted:#9ca3af;
+  --accent:#2563eb;
+  --gain:#dc2626;
+  --loss:#16a34a;
   --mono:'JetBrains Mono',monospace;
-  --display:'Bebas Neue',sans-serif;
+  --radius:14px;
+  --shadow:0 2px 8px rgba(0,0,0,.05);
 }
 
-*{margin:0;padding:0;box-sizing:border-box;}
 body{
   background:var(--bg);
   color:var(--text);
   font-family:'Noto Sans TC',sans-serif;
+  display:flex;
   min-height:100vh;
-  background-image:
-    radial-gradient(ellipse at 20% 0%,rgba(232,160,32,.06) 0%,transparent 60%),
-    radial-gradient(ellipse at 80% 100%,rgba(232,160,32,.04) 0%,transparent 50%),
-    url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.015'%3E%3Cpath d='M0 0h40v1H0zM0 39h40v1H0z'/%3E%3C/g%3E%3C/svg%3E");
 }
 
-/* ── TOPBAR ── */
-.topbar{
-  position:sticky;top:0;z-index:100;
-  background:rgba(13,13,13,.92);
-  backdrop-filter:blur(12px);
+/* ══ SIDEBAR ══ */
+.g-sidebar{
+  width:var(--sidebar);
+  min-height:100vh;
+  background:var(--white);
+  border-right:1px solid var(--border);
+  box-shadow:2px 0 12px rgba(0,0,0,.04);
+  position:fixed;top:0;left:0;
+  display:flex;flex-direction:column;
+  z-index:200;
+}
+.g-sidebar-brand{
+  padding:20px 20px 16px;
   border-bottom:1px solid var(--border);
-  padding:0 24px;
-  display:flex;align-items:center;justify-content:space-between;
-  height:60px;
+  display:flex;align-items:center;gap:10px;
 }
-.topbar-brand{display:flex;align-items:center;gap:12px;}
-.topbar-icon{font-size:26px;line-height:1;}
-.topbar-name{
-  font-family:var(--display);
-  font-size:26px;
-  letter-spacing:3px;
-  color:var(--accent);
-  line-height:1;
+.g-sidebar-icon{font-size:24px;}
+.g-sidebar-title{font-size:15px;font-weight:800;color:var(--text);}
+.g-sidebar-sub{font-size:10px;color:var(--muted);margin-top:1px;letter-spacing:.5px;}
+.g-nav{flex:1;padding:12px 0;overflow-y:auto;}
+.g-nav-section{font-size:10px;font-weight:700;color:#8e92bc;padding:14px 0 6px 14px;letter-spacing:1px;text-transform:uppercase;}
+.g-nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 16px;
+  font-size:13px;font-weight:600;color:#64748b;
+  cursor:pointer;transition:all .15s;
+  border-left:3px solid transparent;
+  user-select:none;margin-bottom:2px;
 }
-.topbar-sub{font-size:11px;color:var(--muted);letter-spacing:1px;margin-top:2px;}
-.topbar-actions{display:flex;gap:10px;align-items:center;}
-
-/* ── BUTTONS ── */
-.btn{
-  border:none;border-radius:6px;padding:9px 18px;
-  font-size:12px;font-weight:700;cursor:pointer;
-  font-family:'Noto Sans TC',sans-serif;
-  letter-spacing:.5px;transition:all .15s;
-}
-.btn-primary{
-  background:var(--accent);color:#000;
-}
-.btn-primary:hover{background:var(--accent2);transform:translateY(-1px);}
-.btn-ghost{
-  background:transparent;color:var(--muted);
-  border:1px solid var(--border);
-}
-.btn-ghost:hover{color:var(--text);border-color:var(--muted);}
-.btn-sm{padding:6px 12px;font-size:11px;}
-.btn-danger{background:#3d1515;color:var(--red);border:1px solid #5a2020;}
-.btn-danger:hover{background:#5a2020;}
-
-/* ── MAIN ── */
-.main{max-width:1400px;margin:0 auto;padding:32px 24px;}
-
-/* ── STATS BAR ── */
-.stats-bar{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
-  gap:12px;
-  margin-bottom:32px;
-}
-.stat-item{
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:10px;
+.g-nav-item:hover{background:#f8fafc;color:var(--accent);}
+.g-nav-item.active{background:#eff6ff;color:var(--accent);border-left-color:var(--accent);font-weight:700;}
+.g-nav-icon{font-size:15px;width:20px;text-align:center;}
+.g-sidebar-footer{
   padding:14px 16px;
-  position:relative;
-  overflow:hidden;
-}
-.stat-item::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,var(--accent),transparent);
-}
-.stat-label{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;}
-.stat-val{font-family:var(--mono);font-size:20px;font-weight:600;color:var(--text);}
-.stat-val.gold{color:var(--accent);}
-.stat-val.green{color:var(--green);}
-.stat-val.red{color:var(--red);}
-
-/* ── FILTERS ── */
-.filters{
-  display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap;align-items:center;
-}
-.filter-chip{
-  padding:7px 16px;border-radius:20px;font-size:12px;font-weight:700;
-  cursor:pointer;border:1.5px solid var(--border);
-  background:transparent;color:var(--muted);
-  transition:all .15s;font-family:'Noto Sans TC',sans-serif;
-}
-.filter-chip.active{background:var(--accent);color:#000;border-color:var(--accent);}
-.filter-chip:hover:not(.active){border-color:var(--accent);color:var(--accent);}
-.search-box{
-  flex:1;min-width:200px;
-  background:var(--surface);border:1.5px solid var(--border);
-  border-radius:8px;padding:8px 14px;font-size:13px;
-  color:var(--text);outline:none;font-family:'Noto Sans TC',sans-serif;
-}
-.search-box:focus{border-color:var(--accent);}
-.search-box::placeholder{color:var(--muted);}
-
-/* ── GLOVE GRID ── */
-.glove-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
-  gap:20px;
-}
-
-/* ── GLOVE CARD ── */
-.glove-card{
-  background:var(--card-bg);
-  border:1px solid var(--border);
-  border-radius:14px;
-  overflow:hidden;
-  cursor:pointer;
-  transition:all .2s;
-  position:relative;
-}
-.glove-card:hover{
-  border-color:var(--accent);
-  transform:translateY(-3px);
-  box-shadow:0 12px 40px rgba(0,0,0,.5),0 0 0 1px rgba(232,160,32,.15);
-}
-.glove-card.sold{opacity:.75;}
-.star-rating{display:flex;gap:3px;margin-top:6px;}
-.star-rating span{font-size:18px;cursor:pointer;opacity:.3;transition:opacity .15s;}
-.star-rating span.on{opacity:1;}
-.star-rating span:hover,.star-rating span:hover~span{opacity:.6;}
-.glove-card.sold .card-img-wrap::after{
-  content:'已售出';
-  position:absolute;top:12px;right:12px;
-  background:var(--red);color:#fff;
-  font-size:11px;font-weight:700;
-  padding:3px 10px;border-radius:20px;
-  letter-spacing:.5px;
-}
-
-/* 圖片區 */
-.card-img-wrap{
-  position:relative;height:200px;
-  background:var(--leather);
-  overflow:hidden;
-}
-.card-img-wrap img{
-  width:100%;height:100%;object-fit:cover;
-  transition:transform .3s;
-}
-.glove-card:hover .card-img-wrap img{transform:scale(1.04);}
-.card-img-placeholder{
-  width:100%;height:100%;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:8px;color:var(--muted);
-}
-.card-img-placeholder .ph-icon{font-size:40px;opacity:.4;}
-.card-img-placeholder .ph-text{font-size:11px;letter-spacing:1px;}
-.card-img-count{
-  position:absolute;bottom:10px;right:10px;
-  background:rgba(0,0,0,.7);color:#fff;
-  font-size:10px;font-weight:700;padding:3px 8px;border-radius:10px;
-  font-family:var(--mono);
-}
-
-/* 品牌 badge */
-.card-brand-badge{
-  position:absolute;top:12px;left:12px;
-  background:rgba(0,0,0,.75);
-  backdrop-filter:blur(4px);
-  border:1px solid rgba(232,160,32,.3);
-  color:var(--accent);
-  font-family:var(--display);
-  font-size:15px;letter-spacing:2px;
-  padding:4px 12px;border-radius:6px;
-  line-height:1.2;
-}
-
-/* 卡片內容 */
-.card-body{padding:16px;}
-.card-name{
-  font-family:var(--display);
-  font-size:20px;letter-spacing:1.5px;
-  color:var(--text);margin-bottom:4px;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
-.card-meta{
-  font-size:11px;color:var(--muted);margin-bottom:12px;
-  display:flex;gap:10px;flex-wrap:wrap;
-}
-.card-meta span{display:flex;align-items:center;gap:3px;}
-
-.card-divider{height:1px;background:var(--border);margin:12px 0;}
-
-.card-prices{
-  display:grid;grid-template-columns:1fr 1fr;gap:8px;
-  margin-bottom:10px;
-}
-.price-block{background:var(--surface2);border-radius:8px;padding:8px 10px;}
-.price-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;}
-.price-val{font-family:var(--mono);font-size:14px;font-weight:600;}
-.price-val.buy{color:var(--red);}
-.price-val.sell{color:var(--green);}
-.price-val.pending{color:var(--muted);}
-
-.card-pnl{
-  display:flex;align-items:center;justify-content:space-between;
-  margin-top:8px;
-}
-.pnl-tag{
-  font-family:var(--mono);font-size:13px;font-weight:700;
-  padding:4px 10px;border-radius:6px;
-}
-.pnl-tag.gain{background:rgba(76,175,125,.15);color:var(--green);}
-.pnl-tag.loss{background:rgba(224,82,82,.15);color:var(--red);}
-.pnl-tag.hold{background:rgba(122,117,112,.1);color:var(--muted);}
-
-.card-pros-cons{margin-top:10px;}
-.pros-cons-row{display:flex;gap:6px;margin-bottom:4px;font-size:11px;line-height:1.5;}
-.pros-cons-icon{flex-shrink:0;margin-top:1px;}
-.pros-cons-text{color:var(--muted);}
-
-/* ── EMPTY STATE ── */
-.empty-state{
-  text-align:center;padding:80px 20px;
-  grid-column:1/-1;
-}
-.empty-icon{font-size:60px;margin-bottom:16px;opacity:.4;}
-.empty-title{font-family:var(--display);font-size:28px;letter-spacing:2px;color:var(--muted);margin-bottom:8px;}
-.empty-sub{font-size:13px;color:#444;}
-
-/* ── MODAL ── */
-.mo{
-  display:none;position:fixed;inset:0;
-  background:rgba(0,0,0,.75);
-  z-index:1000;align-items:flex-start;justify-content:center;
-  padding:20px;overflow-y:auto;
-}
-.mo.open{display:flex;}
-.mo-box{
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:16px;
-  width:100%;max-width:680px;
-  margin:auto;
-  box-shadow:0 30px 80px rgba(0,0,0,.6);
-  animation:moPop .2s ease;
-  overflow:hidden;
-}
-@keyframes moPop{from{opacity:0;transform:scale(.96) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
-.mo-hdr{
-  background:var(--leather);
-  border-bottom:1px solid var(--border);
-  padding:18px 22px;
-  display:flex;align-items:center;justify-content:space-between;
-}
-.mo-title{font-family:var(--display);font-size:22px;letter-spacing:2px;color:var(--accent);}
-.mo-close{background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:5px 12px;font-size:13px;cursor:pointer;}
-.mo-close:hover{color:var(--text);border-color:var(--muted);}
-.mo-body{padding:22px;}
-
-.fg{margin-bottom:16px;}
-.fl{display:block;font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px;}
-.fi{
-  width:100%;background:var(--surface2);
-  border:1.5px solid var(--border);border-radius:8px;
-  padding:10px 12px;font-size:13px;color:var(--text);
-  outline:none;font-family:'Noto Sans TC',sans-serif;
-  transition:border-color .15s;
-}
-.fi:focus{border-color:var(--accent);}
-.fi::placeholder{color:#3a3a3a;}
-select.fi option{background:var(--surface2);}
-textarea.fi{resize:vertical;min-height:80px;}
-
-.fr2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-
-.mo-footer{
-  padding:16px 22px;
   border-top:1px solid var(--border);
-  display:flex;justify-content:space-between;
-  align-items:center;
+  display:flex;flex-direction:column;gap:6px;
 }
-
-/* ── 圖片上傳 ── */
-.img-upload-zone{
-  border:2px dashed var(--border);border-radius:10px;
-  padding:20px;text-align:center;cursor:pointer;
-  transition:all .15s;background:var(--surface2);
-  margin-bottom:10px;
-}
-.img-upload-zone:hover{border-color:var(--accent);background:rgba(232,160,32,.04);}
-.img-upload-icon{font-size:28px;margin-bottom:6px;opacity:.6;}
-.img-upload-text{font-size:12px;color:var(--muted);}
-.img-preview-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
-.img-thumb{
-  position:relative;width:80px;height:80px;
-  border-radius:8px;overflow:hidden;
-  border:1.5px solid var(--border);
-  flex-shrink:0;
-}
-.img-thumb img{width:100%;height:100%;object-fit:cover;}
-.img-thumb-del{
-  position:absolute;top:3px;right:3px;
-  width:18px;height:18px;border-radius:50%;
-  background:rgba(224,82,82,.9);color:#fff;
-  border:none;font-size:11px;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;line-height:1;
-}
-
-/* ── DETAIL MODAL ── */
-.dm-imgs{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
-  gap:8px;margin-bottom:20px;
-}
-.dm-img{
-  aspect-ratio:1;border-radius:10px;overflow:hidden;
-  border:1px solid var(--border);cursor:zoom-in;
-}
-.dm-img img{width:100%;height:100%;object-fit:cover;transition:transform .2s;}
-.dm-img:hover img{transform:scale(1.05);}
-.dm-section{margin-bottom:16px;}
-.dm-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
-.dm-value{font-size:14px;color:var(--text);}
-.dm-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;}
-.dm-kv{background:var(--surface2);border-radius:8px;padding:10px 12px;}
-.dm-k{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px;}
-.dm-v{font-family:var(--mono);font-size:15px;font-weight:600;}
-
-/* ── PRO/CON TAGS ── */
-.tag-list{display:flex;flex-wrap:wrap;gap:6px;}
-.tag-pro{
-  background:rgba(76,175,125,.12);color:var(--green);
-  border:1px solid rgba(76,175,125,.25);
-  padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;
-}
-.tag-con{
-  background:rgba(224,82,82,.1);color:var(--red);
-  border:1px solid rgba(224,82,82,.2);
-  padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;
-}
-
-/* ── LIGHTBOX ── */
-.lightbox{
-  display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);
-  z-index:2000;align-items:center;justify-content:center;flex-direction:column;gap:14px;
-}
-.lightbox.open{display:flex;}
-.lightbox img{max-width:95vw;max-height:82vh;border-radius:10px;object-fit:contain;}
-.lb-nav{display:flex;gap:12px;align-items:center;}
-.lb-btn{
-  background:rgba(255,255,255,.1);border:none;color:#fff;
-  border-radius:50%;width:40px;height:40px;font-size:20px;cursor:pointer;
+.g-sidebar-btn{
+  padding:8px 12px;
+  border-radius:8px;
+  border:1px solid var(--border);
+  background:var(--white);
+  color:var(--text);
+  font-size:12px;font-weight:700;
+  cursor:pointer;width:100%;text-align:left;
   transition:background .15s;
 }
-.lb-btn:hover{background:rgba(255,255,255,.2);}
-.lb-counter{color:rgba(255,255,255,.6);font-size:12px;font-family:var(--mono);min-width:50px;text-align:center;}
+.g-sidebar-btn:hover{background:#f8fafc;}
+.g-sidebar-btn.primary{background:#2563eb;color:#fff;border-color:#2563eb;}
+.g-sidebar-btn.primary:hover{background:#1d4ed8;}
 
-/* ── TOAST ── */
-.toast{
-  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
-  background:var(--surface);border:1px solid var(--accent);
-  color:var(--text);padding:10px 20px;border-radius:8px;
-  font-size:13px;z-index:3000;transition:transform .3s;white-space:nowrap;
+/* ══ MAIN ══ */
+.g-main{
+  margin-left:var(--sidebar);
+  flex:1;min-width:0;
+  height:100vh;overflow-y:auto;
 }
-.toast.show{transform:translateX(-50%) translateY(0);}
+.g-topbar{
+  position:sticky;top:0;z-index:100;
+  background:rgba(248,249,250,.92);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  padding:0 28px;height:56px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.g-topbar-title{font-size:15px;font-weight:800;color:var(--text);}
+.g-topbar-actions{display:flex;gap:8px;align-items:center;}
+.g-content{padding:24px 28px;}
 
-@media(max-width:600px){
-  .glove-grid{grid-template-columns:1fr;}
-  .fr2{grid-template-columns:1fr;}
-  .dm-grid{grid-template-columns:1fr 1fr;}
+/* ══ KPI CARDS ══ */
+.g-kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px;}
+.g-kpi-card{
+  background:var(--white);border-radius:var(--radius);
+  border:1px solid var(--border);padding:18px 20px;
+  box-shadow:var(--shadow);position:relative;overflow:hidden;
+}
+.g-kpi-accent{position:absolute;top:0;left:0;width:4px;height:100%;border-radius:2px;}
+.g-kpi-label{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.3px;padding-left:8px;margin-bottom:6px;}
+.g-kpi-val{font-size:22px;font-weight:800;font-family:var(--mono);color:var(--text);padding-left:8px;}
+.g-kpi-sub{font-size:11px;color:var(--muted);padding-left:8px;margin-top:4px;}
+
+/* ══ CHART ROW ══ */
+.g-mid-grid{display:grid;grid-template-columns:1fr 320px;gap:16px;margin-bottom:20px;}
+.g-chart-card{
+  background:var(--white);border-radius:var(--radius);
+  border:1px solid var(--border);padding:20px;
+  box-shadow:var(--shadow);
+}
+.g-chart-title{font-size:12px;font-weight:700;color:var(--text);margin-bottom:16px;}
+
+/* ══ SECTION HEADER ══ */
+.g-section-hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:14px;
+}
+.g-section-title{font-size:14px;font-weight:800;color:var(--text);}
+
+/* ══ GLOVE GALLERY ══ */
+.g-gallery{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:16px;
+}
+.g-card{
+  background:var(--white);border-radius:var(--radius);
+  border:1px solid var(--border);
+  box-shadow:var(--shadow);
+  overflow:hidden;cursor:pointer;
+  transition:box-shadow .2s,transform .2s;
+}
+.g-card:hover{box-shadow:0 8px 24px rgba(0,0,0,.1);transform:translateY(-2px);}
+.g-card-img{
+  width:100%;height:180px;object-fit:cover;
+  background:#f8f9fa;
+  display:flex;align-items:center;justify-content:center;
+}
+.g-card-img img{width:100%;height:180px;object-fit:cover;}
+.g-card-placeholder{
+  width:100%;height:180px;background:#f1f5f9;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  color:var(--muted);
+}
+.g-card-body{padding:14px 16px;}
+.g-card-brand{font-size:10px;font-weight:700;color:var(--accent);letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px;}
+.g-card-name{font-size:14px;font-weight:800;color:var(--text);margin-bottom:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.g-card-meta{font-size:11px;color:var(--muted);margin-bottom:8px;}
+.g-badge{
+  display:inline-block;font-size:10px;font-weight:700;
+  padding:2px 8px;border-radius:5px;
+}
+.g-badge-hold{background:#dcfce7;color:#15803d;}
+.g-badge-sold{background:#fee2e2;color:#b91c1c;}
+.g-badge-wish{background:#dbeafe;color:#1d4ed8;}
+.g-card-price{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-top:8px;padding-top:8px;border-top:1px solid #f0f2f5;
+}
+.g-card-pnl{font-size:12px;font-weight:700;font-family:var(--mono);}
+.g-card-stars{font-size:12px;}
+
+/* ══ DRAWER ══ */
+.g-drawer{
+  position:fixed;top:0;right:0;height:100vh;
+  width:580px;max-width:92vw;
+  background:var(--white);
+  box-shadow:-8px 0 40px rgba(0,0,0,.12);
+  z-index:3000;display:flex;flex-direction:column;
+  transform:translateX(100%);
+  transition:transform .3s cubic-bezier(.4,0,.2,1);
+}
+.g-drawer.open{transform:translateX(0);}
+.g-drawer-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.3);
+  z-index:2999;opacity:0;pointer-events:none;
+  transition:opacity .3s ease;
+}
+.g-drawer-overlay.open{opacity:1;pointer-events:all;}
+.g-drawer-hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 22px;border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+.g-drawer-title{font-size:16px;font-weight:800;color:var(--text);}
+.g-drawer-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);}
+.g-drawer-body{flex:1;overflow-y:auto;padding:20px 24px;}
+
+/* Form fields */
+.g-label{font-size:11px;font-weight:600;color:#374151;margin-bottom:4px;display:block;}
+.g-input{
+  width:100%;padding:8px 12px;
+  border:1.5px solid var(--border);border-radius:8px;
+  font-size:13px;outline:none;
+  font-family:'Noto Sans TC',sans-serif;
+  transition:border-color .15s;box-sizing:border-box;
+  background:var(--white);color:var(--text);
+}
+.g-input:focus{border-color:var(--accent);}
+.g-textarea{
+  width:100%;padding:8px 12px;
+  border:1.5px solid var(--border);border-radius:8px;
+  font-size:13px;outline:none;resize:vertical;min-height:70px;
+  font-family:'Noto Sans TC',sans-serif;transition:border-color .15s;box-sizing:border-box;
+}
+.g-textarea:focus{border-color:var(--accent);}
+.g-grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.g-section-divider{margin:16px 0 12px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.g-save-btn{
+  width:100%;padding:12px;
+  background:linear-gradient(135deg,#1e3a5f,#2563eb);
+  color:#fff;border:none;border-radius:10px;
+  font-size:14px;font-weight:700;cursor:pointer;
+  font-family:'Noto Sans TC',sans-serif;
+  margin-top:16px;
+}
+.g-save-btn:hover{opacity:.9;}
+
+/* ══ DETAIL DRAWER ══ */
+.g-detail-img{width:100%;border-radius:10px;object-fit:cover;max-height:280px;}
+.g-detail-section{margin-bottom:16px;}
+.g-detail-label{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.5px;margin-bottom:4px;}
+.g-detail-val{font-size:14px;font-weight:600;color:var(--text);}
+.g-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.g-img-gallery{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+.g-img-thumb{width:80px;height:80px;object-fit:cover;border-radius:8px;cursor:zoom-in;border:1.5px solid var(--border);}
+
+/* ══ WISHLIST / SOLD LIST ══ */
+.g-list-row{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 0;border-bottom:1px solid #f5f5f5;
+  cursor:pointer;transition:background .12s;
+}
+.g-list-row:last-child{border-bottom:none;}
+.g-list-row:hover{background:#fafbff;margin:0 -4px;padding:12px 4px;}
+.g-list-thumb{width:48px;height:48px;border-radius:8px;object-fit:cover;flex-shrink:0;background:#f1f5f9;}
+.g-list-brand{font-size:10px;font-weight:700;color:var(--accent);}
+.g-list-name{font-size:13px;font-weight:700;color:var(--text);}
+.g-list-meta{font-size:11px;color:var(--muted);}
+
+/* ══ RECENT LIST ══ */
+.g-recent-item{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 0;border-bottom:1px solid #f5f5f5;
+}
+.g-recent-item:last-child{border-bottom:none;}
+.g-recent-thumb{width:36px;height:36px;border-radius:6px;object-fit:cover;background:#f1f5f9;flex-shrink:0;}
+.g-recent-name{font-size:12px;font-weight:700;color:var(--text);}
+.g-recent-date{font-size:10px;color:var(--muted);}
+
+/* ══ STAR RATING ══ */
+.g-stars{display:flex;gap:4px;cursor:pointer;font-size:20px;}
+.g-star{color:#e2e8f0;transition:color .15s;}
+.g-star.on{color:#f59e0b;}
+
+/* ══ TOAST ══ */
+.g-toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:rgba(17,24,39,.92);color:#fff;
+  padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;
+  opacity:0;transition:all .3s;z-index:9999;pointer-events:none;white-space:nowrap;
+}
+.g-toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ══ IMG UPLOAD ══ */
+.g-img-preview{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;}
+.g-img-preview-item{position:relative;}
+.g-img-preview-img{width:70px;height:70px;object-fit:cover;border-radius:8px;border:1.5px solid var(--border);}
+.g-img-del{
+  position:absolute;top:-4px;right:-4px;
+  background:#dc2626;color:#fff;border:none;
+  border-radius:50%;width:18px;height:18px;
+  font-size:10px;cursor:pointer;
+}
+
+/* ══ PAGES ══ */
+.g-page{display:none;}
+.g-page.active{display:block;}
+
+@media(max-width:768px){
+  .g-sidebar{width:200px;}
+  .g-main{margin-left:200px;}
+  .g-kpi-grid{grid-template-columns:repeat(2,1fr);}
+  .g-mid-grid{grid-template-columns:1fr;}
 }
 </style>
 </head>
 <body>
 
-<!-- TOPBAR -->
-<div class="topbar">
-  <div class="topbar-brand">
-    <div class="topbar-icon">🧤</div>
+<!-- ══ SIDEBAR ══ -->
+<div class="g-sidebar">
+  <div class="g-sidebar-brand">
+    <div class="g-sidebar-icon">🧤</div>
     <div>
-      <div class="topbar-name">GLOVE VAULT</div>
-      <div class="topbar-sub">棒球手套收藏記錄</div>
+      <div class="g-sidebar-title">Glove Vault</div>
+      <div class="g-sidebar-sub">棒球手套收藏記錄</div>
     </div>
   </div>
-  <div class="topbar-actions">
-    <a href="index.html" class="btn btn-ghost btn-sm">🏠 主目錄</a>
-    <button class="btn btn-ghost btn-sm" onclick="manualSync()">☁️ 雲端同步</button>
-    <button class="btn btn-primary" onclick="openAddModal()">＋ 新增手套</button>
+  <nav class="g-nav">
+    <div class="g-nav-section">主要</div>
+    <div class="g-nav-item active" id="gnav-dashboard" onclick="gShowPage('dashboard')">
+      <span class="g-nav-icon">📊</span>收藏總覽
+    </div>
+    <div class="g-nav-section">收藏</div>
+    <div class="g-nav-item" id="gnav-hold" onclick="gShowPage('hold')">
+      <span class="g-nav-icon">⚾</span>持有中手套
+    </div>
+    <div class="g-nav-item" id="gnav-sold" onclick="gShowPage('sold')">
+      <span class="g-nav-icon">🤝</span>已售出紀錄
+    </div>
+    <div class="g-nav-item" id="gnav-wish" onclick="gShowPage('wish')">
+      <span class="g-nav-icon">👁</span>觀察中清單
+    </div>
+    <div class="g-nav-section">記錄</div>
+    <div class="g-nav-item" id="gnav-gallery" onclick="gShowPage('gallery')">
+      <span class="g-nav-icon">🖼</span>手套畫廊
+    </div>
+  </nav>
+  <div class="g-sidebar-footer">
+    <button class="g-sidebar-btn primary" onclick="openAddDrawer()">＋ 新增手套</button>
+    <button class="g-sidebar-btn" onclick="manualSync()">☁️ 雲端同步</button>
+    <a href="index.html" class="g-sidebar-btn" style="text-decoration:none;display:block;text-align:left">🏠 主目錄</a>
   </div>
 </div>
 
-<div class="main">
-
-  <!-- STATS -->
-  <div class="stats-bar">
-    <div class="stat-item">
-      <div class="stat-label">⚾ 總收藏數</div>
-      <div class="stat-val gold" id="s-total">0</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-label">🧤 持有中</div>
-      <div class="stat-val" id="s-hold">0</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-label">💰 總投入</div>
-      <div class="stat-val red" id="s-invested">$0</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-label">📈 已回收</div>
-      <div class="stat-val green" id="s-returned">$0</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-label">📊 損益</div>
-      <div class="stat-val" id="s-pnl">$0</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-label">💾 儲存空間</div>
-      <div class="stat-val" id="s-storage" style="font-size:14px">—</div>
+<!-- ══ MAIN ══ -->
+<div class="g-main">
+  <div class="g-topbar">
+    <div class="g-topbar-title" id="g-page-name">收藏總覽</div>
+    <div class="g-topbar-actions">
+      <div id="g-sync-status" style="font-size:12px;color:var(--muted)"></div>
+      <button style="padding:7px 14px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer" onclick="openAddDrawer()">＋ 新增手套</button>
     </div>
   </div>
 
-  <!-- FILTERS -->
-  <div class="filters">
-    <input type="text" class="search-box" placeholder="🔍 搜尋品牌、型號、備註..." oninput="renderGloves()">
-    <button class="filter-chip active" data-filter="all" onclick="setFilter(this)">全部</button>
-    <button class="filter-chip" data-filter="hold" onclick="setFilter(this)">持有中</button>
-    <button class="filter-chip" data-filter="sold" onclick="setFilter(this)">已售出</button>
-    <button class="filter-chip" id="sort-star-btn" onclick="toggleStarSort()" style="margin-left:auto">⭐ 評分排序</button>
-  </div>
+  <div class="g-content">
 
-  <!-- GRID -->
-  <div class="glove-grid" id="glove-grid"></div>
-
-</div>
-
-<!-- ══ 新增/編輯 Modal ══ -->
-<div class="mo" id="add-modal">
-  <div class="mo-box">
-    <div class="mo-hdr">
-      <div class="mo-title" id="mo-title">NEW GLOVE</div>
-      <button class="mo-close" onclick="closeModal()">✕ 關閉</button>
-    </div>
-    <div class="mo-body">
-      <div class="fr2">
-        <div class="fg">
-          <label class="fl">品牌</label>
-          <input class="fi" id="g-brand" placeholder="例：Rawlings、Wilson">
+    <!-- ══ PAGE: DASHBOARD ══ -->
+    <div class="g-page active" id="gpage-dashboard">
+      <!-- KPI -->
+      <div class="g-kpi-grid">
+        <div class="g-kpi-card">
+          <div class="g-kpi-accent" style="background:#8fa8c8"></div>
+          <div class="g-kpi-label">收藏總隻數</div>
+          <div class="g-kpi-val" id="kpi-total">0</div>
+          <div class="g-kpi-sub" id="kpi-total-sub"></div>
         </div>
-        <div class="fg">
-          <label class="fl">型號 / 名稱</label>
-          <input class="fi" id="g-model" placeholder="例：Heart of the Hide">
+        <div class="g-kpi-card">
+          <div class="g-kpi-accent" style="background:#a8c5a0"></div>
+          <div class="g-kpi-label">持有中</div>
+          <div class="g-kpi-val" id="kpi-hold">0</div>
+          <div class="g-kpi-sub" id="kpi-hold-sub"></div>
         </div>
-      </div>
-      <div class="fr2">
-        <div class="fg">
-          <label class="fl">倉位</label>
-          <select class="fi" id="g-position">
-            <option value="">-- 選擇 --</option>
-            <option>投手</option><option>捕手</option><option>一壘</option>
-            <option>二壘</option><option>三壘</option><option>游擊</option>
-            <option>外野</option><option>通用</option>
-          </select>
+        <div class="g-kpi-card">
+          <div class="g-kpi-accent" style="background:#c9a99a"></div>
+          <div class="g-kpi-label">投入總資本</div>
+          <div class="g-kpi-val" id="kpi-invested">$0</div>
+          <div class="g-kpi-sub" id="kpi-invested-sub"></div>
         </div>
-        <div class="fg">
-          <label class="fl">尺寸</label>
-          <input class="fi" id="g-size" placeholder="例：11.5吋、12吋">
+        <div class="g-kpi-card">
+          <div class="g-kpi-accent" style="background:#b5adc4"></div>
+          <div class="g-kpi-label">損益</div>
+          <div class="g-kpi-val" id="kpi-pnl">$0</div>
+          <div class="g-kpi-sub" id="kpi-pnl-sub"></div>
         </div>
-      </div>
-      <div class="fr2">
-        <div class="fg">
-          <label class="fl">買入日期</label>
-          <input class="fi" type="date" id="g-buy-date">
-        </div>
-        <div class="fg">
-          <label class="fl">買入價格（元）</label>
-          <input class="fi" type="number" id="g-buy-price" placeholder="0">
-        </div>
-      </div>
-      <div class="fr2">
-        <div class="fg">
-          <label class="fl">賣出日期（選填）</label>
-          <input class="fi" type="date" id="g-sell-date">
-        </div>
-        <div class="fg">
-          <label class="fl">賣出價格（選填）</label>
-          <input class="fi" type="number" id="g-sell-price" placeholder="尚未賣出則留空">
-        </div>
-      </div>
-      <div class="fg">
-        <label class="fl">✅ 優點（每行一點）</label>
-        <textarea class="fi" id="g-pros" rows="3" placeholder="手感絕佳&#10;皮革厚實耐用&#10;開口適中"></textarea>
-      </div>
-      <div class="fg">
-        <label class="fl">❌ 缺點（每行一點）</label>
-        <textarea class="fi" id="g-cons" rows="3" placeholder="開手期較長&#10;價格偏高"></textarea>
-      </div>
-      <div class="fg">
-        <label class="fl">📝 備註</label>
-        <textarea class="fi" id="g-note" rows="2" placeholder="其他補充說明..."></textarea>
       </div>
 
-      <!-- 星星評分 -->
-      <div class="fg">
-        <label class="fl">⭐ 個人評分</label>
-        <div style="display:flex;gap:8px;align-items:center;margin-top:4px">
-          <div style="display:flex;gap:4px">
-            <span id="gstar-1" onclick="setModalStar(1)" style="font-size:28px;cursor:pointer;opacity:.25;transition:opacity .15s">★</span>
-            <span id="gstar-2" onclick="setModalStar(2)" style="font-size:28px;cursor:pointer;opacity:.25;transition:opacity .15s">★</span>
-            <span id="gstar-3" onclick="setModalStar(3)" style="font-size:28px;cursor:pointer;opacity:.25;transition:opacity .15s">★</span>
-            <span id="gstar-4" onclick="setModalStar(4)" style="font-size:28px;cursor:pointer;opacity:.25;transition:opacity .15s">★</span>
-            <span id="gstar-5" onclick="setModalStar(5)" style="font-size:28px;cursor:pointer;opacity:.25;transition:opacity .15s">★</span>
+      <!-- 圖表 + 最新動態 -->
+      <div class="g-mid-grid">
+        <div class="g-chart-card">
+          <div class="g-chart-title">🥧 品牌分佈</div>
+          <div style="position:relative;height:220px">
+            <canvas id="brand-donut"></canvas>
           </div>
-          <span id="g-stars-label" style="font-size:12px;color:#94a3b8;margin-left:4px">尚未評分</span>
-          <button type="button" onclick="setModalStar(0)" style="font-size:11px;color:#94a3b8;background:none;border:none;cursor:pointer;padding:2px 6px">清除</button>
+          <div id="brand-legend" style="margin-top:14px;display:flex;flex-direction:column;gap:6px"></div>
+        </div>
+        <div class="g-chart-card">
+          <div class="g-chart-title">🆕 最新入庫</div>
+          <div id="recent-list"></div>
         </div>
       </div>
 
-      <!-- 圖片上傳 -->
-      <div class="fg">
-        <label class="fl">🖼 圖片（最多 8 張）</label>
-        <label class="img-upload-zone">
-          <div class="img-upload-icon">📷</div>
-          <div class="img-upload-text">點擊上傳圖片，存至雲端 · 原始畫質</div>
-          <input type="file" id="g-img-input" accept="image/*" multiple style="display:none" onchange="handleImgUpload(event)">
-        </label>
-        <div class="img-preview-row" id="g-img-preview"></div>
+      <!-- 畫廊預覽 -->
+      <div class="g-section-hdr">
+        <div class="g-section-title">🖼 收藏畫廊</div>
+        <button onclick="gShowPage('gallery')" style="font-size:12px;color:var(--accent);font-weight:700;background:none;border:none;cursor:pointer">查看全部 ↗</button>
+      </div>
+      <div class="g-gallery" id="dash-gallery"></div>
+    </div>
+
+    <!-- ══ PAGE: HOLD ══ -->
+    <div class="g-page" id="gpage-hold">
+      <div class="g-section-hdr">
+        <div class="g-section-title">⚾ 持有中手套</div>
+        <span id="hold-count" style="font-size:12px;color:var(--muted)"></span>
+      </div>
+      <div class="g-gallery" id="hold-gallery"></div>
+    </div>
+
+    <!-- ══ PAGE: SOLD ══ -->
+    <div class="g-page" id="gpage-sold">
+      <div class="g-section-hdr">
+        <div class="g-section-title">🤝 已售出紀錄</div>
+        <span id="sold-count" style="font-size:12px;color:var(--muted)"></span>
+      </div>
+      <div class="g-gallery" id="sold-gallery"></div>
+    </div>
+
+    <!-- ══ PAGE: WISH ══ -->
+    <div class="g-page" id="gpage-wish">
+      <div class="g-section-hdr">
+        <div class="g-section-title">👁 觀察中清單</div>
+      </div>
+      <div style="color:var(--muted);font-size:13px;padding:40px;text-align:center;background:var(--white);border-radius:var(--radius)">
+        觀察清單功能開發中，目前可在手套編輯時標注「備註」作為觀察記錄
       </div>
     </div>
-    <div class="mo-footer">
-      <button class="btn btn-danger btn-sm" id="del-btn" style="display:none" onclick="deleteGlove()">🗑 刪除</button>
-      <div style="display:flex;gap:8px;margin-left:auto">
-        <button class="btn btn-ghost" onclick="closeModal()">取消</button>
-        <button class="btn btn-primary" id="save-btn-main" onclick="saveGlove()">儲存手套</button>
+
+    <!-- ══ PAGE: GALLERY ══ -->
+    <div class="g-page" id="gpage-gallery">
+      <div class="g-section-hdr">
+        <div class="g-section-title">🖼 手套畫廊</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="text" placeholder="🔍 搜尋..." id="g-search"
+            style="padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;outline:none;width:160px"
+            oninput="renderAllPages()">
+          <button id="g-filter-all" onclick="gSetFilter('all',this)" style="padding:6px 12px;background:#2563eb;color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">全部</button>
+          <button id="g-filter-hold" onclick="gSetFilter('hold',this)" style="padding:6px 12px;background:#f8f9fa;border:1px solid var(--border);color:#374151;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">持有中</button>
+          <button id="g-filter-sold" onclick="gSetFilter('sold',this)" style="padding:6px 12px;background:#f8f9fa;border:1px solid var(--border);color:#374151;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">已售出</button>
+        </div>
       </div>
+      <div class="g-gallery" id="all-gallery"></div>
     </div>
+
   </div>
 </div>
 
-<!-- ══ 詳情 Modal ══ -->
-<div class="mo" id="detail-modal">
-  <div class="mo-box" style="max-width:780px">
-    <div class="mo-hdr">
-      <div class="mo-title" id="dm-title">—</div>
-      <div style="display:flex;gap:8px">
-        <button class="btn btn-ghost btn-sm" id="dm-edit-btn" onclick="editFromDetail()">✏️ 編輯</button>
-        <button class="mo-close" onclick="closeDetail()">✕ 關閉</button>
+<!-- ══ DRAWER OVERLAY ══ -->
+<div id="g-drawer-overlay" class="g-drawer-overlay" onclick="closeGDrawer()"></div>
+
+<!-- ══ 新增/編輯 DRAWER ══ -->
+<div id="g-edit-drawer" class="g-drawer">
+  <div class="g-drawer-hdr">
+    <div class="g-drawer-title" id="g-drawer-title">新增手套</div>
+    <div style="display:flex;gap:8px">
+      <button onclick="saveGlove()" style="padding:7px 16px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">💾 儲存</button>
+      <button class="g-drawer-close" onclick="closeGDrawer()">✕</button>
+    </div>
+  </div>
+  <div class="g-drawer-body">
+    <div class="g-section-divider">基本資料</div>
+    <div class="g-grid2" style="margin-bottom:12px">
+      <div><span class="g-label">品牌</span><input class="g-input" id="g-brand" placeholder="Rawlings、Wilson..."></div>
+      <div><span class="g-label">型號</span><input class="g-input" id="g-model" placeholder="Heart of the Hide..."></div>
+    </div>
+    <div class="g-grid2" style="margin-bottom:12px">
+      <div><span class="g-label">守備位置</span>
+        <select class="g-input" id="g-position">
+          <option value="">— 選擇 —</option>
+          <option>投手</option><option>捕手</option><option>一壘手</option>
+          <option>二壘手</option><option>三壘手</option><option>游擊手</option>
+          <option>外野手</option><option>全壘打比賽</option>
+        </select>
+      </div>
+      <div><span class="g-label">尺寸</span><input class="g-input" id="g-size" placeholder="11.5\""></div>
+    </div>
+
+    <div class="g-section-divider">交易資訊</div>
+    <div class="g-grid2" style="margin-bottom:12px">
+      <div><span class="g-label">買入日期</span><input class="g-input" type="date" id="g-buy-date"></div>
+      <div><span class="g-label">買入價格</span><input class="g-input" type="number" id="g-buy-price" placeholder="0"></div>
+    </div>
+    <div class="g-grid2" style="margin-bottom:12px">
+      <div><span class="g-label">賣出日期（已售則填）</span><input class="g-input" type="date" id="g-sell-date"></div>
+      <div><span class="g-label">賣出價格</span><input class="g-input" type="number" id="g-sell-price" placeholder="尚未賣出留空"></div>
+    </div>
+
+    <div class="g-section-divider">評分與評價</div>
+    <div style="margin-bottom:12px">
+      <span class="g-label">評分</span>
+      <div class="g-stars" id="g-stars-row">
+        <span class="g-star" onclick="setModalStar(1)">★</span>
+        <span class="g-star" onclick="setModalStar(2)">★</span>
+        <span class="g-star" onclick="setModalStar(3)">★</span>
+        <span class="g-star" onclick="setModalStar(4)">★</span>
+        <span class="g-star" onclick="setModalStar(5)">★</span>
       </div>
     </div>
-    <div class="mo-body" id="dm-body"></div>
+    <div class="g-grid2" style="margin-bottom:12px">
+      <div><span class="g-label">優點</span><textarea class="g-textarea" id="g-pros" placeholder="手感、皮革..."></textarea></div>
+      <div><span class="g-label">缺點</span><textarea class="g-textarea" id="g-cons" placeholder="需改進之處..."></textarea></div>
+    </div>
+    <div style="margin-bottom:12px">
+      <span class="g-label">備註</span>
+      <textarea class="g-textarea" id="g-note" placeholder="其他記錄..."></textarea>
+    </div>
+
+    <div class="g-section-divider">附圖</div>
+    <div class="g-img-preview" id="g-img-preview"></div>
+    <label style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:#f8f9fa;border:1.5px dashed #d1d5db;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;color:#374151">
+      📎 上傳圖片
+      <input type="file" id="g-img-input" accept="image/*" multiple style="display:none" onchange="handleGImgUpload(event)">
+    </label>
+
+    <button onclick="saveGlove()" class="g-save-btn">💾 儲存手套</button>
+    <div id="g-del-wrap" style="display:none;margin-top:10px">
+      <button onclick="deleteGlove()" style="width:100%;padding:10px;background:#fff;border:1.5px solid #fca5a5;color:#dc2626;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer">🗑 刪除此手套</button>
+    </div>
+    <div style="height:20px"></div>
   </div>
 </div>
 
-<!-- LIGHTBOX -->
-<div class="lightbox" id="lightbox">
-  <img id="lb-img" src="" alt="">
-  <div class="lb-nav">
-    <button class="lb-btn" onclick="lbPrev()">‹</button>
-    <span class="lb-counter" id="lb-counter">1/1</span>
-    <button class="lb-btn" onclick="lbNext()">›</button>
-    <button class="lb-btn" style="border-radius:8px;padding:0 14px;font-size:13px;width:auto" onclick="closeLightbox()">✕</button>
+<!-- ══ 詳情 DRAWER ══ -->
+<div id="g-detail-drawer" class="g-drawer">
+  <div class="g-drawer-hdr">
+    <div class="g-drawer-title" id="g-detail-title">手套詳情</div>
+    <div style="display:flex;gap:8px">
+      <button id="g-detail-edit-btn" onclick="editFromDetail()" style="padding:7px 14px;background:#f8f9fa;border:1px solid var(--border);color:#374151;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">✏️ 編輯</button>
+      <button class="g-drawer-close" onclick="closeGDrawer()">✕</button>
+    </div>
   </div>
+  <div class="g-drawer-body" id="g-detail-body"></div>
 </div>
 
-<div class="toast" id="toast"></div>
+<div class="g-toast" id="g-toast"></div>
 
 <script>
 // ══════════════════════════
 // DATA
 // ══════════════════════════
+
+// ══════════════════════════════════════
+// 新版 UI 函式
+// ══════════════════════════════════════
+const MORANDI=['#8fa8c8','#a8c5a0','#c9a99a','#b5adc4','#c4b89a','#9bbfbf','#d4a9b5','#a3b5a3'];
+let _brandChart=null;
+let _currentFilter='all';
+let _currentDrawer=null;
+
+function gShowPage(id){
+  document.querySelectorAll('.g-page').forEach(p=>p.classList.remove('active'));
+  const page=document.getElementById('gpage-'+id);
+  if(page)page.classList.add('active');
+  document.querySelectorAll('.g-nav-item').forEach(el=>{
+    el.classList.toggle('active', el.id==='gnav-'+id);
+  });
+  const names={dashboard:'收藏總覽',hold:'持有中手套',sold:'已售出紀錄',wish:'觀察中清單',gallery:'手套畫廊'};
+  const titleEl=document.getElementById('g-page-name');
+  if(titleEl)titleEl.textContent=names[id]||id;
+  const mainEl=document.querySelector('.g-main');
+  if(mainEl)mainEl.scrollTo({top:0,behavior:'smooth'});
+  renderAllPages();
+}
+
+function gSetFilter(filter, btn){
+  _currentFilter=filter;
+  document.querySelectorAll('[id^="g-filter-"]').forEach(b=>{
+    b.style.background='#f8f9fa';b.style.color='#374151';b.style.borderColor='var(--border)';
+  });
+  if(btn){btn.style.background='#2563eb';btn.style.color='#fff';btn.style.borderColor='#2563eb';}
+  renderAllPages();
+}
+
+function renderAllPages(){
+  renderKpi();
+  renderBrandChart();
+  renderRecentList();
+  renderGalleryPage('dash-gallery', db.gloves.slice().sort((a,b)=>b.createdAt?.localeCompare(a.createdAt||'')||0).slice(0,8));
+  renderGalleryPage('hold-gallery', db.gloves.filter(g=>!g.sellDate||!g.sellPrice));
+  renderGalleryPage('sold-gallery', db.gloves.filter(g=>g.sellDate&&g.sellPrice));
+  const el=document.getElementById('hold-count');
+  if(el)el.textContent=db.gloves.filter(g=>!g.sellDate||!g.sellPrice).length+' 隻';
+  const sel=document.getElementById('sold-count');
+  if(sel)sel.textContent=db.gloves.filter(g=>g.sellDate&&g.sellPrice).length+' 隻';
+  // 畫廊頁篩選
+  const q=(document.getElementById('g-search')?.value||'').toLowerCase();
+  let list=[...db.gloves];
+  if(_currentFilter==='hold')list=list.filter(g=>!g.sellDate||!g.sellPrice);
+  if(_currentFilter==='sold')list=list.filter(g=>g.sellDate&&g.sellPrice);
+  if(q)list=list.filter(g=>(g.brand||'').toLowerCase().includes(q)||(g.model||'').toLowerCase().includes(q)||(g.note||'').toLowerCase().includes(q));
+  renderGalleryPage('all-gallery', list);
+}
+
+function renderKpi(){
+  const all=db.gloves;
+  const hold=all.filter(g=>!g.sellDate||!g.sellPrice);
+  const sold=all.filter(g=>g.sellDate&&g.sellPrice);
+  const invested=all.reduce((s,g)=>s+(+g.buyPrice||0),0);
+  const returned=sold.reduce((s,g)=>s+(+g.sellPrice||0),0);
+  const pnl=returned-sold.reduce((s,g)=>s+(+g.buyPrice||0),0);
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  set('kpi-total',all.length);
+  set('kpi-total-sub','已售 '+sold.length+' 隻');
+  set('kpi-hold',hold.length);
+  set('kpi-hold-sub','佔 '+Math.round(hold.length/Math.max(all.length,1)*100)+'%');
+  set('kpi-invested','$'+invested.toLocaleString());
+  set('kpi-invested-sub','均價 $'+Math.round(invested/Math.max(all.length,1)).toLocaleString());
+  const pnlEl=document.getElementById('kpi-pnl');
+  if(pnlEl){pnlEl.textContent=(pnl>=0?'+':'')+'$'+Math.abs(pnl).toLocaleString();pnlEl.style.color=pnl>=0?'#dc2626':'#16a34a';}
+  set('kpi-pnl-sub','已售損益');
+}
+
+function renderBrandChart(){
+  const canvas=document.getElementById('brand-donut');
+  const legendEl=document.getElementById('brand-legend');
+  if(!canvas||!legendEl)return;
+  const brandMap={};
+  db.gloves.forEach(g=>{if(g.brand){brandMap[g.brand]=(brandMap[g.brand]||0)+1;}});
+  const entries=Object.entries(brandMap).sort((a,b)=>b[1]-a[1]);
+  if(entries.length===0)return;
+  const labels=entries.map(e=>e[0]);
+  const data=entries.map(e=>e[1]);
+  const colors=entries.map((_,i)=>MORANDI[i%MORANDI.length]);
+  const total=data.reduce((a,b)=>a+b,0);
+  if(_brandChart)_brandChart.destroy();
+  _brandChart=new Chart(canvas,{
+    type:'doughnut',
+    data:{labels,datasets:[{data,backgroundColor:colors,borderWidth:3,borderColor:'#fff',hoverOffset:5}]},
+    options:{
+      cutout:'68%',responsive:true,maintainAspectRatio:false,
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          backgroundColor:'rgba(17,24,39,.88)',
+          bodyFont:{family:"'JetBrains Mono',monospace",size:11},
+          padding:8,cornerRadius:8,
+          callbacks:{label(ctx){const v=ctx.parsed;return ' '+v+' 隻 ('+Math.round(v/total*100)+'%)';}}
+        }
+      }
+    }
+  });
+  legendEl.innerHTML=entries.map((e,i)=>`
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="width:8px;height:8px;border-radius:50%;background:${colors[i]};flex-shrink:0"></span>
+      <span style="font-size:12px;font-weight:700;color:#374151;flex:1">${e[0]}</span>
+      <span style="font-size:11px;color:#9ca3af;font-family:'JetBrains Mono',monospace">${e[1]}隻 · ${Math.round(e[1]/total*100)}%</span>
+    </div>`).join('');
+}
+
+function renderRecentList(){
+  const el=document.getElementById('recent-list');
+  if(!el)return;
+  const recent=[...db.gloves].sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||'' )).slice(0,5);
+  if(recent.length===0){el.innerHTML='<div style="color:#9ca3af;text-align:center;padding:20px;font-size:13px">尚無收藏</div>';return;}
+  el.innerHTML=recent.map(g=>{
+    const sold=g.sellDate&&g.sellPrice;
+    const img=g.images?.[0];
+    return`<div class="g-recent-item" onclick="openGDetail('${g.id}')" style="cursor:pointer">
+      ${img?`<img src="${img}" class="g-recent-thumb">`:`<div class="g-recent-thumb" style="display:flex;align-items:center;justify-content:center;font-size:20px">🧤</div>`}
+      <div style="flex:1;min-width:0">
+        <div class="g-recent-name">${g.brand||'—'} ${g.model||''}</div>
+        <div class="g-recent-date">${g.buyDate||''} · <span class="${sold?'g-badge g-badge-sold':'g-badge g-badge-hold'}">${sold?'已售出':'持有中'}</span></div>
+      </div>
+      <div style="font-size:12px;font-weight:700;color:#374151">$${(+g.buyPrice||0).toLocaleString()}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderGalleryPage(containerId, list){
+  const el=document.getElementById(containerId);
+  if(!el)return;
+  if(list.length===0){
+    el.innerHTML='<div style="color:#9ca3af;text-align:center;padding:40px;grid-column:1/-1;font-size:13px">尚無收藏</div>';
+    return;
+  }
+  el.innerHTML=list.map(g=>{
+    const sold=g.sellDate&&g.sellPrice;
+    const pnl=sold?(+g.sellPrice)-(+g.buyPrice):null;
+    const img=g.images?.[0];
+    const stars=g.stars?'★'.repeat(g.stars)+'☆'.repeat(5-g.stars):'';
+    return`<div class="g-card" onclick="openGDetail('${g.id}')">
+      ${img
+        ?`<div class="g-card-img"><img src="${img}" alt="${g.brand}"></div>`
+        :`<div class="g-card-placeholder"><span style="font-size:36px">🧤</span><span style="font-size:11px;margin-top:4px">NO PHOTO</span></div>`}
+      <div class="g-card-body">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+          <div class="g-card-brand">${g.brand||'—'}</div>
+          <span class="g-badge ${sold?'g-badge-sold':'g-badge-hold'}">${sold?'已售出':'持有中'}</span>
+        </div>
+        <div class="g-card-name">${g.model||'未命名'}</div>
+        <div class="g-card-meta">${g.position||''} ${g.size?'· '+g.size:''} ${g.buyDate?'· '+g.buyDate:''}</div>
+        <div class="g-card-price">
+          <div style="font-size:12px;color:#9ca3af">買入 <span style="font-weight:700;color:#374151;font-family:'JetBrains Mono',monospace">$${(+g.buyPrice||0).toLocaleString()}</span></div>
+          ${pnl!=null?`<div class="g-card-pnl" style="color:${pnl>=0?'#dc2626':'#16a34a'}">${pnl>=0?'+':''} $${Math.abs(pnl).toLocaleString()}</div>`:''}
+        </div>
+        ${stars?`<div class="g-card-stars" style="color:#f59e0b;margin-top:4px">${stars}</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ══ DRAWER ══
+function openGDrawer(id){
+  if(_currentDrawer)closeGDrawer();
+  const drawer=document.getElementById(id);
+  const overlay=document.getElementById('g-drawer-overlay');
+  if(!drawer)return;
+  drawer.classList.add('open');
+  if(overlay)overlay.classList.add('open');
+  _currentDrawer=id;
+  document.body.style.overflow='hidden';
+}
+function closeGDrawer(){
+  if(!_currentDrawer)return;
+  const drawer=document.getElementById(_currentDrawer);
+  const overlay=document.getElementById('g-drawer-overlay');
+  if(drawer)drawer.classList.remove('open');
+  if(overlay)overlay.classList.remove('open');
+  _currentDrawer=null;
+  document.body.style.overflow='';
+}
+
+// ══ ADD/EDIT ══
+function openAddDrawer(){
+  editId=null;
+  _modalStars=0;
+  currentImgs=[];
+  const title=document.getElementById('g-drawer-title');
+  if(title)title.textContent='新增手套';
+  ['g-brand','g-model','g-size','g-pros','g-cons','g-note'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['g-position'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('g-buy-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('g-buy-price').value='';
+  document.getElementById('g-sell-date').value='';
+  document.getElementById('g-sell-price').value='';
+  document.querySelectorAll('#g-stars-row .g-star').forEach(s=>s.classList.remove('on'));
+  const preview=document.getElementById('g-img-preview');if(preview)preview.innerHTML='';
+  const delWrap=document.getElementById('g-del-wrap');if(delWrap)delWrap.style.display='none';
+  openGDrawer('g-edit-drawer');
+}
+
+function openEditDrawer(id){
+  const g=db.gloves.find(x=>x.id===id);if(!g)return;
+  editId=id;
+  _modalStars=g.stars||0;
+  currentImgs=[...(g.images||[])];
+  const title=document.getElementById('g-drawer-title');
+  if(title)title.textContent='編輯手套';
+  const sv=(elId,val)=>{const el=document.getElementById(elId);if(el)el.value=val||'';}
+  sv('g-brand',g.brand);sv('g-model',g.model);sv('g-position',g.position);
+  sv('g-size',g.size);sv('g-buy-date',g.buyDate);sv('g-buy-price',g.buyPrice);
+  sv('g-sell-date',g.sellDate);sv('g-sell-price',g.sellPrice||''  );
+  sv('g-pros',g.pros);sv('g-cons',g.cons);sv('g-note',g.note);
+  document.querySelectorAll('#g-stars-row .g-star').forEach((s,i)=>s.classList.toggle('on',i<_modalStars));
+  const preview=document.getElementById('g-img-preview');
+  if(preview)preview.innerHTML=currentImgs.map((img,i)=>`
+    <div class="g-img-preview-item">
+      <img src="${img}" class="g-img-preview-img">
+      <button class="g-img-del" onclick="removeGImg(${i})">✕</button>
+    </div>`).join('');
+  const delWrap=document.getElementById('g-del-wrap');if(delWrap)delWrap.style.display='';
+  openGDrawer('g-edit-drawer');
+}
+
+function removeGImg(idx){
+  currentImgs.splice(idx,1);
+  const preview=document.getElementById('g-img-preview');
+  if(preview)preview.innerHTML=currentImgs.map((img,i)=>`
+    <div class="g-img-preview-item">
+      <img src="${img}" class="g-img-preview-img">
+      <button class="g-img-del" onclick="removeGImg(${i})">✕</button>
+    </div>`).join('');
+}
+
+// ══ DETAIL ══
+let _detailId=null;
+function openGDetail(id){
+  const g=db.gloves.find(x=>x.id===id);if(!g)return;
+  _detailId=id;
+  const title=document.getElementById('g-detail-title');
+  if(title)title.textContent=(g.brand||'—')+' '+( g.model||''  );
+  const body=document.getElementById('g-detail-body');
+  if(!body)return;
+  const sold=g.sellDate&&g.sellPrice;
+  const pnl=sold?(+g.sellPrice)-(+g.buyPrice):null;
+  const stars=g.stars?'★'.repeat(g.stars)+'☆'.repeat(5-g.stars):'';
+  body.innerHTML=`
+    ${(g.images||[]).length>0?`
+    <div class="g-img-gallery" style="margin-bottom:16px">
+      ${g.images.map(img=>`<img src="${img}" class="g-img-thumb" onclick="window.open('${img}','_blank')">`).join('')}
+    </div>`:''}
+    <div class="g-detail-grid" style="margin-bottom:16px">
+      <div class="g-detail-section">
+        <div class="g-detail-label">品牌</div>
+        <div class="g-detail-val">${g.brand||'—'}</div>
+      </div>
+      <div class="g-detail-section">
+        <div class="g-detail-label">型號</div>
+        <div class="g-detail-val">${g.model||'—'}</div>
+      </div>
+      <div class="g-detail-section">
+        <div class="g-detail-label">守備位置</div>
+        <div class="g-detail-val">${g.position||'—'}</div>
+      </div>
+      <div class="g-detail-section">
+        <div class="g-detail-label">尺寸</div>
+        <div class="g-detail-val">${g.size||'—'}</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;padding:14px;background:#f8f9fa;border-radius:10px">
+      <div style="text-align:center">
+        <div style="font-size:10px;color:#9ca3af;margin-bottom:4px">買入價格</div>
+        <div style="font-size:16px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#dc2626">$${(+g.buyPrice||0).toLocaleString()}</div>
+        <div style="font-size:10px;color:#9ca3af">${g.buyDate||''}</div>
+      </div>
+      ${sold?`
+      <div style="text-align:center">
+        <div style="font-size:10px;color:#9ca3af;margin-bottom:4px">賣出價格</div>
+        <div style="font-size:16px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#16a34a">$${(+g.sellPrice).toLocaleString()}</div>
+        <div style="font-size:10px;color:#9ca3af">${g.sellDate}</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-size:10px;color:#9ca3af;margin-bottom:4px">損益</div>
+        <div style="font-size:16px;font-weight:800;font-family:'JetBrains Mono',monospace;color:${pnl>=0?'#dc2626':'#16a34a'}">${pnl>=0?'+':''} $${Math.abs(pnl).toLocaleString()}</div>
+      </div>`:''}
+    </div>
+    ${stars?`<div style="margin-bottom:14px;font-size:18px;color:#f59e0b">${stars}</div>`:''}
+    ${g.pros?`<div class="g-detail-section"><div class="g-detail-label">優點</div><div class="g-detail-val" style="white-space:pre-wrap">${g.pros}</div></div>`:''  }
+    ${g.cons?`<div class="g-detail-section"><div class="g-detail-label">缺點</div><div class="g-detail-val" style="white-space:pre-wrap">${g.cons}</div></div>`:''  }
+    ${g.note?`<div class="g-detail-section"><div class="g-detail-label">備註</div><div class="g-detail-val" style="white-space:pre-wrap">${g.note}</div></div>`:''}
+    <span class="g-badge ${sold?'g-badge-sold':'g-badge-hold'}" style="font-size:12px;padding:4px 12px">${sold?'已售出':'持有中'}</span>
+  `;
+  openGDrawer('g-detail-drawer');
+}
+
+function editFromDetail(){
+  closeGDrawer();
+  setTimeout(()=>openEditDrawer(_detailId),100);
+}
+
+// ══ STAR ══
+function setModalStar(n){
+  _modalStars=(_modalStars===n)?0:n;
+  document.querySelectorAll('#g-stars-row .g-star').forEach((s,i)=>s.classList.toggle('on',i<_modalStars));
+}
+
+// ══ IMG UPLOAD ══
+function handleGImgUpload(e){
+  const files=Array.from(e.target.files);
+  files.forEach(file=>{
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      currentImgs.push(ev.target.result);
+      const preview=document.getElementById('g-img-preview');
+      if(preview)preview.innerHTML=currentImgs.map((img,i)=>`
+        <div class="g-img-preview-item">
+          <img src="${img}" class="g-img-preview-img">
+          <button class="g-img-del" onclick="removeGImg(${i})">✕</button>
+        </div>`).join('');
+    };
+    reader.readAsDataURL(file);
+  });
+  e.target.value='';
+}
+
+// ══ TOAST ══
+function toast(msg){
+  const el=document.getElementById('g-toast');
+  if(!el)return;
+  el.textContent=msg;el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2500);
+}
+
+function showSyncStatus(msg){
+  const el=document.getElementById('g-sync-status');
+  if(el){el.textContent=msg;setTimeout(()=>el.textContent='',3000);}
+}
+
+
 const DB_KEY='glove_vault_v1';
 const WORKER='https://dashboard-sync.manny76528.workers.dev';
 const GH_FILE='data_glove.json';
@@ -602,6 +887,9 @@ let _syncTimer=null;
 let _syncEnabled=true;
 
 let db=load();
+let editId=null;
+let _modalStars=0;
+let currentImgs=[];
 function load(){try{return JSON.parse(localStorage.getItem(DB_KEY))||{gloves:[]};}catch{return{gloves:[]};}}
 function save(){
   try{
@@ -613,8 +901,6 @@ function save(){
   }
 }
 
-let editId=null;
-let currentImgs=[];
 let currentFilter='all';
 let starSort=0; // 0=不排星 1=高到低 2=低到高
 
@@ -628,10 +914,9 @@ function toggleStarSort(){
     btn.style.background=starSort>0?'#fef3c7':'';
     btn.style.borderColor=starSort>0?'#f59e0b':'';
   }
-  renderGloves();
+  renderAllPages();
 }
 
-let _modalStars=0;
 
 function setModalStar(n){
   _modalStars=n;
@@ -649,7 +934,7 @@ function setGloveStar(id,n){
   if(!g)return;
   g.stars=(g.stars===n)?0:n;
   saveDB();
-  renderGloves();
+  renderAllPages();
 }
 let lbImgs=[];let lbIdx=0;
 let detailId=null;
@@ -914,8 +1199,8 @@ function saveGlove(){
   }
   try{
     save();
-    closeModal();
-    renderGloves();
+    closeGDrawer();
+    renderAllPages();
     toast(editId?'✅ 已更新！':'✅ 已新增！');
   }catch(e){
     if(!editId)db.gloves.pop();
@@ -927,7 +1212,7 @@ function deleteGlove(){
   const g=db.gloves.find(x=>x.id===editId);
   if(!confirm(`確定刪除「${g?.brand||''} ${g?.model||''}」？`))return;
   db.gloves=db.gloves.filter(x=>x.id!==editId);
-  save();closeModal();renderGloves();toast('🗑 已刪除');
+  save();closeGDrawer();renderAllPages();toast('🗑 已刪除');
 }
 
 // ══════════════════════════
@@ -1041,7 +1326,7 @@ document.addEventListener('visibilitychange',async function(){
           if((db.gloves||[]).length>(remote.gloves||[]).length)remote.gloves=db.gloves;
           db=remote;
           localStorage.setItem(DB_KEY,JSON.stringify(db));
-          renderGloves();
+          renderAllPages();
           showSyncStatus('☁️ 已從雲端同步');
         }
       }
@@ -1054,7 +1339,7 @@ document.addEventListener('visibilitychange',async function(){
 setInterval(async()=>{
   if(!_syncEnabled)return;
   const updated=await ghPull();
-  if(updated)renderGloves();
+  if(updated)renderAllPages();
 },5*60*1000);
 
 async function uploadImgToGitHub(file){
@@ -1203,7 +1488,7 @@ async function recompressAll(){
   }
   try{
     save();
-    renderGloves();
+    renderAllPages();
     const bytes=new Blob([localStorage.getItem(DB_KEY)||'']).size;
     const kb=Math.round(bytes/1024);
     toast(`✅ 壓縮完成！目前使用 ${kb}KB / 5120KB`);
@@ -1233,7 +1518,7 @@ function setFilter(btn){
   currentFilter=btn.dataset.filter;
   document.querySelectorAll('.filter-chip').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  renderGloves();
+  renderAllPages();
 }
 
 // ══════════════════════════
@@ -1262,7 +1547,7 @@ async function manualSync(){
   showSyncStatus('🔄 同步中...');
   _ghSha='';
   const updated=await ghPull();
-  if(updated)renderGloves();
+  if(updated)renderAllPages();
   await ghPush();
   showSyncStatus('✅ 同步完成');
 }
@@ -1295,7 +1580,7 @@ async function manualSync(){
     }
   }catch(e){console.warn('啟動Pull失敗:',e.message);}
   _syncEnabled=true;
-  renderGloves();
+  renderAllPages();
 })();
 </script>
 </body>
