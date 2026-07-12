@@ -9888,16 +9888,103 @@ function openAnalyticsDrawer(){
 function renderAnalyticsDrawer(){
   const body=document.getElementById('analytics-drawer-body');
   if(!body)return;
-  const orig=document.getElementById('sp-analytics');
-  if(!orig){body.innerHTML='<div style="color:#9ca3af;text-align:center;padding:40px">請使用完整視窗</div>';return;}
-  const origBody=orig.querySelector('.sp-body');
-  if(origBody){
-    // 用 cloneNode 保留事件綁定
-    body.innerHTML='';
-    const clone=origBody.cloneNode(true);
-    Array.from(clone.children).forEach(c=>body.appendChild(c));
-    if(typeof renderAnalytics==='function')renderAnalytics();
+
+  // 在 Drawer 裡建立獨立的 DOM，不依賴 sp-analytics
+  body.innerHTML=`
+    <div style="margin-bottom:16px">
+      <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:12px">📅 每月回顧報告</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div style="font-size:12px;color:#64748b">依月份檢視交易績效</div>
+        <select id="drawer-report-year-sel" onchange="renderDrawerAnalytics()"
+          style="padding:5px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;background:#fff;cursor:pointer">
+          <option value="all">全部</option>
+        </select>
+      </div>
+      <div id="drawer-monthly-report"></div>
+    </div>
+  `;
+  renderDrawerAnalytics();
+}
+
+function renderDrawerAnalytics(){
+  // 複製 renderAnalytics 的月報邏輯，但寫入 drawer 專屬 id
+  const sellResults=[];
+  db.investments.forEach(function(inv){
+    (inv.transactions||[]).forEach(function(t){
+      if(t.type!=='sell')return;
+      const cost=(inv.avgCost||0)*t.lots*1000;
+      const rev=t.price*t.lots*1000-(t.fee||0);
+      sellResults.push({date:t.date||'',pnl:rev-cost,code:inv.code,name:inv.name||inv.code,lots:t.lots});
+    });
+  });
+
+  const monthMap={};
+  sellResults.forEach(function(t){
+    const ym=t.date.slice(0,7);
+    if(!monthMap[ym])monthMap[ym]={wins:0,losses:0,pnl:0,txns:0,sells:[]};
+    monthMap[ym].txns++;monthMap[ym].pnl+=t.pnl;
+    if(t.pnl>0)monthMap[ym].wins++;else monthMap[ym].losses++;
+    monthMap[ym].sells.push(t);
+  });
+
+  const yrSel=document.getElementById('drawer-report-year-sel');
+  const allYears=[...new Set(Object.keys(monthMap).map(function(ym){return ym.slice(0,4);}))]
+    .sort().reverse();
+  if(yrSel){
+    const cur=yrSel.value||'all';
+    yrSel.innerHTML='<option value="all">全部</option>'+allYears.map(function(y){
+      return'<option value="'+y+'"'+(cur===y?' selected':'')+'>'+y+'年</option>';
+    }).join('');
   }
+  const filterYr=yrSel?yrSel.value:'all';
+  let months=Object.keys(monthMap).sort().reverse();
+  if(filterYr!=='all')months=months.filter(function(ym){return ym.startsWith(filterYr);});
+
+  const reportEl=document.getElementById('drawer-monthly-report');
+  if(!reportEl)return;
+  if(months.length===0){
+    reportEl.innerHTML='<div style="color:#94a3b8;font-size:12px;text-align:center;padding:20px">尚無交易記錄</div>';
+    return;
+  }
+
+  var html='';
+  months.forEach(function(ym){
+    var m=monthMap[ym];
+    var wr=m.txns>0?Math.round(m.wins/m.txns*100):0;
+    var pnlColor=m.pnl>=0?'#dc2626':'#16a34a';
+    var comment=wr>=80?'🔥 超強月':wr>=60?'👍 穩定月':wr>=40?'😐 普通月':'📉 需檢討';
+    var detailId='dr-mr-'+ym.replace('-','');
+    html+='<div style="border:1px solid #eaecf0;border-radius:10px;overflow:hidden;margin-bottom:8px">';
+    html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#f8fafc;cursor:pointer" onclick="toggleDrawerMonthDetail(\''+detailId+'\')">';
+    html+='<div style="display:flex;align-items:center;gap:12px">';
+    html+='<span style="font-size:13px;font-weight:700;color:#1e293b">'+ym+'</span>';
+    html+='<span style="font-size:11px;color:#64748b">'+m.txns+'筆 · 勝率'+wr+'%</span>';
+    html+='<span style="font-size:11px">'+comment+'</span>';
+    html+='</div>';
+    html+='<div style="display:flex;align-items:center;gap:12px">';
+    html+='<span style="font-size:14px;font-weight:800;font-family:\'JetBrains Mono\',monospace;color:'+pnlColor+'">'+(m.pnl>=0?'+':'')+Math.round(m.pnl).toLocaleString()+'</span>';
+    html+='<span id="darr-'+detailId+'" style="color:#9ca3af;font-size:12px">▼</span>';
+    html+='</div></div>';
+    html+='<div id="'+detailId+'" style="display:none;padding:12px 14px;border-top:1px solid #eaecf0">';
+    m.sells.forEach(function(s){
+      var c=s.pnl>=0?'#dc2626':'#16a34a';
+      html+='<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f5f5f5;font-size:12px">';
+      html+='<span style="color:#374151;font-weight:600">'+s.code+' '+s.name+' · '+s.lots+'張</span>';
+      html+='<span style="font-weight:700;font-family:\'JetBrains Mono\',monospace;color:'+c+'">'+(s.pnl>=0?'+':'')+Math.round(s.pnl).toLocaleString()+'</span>';
+      html+='</div>';
+    });
+    html+='</div></div>';
+  });
+  reportEl.innerHTML=html;
+}
+
+function toggleDrawerMonthDetail(id){
+  var el=document.getElementById(id);
+  if(!el)return;
+  var open=el.style.display==='none';
+  el.style.display=open?'block':'none';
+  var arr=document.getElementById('darr-'+id);
+  if(arr)arr.textContent=open?'▲':'▼';
 }
 
 // ══════════════════════════════════════
