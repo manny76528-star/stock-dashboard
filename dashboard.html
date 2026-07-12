@@ -1675,24 +1675,31 @@ body:not(.privacy) .privacy-mask{filter:none;}
 
 /* ═══ DIV ROW 股息橫列 ═══ */
 .div-row {
-  display:grid;
-  grid-template-columns:1fr 140px 140px 24px;
-  align-items:center;gap:0 16px;
-  padding:13px 20px;
-  cursor:pointer;border-bottom:1px solid #f1f5f9;
-  background:#fff;transition:background .15s;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:10px 16px;
+  cursor:pointer;
+  border-bottom:1px solid #f3f4f6;
+  background:#fff;
+  transition:background .15s;
   user-select:none;
 }
-.div-row:hover { background:#f8fafc; }
+.div-row:hover { background:#fafbff; }
 .div-row:last-of-type { border-bottom:none; }
-.div-row-name { display:flex;flex-direction:column;gap:3px; }
-.div-row-code { font-size:15px;font-weight:700; }
-.div-row-invname { font-size:11px;color:#94a3b8; }
+.div-row-name {
+  display:flex;flex-direction:column;gap:2px;
+  flex:1;min-width:0;
+}
+.div-row-code { font-size:13px;font-weight:700;color:#1e293b; }
+.div-row-invname { font-size:11px;color:#94a3b8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
 .div-row-cnt { font-size:10px;color:#cbd5e1; }
-.div-row-cell { display:flex;flex-direction:column;gap:2px;align-items:flex-end; }
-.div-row-primary { font-size:18px;font-weight:700;font-family:var(--mono);color:var(--gain); }
-.div-row-label { font-size:10px;color:#94a3b8; }
-.div-row-arrow { font-size:16px;color:#94a3b8;text-align:center; }
+.div-row-cell { display:flex;flex-direction:column;gap:1px;align-items:flex-end;flex-shrink:0; }
+.div-row-primary { font-size:16px;font-weight:800;font-family:var(--mono);color:var(--gain);text-align:right; }
+.div-row-label { font-size:10px;color:#94a3b8;text-align:right; }
+.div-row-accent { width:3px;border-radius:2px;flex-shrink:0;align-self:center; }
+.div-row-arrow { font-size:14px;color:#d1d5db;flex-shrink:0; }
 
 /* loan/flex/cash card grid */
 .loan-card-grid,.flex-card-grid,.cash-card-grid {
@@ -5092,7 +5099,8 @@ function renderDivs(){
       const dc=getDivColor(code);
       const inv=db.investments.find(i=>i.code===code);
       const pend=d.pending||0;
-      return '<div class="div-row" onclick="showDivDetail(\''+code+'\')" style="border-left:4px solid '+dc+';cursor:pointer">'
+      return '<div class="div-row" onclick="showDivDetail(\''+code+'\')">'
+        +'<div class="div-row-accent" style="background:'+dc+';height:70%;min-height:28px"></div>'
         +'<div class="div-row-name">'
           +'<span class="div-row-code" style="color:'+dc+'">'+code+'</span>'
           +(inv?.name?'<span class="div-row-invname">'+inv.name+'</span>':'')
@@ -5102,7 +5110,7 @@ function renderDivs(){
           +'<span class="div-row-primary">$'+Math.round(d.tot).toLocaleString()+'</span>'
           +'<span class="div-row-label">今年股息</span>'
         +'</div>'
-         +'<div class="div-row-arrow">›</div>'
+        +'<div class="div-row-arrow">›</div>'
         +'</div>';
     }).join('')+'<div style="padding:10px 16px"><button class="irow-btn" onclick="openDivModal()">＋ 新增股息記錄</button></div>';
   }
