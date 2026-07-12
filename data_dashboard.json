@@ -1354,7 +1354,7 @@
     {
       "id": "mncull1439i",
       "bank": "Line Bank",
-      "cash": 32020,
+      "cash": 60020,
       "d1Date": "",
       "d1": 0,
       "d2": 0
@@ -2302,7 +2302,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1783830416708,
+  "_ts": 1783830453807,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
