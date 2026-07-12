@@ -2015,72 +2015,53 @@ body:not(.privacy) .privacy-mask{filter:none;}
     <!-- ══ 頁面：數據總覽 ══ -->
     <div class="db-page active" id="dbpage-overview">
 
-<!-- 舊版資產總覽（保留顯示） -->
-<div>
-<!-- 資產總覽 KPI 卡片 -->
-<div class="db-card" style="margin-bottom:12px">
-  <div class="db-card-header" style="justify-content:space-between">
-    <span>📊 資產總覽</span>
-    <div style="display:flex;align-items:center;gap:8px">
-      <button id="privacy-btn" onclick="togglePrivacy()"
-        style="background:rgba(0,0,0,.06);border:1.5px solid #e2e8f0;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;color:#475569;display:flex;align-items:center;gap:5px">
-        👁 顯示金額
-      </button>
-      <label class="div-roi-toggle" onclick="showDivRoi=!document.getElementById('roi-chk-sum').checked;document.getElementById('roi-chk-sum').checked=showDivRoi;renderSum();renderInv()">
-        <input type="checkbox" id="roi-chk-sum" style="display:none">
-        <span class="div-roi-icon">💹</span>
-        <span class="div-roi-label">含息</span>
-        <span class="div-roi-switch" id="roi-switch-dot"></span>
-      </label>
-    </div>
-  </div>
-  <!-- 4張主角卡片 -->
-  <div class="inv-hero-strip">
-    <div class="inv-hero-card blue">
-      <div class="inv-hero-label">🏛️ 淨資產</div>
-      <div class="inv-hero-value privacy-mask" id="qb-net">—</div>
-    </div>
-    <div class="inv-hero-card" id="inv-hero-real">
-      <div class="inv-hero-label">✅ 已實現損益</div>
-      <div class="inv-hero-value privacy-mask" id="qb-real">—</div>
-    </div>
-    <div class="inv-hero-card" id="inv-hero-pnl" style="background:#fffbeb;">
-      <div class="inv-hero-label">📊 損益</div>
-      <div class="inv-hero-value privacy-mask" id="qb-pnl">—</div>
-    </div>
-    <div class="inv-hero-card">
-      <div class="inv-hero-label">📈 股票總額</div>
-      <div class="inv-hero-value privacy-mask" id="qb-tot">—</div>
-    </div>
-    <div class="inv-hero-card" id="inv-hero-dr">
-      <div class="inv-hero-label">📊 負債比</div>
-      <div class="inv-hero-value privacy-mask" id="qb-dr">—</div>
-    </div>
-  </div>
-  <!-- 月度概況小橫排（移入卡片底端） -->
-  <div style="display:flex;gap:0;border-top:1px solid #f0f2f5;background:#f8f9fa;">
-    <div style="flex:1;padding:10px 16px;border-right:1px solid #f0f2f5;">
-      <div style="font-size:10px;color:#9ca3af;font-weight:600;letter-spacing:.3px">每月淨現金流</div>
-      <div style="font-size:14px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#111827;margin-top:2px" id="sb-cf" class="privacy-mask">—</div>
-    </div>
-    <div style="flex:1;padding:10px 16px;border-right:1px solid #f0f2f5;">
-      <div style="font-size:10px;color:#9ca3af;font-weight:600;letter-spacing:.3px">每月股息</div>
-      <div style="font-size:14px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#111827;margin-top:2px" id="sb-div" class="privacy-mask">—</div>
-    </div>
-    <div style="flex:1;padding:10px 16px;border-right:1px solid #f0f2f5;">
-      <div style="font-size:10px;color:#9ca3af;font-weight:600;letter-spacing:.3px">負債比</div>
-      <div style="font-size:14px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#111827;margin-top:2px" id="sb-dr" class="privacy-mask">—</div>
-    </div>
-    <div style="flex:1;padding:10px 16px;">
-      <div style="font-size:10px;color:#9ca3af;font-weight:600;letter-spacing:.3px">信貸尚餘</div>
-      <div style="font-size:14px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#111827;margin-top:2px" id="sb-loan" class="privacy-mask">—</div>
-    </div>
-  </div>
-  <div id="sum-tbl" style="display:none"></div>
+<!-- 隱藏舊版 JS 依賴的 ids -->
+<div style="display:none">
+  <div id="qb-net"></div><div id="qb-real"></div><div id="qb-pnl"></div>
+  <div id="qb-tot"></div><div id="qb-dr"></div>
+  <div id="sb-cf"></div><div id="sb-div"></div><div id="sb-dr"></div><div id="sb-loan"></div>
+  <div id="sum-tbl"></div>
+  <input type="checkbox" id="roi-chk-sum">
+  <span id="roi-switch-dot"></span>
+  <button id="privacy-btn" onclick="togglePrivacy()"></button>
 </div>
-<!-- 含息模式 toggle 移至頁面標題列 -->
+
+<!-- ═══ KPI 大卡片（最頂端）═══ -->
+<div class="ov-kpi-grid" style="margin-bottom:20px">
+  <div class="ov-kpi-card">
+    <div class="ov-kpi-accent" style="background:#8fa8c8"></div>
+    <div class="ov-kpi-label" style="padding-left:8px">淨資產</div>
+    <div class="ov-kpi-val privacy-mask" id="ov-net" style="padding-left:8px">—</div>
+    <div class="ov-kpi-sub" id="ov-net-sub" style="padding-left:8px"></div>
+  </div>
+  <div class="ov-kpi-card">
+    <div class="ov-kpi-accent" style="background:#a8c5a0"></div>
+    <div class="ov-kpi-label" style="padding-left:8px">投資總損益</div>
+    <div class="ov-kpi-val privacy-mask" id="ov-pnl" style="padding-left:8px">—</div>
+    <div class="ov-kpi-sub privacy-mask" id="ov-roi" style="padding-left:8px"></div>
+    <div style="display:flex;gap:16px;padding-left:8px;margin-top:8px;padding-top:8px;border-top:1px solid #f0f2f5">
+      <div><div style="font-size:9px;color:#9ca3af;font-weight:600">已實現損益</div>
+      <div style="font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace" class="privacy-mask" id="ov-real">—</div></div>
+      <div><div style="font-size:9px;color:#9ca3af;font-weight:600">股票市值</div>
+      <div style="font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace" class="privacy-mask" id="ov-tot">—</div></div>
+    </div>
+  </div>
+  <div class="ov-kpi-card">
+    <div class="ov-kpi-accent" style="background:#c9a99a"></div>
+    <div class="ov-kpi-label" style="padding-left:8px">每月股息</div>
+    <div class="ov-kpi-val privacy-mask" id="ov-div" style="padding-left:8px">—</div>
+    <div class="ov-kpi-sub" id="ov-div-sub" style="padding-left:8px"></div>
+  </div>
+  <div class="ov-kpi-card">
+    <div class="ov-kpi-accent" style="background:#b5adc4"></div>
+    <div class="ov-kpi-label" style="padding-left:8px">信貸負債 / 負債比</div>
+    <div class="ov-kpi-val privacy-mask" id="ov-loan" style="padding-left:8px">—</div>
+    <div class="ov-kpi-sub privacy-mask" id="ov-dr" style="padding-left:8px"></div>
+  </div>
+</div>
 
 <!-- ═══ 五大項卡片 ═══ -->
+
 <div class="big5-wrap">
 
   <!-- 第二排：左右雙欄 -->
@@ -2285,38 +2266,11 @@ body:not(.privacy) .privacy-mask{filter:none;}
 </div><!-- /db-root (legacy content inside overview page) -->
 </div><!-- /hidden legacy -->
 
-    <!-- ══ 三段式新總覽 ══ -->
+    <!-- ══ 三段式總覽（中下層）══ -->
     <div id="ov-dashboard" style="margin-top:20px">
 
-      <!-- 上層：KPI 卡片 -->
-      <div class="ov-kpi-grid">
-        <div class="ov-kpi-card">
-          <div class="ov-kpi-accent" style="background:#8fa8c8"></div>
-          <div class="ov-kpi-label" style="padding-left:8px">淨資產</div>
-          <div class="ov-kpi-val privacy-mask" id="ov-net" style="padding-left:8px">—</div>
-          <div class="ov-kpi-sub" id="ov-net-sub" style="padding-left:8px"></div>
-        </div>
-        <div class="ov-kpi-card">
-          <div class="ov-kpi-accent" style="background:#a8c5a0"></div>
-          <div class="ov-kpi-label" style="padding-left:8px">投資總損益</div>
-          <div class="ov-kpi-val privacy-mask" id="ov-pnl" style="padding-left:8px">—</div>
-          <div class="ov-kpi-sub privacy-mask" id="ov-roi" style="padding-left:8px"></div>
-        </div>
-        <div class="ov-kpi-card">
-          <div class="ov-kpi-accent" style="background:#c9a99a"></div>
-          <div class="ov-kpi-label" style="padding-left:8px">每月股息</div>
-          <div class="ov-kpi-val privacy-mask" id="ov-div" style="padding-left:8px">—</div>
-          <div class="ov-kpi-sub" id="ov-div-sub" style="padding-left:8px"></div>
-        </div>
-        <div class="ov-kpi-card">
-          <div class="ov-kpi-accent" style="background:#b5adc4"></div>
-          <div class="ov-kpi-label" style="padding-left:8px">信貸負債 / 負債比</div>
-          <div class="ov-kpi-val privacy-mask" id="ov-loan" style="padding-left:8px">—</div>
-          <div class="ov-kpi-sub privacy-mask" id="ov-dr" style="padding-left:8px"></div>
-        </div>
-      </div>
-
       <!-- 中層：趨勢圖 + 甜甜圈圖 -->
+
       <div class="ov-mid-grid">
         <!-- 左：資產趨勢折線圖 -->
         <div class="ov-chart-card">
@@ -10045,7 +9999,15 @@ function renderOvKpi(){
 
   set('ov-pnl',(tPnl>=0?'+':'')+fmtM(tPnl));
   setC('ov-roi','投報率 '+(roi>=0?'+':'')+roi+'%',tPnl>=0?'up':'dn');
-  const netEl=document.getElementById('ov-pnl');if(netEl)netEl.style.color=tPnl>=0?'#dc2626':'#16a34a';
+  const pnlEl=document.getElementById('ov-pnl');if(pnlEl)pnlEl.style.color=tPnl>=0?'#dc2626':'#16a34a';
+
+  // 已實現損益 + 股票市值
+  let tReal=0;
+  db.investments.forEach(inv=>{const c=calcInv(inv);tReal+=(c.realized||0);});
+  set('ov-real',(tReal>=0?'+':'')+fmtM(tReal));
+  const realEl=document.getElementById('ov-real');
+  if(realEl)realEl.style.color=tReal>=0?'#dc2626':'#16a34a';
+  set('ov-tot',fmtM(tM>0?tM:tC));
 
   set('ov-div','$'+Math.round(tD).toLocaleString());
   setC('ov-div-sub','年化 $'+Math.round(tD*12).toLocaleString(),'');
