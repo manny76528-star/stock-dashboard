@@ -2351,19 +2351,19 @@ body:not(.privacy) .privacy-mask{filter:none;}
         </div>
       </div>
 
-      <!-- 信貸 + 不限用途 -->
-      <div class="as-grid">
-        <!-- 信貸管理 -->
-        <div class="as-card">
-          <div class="as-card-hdr">
-            <div class="as-card-title">🏦 信貸管理</div>
-            <button onclick="openSP('health')" style="display:none"></button>
-            <span class="as-card-badge" id="as-loan-badge" style="background:#fee2e2;color:#b91c1c"></span>
-          </div>
-          <div id="as-loan-body"></div>
-          <div class="as-add-btn" onclick="openLoanModal()">＋ 新增信貸</div>
+      <!-- 信貸管理（全寬） -->
+      <div class="as-card" style="margin-bottom:16px">
+        <div class="as-card-hdr">
+          <div class="as-card-title">🏦 信貸管理</div>
+          <button onclick="openSP('health')" style="display:none"></button>
+          <span class="as-card-badge" id="as-loan-badge" style="background:#fee2e2;color:#b91c1c"></span>
         </div>
+        <div id="as-loan-body"></div>
+        <div class="as-add-btn" onclick="openLoanModal()">＋ 新增信貸</div>
+      </div>
 
+      <!-- 不限用途 + 現金帳戶（並排） -->
+      <div class="as-grid" style="margin-bottom:16px">
         <!-- 不限用途 -->
         <div class="as-card">
           <div class="as-card-hdr">
@@ -2373,16 +2373,16 @@ body:not(.privacy) .privacy-mask{filter:none;}
           <div id="as-flex-body"></div>
           <div class="as-add-btn" onclick="openFlexModal()">＋ 新增不限用途</div>
         </div>
-      </div>
 
-      <!-- 現金帳戶 -->
-      <div class="as-card" style="margin-bottom:16px">
-        <div class="as-card-hdr">
-          <div class="as-card-title">💵 現金帳戶</div>
-          <span class="as-card-badge" id="as-cash-badge" style="background:#dcfce7;color:#15803d"></span>
+        <!-- 現金帳戶 -->
+        <div class="as-card">
+          <div class="as-card-hdr">
+            <div class="as-card-title">💵 現金帳戶</div>
+            <span class="as-card-badge" id="as-cash-badge" style="background:#dcfce7;color:#15803d"></span>
+          </div>
+          <div id="as-cash-body" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0"></div>
+          <div class="as-add-btn" onclick="openCashModal()">＋ 新增帳戶</div>
         </div>
-        <div id="as-cash-body" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:0"></div>
-        <div class="as-add-btn" onclick="openCashModal()">＋ 新增帳戶</div>
       </div>
     </div>
 
