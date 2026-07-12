@@ -2011,13 +2011,6 @@ body:not(.privacy) .privacy-mask{filter:none;}
     </div>
     <div class="db-topbar-right">
       <span id="pstat" style="font-size:11px;color:#94a3b8;font-weight:600"></span>
-      <button class="db-btn indigo" onclick="refreshPrices()" style="font-size:11px;padding:5px 12px">🔄 更新股價</button>
-      <label class="div-roi-toggle" onclick="showDivRoi=!document.getElementById('roi-chk-sum').checked;document.getElementById('roi-chk-sum').checked=showDivRoi;renderSum();renderInv()">
-        <input type="checkbox" id="roi-chk-sum" style="display:none">
-        <span class="div-roi-icon">💹</span>
-        <span class="div-roi-label">含息</span>
-        <span class="div-roi-switch" id="roi-switch-dot"></span>
-      </label>
       <a href="index.html" class="db-btn neutral" style="font-size:11px;padding:5px 12px">🏠 主目錄</a>
     </div>
   </div>
@@ -2049,7 +2042,16 @@ body:not(.privacy) .privacy-mask{filter:none;}
   </div>
   <div class="ov-kpi-card">
     <div class="ov-kpi-accent" style="background:#a8c5a0"></div>
-    <div class="ov-kpi-label" style="padding-left:8px">投資總損益</div>
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;padding-left:8px">
+      <div class="ov-kpi-label" style="padding-left:0">投資總損益</div>
+      <div style="display:flex;gap:4px;flex-shrink:0">
+        <button onclick="refreshPrices()" style="background:#f3f4f6;color:#4b5563;border:none;border-radius:6px;font-size:11px;padding:3px 8px;cursor:pointer;font-weight:600;transition:background .15s" onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#f3f4f6'">🔄 股價</button>
+        <button onclick="showDivRoi=!showDivRoi;document.getElementById('roi-chk-sum').checked=showDivRoi;renderSum();renderInv()" id="roi-toggle-btn" style="background:#f3f4f6;color:#4b5563;border:none;border-radius:6px;font-size:11px;padding:3px 8px;cursor:pointer;font-weight:600;transition:background .15s" onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#f3f4f6'">💹 含息</button>
+      </div>
+    </div>
+    <!-- 隱藏的 roi-chk-sum 供 JS 使用 -->
+    <input type="checkbox" id="roi-chk-sum" style="display:none">
+    <span id="roi-switch-dot" style="display:none"></span>
     <div class="ov-kpi-val privacy-mask" id="ov-pnl" style="padding-left:8px">—</div>
     <div class="ov-kpi-sub privacy-mask" id="ov-roi" style="padding-left:8px"></div>
     <div style="display:flex;gap:16px;padding-left:8px;margin-top:8px;padding-top:8px;border-top:1px solid #f0f2f5">
@@ -2097,7 +2099,6 @@ body:not(.privacy) .privacy-mask{filter:none;}
         <span style="display:none" id="t-mkt">—</span>
       </div>
       <div class="big5-right">
-        <button class="big5-add-btn" onclick="event.stopPropagation();refreshPrices()" title="更新股價">↻</button>
         <button class="big5-add-btn" onclick="event.stopPropagation();openInvModal()">＋</button>
         <button class="big5-add-btn" onclick="event.stopPropagation();openSearchModal()">🔍</button>
         <button class="big5-toggle-btn" id="tog-inv" onclick="toggleSection('inv-detail')">展開 ▼</button>
