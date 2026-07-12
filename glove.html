@@ -273,6 +273,9 @@ body{
 }
 .g-toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
+#lightbox{display:none;}
+#lightbox.open{display:flex !important;}
+
 /* ══ IMG UPLOAD ══ */
 .g-img-preview{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;}
 .g-img-preview-item{position:relative;}
@@ -535,6 +538,15 @@ body{
 </div>
 
 <div class="g-toast" id="g-toast"></div>
+
+<!-- ══ LIGHTBOX ══ -->
+<div id="lightbox" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:99999;align-items:center;justify-content:center;flex-direction:column">
+  <button onclick="closeLightbox()" style="position:absolute;top:16px;right:20px;background:none;border:none;color:#fff;font-size:28px;cursor:pointer;z-index:1">✕</button>
+  <button onclick="lbPrev()" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.15);border:none;color:#fff;font-size:28px;cursor:pointer;padding:10px 14px;border-radius:10px">‹</button>
+  <img id="lb-img" style="max-width:90vw;max-height:85vh;object-fit:contain;border-radius:8px">
+  <div id="lb-counter" style="color:#fff;font-size:13px;margin-top:12px;font-family:'JetBrains Mono',monospace"></div>
+  <button onclick="lbNext()" style="position:absolute;right:16px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.15);border:none;color:#fff;font-size:28px;cursor:pointer;padding:10px 14px;border-radius:10px">›</button>
+</div>
 
 <script>
 // ══════════════════════════
@@ -811,7 +823,7 @@ function openGDetail(id){
   body.innerHTML=`
     ${(g.images||[]).length>0?`
     <div class="g-img-gallery" style="margin-bottom:16px">
-      ${g.images.map(img=>`<img src="${img}" class="g-img-thumb" onclick="window.open('${img}','_blank')">`).join('')}
+      ${g.images.map((img,i)=>`<img src="${img}" class="g-img-thumb" onclick="openLightbox(${i},'${g.id}')">`).join('')}
     </div>`:''}
     <div class="g-detail-grid" style="margin-bottom:16px">
       <div class="g-detail-section">
