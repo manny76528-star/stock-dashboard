@@ -2071,7 +2071,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
     <div class="ov-kpi-accent" style="background:#b5adc4"></div>
     <div class="ov-kpi-label" style="padding-left:8px">信貸負債 / 負債比</div>
     <div class="ov-kpi-val privacy-mask" id="ov-loan" style="padding-left:8px">—</div>
-    <div class="ov-kpi-sub privacy-mask" id="ov-dr" style="padding-left:8px"></div>
+    <div class="ov-kpi-sub" id="ov-dr" style="padding-left:8px"></div>
   </div>
 </div>
 
@@ -9639,6 +9639,8 @@ function renderAssetsPage(){
   const fmtM=v=>'$'+Math.round(v).toLocaleString();
   const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
   set('as-loan-total','$'+Math.round(lR).toLocaleString());
+  set('as-loan-badge',db.loans.length+' 筆');
+  set('as-flex-total',fmtM(fU));
   // 月繳字體放大+綠色（錢流出）
   const loanMonthEl=document.getElementById('as-loan-monthly');
   if(loanMonthEl){
@@ -9884,7 +9886,7 @@ function renderTrendPage(){
 function renderTrendPageChart(){
   const canvas=document.getElementById('trend-page-canvas');
   if(!canvas)return;
-  const snaps=(db.snapshots||[]).sort((a,b)=>a.ym.localeCompare(b.ym));
+  const snaps=(db.snapshots||[]).slice().sort((a,b)=>(a.ym||'').slice(0,10).localeCompare((b.ym||'').slice(0,10)));
   if(snaps.length===0)return;
   const showNet=document.getElementById('tp-tc-net')?.checked;
   const showIndex=document.getElementById('tp-tc-index')?.checked;
@@ -9897,7 +9899,7 @@ function renderTrendPageChart(){
   grad.addColorStop(0,'rgba(143,168,200,.2)');grad.addColorStop(1,'rgba(143,168,200,.01)');
   const datasets=[];
   if(showNet)datasets.push({label:'淨資產',data:snaps.map(s=>s.net),borderColor:'#8fa8c8',backgroundColor:grad,borderWidth:2,tension:0.4,fill:true,pointRadius:3,yAxisID:'yL'});
-  if(showIndex)datasets.push({label:'大盤',data:snaps.map(s=>s.indexVal||null),borderColor:'#a8c5a0',borderWidth:2,tension:0.4,spanGaps:true,fill:false,pointRadius:3,yAxisID:'yR'});
+  if(showIndex){const indexData=snaps.map(s=>s.indexVal||null);const indexSegs=buildIndexSegments(indexData,'yR');indexSegs.forEach(seg=>datasets.push(seg));}
   if(showDiv)datasets.push({label:'每月股息',data:snaps.map(s=>s.div),borderColor:'#c9a99a',borderWidth:2,tension:0.4,fill:false,pointRadius:3,yAxisID:'yL'});
   if(_trendPageChart)_trendPageChart.destroy();
   _trendPageChart=new Chart(canvas,{
@@ -9919,7 +9921,7 @@ function renderTrendPageChart(){
 function renderTrendPageTable(){
   const el=document.getElementById('trend-page-table');
   if(!el)return;
-  const snaps=(db.snapshots||[]).sort((a,b)=>b.ym.localeCompare(a.ym));
+  const snaps=(db.snapshots||[]).slice().sort((a,b)=>(b.ym||'').slice(0,10).localeCompare((a.ym||'').slice(0,10)));
   if(snaps.length===0){el.innerHTML='<div style="padding:20px;text-align:center;color:#9ca3af;font-size:12px">尚無快照記錄</div>';return;}
   el.innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:12px">
     <thead><tr style="background:#f8f9fa">
@@ -10098,7 +10100,7 @@ function renderOvKpi(){
 function renderOvTrend(){
   const canvas=document.getElementById('ov-trend-canvas');
   if(!canvas)return;
-  const snaps=(db.snapshots||[]).sort((a,b)=>a.ym.localeCompare(b.ym));
+  const snaps=(db.snapshots||[]).slice().sort((a,b)=>(a.ym||'').slice(0,10).localeCompare((b.ym||'').slice(0,10)));
   if(snaps.length===0){canvas.style.display='none';return;}
 
   // 設定 canvas 大小
