@@ -1968,16 +1968,16 @@ body:not(.privacy) .privacy-mask{filter:none;}
       <span class="nav-icon">📓</span>交易日誌
       <span class="db-nav-badge" id="nav-journal-badge" style="background:#dbeafe;color:#1d4ed8"></span>
     </div>
-    <div class="db-nav-item" id="nav-dividend" onclick="openDivDrawer()">
+    <div class="db-nav-item" id="nav-dividend" onclick="dbShowPage('dividend')">
       <span class="nav-icon">💰</span>股息管理
       <span class="db-nav-badge" id="nav-div-badge" style="background:#dcfce7;color:#15803d"></span>
     </div>
 
     <div class="db-nav-section">分析與規劃</div>
-    <div class="db-nav-item" id="nav-analytics" onclick="openAnalyticsDrawer()">
+    <div class="db-nav-item" id="nav-analytics" onclick="dbShowPage('analytics')">
       <span class="nav-icon">📈</span>投資分析
     </div>
-    <div class="db-nav-item" id="nav-finplan" onclick="openFinPlanDrawer()">
+    <div class="db-nav-item" id="nav-finplan" onclick="dbShowPage('finplan')">
       <span class="nav-icon">📐</span>財務規劃
     </div>
     <div class="db-nav-item" id="nav-trend" onclick="dbShowPage('trend')">
@@ -2520,6 +2520,95 @@ body:not(.privacy) .privacy-mask{filter:none;}
           </div>
         </div>
         <div id="trend-page-table" style="overflow-x:auto"></div>
+      </div>
+    </div>
+
+    <!-- ══ 頁面：股息管理 ══ -->
+    <div class="db-page" id="dbpage-dividend">
+      <div class="trend-page-card" style="padding:0;overflow:hidden">
+        <div class="trend-page-hdr" style="padding:14px 18px;border-bottom:1px solid #f0f2f5">
+          <span>💰 股息管理</span>
+          <button onclick="openDivModal()" style="padding:6px 14px;background:#dcfce7;border:1px solid #86efac;color:#15803d;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">＋ 新增股息</button>
+        </div>
+        <div class="div-cards" id="div-cards" style="padding:14px 16px;background:#f0fdfa;border-bottom:1px solid #99f6e4"><span style="color:var(--muted);font-size:11px">尚無領息記錄</span></div>
+        <div id="div-pending-bar" style="display:none">
+          <div style="padding:8px 14px 4px;background:#eff6ff;border-bottom:1px solid #bfdbfe;display:flex;align-items:center;justify-content:space-between">
+            <span style="font-size:12px;font-weight:700;color:#1d4ed8">⏳ 準備入帳</span>
+            <span style="font-size:14px;font-weight:800;color:#2563eb" id="d-pending">$0</span>
+          </div>
+          <div class="pending-card-grid" id="d-pending-cards"></div>
+        </div>
+        <div class="div-yr-bar">
+          <div style="font-size:13px;font-weight:700">
+            📅 今年：<span class="gain mono" id="d-yr" style="font-size:16px">$0</span>
+            &nbsp;｜&nbsp;🏆 累積：<span class="gain mono" id="d-tot" style="font-size:15px">$0</span>
+          </div>
+          <select id="div-year-sel" onchange="renderDivs()" style="padding:4px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;color:#475569;background:#fff;cursor:pointer;outline:none">
+            <option value="cur">今年</option><option value="all">全部</option>
+          </select>
+        </div>
+        <div class="div-section-hdr" style="background:#ccfbf1;color:#0f766e" onclick="toggleDivYear()">
+          <span>📋 今年明細</span><span id="div-yr-hint">▼ 展開</span>
+        </div>
+        <div id="div-yr-tbl" style="display:none;overflow-x:auto">
+          <table class="dt" style="min-width:400px">
+            <thead><tr><th>標的</th><th>領息日期</th><th>張數</th><th>每股配息</th><th>本次金額</th><th>操作</th></tr></thead>
+            <tbody id="div-body-yr"></tbody>
+          </table>
+        </div>
+        <div id="div-hist-sec" style="display:none">
+          <div style="padding:6px 12px;background:#e8edf5;font-size:11px;font-weight:700;color:#2563eb">📚 歷史記錄</div>
+          <div style="overflow-x:auto">
+            <table class="dt" style="min-width:400px">
+              <thead><tr><th>標的</th><th>領息日期</th><th>張數</th><th>每股配息</th><th>本次金額</th><th>操作</th></tr></thead>
+              <tbody id="div-body-hist"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ 頁面：投資分析 ══ -->
+    <div class="db-page" id="dbpage-analytics">
+      <div class="trend-page-card" style="padding:0;overflow:hidden">
+        <div class="trend-page-hdr" style="padding:14px 18px;border-bottom:1px solid #f0f2f5">
+          <span>📈 投資分析</span>
+          <button onclick="renderAnalytics()" style="padding:6px 14px;background:#eff6ff;border:1px solid #bfdbfe;color:#2563eb;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">🔄 重新計算</button>
+        </div>
+        <div id="analytics-body" style="padding:16px">
+          <div id="analytics-kpi" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:16px"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+            <div style="background:#f8fafc;border-radius:12px;padding:14px">
+              <div style="font-size:12px;font-weight:700;color:#1e293b;margin-bottom:10px">🧠 情緒 vs 勝率</div>
+              <div id="mood-chart"></div>
+            </div>
+            <div style="background:#f8fafc;border-radius:12px;padding:14px">
+              <div style="font-size:12px;font-weight:700;color:#1e293b;margin-bottom:10px">❌ 虧損原因分析</div>
+              <div id="loss-chart"></div>
+            </div>
+          </div>
+          <div style="background:#f8fafc;border-radius:12px;padding:14px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+              <div style="font-size:12px;font-weight:700;color:#1e293b">📅 每月回顧報告</div>
+              <select id="report-year-sel" onchange="renderAnalytics()" style="padding:5px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;background:#fff;cursor:pointer">
+                <option value="all">全部</option>
+              </select>
+            </div>
+            <div id="monthly-report"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ 頁面：財務規劃 ══ -->
+    <div class="db-page" id="dbpage-finplan">
+      <div class="trend-page-card" style="padding:0;overflow:hidden">
+        <div class="trend-page-hdr" style="padding:14px 18px;border-bottom:1px solid #f0f2f5">
+          <span>📐 財務規劃</span>
+        </div>
+        <div id="finplan-page-body" style="padding:16px">
+          <div style="color:#9ca3af;text-align:center;padding:40px">載入中...</div>
+        </div>
       </div>
     </div>
 
@@ -3205,109 +3294,13 @@ body:not(.privacy) .privacy-mask{filter:none;}
   </div>
 </div>
 <!-- ══ 股息管理 Drawer ══ -->
-<div id="div-drawer" class="side-drawer" style="width:700px;max-width:95vw">
-  <div class="side-drawer-hdr">
-    <div class="side-drawer-title"><span>💰</span><span>股息管理</span></div>
-    <div class="side-drawer-actions">
-      <button onclick="openDivModal()" style="padding:7px 14px;background:#dcfce7;border:1px solid #86efac;color:#15803d;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">＋ 新增股息</button>
-      <button class="side-drawer-close" onclick="closeDrawer()">✕</button>
-    </div>
-  </div>
-  <div class="side-drawer-body" style="padding:0" id="div-drawer-body">
-    <!-- 卡片速覽 -->
-    <div class="div-cards" id="div-cards" style="padding:14px 16px;background:#f0fdfa;border-bottom:1px solid #99f6e4"><span style="color:var(--muted);font-size:11px">尚無領息記錄</span></div>
-    <!-- 準備入帳 -->
-    <div id="div-pending-bar" style="display:none">
-      <div style="padding:8px 14px 4px;background:#eff6ff;border-bottom:1px solid #bfdbfe;display:flex;align-items:center;justify-content:space-between">
-        <span style="font-size:12px;font-weight:700;color:#1d4ed8">⏳ 準備入帳</span>
-        <span style="font-size:14px;font-weight:800;color:#2563eb" id="d-pending">$0</span>
-      </div>
-      <div class="pending-card-grid" id="d-pending-cards"></div>
-    </div>
-    <!-- 年份統計列 -->
-    <div class="div-yr-bar">
-      <div style="font-size:13px;font-weight:700">
-        📅 今年：<span class="gain mono" id="d-yr" style="font-size:16px">$0</span>
-        &nbsp;｜&nbsp;🏆 累積：<span class="gain mono" id="d-tot" style="font-size:15px">$0</span>
-      </div>
-      <select id="div-year-sel" onchange="renderDivs()" style="padding:4px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;color:#475569;background:#fff;cursor:pointer;outline:none">
-        <option value="cur">今年</option>
-        <option value="all">全部</option>
-      </select>
-    </div>
-    <!-- 今年明細 -->
-    <div class="div-section-hdr" style="background:#ccfbf1;color:#0f766e" onclick="toggleDivYear()">
-      <span>📋 今年明細</span><span id="div-yr-hint">▼ 展開</span>
-    </div>
-    <div id="div-yr-tbl" style="display:none;overflow-x:auto">
-      <table class="dt" style="min-width:400px">
-        <thead><tr><th>標的</th><th>領息日期</th><th>張數</th><th>每股配息</th><th>本次金額</th><th>操作</th></tr></thead>
-        <tbody id="div-body-yr"></tbody>
-      </table>
-    </div>
-    <!-- 歷史年份 -->
-    <div id="div-hist-sec" style="display:none">
-      <div style="padding:6px 12px;background:#e8edf5;font-size:11px;font-weight:700;color:#2563eb">📚 歷史記錄</div>
-      <div style="overflow-x:auto">
-        <table class="dt" style="min-width:400px">
-          <thead><tr><th>標的</th><th>領息日期</th><th>張數</th><th>每股配息</th><th>本次金額</th><th>操作</th></tr></thead>
-          <tbody id="div-body-hist"></tbody>
-        </table>
-      </div>
-    </div>
-    <div id="div-hist-area"></div>
-  </div>
-</div>
+<div id="div-drawer" style="display:none!important"></div>
 
-<!-- ══ 財務規劃 Drawer ══ -->
-<div id="finplan-drawer" class="side-drawer">
-  <div class="side-drawer-hdr">
-    <div class="side-drawer-title"><span>📐</span><span>財務規劃</span></div>
-    <div class="side-drawer-actions">
-      <button onclick="openSP('finplan')" style="padding:7px 12px;background:#f8f9fa;border:1px solid #e2e8f0;color:#374151;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">完整視窗 ↗</button>
-      <button class="side-drawer-close" onclick="closeDrawer()">✕</button>
-    </div>
-  </div>
-  <div class="side-drawer-body" id="finplan-drawer-body">
-    <div style="color:#9ca3af;text-align:center;padding:40px">載入中...</div>
-  </div>
-</div>
+<!-- ══ 財務規劃 Drawer（已改為獨立分頁）══ -->
+<div id="finplan-drawer" style="display:none!important"></div>
 
-<!-- ══ 投資分析 Drawer ══ -->
-<div id="analytics-drawer" class="side-drawer" style="width:680px">
-  <div class="side-drawer-hdr">
-    <div class="side-drawer-title"><span>📈</span><span>投資分析</span></div>
-    <div class="side-drawer-actions">
-      <button onclick="renderAnalytics()" style="padding:7px 12px;background:#f8f9fa;border:1px solid #e2e8f0;color:#374151;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">🔄 重新計算</button>
-      <button class="side-drawer-close" onclick="closeDrawer()">✕</button>
-    </div>
-  </div>
-  <div class="side-drawer-body" id="analytics-drawer-body">
-    <!-- analytics-body 直接放這裡 -->
-    <div id="analytics-body">
-      <div id="analytics-kpi" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:16px"></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
-        <div style="background:#f8fafc;border-radius:12px;padding:14px">
-          <div style="font-size:12px;font-weight:700;color:#1e293b;margin-bottom:10px">🧠 情緒 vs 勝率</div>
-          <div id="mood-chart"></div>
-        </div>
-        <div style="background:#f8fafc;border-radius:12px;padding:14px">
-          <div style="font-size:12px;font-weight:700;color:#1e293b;margin-bottom:10px">❌ 虧損原因分析</div>
-          <div id="loss-chart"></div>
-        </div>
-      </div>
-      <div style="background:#f8fafc;border-radius:12px;padding:14px">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-          <div style="font-size:12px;font-weight:700;color:#1e293b">📅 每月回顧報告</div>
-          <select id="report-year-sel" onchange="renderAnalytics()" style="padding:5px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;background:#fff;cursor:pointer">
-            <option value="all">全部</option>
-          </select>
-        </div>
-        <div id="monthly-report"></div>
-      </div>
-    </div>
-  </div>
-</div>
+<!-- ══ 投資分析 Drawer（已改為獨立分頁）══ -->
+<div id="analytics-drawer" class="side-drawer" style="display:none!important"></div>
 
 <!-- ══ 觀察股 Drawer ══ -->
 <div id="watch-drawer" class="side-drawer">
@@ -9600,7 +9593,7 @@ setTimeout(()=>applyPrivacy(),500); // 確保元素都渲染完
 // ── 新版頁面導航 ──
 const DB_PAGE_NAMES={
   overview:'數據總覽',assets:'資產與負債',invest:'投資與觀察',
-  journal:'交易日誌',dividend:'股息管理',finplan:'財務規劃',trend:'資產趨勢'
+  journal:'交易日誌',dividend:'股息管理',analytics:'投資分析',finplan:'財務規劃',trend:'資產趨勢'
 };
 // ══════════════════════════════════════
 // 三段式總覽 Dashboard
@@ -10584,6 +10577,24 @@ function smoothScrollTo(id, offset=24){
   window.scrollTo({top,behavior:'smooth'});
 }
 
+function renderFinPlanPage(){
+  const body=document.getElementById('finplan-page-body');
+  if(!body)return;
+  const orig=document.getElementById('sp-finplan');
+  if(!orig){body.innerHTML='<div style="color:#9ca3af;text-align:center;padding:40px">載入中...</div>';return;}
+  const origBody=orig.querySelector('.sp-body');
+  if(origBody){
+    body.innerHTML='';
+    const clone=origBody.cloneNode(true);
+    // 把三欄 grid 改成可換行
+    clone.querySelectorAll('[style*="grid-template-columns:1fr 1fr 1fr"]').forEach(el=>{
+      el.style.gridTemplateColumns='repeat(auto-fill,minmax(280px,1fr))';
+    });
+    Array.from(clone.children).forEach(c=>body.appendChild(c));
+    if(typeof initFinPlan==='function')initFinPlan();
+  }
+}
+
 function dbShowPage(id){
   // 如果目前在總覽頁，部分功能只需滾動
   const overviewActive=document.getElementById('dbpage-overview')?.classList.contains('active');
@@ -10599,19 +10610,19 @@ function dbShowPage(id){
   if(nameEl)nameEl.textContent=DB_PAGE_NAMES[id]||id;
 
   // 各頁面邏輯
-  if(id==='overview'){
-    render();setTimeout(renderOvDashboard,100);
+  if(id==='overview'){render();setTimeout(renderOvDashboard,100);
     const mainEl=document.querySelector('.db-main');
     if(mainEl)mainEl.scrollTo({top:0,behavior:'smooth'});
-    else window.scrollTo({top:0,behavior:'smooth'});
     return;
   }
   if(id==='assets')renderAssetsPage();
   if(id==='invest')renderInvestPage();
   if(id==='trend')renderTrendPage();
   if(id==='journal')renderJournalPage();
+  if(id==='dividend'){if(typeof renderDivs==='function')renderDivs();}
+  if(id==='analytics'){if(typeof renderAnalytics==='function')renderAnalytics();}
+  if(id==='finplan')renderFinPlanPage();
 
-  // 渲染完後滾回頂部
   setTimeout(()=>{
     const mainEl=document.querySelector('.db-main');
     if(mainEl)mainEl.scrollTo({top:0,behavior:'smooth'});
