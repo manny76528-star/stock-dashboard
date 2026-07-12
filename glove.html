@@ -431,13 +431,14 @@ body{
     <div class="g-page" id="gpage-gallery">
       <div class="g-section-hdr">
         <div class="g-section-title">🖼 手套畫廊</div>
-        <div style="display:flex;gap:8px;align-items:center">
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
           <input type="text" placeholder="🔍 搜尋..." id="g-search"
-            style="padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;outline:none;width:160px"
+            style="padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;outline:none;width:140px"
             oninput="renderAllPages()">
           <button id="g-filter-all" onclick="gSetFilter('all',this)" style="padding:6px 12px;background:#2563eb;color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">全部</button>
           <button id="g-filter-hold" onclick="gSetFilter('hold',this)" style="padding:6px 12px;background:#f8f9fa;border:1px solid var(--border);color:#374151;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">持有中</button>
           <button id="g-filter-sold" onclick="gSetFilter('sold',this)" style="padding:6px 12px;background:#f8f9fa;border:1px solid var(--border);color:#374151;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">已售出</button>
+          <button id="g-sort-star" onclick="gToggleStarSort()" style="padding:6px 12px;background:#f8f9fa;border:1px solid var(--border);color:#374151;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">⭐ 評分排序</button>
         </div>
       </div>
       <div class="g-gallery" id="all-gallery"></div>
@@ -563,6 +564,26 @@ function gShowPage(id){
   renderAllPages();
 }
 
+let _starSort=0; // 0=日期新到舊 1=星星高到低 2=星星低到高
+
+function gToggleStarSort(){
+  _starSort=(_starSort+1)%3;
+  const btn=document.getElementById('g-sort-star');
+  if(btn){
+    if(_starSort===0){btn.textContent='⭐ 評分排序';btn.style.background='#f8f9fa';btn.style.color='#374151';btn.style.borderColor='var(--border)';}
+    else if(_starSort===1){btn.textContent='⭐ 高→低';btn.style.background='#fef3c7';btn.style.color='#92400e';btn.style.borderColor='#f59e0b';}
+    else{btn.textContent='⭐ 低→高';btn.style.background='#fef3c7';btn.style.color='#92400e';btn.style.borderColor='#f59e0b';}
+  }
+  renderAllPages();
+}
+
+function gSortList(list){
+  if(_starSort===1) return list.sort((a,b)=>(b.stars||0)-(a.stars||0));
+  if(_starSort===2) return list.sort((a,b)=>(a.stars||0)-(b.stars||0));
+  // 預設：買入日期新到舊
+  return list.sort((a,b)=>(b.buyDate||'').localeCompare(a.buyDate||''));
+}
+
 function gSetFilter(filter, btn){
   _currentFilter=filter;
   document.querySelectorAll('[id^="g-filter-"]').forEach(b=>{
@@ -576,20 +597,22 @@ function renderAllPages(){
   renderKpi();
   renderBrandChart();
   renderRecentList();
-  renderGalleryPage('dash-gallery', db.gloves.slice().sort((a,b)=>b.createdAt?.localeCompare(a.createdAt||'')||0).slice(0,8));
-  renderGalleryPage('hold-gallery', db.gloves.filter(g=>!g.sellDate||!g.sellPrice));
-  renderGalleryPage('sold-gallery', db.gloves.filter(g=>g.sellDate&&g.sellPrice));
+  // Dashboard 預覽：最新8隻
+  const dashList=gSortList([...db.gloves]).slice(0,8);
+  renderGalleryPage('dash-gallery', dashList);
+  renderGalleryPage('hold-gallery', gSortList(db.gloves.filter(g=>!g.sellDate||!g.sellPrice)));
+  renderGalleryPage('sold-gallery', gSortList(db.gloves.filter(g=>g.sellDate&&g.sellPrice)));
   const el=document.getElementById('hold-count');
   if(el)el.textContent=db.gloves.filter(g=>!g.sellDate||!g.sellPrice).length+' 隻';
   const sel=document.getElementById('sold-count');
   if(sel)sel.textContent=db.gloves.filter(g=>g.sellDate&&g.sellPrice).length+' 隻';
-  // 畫廊頁篩選
+  // 畫廊頁篩選+排序
   const q=(document.getElementById('g-search')?.value||'').toLowerCase();
   let list=[...db.gloves];
   if(_currentFilter==='hold')list=list.filter(g=>!g.sellDate||!g.sellPrice);
   if(_currentFilter==='sold')list=list.filter(g=>g.sellDate&&g.sellPrice);
   if(q)list=list.filter(g=>(g.brand||'').toLowerCase().includes(q)||(g.model||'').toLowerCase().includes(q)||(g.note||'').toLowerCase().includes(q));
-  renderGalleryPage('all-gallery', list);
+  renderGalleryPage('all-gallery', gSortList(list));
 }
 
 function renderKpi(){
