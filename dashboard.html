@@ -9776,7 +9776,8 @@ function renderInvestPage(){
   const roi=tCost>0?Math.round(tPnl/tCost*1000)/10:0;
   const setKpi=(id,v,color)=>{const el=document.getElementById(id);if(el){el.textContent=v;if(color)el.style.color=color;}};
   const pnlColor=tPnl>=0?'#dc2626':'#16a34a';
-  setKpi('inv-kpi-pnl',(tPnl>=0?'+':'')+fmt(tPnl),pnlColor);
+  const pnlEl=document.getElementById('inv-kpi-pnl');
+  if(pnlEl){pnlEl.textContent=(tPnl>=0?'+':'')+fmt(tPnl);pnlEl.style.color=pnlColor;pnlEl.style.setProperty('color',pnlColor,'important');}
   setKpi('inv-kpi-roi','投報率 '+(roi>=0?'+':'')+roi+'%');
   setKpi('inv-kpi-mkt',fmt(tMkt));
   setKpi('inv-kpi-real',(tReal>=0?'+':'')+fmt(tReal),tReal>=0?'#dc2626':'#16a34a');
@@ -9810,12 +9811,12 @@ function renderInvestPage(){
               <div style="font-size:10px;color:${pnlColor};font-weight:600">${pnlPct!=null?(pnlPct>=0?'+':'')+Math.round(pnlPct*10)/10+'%':''}</div>
             </div>
           </div>
-          <div style="display:flex;gap:16px">
+          <div style="display:flex;gap:16px;flex-wrap:wrap">
             <div style="font-size:11px;color:#64748b"><span style="color:#9ca3af">張數</span> <b>${c.tLots}</b></div>
-            <div style="font-size:11px;color:#64748b"><span style="color:#9ca3af">均成本</span> <b class="privacy-mask">$${Math.round(c.avgCost).toLocaleString()}</b></div>
+            <div style="font-size:11px;color:#64748b"><span style="color:#9ca3af">均成本</span> <b class="privacy-mask">$${c.avgCost.toFixed(2)}</b></div>
             <div style="font-size:11px;color:#64748b"><span style="color:#9ca3af">現價</span> <b>${price?'$'+price:'—'}</b></div>
-            <div style="font-size:11px;color:#64748b;margin-left:auto"><span style="color:#9ca3af">市值</span> <b class="privacy-mask">$${Math.round(mkt/10000)/100}萬</b></div>
-            ${c.divTot>0?`<div style="font-size:11px;color:#15803d"><span style="color:#9ca3af">股息</span> <b class="privacy-mask">+$${Math.round(c.divTot).toLocaleString()}</b></div>`:''}
+            <div style="font-size:11px;color:#64748b;margin-left:auto"><span style="color:#9ca3af">市值</span> <b class="privacy-mask">$${Math.round(mkt).toLocaleString()}</b></div>
+            ${c.divTot>0?`<div style="font-size:11px;color:#dc2626;font-weight:700"><span style="color:#9ca3af">股息</span> <b class="privacy-mask">+$${Math.round(c.divTot).toLocaleString()}</b></div>`:''}
           </div>
         </div>`;
       }).join('');
