@@ -1921,7 +1921,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
     <span>📈 資產趨勢圖</span>
     <div style="display:flex;gap:8px;align-items:center">
       <button onclick="event.stopPropagation();recordSnapshot(true)" style="background:var(--gain);color:#fff;border:none;border-radius:6px;padding:4px 12px;font-size:11px;cursor:pointer;font-weight:600">📷 手動記錄</button>
-      <button onclick="event.stopPropagation();clearAndReRecord()" style="background:#e67e22;color:#fff;border:none;border-radius:6px;padding:4px 12px;font-size:11px;cursor:pointer;font-weight:600" title="清除舊快照並以目前正確數值重算本月">🔄 重算本月</button>
+      <button onclick="event.stopPropagation();clearAndReRecord()" style="background:#e67e22;color:#fff;border:none;border-radius:6px;padding:4px 12px;font-size:11px;cursor:pointer;font-weight:600" title="清除今天的快照並重新計算">🔄 重算本次</button>
       <span id="trend-hint" style="font-size:11px;color:var(--muted)">▼ 展開</span>
     </div>
   </div>
@@ -2142,19 +2142,19 @@ body:not(.privacy) .privacy-mask{filter:none;}
         <div class="ov-kpi-card">
           <div class="ov-kpi-accent" style="background:#c9a99a"></div>
           <div class="ov-kpi-label" style="padding-left:8px">信貸總負債</div>
-          <div class="ov-kpi-val privacy-mask" id="as-loan-total" style="padding-left:8px">—</div>
+          <div class="ov-kpi-val" id="as-loan-total" style="padding-left:8px">—</div>
           <div class="ov-kpi-sub" id="as-loan-monthly" style="padding-left:8px"></div>
         </div>
         <div class="ov-kpi-card">
           <div class="ov-kpi-accent" style="background:#b5adc4"></div>
           <div class="ov-kpi-label" style="padding-left:8px">不限用途（已用）</div>
-          <div class="ov-kpi-val privacy-mask" id="as-flex-total" style="padding-left:8px">—</div>
+          <div class="ov-kpi-val" id="as-flex-total" style="padding-left:8px">—</div>
           <div class="ov-kpi-sub" id="as-flex-sub" style="padding-left:8px"></div>
         </div>
         <div class="ov-kpi-card">
           <div class="ov-kpi-accent" style="background:#a8c5a0"></div>
           <div class="ov-kpi-label" style="padding-left:8px">現金帳戶總計</div>
-          <div class="ov-kpi-val privacy-mask" id="as-cash-total" style="padding-left:8px">—</div>
+          <div class="ov-kpi-val" id="as-cash-total" style="padding-left:8px">—</div>
           <div class="ov-kpi-sub" id="as-cash-sub" style="padding-left:8px"></div>
         </div>
       </div>
@@ -6651,13 +6651,16 @@ function renderTrendChart(){
 
 // ═══ EDIT TITLE ═══
 function clearAndReRecord(){
-  if(!confirm('重算本月快照？\n這會用目前的正確數值覆蓋本月的快照。'))return;
-  const ym=new Date().toISOString().slice(0,10);
-  // Remove today's snapshot
-  db.snapshots=(db.snapshots||[]).filter(s=>s.ym!==ym);
-  // Force re-record with correct formula
+  const today=new Date().toISOString().slice(0,10);
+  const todaySnap=(db.snapshots||[]).find(s=>s.ym===today);
+  if(!todaySnap){
+    if(!confirm('今天尚無快照，確定要新增一筆今天的快照嗎？'))return;
+  } else {
+    if(!confirm('確定要清除本次快照（'+today+'）並重新計算嗎？\n只有今天這一筆會被重算，其他歷史記錄不受影響。'))return;
+  }
+  db.snapshots=(db.snapshots||[]).filter(s=>s.ym!==today);
   recordSnapshot(false);
-  toast('✅ 本月快照已重算');
+  toast('✅ 本次快照已重算');
 }
 
 function openSnapDetail(ym){
