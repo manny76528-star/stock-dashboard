@@ -2079,6 +2079,61 @@ body:not(.privacy) .privacy-mask{filter:none;}
 
 
 
+
+    <!-- ══ 三段式總覽（中下層）══ -->
+    <div id="ov-dashboard" style="margin-top:20px">
+
+      <!-- 中層：趨勢圖 + 甜甜圈圖 -->
+
+      <div class="ov-mid-grid">
+        <!-- 左：資產趨勢折線圖 -->
+        <div class="ov-chart-card">
+          <div class="ov-chart-title">📈 資產趨勢 <span style="font-size:10px;color:#9ca3af;font-weight:500">（每週五快照）</span></div>
+          <div style="flex:1;position:relative;min-height:220px">
+            <canvas id="ov-trend-canvas"></canvas>
+          </div>
+        </div>
+        <!-- 右：資產分佈甜甜圈圖 -->
+        <div class="ov-chart-card">
+          <div class="ov-chart-title">🥧 資產分佈</div>
+          <div style="position:relative;width:160px;height:160px;margin:0 auto">
+            <canvas id="ov-donut-canvas" width="160" height="160"></canvas>
+            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none">
+              <div style="font-size:9px;color:#9ca3af;font-weight:600">市值</div>
+              <div id="ov-donut-total" class="privacy-mask" style="font-size:13px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#111827">—</div>
+            </div>
+          </div>
+          <div id="ov-donut-legend" style="margin-top:14px;display:flex;flex-direction:column;gap:7px"></div>
+        </div>
+      </div>
+
+      <!-- 下層：信貸提醒 + 最新日誌 -->
+      <div class="ov-bot-grid">
+        <!-- 左：近期扣款提醒 -->
+        <div class="ov-bot-card">
+          <div class="ov-bot-title">
+            <span>🏦 近期扣款提醒</span>
+            <span class="ov-bot-link" onclick="dbShowPage('assets')">查看全部 ↗</span>
+          </div>
+          <div id="ov-loan-list">
+            <div style="color:#9ca3af;font-size:12px;text-align:center;padding:20px">載入中...</div>
+          </div>
+        </div>
+        <!-- 右：最新交易日誌 -->
+        <div class="ov-bot-card">
+          <div class="ov-bot-title">
+            <span>📓 最新日誌</span>
+            <span class="ov-bot-link" onclick="dbShowPage('journal')">查看全部 ↗</span>
+          </div>
+          <div id="ov-journal-list">
+            <div style="color:#9ca3af;font-size:12px;text-align:center;padding:20px">載入中...</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /ov-dashboard -->
+
+    </div><!-- /dbpage-overview -->
 <!-- ═══ POPUP：不限用途額度 ═══ -->
 <div class="sp-overlay" id="sp-flex">
   <div class="sp-modal" style="max-width:1100px">
@@ -2164,8 +2219,6 @@ body:not(.privacy) .privacy-mask{filter:none;}
 
 </div><!-- /db-root (legacy content inside overview page) -->
 
-    </div><!-- /ov-dashboard (moved up - was below) -->
-    </div><!-- /dbpage-overview -->
 
 <!-- big5-wrap 隱藏（JS 仍需要這些 DOM id） -->
 <div style="display:none">
@@ -2294,58 +2347,6 @@ body:not(.privacy) .privacy-mask{filter:none;}
 </div>
 </div><!-- /hidden legacy -->
 
-    <!-- ══ 三段式總覽（中下層）══ -->
-    <div id="ov-dashboard" style="margin-top:20px">
-
-      <!-- 中層：趨勢圖 + 甜甜圈圖 -->
-
-      <div class="ov-mid-grid">
-        <!-- 左：資產趨勢折線圖 -->
-        <div class="ov-chart-card">
-          <div class="ov-chart-title">📈 資產趨勢 <span style="font-size:10px;color:#9ca3af;font-weight:500">（每週五快照）</span></div>
-          <div style="flex:1;position:relative;min-height:220px">
-            <canvas id="ov-trend-canvas"></canvas>
-          </div>
-        </div>
-        <!-- 右：資產分佈甜甜圈圖 -->
-        <div class="ov-chart-card">
-          <div class="ov-chart-title">🥧 資產分佈</div>
-          <div style="position:relative;width:160px;height:160px;margin:0 auto">
-            <canvas id="ov-donut-canvas" width="160" height="160"></canvas>
-            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none">
-              <div style="font-size:9px;color:#9ca3af;font-weight:600">市值</div>
-              <div id="ov-donut-total" class="privacy-mask" style="font-size:13px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#111827">—</div>
-            </div>
-          </div>
-          <div id="ov-donut-legend" style="margin-top:14px;display:flex;flex-direction:column;gap:7px"></div>
-        </div>
-      </div>
-
-      <!-- 下層：信貸提醒 + 最新日誌 -->
-      <div class="ov-bot-grid">
-        <!-- 左：近期扣款提醒 -->
-        <div class="ov-bot-card">
-          <div class="ov-bot-title">
-            <span>🏦 近期扣款提醒</span>
-            <span class="ov-bot-link" onclick="dbShowPage('assets')">查看全部 ↗</span>
-          </div>
-          <div id="ov-loan-list">
-            <div style="color:#9ca3af;font-size:12px;text-align:center;padding:20px">載入中...</div>
-          </div>
-        </div>
-        <!-- 右：最新交易日誌 -->
-        <div class="ov-bot-card">
-          <div class="ov-bot-title">
-            <span>📓 最新日誌</span>
-            <span class="ov-bot-link" onclick="dbShowPage('journal')">查看全部 ↗</span>
-          </div>
-          <div id="ov-journal-list">
-            <div style="color:#9ca3af;font-size:12px;text-align:center;padding:20px">載入中...</div>
-          </div>
-        </div>
-      </div>
-
-    </div><!-- /ov-dashboard -->
 
     <!-- ══ 頁面：資產與負債 ══ -->
     <div class="db-page" id="dbpage-assets">
