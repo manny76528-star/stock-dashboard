@@ -2161,7 +2161,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
       <!-- 信貸管理（全寬） -->
       <div class="as-card" style="margin-bottom:16px">
         <div class="as-card-hdr">
-          <div class="as-card-title">🏦 信貸管理</div>
+          <div class="as-card-title">🏦 信貸管理 <span id="as-loan-remain" style="font-size:13px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#16a34a;margin-left:6px"></span></div>
           <button onclick="openSP('health')" style="display:none"></button>
           <span class="as-card-badge" id="as-loan-badge" style="background:#fee2e2;color:#b91c1c"></span>
         </div>
@@ -2204,7 +2204,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
             <div class="ov-kpi-label" style="padding-left:0">投資總損益</div>
             <div style="display:flex;gap:4px;flex-shrink:0">
               <button onclick="refreshPrices()" style="background:#f3f4f6;color:#4b5563;border:none;border-radius:6px;font-size:11px;padding:3px 8px;cursor:pointer;font-weight:600" onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#f3f4f6'">🔄 股價</button>
-              <button onclick="showDivRoi=!showDivRoi;document.getElementById('roi-chk-sum').checked=showDivRoi;renderSum();renderInv();renderInvestPage()" style="background:#f3f4f6;color:#4b5563;border:none;border-radius:6px;font-size:11px;padding:3px 8px;cursor:pointer;font-weight:600" onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#f3f4f6'">💹 含息</button>
+              <button id="inv-roi-btn" onclick="showDivRoi=!showDivRoi;document.getElementById('roi-chk-sum').checked=showDivRoi;renderSum();renderInv();renderInvestPage()" style="border:none;border-radius:6px;font-size:11px;padding:3px 8px;cursor:pointer;font-weight:600;transition:all .2s">💹 含息</button>
             </div>
           </div>
           <div class="ov-kpi-val privacy-mask" id="inv-kpi-pnl" style="padding-left:8px">—</div>
@@ -9640,6 +9640,9 @@ function renderAssetsPage(){
   const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
   set('as-loan-total','$'+Math.round(lR).toLocaleString());
   set('as-loan-badge',db.loans.length+' 筆');
+  // 信貸尚餘本金加總
+  const remainEl=document.getElementById('as-loan-remain');
+  if(remainEl)remainEl.textContent='$'+Math.round(lR).toLocaleString();
   set('as-flex-total',fmtM(fU));
   // 月繳字體放大+綠色（錢流出）
   const loanMonthEl=document.getElementById('as-loan-monthly');
@@ -9760,6 +9763,14 @@ function renderAssetsPage(){
 // ══════════════════════════════════════
 let _investMiniDonut=null;
 function renderInvestPage(){
+  // 更新含息按鈕狀態
+  const roiBtn=document.getElementById('inv-roi-btn');
+  if(roiBtn){
+    roiBtn.textContent=showDivRoi?'💹 含息 ✓':'💹 含息';
+    roiBtn.style.background=showDivRoi?'#2563eb':'#f3f4f6';
+    roiBtn.style.color=showDivRoi?'#fff':'#4b5563';
+  }
+
   // 更新頂部 KPI
   let tPnl=0,tMkt=0,tCost=0,tReal=0,tDiv=0;
   db.investments.forEach(inv=>{
