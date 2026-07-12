@@ -9584,23 +9584,26 @@ function renderAssetsPage(){
         const deducts=[];
         const day=parseInt(l.deductDay||0);
         if(day>0){
+          let runningBal=null; // 追蹤累積後的餘額
+          if(l.deductBank){
+            const acc=db.cashAccounts.find(c=>c.bank===l.deductBank);
+            if(acc)runningBal=(acc.cash||0)+(acc.d1||0)+(acc.d2||0);
+          }
           for(let mo=0;mo<=1;mo++){
             try{
               const d=new Date(today.getFullYear(),today.getMonth()+mo,day);
               if(isNaN(d.getTime()))continue;
               const ds=d.toISOString().slice(0,10);
               const daysLeft=Math.round((d-today)/86400000);
-              if(ds>=todayStr&&deducts.length<2){
-                // 計算扣款後餘額
+              if(ds>=todayStr&&daysLeft<=30&&deducts.length<2){
                 let afterBal=null;
-                if(l.deductBank){
-                  const acc=db.cashAccounts.find(c=>c.bank===l.deductBank);
-                  if(acc){
-                    const accBal=(acc.cash||0)+(acc.d1||0)+(acc.d2||0);
-                    const preDivs=(db.dividends||[]).filter(dv=>dv.date&&dv.date>todayStr&&dv.date<=ds&&!dv.pending);
-                    const preDivTotal=preDivs.reduce((s,dv)=>s+(dv.amount||0),0);
-                    afterBal=Math.round(accBal+preDivTotal-(l.monthly||0));
-                  }
+                if(runningBal!=null){
+                  // 這筆扣款前會入帳的股息
+                  const prevDs=deducts.length>0?deducts[deducts.length-1].ds:todayStr;
+                  const preDivs=(db.dividends||[]).filter(dv=>dv.date&&dv.date>prevDs&&dv.date<=ds&&!dv.pending);
+                  const preDivTotal=preDivs.reduce((s,dv)=>s+(dv.amount||0),0);
+                  afterBal=Math.round(runningBal+preDivTotal-(l.monthly||0));
+                  runningBal=afterBal; // 下一筆從這裡開始
                 }
                 deducts.push({ds,daysLeft,afterBal});
               }
