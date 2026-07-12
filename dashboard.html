@@ -2104,6 +2104,12 @@ body:not(.privacy) .privacy-mask{filter:none;}
         <button class="big5-toggle-btn" id="tog-inv" onclick="toggleSection('inv-detail')">展開 ▼</button>
       </div>
     </div>
+    <!-- 收合預覽：Top 3 持股 -->
+    <div id="inv-collapsed-preview" style="padding:14px 20px;border-top:1px solid #f0f2f5">
+      <div style="font-size:10px;font-weight:700;color:#9ca3af;letter-spacing:.5px;margin-bottom:10px">📊 市值前三大持股</div>
+      <div id="inv-top3-body" style="display:flex;flex-direction:column;gap:8px"></div>
+    </div>
+
     <div class="big5-detail" id="inv-detail" style="display:none">
       <div class="irow-list" id="inv-body"></div>
 
@@ -4295,7 +4301,7 @@ function fmtF(n,d=2){return isNaN(n)?'—':n.toFixed(d);}
 // ═══════ RENDER ═══════
 let showDivRoi=false;
 
-function render(){renderInv();renderLoans();renderFlex();renderCash();renderDivs();renderSum();}
+function render(){renderInv();renderInvTop3();renderLoans();renderFlex();renderCash();renderDivs();renderSum();}
 
 // ── 資產分佈甜甜圈圖 ──
 let _invDonutChart=null;
@@ -4378,6 +4384,37 @@ function renderInvDonut(){
       </div>
     </div>`;
   }).join('');
+}
+
+function renderInvTop3(){
+  const el=document.getElementById('inv-top3-body');
+  if(!el)return;
+  const active=db.investments
+    .filter(inv=>calcInv(inv).tLots>0)
+    .map(inv=>({inv,c:calcInv(inv)}))
+    .sort((a,b)=>((b.c.mktVal||b.c.tCost))-(a.c.mktVal||a.c.tCost))
+    .slice(0,3);
+  if(active.length===0){
+    el.innerHTML='<div style="color:#9ca3af;font-size:12px;text-align:center;padding:8px">尚無持股</div>';
+    return;
+  }
+  el.innerHTML=active.map(({inv,c},i)=>{
+    const price=db.prices[inv.code]?.price;
+    const mkt=c.mktVal||c.tCost;
+    const medals=['🥇','🥈','🥉'];
+    return`<div style="display:flex;align-items:center;gap:12px;padding:8px 10px;background:#f8f9fa;border-radius:10px;cursor:pointer" onclick="toggleInvDetail('${inv.id}')">
+      <span style="font-size:14px">${medals[i]}</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:800;color:#1e293b">${inv.code} <span style="font-size:10px;font-weight:500;color:#9ca3af">${inv.name||''}</span></div>
+        <div style="font-size:10px;color:#9ca3af;margin-top:1px">${c.tLots}張 · ${price?'$'+price:'—'}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:13px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#374151" class="privacy-mask">$${Math.round(mkt).toLocaleString()}</div>
+        <div style="font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace" class="privacy-mask" style="color:${(c.pnl||0)>=0?'#dc2626':'#16a34a'}">${(c.pnl||0)>=0?'+':''}${Math.round(c.pnl||0).toLocaleString()}</div>
+      </div>
+    </div>`;
+  }).join('');
+  if(typeof applyPrivacy==='function')applyPrivacy();
 }
 
 function renderInv(){
@@ -4604,8 +4641,11 @@ function toggleSection(id){
   const card=detail.closest('.big5-card')||detail.closest('.sec-collapsible')||detail.closest('.db-card');
   const btn=card?.querySelector('.big5-toggle-btn,.sec-toggle-btn');
   if(btn)btn.textContent=isOpen?'展開 ▼':'收起 ▲';
-  // 展開投資標的時渲染甜甜圈圖
-  if(id==='inv-detail'&&!isOpen)setTimeout(renderInvDonut,50);
+  if(id==='inv-detail'){
+    const preview=document.getElementById('inv-collapsed-preview');
+    if(preview)preview.style.display=isOpen?'':'none';
+    if(!isOpen)setTimeout(renderInvDonut,50);
+  }
 }
 
 function toggleHist(id){
