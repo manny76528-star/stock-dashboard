@@ -9568,7 +9568,7 @@ function renderAssetsPage(){
   set('as-cash-badge',db.cashAccounts.length+' 個帳戶');
   set('as-cash-sub','含待入帳');
 
-  // 信貸列表（顯示2筆扣款提醒）
+  // 信貸列表 — 使用與數據總覽相同的計算邏輯
   const lb=document.getElementById('as-loan-body');
   if(lb){
     if(db.loans.length===0){
@@ -9576,47 +9576,49 @@ function renderAssetsPage(){
     } else {
       const today=new Date();
       const todayStr=today.toISOString().slice(0,10);
-      // 計算每筆信貸最近扣款日和預估餘額
-      const loanRows=db.loans.map(l=>{
-        const rem=calcLoanRemain(l);
-        const pct=l.amount>0?Math.round((1-rem/l.amount)*100):0;
-        // 找最近兩筆扣款
+
+      // 先用 renderOvLoans 相同邏輯收集每筆近期扣款
+      const upcoming=[];
+      db.loans.forEach(loan=>{
+        const monthly=loan.monthly||0;
+        if(!monthly)return;
+        const day=parseInt(loan.deductDay||0);
+        if(!day||day<1||day>31)return;
+        const rem=calcLoanRemain(loan);
+        const pct=loan.amount>0?Math.round((1-rem/loan.amount)*100):0;
         const deducts=[];
-        const day=parseInt(l.deductDay||0);
-        if(day>0){
-          let runningBal=null; // 追蹤累積後的餘額
-          if(l.deductBank){
-            const acc=db.cashAccounts.find(c=>c.bank===l.deductBank);
-            if(acc)runningBal=(acc.cash||0)+(acc.d1||0)+(acc.d2||0);
-          }
+        try{
           for(let mo=0;mo<=1;mo++){
-            try{
-              const d=new Date(today.getFullYear(),today.getMonth()+mo,day);
-              if(isNaN(d.getTime()))continue;
-              const ds=d.toISOString().slice(0,10);
+            const d=new Date(today.getFullYear(),today.getMonth()+mo,day);
+            if(isNaN(d.getTime()))continue;
+            const ds=d.toISOString().slice(0,10);
+            if(ds>=todayStr){
               const daysLeft=Math.round((d-today)/86400000);
-              if(ds>=todayStr&&daysLeft<=30&&deducts.length<2){
-                let afterBal=null;
-                if(runningBal!=null){
-                  // 這筆扣款前會入帳的股息
-                  const prevDs=deducts.length>0?deducts[deducts.length-1].ds:todayStr;
-                  const preDivs=(db.dividends||[]).filter(dv=>dv.date&&dv.date>prevDs&&dv.date<=ds&&!dv.pending);
-                  const preDivTotal=preDivs.reduce((s,dv)=>s+(dv.amount||0),0);
-                  afterBal=Math.round(runningBal+preDivTotal-(l.monthly||0));
-                  runningBal=afterBal; // 下一筆從這裡開始
+              if(daysLeft<=30){
+                // 與 renderOvLoans 完全相同的計算方式
+                let afterBal=null,divNote='';
+                if(loan.deductBank){
+                  const acc=db.cashAccounts.find(c=>c.bank===loan.deductBank);
+                  if(acc){
+                    const accBal=(acc.cash||0)+(acc.d1||0)+(acc.d2||0);
+                    const preDivs=(db.dividends||[]).filter(dv=>dv.date&&dv.date>todayStr&&dv.date<=ds);
+                    const preDivTotal=preDivs.reduce((s,dv)=>s+(dv.amount||0),0);
+                    afterBal=Math.round(accBal+preDivTotal-monthly);
+                    if(preDivTotal>0)divNote='+$'+Math.round(preDivTotal).toLocaleString()+'股息';
+                  }
                 }
-                deducts.push({ds,daysLeft,afterBal});
+                deducts.push({ds,daysLeft,afterBal,divNote});
               }
-            }catch(e){}
+              break;
+            }
           }
-        }
-        return{l,rem,pct,deducts};
+        }catch(e){}
+        upcoming.push({loan,rem,pct,deducts});
       });
 
       lb.innerHTML=`<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;padding:16px">
-        ${loanRows.map(({l,rem,pct,deducts})=>{
-          const urgent=deducts[0]&&deducts[0].daysLeft<=5;
-          return`<div style="background:#fff;border-radius:12px;border:1px solid #eaecf0;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.04);cursor:pointer" onclick="openLoanModal()">
+        ${upcoming.map(({loan:l,rem,pct,deducts})=>`
+          <div style="background:#fff;border-radius:12px;border:1px solid #eaecf0;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.04);cursor:pointer" onclick="openLoanModal('${l.id}')">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
               <div style="font-size:13px;font-weight:800;color:#1e293b">${l.bank||l.name||'信貸'}</div>
               <div style="font-size:10px;background:#f0f4ff;color:#4338ca;padding:2px 8px;border-radius:6px;font-weight:700">💳 信貸</div>
@@ -9624,21 +9626,21 @@ function renderAssetsPage(){
             <div style="font-size:11px;color:#9ca3af;margin-bottom:2px">尚餘本金</div>
             <div style="font-size:16px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#dc2626;margin-bottom:8px">$${Math.round(rem).toLocaleString()}</div>
             <div style="height:4px;background:#f0f2f5;border-radius:2px;margin-bottom:10px;overflow:hidden">
-              <div style="height:100%;border-radius:2px;background:${urgent?'#f87171':'#8fa8c8'};width:${pct}%"></div>
+              <div style="height:100%;border-radius:2px;background:#8fa8c8;width:${pct}%"></div>
             </div>
-            ${deducts.map((d,i)=>`
+            ${deducts.length===0?'<div style="font-size:11px;color:#9ca3af">近30天無扣款</div>':
+            deducts.map((d,i)=>`
               <div style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;${i>0?'border-top:1px solid #f5f5f5;margin-top:4px':''}">
                 <div>
-                  <div style="font-size:11px;color:#374151;font-weight:700">${d.ds} <span style="${d.daysLeft<=5?'color:#b91c1c':'color:#2563eb'};font-weight:800">(${d.daysLeft===0?'今天':d.daysLeft+'天後'})</span></div>
-                  <div style="font-size:10px;color:#9ca3af">月繳 $${Math.round(l.monthly||0).toLocaleString()}</div>
+                  <div style="font-size:11px;color:#374151;font-weight:700">${d.ds}${d.divNote?` <span style="color:#2563eb">${d.divNote}</span>`:''}</div>
+                  <div style="font-size:10px;color:#9ca3af"><span style="${d.daysLeft<=5?'color:#b91c1c;font-weight:800':'color:#2563eb;font-weight:700'}">(${d.daysLeft===0?'今天':d.daysLeft+'天後'})</span> 月繳 $${Math.round(l.monthly||0).toLocaleString()}</div>
                 </div>
                 ${d.afterBal!=null?`<div style="text-align:right">
                   <div style="font-size:10px;color:#9ca3af">扣後預估</div>
                   <div style="font-size:12px;font-weight:800;font-family:'JetBrains Mono',monospace;${d.afterBal<0?'color:#16a34a':'color:#dc2626'}">$${Math.abs(d.afterBal).toLocaleString()}${d.afterBal<0?' ⚠️':''}</div>
                 </div>`:''}
               </div>`).join('')}
-          </div>`;
-        }).join('')}
+          </div>`).join('')}
       </div>`;
     }
   }
