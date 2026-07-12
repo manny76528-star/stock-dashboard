@@ -647,8 +647,11 @@ body:not(.privacy) .privacy-mask{filter:none;}
 .loan-sum-val.loss{color:var(--loss);}
 
 .loan-card-grid{
-  display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
-  gap:16px;padding:16px;background:transparent;
+  display:grid !important;
+  grid-template-columns:repeat(2,1fr) !important;
+  gap:16px !important;
+  padding:16px !important;
+  background:transparent !important;
 }
 .loan-card{
   background:#fff;border-radius:12px;overflow:hidden;
@@ -701,8 +704,11 @@ body:not(.privacy) .privacy-mask{filter:none;}
 
 /* ═══ CASH CARDS ═══ */
 .cash-card-grid{
-  display:grid;grid-template-columns:repeat(2,1fr);
-  gap:16px;padding:16px;background:transparent;
+  display:grid !important;
+  grid-template-columns:repeat(2,1fr) !important;
+  gap:16px !important;
+  padding:16px !important;
+  background:transparent !important;
 }
 .cash-card{
   background:#fff;border-radius:14px;overflow:hidden;
@@ -1691,8 +1697,8 @@ body:not(.privacy) .privacy-mask{filter:none;}
 /* loan/flex/cash card grid */
 .loan-card-grid,.flex-card-grid,.cash-card-grid {
   display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
-  gap:12px;padding:16px;background:#f8fafc;
+  grid-template-columns:repeat(2,1fr);
+  gap:16px;padding:16px;background:transparent;
 }
 
 /* ═══ irow note bar with lots ═══ */
