@@ -2187,7 +2187,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
             <div class="as-card-title">💵 現金帳戶</div>
             <span class="as-card-badge" id="as-cash-badge" style="background:#dcfce7;color:#15803d"></span>
           </div>
-          <div id="as-cash-body" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0"></div>
+          <div id="as-cash-body"></div>
           <div class="as-add-btn" onclick="openCashModal()">＋ 新增帳戶</div>
         </div>
       </div>
@@ -9639,10 +9639,17 @@ function renderAssetsPage(){
   const fmtM=v=>'$'+Math.round(v).toLocaleString();
   const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
   set('as-loan-total','$'+Math.round(lR).toLocaleString());
-  set('as-loan-monthly','月繳 '+fmtM(lM));
-  set('as-loan-badge',db.loans.length+' 筆');
-  set('as-flex-total',fmtM(fU));
-  set('as-flex-sub','額度 '+fmtM(fL)+'，已用 '+Math.round(fU/fL*100)+'%');
+  // 月繳字體放大+綠色（錢流出）
+  const loanMonthEl=document.getElementById('as-loan-monthly');
+  if(loanMonthEl){
+    loanMonthEl.innerHTML=`<span style="font-size:15px;font-weight:800;color:#16a34a;font-family:'JetBrains Mono',monospace">月繳 ${fmtM(lM)}</span>`;
+  }
+  // 不限用途月繳（從 flexLoans 加總 monthly）
+  const fM=db.flexLoans.reduce((s,f)=>s+(f.monthly||0),0);
+  const flexSubEl=document.getElementById('as-flex-sub');
+  if(flexSubEl){
+    flexSubEl.innerHTML=`額度 ${fmtM(fL)}，已用 ${Math.round(fU/fL*100)||0}%<br><span style="font-size:15px;font-weight:800;color:#16a34a;font-family:'JetBrains Mono',monospace">月繳 ${fmtM(fM)}</span>`;
+  }
   set('as-flex-badge',fmtM(fL-fU)+' 可用');
   set('as-cash-total',fmtM(cT));
   set('as-cash-badge',db.cashAccounts.length+' 個帳戶');
@@ -9767,11 +9774,11 @@ function renderInvestPage(){
   const roi=tCost>0?Math.round(tPnl/tCost*1000)/10:0;
   const setKpi=(id,v,color)=>{const el=document.getElementById(id);if(el){el.textContent=v;if(color)el.style.color=color;}};
   const pnlColor=tPnl>=0?'#dc2626':'#16a34a';
-  setKpi('inv-kpi-pnl',(tPnl>=0?'+':'')+fmtM(tPnl),pnlColor);
+  setKpi('inv-kpi-pnl',(tPnl>=0?'+':'')+fmt(tPnl),pnlColor);
   setKpi('inv-kpi-roi','投報率 '+(roi>=0?'+':'')+roi+'%');
-  setKpi('inv-kpi-mkt',fmtM(tMkt));
-  setKpi('inv-kpi-real',(tReal>=0?'+':'')+fmtM(tReal),tReal>=0?'#dc2626':'#16a34a');
-  setKpi('inv-kpi-div',fmtM(tDiv));
+  setKpi('inv-kpi-mkt',fmt(tMkt));
+  setKpi('inv-kpi-real',(tReal>=0?'+':'')+fmt(tReal),tReal>=0?'#dc2626':'#16a34a');
+  setKpi('inv-kpi-div',fmt(tDiv));
 
   // 持股清單（豐富版）
   const body=document.getElementById('invest-page-body');
