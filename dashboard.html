@@ -22,7 +22,8 @@
 body{background:#f0f2f5;color:var(--text);font-family:'Noto Sans TC',sans-serif;font-size:13px;min-height:100vh;}
 
 /* ── 新版側欄佈局 ── */
-.db-app{display:flex;min-height:100vh;}
+html,body{margin:0;padding:0;width:100%;min-height:100vh;}
+.db-app{display:flex;min-height:100vh;width:100%;}
 
 /* 側欄 */
 .db-sidebar{
@@ -66,6 +67,7 @@ body{background:#f0f2f5;color:var(--text);font-family:'Noto Sans TC',sans-serif;
   margin-left:220px;
   flex:1;
   min-width:0;
+  width:calc(100% - 220px);
   display:flex;flex-direction:column;
   height:100vh;
   overflow-y:auto;
