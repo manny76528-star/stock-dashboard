@@ -3278,7 +3278,11 @@ body:not(.privacy) .privacy-mask{filter:none;}
           <label class="drawer-tag-label" id="dtag-sell"><input type="checkbox" id="jtag-sell" value="賣出">💸 賣出</label>
           <label class="drawer-tag-label" id="dtag-alert"><input type="checkbox" id="jtag-alert" value="重大事項">🚨 重大事項</label>
           <label class="drawer-tag-label" id="dtag-panic"><input type="checkbox" id="jtag-panic" value="極度恐慌">😱 極度恐慌</label>
-          <label class="drawer-tag-label" id="dtag-youtube"><input type="checkbox" id="jtag-youtube" value="YouTube">🔴▶ YouTube</label>
+          <label class="drawer-tag-label" id="dtag-youtube"><input type="checkbox" id="jtag-youtube" value="YouTube" onchange="toggleYoutubeUrl(this)">🔴▶ YouTube</label>
+        </div>
+        <!-- YouTube 網址輸入框（勾選才顯示） -->
+        <div id="youtube-url-wrap" style="display:none;margin-top:8px">
+          <input class="drawer-input" type="url" id="j-youtube-url" placeholder="🔴▶ 貼上 YouTube 網址..." style="width:100%">
         </div>
         <div class="drawer-grid-2">
           <div>
@@ -8945,6 +8949,17 @@ function onJournalFilterChange(){
 // ── 日誌草稿自動儲存 ──
 const DRAFT_KEY='journal_draft_v1';
 
+function toggleYoutubeUrl(cb){
+  const lb=document.getElementById('dtag-youtube');
+  if(lb)lb.classList.toggle('checked',cb.checked);
+  const wrap=document.getElementById('youtube-url-wrap');
+  if(wrap){
+    wrap.style.display=cb.checked?'block':'none';
+    if(!cb.checked){const urlEl=document.getElementById('j-youtube-url');if(urlEl)urlEl.value='';}
+    else setTimeout(()=>document.getElementById('j-youtube-url')?.focus(),100);
+  }
+}
+
 function autoSaveJournalDraft(){
   const draft={
     market:document.getElementById('j-market')?.value||'',
@@ -9144,7 +9159,7 @@ function saveJournal(){
   const date=document.getElementById('j-date').value;
   if(!date){toast('請填寫日期');return;}
   const tags=[];
-  ['jtag-bull','jtag-bear','jtag-buy','jtag-sell','jtag-alert','jtag-panic'].forEach(id2=>{
+  ['jtag-bull','jtag-bear','jtag-buy','jtag-sell','jtag-alert','jtag-panic','jtag-youtube'].forEach(id2=>{
     const el=document.getElementById(id2);
     if(el&&el.checked)tags.push(el.value);
   });
@@ -9154,6 +9169,7 @@ function saveJournal(){
     tags,
     market:document.getElementById('j-market').value.trim(),
     marketUrl:document.getElementById('j-market-url')?.value.trim()||'',
+    youtubeUrl:document.getElementById('j-youtube-url')?.value.trim()||'',
     content:document.getElementById('j-content').value.trim(),
     stockTags:document.getElementById('j-stock-tags').value.trim().split(/[\s,，]+/).filter(Boolean),
     eventCat:document.getElementById('j-event-cat')?.value||'',
@@ -10580,12 +10596,11 @@ function renderJournalReadMode(id){
   // 原文連結
   const linkEl=document.getElementById('jdr-link');
   if(linkEl){
-    if(j.marketUrl){
-      linkEl.innerHTML=`<a href="${j.marketUrl}" target="_blank" style="font-size:12px;color:#2563eb;text-decoration:none;display:flex;align-items:center;gap:6px">🔗 查看原文 <span style="font-size:10px">↗</span></a>`;
-      linkEl.style.display='';
-    } else {
-      linkEl.style.display='none';
-    }
+    let linkHtml='';
+    if(j.marketUrl) linkHtml+=`<a href="${j.marketUrl}" target="_blank" style="font-size:12px;color:#2563eb;text-decoration:none;display:flex;align-items:center;gap:6px">🔗 查看原文 <span style="font-size:10px">↗</span></a>`;
+    if(j.youtubeUrl) linkHtml+=`<a href="${j.youtubeUrl}" target="_blank" style="font-size:12px;color:#dc2626;text-decoration:none;display:flex;align-items:center;gap:6px;margin-top:4px">🔴▶ 觀看 YouTube <span style="font-size:10px">↗</span></a>`;
+    if(linkHtml){linkEl.innerHTML=linkHtml;linkEl.style.display='';}
+    else linkEl.style.display='none';
   }
 }
 
@@ -10608,6 +10623,13 @@ function fillJournalEditForm(id){
     if(cb){cb.checked=(j?.tags||[]).includes(tagMap[t]);}
     if(lb){lb.classList.toggle('checked',cb?.checked||false);cb.onchange=()=>lb.classList.toggle('checked',cb.checked);}
   });
+
+  // YouTube 網址還原
+  const ytChecked=(j?.tags||[]).includes('YouTube');
+  const ytWrap=document.getElementById('youtube-url-wrap');
+  const ytUrl=document.getElementById('j-youtube-url');
+  if(ytWrap)ytWrap.style.display=ytChecked?'block':'none';
+  if(ytUrl)ytUrl.value=j?.youtubeUrl||'';
 
   const preview=document.getElementById('j-img-preview');
   if(preview)preview.innerHTML=(j?.images||[]).map((img,i)=>`
