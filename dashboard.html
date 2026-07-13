@@ -8952,6 +8952,8 @@ const DRAFT_KEY='journal_draft_v1';
 function toggleYoutubeUrl(cb){
   const lb=document.getElementById('dtag-youtube');
   if(lb)lb.classList.toggle('checked',cb.checked);
+  // 防止 onchange 被覆蓋，直接在這裡重新綁定
+  if(cb)cb.onchange=function(){toggleYoutubeUrl(this);};
   const wrap=document.getElementById('youtube-url-wrap');
   if(wrap){
     wrap.style.display=cb.checked?'block':'none';
@@ -10624,7 +10626,8 @@ function fillJournalEditForm(id){
     if(lb){
       lb.classList.toggle('checked',cb?.checked||false);
       // youtube 的 onchange 由 HTML 的 toggleYoutubeUrl 處理，不覆蓋
-      if(t!=='youtube') cb.onchange=()=>lb.classList.toggle('checked',cb.checked);
+      if(t!=='youtube'){cb.onchange=()=>lb.classList.toggle('checked',cb.checked);}
+      else if(cb){cb.onchange=function(){toggleYoutubeUrl(this);};}
     }
   });
 
