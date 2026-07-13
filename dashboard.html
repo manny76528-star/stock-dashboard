@@ -5454,7 +5454,7 @@ function saveInv(){
       holdType,targetRoi,
       transactions:initTxns,order:maxOrder+1});
   }
-  save();closeModal('invModal');render();toast(editId?'已更新':'已新增 '+code);
+  save();closeModal('invModal');render();renderInvestPage();toast(editId?'已更新':'已新增 '+code);
   if(healthOpen)renderHealth(); // 持倉健康檢查同步更新
   fetchPrice(code).then(p=>{if(p){db.prices[code]=p;localStorage.setItem(STORE,JSON.stringify(db));renderInv();}});
 }
@@ -5466,7 +5466,7 @@ function delInv(id){
     if(!db.archivedTxns)db.archivedTxns=[];
     inv.transactions.forEach(t=>db.archivedTxns.push({...t,code:inv.code,name:inv.name||'',archivedDate:new Date().toISOString().split('T')[0]}));
   }
-  db.investments=db.investments.filter(i=>i.id!==id);save();render();toast('已刪除（交易記錄已存檔，可用🔍查詢）');
+  db.investments=db.investments.filter(i=>i.id!==id);save();render();renderInvestPage();toast('已刪除（交易記錄已存檔，可用🔍查詢）');
 }
 
 // BUY
@@ -5510,7 +5510,7 @@ function saveBuy(){
   const mood=document.getElementById('b-mood')?.value.trim()||'';
   inv.transactions.push({id:uid(),type:'buy',lots,price,date,fee,remark,mood});
   inv.transactions.sort((a,b)=>a.date.localeCompare(b.date));
-  save();closeModal('buyModal');render();toast(`買入 ${lots} 張已記錄`);
+  save();closeModal('buyModal');render();renderInvestPage();toast(`買入 ${lots} 張已記錄`);
 }
 
 // SELL
@@ -5602,7 +5602,7 @@ function saveSell(){
   const sLossReason=document.querySelector('.loss-sel-btn.active')?.dataset?.reason||'';
   inv.transactions.push({id:uid(),type:'sell',lots:tLots,price,date,fee:fee+tax,lotRefs:lotRefs.map(r=>({txnId:r.txnId,lots:r.lots,date:r.date})),remark:sRemark,mood:sMood,lossReason:sLossReason});
   inv.transactions.sort((a,b)=>a.date.localeCompare(b.date));
-  save();closeModal('sellModal');render();toast(`賣出 ${tLots} 張已記錄`);
+  save();closeModal('sellModal');render();renderInvestPage();toast(`賣出 ${tLots} 張已記錄`);
 }
 function delTxn(invId,txnId){
   if(!confirm('確定刪除？'))return;
@@ -5658,7 +5658,7 @@ function saveLoan(){
     deductBank:document.getElementById('l-dbank').value};
   if(editId){const i=db.loans.findIndex(x=>x.id===editId);db.loans[i]=obj;}
   else db.loans.push(obj);
-  save();closeModal('loanModal');render();toast('已儲存');
+  save();closeModal('loanModal');render();renderAssetsPage();toast('已儲存');
 }
 function clearLoan(id){
   const l=db.loans.find(x=>x.id===id);
@@ -5667,10 +5667,10 @@ function clearLoan(id){
   if(!db.clearedLoans)db.clearedLoans=[];
   db.clearedLoans.push({...l,clearedDate:new Date().toISOString().split('T')[0]});
   db.loans=db.loans.filter(x=>x.id!==id);
-  save();render();toast('✅ 已標記結清，可在「結清記錄」查詢');
+  save();render();renderAssetsPage();toast('✅ 已標記結清，可在「結清記錄」查詢');
 }
 
-function delLoan(id){if(!doubleConfirm('確定要刪除這筆信貸？'))return;db.loans=db.loans.filter(x=>x.id!==id);save();render();toast('已刪除');}
+function delLoan(id){if(!doubleConfirm('確定要刪除這筆信貸？'))return;db.loans=db.loans.filter(x=>x.id!==id);save();render();renderAssetsPage();toast('已刪除');}
 
 // FLEX
 function calcFlex(){
@@ -5719,9 +5719,9 @@ function saveFlex(){
     note:document.getElementById('f-note').value.trim()};
   if(editId){const i=db.flexLoans.findIndex(x=>x.id===editId);db.flexLoans[i]=obj;}
   else db.flexLoans.push(obj);
-  save();closeModal('flexModal');render();toast('已儲存');
+  save();closeModal('flexModal');render();renderAssetsPage();toast('已儲存');
 }
-function delFlex(id){if(!doubleConfirm('確定要刪除這筆不限用途？'))return;db.flexLoans=db.flexLoans.filter(x=>x.id!==id);save();render();toast('已刪除');}
+function delFlex(id){if(!doubleConfirm('確定要刪除這筆不限用途？'))return;db.flexLoans=db.flexLoans.filter(x=>x.id!==id);save();render();renderAssetsPage();toast('已刪除');}
 
 // CASH
 function toggleCustomBank(sel){
@@ -5806,9 +5806,9 @@ function saveCash(){
     d2:parseFloat(document.getElementById('c-d2').value)||0};
   if(editId){const i=db.cashAccounts.findIndex(x=>x.id===editId);db.cashAccounts[i]=obj;}
   else db.cashAccounts.push(obj);
-  save();closeModal('cashModal');render();toast('已儲存');
+  save();closeModal('cashModal');render();renderAssetsPage();toast('已儲存');
 }
-function delCash(id){if(!doubleConfirm('確定要刪除此帳戶？'))return;db.cashAccounts=db.cashAccounts.filter(x=>x.id!==id);save();render();toast('已刪除');}
+function delCash(id){if(!doubleConfirm('確定要刪除此帳戶？'))return;db.cashAccounts=db.cashAccounts.filter(x=>x.id!==id);save();render();renderAssetsPage();toast('已刪除');}
 
 // DIV
 function showDivDetail(code){
