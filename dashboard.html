@@ -10467,6 +10467,10 @@ function openJournalDrawer(id=null){
     switchJournalDrawerMode('edit');
   }
   openDrawer('journal-drawer');
+  // 新增模式：Drawer 開啟後才抓大盤+個股（避免 timing 問題）
+  if(!id){
+    setTimeout(()=>autoFetchJournalPrices(),500);
+  }
 }
 
 function switchJournalDrawerMode(mode){
@@ -10627,14 +10631,10 @@ function fillJournalEditForm(id){
 
   // 個股股價輸入框
   updateStockPriceInputs();
-
-  // 新增模式才自動抓大盤+個股
-  if(!id){
-    setTimeout(()=>autoFetchJournalPrices(),100);
-  } else {
-    // 編輯模式：帶入已存的個股價格
+  // 編輯模式：帶入已存的個股價格
+  if(id){
     setTimeout(()=>{
-      const wrap=document.getElementById('j-stock-prices')||document.getElementById('j-stock-prices-container');
+      const wrap=document.getElementById('j-stock-prices-container')||document.getElementById('j-stock-prices');
       if(wrap&&j?.stockPrices){
         wrap.querySelectorAll('input[data-code]').forEach(el=>{
           if(j.stockPrices[el.dataset.code])el.value=j.stockPrices[el.dataset.code];
