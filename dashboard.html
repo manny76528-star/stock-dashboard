@@ -8784,7 +8784,7 @@ async function autoFetchJournalPrices(){
     }catch(e){}
   }
   // 自動抓個股
-  const wrap=document.getElementById('j-stock-prices')||document.getElementById('j-stock-prices-container');
+  const wrap=document.getElementById('j-stock-prices-container')||document.getElementById('j-stock-prices');
   if(!wrap)return;
   const inputs=wrap.querySelectorAll('input[data-code]');
   await Promise.all([...inputs].map(async el=>{
@@ -8799,8 +8799,10 @@ async function autoFetchJournalPrices(){
 
 function updateStockPriceInputs(){
   const tags=document.getElementById('j-stock-tags')?.value.trim().split(/[\s,，]+/).filter(Boolean)||[];
-  const wrap=document.getElementById('j-stock-prices')||document.getElementById('j-stock-prices-container');
-  if(!wrap)return;
+  // 同時更新兩個容器（Drawer 和舊 Modal）
+  const wraps=[document.getElementById('j-stock-prices-container'),document.getElementById('j-stock-prices')].filter(Boolean);
+  if(!wraps.length)return;
+  const wrap=wraps[0];
   const existing={};
   wrap.querySelectorAll('input[data-code]').forEach(el=>{existing[el.dataset.code]=el.value;});
   const codes=tags.filter(t=>/^[A-Za-z0-9]{3,8}$/.test(t));
@@ -8840,7 +8842,7 @@ ${content||'（無）'}
 
 請提供：
 1. **核心關鍵字**（3-8個，用逗號分隔，例如：AI算力、費半大跌、恐慌賣出）
-2. **事件分類**（從以下選1-2個：總經面、消息面、政治面、技術面、個股操作、YouTube）
+2. **事件分類**（從以下選1-2個：總經面、消息面、政治面、技術面、個股操作）
 3. **個人行為**（從以下選1-2個：心情愉悅、跌到有點煩躁、觸發PTSD、信心滿滿的買進、賣出降低水位）
 4. **恐慌指數**（0-100分，0=完全冷靜，100=極度恐慌崩潰，給出數字並簡短說明原因）
 5. **一句話總結**（用一句話描述這天的核心事件與心態）
