@@ -3280,7 +3280,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
       <!-- 個股追蹤 -->
       <div class="drawer-section">
         <div class="drawer-section-title">個股追蹤（選填）</div>
-        <input class="drawer-input" type="text" id="j-stock-tags" placeholder="股票代號，空格分隔">
+        <input class="drawer-input" type="text" id="j-stock-tags" placeholder="股票代號，空格分隔" oninput="updateStockPriceInputs()">
         <div id="j-stock-prices-container" style="margin-top:10px;display:flex;flex-direction:column;gap:6px"></div>
       </div>
 
@@ -8783,7 +8783,7 @@ async function autoFetchJournalPrices(){
     }catch(e){}
   }
   // 自動抓個股
-  const wrap=document.getElementById('j-stock-prices');
+  const wrap=document.getElementById('j-stock-prices')||document.getElementById('j-stock-prices-container');
   if(!wrap)return;
   const inputs=wrap.querySelectorAll('input[data-code]');
   await Promise.all([...inputs].map(async el=>{
@@ -8798,7 +8798,7 @@ async function autoFetchJournalPrices(){
 
 function updateStockPriceInputs(){
   const tags=document.getElementById('j-stock-tags')?.value.trim().split(/[\s,，]+/).filter(Boolean)||[];
-  const wrap=document.getElementById('j-stock-prices');
+  const wrap=document.getElementById('j-stock-prices')||document.getElementById('j-stock-prices-container');
   if(!wrap)return;
   const existing={};
   wrap.querySelectorAll('input[data-code]').forEach(el=>{existing[el.dataset.code]=el.value;});
