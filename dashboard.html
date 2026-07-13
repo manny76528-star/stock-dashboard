@@ -10592,6 +10592,24 @@ function fillJournalEditForm(id){
       } else clearJournalDraft();
     }
   }
+
+  // 個股股價輸入框
+  updateStockPriceInputs();
+
+  // 新增模式才自動抓大盤+個股
+  if(!id){
+    setTimeout(()=>autoFetchJournalPrices(),100);
+  } else {
+    // 編輯模式：帶入已存的個股價格
+    setTimeout(()=>{
+      const wrap=document.getElementById('j-stock-prices');
+      if(wrap&&j?.stockPrices){
+        wrap.querySelectorAll('input[data-code]').forEach(el=>{
+          if(j.stockPrices[el.dataset.code])el.value=j.stockPrices[el.dataset.code];
+        });
+      }
+    },50);
+  }
 }
 
 function deleteJournalFromDrawer(){
