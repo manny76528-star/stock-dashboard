@@ -8930,14 +8930,15 @@ ${content||'（無）'}
 function setJournalTagSel(sel){
   journalTagFilter=sel.value;
   renderJournal();
-  const chartBody=document.getElementById('journal-chart-body');
+  // 支援新版分頁和舊版sp-overlay兩種chart body
+  const chartBody=document.getElementById('journal-page-chart-body')||document.getElementById('journal-chart-body');
   if(chartBody&&chartBody.style.display!=='none')renderJournalChart();
 }
 
 // 事件/行為篩選也連動走勢圖
 function onJournalFilterChange(){
   renderJournal();
-  const chartBody=document.getElementById('journal-chart-body');
+  const chartBody=document.getElementById('journal-page-chart-body')||document.getElementById('journal-chart-body');
   if(chartBody&&chartBody.style.display!=='none')renderJournalChart();
 }
 
