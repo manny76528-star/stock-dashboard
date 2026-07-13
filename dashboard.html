@@ -10621,7 +10621,11 @@ function fillJournalEditForm(id){
     const cb=document.getElementById('jtag-'+t);
     const lb=document.getElementById('dtag-'+t);
     if(cb){cb.checked=(j?.tags||[]).includes(tagMap[t]);}
-    if(lb){lb.classList.toggle('checked',cb?.checked||false);cb.onchange=()=>lb.classList.toggle('checked',cb.checked);}
+    if(lb){
+      lb.classList.toggle('checked',cb?.checked||false);
+      // youtube 的 onchange 由 HTML 的 toggleYoutubeUrl 處理，不覆蓋
+      if(t!=='youtube') cb.onchange=()=>lb.classList.toggle('checked',cb.checked);
+    }
   });
 
   // YouTube 網址還原
