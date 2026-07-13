@@ -2271,6 +2271,35 @@ body:not(.privacy) .privacy-mask{filter:none;}
           <span id="journal-page-chart-arrow" style="font-size:11px;color:#94a3b8">▼ 點擊展開</span>
         </div>
         <div id="journal-page-chart-body" style="display:none;padding:12px 16px;border-top:1px solid #f0f2f5">
+          <!-- 篩選器 -->
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;align-items:center">
+            <select id="journal-tag-sel" onchange="setJournalTagSel(this)" class="drawer-select" style="width:auto">
+              <option value="">全部標籤</option>
+              <option value="看多">📈 看多</option>
+              <option value="看空">📉 看空</option>
+              <option value="買入">💰 買入</option>
+              <option value="賣出">💸 賣出</option>
+              <option value="重大事項">🚨 重大事項</option>
+              <option value="極度恐慌">😱 極度恐慌</option>
+              <option value="YouTube">🔴▶ YouTube</option>
+            </select>
+            <select id="journal-event-sel" onchange="onJournalFilterChange()" class="drawer-select" style="width:auto">
+              <option value="">全部事件</option>
+              <option value="總經面">🌐 總經面</option>
+              <option value="消息面">📰 消息面</option>
+              <option value="政治面">🏛 政治面</option>
+              <option value="技術面">📊 技術面</option>
+              <option value="個股操作">💹 個股操作</option>
+            </select>
+            <select id="journal-behavior-sel" onchange="onJournalFilterChange()" class="drawer-select" style="width:auto">
+              <option value="">全部行為</option>
+              <option value="心情愉悅">😊 心情愉悅</option>
+              <option value="跌到有點煩躁">😤 跌到有點煩躁</option>
+              <option value="觸發PTSD">😱 觸發PTSD</option>
+              <option value="信心滿滿的買進">💪 信心滿滿的買進</option>
+              <option value="賣出降低水位">📉 賣出降低水位</option>
+            </select>
+          </div>
           <div id="journal-chart-checks" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;font-size:12px;align-items:center"></div>
           <label style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:700;color:#7c3aed;margin-bottom:10px;cursor:pointer">
             <input type="checkbox" id="jchart-backtest-toggle" onchange="renderJournalChart()">
@@ -2296,6 +2325,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
             <option value="賣出">💸 賣出</option>
             <option value="重大事項">🚨 重大事項</option>
             <option value="極度恐慌">😱 極度恐慌</option>
+          <option value="YouTube">🔴▶ YouTube</option>
           </select>
           <button onclick="openJournalDrawer()" style="padding:8px 16px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">＋ 新增日誌</button>
           <button onclick="batchUpdateBacktest()" style="padding:8px 14px;background:#f8f9fa;border:1px solid #e2e8f0;color:#374151;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">🔄 更新回測</button>
