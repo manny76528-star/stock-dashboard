@@ -6965,6 +6965,8 @@ function runDailyProcess(force){
   if(changed){
     save();
     render();
+    renderAssetsPage();
+    setTimeout(renderOvDashboard,200);
     setTimeout(()=>{
       msgs.forEach((m,i)=>setTimeout(()=>toast(m),i*1500));
     },300);
@@ -9141,11 +9143,7 @@ function saveJournal(){
     db.journals.push(j);
   }
   db.journals.sort((a,b)=>b.date.localeCompare(a.date));
-  save();
-  closeModal('journalModal');
-  renderJournal();
-  updateJournalCount();
-  toast('✅ 日誌已儲存');
+  save();clearJournalDraft();closeDrawer();closeModal('journalModal');renderJournal();renderJournalPage();updateJournalCount();toast('✅ 日誌已儲存');
 }
 
 function deleteJournal(){
