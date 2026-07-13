@@ -2994,6 +2994,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
           <option value="賣出">💸 賣出</option>
           <option value="重大事項">🚨 重大事項</option>
           <option value="極度恐慌">😱 極度恐慌(PTSD)</option>
+          <option value="YouTube">🔴▶ YouTube</option>
         </select>
         <select id="journal-event-sel" onchange="onJournalFilterChange()" style="padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:700;color:#475569;background:#fff;cursor:pointer;outline:none;min-width:110px">
           <option value="">全部事件</option>
@@ -3002,7 +3003,6 @@ body:not(.privacy) .privacy-mask{filter:none;}
           <option value="政治面">🏛 政治面</option>
           <option value="技術面">📊 技術面</option>
           <option value="個股操作">💹 個股操作</option>
-          <option value="YouTube">🔴▶ YouTube</option>
         </select>
         <select id="journal-behavior-sel" onchange="onJournalFilterChange()" style="padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:700;color:#475569;background:#fff;cursor:pointer;outline:none;min-width:110px">
           <option value="">全部行為</option>
@@ -3248,6 +3248,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
           <label class="drawer-tag-label" id="dtag-sell"><input type="checkbox" id="jtag-sell" value="賣出">💸 賣出</label>
           <label class="drawer-tag-label" id="dtag-alert"><input type="checkbox" id="jtag-alert" value="重大事項">🚨 重大事項</label>
           <label class="drawer-tag-label" id="dtag-panic"><input type="checkbox" id="jtag-panic" value="極度恐慌">😱 極度恐慌</label>
+          <label class="drawer-tag-label" id="dtag-youtube"><input type="checkbox" id="jtag-youtube" value="YouTube">🔴▶ YouTube</label>
         </div>
         <div class="drawer-grid-2">
           <div>
@@ -3259,7 +3260,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
               <option value="政治面">🏛 政治面</option>
               <option value="技術面">📊 技術面</option>
               <option value="個股操作">💹 個股操作</option>
-              <option value="YouTube">🔴▶ YouTube</option>
+
             </select>
           </div>
           <div>
@@ -3366,7 +3367,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
               <option value="政治面">🏛 政治面（關稅/地緣政治）</option>
               <option value="技術面">📊 技術面（突破/跌破）</option>
               <option value="個股操作">💹 個股操作</option>
-              <option value="YouTube">🔴▶ YouTube</option>
+
             </select>
           </div>
           <div>
@@ -8548,7 +8549,7 @@ function renderJournalChart(){
     ci++;
   });
 
-  const tagEmojiMap={'看多':'📈','看空':'📉','買入':'💰','賣出':'💸','重大事項':'🚨','極度恐慌':'😱'};
+  const tagEmojiMap={'看多':'📈','看空':'📉','買入':'💰','賣出':'💸','重大事項':'🚨','極度恐慌':'😱','YouTube':'🔴▶'};
   const eventEmojiMap={'總經面':'🌐','消息面':'📰','政治面':'🏛','技術面':'📊','個股操作':'💹'};
   const behaviorEmojiMap={'心情愉悅':'😊','跌到有點煩躁':'😤','觸發PTSD':'😱','信心滿滿的買進':'💪','賣出降低水位':'📉'};
   const activeLabelFilter=(document.getElementById('journal-tag-sel')?.value)||'';
@@ -8997,7 +8998,7 @@ function _openJournalModalLegacy(id=null){
     }
   },50);
   // 標籤
-  ['jtag-bull','jtag-bear','jtag-buy','jtag-sell','jtag-alert','jtag-panic'].forEach(id2=>{
+  ['jtag-bull','jtag-bear','jtag-buy','jtag-sell','jtag-alert','jtag-panic','jtag-youtube'].forEach(id2=>{
     const el=document.getElementById(id2);
     if(el)el.checked=j?.tags?.includes(el.value)||false;
   });
@@ -10563,8 +10564,8 @@ function fillJournalEditForm(id){
   sv('j-event-cat',j?.eventCat||'');
   sv('j-behavior',j?.behavior||'');
 
-  ['bull','bear','buy','sell','alert','panic'].forEach(t=>{
-    const tagMap={bull:'看多',bear:'看空',buy:'買入',sell:'賣出',alert:'重大事項',panic:'極度恐慌'};
+  ['bull','bear','buy','sell','alert','panic','youtube'].forEach(t=>{
+    const tagMap={bull:'看多',bear:'看空',buy:'買入',sell:'賣出',alert:'重大事項',panic:'極度恐慌',youtube:'YouTube'};
     const cb=document.getElementById('jtag-'+t);
     const lb=document.getElementById('dtag-'+t);
     if(cb){cb.checked=(j?.tags||[]).includes(tagMap[t]);}
@@ -10600,7 +10601,7 @@ function fillJournalEditForm(id){
   } else {
     // 編輯模式：帶入已存的個股價格
     setTimeout(()=>{
-      const wrap=document.getElementById('j-stock-prices');
+      const wrap=document.getElementById('j-stock-prices')||document.getElementById('j-stock-prices-container');
       if(wrap&&j?.stockPrices){
         wrap.querySelectorAll('input[data-code]').forEach(el=>{
           if(j.stockPrices[el.dataset.code])el.value=j.stockPrices[el.dataset.code];
