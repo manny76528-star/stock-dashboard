@@ -412,7 +412,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-seri
 
 <div class="v-toast" id="toast"></div>
 
-
+<script>
 // ══ 新版導航 ══
 const V_PAGE_NAMES={overview:'學習總覽',browse:'對照瀏覽',weak:'不熟單字',errors:'練習常錯',numbers:'數字練習',import:'匯入單字'};
 function vShowPage(id){
@@ -445,7 +445,6 @@ function showToast(msg){
   if(el){el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500);}
 }
 
-<script>
 // ══════════════════════════════════════
 // DATA LAYER
 // ══════════════════════════════════════
