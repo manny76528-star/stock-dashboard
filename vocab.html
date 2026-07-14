@@ -1,413 +1,449 @@
-<!DOCTYPE html><!-- vocab v1.0 -->
+<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>日文單字複習</title>
+<title>🇯🇵 日文單字練習</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Sans+JP:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
-:root{
-  --bg:#0f172a;--surface:#1e293b;--surface2:#263348;--border:#334155;
-  --accent:#38bdf8;--accent2:#0ea5e9;--green:#22c55e;--red:#ef4444;
-  --yellow:#fbbf24;--purple:#a78bfa;--pink:#f472b6;
-  --text:#f1f5f9;--muted:#94a3b8;--white:#fff;
-  --card-shadow:0 4px 24px rgba(0,0,0,.4);
-  --mono:'JetBrains Mono',monospace;
-}
 *{margin:0;padding:0;box-sizing:border-box;}
-body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;font-size:14px;min-height:100vh;}
-
-/* ── TOPBAR ── */
-.topbar{
-  background:linear-gradient(135deg,#0c1a2e,#1a2f4a);
-  border-bottom:1px solid var(--border);
-  padding:8px 14px;
-  display:flex;align-items:center;justify-content:space-between;
-  position:sticky;top:0;z-index:100;
+:root{
+  --sidebar:220px;
+  --bg:#f8f9fa;
+  --white:#ffffff;
+  --border:#eaecf0;
+  --text:#1e293b;
+  --muted:#9ca3af;
+  --accent:#2563eb;
+  --jp:#7c3aed;
+  --gain:#dc2626;
+  --loss:#16a34a;
+  --warn:#f59e0b;
+  --mono:'JetBrains Mono',monospace;
+  --radius:14px;
+  --shadow:0 2px 8px rgba(0,0,0,.05);
 }
-.topbar-left{display:flex;align-items:center;gap:8px;}
-.topbar-logo{font-size:18px;}
-.topbar-title{font-size:15px;font-weight:900;color:var(--white);letter-spacing:2px;}
-.topbar-sub{font-size:10px;color:var(--muted);margin-top:1px;}
-.topbar-right{display:flex;gap:6px;align-items:center;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;display:flex;min-height:100vh;}
 
-/* ── BUTTONS ── */
-.btn{border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:all .15s;}
-.btn-primary{background:var(--accent2);color:#fff;}.btn-primary:hover{background:#0284c7;}
-.btn-success{background:#16a34a;color:#fff;}.btn-success:hover{background:#15803d;}
-.btn-warn{background:#d97706;color:#fff;}.btn-warn:hover{background:#b45309;}
-.btn-danger{background:#dc2626;color:#fff;}.btn-danger:hover{background:#b91c1c;}
-.btn-ghost{background:rgba(255,255,255,.08);color:var(--text);border:1px solid var(--border);}.btn-ghost:hover{background:rgba(255,255,255,.15);}
-.btn-sm{padding:5px 10px;font-size:11px;}
+/* ══ SIDEBAR ══ */
+.v-sidebar{
+  width:var(--sidebar);min-height:100vh;background:var(--white);
+  border-right:1px solid var(--border);box-shadow:2px 0 12px rgba(0,0,0,.04);
+  position:fixed;top:0;left:0;display:flex;flex-direction:column;z-index:200;
+}
+.v-brand{padding:20px 16px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.v-brand-icon{font-size:24px;}
+.v-brand-title{font-size:15px;font-weight:800;color:var(--text);}
+.v-brand-sub{font-size:10px;color:var(--muted);margin-top:1px;}
+.v-nav{flex:1;padding:10px 0;overflow-y:auto;}
+.v-nav-section{font-size:10px;font-weight:700;color:#8e92bc;padding:12px 0 4px 14px;letter-spacing:1px;}
+.v-nav-item{
+  display:flex;align-items:center;gap:10px;padding:10px 16px;
+  font-size:13px;font-weight:600;color:#64748b;cursor:pointer;
+  transition:all .15s;border-left:3px solid transparent;margin-bottom:1px;
+}
+.v-nav-item:hover{background:#f8fafc;color:var(--accent);}
+.v-nav-item.active{background:#eff6ff;color:var(--accent);border-left-color:var(--accent);font-weight:700;}
+.v-nav-icon{font-size:15px;width:20px;text-align:center;}
+.v-sidebar-footer{padding:12px 14px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:6px;}
+.v-sidebar-btn{padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--white);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;width:100%;text-align:left;transition:background .15s;font-family:'Noto Sans TC',sans-serif;}
+.v-sidebar-btn:hover{background:#f8fafc;}
+.v-sidebar-btn.primary{background:#2563eb;color:#fff;border-color:#2563eb;}
+.v-sidebar-btn.primary:hover{background:#1d4ed8;}
+.v-sidebar-btn.warn{background:#fef3c7;color:#92400e;border-color:#f59e0b;}
 
-/* ── MAIN ── */
-.main{max-width:1200px;margin:0 auto;padding:10px 12px;}
+/* ══ MAIN ══ */
+.v-main{margin-left:var(--sidebar);flex:1;height:100vh;overflow-y:auto;display:flex;flex-direction:column;}
+.v-topbar{
+  position:sticky;top:0;z-index:100;background:rgba(248,249,250,.92);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--border);
+  padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;
+}
+.v-topbar-title{font-size:15px;font-weight:800;color:var(--text);}
+.v-content{padding:20px 24px;flex:1;}
 
-/* ── STAT STRIP ── */
-.stat-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:6px;margin-bottom:10px;}
-.stat-card{background:var(--surface);border-radius:10px;padding:8px 10px;border:1px solid var(--border);}
-.stat-label{font-size:9px;color:var(--muted);font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:3px;}
-.stat-val{font-size:16px;font-weight:800;font-family:var(--mono);}
-.stat-val.blue{color:var(--accent);}
-.stat-val.green{color:var(--green);}
-.stat-val.yellow{color:var(--yellow);}
-.stat-val.red{color:var(--red);}
-.stat-val.purple{color:var(--purple);}
+/* ══ KPI ══ */
+.v-kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:20px;}
+.v-kpi-card{background:var(--white);border-radius:var(--radius);border:1px solid var(--border);padding:16px 18px;box-shadow:var(--shadow);position:relative;overflow:hidden;}
+.v-kpi-accent{position:absolute;top:0;left:0;width:4px;height:100%;border-radius:2px;}
+.v-kpi-label{font-size:10px;font-weight:600;color:var(--muted);letter-spacing:.3px;padding-left:8px;margin-bottom:4px;}
+.v-kpi-val{font-size:22px;font-weight:800;font-family:var(--mono);color:var(--text);padding-left:8px;}
 
-/* ── PROGRESS BAR ── */
-.prog-wrap{background:var(--surface);border-radius:10px;padding:8px 12px;margin-bottom:10px;border:1px solid var(--border);}
-.prog-label{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:5px;}
-.prog-bar-bg{height:7px;background:#1e293b;border-radius:4px;overflow:hidden;border:1px solid var(--border);}
-.prog-bar{height:7px;background:linear-gradient(90deg,var(--accent2),var(--green));border-radius:4px;transition:width .5s ease;}
+/* ══ PROGRESS ══ */
+.v-prog-wrap{background:var(--white);border-radius:var(--radius);border:1px solid var(--border);padding:16px 20px;margin-bottom:20px;box-shadow:var(--shadow);}
+.v-prog-label{display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px;}
+.v-prog-bg{height:8px;background:#f1f5f9;border-radius:4px;overflow:hidden;}
+.v-prog-bar{height:8px;background:linear-gradient(to right,#2563eb,#7c3aed);border-radius:4px;transition:width .5s ease;}
 
-/* ── TAB NAV ── */
-.tab-nav{display:flex;gap:3px;margin-bottom:10px;background:var(--surface);padding:3px;border-radius:10px;border:1px solid var(--border);}
-.tab-btn{flex:1;padding:6px;text-align:center;font-size:11px;font-weight:700;cursor:pointer;border-radius:8px;border:none;background:transparent;color:var(--muted);transition:all .15s;font-family:'Noto Sans TC',sans-serif;}
-.tab-btn.active{background:var(--accent2);color:#fff;}
-.tab-btn:hover:not(.active){background:rgba(255,255,255,.06);color:var(--text);}
+/* ══ CARDS ══ */
+.v-card{background:var(--white);border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px;}
+.v-card-hdr{padding:14px 18px;border-bottom:1px solid #f0f2f5;display:flex;align-items:center;justify-content:space-between;}
+.v-card-title{font-size:13px;font-weight:800;color:var(--text);}
 
-/* ── VIEWS ── */
-.view{display:none;}.view.active{display:block;}
+/* ══ PAGE ══ */
+.v-page{display:none;}
+.v-page.active{display:block;}
 
-/* ── MATCH GAME ── */
-.match-wrap{display:grid;grid-template-columns:1fr 24px 1fr;gap:0;align-items:start;}
-.match-col{display:flex;flex-direction:column;gap:3px;}
-.match-center{display:flex;flex-direction:column;gap:3px;align-items:center;padding-top:0;}
+/* ══ WORD ROW ══ */
+.v-word-row{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 16px;border-bottom:1px solid #f5f7fa;
+  transition:background .12s;
+}
+.v-word-row:last-child{border-bottom:none;}
+.v-word-row:hover{background:#fafbff;}
+.v-word-row.weak-row{background:#fff5f5;border-color:rgba(239,68,68,.2);}
+.v-word-q{flex:1;font-size:14px;font-weight:700;color:var(--text);}
+.v-word-a{flex:1;font-size:14px;color:var(--jp);font-family:'Noto Sans JP',sans-serif;font-weight:700;}
+.v-weak-btn{
+  flex-shrink:0;padding:4px 12px;border-radius:8px;border:1.5px solid var(--border);
+  background:transparent;color:var(--muted);font-size:11px;font-weight:700;cursor:pointer;
+  white-space:nowrap;transition:all .15s;
+}
+.v-weak-btn.on{border-color:rgba(239,68,68,.5);background:rgba(239,68,68,.1);color:#ef4444;}
 
+/* ══ PAGINATION ══ */
+.v-page-nav{display:flex;align-items:center;justify-content:space-between;padding:12px 0;margin-bottom:8px;}
+.v-page-info{font-size:12px;color:var(--muted);font-weight:600;}
+.v-page-btns{display:flex;gap:8px;}
+.v-btn{padding:7px 16px;border-radius:8px;border:1.5px solid var(--border);background:var(--white);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;font-family:'Noto Sans TC',sans-serif;}
+.v-btn:hover{background:#f8fafc;}
+.v-btn.primary{background:#2563eb;color:#fff;border-color:#2563eb;}
+.v-btn.primary:hover{background:#1d4ed8;}
+.v-btn.warn{background:#fef3c7;color:#92400e;border-color:#f59e0b;}
+.v-btn.danger{background:#fee2e2;color:#b91c1c;border-color:#fca5a5;}
+
+/* ══ MATCH GAME ══ */
+.match-wrap{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.match-col{display:flex;flex-direction:column;gap:8px;}
 .match-item{
-  background:var(--surface);border:1.5px solid var(--border);
-  border-radius:7px;padding:5px 7px;cursor:pointer;
-  transition:all .15s;user-select:none;min-height:0;
-  display:flex;align-items:center;
+  padding:12px 16px;border-radius:10px;border:2px solid var(--border);
+  background:var(--white);font-size:14px;font-weight:700;cursor:pointer;
+  transition:all .18s;text-align:center;user-select:none;
 }
-.match-item:hover{border-color:var(--accent);background:var(--surface2);}
-.match-item.selected{border-color:var(--accent);background:rgba(56,189,248,.1);box-shadow:0 0 0 2px rgba(56,189,248,.3);}
-.match-item.matched{border-color:var(--green);background:rgba(34,197,94,.08);opacity:.5;pointer-events:none;}
-.match-item.wrong{border-color:var(--red);background:rgba(239,68,68,.1);animation:shake .3s ease;}
-.match-item.disabled{opacity:.3;pointer-events:none;}
-
+.match-item:hover{border-color:var(--accent);background:#eff6ff;}
+.match-item.selected{border-color:#7c3aed;background:#ede9fe;color:#5b21b6;}
+.match-item.correct{border-color:#16a34a;background:#dcfce7;color:#15803d;pointer-events:none;}
+.match-item.wrong{border-color:#dc2626;background:#fee2e2;animation:shake .3s;}
+.match-item.jp{font-family:'Noto Sans JP',sans-serif;color:var(--jp);}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
-@keyframes matchPop{0%{transform:scale(1)}50%{transform:scale(1.04)}100%{transform:scale(1)}}
-.match-item.pop{animation:matchPop .25s ease;}
 
-.match-jp{font-family:'Noto Sans JP',sans-serif;font-size:12px;font-weight:700;color:var(--accent);}
-.match-zh{font-size:10px;color:var(--muted);margin-top:1px;}
-.match-ans{font-size:12px;color:var(--text);font-family:'Noto Sans JP',sans-serif;}
+/* ══ NUM TYPE BTN ══ */
+.num-type-btn{padding:8px 16px;border-radius:20px;border:1.5px solid var(--border);background:var(--white);color:#64748b;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;font-family:'Noto Sans TC',sans-serif;}
+.num-type-btn.active{background:#2563eb;color:#fff;border-color:#2563eb;}
 
-.match-connector{width:18px;display:flex;justify-content:center;align-items:center;height:30px;margin-top:0;}
-.conn-line{width:2px;background:var(--border);height:100%;border-radius:1px;}
+/* ══ IMPORT ══ */
+.import-zone{border:2.5px dashed var(--border);border-radius:var(--radius);padding:40px;text-align:center;cursor:pointer;transition:all .2s;background:var(--white);}
+.import-zone:hover,.import-zone.drag{border-color:#2563eb;background:#eff6ff;}
+.import-icon{font-size:48px;margin-bottom:12px;}
+.import-title{font-size:16px;font-weight:800;color:var(--text);margin-bottom:6px;}
+.import-sub{font-size:12px;color:var(--muted);line-height:1.6;}
 
-/* ── ROUND INFO ── */
-.round-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:6px;}
-.round-info{font-size:11px;color:var(--muted);}
-.round-info b{color:var(--text);}
+/* ══ RESULT ══ */
+.result-panel{text-align:center;padding:48px 24px;}
+.result-emoji{font-size:56px;margin-bottom:12px;}
+.result-title{font-size:22px;font-weight:800;color:var(--text);margin-bottom:6px;}
+.result-sub{font-size:14px;color:var(--muted);margin-bottom:20px;}
 
-/* ── RESULT PANEL ── */
-.result-panel{background:var(--surface);border-radius:14px;padding:24px;text-align:center;border:1px solid var(--border);margin-top:20px;}
-.result-emoji{font-size:48px;margin-bottom:12px;}
-.result-title{font-size:20px;font-weight:800;color:var(--white);margin-bottom:6px;}
-.result-sub{font-size:13px;color:var(--muted);margin-bottom:20px;}
-
-/* ── ERROR LIST ── */
-.error-list{display:flex;flex-direction:column;gap:8px;}
-.error-item{
-  background:var(--surface);border-radius:10px;padding:12px 14px;
-  border:1px solid var(--border);border-left:3px solid var(--red);
-  display:flex;align-items:center;justify-content:space-between;gap:12px;
-}
-.error-item.many{border-left-color:var(--red);}
-.error-item.few{border-left-color:var(--yellow);}
-.error-q{display:flex;flex-direction:column;gap:2px;}
-.error-jp{font-family:'Noto Sans JP',sans-serif;font-size:14px;font-weight:700;color:var(--accent);}
-.error-zh{font-size:12px;color:var(--muted);}
-.error-ans{font-size:13px;color:var(--text);}
-.error-cnt{font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;white-space:nowrap;}
-.error-cnt.many{background:rgba(239,68,68,.2);color:var(--red);}
-.error-cnt.few{background:rgba(251,191,36,.2);color:var(--yellow);}
-
-/* ── IMPORT PANEL ── */
-.import-zone{
-  border:2px dashed var(--border);border-radius:14px;padding:40px;
-  text-align:center;cursor:pointer;transition:all .2s;
-  background:var(--surface);
-}
-.import-zone:hover,.import-zone.drag{border-color:var(--accent);background:rgba(56,189,248,.05);}
-.import-icon{font-size:36px;margin-bottom:12px;}
-.import-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;}
-.import-sub{font-size:12px;color:var(--muted);}
-
-/* ── NUMBER TYPE BTNS ── */
-.num-type-btn{
-  padding:7px 14px;border-radius:20px;font-size:12px;font-weight:700;
-  cursor:pointer;border:1.5px solid var(--border);
-  background:var(--surface);color:var(--muted);
-  transition:all .15s;font-family:'Noto Sans TC',sans-serif;
-}
-.num-type-btn.active{background:var(--accent2);color:#fff;border-color:var(--accent2);}
-.num-type-btn:hover:not(.active){border-color:var(--accent);color:var(--accent);}
-
-/* ── CONFIRM DIALOG ── */
-.confirm-overlay{
-  display:none;position:fixed;inset:0;
-  background:rgba(0,0,0,.7);
-  z-index:9000;align-items:center;justify-content:center;
-}
+/* ══ CONFIRM ══ */
+.confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9000;display:none;align-items:center;justify-content:center;}
 .confirm-overlay.open{display:flex;}
-.confirm-box{
-  background:#1e293b;border:1px solid #334155;
-  border-radius:16px;padding:28px 24px;
-  width:100%;max-width:360px;
-  box-shadow:0 24px 60px rgba(0,0,0,.5);
-  animation:spPop .2s ease;
-  text-align:center;
-}
-.confirm-icon{font-size:36px;margin-bottom:12px;}
-.confirm-title{font-size:16px;font-weight:800;color:#f1f5f9;margin-bottom:8px;}
-.confirm-msg{font-size:13px;color:#94a3b8;line-height:1.6;margin-bottom:22px;}
+.confirm-box{background:var(--white);border-radius:16px;padding:28px 24px;max-width:340px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.2);}
+.confirm-icon{font-size:36px;margin-bottom:10px;}
+.confirm-title{font-size:16px;font-weight:800;color:var(--text);margin-bottom:6px;}
+.confirm-msg{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.5;}
 .confirm-btns{display:flex;gap:10px;justify-content:center;}
-@keyframes spPop{from{opacity:0;transform:scale(.93)}to{opacity:1;transform:scale(1)}}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a2535;color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;z-index:9999;transition:transform .3s;border:1px solid var(--border);white-space:nowrap;}
-.toast.show{transform:translateX(-50%) translateY(0);}
 
-/* ── EMPTY ── */
-.empty{text-align:center;padding:60px;color:var(--muted);}
-.empty-icon{font-size:40px;margin-bottom:12px;}
+/* ══ TOAST ══ */
+.v-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(17,24,39,.92);color:#fff;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;opacity:0;transition:all .3s;z-index:9999;pointer-events:none;white-space:nowrap;}
+.v-toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
-/* ── BADGE ── */
-.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;}
-.badge-red{background:rgba(239,68,68,.2);color:var(--red);}
-.badge-green{background:rgba(34,197,94,.2);color:var(--green);}
-.badge-blue{background:rgba(56,189,248,.2);color:var(--accent);}
-
-/* ── PRACTICE ERRORS BTN ── */
-.prac-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;}
-.prac-title{font-size:15px;font-weight:700;color:var(--white);}
-.prac-sub{font-size:12px;color:var(--muted);margin-top:2px;}
-
-@media(max-width:600px){
-  .match-wrap{grid-template-columns:1fr 18px 1fr;gap:0;}
-  .match-item{padding:5px 6px;}
-  .match-jp{font-size:11px;}
-  .match-ans{font-size:11px;}
-  .stat-strip{grid-template-columns:repeat(3,1fr);}
-  .tab-btn{font-size:10px;padding:5px 2px;}
-}
+/* ══ SYNC STATUS ══ */
+#sync-status{font-size:11px;color:var(--muted);}
 </style>
 </head>
 <body>
 
-<div class="topbar">
-  <div class="topbar-left">
-    <span class="topbar-logo">🇯🇵</span>
+<!-- ══ SIDEBAR ══ -->
+<div class="v-sidebar">
+  <div class="v-brand">
+    <div class="v-brand-icon">🇯🇵</div>
     <div>
-      <div class="topbar-title">日文單字複習</div>
-      <div class="topbar-sub" id="top-sub">載入中...</div>
+      <div class="v-brand-title">日文單字練習</div>
+      <div class="v-brand-sub" id="top-sub">載入中...</div>
     </div>
   </div>
-  <div class="topbar-right">
-    <span id="sync-status" style="font-size:11px;color:var(--muted);font-family:var(--mono)"></span>
-    <button class="btn btn-ghost btn-sm" onclick="manualSync()">☁️ 雲端同步</button>
-    <button class="btn btn-ghost btn-sm" onclick="document.getElementById('import-file').click()">📥 匯入 Excel</button>
-    <button class="btn btn-warn btn-sm" onclick="resetTodayProgress()">🔄 重置進度</button>
-    <a href="index.html" class="btn btn-ghost btn-sm">🏠 主目錄</a>
-    <input type="file" id="import-file" accept=".xlsx,.csv" style="display:none" onchange="importFile(event)">
+  <nav class="v-nav">
+    <div class="v-nav-section">主要</div>
+    <div class="v-nav-item active" id="vnav-overview" onclick="vShowPage('overview')">
+      <span class="v-nav-icon">📊</span>學習總覽
+    </div>
+    <div class="v-nav-section">練習</div>
+    <div class="v-nav-item" id="vnav-browse" onclick="vShowPage('browse')">
+      <span class="v-nav-icon">📖</span>對照瀏覽
+    </div>
+    <div class="v-nav-item" id="vnav-weak" onclick="vShowPage('weak')">
+      <span class="v-nav-icon">❌</span>不熟單字
+    </div>
+    <div class="v-nav-item" id="vnav-errors" onclick="vShowPage('errors')">
+      <span class="v-nav-icon">🔥</span>練習常錯
+    </div>
+    <div class="v-nav-item" id="vnav-numbers" onclick="vShowPage('numbers')">
+      <span class="v-nav-icon">🔢</span>數字練習
+    </div>
+    <div class="v-nav-section">管理</div>
+    <div class="v-nav-item" id="vnav-import" onclick="vShowPage('import')">
+      <span class="v-nav-icon">📥</span>匯入單字
+    </div>
+  </nav>
+  <div class="v-sidebar-footer">
+    <button class="v-sidebar-btn warn" onclick="resetTodayProgress()">🔄 重置進度</button>
+    <button class="v-sidebar-btn" onclick="manualSync()">☁️ 雲端同步</button>
+    <button class="v-sidebar-btn" onclick="document.getElementById('import-file').click()">📥 匯入 Excel</button>
+    <a href="index.html" class="v-sidebar-btn" style="text-decoration:none;display:block">🏠 主目錄</a>
   </div>
 </div>
 
-<div class="main">
-
-  <!-- 進度條 -->
-  <div class="prog-wrap">
-    <div class="prog-label">
-      <span>練習進度</span>
-      <span id="prog-text">0 / 0</span>
+<!-- ══ MAIN ══ -->
+<div class="v-main">
+  <div class="v-topbar">
+    <div class="v-topbar-title" id="v-page-name">學習總覽</div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <span id="sync-status"></span>
     </div>
-    <div class="prog-bar-bg"><div class="prog-bar" id="prog-bar" style="width:0%"></div></div>
   </div>
 
-  <!-- 統計 -->
-  <div class="stat-strip">
-    <div class="stat-card"><div class="stat-label">📚 總單字數</div><div class="stat-val blue" id="s-total">0</div></div>
-    <div class="stat-card"><div class="stat-label">✅ 已完成</div><div class="stat-val green" id="s-done">0</div></div>
-    <div class="stat-card"><div class="stat-label">📋 待複習</div><div class="stat-val yellow" id="s-remain">0</div></div>
-    <div class="stat-card"><div class="stat-label">❌ 常錯單字</div><div class="stat-val red" id="s-errors">0</div></div>
-    <div class="stat-card"><div class="stat-label">🔥 連續答對</div><div class="stat-val purple" id="s-streak">0</div></div>
-  </div>
+  <div class="v-content">
 
-  <!-- Tab -->
-  <div class="tab-nav">
-    <button class="tab-btn active" onclick="switchTab('match')">📖 對照瀏覽</button>
-    <button class="tab-btn" onclick="switchTab('weak')">❌ 不熟單字</button>
-    <button class="tab-btn" onclick="switchTab('numbers')">🔢 數字</button>
-    <button class="tab-btn" onclick="switchTab('import')">📥 匯入</button>
-  </div>
-
-  <!-- ══ TAB 1: 對照瀏覽 ══ -->
-  <div class="view active" id="view-match">
-
-    <!-- 控制列 -->
-    <div class="round-bar" style="margin-bottom:10px">
-      <div class="round-info">第 <b id="page-num">1</b> 頁　<span id="page-range">1-20</span>　共 <b id="total-pages">0</b> 頁</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-        <button class="btn btn-ghost btn-sm" onclick="prevPage()">← 上一頁</button>
-        <button class="btn btn-primary btn-sm" onclick="nextPage()">下一頁 +進度 →</button>
+    <!-- 頁面：總覽 -->
+    <div class="v-page active" id="vpage-overview">
+      <div class="v-kpi-grid">
+        <div class="v-kpi-card"><div class="v-kpi-accent" style="background:#8fa8c8"></div><div class="v-kpi-label">📚 總單字數</div><div class="v-kpi-val" id="s-total">0</div></div>
+        <div class="v-kpi-card"><div class="v-kpi-accent" style="background:#a8c5a0"></div><div class="v-kpi-label">✅ 已完成</div><div class="v-kpi-val" id="s-done">0</div></div>
+        <div class="v-kpi-card"><div class="v-kpi-accent" style="background:#c9a99a"></div><div class="v-kpi-label">📋 待複習</div><div class="v-kpi-val" id="s-remain">0</div></div>
+        <div class="v-kpi-card"><div class="v-kpi-accent" style="background:#f87171"></div><div class="v-kpi-label">❌ 不熟單字</div><div class="v-kpi-val" id="s-errors">0</div></div>
+        <div class="v-kpi-card"><div class="v-kpi-accent" style="background:#b5adc4"></div><div class="v-kpi-label">🔥 連續答對</div><div class="v-kpi-val" id="s-streak">0</div></div>
+      </div>
+      <div class="v-prog-wrap">
+        <div class="v-prog-label"><span>今日學習進度</span><span id="prog-text">0 / 0</span></div>
+        <div class="v-prog-bg"><div class="v-prog-bar" id="prog-bar" style="width:0%"></div></div>
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <button class="v-btn primary" onclick="vShowPage('browse')">📖 開始對照瀏覽</button>
+        <button class="v-btn" onclick="vShowPage('weak')">❌ 查看不熟單字</button>
+        <button class="v-btn" onclick="vShowPage('errors')">🔥 練習常錯</button>
+        <button class="v-btn" onclick="vShowPage('numbers')">🔢 數字練習</button>
       </div>
     </div>
 
-    <!-- 對照列表 -->
-    <div id="browse-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px">
-      <!-- JS 渲染 -->
-    </div>
-
-    <!-- 底部導航（同上） -->
-    <div class="round-bar" id="browse-nav-bottom" style="margin-top:4px;margin-bottom:16px;display:none">
-      <div class="round-info">第 <b id="page-num-b">1</b> 頁　<span id="page-range-b">1-60</span>　共 <b id="total-pages-b">0</b> 頁</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-        <button class="btn btn-ghost btn-sm" onclick="prevPage()">← 上一頁</button>
-        <button class="btn btn-primary btn-sm" onclick="nextPage()">下一頁 +進度 →</button>
+    <!-- 頁面：對照瀏覽 -->
+    <div class="v-page" id="vpage-browse">
+      <div class="v-card">
+        <div class="v-card-hdr">
+          <div class="v-card-title">📖 對照瀏覽</div>
+          <div class="v-page-btns">
+            <button class="v-btn" onclick="prevPage()">← 上一頁</button>
+            <button class="v-btn primary" onclick="nextPage()">下一頁 +進度 →</button>
+          </div>
+        </div>
+        <div class="v-page-nav" style="padding:8px 18px 0">
+          <span class="v-page-info">第 <b id="page-num">1</b> 頁　<span id="page-range">1-60</span>　共 <b id="total-pages">0</b> 頁</span>
+        </div>
+        <div id="browse-list" style="display:flex;flex-direction:column"></div>
+        <div id="all-done" style="display:none">
+          <div class="result-panel">
+            <div class="result-emoji">🎉</div>
+            <div class="result-title">全部完成！</div>
+            <div class="result-sub" id="all-done-sub"></div>
+            <button class="v-btn primary" onclick="resetTodayProgress()">重新開始</button>
+          </div>
+        </div>
+        <div class="v-card-hdr" style="justify-content:flex-end;border-top:1px solid #f0f2f5;border-bottom:none">
+          <div class="v-page-btns">
+            <button class="v-btn" onclick="prevPage()">← 上一頁</button>
+            <button class="v-btn primary" onclick="nextPage()">下一頁 +進度 →</button>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- 全部完成 -->
-    <div id="all-done" style="display:none">
-      <div class="result-panel">
-        <div class="result-emoji">🏆</div>
-        <div class="result-title">全部完成！</div>
-        <div class="result-sub" id="all-done-sub"></div>
-        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
-          <button class="btn btn-primary" onclick="restartAll()">重頭開始</button>
-          <button class="btn btn-warn btn-sm" onclick="switchTab('weak')">❌ 練習不熟單字</button>
+    <!-- 頁面：不熟單字 -->
+    <div class="v-page" id="vpage-weak">
+      <div class="v-card">
+        <div class="v-card-hdr">
+          <div class="v-card-title">❌ 不熟單字</div>
+          <div class="v-page-btns">
+            <button class="v-btn" onclick="prevWeakPage()">← 上一頁</button>
+            <button class="v-btn primary" onclick="nextWeakPage()">下一頁 →</button>
+          </div>
+        </div>
+        <div class="v-page-nav" style="padding:8px 18px 0">
+          <span class="v-page-info">第 <b id="weak-page-num">1</b> 頁　共 <b id="weak-total-pages">0</b> 頁</span>
+        </div>
+        <div id="weak-list" style="display:flex;flex-direction:column"></div>
+        <div id="weak-empty" style="display:none">
+          <div class="result-panel">
+            <div class="result-emoji">🎉</div>
+            <div class="result-title">沒有不熟的單字！</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 頁面：練習常錯 -->
+    <div class="v-page" id="vpage-errors">
+      <div class="v-card">
+        <div class="v-card-hdr">
+          <div class="v-card-title">🔥 練習常錯單字</div>
+          <button class="v-btn warn" onclick="startPracticeErrors()">重新出題</button>
+        </div>
+        <div style="padding:14px 18px">
+          <div id="pe-round-bar" style="display:none;margin-bottom:12px">
+            <span class="v-page-info">已配對 <b id="pe-matched">0</b> / <b id="pe-total">0</b></span>
+          </div>
+          <div class="match-wrap" id="pe-match-area"></div>
+          <div id="pe-done" style="display:none">
+            <div class="result-panel">
+              <div class="result-emoji">💪</div>
+              <div class="result-title">常錯單字練習完成！</div>
+              <div class="result-sub">繼續保持，錯誤率會越來越低的！</div>
+              <button class="v-btn warn" onclick="startPracticeErrors()">再練一次</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 常錯單字列表 -->
+      <div class="v-card">
+        <div class="v-card-hdr">
+          <div class="v-card-title">📋 常錯單字列表</div>
+          <button class="v-btn danger" onclick="clearErrors()">清除記錄</button>
+        </div>
+        <div id="error-list-wrap"></div>
+      </div>
+    </div>
+
+    <!-- 頁面：數字練習 -->
+    <div class="v-page" id="vpage-numbers">
+      <div class="v-card">
+        <div class="v-card-hdr">
+          <div class="v-card-title">🔢 數字練習</div>
+          <button class="v-btn primary" onclick="startNumGame()">重新出題</button>
+        </div>
+        <div style="padding:14px 18px">
+          <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+            <button class="num-type-btn active" data-type="count" onclick="selectNumType(this)">🧮 數量詞 1-10</button>
+            <button class="num-type-btn" data-type="num1" onclick="selectNumType(this)">🔢 數字 1-10</button>
+            <button class="num-type-btn" data-type="num2" onclick="selectNumType(this)">🔢 數字 11-20</button>
+            <button class="num-type-btn" data-type="months" onclick="selectNumType(this)">📅 月份 1-12月</button>
+            <button class="num-type-btn" data-type="all" onclick="selectNumType(this)">🎲 全部混合</button>
+          </div>
+          <div id="num-score-bar" style="display:none;margin-bottom:10px">
+            <span class="v-page-info">已配對 <b id="num-matched">0</b> / <b id="num-total">0</b></span>
+          </div>
+          <div class="match-wrap" id="num-match-area"></div>
+          <div id="num-done" style="display:none">
+            <div class="result-panel">
+              <div class="result-emoji">🎉</div>
+              <div class="result-title">練習完成！</div>
+              <div class="result-sub">數字掌握得很好！再來一次鞏固記憶？</div>
+              <button class="v-btn primary" onclick="startNumGame()">再練一次</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 頁面：匯入 -->
+    <div class="v-page" id="vpage-import">
+      <div class="v-card">
+        <div class="v-card-hdr"><div class="v-card-title">📥 匯入單字</div></div>
+        <div style="padding:16px">
+          <div class="import-zone" id="drop-zone"
+            ondragover="event.preventDefault();this.classList.add('drag')"
+            ondragleave="this.classList.remove('drag')"
+            ondrop="dropFile(event)"
+            onclick="document.getElementById('import-file').click()">
+            <div class="import-icon">📊</div>
+            <div class="import-title">點擊或拖曳 Excel / CSV 檔案</div>
+            <div class="import-sub">A 欄：中文＋日文（問題）　B 欄：正確解答<br>新匯入會合併保留，不會覆蓋學習記錄</div>
+          </div>
+          <div style="margin-top:16px;background:#f8fafc;border-radius:10px;padding:14px;border:1px solid var(--border)">
+            <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px">📋 目前單字庫</div>
+            <div id="vocab-preview" style="font-size:12px;color:var(--muted)">尚未載入</div>
+          </div>
+          <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+            <button class="v-btn danger" onclick="clearAllVocab()">🗑 清除所有單字</button>
+            <button class="v-btn" onclick="clearAllProgress()">🔄 清除學習記錄</button>
+          </div>
         </div>
       </div>
     </div>
 
   </div>
+</div>
 
-  <!-- ══ TAB 2: 常錯單字 ══ -->
-  <div class="view" id="view-errors">
-    <div class="prac-header">
-      <div>
-        <div class="prac-title">❌ 常錯單字</div>
-        <div class="prac-sub">答錯 2 次以上的單字會列在這裡</div>
-      </div>
-      <button class="btn btn-warn btn-sm" onclick="clearErrors()">清除記錄</button>
-    </div>
-    <div id="error-list-wrap"></div>
-  </div>
+<!-- 隱藏 elements（JS 相容用）-->
+<div style="display:none">
+  <div class="view active" id="view-match"></div>
+  <div class="view" id="view-errors"></div>
+  <div class="view" id="view-practice-errors"></div>
+  <div class="view" id="view-numbers"></div>
+  <div class="view" id="view-weak"></div>
+  <div class="view" id="view-import"></div>
+  <div id="browse-nav-bottom"></div>
+  <span id="page-num-b"></span><span id="page-range-b"></span><span id="total-pages-b"></span>
+  <span id="weak-page-num-b"></span><span id="weak-total-pages-b"></span>
+  <input type="file" id="import-file" accept=".xlsx,.csv" onchange="importFile(event)">
+</div>
 
-  <!-- ══ TAB 3: 練習常錯 ══ -->
-  <div class="view" id="view-practice-errors">
-    <div class="prac-header">
-      <div>
-        <div class="prac-title">🔥 練習常錯單字</div>
-        <div class="prac-sub" id="pe-sub">從常錯單字中出題</div>
-      </div>
-      <button class="btn btn-warn btn-sm" onclick="startPracticeErrors()">重新出題</button>
-    </div>
-    <div id="pe-round-bar" style="margin-bottom:14px;display:none">
-      <div class="round-info">已配對 <b id="pe-matched">0</b> / <b id="pe-total">0</b></div>
-    </div>
-    <div class="match-wrap" id="pe-match-area"></div>
-    <div id="pe-done" style="display:none">
-      <div class="result-panel">
-        <div class="result-emoji">💪</div>
-        <div class="result-title">常錯單字練習完成！</div>
-        <div class="result-sub">繼續保持，錯誤率會越來越低的！</div>
-        <button class="btn btn-warn" onclick="startPracticeErrors()">再練一次</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══ TAB 4: 數字練習 ══ -->
-  <div class="view" id="view-numbers">
-    <div class="prac-header">
-      <div>
-        <div class="prac-title">🔢 數字練習</div>
-        <div class="prac-sub" id="num-sub">選擇練習類型</div>
-      </div>
-      <button class="btn btn-primary btn-sm" onclick="startNumGame()">重新出題</button>
-    </div>
-
-    <!-- 類型選擇 -->
-    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
-      <button class="num-type-btn active" data-type="count" onclick="selectNumType(this)">🧮 數量詞 1-10</button>
-      <button class="num-type-btn" data-type="num1" onclick="selectNumType(this)">🔢 數字 1-10</button>
-      <button class="num-type-btn" data-type="num2" onclick="selectNumType(this)">🔢 數字 11-20</button>
-      <button class="num-type-btn" data-type="months" onclick="selectNumType(this)">📅 月份 1-12月</button>
-      <button class="num-type-btn" data-type="all" onclick="selectNumType(this)">🎲 全部混合</button>
-    </div>
-
-    <div id="num-score-bar" style="display:none;margin-bottom:10px">
-      <div class="round-info">已配對 <b id="num-matched">0</b> / <b id="num-total">0</b></div>
-    </div>
-
-    <div class="match-wrap" id="num-match-area"></div>
-
-    <div id="num-done" style="display:none">
-      <div class="result-panel">
-        <div class="result-emoji">🎉</div>
-        <div class="result-title">練習完成！</div>
-        <div class="result-sub">數字掌握得很好！再來一次鞏固記憶？</div>
-        <button class="btn btn-primary" onclick="startNumGame()">再練一次</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══ TAB: 不熟單字 ══ -->
-  <div class="view" id="view-weak">
-    <div class="round-bar" style="margin-bottom:10px">
-      <div class="round-info">不熟單字　第 <b id="weak-page-num">1</b> 頁　共 <b id="weak-total-pages">0</b> 頁</div>
-      <div style="display:flex;gap:8px">
-        <button class="btn btn-ghost btn-sm" onclick="prevWeakPage()">← 上一頁</button>
-        <button class="btn btn-primary btn-sm" onclick="nextWeakPage()">下一頁 →</button>
-      </div>
-    </div>
-    <div id="weak-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px"></div>
-    <div id="weak-empty" style="display:none;text-align:center;padding:40px;color:var(--muted)">
-      <div style="font-size:40px;margin-bottom:8px">🎉</div>
-      <div style="font-size:16px;font-weight:700">沒有不熟的單字！</div>
-    </div>
-  </div>
-
-  <!-- ══ TAB 5: 匯入管理 ══ -->
-  <div class="view" id="view-import">
-    <div class="import-zone" id="drop-zone"
-      ondragover="event.preventDefault();this.classList.add('drag')"
-      ondragleave="this.classList.remove('drag')"
-      ondrop="dropFile(event)"
-      onclick="document.getElementById('import-file').click()">
-      <div class="import-icon">📊</div>
-      <div class="import-title">點擊或拖曳 Excel / CSV 檔案</div>
-      <div class="import-sub">A 欄：中文＋日文（問題）　B 欄：正確解答<br>新匯入會合併保留，不會覆蓋學習記錄</div>
-    </div>
-
-    <div style="margin-top:20px;background:var(--surface);border-radius:12px;padding:16px;border:1px solid var(--border)">
-      <div style="font-size:13px;font-weight:700;color:var(--white);margin-bottom:10px">📋 目前單字庫</div>
-      <div id="vocab-preview" style="font-size:12px;color:var(--muted)">尚未載入</div>
-    </div>
-
-    <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
-      <button class="btn btn-danger btn-sm" onclick="clearAllVocab()">🗑 清除所有單字</button>
-      <button class="btn btn-ghost btn-sm" onclick="clearAllProgress()">🔄 清除學習記錄</button>
-    </div>
-  </div>
-
-</div><!-- /main -->
-
-<!-- ══ 自製確認視窗 ══ -->
+<!-- ══ 確認視窗 ══ -->
 <div class="confirm-overlay" id="confirm-overlay">
   <div class="confirm-box">
     <div class="confirm-icon" id="confirm-icon">⚠️</div>
-    <div class="confirm-title" id="confirm-title"></div>
+    <div class="confirm-title" id="confirm-title">確認</div>
     <div class="confirm-msg" id="confirm-msg"></div>
     <div class="confirm-btns">
-      <button class="btn btn-ghost" onclick="closeConfirm()">取消</button>
-      <button class="btn btn-danger" id="confirm-ok-btn">確定</button>
+      <button class="v-btn" onclick="closeConfirm(false)">取消</button>
+      <button class="v-btn danger" id="confirm-ok" onclick="closeConfirm(true)">確定</button>
     </div>
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<div class="v-toast" id="toast"></div>
+
+
+// ══ 新版導航 ══
+const V_PAGE_NAMES={overview:'學習總覽',browse:'對照瀏覽',weak:'不熟單字',errors:'練習常錯',numbers:'數字練習',import:'匯入單字'};
+function vShowPage(id){
+  document.querySelectorAll('.v-page').forEach(p=>p.classList.remove('active'));
+  const page=document.getElementById('vpage-'+id);
+  if(page)page.classList.add('active');
+  document.querySelectorAll('.v-nav-item').forEach(el=>el.classList.toggle('active',el.id==='vnav-'+id));
+  const title=document.getElementById('v-page-name');
+  if(title)title.textContent=V_PAGE_NAMES[id]||id;
+  const main=document.querySelector('.v-main');
+  if(main)main.scrollTo({top:0,behavior:'smooth'});
+  // 切換時更新對應內容
+  if(id==='overview'){updateStats();}
+  if(id==='browse'){renderBrowsePage();}
+  if(id==='weak'){renderWeakPage();}
+  if(id==='errors'){renderErrorList();startPracticeErrors();}
+  if(id==='numbers'){startNumGame();}
+  if(id==='import'){renderVocabPreview();}
+}
+
+// 舊版 switchTab 相容
+function switchTab(tab){
+  const tabMap={match:'browse',weak:'weak',errors:'errors','practice-errors':'errors',numbers:'numbers',import:'import'};
+  vShowPage(tabMap[tab]||tab);
+}
+
+// toast 相容（新版用 v-toast）
+function showToast(msg){
+  const el=document.getElementById('toast');
+  if(el){el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500);}
+}
 
 <script>
 // ══════════════════════════════════════
@@ -532,10 +568,10 @@ function renderBrowsePage(){
   // 渲染單字列表
   list.innerHTML=pageWords.map(v=>{
     const isWeak=!!(db.weak||{})[v.id];
-    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:${isWeak?'rgba(239,68,68,.08)':'var(--surface)'};border:1px solid ${isWeak?'rgba(239,68,68,.3)':'var(--border)'};border-radius:10px;">
-      <div style="flex:1;font-size:15px;font-weight:700;color:var(--text)">${v.q}</div>
-      <div style="flex:1;font-size:15px;color:var(--accent);font-family:'Noto Sans JP',sans-serif;text-align:center">${v.a}</div>
-      <button onclick="toggleWeak('${v.id}')" style="flex-shrink:0;padding:5px 12px;border-radius:8px;border:1px solid ${isWeak?'rgba(239,68,68,.5)':'var(--border)'};background:${isWeak?'rgba(239,68,68,.15)':'transparent'};color:${isWeak?'#ef4444':'var(--muted)'};font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap">
+    return `<div class="v-word-row${isWeak?' weak-row':''}">
+      <div class="v-word-q">${v.q}</div>
+      <div class="v-word-a">${v.a}</div>
+      <button onclick="toggleWeak('${v.id}')" class="v-weak-btn${isWeak?' on':''}">
         ${isWeak?'✓ 不熟':'不熟'}
       </button>
     </div>`;
