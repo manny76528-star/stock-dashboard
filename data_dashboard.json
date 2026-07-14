@@ -2302,7 +2302,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1784021553432,
+  "_ts": 1784021565199,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -2363,7 +2363,7 @@
   "journals": [
     {
       "id": "mrk6czaqo4q",
-      "date": "2026-07-14",
+      "date": "2026-07-13",
       "tags": [
         "YouTube"
       ],
@@ -2381,9 +2381,7 @@
       "indexVal": 44468,
       "stockPrices": null,
       "aiAnalysis": null,
-      "images": [
-        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1784004331044_3q8z.jpg"
-      ]
+      "images": []
     },
     {
       "id": "mrbw2pzhsfm",
