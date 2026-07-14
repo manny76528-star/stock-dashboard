@@ -2302,7 +2302,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1784004140064,
+  "_ts": 1784004741021,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -2361,6 +2361,30 @@
     }
   ],
   "journals": [
+    {
+      "id": "mrk6czaqo4q",
+      "date": "2026-07-14",
+      "tags": [
+        "YouTube"
+      ],
+      "market": "美銀上調三大CSP資本支出預測\n海力士破紀錄點15趴 , 韓國第七次熔斷",
+      "marketUrl": "https://udn.com/news/story/6811/9614709",
+      "youtubeUrl": "https://www.youtube.com/watch?v=ZACsUuAkCpI&t=947s",
+      "content": "上週四美銀還上調三大CSP資本支出預測 , 帶動AI設備股想要反攻\n但接連被韓國股市的下殺拖累整個AI硬體股 , 尤其是韓國股市\n大盤不到一個月回跌30% , 主要還是槓桿ETF超高引起連帶效應\n加上META販賣多於出租引起市場恐慌 , 目前就是等一個龍頭公司的財報拉破除市場擔憂\n\n昨天看了群聯董事的專訪 他提到整體的AI建設還在持續且尚無法被滿足\n1. 目前各大龍頭公司投入的都是前期建設成本 現在收手等於白花\n2. TOKEN永遠無法被滿足 且會等比例放大 主要是目前都是文字KB需求 幾年後會是影音(MB)\n3. 擴廠是無法等比例放大,假設目前五個產線 , 2-3年後最多就是放大1.2倍 - 1.5倍\n4. 目前群聯股價2200元, 發了3700 海外可轉債 以目前在手跟未來訂單公司 有信心轉換完成\n\n這也只能持續加強持股的信心外 就是蓋牌了, 畢竟我自以為聰明的操作已經失手好幾次了.. 包含最近的短債轉移到主動ETF , 但時間周期拉長 以目前AI需求我相信會是對的",
+      "stockTags": [
+        "00981A",
+        "00988A",
+        "00981T"
+      ],
+      "eventCat": "技術面",
+      "behavior": "觸發PTSD",
+      "indexVal": 44468,
+      "stockPrices": null,
+      "aiAnalysis": null,
+      "images": [
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1784004331044_3q8z.jpg"
+      ]
+    },
     {
       "id": "mrbw2pzhsfm",
       "date": "2026-07-08",
