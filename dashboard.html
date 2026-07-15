@@ -2235,7 +2235,10 @@ body:not(.privacy) .privacy-mask{filter:none;}
         <div class="inv-page-card" style="padding:0;overflow:hidden">
           <div class="inv-page-hdr" style="padding:12px 16px;border-bottom:1px solid #f0f2f5">
             <div class="inv-page-title">💼 目前持股</div>
-            <button onclick="openInvModal()" style="padding:5px 12px;background:#eff6ff;border:1px solid #bfdbfe;color:#2563eb;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">＋ 新增</button>
+            <div style="display:flex;gap:6px">
+              <button onclick="openSearchModal()" style="padding:5px 12px;background:#f8f9fa;border:1px solid #eaecf0;color:#374151;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">🔍 查詢記錄</button>
+              <button onclick="openInvModal()" style="padding:5px 12px;background:#eff6ff;border:1px solid #bfdbfe;color:#2563eb;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">＋ 新增</button>
+            </div>
           </div>
           <div id="invest-page-body"></div>
         </div>
