@@ -692,16 +692,6 @@ function nextWeakPage(){
   if(weakPage<totalPages-1){weakPage++;renderWeakPage();window.scrollTo(0,0);}
 }
 
-function resetTodayProgress(){
-  if(!confirm('確定要重置今日進度？'))return;
-  db.todayDone=[];
-  currentPage=0;
-  db.currentPage=0;
-  saveDB();
-  renderBrowsePage();
-  toast('已重置進度');
-}
-
 // IMPORT
 // ══════════════════════════════════════
 function importFile(evt){
@@ -988,21 +978,18 @@ function showConfirm({icon='⚠️',title,msg,btnText='確定',btnClass='btn-dan
   el('confirm-icon').textContent=icon;
   el('confirm-title').textContent=title;
   el('confirm-msg').textContent=msg;
-  const okBtn=el('confirm-ok-btn');
+  const okBtn=el('confirm-ok');
   okBtn.textContent=btnText;
   okBtn.className='btn '+btnClass;
   _confirmCallback=onOk;
   el('confirm-overlay').classList.add('open');
 }
-function closeConfirm(){
+function closeConfirm(confirmed){
   el('confirm-overlay').classList.remove('open');
-  _confirmCallback=null;
+  if(confirmed===true&&_confirmCallback){const cb=_confirmCallback;_confirmCallback=null;cb();}
+  else _confirmCallback=null;
 }
-el('confirm-ok-btn').addEventListener('click',()=>{
-  closeConfirm();
-  if(_confirmCallback)_confirmCallback();
-  _confirmCallback=null;
-});
+el('confirm-ok').addEventListener('click',()=>closeConfirm(true));
 // ESC 關閉
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeConfirm();});
 
