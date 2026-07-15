@@ -192,6 +192,13 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-seri
     <div class="v-nav-item" id="vnav-numbers" onclick="vShowPage('numbers')">
       <span class="v-nav-icon">🔢</span>數字練習
     </div>
+    <div class="v-nav-section">文法</div>
+    <div class="v-nav-item" id="vnav-grammar" onclick="vShowPage('grammar')">
+      <span class="v-nav-icon">📝</span>文法選擇題
+    </div>
+    <div class="v-nav-item" id="vnav-grammar-weak" onclick="vShowPage('grammar-weak')">
+      <span class="v-nav-icon">❌</span>文法不熟
+    </div>
     <div class="v-nav-section">管理</div>
     <div class="v-nav-item" id="vnav-import" onclick="vShowPage('import')">
       <span class="v-nav-icon">📥</span>匯入單字
@@ -354,6 +361,45 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-seri
       </div>
     </div>
 
+    <!-- 頁面：文法選擇題 -->
+    <div class="v-page" id="vpage-grammar">
+      <div class="v-card">
+        <div class="v-card-hdr">
+          <div class="v-card-title">📝 文法選擇題</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span id="g-progress" style="font-size:12px;color:var(--muted)"></span>
+            <button class="v-btn primary" onclick="startGrammarQuiz()">重新出題</button>
+          </div>
+        </div>
+        <div style="padding:20px">
+          <div id="grammar-quiz-area">
+            <div style="text-align:center;color:var(--muted);padding:40px">
+              <div style="font-size:36px;margin-bottom:12px">📝</div>
+              <div style="font-size:14px;font-weight:700">尚未匯入文法單字</div>
+              <div style="font-size:12px;margin-top:6px">請在 Excel 工作表2 加入文法內容</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 頁面：文法不熟 -->
+    <div class="v-page" id="vpage-grammar-weak">
+      <div class="v-card">
+        <div class="v-card-hdr">
+          <div class="v-card-title">❌ 文法不熟單字</div>
+          <button class="v-btn warn" onclick="startGrammarWeakQuiz()">練習不熟文法</button>
+        </div>
+        <div id="grammar-weak-list" style="display:flex;flex-direction:column"></div>
+        <div id="grammar-weak-empty" style="display:none">
+          <div class="result-panel">
+            <div class="result-emoji">🎉</div>
+            <div class="result-title">沒有不熟的文法！</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- 頁面：匯入 -->
     <div class="v-page" id="vpage-import">
       <div class="v-card">
@@ -414,7 +460,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-seri
 
 <script>
 // ══ 新版導航 ══
-const V_PAGE_NAMES={overview:'學習總覽',browse:'對照瀏覽',weak:'不熟單字',errors:'練習常錯',numbers:'數字練習',import:'匯入單字'};
+const V_PAGE_NAMES={overview:'學習總覽',browse:'對照瀏覽',weak:'不熟單字',errors:'練習常錯',numbers:'數字練習',grammar:'文法選擇題','grammar-weak':'文法不熟',import:'匯入單字'};
 function vShowPage(id){
   document.querySelectorAll('.v-page').forEach(p=>p.classList.remove('active'));
   const page=document.getElementById('vpage-'+id);
@@ -431,6 +477,8 @@ function vShowPage(id){
   if(id==='errors'){renderErrorList();startPracticeErrors();}
   if(id==='numbers'){startNumGame();}
   if(id==='import'){renderVocabPreview();}
+  if(id==='grammar'){renderGrammarQuiz();}
+  if(id==='grammar-weak'){renderGrammarWeakList();}
 }
 
 // 舊版 switchTab 相容
@@ -509,7 +557,8 @@ function updateStats(){
   const pct=total>0?Math.round(done/total*100):0;
   if(el('prog-bar'))el('prog-bar').style.width=pct+'%';
   if(el('prog-text'))el('prog-text').textContent=done+' / '+total;
-  if(el('top-sub'))el('top-sub').textContent=total>0?`共 ${total} 個・已完成 ${done} 個・不熟 ${weakCount} 個`:'尚未載入單字';
+  const grammarCount=(db.grammar||[]).length;
+  if(el('top-sub'))el('top-sub').textContent=total>0?`單字 ${total} 個・文法 ${grammarCount} 個・已完成 ${done} 個`:'尚未載入單字';
 }
 
 // 當前這輪的洗牌順序（翻頁時保持固定）
@@ -639,6 +688,126 @@ function restartAll(){
 // ══════════════════════════════════════
 // WEAK WORDS PAGE
 // ══════════════════════════════════════
+// ══════════════════════════════════════
+// GRAMMAR
+// ══════════════════════════════════════
+function processGrammarRows(rows){
+  if(!db.grammar)db.grammar=[];
+  if(!db.grammarWeak)db.grammarWeak={};
+  let added=0,skipped=0;
+  const existing=new Set(db.grammar.map(g=>g.q+'|'+g.a));
+  rows.forEach(r=>{
+    const q=(r[0]||'').toString().trim();
+    const a=(r[1]||'').toString().trim();
+    if(!q||!a){skipped++;return;}
+    const key=q+'|'+a;
+    if(existing.has(key)){skipped++;return;}
+    const id='g'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+    db.grammar.push({id,q,a});
+    existing.add(key);added++;
+  });
+  saveDB();renderGrammarQuiz();updateStats();
+  toast('✅ 文法：新增 '+added+' 筆，略過 '+skipped+' 筆');
+}
+
+let gQuizList=[],gQuizIdx=0;
+
+function startGrammarQuiz(weakOnly){
+  if(!db.grammar)db.grammar=[];
+  if(!db.grammarWeak)db.grammarWeak={};
+  const pool=weakOnly?db.grammar.filter(g=>db.grammarWeak[g.id]):db.grammar;
+  const area=document.getElementById('grammar-quiz-area');
+  if(pool.length===0){
+    if(area)area.innerHTML='<div style="text-align:center;color:var(--muted);padding:40px"><div style="font-size:36px;margin-bottom:12px">'+(weakOnly?'🎉':'📝')+'</div><div style="font-size:14px;font-weight:700">'+(weakOnly?'沒有不熟的文法！':'尚未匯入文法單字')+'</div></div>';
+    return;
+  }
+  gQuizList=shuffle(pool);gQuizIdx=0;
+  renderGrammarQuestion();
+}
+
+function renderGrammarQuiz(){
+  if(!db.grammar||db.grammar.length===0){
+    const area=document.getElementById('grammar-quiz-area');
+    if(area)area.innerHTML='<div style="text-align:center;color:var(--muted);padding:40px"><div style="font-size:36px;margin-bottom:12px">📝</div><div style="font-size:14px;font-weight:700">尚未匯入文法單字</div><div style="font-size:12px;margin-top:6px">請在 Excel 工作表2 加入文法內容</div></div>';
+    return;
+  }
+  startGrammarQuiz(false);
+}
+
+function renderGrammarQuestion(){
+  const area=document.getElementById('grammar-quiz-area');
+  const prog=document.getElementById('g-progress');
+  if(!area)return;
+  if(gQuizIdx>=gQuizList.length){
+    area.innerHTML='<div class="result-panel"><div class="result-emoji">🎉</div><div class="result-title">全部完成！</div><div class="result-sub">文法掌握得很好！</div><button class="v-btn primary" onclick="startGrammarQuiz(false)">再練一次</button></div>';
+    if(prog)prog.textContent='';return;
+  }
+  if(prog)prog.textContent=(gQuizIdx+1)+' / '+gQuizList.length;
+  const cur=gQuizList[gQuizIdx];
+  const isWeak=!!(db.grammarWeak||{})[cur.id];
+  const others=db.grammar.filter(g=>g.id!==cur.id).map(g=>g.a);
+  const wrong=shuffle(others).slice(0,3);
+  const opts=shuffle([cur.a,...wrong]);
+  const ca=cur.a.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+  area.innerHTML='<div style="margin-bottom:20px">'
+    +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">'
+    +'<div style="font-size:16px;font-weight:800;color:var(--text);flex:1">'+cur.q+'</div>'
+    +'<button onclick="toggleGrammarWeak(\''+cur.id+'\')" class="v-weak-btn'+(isWeak?' on':'')+'" id="gw-btn">'+(isWeak?'✓ 不熟':'不熟')+'</button>'
+    +'</div>'
+    +'<div style="display:flex;flex-direction:column;gap:10px" id="g-opts">'
+    +opts.map((o,i)=>{
+      const oe=o.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+      return '<button onclick="checkGrammarAnswer(\''+cur.id+'\',\''+ca+'\',\''+oe+'\',this)"'
+        +' style="padding:14px 18px;border-radius:10px;border:2px solid var(--border);background:var(--white);text-align:left;font-size:14px;font-weight:600;cursor:pointer;transition:all .18s;font-family:\'Noto Sans JP\',sans-serif;color:#374151">'
+        +String.fromCharCode(65+i)+'．'+o+'</button>';
+    }).join('')
+    +'</div></div>';
+}
+
+function checkGrammarAnswer(id,correct,chosen,btn){
+  document.querySelectorAll('#g-opts button').forEach(b=>b.onclick=null);
+  if(chosen===correct){
+    btn.style.cssText+=';border-color:#16a34a!important;background:#dcfce7!important;color:#15803d!important';
+    toast('✅ 正確！');setTimeout(()=>{gQuizIdx++;renderGrammarQuestion();},800);
+  } else {
+    btn.style.cssText+=';border-color:#dc2626!important;background:#fee2e2!important;color:#b91c1c!important';
+    document.querySelectorAll('#g-opts button').forEach(b=>{
+      if(b.textContent.trim().slice(2).trim()===correct)
+        b.style.cssText+=';border-color:#16a34a!important;background:#dcfce7!important;color:#15803d!important';
+    });
+    toast('❌ 答錯了！');setTimeout(()=>{gQuizIdx++;renderGrammarQuestion();},1500);
+  }
+}
+
+function toggleGrammarWeak(id){
+  if(!db.grammarWeak)db.grammarWeak={};
+  if(db.grammarWeak[id])delete db.grammarWeak[id];
+  else db.grammarWeak[id]=true;
+  saveDB();
+  const btn=document.getElementById('gw-btn');
+  if(btn){btn.classList.toggle('on',!!db.grammarWeak[id]);btn.textContent=db.grammarWeak[id]?'✓ 不熟':'不熟';}
+}
+
+function renderGrammarWeakList(){
+  const list=document.getElementById('grammar-weak-list');
+  const empty=document.getElementById('grammar-weak-empty');
+  if(!list)return;
+  if(!db.grammar)db.grammar=[];
+  if(!db.grammarWeak)db.grammarWeak={};
+  const weaks=db.grammar.filter(g=>db.grammarWeak[g.id]);
+  if(weaks.length===0){list.style.display='none';if(empty)empty.style.display='';return;}
+  if(empty)empty.style.display='none';list.style.display='flex';
+  list.innerHTML=weaks.map(g=>'<div class="v-word-row weak-row">'
+    +'<div class="v-word-q">'+g.q+'</div>'
+    +'<div class="v-word-a" style="color:var(--jp)">'+g.a+'</div>'
+    +'<button onclick="toggleGrammarWeak(\''+g.id+'\');renderGrammarWeakList()" class="v-weak-btn on">✓ 不熟</button>'
+    +'</div>').join('');
+}
+
+function startGrammarWeakQuiz(){vShowPage('grammar');startGrammarQuiz(true);}
+
+// ══════════════════════════════════════
+// WEAK PAGE
 function renderWeakPage(){
   const list=el('weak-list');
   const empty=el('weak-empty');
@@ -709,9 +878,16 @@ function importFile(evt){
       try{
         const data=new Uint8Array(e.target.result);
         const wb=XLSX.read(data,{type:'array'});
-        const ws=wb.Sheets[wb.SheetNames[0]];
-        const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
-        processRows(rows);
+        // 工作表1 → 單字
+        const ws1=wb.Sheets[wb.SheetNames[0]];
+        const rows1=XLSX.utils.sheet_to_json(ws1,{header:1,defval:''});
+        processRows(rows1);
+        // 工作表2 → 文法（如有）
+        if(wb.SheetNames.length>1){
+          const ws2=wb.Sheets[wb.SheetNames[1]];
+          const rows2=XLSX.utils.sheet_to_json(ws2,{header:1,defval:''});
+          processGrammarRows(rows2);
+        }
       } catch(err){ toast('❌ 讀取失敗：'+err.message); }
     };
     reader.readAsArrayBuffer(file);
