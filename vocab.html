@@ -827,7 +827,14 @@ function checkGrammarAnswer(id,correct,chosen,btn){
       if(b.textContent.trim().slice(2).trim()===correct)
         b.style.cssText+=';border-color:#16a34a!important;background:#dcfce7!important;color:#15803d!important';
     });
-    toast('❌ 答錯了！');setTimeout(()=>{gQuizIdx++;renderGrammarQuestion();},1500);
+    // 答錯自動標記為不熟
+    if(!db.grammarWeak)db.grammarWeak={};
+    db.grammarWeak[id]=true;
+    saveDB();
+    // 更新不熟按鈕狀態
+    const gwBtn=document.getElementById('gw-btn');
+    if(gwBtn){gwBtn.classList.add('on');gwBtn.textContent='✓ 不熟';}
+    toast('❌ 答錯了！已加入不熟文法');setTimeout(()=>{gQuizIdx++;renderGrammarQuestion();},1500);
   }
 }
 
