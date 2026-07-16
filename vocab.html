@@ -1019,7 +1019,21 @@ function resetTodayProgress(){
     msg:'確定要重置練習進度嗎？\n\n已完成的累積進度會清空，從頭開始練習。\n但錯誤統計和單字庫不受影響。\n\n⚠️ 還沒全部完成的話建議不要重置！',
     btnText:'確定重置',
     btnClass:'btn-warn',
-    onOk:()=>{db.todayDone=[];db.currentPage=0;currentPage=0;weakPage=0;saveDB();updateStats();renderBrowsePage();toast('進度已重置，從第1頁開始！');}
+    onOk:()=>{
+      db.todayDone=[];
+      db.currentPage=0;
+      currentPage=0;
+      weakPage=0;
+      saveDB();
+      updateStats();
+      // 強制清除後再 render，確保從第1頁開始
+      setTimeout(()=>{
+        currentPage=0;
+        db.currentPage=0;
+        renderBrowsePage();
+      },100);
+      toast('進度已重置，從第1頁開始！');
+    }
   });
 }
 
