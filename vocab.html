@@ -199,6 +199,13 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-seri
     <div class="v-nav-item" id="vnav-grammar-weak" onclick="vShowPage('grammar-weak')">
       <span class="v-nav-icon">❌</span>文法不熟
     </div>
+    <div class="v-nav-section">動詞</div>
+    <div class="v-nav-item" id="vnav-verb" onclick="vShowPage('verb')">
+      <span class="v-nav-icon">🔤</span>動詞選擇題
+    </div>
+    <div class="v-nav-item" id="vnav-verb-weak" onclick="vShowPage('verb-weak')">
+      <span class="v-nav-icon">❌</span>動詞不熟
+    </div>
     <div class="v-nav-section">管理</div>
     <div class="v-nav-item" id="vnav-import" onclick="vShowPage('import')">
       <span class="v-nav-icon">📥</span>匯入單字
@@ -238,6 +245,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-seri
       <div style="display:flex;gap:8px;margin-bottom:16px">
         <button id="ov-tab-vocab" onclick="ovSwitchTab('vocab')" style="padding:8px 20px;border-radius:8px;border:1.5px solid #2563eb;background:#2563eb;color:#fff;font-size:13px;font-weight:700;cursor:pointer">📖 單字練習</button>
         <button id="ov-tab-grammar" onclick="ovSwitchTab('grammar')" style="padding:8px 20px;border-radius:8px;border:1.5px solid var(--border);background:var(--white);color:#64748b;font-size:13px;font-weight:700;cursor:pointer">📝 文法練習</button>
+        <button id="ov-tab-verb" onclick="ovSwitchTab('verb')" style="padding:8px 20px;border-radius:8px;border:1.5px solid var(--border);background:var(--white);color:#64748b;font-size:13px;font-weight:700;cursor:pointer">🔤 動詞練習</button>
       </div>
 
       <!-- 單字區 -->
@@ -268,6 +276,23 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-seri
         <div style="display:flex;gap:12px;flex-wrap:wrap">
           <button class="v-btn primary" onclick="vShowPage('grammar')">📝 開始文法練習</button>
           <button class="v-btn" onclick="vShowPage('grammar-weak')">❌ 不熟文法</button>
+        </div>
+      </div>
+
+      <!-- 動詞區 -->
+      <div id="ov-verb-section" style="display:none">
+        <div class="v-kpi-grid" style="grid-template-columns:repeat(3,1fr)">
+          <div class="v-kpi-card"><div class="v-kpi-accent" style="background:#0891b2"></div><div class="v-kpi-label">🔤 動詞總數</div><div class="v-kpi-val" id="sv-total">0</div></div>
+          <div class="v-kpi-card"><div class="v-kpi-accent" style="background:#f87171"></div><div class="v-kpi-label">❌ 不熟動詞</div><div class="v-kpi-val" id="sv-weak">0</div></div>
+          <div class="v-kpi-card"><div class="v-kpi-accent" style="background:#a8c5a0"></div><div class="v-kpi-label">✅ 已練習</div><div class="v-kpi-val" id="sv-done">0</div></div>
+        </div>
+        <div class="v-prog-wrap">
+          <div class="v-prog-label"><span>動詞練習進度</span><span id="vprog-text">0 / 0</span></div>
+          <div class="v-prog-bg"><div class="v-prog-bar" id="vprog-bar" style="width:0%;background:linear-gradient(to right,#0891b2,#2563eb)"></div></div>
+        </div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <button class="v-btn primary" onclick="vShowPage('verb')">🔤 開始動詞練習</button>
+          <button class="v-btn" onclick="vShowPage('verb-weak')">❌ 不熟動詞</button>
         </div>
       </div>
     </div>
@@ -428,6 +453,45 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-seri
       </div>
     </div>
 
+    <!-- 頁面：動詞選擇題 -->
+    <div class="v-page" id="vpage-verb">
+      <div class="v-card">
+        <div class="v-card-hdr">
+          <div class="v-card-title">🔤 動詞選擇題</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span id="v-progress" style="font-size:12px;color:var(--muted)"></span>
+            <button class="v-btn primary" onclick="startVerbQuiz(false)">重新出題</button>
+          </div>
+        </div>
+        <div style="padding:20px">
+          <div id="verb-quiz-area">
+            <div style="text-align:center;color:var(--muted);padding:40px">
+              <div style="font-size:36px;margin-bottom:12px">🔤</div>
+              <div style="font-size:14px;font-weight:700">尚未匯入動詞單字</div>
+              <div style="font-size:12px;margin-top:6px">請在 Excel 工作表3 加入動詞內容</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 頁面：動詞不熟 -->
+    <div class="v-page" id="vpage-verb-weak">
+      <div class="v-card">
+        <div class="v-card-hdr">
+          <div class="v-card-title">❌ 動詞不熟</div>
+          <button class="v-btn warn" onclick="startVerbWeakQuiz()">練習不熟動詞</button>
+        </div>
+        <div id="verb-weak-list" style="display:flex;flex-direction:column"></div>
+        <div id="verb-weak-empty" style="display:none">
+          <div class="result-panel">
+            <div class="result-emoji">🎉</div>
+            <div class="result-title">沒有不熟的動詞！</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- 頁面：匯入 -->
     <div class="v-page" id="vpage-import">
       <div class="v-card">
@@ -488,16 +552,23 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-seri
 
 <script>
 // ══ 新版導航 ══
-const V_PAGE_NAMES={overview:'學習總覽',browse:'對照瀏覽',weak:'不熟單字',errors:'練習常錯',numbers:'數字練習',grammar:'文法選擇題','grammar-weak':'文法不熟',import:'匯入單字'};
+const V_PAGE_NAMES={overview:'學習總覽',browse:'對照瀏覽',weak:'不熟單字',errors:'練習常錯',numbers:'數字練習',grammar:'文法選擇題','grammar-weak':'文法不熟',verb:'動詞選擇題','verb-weak':'動詞不熟',import:'匯入單字'};
 // ══ 總覽頁籤 ══
 function ovSwitchTab(tab){
   document.getElementById('ov-vocab-section').style.display=tab==='vocab'?'':'none';
   document.getElementById('ov-grammar-section').style.display=tab==='grammar'?'':'none';
-  const vBtn=document.getElementById('ov-tab-vocab');
-  const gBtn=document.getElementById('ov-tab-grammar');
-  if(vBtn){vBtn.style.background=tab==='vocab'?'#2563eb':'var(--white)';vBtn.style.color=tab==='vocab'?'#fff':'#64748b';vBtn.style.borderColor=tab==='vocab'?'#2563eb':'var(--border)';}
-  if(gBtn){gBtn.style.background=tab==='grammar'?'#7c3aed':'var(--white)';gBtn.style.color=tab==='grammar'?'#fff':'#64748b';gBtn.style.borderColor=tab==='grammar'?'#7c3aed':'var(--border)';}
+  document.getElementById('ov-verb-section').style.display=tab==='verb'?'':'none';
+  ['vocab','grammar','verb'].forEach(t=>{
+    const btn=document.getElementById('ov-tab-'+t);
+    if(!btn)return;
+    const colors={vocab:'#2563eb',grammar:'#7c3aed',verb:'#0891b2'};
+    const active=t===tab;
+    btn.style.background=active?colors[t]:'var(--white)';
+    btn.style.color=active?'#fff':'#64748b';
+    btn.style.borderColor=active?colors[t]:'var(--border)';
+  });
   if(tab==='grammar')updateGrammarStats();
+  if(tab==='verb')updateVerbStats();
 }
 
 function updateGrammarStats(){
@@ -510,6 +581,18 @@ function updateGrammarStats(){
   const pct=grammar.length>0?Math.round(done/grammar.length*100):0;
   if(el('gprog-bar'))el('gprog-bar').style.width=pct+'%';
   if(el('gprog-text'))el('gprog-text').textContent=done+' / '+grammar.length;
+}
+
+function updateVerbStats(){
+  const verb=db.verb||[];
+  const weakCount=Object.keys(db.verbWeak||{}).length;
+  const done=db.verbDone||0;
+  if(el('sv-total'))el('sv-total').textContent=verb.length;
+  if(el('sv-weak'))el('sv-weak').textContent=weakCount;
+  if(el('sv-done'))el('sv-done').textContent=done;
+  const pct=verb.length>0?Math.round(done/verb.length*100):0;
+  if(el('vprog-bar'))el('vprog-bar').style.width=pct+'%';
+  if(el('vprog-text'))el('vprog-text').textContent=done+' / '+verb.length;
 }
 
 function vShowPage(id){
@@ -530,6 +613,8 @@ function vShowPage(id){
   if(id==='import'){renderVocabPreview();}
   if(id==='grammar'){renderGrammarQuiz();}
   if(id==='grammar-weak'){renderGrammarWeakList();}
+  if(id==='verb'){renderVerbQuiz();}
+  if(id==='verb-weak'){renderVerbWeakList();}
 }
 
 // 舊版 switchTab 相容
@@ -867,6 +952,130 @@ function renderGrammarWeakList(){
 function startGrammarWeakQuiz(){vShowPage('grammar');startGrammarQuiz(true);}
 
 // ══════════════════════════════════════
+// VERB（動詞）- 與文法相同架構
+// ══════════════════════════════════════
+function processVerbRows(rows){
+  if(!db.verb)db.verb=[];
+  if(!db.verbWeak)db.verbWeak={};
+  let added=0,skipped=0;
+  const existing=new Set(db.verb.map(g=>g.q+'|'+g.a));
+  rows.forEach(r=>{
+    const q=(r[0]||'').toString().trim();
+    const a=(r[1]||'').toString().trim();
+    if(!q||!a){skipped++;return;}
+    const key=q+'|'+a;
+    if(existing.has(key)){skipped++;return;}
+    const id='v'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+    db.verb.push({id,q,a});
+    existing.add(key);added++;
+  });
+  saveDB();renderVerbQuiz();updateStats();
+  toast('✅ 動詞：新增 '+added+' 筆，略過 '+skipped+' 筆');
+}
+
+let vQuizList=[],vQuizIdx=0;
+
+function startVerbQuiz(weakOnly){
+  if(!db.verb)db.verb=[];
+  if(!db.verbWeak)db.verbWeak={};
+  const pool=weakOnly?db.verb.filter(g=>db.verbWeak[g.id]):db.verb;
+  const area=document.getElementById('verb-quiz-area');
+  if(pool.length===0){
+    if(area)area.innerHTML='<div style="text-align:center;color:var(--muted);padding:40px"><div style="font-size:36px;margin-bottom:12px">'+(weakOnly?'🎉':'🔤')+'</div><div style="font-size:14px;font-weight:700">'+(weakOnly?'沒有不熟的動詞！':'尚未匯入動詞單字')+'</div></div>';
+    return;
+  }
+  vQuizList=shuffle(pool);vQuizIdx=0;
+  renderVerbQuestion();
+}
+
+function renderVerbQuiz(){
+  if(!db.verb||db.verb.length===0){
+    const area=document.getElementById('verb-quiz-area');
+    if(area)area.innerHTML='<div style="text-align:center;color:var(--muted);padding:40px"><div style="font-size:36px;margin-bottom:12px">🔤</div><div style="font-size:14px;font-weight:700">尚未匯入動詞單字</div><div style="font-size:12px;margin-top:6px">請在 Excel 工作表3 加入動詞內容</div></div>';
+    return;
+  }
+  startVerbQuiz(false);
+}
+
+function renderVerbQuestion(){
+  const area=document.getElementById('verb-quiz-area');
+  const prog=document.getElementById('v-progress');
+  if(!area)return;
+  if(vQuizIdx>=vQuizList.length){
+    area.innerHTML='<div class="result-panel"><div class="result-emoji">🎉</div><div class="result-title">全部完成！</div><div class="result-sub">動詞掌握得很好！</div><button class="v-btn primary" onclick="startVerbQuiz(false)">再練一次</button></div>';
+    if(prog)prog.textContent='';return;
+  }
+  if(prog)prog.textContent=(vQuizIdx+1)+' / '+vQuizList.length;
+  const cur=vQuizList[vQuizIdx];
+  const isWeak=!!(db.verbWeak||{})[cur.id];
+  const others=db.verb.filter(g=>g.id!==cur.id).map(g=>g.a);
+  const wrong=shuffle(others).slice(0,3);
+  const opts=shuffle([cur.a,...wrong]);
+  const ca=cur.a.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+  area.innerHTML='<div style="margin-bottom:20px">'
+    +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">'
+    +'<div style="font-size:16px;font-weight:800;color:var(--text);flex:1">'+cur.q+'</div>'
+    +'<button onclick="toggleVerbWeak(\''+cur.id+'\')" class="v-weak-btn'+(isWeak?' on':'')+'" id="vw-btn">'+(isWeak?'✓ 不熟':'不熟')+'</button>'
+    +'</div>'
+    +'<div style="display:flex;flex-direction:column;gap:10px" id="v-opts">'
+    +opts.map((o,i)=>{
+      const oe=o.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+      return '<button onclick="checkVerbAnswer(\''+cur.id+'\',\''+ca+'\',\''+oe+'\',this)"'
+        +' style="padding:14px 18px;border-radius:10px;border:2px solid var(--border);background:var(--white);text-align:left;font-size:14px;font-weight:600;cursor:pointer;transition:all .18s;font-family:\'Noto Sans JP\',sans-serif;color:#374151">'
+        +String.fromCharCode(65+i)+'．'+o+'</button>';
+    }).join('')
+    +'</div></div>';
+}
+
+function checkVerbAnswer(id,correct,chosen,btn){
+  document.querySelectorAll('#v-opts button').forEach(b=>b.onclick=null);
+  if(chosen===correct){
+    btn.style.cssText+=';border-color:#16a34a!important;background:#dcfce7!important;color:#15803d!important';
+    if(!db.verbDone)db.verbDone=0;
+    db.verbDone++;saveDB();
+    toast('✅ 正確！');setTimeout(()=>{vQuizIdx++;renderVerbQuestion();},800);
+  } else {
+    btn.style.cssText+=';border-color:#dc2626!important;background:#fee2e2!important;color:#b91c1c!important';
+    document.querySelectorAll('#v-opts button').forEach(b=>{
+      if(b.textContent.trim().slice(2).trim()===correct)
+        b.style.cssText+=';border-color:#16a34a!important;background:#dcfce7!important;color:#15803d!important';
+    });
+    if(!db.verbWeak)db.verbWeak={};
+    db.verbWeak[id]=true;saveDB();
+    const vwBtn=document.getElementById('vw-btn');
+    if(vwBtn){vwBtn.classList.add('on');vwBtn.textContent='✓ 不熟';}
+    toast('❌ 答錯了！已加入不熟動詞');setTimeout(()=>{vQuizIdx++;renderVerbQuestion();},1500);
+  }
+}
+
+function toggleVerbWeak(id){
+  if(!db.verbWeak)db.verbWeak={};
+  if(db.verbWeak[id])delete db.verbWeak[id];
+  else db.verbWeak[id]=true;
+  saveDB();
+  const btn=document.getElementById('vw-btn');
+  if(btn){btn.classList.toggle('on',!!db.verbWeak[id]);btn.textContent=db.verbWeak[id]?'✓ 不熟':'不熟';}
+}
+
+function renderVerbWeakList(){
+  const list=document.getElementById('verb-weak-list');
+  const empty=document.getElementById('verb-weak-empty');
+  if(!list)return;
+  if(!db.verb)db.verb=[];
+  if(!db.verbWeak)db.verbWeak={};
+  const weaks=db.verb.filter(g=>db.verbWeak[g.id]);
+  if(weaks.length===0){list.style.display='none';if(empty)empty.style.display='';return;}
+  if(empty)empty.style.display='none';list.style.display='flex';
+  list.innerHTML=weaks.map(g=>'<div class="v-word-row weak-row">'
+    +'<div class="v-word-q">'+g.q+'</div>'
+    +'<div class="v-word-a" style="color:var(--jp)">'+g.a+'</div>'
+    +'<button onclick="toggleVerbWeak(\''+g.id+'\');renderVerbWeakList()" class="v-weak-btn on">✓ 不熟</button>'
+    +'</div>').join('');
+}
+
+function startVerbWeakQuiz(){vShowPage('verb');startVerbQuiz(true);}
+
+// ══════════════════════════════════════
 // WEAK PAGE
 function renderWeakPage(){
   const list=el('weak-list');
@@ -945,6 +1154,12 @@ function importFile(evt){
           const ws2=wb.Sheets[wb.SheetNames[1]];
           const rows2=XLSX.utils.sheet_to_json(ws2,{header:1,defval:''});
           processGrammarRows(rows2);
+        }
+        // 工作表3 → 動詞（如有）
+        if(wb.SheetNames.length>2){
+          const ws3=wb.Sheets[wb.SheetNames[2]];
+          const rows3=XLSX.utils.sheet_to_json(ws3,{header:1,defval:''});
+          processVerbRows(rows3);
         }
       } catch(err){ toast('❌ 讀取失敗：'+err.message); }
     };
