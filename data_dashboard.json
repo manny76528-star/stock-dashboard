@@ -2312,7 +2312,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1784357611042,
+  "_ts": 1784358483230,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -2371,6 +2371,30 @@
     }
   ],
   "journals": [
+    {
+      "id": "mrq0ywj48ju",
+      "date": "2026-07-18",
+      "tags": [
+        "極度恐慌"
+      ],
+      "market": "台積電法說市場不買單 , 台股收黑重挫2953點，創史上收盤最大跌點！！",
+      "marketUrl": "https://www.pocket.tw/school/report/newflash/7638/",
+      "youtubeUrl": "",
+      "content": "從六月全球主要AI供應鏈股市創高後 , 開始尖頭反轉且跌的又凶又狠\n上週三星 , SK發表財報後 成長力道依舊強件 , 但迎來的是10% , 12%的跌幅\n本週四台積電法說 毛利率達到預期 , 且基本支出持續增加 , 但一樣與AI主流股一樣\n法說會後迎來7%的大跌 , 台股破天荒下跌三千點史上最高跌幅\n\n短短三週 00988A 回檔接近35% , 00981 回檔10%多 , 今天將所有主動式ETF全部出清... 唯一值得欣慰的是 前一週 已將目前現價16元持有57張的009805 出清在17元\n目前現價16.2元 持有33張的00988A 出清24張在20元 , 剩餘9張今天出清在16.9元\n持有31張的 00981A 全部認賠清出在26.7元\n\n但從上週群聯董事長 , 集昨天 SK海力士集團董事長的談話裡面\n依然是對目前記憶體的需求爆發持有非常樂觀的看法 , 我相信一定會在持續往基本面前進 , 但看對趨勢還要熬得過波動 , 這波我選擇降低波動\n\n預計騰出的90萬資金 , 會全部轉移到目前正在IPO 的 009826 *VT上面 (原因2026/07/15)",
+      "stockTags": [
+        "00981A",
+        "00988A"
+      ],
+      "eventCat": "技術面",
+      "behavior": "賣出降低水位",
+      "indexVal": 42671,
+      "stockPrices": null,
+      "aiAnalysis": null,
+      "images": [
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1784357762731_ijon.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1784358118628_2l6a.jpg"
+      ]
+    },
     {
       "id": "mrkgy6prh0u",
       "date": "2026-07-15",
