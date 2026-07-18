@@ -460,6 +460,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-seri
           <div class="v-card-title">🔤 動詞選擇題</div>
           <div style="display:flex;gap:8px;align-items:center">
             <span id="v-progress" style="font-size:12px;color:var(--muted)"></span>
+            <button id="verb-mode-btn" onclick="toggleVerbMode()" style="padding:5px 12px;border-radius:8px;border:1.5px solid #0891b2;background:#e0f2fe;color:#0891b2;font-size:11px;font-weight:700;cursor:pointer">🇯🇵→🇹🇼 日文→中文</button>
             <button class="v-btn primary" onclick="startVerbQuiz(false)">重新出題</button>
           </div>
         </div>
@@ -958,22 +959,39 @@ function processVerbRows(rows){
   if(!db.verb)db.verb=[];
   if(!db.verbWeak)db.verbWeak={};
   let added=0,skipped=0;
-  const existing=new Set(db.verb.map(g=>g.q+'|'+g.a));
+  const existing=new Set(db.verb.map(g=>g.pattern+'|'+g.jp));
   rows.forEach(r=>{
-    const q=(r[0]||'').toString().trim();
-    const a=(r[1]||'').toString().trim();
-    if(!q||!a){skipped++;return;}
-    const key=q+'|'+a;
+    const pattern=(r[0]||'').toString().trim(); // A欄：文法形式
+    const jp=(r[1]||'').toString().trim();       // B欄：日文例句
+    const zh=(r[2]||'').toString().trim();       // C欄：中文意思
+    if(!pattern||!jp){skipped++;return;}
+    const key=pattern+'|'+jp;
     if(existing.has(key)){skipped++;return;}
     const id='v'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
-    db.verb.push({id,q,a});
+    // q=題目顯示，a=正確答案，另存jp和zh供切換模式
+    db.verb.push({id,pattern,jp,zh,q:pattern+'\n'+jp,a:zh||jp});
     existing.add(key);added++;
   });
   saveDB();renderVerbQuiz();updateStats();
   toast('✅ 動詞：新增 '+added+' 筆，略過 '+skipped+' 筆');
 }
 
-let vQuizList=[],vQuizIdx=0;
+let vQuizList=[],vQuizIdx=0,vQuizMode="jp2zh"; // jp2zh=日文→中文, zh2jp=中文→日文
+
+function toggleVerbMode(){
+  vQuizMode = vQuizMode==='jp2zh'?'zh2jp':'jp2zh';
+  const btn=document.getElementById('verb-mode-btn');
+  if(btn){
+    if(vQuizMode==='jp2zh'){
+      btn.textContent='🇯🇵→🇹🇼 日文→中文';
+      btn.style.borderColor='#0891b2';btn.style.background='#e0f2fe';btn.style.color='#0891b2';
+    } else {
+      btn.textContent='🇹🇼→🇯🇵 中文→日文';
+      btn.style.borderColor='#7c3aed';btn.style.background='#ede9fe';btn.style.color='#7c3aed';
+    }
+  }
+  startVerbQuiz(false);
+}
 
 function startVerbQuiz(weakOnly){
   if(!db.verb)db.verb=[];
