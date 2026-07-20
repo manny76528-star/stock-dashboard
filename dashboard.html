@@ -2046,7 +2046,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
       <div class="ov-kpi-label" style="padding-left:0">投資總損益</div>
       <div style="display:flex;gap:4px;flex-shrink:0">
         <button onclick="refreshPrices()" style="background:#f3f4f6;color:#4b5563;border:none;border-radius:6px;font-size:11px;padding:3px 8px;cursor:pointer;font-weight:600;transition:background .15s" onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#f3f4f6'">🔄 股價</button>
-        <button id="roi-toggle-btn" onclick="showDivRoi=!showDivRoi;document.getElementById('roi-chk-sum').checked=showDivRoi;renderSum();renderInv();renderOvKpi();updateRoiBtn()" style="border:none;border-radius:6px;font-size:11px;padding:3px 8px;cursor:pointer;font-weight:600;transition:all .2s">💹 含息</button>
+        <button id="roi-toggle-btn" onclick="showDivRoi=!showDivRoi;document.getElementById('roi-chk-sum').checked=showDivRoi;renderSum();renderInv();renderOvKpi();updateRoiBtn();setTimeout(renderOvDashboard,50)" style="border:none;border-radius:6px;font-size:11px;padding:3px 8px;cursor:pointer;font-weight:600;transition:all .2s">💹 含息</button>
       </div>
     </div>
     <!-- 隱藏的 roi-chk-sum 供 JS 使用 -->
@@ -2166,6 +2166,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
           <div class="ov-kpi-label" style="padding-left:8px">現金帳戶總計</div>
           <div class="ov-kpi-val" id="as-cash-total" style="padding-left:8px">—</div>
           <div class="ov-kpi-sub" id="as-cash-sub" style="padding-left:8px"></div>
+          <div id="as-cash-pending-divs" style="padding:4px 8px 0;display:flex;flex-direction:column;gap:3px"></div>
         </div>
       </div>
 
@@ -9739,6 +9740,27 @@ function renderAssetsPage(){
   set('as-cash-badge',db.cashAccounts.length+' 個帳戶');
   set('as-cash-sub','含待入帳');
 
+  // 待入帳股息
+  const todayStr=new Date().toISOString().split('T')[0];
+  const pendingDivs=(db.dividends||[])
+    .filter(d=>d.date&&d.date>todayStr&&
+      (d.pending||(d.exDate&&d.exDate<=todayStr&&d.date>todayStr)||(!d.exDate&&d.date>todayStr)))
+    .sort((a,b)=>a.date.localeCompare(b.date));
+  const pendingWrap=document.getElementById('as-cash-pending-divs');
+  if(pendingWrap){
+    if(pendingDivs.length===0){
+      pendingWrap.innerHTML='';
+    } else {
+      pendingWrap.innerHTML=pendingDivs.map(d=>{
+        const days=Math.ceil((new Date(d.date)-new Date(todayStr))/86400000);
+        return `<div style="font-size:10px;color:#7c3aed;font-weight:700;display:flex;justify-content:space-between;padding:2px 0;border-top:1px solid #f0fdf4">
+          <span>💰 ${d.code||'股息'}</span>
+          <span style="font-family:'JetBrains Mono',monospace">$${Math.round(d.amount).toLocaleString()} <span style="color:#9ca3af">(${days}天後)</span></span>
+        </div>`;
+      }).join('');
+    }
+  }
+
   // 信貸列表 — 直接呼叫 renderLoans()，複製其輸出到 as-loan-body
   const lb=document.getElementById('as-loan-body');
   if(lb){
@@ -10165,7 +10187,7 @@ function renderOvKpi(){
   const roi=tC>0?Math.round(tPnl/tC*1000)/10:0;
 
   const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
-  const setC=(id,v,cls)=>{const el=document.getElementById(id);if(el){el.textContent=v;el.className='ov-kpi-sub '+(cls||'');}};
+  const setC=(id,v,cls)=>{const el=document.getElementById(id);if(el){el.textContent=v;const hasMask=el.classList.contains('privacy-mask');el.className='ov-kpi-sub '+(cls||'');if(hasMask)el.classList.add('privacy-mask');}};
   const fmtM=v=>'$'+Math.round(v).toLocaleString();
 
   set('ov-net',fmtM(net));
@@ -10194,6 +10216,8 @@ function renderOvKpi(){
 
   set('ov-loan','$'+Math.round(lR).toLocaleString());
   setC('ov-dr','負債比 '+dR+'%',dR>85?'dn':dR>70?'':'up');
+  // 渲染後重新套用隱私遮罩
+  if(typeof applyPrivacy==='function')applyPrivacy();
 }
 
 // ── 資產趨勢折線圖 ──
