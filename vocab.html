@@ -34,18 +34,18 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-seri
 }
 .v-brand{padding:20px 16px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
 .v-brand-icon{font-size:24px;}
-.v-brand-title{font-size:15px;font-weight:800;color:var(--text);}
+.v-brand-title{font-size:13px;font-weight:800;color:var(--text);}
 .v-brand-sub{font-size:10px;color:var(--muted);margin-top:1px;}
 .v-nav{flex:1;padding:10px 0;overflow-y:auto;min-height:0;}
-.v-nav-section{font-size:10px;font-weight:700;color:#8e92bc;padding:12px 0 4px 14px;letter-spacing:1px;}
+.v-nav-section{font-size:9px;font-weight:700;color:#8e92bc;padding:8px 0 3px 14px;letter-spacing:1px;}
 .v-nav-item{
-  display:flex;align-items:center;gap:10px;padding:10px 16px;
-  font-size:13px;font-weight:600;color:#64748b;cursor:pointer;
+  display:flex;align-items:center;gap:8px;padding:7px 14px;
+  font-size:12px;font-weight:600;color:#64748b;cursor:pointer;
   transition:all .15s;border-left:3px solid transparent;margin-bottom:1px;
 }
 .v-nav-item:hover{background:#f8fafc;color:var(--accent);}
 .v-nav-item.active{background:#eff6ff;color:var(--accent);border-left-color:var(--accent);font-weight:700;}
-.v-nav-icon{font-size:15px;width:20px;text-align:center;}
+.v-nav-icon{font-size:13px;width:18px;text-align:center;}
 .v-sidebar-footer{padding:12px 14px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:6px;flex-shrink:0;}
 .v-sidebar-btn{padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--white);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;width:100%;text-align:left;transition:background .15s;font-family:'Noto Sans TC',sans-serif;}
 .v-sidebar-btn:hover{background:#f8fafc;}
@@ -211,11 +211,16 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-seri
       <span class="v-nav-icon">📥</span>匯入單字
     </div>
   </nav>
-  <div class="v-sidebar-footer">
-    <button class="v-sidebar-btn warn" onclick="resetTodayProgress()">🔄 重置進度</button>
-    <button class="v-sidebar-btn" onclick="manualSync()">☁️ 雲端同步</button>
-    <button class="v-sidebar-btn" onclick="document.getElementById('import-file').click()">📥 匯入 Excel</button>
-    <a href="index.html" class="v-sidebar-btn" style="text-decoration:none;display:block">🏠 主目錄</a>
+  <div class="v-sidebar-footer" style="padding:8px 10px">
+    <button onclick="toggleSidebarTools()" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:#f8fafc;border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:11px;font-weight:700;color:#64748b;font-family:'Noto Sans TC',sans-serif">
+      <span>⚙️ 工具</span><span id="sidebar-tools-arrow">▲</span>
+    </button>
+    <div id="sidebar-tools" style="display:flex;flex-direction:column;gap:5px;margin-top:6px">
+      <button class="v-sidebar-btn warn" onclick="resetTodayProgress()">🔄 重置進度</button>
+      <button class="v-sidebar-btn" onclick="manualSync()">☁️ 雲端同步</button>
+      <button class="v-sidebar-btn" onclick="document.getElementById('import-file').click()">📥 匯入 Excel</button>
+      <a href="index.html" class="v-sidebar-btn" style="text-decoration:none;display:block">🏠 主目錄</a>
+    </div>
   </div>
 </div>
 
@@ -554,6 +559,15 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-seri
 <script>
 // ══ 新版導航 ══
 const V_PAGE_NAMES={overview:'學習總覽',browse:'對照瀏覽',weak:'不熟單字',errors:'練習常錯',numbers:'數字練習',grammar:'文法選擇題','grammar-weak':'文法不熟',verb:'動詞選擇題','verb-weak':'動詞不熟',import:'匯入單字'};
+function toggleSidebarTools(){
+  const tools=document.getElementById('sidebar-tools');
+  const arrow=document.getElementById('sidebar-tools-arrow');
+  if(!tools)return;
+  const open=tools.style.display!=='none';
+  tools.style.display=open?'none':'flex';
+  if(arrow)arrow.textContent=open?'▼':'▲';
+}
+
 // ══ 總覽頁籤 ══
 function ovSwitchTab(tab){
   document.getElementById('ov-vocab-section').style.display=tab==='vocab'?'':'none';
