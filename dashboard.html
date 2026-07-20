@@ -9878,18 +9878,20 @@ function renderInvestPage(){
   updateRoiBtn();
 
   // 更新頂部 KPI
-  let tPnl=0,tMkt=0,tCost=0,tReal=0,tDiv=0;
+  let tUnreal=0,tMkt=0,tCost=0,tReal=0;
   db.investments.forEach(inv=>{
     const c=calcInv(inv);
     if(c.tLots>0){
       if(c.mktVal!=null)tMkt+=c.mktVal;
       tCost+=c.tCost;
-      const p=showDivRoi?c.pnlWithDiv:c.pnl;
-      if(p!=null)tPnl+=p;
+      if(c.pnl!=null)tUnreal+=c.pnl; // 含手續費的未實現損益
     }
     tReal+=c.realized||0;
-    tDiv+=c.divTot||0;
   });
+  // 全部股息（不管持股有沒有賣出）
+  const tAllDiv=(db.dividends||[]).filter(d=>!d.pending).reduce((s,d)=>s+d.amount,0);
+  // 含息 = 未實現 + 已實現 + 全部股息
+  const tPnl=showDivRoi?(tUnreal+tReal+tAllDiv):tUnreal;
   const roi=tCost>0?Math.round(tPnl/tCost*1000)/10:0;
   const setKpi=(id,v,color)=>{const el=document.getElementById(id);if(el){el.textContent=v;if(color)el.style.color=color;}};
   const pnlColor=tPnl>=0?'#dc2626':'#16a34a';
@@ -10170,19 +10172,19 @@ function renderOvDashboard(){
 
 // ── KPI ──
 function renderOvKpi(){
-  let tC=0,tM=0,tD=0,tPnl=0,tPnlWithDiv=0;
+  let tC=0,tM=0,tD=0,tUnreal=0,tReal=0;
   db.investments.forEach(inv=>{
     const c=calcInv(inv);
     tC+=c.tCost;
     if(c.mktVal)tM+=c.mktVal;
     tD+=c.moDivAmt||0;
-    if(c.mktVal!=null){
-      tPnl+=(c.mktVal-c.tCost);
-      tPnlWithDiv+=(c.pnlWithDiv!=null?c.pnlWithDiv:(c.mktVal-c.tCost));
-    }
+    if(c.tLots>0&&c.pnl!=null)tUnreal+=c.pnl; // 含手續費未實現
+    tReal+=c.realized||0;
   });
-  // 含息切換 - 與投資與觀察用同一套 calcInv 邏輯
-  const displayPnl=showDivRoi?tPnlWithDiv:tPnl;
+  // 全部股息（含已賣出股票）
+  const tAllDiv=(db.dividends||[]).filter(d=>!d.pending).reduce((s,d)=>s+d.amount,0);
+  // 含息 = 未實現 + 已實現 + 全部股息
+  const displayPnl=showDivRoi?(tUnreal+tReal+tAllDiv):tUnreal;
   const roi=tC>0?Math.round(displayPnl/tC*1000)/10:0;
 
   const lR=db.loans.reduce((s,l)=>s+calcLoanRemain(l),0)
@@ -10210,8 +10212,6 @@ function renderOvKpi(){
   const pnlEl=document.getElementById('ov-pnl');if(pnlEl)pnlEl.style.color=displayPnl>=0?'#dc2626':'#16a34a';
 
   // 已實現損益 + 股票市值
-  let tReal=0;
-  db.investments.forEach(inv=>{const c=calcInv(inv);tReal+=(c.realized||0);});
   set('ov-real',(tReal>=0?'+':'')+fmtM(tReal));
   const realEl=document.getElementById('ov-real');
   if(realEl)realEl.style.color=tReal>=0?'#dc2626':'#16a34a';
