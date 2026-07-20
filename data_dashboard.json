@@ -1091,6 +1091,24 @@
           "remark": "META販售算力引起的回檔",
           "mood": "🤔 猶豫",
           "lossReason": "黑天鵝事件"
+        },
+        {
+          "id": "mrt027l784z",
+          "type": "sell",
+          "lots": 9,
+          "price": 16.95,
+          "date": "2026-07-20",
+          "fee": 519,
+          "lotRefs": [
+            {
+              "txnId": "mpv1dgqgpns",
+              "lots": 9,
+              "date": "2026-06-01"
+            }
+          ],
+          "remark": "",
+          "mood": "😰 焦慮",
+          "lossReason": "黑天鵝事件"
         }
       ],
       "order": 12
@@ -2343,7 +2361,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1784538125387,
+  "_ts": 1784538356442,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
