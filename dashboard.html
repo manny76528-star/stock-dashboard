@@ -10170,17 +10170,19 @@ function renderOvDashboard(){
 
 // ── KPI ──
 function renderOvKpi(){
-  let tC=0,tM=0,tD=0,tPnl=0,tDivTot=0;
+  let tC=0,tM=0,tD=0,tPnl=0,tPnlWithDiv=0;
   db.investments.forEach(inv=>{
     const c=calcInv(inv);
     tC+=c.tCost;
     if(c.mktVal)tM+=c.mktVal;
     tD+=c.moDivAmt||0;
-    tDivTot+=c.divTot||0;
-    if(c.mktVal!=null)tPnl+=(c.mktVal-c.tCost);
+    if(c.mktVal!=null){
+      tPnl+=(c.mktVal-c.tCost);
+      tPnlWithDiv+=(c.pnlWithDiv!=null?c.pnlWithDiv:(c.mktVal-c.tCost));
+    }
   });
-  // 含息切換
-  const displayPnl=showDivRoi?tPnl+tDivTot:tPnl;
+  // 含息切換 - 與投資與觀察用同一套 calcInv 邏輯
+  const displayPnl=showDivRoi?tPnlWithDiv:tPnl;
   const roi=tC>0?Math.round(displayPnl/tC*1000)/10:0;
 
   const lR=db.loans.reduce((s,l)=>s+calcLoanRemain(l),0)
