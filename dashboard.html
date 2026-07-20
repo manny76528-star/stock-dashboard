@@ -2238,7 +2238,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
           <div class="ov-kpi-accent" style="background:#b5adc4"></div>
           <div class="ov-kpi-label" style="padding-left:8px">累積股息</div>
           <div class="ov-kpi-val privacy-mask" id="inv-kpi-div" style="padding-left:8px">—</div>
-          <div class="ov-kpi-sub" style="padding-left:8px">實際入帳</div>
+          <div id="inv-kpi-div-sub" style="padding-left:8px;font-size:11px;color:#7c3aed;font-weight:700;margin-top:2px"></div>
         </div>
       </div>
 
@@ -9900,7 +9900,26 @@ function renderInvestPage(){
   setKpi('inv-kpi-roi','投報率 '+(roi>=0?'+':'')+roi+'%');
   setKpi('inv-kpi-mkt',fmt(tMkt));
   setKpi('inv-kpi-real',(tReal>=0?'+':'')+fmt(tReal),tReal>=0?'#dc2626':'#16a34a');
-  setKpi('inv-kpi-div',fmt(tDiv));
+
+  // 累積股息：今年入帳
+  const yr=new Date().getFullYear().toString();
+  const tDivYr=(db.dividends||[]).filter(d=>!d.pending&&(d.date||'').startsWith(yr)).reduce((s,d)=>s+d.amount,0);
+  setKpi('inv-kpi-div',fmt(tDivYr));
+  // 即將入帳
+  const todayStr2=new Date().toISOString().split('T')[0];
+  const pending=(db.dividends||[]).filter(d=>d.date&&d.date>todayStr2&&
+    (d.pending||(d.exDate&&d.exDate<=todayStr2)||(!d.exDate&&d.date>todayStr2)));
+  const pendingTotal=pending.reduce((s,d)=>s+d.amount,0);
+  const subEl=document.getElementById('inv-kpi-div-sub');
+  if(subEl){
+    if(pending.length>0){
+      const next=pending.sort((a,b)=>a.date.localeCompare(b.date))[0];
+      const days=Math.ceil((new Date(next.date)-new Date(todayStr2))/86400000);
+      subEl.innerHTML='即將入帳：<span class="privacy-mask">$'+Math.round(pendingTotal).toLocaleString()+'</span> <span style="color:#9ca3af;font-weight:400">('+days+'天後)</span>';
+    } else {
+      subEl.textContent='';
+    }
+  }
 
   // 持股清單（豐富版）
   const body=document.getElementById('invest-page-body');
