@@ -1383,11 +1383,11 @@
     {
       "id": "mnffzewmdbd",
       "name": "統一證券",
-      "rate": 2.56,
+      "rate": 3.1,
       "limit": 13000000,
       "used": 9416000,
       "remain": 3584000,
-      "monthly": 20087,
+      "monthly": 24325,
       "note": "一年一簽,賣出股票時還利息"
     }
   ],
@@ -2384,7 +2384,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1784542352224,
+  "_ts": 1784542362513,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
