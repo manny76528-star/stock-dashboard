@@ -2143,6 +2143,17 @@ body:not(.privacy) .privacy-mask{filter:none;}
           <div class="ov-kpi-label" style="padding-left:8px">信貸總負債</div>
           <div class="ov-kpi-val" id="as-loan-total" style="padding-left:8px">—</div>
           <div class="ov-kpi-sub" id="as-loan-monthly" style="padding-left:8px"></div>
+          <!-- 信貸還款進度條 -->
+          <div style="padding:8px 8px 0">
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:#9ca3af;margin-bottom:4px">
+              <span>已還款進度</span>
+              <span id="as-loan-pct">—</span>
+            </div>
+            <div style="height:6px;background:#f1f5f9;border-radius:3px;overflow:hidden">
+              <div id="as-loan-prog" style="height:6px;background:linear-gradient(to right,#16a34a,#22c55e);border-radius:3px;width:0%;transition:width .5s"></div>
+            </div>
+            <div style="font-size:10px;color:#9ca3af;margin-top:3px" id="as-loan-prog-sub"></div>
+          </div>
         </div>
         <div class="ov-kpi-card">
           <div class="ov-kpi-accent" style="background:#b5adc4"></div>
@@ -2296,7 +2307,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
             </select>
             <select id="journal-behavior-sel" onchange="onJournalFilterChange()" class="drawer-select" style="width:auto">
               <option value="">全部行為</option>
-              <option value="心情愉悅">😊 心情愉悅</option>
+              <option value="阿豪の強心針">😊 阿豪の強心針</option>
               <option value="跌到有點煩躁">😤 跌到有點煩躁</option>
               <option value="觸發PTSD">😱 觸發PTSD</option>
               <option value="信心滿滿的買進">💪 信心滿滿的買進</option>
@@ -3039,7 +3050,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
         </select>
         <select id="journal-behavior-sel" onchange="onJournalFilterChange()" style="padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:700;color:#475569;background:#fff;cursor:pointer;outline:none;min-width:110px">
           <option value="">全部行為</option>
-          <option value="心情愉悅">😊 心情愉悅</option>
+          <option value="阿豪の強心針">😊 阿豪の強心針</option>
           <option value="跌到有點煩躁">😤 跌到有點煩躁</option>
           <option value="觸發PTSD">😱 觸發PTSD</option>
           <option value="信心滿滿的買進">💪 信心滿滿的買進</option>
@@ -3304,7 +3315,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
             <span class="drawer-label">🎯 個人行為</span>
             <select class="drawer-select" id="j-behavior">
               <option value="">— 選擇個人行為 —</option>
-              <option value="心情愉悅">😊 心情愉悅</option>
+              <option value="阿豪の強心針">😊 阿豪の強心針</option>
               <option value="跌到有點煩躁">😤 跌到有點煩躁</option>
               <option value="觸發PTSD">😱 觸發PTSD</option>
               <option value="信心滿滿的買進">💪 信心滿滿的買進</option>
@@ -3411,7 +3422,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
             <div style="font-size:10px;color:#94a3b8;margin-bottom:3px">🎯 個人行為</div>
             <select id="j-behavior" class="fi" style="padding:5px 8px;font-size:12px">
               <option value="">— 選擇個人行為 —</option>
-              <option value="心情愉悅">😊 心情愉悅</option>
+              <option value="阿豪の強心針">😊 阿豪の強心針</option>
               <option value="跌到有點煩躁">😤 跌到有點煩躁</option>
               <option value="觸發PTSD">😱 觸發PTSD</option>
               <option value="信心滿滿的買進">💪 信心滿滿的買進</option>
@@ -7050,14 +7061,17 @@ function autoSnapshot(){
   const m=String(today.getMonth()+1).padStart(2,'0');
   const d=String(today.getDate()).padStart(2,'0');
   const dateKey=`${y}-${m}-${d}`;
-  const snapshotKey='snap_done_'+dateKey+'_'+hour;
+  // key 只用日期，不含 hour，確保每個禮拜五只拍一次
+  const snapshotKey='snap_done_'+dateKey;
   if(localStorage.getItem(snapshotKey))return;
   localStorage.setItem(snapshotKey,'1');
   if(!db.snapshots)db.snapshots=[];
   setTimeout(()=>recordSnapshot(false),1500);
 }
-// 頁面載入時也試一次（如果本地已是最新就直接拍）
+// 頁面載入時試一次
 autoSnapshot();
+// 每15分鐘再檢查一次（避免開著頁面過了15:00沒觸發）
+setInterval(autoSnapshot, 15*60*1000);
 // Restore custom title
 if(db.settings?.title){
   const td=document.getElementById('title-display');
@@ -8588,7 +8602,7 @@ function renderJournalChart(){
 
   const tagEmojiMap={'看多':'📈','看空':'📉','買入':'💰','賣出':'💸','重大事項':'🚨','極度恐慌':'😱','YouTube':'🔴▶'};
   const eventEmojiMap={'總經面':'🌐','消息面':'📰','政治面':'🏛','技術面':'📊','個股操作':'💹'};
-  const behaviorEmojiMap={'心情愉悅':'😊','跌到有點煩躁':'😤','觸發PTSD':'😱','信心滿滿的買進':'💪','賣出降低水位':'📉'};
+  const behaviorEmojiMap={'阿豪の強心針':'😊','跌到有點煩躁':'😤','觸發PTSD':'😱','信心滿滿的買進':'💪','賣出降低水位':'📉'};
   const activeLabelFilter=(document.getElementById('journal-tag-sel')?.value)||'';
   const activeEventFilter=(document.getElementById('journal-event-sel')?.value)||'';
   const activeBehaviorFilter=(document.getElementById('journal-behavior-sel')?.value)||'';
@@ -8880,7 +8894,7 @@ ${content||'（無）'}
 請提供：
 1. **核心關鍵字**（3-8個，用逗號分隔，例如：AI算力、費半大跌、恐慌賣出）
 2. **事件分類**（從以下選1-2個：總經面、消息面、政治面、技術面、個股操作）
-3. **個人行為**（從以下選1-2個：心情愉悅、跌到有點煩躁、觸發PTSD、信心滿滿的買進、賣出降低水位）
+3. **個人行為**（從以下選1-2個：阿豪の強心針、跌到有點煩躁、觸發PTSD、信心滿滿的買進、賣出降低水位）
 4. **恐慌指數**（0-100分，0=完全冷靜，100=極度恐慌崩潰，給出數字並簡短說明原因）
 5. **一句話總結**（用一句話描述這天的核心事件與心態）
 
@@ -9697,6 +9711,17 @@ function renderAssetsPage(){
   // 信貸尚餘本金加總
   const remainEl=document.getElementById('as-loan-remain');
   if(remainEl)remainEl.textContent='$'+Math.round(lR).toLocaleString();
+
+  // 信貸進度條：原始本金 = 活躍信貸的 amount 加總
+  const lOrig=db.loans.reduce((s,l)=>s+(l.amount||0),0);
+  const lPaid=Math.max(0,lOrig-lR);
+  const lPct=lOrig>0?Math.round(lPaid/lOrig*100):0;
+  const progEl=document.getElementById('as-loan-prog');
+  const pctEl=document.getElementById('as-loan-pct');
+  const subEl=document.getElementById('as-loan-prog-sub');
+  if(progEl)progEl.style.width=lPct+'%';
+  if(pctEl)pctEl.textContent=lPct+'%';
+  if(subEl)subEl.textContent='已還 $'+Math.round(lPaid).toLocaleString()+' / 原始 $'+Math.round(lOrig).toLocaleString();
   set('as-flex-total',fmtM(fU));
   // 月繳字體放大+綠色（錢流出）
   const loanMonthEl=document.getElementById('as-loan-monthly');
