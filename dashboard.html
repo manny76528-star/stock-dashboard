@@ -10170,21 +10170,25 @@ function renderOvDashboard(){
 
 // ── KPI ──
 function renderOvKpi(){
-  let tC=0,tM=0,tD=0,tPnl=0;
+  let tC=0,tM=0,tD=0,tPnl=0,tDivTot=0;
   db.investments.forEach(inv=>{
     const c=calcInv(inv);
     tC+=c.tCost;
     if(c.mktVal)tM+=c.mktVal;
     tD+=c.moDivAmt||0;
+    tDivTot+=c.divTot||0;
     if(c.mktVal!=null)tPnl+=(c.mktVal-c.tCost);
   });
+  // 含息切換
+  const displayPnl=showDivRoi?tPnl+tDivTot:tPnl;
+  const roi=tC>0?Math.round(displayPnl/tC*1000)/10:0;
+
   const lR=db.loans.reduce((s,l)=>s+calcLoanRemain(l),0)
            +db.flexLoans.reduce((s,f)=>s+(f.used||f.remain||0),0);
   const cT=db.cashAccounts.reduce((s,c)=>s+(c.cash||0)+(c.d1||0)+(c.d2||0),0);
   const mktV=tM>0?tM:tC;
   const net=mktV+cT-lR;
   const dR=net>0?Math.round(lR/(mktV+cT)*1000)/10:0;
-  const roi=tC>0?Math.round(tPnl/tC*1000)/10:0;
 
   const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
   const setC=(id,v,cls)=>{const el=document.getElementById(id);if(el){el.textContent=v;const hasMask=el.classList.contains('privacy-mask');el.className='ov-kpi-sub '+(cls||'');if(hasMask)el.classList.add('privacy-mask');}};
@@ -10199,9 +10203,9 @@ function renderOvKpi(){
     return (diff>=0?'+':'')+fmtM(diff);
   })()), net>0?'up':'');
 
-  set('ov-pnl',(tPnl>=0?'+':'')+fmtM(tPnl));
-  setC('ov-roi','投報率 '+(roi>=0?'+':'')+roi+'%',tPnl>=0?'up':'dn');
-  const pnlEl=document.getElementById('ov-pnl');if(pnlEl)pnlEl.style.color=tPnl>=0?'#dc2626':'#16a34a';
+  set('ov-pnl',(displayPnl>=0?'+':'')+fmtM(displayPnl));
+  setC('ov-roi','投報率 '+(roi>=0?'+':'')+roi+'%',displayPnl>=0?'up':'dn');
+  const pnlEl=document.getElementById('ov-pnl');if(pnlEl)pnlEl.style.color=displayPnl>=0?'#dc2626':'#16a34a';
 
   // 已實現損益 + 股票市值
   let tReal=0;
