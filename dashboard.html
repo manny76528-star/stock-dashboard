@@ -1594,8 +1594,8 @@ body:not(.privacy) .privacy-mask{filter:none;}
 
 .irow-txn {
   display:grid;
-  grid-template-columns:70px 90px 50px 70px 90px 1fr 1fr auto;
-  gap:8px;align-items:center;
+  grid-template-columns:70px 90px 50px 70px 90px 80px 80px 1fr auto;
+  gap:6px;align-items:center;
   padding:7px 20px;
   font-size:11px;font-family:var(--mono);
   border-bottom:1px solid #f8fafc;
@@ -1603,7 +1603,8 @@ body:not(.privacy) .privacy-mask{filter:none;}
 .irow-txn:hover { background:#f0f9ff; }
 .irow-txn-buy .irow-txn-type { color:#dc2626;font-weight:700; }
 .irow-txn-sell .irow-txn-type { color:#16a34a;font-weight:700; }
-.irow-txn-note { color:#94a3b8;font-size:10px;font-family:"Noto Sans TC",sans-serif; }
+.irow-txn-note { color:#94a3b8;font-size:10px;font-family:"Noto Sans TC",sans-serif;
+  grid-column:1/-1;padding:0 0 4px 0;margin-top:-2px;white-space:normal;line-height:1.4; }
 
 .irow-sm-btn {
   border:1px solid #e5e7eb;background:#f9fafb;
@@ -5549,6 +5550,28 @@ function saveBuy(){
   if(!date)return toast('請選擇日期');
   const feeIn=document.getElementById('b-fee').value;
   const fee=feeIn!==''?parseFloat(feeIn):Math.max(1,Math.round(lots*1000*price*0.001425*0.28));
+  const remark=document.getElementById('b-remark')?.value.trim()||'';
+  const mood=document.getElementById('b-mood')?.value.trim()||'';
+
+  // 編輯模式：更新既有交易
+  const modal=document.getElementById('buyModal');
+  const editTxnId=modal?.dataset.editTxnId;
+  const editInvId=modal?.dataset.editInvId;
+  if(editTxnId&&editInvId){
+    const inv=db.investments.find(i=>i.id===editInvId);
+    if(inv){
+      const t=inv.transactions.find(x=>x.id===editTxnId);
+      if(t){t.lots=lots;t.price=price;t.date=date;t.fee=fee;t.remark=remark;t.mood=mood;}
+      inv.transactions.sort((a,b)=>a.date.localeCompare(b.date));
+      delete modal.dataset.editTxnId;delete modal.dataset.editInvId;
+      const btn=document.querySelector('#buyModal .act-btn.add');
+      if(btn)btn.textContent='確認買入';
+      save();closeModal('buyModal');render();renderInvestPage();
+      setTimeout(()=>toggleInvDetail(editInvId),100);
+      return toast('✅ 交易已更新');
+    }
+  }
+
   const inv=db.investments.find(i=>i.id===buyInvId);
   // 若有初始張數但無交易記錄，先把初始張數轉為一筆買入記錄
   if((inv.lots||0)>0 && !(inv.transactions||[]).length){
@@ -5556,8 +5579,6 @@ function saveBuy(){
     inv.transactions.push({id:uid(),type:'buy',lots:inv.lots,price:inv.avgPrice||0,
       date:inv.addedDate||'2020-01-01',fee:0,remark:'初始持倉'});
   }
-  const remark=document.getElementById('b-remark')?.value.trim()||'';
-  const mood=document.getElementById('b-mood')?.value.trim()||'';
   inv.transactions.push({id:uid(),type:'buy',lots,price,date,fee,remark,mood});
   inv.transactions.sort((a,b)=>a.date.localeCompare(b.date));
   save();closeModal('buyModal');render();renderInvestPage();toast(`買入 ${lots} 張已記錄`);
@@ -5658,9 +5679,38 @@ function delTxn(invId,txnId){
   if(!confirm('確定刪除？'))return;
   const inv=db.investments.find(i=>i.id===invId);
   inv.transactions=inv.transactions.filter(t=>t.id!==txnId);
-  save();render();
-  setTimeout(()=>{const hr=document.getElementById('hr-'+invId);if(hr){hr.classList.add('open');document.getElementById('hb-'+invId).textContent='📋 記錄▲';}},50);
+  save();render();renderInvestPage();
   toast('已刪除');
+}
+
+function editTxn(invId,txnId){
+  const inv=db.investments.find(i=>i.id===invId);
+  if(!inv)return;
+  const t=inv.transactions.find(x=>x.id===txnId);
+  if(!t)return;
+  closeModal('inv-detail-modal');
+  if(t.type==='buy'){
+    openBuyModal(invId);
+    setTimeout(()=>{
+      const d=document.getElementById('b-date');
+      const lo=document.getElementById('b-lots');
+      const pr=document.getElementById('b-price');
+      const fe=document.getElementById('b-fee');
+      const re=document.getElementById('b-remark');
+      if(d)d.value=t.date||'';
+      if(lo)lo.value=t.lots||'';
+      if(pr)pr.value=t.price||'';
+      if(fe)fe.value=t.fee||'';
+      if(re)re.value=t.remark||'';
+      // 標記編輯模式
+      const modal=document.getElementById('buyModal');
+      if(modal){modal.dataset.editInvId=invId;modal.dataset.editTxnId=txnId;}
+      const btn=document.querySelector('#buyModal .act-btn.add');
+      if(btn)btn.textContent='💾 儲存修改';
+    },100);
+  } else {
+    toast('⚠️ 賣出記錄目前不支援編輯，請刪除後重新建立');
+  }
 }
 
 // LOAN
@@ -6082,11 +6132,24 @@ function buildTxnRows(inv,c,yearFilter){
     l1+='<span style="font-family:\'JetBrains Mono\',monospace">$'+t.price.toFixed(2)+'</span>';
     l1+='<span style="font-family:\'JetBrains Mono\',monospace">'+fmt(gross)+'</span>';
     l1+='<span style="color:#94a3b8;font-size:10px">'+(fee?'手續費$'+Math.round(fee).toLocaleString():'')+'</span>';
-    if(!isB)l1+=pnlHtml;
-    if(isB&&buyPnlHtml)l1+=buyPnlHtml;
-    if(isB&&t.remark)l1+='<span class="irow-txn-note">'+t.remark+'</span>';
-    if(canExpand)l1+='<button class="irow-sm-btn" id="tarr-'+tid+'" style="margin-left:auto;font-size:10px;color:#94a3b8">▼</button>';
+    // 損益欄（固定）
+    if(isB&&buyPnlHtml){
+      l1+=buyPnlHtml;
+    } else if(!isB&&pnlHtml){
+      l1+=pnlHtml;
+    } else {
+      l1+='<span></span>';
+    }
+    // 佔位欄（備註移到下一行）
+    l1+='<span></span>';
+    // 按鈕群
+    l1+='<span style="display:flex;gap:3px;justify-content:flex-end">';
+    if(canExpand)l1+='<button class="irow-sm-btn" id="tarr-'+tid+'" style="font-size:10px;color:#94a3b8">▼</button>';
+    l1+='<button class="irow-sm-btn" onclick="event.stopPropagation();editTxn(\''+inv.id+'\',\''+t.id+'\')">✏️</button>';
     l1+='<button class="irow-sm-btn del" onclick="event.stopPropagation();delTxn(\''+inv.id+'\',\''+t.id+'\')">刪</button>';
+    l1+='</span>';
+    // 備註獨立一行（span grid-column:1/-1）
+    if(t.remark)l1+='<span class="irow-txn-note">📝 '+t.remark+'</span>';
     l1+='</div>';
     // 第二層（賣出才有）
     let l2='';
