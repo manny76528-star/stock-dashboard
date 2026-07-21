@@ -6805,7 +6805,7 @@
   "todayDone": [],
   "todayDate": "2026-04-20",
   "streak": 0,
-  "_ts": 1784625844488,
+  "_ts": 1784625848987,
   "weak": {
     "v17766145007324n9m": true,
     "v1776614500732244e": true,
@@ -7150,7 +7150,8 @@
     }
   ],
   "verbWeak": {
-    "vmrq1004sume": true
+    "vmrq1004sume": true,
+    "vmrsz9nps1ej": true
   },
   "verbDone": 13
 }
