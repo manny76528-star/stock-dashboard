@@ -716,7 +716,7 @@
       "name": "平衡凱基雙核收息",
       "lots": 17,
       "avgPrice": 12.17,
-      "divPerShare": 0.065,
+      "divPerShare": 0.07,
       "note": "質押中",
       "url": "https://www.wantgoo.com/stock/etf/00981T/dividend-policy/ex-dividend",
       "holdType": "long",
@@ -2394,7 +2394,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1784626942067,
+  "_ts": 1784626969374,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
