@@ -950,6 +950,16 @@
           "fee": 188,
           "remark": "META算力出售引發記憶體黑天鵝,出售00988A資金轉移到此",
           "mood": "😰 焦慮"
+        },
+        {
+          "id": "mrufssl4k5v",
+          "type": "buy",
+          "lots": 8,
+          "price": 11.97,
+          "date": "2026-07-21",
+          "fee": 38,
+          "remark": "",
+          "mood": "🤔 猶豫"
         }
       ],
       "order": 9
@@ -2384,7 +2394,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1784625157630,
+  "_ts": 1784625257126,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
