@@ -3176,7 +3176,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
 
 <!-- ══ 投資標的詳情 Modal ══ -->
 <div class="mo" id="inv-detail-modal" style="z-index:1600">
-  <div class="modal" style="max-width:680px;width:100%">
+  <div class="modal" style="max-width:920px;width:100%">
     <div class="mt">
       <div id="inv-detail-modal-title">📊 標的詳情</div>
       <button onclick="closeModal('inv-detail-modal')" style="background:none;border:none;font-size:20px;cursor:pointer;color:#94a3b8;line-height:1">✕</button>
@@ -6046,6 +6046,16 @@ function buildTxnRows(inv,c,yearFilter){
     const gross=t.lots*1000*t.price;
     const fee=t.fee||0;
     const tid='txd-'+inv.id+'-'+t.id;
+    // 買入損益（用現價計算）
+    let buyPnlHtml='';
+    if(isB&&c.curPrice!=null){
+      const curVal=t.lots*1000*c.curPrice;
+      const buyCost=gross+(fee||0);
+      const bPnl=curVal-buyCost;
+      const bRoi=buyCost>0?bPnl/buyCost*100:0;
+      const bColor=bPnl>=0?'var(--gain)':'var(--loss)';
+      buyPnlHtml='<span style="color:'+bColor+';font-weight:700;font-size:11px">'+(bPnl>=0?'+':'')+Math.round(bPnl).toLocaleString()+'<br><span style="font-size:10px">'+(bRoi>=0?'+':'')+bRoi.toFixed(2)+'%</span></span>';
+    }
     // 計算賣出損益
     let pnlHtml='';
     if(!isB&&t.lotRefs&&t.lotRefs.length){
@@ -6073,6 +6083,7 @@ function buildTxnRows(inv,c,yearFilter){
     l1+='<span style="font-family:\'JetBrains Mono\',monospace">'+fmt(gross)+'</span>';
     l1+='<span style="color:#94a3b8;font-size:10px">'+(fee?'手續費$'+Math.round(fee).toLocaleString():'')+'</span>';
     if(!isB)l1+=pnlHtml;
+    if(isB&&buyPnlHtml)l1+=buyPnlHtml;
     if(isB&&t.remark)l1+='<span class="irow-txn-note">'+t.remark+'</span>';
     if(canExpand)l1+='<button class="irow-sm-btn" id="tarr-'+tid+'" style="margin-left:auto;font-size:10px;color:#94a3b8">▼</button>';
     l1+='<button class="irow-sm-btn del" onclick="event.stopPropagation();delTxn(\''+inv.id+'\',\''+t.id+'\')">刪</button>';
