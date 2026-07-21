@@ -6302,6 +6302,37 @@
       "vendorPaid": false,
       "vendorPaidDate": "",
       "images": []
+    },
+    {
+      "id": "mru924jpcuqm",
+      "date": "2026-07-21",
+      "custId": "mnmofk0wvucy",
+      "custName": "騰亦資訊",
+      "contact": "Jack歐",
+      "phone": "07-5885038",
+      "note": "CINO F560",
+      "items": [
+        {
+          "name": "掃描器",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "",
+          "qty": 1,
+          "sn": "C5190137",
+          "sns": [
+            "C5190137"
+          ],
+          "cost": 1,
+          "price": 1480,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2026-07-21",
+      "vendorPaid": false,
+      "vendorPaidDate": "",
+      "images": [],
+      "createdAt": "2026-07-21T06:05:34.213Z"
     }
   ],
   "customers": [
@@ -6623,6 +6654,6 @@
     "bankCode": "013",
     "bankAccount": "061506186489"
   },
-  "_ts": 1783419429255,
+  "_ts": 1784613937229,
   "_vendorPaidBackfilled": true
 }
