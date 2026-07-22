@@ -2501,7 +2501,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
             <div style="font-size:12px;color:#9ca3af;margin-bottom:4px;display:flex;align-items:center;justify-content:center;gap:4px">
               ⚠️ 警戒價
               <input type="number" id="pledge-threshold" value="130" min="100" max="200" step="1"
-                onchange="renderPledgePage()"
+                onchange="db.pledgeThreshold=parseInt(this.value)||130;save();renderPledgePage()"
                 style="width:48px;padding:1px 4px;border:1px solid #e2e8f0;border-radius:4px;font-size:11px;font-weight:700;color:#374151;text-align:center">
               %
             </div>
@@ -11063,8 +11063,10 @@ function renderPledgePage(){
   // 台灣用法：紅色=好（高維持率），綠色=危險（低維持率）
   const ratioColor=ratio<130?'#16a34a':ratio<145?'#f59e0b':'#dc2626';
 
-  // 自訂警戒門檻
-  const threshold=parseFloat(document.getElementById('pledge-threshold')?.value)||130;
+  // 自訂警戒門檻（從 db 讀取，確保重整後不消失）
+  const thresholdEl=document.getElementById('pledge-threshold');
+  if(thresholdEl&&db.pledgeThreshold)thresholdEl.value=db.pledgeThreshold;
+  const threshold=parseFloat(thresholdEl?.value)||db.pledgeThreshold||130;
   const totalLots=db.pledgeAssets.reduce((s,a)=>s+(a.lots||0),0);
   const thresholdPrice=totalLots>0?(totalLoan*threshold/100)/(totalLots*1000):0;
   const dangerPrice=thresholdPrice;
@@ -11116,7 +11118,7 @@ function renderPledgePage(){
   }
 
   // 數據總覽 KPI
-  updatePledgeOvKpi(ratio,ratioColor,dangerPrice,warnPrice);
+  updatePledgeOvKpi(ratio,ratioColor,dangerPrice,0);
 
   // 渲染計入維持率的借款（從不限用途抓）
   const loanBody=document.getElementById('pledge-loan-body');
