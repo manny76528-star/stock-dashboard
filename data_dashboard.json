@@ -1398,7 +1398,8 @@
       "used": 9416000,
       "remain": 3584000,
       "monthly": 24325,
-      "note": "一年一簽,賣出股票時還利息"
+      "note": "一年一簽,賣出股票時還利息",
+      "calcPledge": true
     }
   ],
   "cashAccounts": [
@@ -2394,7 +2395,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1784712450197,
+  "_ts": 1784712651158,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
