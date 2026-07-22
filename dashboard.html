@@ -11065,8 +11065,9 @@ function renderPledgePage(){
 
   // 自訂警戒門檻
   const threshold=parseFloat(document.getElementById('pledge-threshold')?.value)||130;
+  const totalLots=db.pledgeAssets.reduce((s,a)=>s+(a.lots||0),0);
   const thresholdPrice=totalLots>0?(totalLoan*threshold/100)/(totalLots*1000):0;
-  const dangerPrice=thresholdPrice; // 沿用 dangerPrice 變數名
+  const dangerPrice=thresholdPrice;
 
   // 更新 KPI
   const ratioEl=document.getElementById('pledge-ratio');
