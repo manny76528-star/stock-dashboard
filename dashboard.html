@@ -1975,6 +1975,10 @@ body:not(.privacy) .privacy-mask{filter:none;}
     </div>
 
     <div class="db-nav-section">分析與規劃</div>
+    <div class="db-nav-item" id="nav-pledge" onclick="dbShowPage('pledge')">
+      <span class="nav-icon">🔒</span>質押管理
+      <span class="db-nav-badge" id="nav-pledge-badge" style="background:#fef3c7;color:#92400e"></span>
+    </div>
     <div class="db-nav-item" id="nav-analytics" onclick="dbShowPage('analytics')">
       <span class="nav-icon">📈</span>投資分析
     </div>
@@ -2067,6 +2071,12 @@ body:not(.privacy) .privacy-mask{filter:none;}
     <div class="ov-kpi-label" style="padding-left:8px">每月股息</div>
     <div class="ov-kpi-val privacy-mask" id="ov-div" style="padding-left:8px">—</div>
     <div class="ov-kpi-sub" id="ov-div-sub" style="padding-left:8px"></div>
+  </div>
+  <div class="ov-kpi-card" style="cursor:pointer" onclick="dbShowPage('pledge')">
+    <div class="ov-kpi-accent" style="background:#f59e0b"></div>
+    <div class="ov-kpi-label" style="padding-left:8px">🔒 質押維持率</div>
+    <div class="ov-kpi-val" id="ov-pledge-ratio" style="padding-left:8px">—</div>
+    <div class="ov-kpi-sub" id="ov-pledge-sub" style="padding-left:8px;font-size:10px"></div>
   </div>
   <div class="ov-kpi-card">
     <div class="ov-kpi-accent" style="background:#b5adc4"></div>
@@ -2462,6 +2472,67 @@ body:not(.privacy) .privacy-mask{filter:none;}
         </div>
         <div id="finplan-page-body" style="padding:20px;width:100%;box-sizing:border-box">
           <div style="color:#9ca3af;text-align:center;padding:40px">載入中...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ 頁面：質押管理 ══ -->
+    <div class="db-page" id="dbpage-pledge">
+      <!-- 整體維持率大卡 -->
+      <div class="trend-page-card" style="padding:20px;margin-bottom:16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <div style="font-size:15px;font-weight:800;color:#1e293b">🔒 質押維持率</div>
+          <button onclick="renderPledgePage()" style="padding:5px 12px;background:#f8fafc;border:1px solid #eaecf0;color:#374151;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">🔄 更新</button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:14px" id="pledge-kpi-grid">
+          <div style="text-align:center;padding:20px;background:#f8fafc;border-radius:12px">
+            <div style="font-size:12px;color:#9ca3af;margin-bottom:6px">整體維持率</div>
+            <div style="font-size:36px;font-weight:900;font-family:'JetBrains Mono',monospace" id="pledge-ratio">—</div>
+          </div>
+          <div style="text-align:center;padding:20px;background:#f8fafc;border-radius:12px">
+            <div style="font-size:12px;color:#9ca3af;margin-bottom:6px">擔保品總市值</div>
+            <div style="font-size:22px;font-weight:800;font-family:'JetBrains Mono',monospace" id="pledge-mkt">—</div>
+          </div>
+          <div style="text-align:center;padding:20px;background:#f8fafc;border-radius:12px">
+            <div style="font-size:12px;color:#9ca3af;margin-bottom:6px">借款總額</div>
+            <div style="font-size:22px;font-weight:800;font-family:'JetBrains Mono',monospace" id="pledge-loan">—</div>
+          </div>
+          <div style="text-align:center;padding:20px;background:#fff3cd;border-radius:12px;border:1px solid #f59e0b">
+            <div style="font-size:12px;color:#92400e;margin-bottom:6px">⚠️ 斷頭價（130%）</div>
+            <div style="font-size:22px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#dc2626" id="pledge-danger-price">—</div>
+          </div>
+        </div>
+        <!-- 警示進度條 -->
+        <div style="margin-top:16px">
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:#9ca3af;margin-bottom:6px">
+            <span>斷頭 130%</span><span>警示 145%</span><span>安全 166.67%</span>
+          </div>
+          <div style="height:10px;background:#f1f5f9;border-radius:5px;overflow:hidden;position:relative">
+            <div id="pledge-prog-bar" style="height:10px;border-radius:5px;transition:width .5s;width:0%"></div>
+            <!-- 130% 警戒線 -->
+            <div style="position:absolute;top:0;bottom:0;width:2px;background:#dc2626;left:0%" id="pledge-line-130"></div>
+            <!-- 145% 警戒線 -->
+            <div style="position:absolute;top:0;bottom:0;width:2px;background:#f59e0b;left:0%" id="pledge-line-145"></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <!-- 借款清單 -->
+        <div class="trend-page-card" style="padding:0;overflow:hidden">
+          <div class="trend-page-hdr" style="padding:14px 18px;border-bottom:1px solid #f0f2f5">
+            <span>💳 借款清單</span>
+            <button onclick="openPledgeLoanModal()" style="padding:5px 12px;background:#fee2e2;border:1px solid #fca5a5;color:#dc2626;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">＋ 新增</button>
+          </div>
+          <div id="pledge-loan-body" style="padding:12px"></div>
+        </div>
+        <!-- 擔保品清單 -->
+        <div class="trend-page-card" style="padding:0;overflow:hidden">
+          <div class="trend-page-hdr" style="padding:14px 18px;border-bottom:1px solid #f0f2f5">
+            <span>📦 擔保品清單</span>
+            <button onclick="openPledgeAssetModal()" style="padding:5px 12px;background:#dcfce7;border:1px solid #86efac;color:#15803d;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">＋ 新增</button>
+          </div>
+          <div id="pledge-asset-body" style="padding:12px"></div>
         </div>
       </div>
     </div>
@@ -3375,6 +3446,32 @@ body:not(.privacy) .privacy-mask{filter:none;}
 <!-- ══ 投資分析 Drawer（已改為獨立分頁）══ -->
 <div id="analytics-drawer" class="side-drawer" style="display:none!important"></div>
 
+<!-- ══ 質押借款 Modal ══ -->
+<div class="mo" id="pledgeLoanModal">
+  <div class="modal" style="max-width:400px;width:100%">
+    <div class="mt"><div class="mt-title" id="pledgeLoanModalTitle">＋ 新增借款</div><button onclick="closeModal('pledgeLoanModal')" style="background:none;border:none;font-size:20px;cursor:pointer;color:#94a3b8">✕</button></div>
+    <div class="mb">
+      <div class="fg"><label class="fl">銀行/帳戶名稱</label><input class="fi" id="pl-bank" placeholder="例：永豐證券"></div>
+      <div class="fg"><label class="fl">借款金額</label><input class="fi" id="pl-amount" type="number" placeholder="例：2880911"></div>
+      <div class="fg"><label class="fl">備註（選填）</label><input class="fi" id="pl-note" placeholder="例：台股質押"></div>
+    </div>
+    <div class="br"><button class="btn btn-s" onclick="closeModal('pledgeLoanModal')">取消</button><button class="btn btn-p" onclick="savePledgeLoan()">儲存</button></div>
+  </div>
+</div>
+
+<!-- ══ 質押擔保品 Modal ══ -->
+<div class="mo" id="pledgeAssetModal">
+  <div class="modal" style="max-width:400px;width:100%">
+    <div class="mt"><div class="mt-title" id="pledgeAssetModalTitle">＋ 新增擔保品</div><button onclick="closeModal('pledgeAssetModal')" style="background:none;border:none;font-size:20px;cursor:pointer;color:#94a3b8">✕</button></div>
+    <div class="mb">
+      <div class="fg"><label class="fl">股票代碼</label><input class="fi" id="pa-code" placeholder="例：00981T"></div>
+      <div class="fg"><label class="fl">質押張數</label><input class="fi" id="pa-lots" type="number" placeholder="例：1277"></div>
+      <div class="fg"><label class="fl">備註（選填）</label><input class="fi" id="pa-note" placeholder="例：待交割8張"></div>
+    </div>
+    <div class="br"><button class="btn btn-s" onclick="closeModal('pledgeAssetModal')">取消</button><button class="btn btn-p" onclick="savePledgeAsset()">儲存</button></div>
+  </div>
+</div>
+
 <!-- ══ 觀察股 Drawer ══ -->
 <div id="watch-drawer" class="side-drawer">
   <div class="side-drawer-hdr">
@@ -4130,6 +4227,8 @@ function importData(e){
       if(!db.loans)db.loans=[];
       if(!db.flexLoans)db.flexLoans=[];
       if(!db.cashAccounts)db.cashAccounts=[];
+  if(!db.pledgeLoans)db.pledgeLoans=[];
+  if(!db.pledgeAssets)db.pledgeAssets=[];
       if(!db.prices)db.prices={};
       if(!db.dividends)db.dividends=[];
       if(!db.snapshots)db.snapshots=[];
@@ -10315,6 +10414,8 @@ function renderOvKpi(){
 
   set('ov-loan','$'+Math.round(lR).toLocaleString());
   setC('ov-dr','負債比 '+dR+'%',dR>85?'dn':dR>70?'':'up');
+  // 質押維持率
+  if(typeof renderPledgeOvOnly==='function')renderPledgeOvOnly();
   // 渲染後重新套用隱私遮罩
   if(typeof applyPrivacy==='function')applyPrivacy();
 }
@@ -10898,6 +10999,214 @@ function smoothScrollTo(id, offset=24){
   window.scrollTo({top,behavior:'smooth'});
 }
 
+// ══════════════════════════════════════
+// 質押管理
+// ══════════════════════════════════════
+let _editPledgeLoanId=null, _editPledgeAssetId=null;
+
+function renderPledgeOvOnly(){
+  if(!db.pledgeLoans||!db.pledgeAssets)return;
+  const totalLoan=db.pledgeLoans.reduce((s,l)=>s+(l.amount||0),0);
+  let totalMkt=0;
+  db.pledgeAssets.forEach(a=>{const price=db.prices[a.code]?.price||0;totalMkt+=price*(a.lots||0)*1000;});
+  const ratio=totalLoan>0?totalMkt/totalLoan*100:0;
+  const color=ratio<130?'#dc2626':ratio<145?'#f59e0b':'#16a34a';
+  const totalLots=db.pledgeAssets.reduce((s,a)=>s+(a.lots||0),0);
+  const dangerPrice=totalLots>0?(totalLoan*1.3)/(totalLots*1000):0;
+  updatePledgeOvKpi(ratio,color,dangerPrice,0);
+  // 如果質押頁是開著的也一起更新
+  const pledgePage=document.getElementById('dbpage-pledge');
+  if(pledgePage&&pledgePage.classList.contains('active'))renderPledgePage();
+}
+
+function renderPledgePage(){
+  if(!db.pledgeLoans)db.pledgeLoans=[];
+  if(!db.pledgeAssets)db.pledgeAssets=[];
+
+  // 計算總借款
+  const totalLoan=db.pledgeLoans.reduce((s,l)=>s+(l.amount||0),0);
+
+  // 計算擔保品總市值（從 db.prices 抓）
+  let totalMkt=0;
+  db.pledgeAssets.forEach(a=>{
+    const price=db.prices[a.code]?.price||0;
+    totalMkt+=price*(a.lots||0)*1000;
+  });
+
+  // 維持率
+  const ratio=totalLoan>0?totalMkt/totalLoan*100:0;
+  const ratioColor=ratio<130?'#dc2626':ratio<145?'#f59e0b':'#16a34a';
+
+  // 斷頭價（維持率130%時的市值 / 總張數）
+  const totalLots=db.pledgeAssets.reduce((s,a)=>s+(a.lots||0),0);
+  const dangerMkt=totalLoan*1.3;
+  const dangerPrice=totalLots>0?dangerMkt/(totalLots*1000):0;
+
+  // 警示價（145%）
+  const warnPrice=totalLots>0?(totalLoan*1.45)/(totalLots*1000):0;
+
+  // 更新 KPI
+  const ratioEl=document.getElementById('pledge-ratio');
+  if(ratioEl){ratioEl.textContent=ratio>0?ratio.toFixed(1)+'%':'—';ratioEl.style.color=ratioColor;}
+  const mktEl=document.getElementById('pledge-mkt');
+  if(mktEl)mktEl.textContent=totalMkt>0?'$'+Math.round(totalMkt).toLocaleString():'—';
+  const loanEl=document.getElementById('pledge-loan');
+  if(loanEl)loanEl.textContent=totalLoan>0?'$'+Math.round(totalLoan).toLocaleString():'—';
+  const dpEl=document.getElementById('pledge-danger-price');
+  if(dpEl)dpEl.textContent=dangerPrice>0?'$'+dangerPrice.toFixed(2):'—';
+
+  // 進度條（130%=0%, 200%=100%）
+  const barEl=document.getElementById('pledge-prog-bar');
+  const pct=Math.min(100,Math.max(0,(ratio-130)/(200-130)*100));
+  if(barEl){barEl.style.width=pct+'%';barEl.style.background=ratioColor;}
+  // 警戒線位置
+  const l130=document.getElementById('pledge-line-130');
+  const l145=document.getElementById('pledge-line-145');
+  if(l130)l130.style.left='0%';
+  if(l145)l145.style.left=((145-130)/(200-130)*100).toFixed(1)+'%';
+
+  // 更新導航 badge
+  const badge=document.getElementById('nav-pledge-badge');
+  if(badge){
+    if(ratio>0&&ratio<145){
+      badge.textContent=ratio.toFixed(1)+'%';
+      badge.style.display='';
+      badge.style.background=ratio<130?'#fee2e2':'#fef3c7';
+      badge.style.color=ratio<130?'#dc2626':'#92400e';
+    } else {
+      badge.style.display='none';
+    }
+  }
+
+  // 數據總覽 KPI
+  updatePledgeOvKpi(ratio,ratioColor,dangerPrice,warnPrice);
+
+  // 渲染借款清單
+  const loanBody=document.getElementById('pledge-loan-body');
+  if(loanBody){
+    loanBody.innerHTML=db.pledgeLoans.length===0
+      ?'<div style="text-align:center;color:#9ca3af;padding:20px;font-size:12px">尚無借款記錄</div>'
+      :db.pledgeLoans.map(l=>`
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 8px;border-bottom:1px solid #f5f7fa">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:#1e293b">${l.bank||'—'}</div>
+            ${l.note?`<div style="font-size:11px;color:#9ca3af">${l.note}</div>`:''}
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="font-size:14px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#dc2626">$${Math.round(l.amount||0).toLocaleString()}</div>
+            <button onclick="editPledgeLoan('${l.id}')" style="padding:3px 8px;border:1px solid #e2e8f0;border-radius:6px;background:#f8fafc;font-size:11px;cursor:pointer">✏️</button>
+            <button onclick="delPledgeLoan('${l.id}')" style="padding:3px 8px;border:none;background:none;color:#ef4444;font-size:11px;cursor:pointer">🗑</button>
+          </div>
+        </div>`).join('')+
+      `<div style="padding:10px 8px;text-align:right;font-size:12px;font-weight:700;color:#64748b;border-top:2px solid #f0f2f5">
+        合計：<span style="color:#dc2626;font-family:'JetBrains Mono',monospace">$${Math.round(totalLoan).toLocaleString()}</span>
+      </div>`;
+  }
+
+  // 渲染擔保品清單
+  const assetBody=document.getElementById('pledge-asset-body');
+  if(assetBody){
+    assetBody.innerHTML=db.pledgeAssets.length===0
+      ?'<div style="text-align:center;color:#9ca3af;padding:20px;font-size:12px">尚無擔保品記錄</div>'
+      :db.pledgeAssets.map(a=>{
+        const price=db.prices[a.code]?.price||0;
+        const mkt=price*(a.lots||0)*1000;
+        return`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 8px;border-bottom:1px solid #f5f7fa">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:#1e293b">${a.code} <span style="font-size:11px;color:#9ca3af;font-weight:400">${a.lots||0}張</span></div>
+            <div style="font-size:11px;color:#9ca3af">現價 $${price||'—'} ${a.note?'・'+a.note:''}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="text-align:right">
+              <div style="font-size:14px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#16a34a">$${Math.round(mkt).toLocaleString()}</div>
+              <div style="font-size:10px;color:#9ca3af">${warnPrice>0?'警示 $'+warnPrice.toFixed(2):''}</div>
+            </div>
+            <button onclick="editPledgeAsset('${a.id}')" style="padding:3px 8px;border:1px solid #e2e8f0;border-radius:6px;background:#f8fafc;font-size:11px;cursor:pointer">✏️</button>
+            <button onclick="delPledgeAsset('${a.id}')" style="padding:3px 8px;border:none;background:none;color:#ef4444;font-size:11px;cursor:pointer">🗑</button>
+          </div>
+        </div>`;
+      }).join('')+
+      `<div style="padding:10px 8px;text-align:right;font-size:12px;font-weight:700;color:#64748b;border-top:2px solid #f0f2f5">
+        合計市值：<span style="color:#16a34a;font-family:'JetBrains Mono',monospace">$${Math.round(totalMkt).toLocaleString()}</span>
+      </div>`;
+  }
+}
+
+function updatePledgeOvKpi(ratio,color,dangerPrice,warnPrice){
+  const el=document.getElementById('ov-pledge-ratio');
+  if(!el)return;
+  el.textContent=ratio>0?ratio.toFixed(1)+'%':'—';
+  el.style.color=color;
+  const sub=document.getElementById('ov-pledge-sub');
+  if(sub){
+    if(ratio>0&&ratio<145)sub.textContent=ratio<130?'⚠️ 低於斷頭線！':'⚠️ 接近警示線';
+    else if(dangerPrice>0)sub.textContent='斷頭價 $'+dangerPrice.toFixed(2);
+    else sub.textContent='';
+  }
+}
+
+function openPledgeLoanModal(id){
+  _editPledgeLoanId=id||null;
+  const l=id?(db.pledgeLoans||[]).find(x=>x.id===id):null;
+  document.getElementById('pledgeLoanModalTitle').textContent=id?'✏️ 編輯借款':'＋ 新增借款';
+  document.getElementById('pl-bank').value=l?.bank||'';
+  document.getElementById('pl-amount').value=l?.amount||'';
+  document.getElementById('pl-note').value=l?.note||'';
+  openModal('pledgeLoanModal');
+}
+function savePledgeLoan(){
+  const bank=document.getElementById('pl-bank').value.trim();
+  const amount=parseFloat(document.getElementById('pl-amount').value)||0;
+  const note=document.getElementById('pl-note').value.trim();
+  if(!bank)return toast('請輸入銀行名稱');
+  if(!amount)return toast('請輸入借款金額');
+  if(!db.pledgeLoans)db.pledgeLoans=[];
+  if(_editPledgeLoanId){
+    const l=db.pledgeLoans.find(x=>x.id===_editPledgeLoanId);
+    if(l){l.bank=bank;l.amount=amount;l.note=note;}
+  } else {
+    db.pledgeLoans.push({id:uid(),bank,amount,note});
+  }
+  save();closeModal('pledgeLoanModal');renderPledgePage();toast('已儲存');
+}
+function editPledgeLoan(id){openPledgeLoanModal(id);}
+function delPledgeLoan(id){
+  if(!confirm('確定刪除？'))return;
+  db.pledgeLoans=db.pledgeLoans.filter(x=>x.id!==id);
+  save();renderPledgePage();toast('已刪除');
+}
+
+function openPledgeAssetModal(id){
+  _editPledgeAssetId=id||null;
+  const a=id?(db.pledgeAssets||[]).find(x=>x.id===id):null;
+  document.getElementById('pledgeAssetModalTitle').textContent=id?'✏️ 編輯擔保品':'＋ 新增擔保品';
+  document.getElementById('pa-code').value=a?.code||'';
+  document.getElementById('pa-lots').value=a?.lots||'';
+  document.getElementById('pa-note').value=a?.note||'';
+  openModal('pledgeAssetModal');
+}
+function savePledgeAsset(){
+  const code=document.getElementById('pa-code').value.trim().toUpperCase();
+  const lots=parseFloat(document.getElementById('pa-lots').value)||0;
+  const note=document.getElementById('pa-note').value.trim();
+  if(!code)return toast('請輸入股票代碼');
+  if(!lots)return toast('請輸入張數');
+  if(!db.pledgeAssets)db.pledgeAssets=[];
+  if(_editPledgeAssetId){
+    const a=db.pledgeAssets.find(x=>x.id===_editPledgeAssetId);
+    if(a){a.code=code;a.lots=lots;a.note=note;}
+  } else {
+    db.pledgeAssets.push({id:uid(),code,lots,note});
+  }
+  save();closeModal('pledgeAssetModal');renderPledgePage();toast('已儲存');
+}
+function editPledgeAsset(id){openPledgeAssetModal(id);}
+function delPledgeAsset(id){
+  if(!confirm('確定刪除？'))return;
+  db.pledgeAssets=db.pledgeAssets.filter(x=>x.id!==id);
+  save();renderPledgePage();toast('已刪除');
+}
+
 function renderFinPlanPage(){
   const body=document.getElementById('finplan-page-body');
   if(!body)return;
@@ -10942,6 +11251,7 @@ function dbShowPage(id){
   if(id==='dividend'){if(typeof renderDivs==='function')renderDivs();}
   if(id==='analytics'){if(typeof renderAnalytics==='function')renderAnalytics();}
   if(id==='finplan')renderFinPlanPage();
+  if(id==='pledge')renderPledgePage();
 
   setTimeout(()=>{
     const mainEl=document.querySelector('.db-main');
