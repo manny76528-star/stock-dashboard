@@ -4223,7 +4223,7 @@ async function refreshPrices(){
     else notFound.push(c);
   }));
 
-  save();render();
+  save();render();renderOvKpi();
   if(healthOpen)renderHealth();
   if(watchOpen)renderWatchlist();
   const n=new Date();
