@@ -3451,9 +3451,13 @@ body:not(.privacy) .privacy-mask{filter:none;}
   <div class="modal" style="max-width:400px;width:100%">
     <div class="mt"><div class="mt-title" id="pledgeLoanModalTitle">＋ 新增借款</div><button onclick="closeModal('pledgeLoanModal')" style="background:none;border:none;font-size:20px;cursor:pointer;color:#94a3b8">✕</button></div>
     <div class="mb">
-      <div class="fg"><label class="fl">銀行/帳戶名稱</label><input class="fi" id="pl-bank" placeholder="例：永豐證券"></div>
-      <div class="fg"><label class="fl">借款金額</label><input class="fi" id="pl-amount" type="number" placeholder="例：2880911"></div>
+      <div class="fg"><label class="fl">銀行/帳戶名稱</label><input class="fi" id="pl-bank" placeholder="例：統一證券"></div>
+      <div class="fg"><label class="fl">借款金額</label><input class="fi" id="pl-amount" type="number" placeholder="例：9416000"></div>
       <div class="fg"><label class="fl">備註（選填）</label><input class="fi" id="pl-note" placeholder="例：台股質押"></div>
+      <div class="fg" style="display:flex;align-items:center;gap:8px;padding:8px 0">
+        <input type="checkbox" id="pl-calc" style="width:16px;height:16px;cursor:pointer">
+        <label for="pl-calc" style="font-size:13px;font-weight:600;color:#374151;cursor:pointer">計算維持率（此借款有對應擔保品）</label>
+      </div>
     </div>
     <div class="br"><button class="btn btn-s" onclick="closeModal('pledgeLoanModal')">取消</button><button class="btn btn-p" onclick="savePledgeLoan()">儲存</button></div>
   </div>
@@ -11006,7 +11010,7 @@ let _editPledgeLoanId=null, _editPledgeAssetId=null;
 
 function renderPledgeOvOnly(){
   if(!db.pledgeLoans||!db.pledgeAssets)return;
-  const totalLoan=db.pledgeLoans.reduce((s,l)=>s+(l.amount||0),0);
+  const totalLoan=db.pledgeLoans.filter(l=>l.calcMaintenance).reduce((s,l)=>s+(l.amount||0),0);
   let totalMkt=0;
   db.pledgeAssets.forEach(a=>{const price=db.prices[a.code]?.price||0;totalMkt+=price*(a.lots||0)*1000;});
   const ratio=totalLoan>0?totalMkt/totalLoan*100:0;
@@ -11023,8 +11027,8 @@ function renderPledgePage(){
   if(!db.pledgeLoans)db.pledgeLoans=[];
   if(!db.pledgeAssets)db.pledgeAssets=[];
 
-  // 計算總借款
-  const totalLoan=db.pledgeLoans.reduce((s,l)=>s+(l.amount||0),0);
+  // 計算總借款（只含勾選「計算維持率」的帳戶）
+  const totalLoan=db.pledgeLoans.filter(l=>l.calcMaintenance).reduce((s,l)=>s+(l.amount||0),0);
 
   // 計算擔保品總市值（從 db.prices 抓）
   let totalMkt=0;
@@ -11089,7 +11093,7 @@ function renderPledgePage(){
       :db.pledgeLoans.map(l=>`
         <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 8px;border-bottom:1px solid #f5f7fa">
           <div>
-            <div style="font-size:13px;font-weight:700;color:#1e293b">${l.bank||'—'}</div>
+            <div style="font-size:13px;font-weight:700;color:#1e293b">${l.bank||'—'} ${l.calcMaintenance?'<span style="font-size:10px;background:#dcfce7;color:#15803d;padding:1px 6px;border-radius:4px;font-weight:700">計算維持率</span>':'<span style="font-size:10px;background:#f1f5f9;color:#9ca3af;padding:1px 6px;border-radius:4px">純借款</span>'}</div>
             ${l.note?`<div style="font-size:11px;color:#9ca3af">${l.note}</div>`:''}
           </div>
           <div style="display:flex;align-items:center;gap:8px">
@@ -11152,20 +11156,22 @@ function openPledgeLoanModal(id){
   document.getElementById('pl-bank').value=l?.bank||'';
   document.getElementById('pl-amount').value=l?.amount||'';
   document.getElementById('pl-note').value=l?.note||'';
+  document.getElementById('pl-calc').checked=l?.calcMaintenance||false;
   openModal('pledgeLoanModal');
 }
 function savePledgeLoan(){
   const bank=document.getElementById('pl-bank').value.trim();
   const amount=parseFloat(document.getElementById('pl-amount').value)||0;
   const note=document.getElementById('pl-note').value.trim();
+  const calcMaintenance=document.getElementById('pl-calc').checked;
   if(!bank)return toast('請輸入銀行名稱');
   if(!amount)return toast('請輸入借款金額');
   if(!db.pledgeLoans)db.pledgeLoans=[];
   if(_editPledgeLoanId){
     const l=db.pledgeLoans.find(x=>x.id===_editPledgeLoanId);
-    if(l){l.bank=bank;l.amount=amount;l.note=note;}
+    if(l){l.bank=bank;l.amount=amount;l.note=note;l.calcMaintenance=calcMaintenance;}
   } else {
-    db.pledgeLoans.push({id:uid(),bank,amount,note});
+    db.pledgeLoans.push({id:uid(),bank,amount,note,calcMaintenance});
   }
   save();closeModal('pledgeLoanModal');renderPledgePage();toast('已儲存');
 }
