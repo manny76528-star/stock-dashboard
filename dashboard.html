@@ -11154,7 +11154,7 @@ function renderPledgePage(){
           <div style="display:flex;align-items:center;gap:8px">
             <div style="text-align:right">
               <div style="font-size:14px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#16a34a">$${Math.round(mkt).toLocaleString()}</div>
-              <div style="font-size:10px;color:#9ca3af">${warnPrice>0?'警示 $'+warnPrice.toFixed(2):''}</div>
+              <div style="font-size:10px;color:#9ca3af">${threshold>0?'警戒 $'+(totalLoan*threshold/100/(totalLots*1000)).toFixed(2):''}</div>
             </div>
             <button onclick="editPledgeAsset('${a.id}')" style="padding:3px 8px;border:1px solid #e2e8f0;border-radius:6px;background:#f8fafc;font-size:11px;cursor:pointer">✏️</button>
             <button onclick="delPledgeAsset('${a.id}')" style="padding:3px 8px;border:none;background:none;color:#ef4444;font-size:11px;cursor:pointer">🗑</button>
