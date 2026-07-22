@@ -2395,7 +2395,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1784712651158,
+  "_ts": 1784712781973,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -3961,6 +3961,12 @@
       "id": "mrvvpn6ww0y",
       "code": "00981T",
       "lots": 1277,
+      "note": ""
+    },
+    {
+      "id": "mrvvwr6zg4o",
+      "code": "00997A",
+      "lots": 20,
       "note": ""
     }
   ]
