@@ -2497,9 +2497,16 @@ body:not(.privacy) .privacy-mask{filter:none;}
             <div style="font-size:12px;color:#9ca3af;margin-bottom:6px">借款總額</div>
             <div style="font-size:22px;font-weight:800;font-family:'JetBrains Mono',monospace" id="pledge-loan">—</div>
           </div>
-          <div style="text-align:center;padding:20px;background:#fff3cd;border-radius:12px;border:1px solid #f59e0b">
-            <div style="font-size:12px;color:#92400e;margin-bottom:6px">⚠️ 斷頭價（130%）</div>
-            <div style="font-size:22px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#dc2626" id="pledge-danger-price">—</div>
+          <div style="text-align:center;padding:20px;background:#f8fafc;border-radius:12px;border:1px solid #e2e8f0" id="pledge-threshold-card">
+            <div style="font-size:12px;color:#9ca3af;margin-bottom:4px;display:flex;align-items:center;justify-content:center;gap:4px">
+              ⚠️ 警戒價
+              <input type="number" id="pledge-threshold" value="130" min="100" max="200" step="1"
+                onchange="renderPledgePage()"
+                style="width:48px;padding:1px 4px;border:1px solid #e2e8f0;border-radius:4px;font-size:11px;font-weight:700;color:#374151;text-align:center">
+              %
+            </div>
+            <div style="font-size:22px;font-weight:800;font-family:'JetBrains Mono',monospace" id="pledge-danger-price">—</div>
+            <div style="font-size:10px;color:#9ca3af;margin-top:2px" id="pledge-threshold-label"></div>
           </div>
         </div>
         <!-- 警示進度條 -->
@@ -4318,12 +4325,13 @@ async function refreshPrices(){
   document.getElementById('pstat').innerHTML='<span class="spin"></span> 即時更新中...';
   const activeCodes=[...new Set(db.investments.filter(inv=>calcInv(inv).tLots>0).map(i=>i.code))];
   const watchCodes=(db.watchlist||[]).map(w=>w.code);
-  const allCodes=[...new Set([...activeCodes,...watchCodes])];
+  // 擔保品清單裡的股票也一起抓（即使不在持股清單）
+  const pledgeCodes=(db.pledgeAssets||[]).map(a=>a.code).filter(Boolean);
+  const allCodes=[...new Set([...activeCodes,...watchCodes,...pledgeCodes])];
   if(allCodes.length===0){document.getElementById('pstat').innerHTML='無持股';return;}
 
   const found=[], notFound=[];
 
-  // 直接並行單檔查詢（批次 endpoint 不存在）
   await Promise.all(allCodes.map(async c=>{
     const p=await fetchPrice(c);
     if(p){db.prices[c]=p;found.push(c+'$'+p.price);}
@@ -4333,6 +4341,7 @@ async function refreshPrices(){
   save();render();renderOvKpi();
   if(healthOpen)renderHealth();
   if(watchOpen)renderWatchlist();
+  if(typeof renderPledgeOvOnly==='function')renderPledgeOvOnly();
   const n=new Date();
   const isAfterMarket=found.length===0&&notFound.length>0;
   let msg=isAfterMarket?'盤後 - 使用收盤價':'即時股價已更新 '+found.length+'檔';
@@ -11024,7 +11033,8 @@ function renderPledgeOvOnly(){
   let totalMkt=0;
   db.pledgeAssets.forEach(a=>{const price=db.prices[a.code]?.price||0;totalMkt+=price*(a.lots||0)*1000;});
   const ratio=totalLoan>0?totalMkt/totalLoan*100:0;
-  const color=ratio<130?'#dc2626':ratio<145?'#f59e0b':'#16a34a';
+  // 台灣用法：紅=好，綠=危
+  const color=ratio<130?'#16a34a':ratio<145?'#f59e0b':'#dc2626';
   const totalLots=db.pledgeAssets.reduce((s,a)=>s+(a.lots||0),0);
   const dangerPrice=totalLots>0?(totalLoan*1.3)/(totalLots*1000):0;
   updatePledgeOvKpi(ratio,color,dangerPrice,0);
@@ -11050,15 +11060,13 @@ function renderPledgePage(){
 
   // 維持率
   const ratio=totalLoan>0?totalMkt/totalLoan*100:0;
-  const ratioColor=ratio<130?'#dc2626':ratio<145?'#f59e0b':'#16a34a';
+  // 台灣用法：紅色=好（高維持率），綠色=危險（低維持率）
+  const ratioColor=ratio<130?'#16a34a':ratio<145?'#f59e0b':'#dc2626';
 
-  // 斷頭價（維持率130%時的市值 / 總張數）
-  const totalLots=db.pledgeAssets.reduce((s,a)=>s+(a.lots||0),0);
-  const dangerMkt=totalLoan*1.3;
-  const dangerPrice=totalLots>0?dangerMkt/(totalLots*1000):0;
-
-  // 警示價（145%）
-  const warnPrice=totalLots>0?(totalLoan*1.45)/(totalLots*1000):0;
+  // 自訂警戒門檻
+  const threshold=parseFloat(document.getElementById('pledge-threshold')?.value)||130;
+  const thresholdPrice=totalLots>0?(totalLoan*threshold/100)/(totalLots*1000):0;
+  const dangerPrice=thresholdPrice; // 沿用 dangerPrice 變數名
 
   // 更新 KPI
   const ratioEl=document.getElementById('pledge-ratio');
@@ -11068,7 +11076,20 @@ function renderPledgePage(){
   const loanEl=document.getElementById('pledge-loan');
   if(loanEl)loanEl.textContent=totalLoan>0?'$'+Math.round(totalLoan).toLocaleString():'—';
   const dpEl=document.getElementById('pledge-danger-price');
-  if(dpEl)dpEl.textContent=dangerPrice>0?'$'+dangerPrice.toFixed(2):'—';
+  if(dpEl){dpEl.textContent=dangerPrice>0?'$'+dangerPrice.toFixed(2):'—';dpEl.style.color=ratio>0&&ratio<threshold?'#16a34a':'#374151';}
+  const tlEl=document.getElementById('pledge-threshold-label');
+  if(tlEl)tlEl.textContent=threshold+'% 對應價格';
+  // 更新警戒卡片背景
+  const tcEl=document.getElementById('pledge-threshold-card');
+  if(tcEl){
+    if(ratio>0&&ratio<threshold){
+      tcEl.style.background='#dcfce7';tcEl.style.borderColor='#16a34a';
+    } else if(ratio>0&&ratio<145){
+      tcEl.style.background='#fef3c7';tcEl.style.borderColor='#f59e0b';
+    } else {
+      tcEl.style.background='#f8fafc';tcEl.style.borderColor='#e2e8f0';
+    }
+  }
 
   // 進度條（130%=0%, 200%=100%）
   const barEl=document.getElementById('pledge-prog-bar');
@@ -11152,8 +11173,10 @@ function updatePledgeOvKpi(ratio,color,dangerPrice,warnPrice){
   el.style.color=color;
   const sub=document.getElementById('ov-pledge-sub');
   if(sub){
-    if(ratio>0&&ratio<145)sub.textContent=ratio<130?'⚠️ 低於斷頭線！':'⚠️ 接近警示線';
-    else if(dangerPrice>0)sub.textContent='斷頭價 $'+dangerPrice.toFixed(2);
+    // 台灣用法：綠色=危險，需要注意
+    if(ratio>0&&ratio<130)sub.textContent='🚨 低於130% 危險！';
+    else if(ratio>0&&ratio<145)sub.textContent='⚠️ 接近警示線';
+    else if(dangerPrice>0)sub.textContent='警戒 $'+dangerPrice.toFixed(2);
     else sub.textContent='';
   }
 }
