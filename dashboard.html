@@ -3569,7 +3569,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
       <div class="fg"><label class="fl">網址連結（選填）</label><input class="fi" id="fb-url" placeholder="https://..."></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
         <div class="fg"><label class="fl">日期</label><input class="fi" id="fb-date" type="date"></div>
-        <div class="fg"><label class="fl">張數</label><input class="fi" id="fb-lots" type="number" placeholder="例：10"></div>
+        <div class="fg"><label class="fl">股數</label><input class="fi" id="fb-lots" type="number" placeholder="例：500（零股）或 1000（1張）"></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
         <div class="fg"><label class="fl">成交價</label><input class="fi" id="fb-price" type="number" step="0.01" placeholder="例：21.50"></div>
@@ -3591,7 +3591,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
         <div class="fg"><label class="fl">日期</label><input class="fi" id="fs-date" type="date"></div>
-        <div class="fg"><label class="fl">張數</label><input class="fi" id="fs-lots" type="number" placeholder="例：5"></div>
+        <div class="fg"><label class="fl">股數</label><input class="fi" id="fs-lots" type="number" placeholder="例：500"></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
         <div class="fg"><label class="fl">成交價</label><input class="fi" id="fs-price" type="number" step="0.01"></div>
@@ -11465,28 +11465,26 @@ function saveFamilyBuy(){
   const name=document.getElementById('fb-name').value.trim();
   const url=document.getElementById('fb-url').value.trim();
   const date=document.getElementById('fb-date').value;
-  const lots=parseFloat(document.getElementById('fb-lots').value)||0;
+  const shares=parseFloat(document.getElementById('fb-lots').value)||0; // 股數
   const price=parseFloat(document.getElementById('fb-price').value)||0;
   const remark=document.getElementById('fb-remark').value.trim();
   if(!code)return toast('請輸入股票代碼');
-  if(!lots||lots<=0)return toast('請輸入張數');
+  if(!shares||shares<=0)return toast('請輸入股數');
   if(!price||price<=0)return toast('請輸入成交價');
   if(!date)return toast('請選擇日期');
   const feeIn=document.getElementById('fb-fee').value;
-  const fee=feeIn!==''?parseFloat(feeIn):Math.max(1,Math.round(lots*1000*price*0.001425*0.28));
+  const fee=feeIn!==''?parseFloat(feeIn):Math.max(1,Math.round(shares*price*0.001425*0.28));
   const member=curFamilyMember();
   if(!member)return toast('請先選擇成員');
   const acc=getFamilyAccount(member);
-  // 找或建立持股
   let h=acc.holdings.find(x=>x.code===code);
   if(!h){h={id:uid(),code,name,url,transactions:[]};acc.holdings.push(h);}
   else{if(name)h.name=name;if(url)h.url=url;}
-  const gross=lots*1000*price;
-  h.transactions.push({id:uid(),type:'buy',date,lots,price,fee,remark});
-  // 加入LOG
-  acc.log.push({id:uid(),date,type:'buy',code,name:h.name,lots,price,amount:gross+fee,fee,remark});
+  const gross=shares*price;
+  h.transactions.push({id:uid(),type:'buy',date,shares,price,fee,remark}); // 存股數
+  acc.log.push({id:uid(),date,type:'buy',code,name:h.name,shares,price,amount:gross+fee,fee,remark});
   acc.log.sort((a,b)=>b.date.localeCompare(a.date));
-  save();closeModal('familyBuyModal');renderFamilyPage();toast(`💰 買入 ${code} ${lots}張`);
+  save();closeModal('familyBuyModal');renderFamilyPage();toast(`💰 買入 ${code} ${shares}股`);
 }
 
 // ── 賣出 ──
@@ -11496,7 +11494,7 @@ function openFamilySellModal(){
   const acc=getFamilyAccount(member);
   const sel=document.getElementById('fs-code');
   sel.innerHTML='<option value="">— 選擇持股 —</option>'+
-    acc.holdings.filter(h=>calcFamilyHolding(h).lots>0)
+    acc.holdings.filter(h=>calcFamilyHolding(h).shares>0)
     .map(h=>`<option value="${h.code}">${h.code} ${h.name||''}</option>`).join('');
   document.getElementById('fs-date').value=new Date().toISOString().slice(0,10);
   document.getElementById('fs-lots').value='';
@@ -11508,24 +11506,24 @@ function openFamilySellModal(){
 function saveFamilySell(){
   const code=document.getElementById('fs-code').value;
   const date=document.getElementById('fs-date').value;
-  const lots=parseFloat(document.getElementById('fs-lots').value)||0;
+  const shares=parseFloat(document.getElementById('fs-lots').value)||0;
   const price=parseFloat(document.getElementById('fs-price').value)||0;
   const remark=document.getElementById('fs-remark').value.trim();
   if(!code)return toast('請選擇股票');
-  if(!lots||lots<=0)return toast('請輸入張數');
+  if(!shares||shares<=0)return toast('請輸入股數');
   if(!price||price<=0)return toast('請輸入成交價');
   if(!date)return toast('請選擇日期');
   const feeIn=document.getElementById('fs-fee').value;
-  const gross=lots*1000*price;
+  const gross=shares*price;
   const fee=feeIn!==''?parseFloat(feeIn):Math.round(gross*0.001425*0.28)+Math.round(gross*0.003);
   const member=curFamilyMember();
   const acc=getFamilyAccount(member);
   const h=acc.holdings.find(x=>x.code===code);
   if(!h)return toast('找不到持股');
-  h.transactions.push({id:uid(),type:'sell',date,lots,price,fee,remark});
-  acc.log.push({id:uid(),date,type:'sell',code,name:h.name,lots,price,amount:gross-fee,fee,remark});
+  h.transactions.push({id:uid(),type:'sell',date,shares,price,fee,remark});
+  acc.log.push({id:uid(),date,type:'sell',code,name:h.name,shares,price,amount:gross-fee,fee,remark});
   acc.log.sort((a,b)=>b.date.localeCompare(a.date));
-  save();closeModal('familySellModal');renderFamilyPage();toast(`💸 賣出 ${code} ${lots}張`);
+  save();closeModal('familySellModal');renderFamilyPage();toast(`💸 賣出 ${code} ${shares}股`);
 }
 
 // ── 股息 ──
@@ -11559,20 +11557,32 @@ function saveFamilyDiv(){
 
 // ── 計算持股 ──
 function calcFamilyHolding(h){
-  let lots=0,cost=0,realized=0;
-  (h.transactions||[]).sort((a,b)=>a.date.localeCompare(b.date)).forEach(t=>{
-    if(t.type==='buy'){lots+=t.lots;cost+=t.lots*1000*t.price+(t.fee||0);}
-    else if(t.type==='sell'){
-      const avgCost=lots>0?cost/lots/1000:0;
-      realized+=(t.price-avgCost)*t.lots*1000-(t.fee||0);
-      lots-=t.lots;cost=lots>0?avgCost*lots*1000:0;
+  let shares=0,cost=0,realized=0;
+  (h.transactions||[]).slice().sort((a,b)=>a.date.localeCompare(b.date)).forEach(t=>{
+    const s=t.shares||(t.lots||0)*1000; // 相容舊格式（lots×1000）
+    if(t.type==='buy'){
+      shares+=s;
+      cost+=s*t.price+(t.fee||0);
+    } else if(t.type==='sell'){
+      const avgCost=shares>0?cost/shares:0;
+      const sellShares=t.shares||(t.lots||0)*1000;
+      realized+=(t.price-avgCost)*sellShares-(t.fee||0);
+      shares-=sellShares;
+      cost=shares>0?avgCost*shares:0;
     }
   });
-  const avgCost=lots>0?cost/(lots*1000):0;
+  const avgCost=shares>0?cost/shares:0;
   const price=db.prices[h.code]?.price||0;
-  const mktVal=price>0?lots*1000*price:null;
+  const mktVal=price>0?shares*price:null;
   const pnl=mktVal!=null?mktVal-cost:null;
-  return{lots,cost,avgCost,mktVal,pnl,realized};
+  // 換算張數顯示
+  const fullLots=Math.floor(shares/1000);
+  const remShares=shares%1000;
+  let lotsDisplay='';
+  if(fullLots>0&&remShares>0)lotsDisplay=`${fullLots}張 ${remShares}股`;
+  else if(fullLots>0)lotsDisplay=`${fullLots}張`;
+  else lotsDisplay=`${shares}股`;
+  return{shares,cost,avgCost,mktVal,pnl,realized,lotsDisplay};
 }
 
 // ── 更新股價 ──
@@ -11627,7 +11637,7 @@ function renderFamilyPage(){
   // 持股清單
   const holdBody=document.getElementById('family-holdings-body');
   if(holdBody){
-    const active=acc.holdings.filter(h=>calcFamilyHolding(h).lots>0);
+    const active=acc.holdings.filter(h=>calcFamilyHolding(h).shares>0);
     holdBody.innerHTML=active.length===0
       ?'<div style="text-align:center;color:#9ca3af;padding:30px;font-size:12px">尚無持股，點擊「💰 買入」新增</div>'
       :active.map(h=>{
@@ -11675,7 +11685,7 @@ function renderFamilyPage(){
             <div style="display:flex;align-items:center;gap:6px">
               <span style="font-weight:700;color:${colorMap[l.type]}">${typeMap[l.type]||l.type}</span>
               <span style="font-weight:700;color:#1e293b">${l.code}</span>
-              ${l.lots?`<span style="color:#9ca3af">${l.lots}張</span>`:''}
+              ${l.shares?`<span style="color:#9ca3af">${l.shares}股</span>`:''}
             </div>
             <span style="font-weight:800;font-family:'JetBrains Mono',monospace;color:${amtColor}">${amtSign}$${Math.round(l.amount||0).toLocaleString()}</span>
           </div>
