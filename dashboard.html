@@ -1963,6 +1963,9 @@ body:not(.privacy) .privacy-mask{filter:none;}
       <span class="nav-icon">🏦</span>資產與負債
       <span class="db-nav-badge" id="nav-flex-badge" style="display:none"></span>
     </div>
+    <div class="db-nav-item" id="nav-family" onclick="dbShowPage('family')">
+      <span class="nav-icon">👨‍👩‍👧‍👦</span>家族帳戶
+    </div>
 
     <div class="db-nav-section">記錄</div>
     <div class="db-nav-item" id="nav-journal" onclick="dbShowPage('journal')" style="position:relative">
@@ -2540,6 +2543,65 @@ body:not(.privacy) .privacy-mask{filter:none;}
             <button onclick="openPledgeAssetModal()" style="padding:5px 12px;background:#dcfce7;border:1px solid #86efac;color:#15803d;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">＋ 新增</button>
           </div>
           <div id="pledge-asset-body" style="padding:12px"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ 頁面：家族帳戶 ══ -->
+    <div class="db-page" id="dbpage-family">
+      <!-- 頂部：選擇成員 -->
+      <div class="trend-page-card" style="padding:14px 18px;margin-bottom:16px">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <div style="font-size:14px;font-weight:800;color:#1e293b">👨‍👩‍👧‍👦 家族帳戶</div>
+          <select id="family-member-sel" onchange="renderFamilyPage()" style="padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-weight:700;color:#475569;background:#fff;cursor:pointer;outline:none;min-width:120px">
+            <option value="">— 選擇成員 —</option>
+          </select>
+          <button onclick="openFamilyMemberModal()" style="padding:6px 14px;background:#eff6ff;border:1px solid #bfdbfe;color:#2563eb;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">⚙️ 管理成員</button>
+          <div id="family-refresh-btn" style="display:none">
+            <button onclick="refreshFamilyPrices()" style="padding:6px 14px;background:#f3f4f6;border:1px solid #e2e8f0;color:#374151;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">🔄 更新股價</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 未選成員提示 -->
+      <div id="family-empty" style="text-align:center;padding:60px;color:#9ca3af">
+        <div style="font-size:48px;margin-bottom:12px">👨‍👩‍👧‍👦</div>
+        <div style="font-size:16px;font-weight:700;margin-bottom:6px">請先選擇成員</div>
+        <div style="font-size:13px">或點擊「⚙️ 管理成員」新增家族成員</div>
+      </div>
+
+      <!-- 成員內容區 -->
+      <div id="family-content" style="display:none">
+        <!-- KPI -->
+        <div class="ov-kpi-grid" style="margin-bottom:16px" id="family-kpi-grid">
+          <div class="ov-kpi-card"><div class="ov-kpi-accent" style="background:#8fa8c8"></div><div class="ov-kpi-label" style="padding-left:8px">總投入成本</div><div class="ov-kpi-val" id="fm-cost" style="padding-left:8px">—</div></div>
+          <div class="ov-kpi-card"><div class="ov-kpi-accent" style="background:#a8c5a0"></div><div class="ov-kpi-label" style="padding-left:8px">股票市值</div><div class="ov-kpi-val" id="fm-mkt" style="padding-left:8px">—</div></div>
+          <div class="ov-kpi-card"><div class="ov-kpi-accent" style="background:#c9a99a"></div><div class="ov-kpi-label" style="padding-left:8px">損益</div><div class="ov-kpi-val" id="fm-pnl" style="padding-left:8px">—</div><div class="ov-kpi-sub" id="fm-roi" style="padding-left:8px"></div></div>
+          <div class="ov-kpi-card"><div class="ov-kpi-accent" style="background:#b5adc4"></div><div class="ov-kpi-label" style="padding-left:8px">累積股息</div><div class="ov-kpi-val" id="fm-div" style="padding-left:8px">—</div></div>
+        </div>
+
+        <!-- 持股 + 操作 -->
+        <div style="display:grid;grid-template-columns:1fr 340px;gap:16px">
+          <!-- 持股清單 -->
+          <div class="trend-page-card" style="padding:0;overflow:hidden">
+            <div class="trend-page-hdr" style="padding:12px 16px;border-bottom:1px solid #f0f2f5">
+              <span>💼 持股清單</span>
+              <div style="display:flex;gap:6px">
+                <button onclick="openFamilyBuyModal()" style="padding:5px 12px;background:#fee2e2;border:1px solid #fca5a5;color:#dc2626;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">💰 買入</button>
+                <button onclick="openFamilySellModal()" style="padding:5px 12px;background:#dcfce7;border:1px solid #86efac;color:#15803d;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">💸 賣出</button>
+                <button onclick="openFamilyDivModal()" style="padding:5px 12px;background:#fef3c7;border:1px solid #fcd34d;color:#92400e;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">🎁 股息</button>
+              </div>
+            </div>
+            <div id="family-holdings-body"></div>
+          </div>
+
+          <!-- 歷史紀錄 -->
+          <div class="trend-page-card" style="padding:0;overflow:hidden">
+            <div class="trend-page-hdr" style="padding:12px 16px;border-bottom:1px solid #f0f2f5">
+              <span>📋 歷史紀錄</span>
+            </div>
+            <div id="family-log-body" style="max-height:500px;overflow-y:auto"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -3483,6 +3545,82 @@ body:not(.privacy) .privacy-mask{filter:none;}
   </div>
 </div>
 
+<!-- ══ 家族：管理成員 Modal ══ -->
+<div class="mo" id="familyMemberModal">
+  <div class="modal" style="max-width:400px;width:100%">
+    <div class="mt"><div class="mt-title">⚙️ 管理家族成員</div><button onclick="closeModal('familyMemberModal')" style="background:none;border:none;font-size:20px;cursor:pointer;color:#94a3b8">✕</button></div>
+    <div class="mb">
+      <div id="family-member-list" style="margin-bottom:12px"></div>
+      <div style="display:flex;gap:8px">
+        <input class="fi" id="family-new-member" placeholder="輸入成員名稱（例：媽媽）" style="flex:1">
+        <button onclick="addFamilyMember()" class="btn btn-p" style="white-space:nowrap">新增</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 家族：買入 Modal ══ -->
+<div class="mo" id="familyBuyModal">
+  <div class="modal" style="max-width:440px;width:100%">
+    <div class="mt"><div class="mt-title" id="familyBuyTitle">💰 買入股票</div><button onclick="closeModal('familyBuyModal')" style="background:none;border:none;font-size:20px;cursor:pointer;color:#94a3b8">✕</button></div>
+    <div class="mb">
+      <div class="fg"><label class="fl">股票代碼</label><input class="fi" id="fb-code" placeholder="例：00878"></div>
+      <div class="fg"><label class="fl">股票名稱</label><input class="fi" id="fb-name" placeholder="例：國泰永續高股息"></div>
+      <div class="fg"><label class="fl">網址連結（選填）</label><input class="fi" id="fb-url" placeholder="https://..."></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="fg"><label class="fl">日期</label><input class="fi" id="fb-date" type="date"></div>
+        <div class="fg"><label class="fl">張數</label><input class="fi" id="fb-lots" type="number" placeholder="例：10"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="fg"><label class="fl">成交價</label><input class="fi" id="fb-price" type="number" step="0.01" placeholder="例：21.50"></div>
+        <div class="fg"><label class="fl">手續費</label><input class="fi" id="fb-fee" type="number" placeholder="自動計算"></div>
+      </div>
+      <div class="fg"><label class="fl">備註（選填）</label><input class="fi" id="fb-remark" placeholder="例：股息再投入"></div>
+    </div>
+    <div class="br"><button class="btn btn-s" onclick="closeModal('familyBuyModal')">取消</button><button class="btn btn-p" onclick="saveFamilyBuy()">確認買入</button></div>
+  </div>
+</div>
+
+<!-- ══ 家族：賣出 Modal ══ -->
+<div class="mo" id="familySellModal">
+  <div class="modal" style="max-width:440px;width:100%">
+    <div class="mt"><div class="mt-title">💸 賣出股票</div><button onclick="closeModal('familySellModal')" style="background:none;border:none;font-size:20px;cursor:pointer;color:#94a3b8">✕</button></div>
+    <div class="mb">
+      <div class="fg"><label class="fl">股票代碼</label>
+        <select class="fi" id="fs-code" onchange="fillFamilySellInfo()"><option value="">— 選擇持股 —</option></select>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="fg"><label class="fl">日期</label><input class="fi" id="fs-date" type="date"></div>
+        <div class="fg"><label class="fl">張數</label><input class="fi" id="fs-lots" type="number" placeholder="例：5"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="fg"><label class="fl">成交價</label><input class="fi" id="fs-price" type="number" step="0.01"></div>
+        <div class="fg"><label class="fl">手續費＋交易稅</label><input class="fi" id="fs-fee" type="number" placeholder="自動計算"></div>
+      </div>
+      <div class="fg"><label class="fl">備註（選填）</label><input class="fi" id="fs-remark" placeholder="例：繳電話費"></div>
+    </div>
+    <div class="br"><button class="btn btn-s" onclick="closeModal('familySellModal')">取消</button><button class="btn btn-p" onclick="saveFamilySell()">確認賣出</button></div>
+  </div>
+</div>
+
+<!-- ══ 家族：股息 Modal ══ -->
+<div class="mo" id="familyDivModal">
+  <div class="modal" style="max-width:400px;width:100%">
+    <div class="mt"><div class="mt-title">🎁 股息入帳</div><button onclick="closeModal('familyDivModal')" style="background:none;border:none;font-size:20px;cursor:pointer;color:#94a3b8">✕</button></div>
+    <div class="mb">
+      <div class="fg"><label class="fl">股票代碼</label>
+        <select class="fi" id="fd-code"><option value="">— 選擇標的 —</option></select>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="fg"><label class="fl">入帳日期</label><input class="fi" id="fd-date" type="date"></div>
+        <div class="fg"><label class="fl">股息金額</label><input class="fi" id="fd-amount" type="number" placeholder="例：12500"></div>
+      </div>
+      <div class="fg"><label class="fl">備註（選填）</label><input class="fi" id="fd-remark" placeholder="例：Q2股息"></div>
+    </div>
+    <div class="br"><button class="btn btn-s" onclick="closeModal('familyDivModal')">取消</button><button class="btn btn-p" onclick="saveFamilyDiv()">確認入帳</button></div>
+  </div>
+</div>
+
 <!-- ══ 觀察股 Drawer ══ -->
 <div id="watch-drawer" class="side-drawer">
   <div class="side-drawer-hdr">
@@ -4244,6 +4382,7 @@ function importData(e){
       if(!db.cashAccounts)db.cashAccounts=[];
   if(!db.pledgeLoans)db.pledgeLoans=[];
   if(!db.pledgeAssets)db.pledgeAssets=[];
+  if(!db.family)db.family={members:[],accounts:{}};
       if(!db.prices)db.prices={};
       if(!db.dividends)db.dividends=[];
       if(!db.snapshots)db.snapshots=[];
@@ -11248,6 +11387,306 @@ function delPledgeAsset(id){
   save();renderPledgePage();toast('已刪除');
 }
 
+// ══════════════════════════════════════
+// 家族帳戶
+// ══════════════════════════════════════
+function getFamilyDB(){
+  if(!db.family)db.family={members:[],accounts:{}};
+  if(!db.family.members)db.family.members=[];
+  if(!db.family.accounts)db.family.accounts={};
+  return db.family;
+}
+function curFamilyMember(){
+  return document.getElementById('family-member-sel')?.value||'';
+}
+function getFamilyAccount(member){
+  const f=getFamilyDB();
+  if(!f.accounts[member])f.accounts[member]={holdings:[],log:[]};
+  return f.accounts[member];
+}
+
+// ── 成員管理 ──
+function openFamilyMemberModal(){
+  renderFamilyMemberList();
+  openModal('familyMemberModal');
+}
+function renderFamilyMemberList(){
+  const f=getFamilyDB();
+  const el=document.getElementById('family-member-list');
+  if(!el)return;
+  el.innerHTML=f.members.length===0
+    ?'<div style="color:#9ca3af;font-size:12px;text-align:center;padding:8px">尚無成員</div>'
+    :f.members.map(m=>`
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 4px;border-bottom:1px solid #f5f7fa">
+        <span style="font-size:14px;font-weight:700">${m}</span>
+        <button onclick="delFamilyMember('${m}')" style="border:none;background:none;color:#ef4444;cursor:pointer;font-size:13px">🗑</button>
+      </div>`).join('');
+}
+function addFamilyMember(){
+  const inp=document.getElementById('family-new-member');
+  const name=inp?.value.trim();
+  if(!name)return toast('請輸入成員名稱');
+  const f=getFamilyDB();
+  if(f.members.includes(name))return toast('成員已存在');
+  f.members.push(name);
+  save();renderFamilyMemberList();renderFamilyMemberSel();inp.value='';toast('✅ 已新增 '+name);
+}
+function delFamilyMember(name){
+  if(!confirm('確定刪除 '+name+'？（相關記錄也會一起刪除）'))return;
+  const f=getFamilyDB();
+  f.members=f.members.filter(m=>m!==name);
+  delete f.accounts[name];
+  save();renderFamilyMemberList();renderFamilyMemberSel();toast('已刪除');
+}
+function renderFamilyMemberSel(){
+  const f=getFamilyDB();
+  const sel=document.getElementById('family-member-sel');
+  if(!sel)return;
+  const cur=sel.value;
+  sel.innerHTML='<option value="">— 選擇成員 —</option>'+
+    f.members.map(m=>`<option value="${m}" ${m===cur?'selected':''}>${m}</option>`).join('');
+}
+
+// ── 買入 ──
+function openFamilyBuyModal(txnId){
+  const today=new Date().toISOString().slice(0,10);
+  document.getElementById('fb-code').value='';
+  document.getElementById('fb-name').value='';
+  document.getElementById('fb-url').value='';
+  document.getElementById('fb-date').value=today;
+  document.getElementById('fb-lots').value='';
+  document.getElementById('fb-price').value='';
+  document.getElementById('fb-fee').value='';
+  document.getElementById('fb-remark').value='';
+  openModal('familyBuyModal');
+}
+function saveFamilyBuy(){
+  const code=document.getElementById('fb-code').value.trim().toUpperCase();
+  const name=document.getElementById('fb-name').value.trim();
+  const url=document.getElementById('fb-url').value.trim();
+  const date=document.getElementById('fb-date').value;
+  const lots=parseFloat(document.getElementById('fb-lots').value)||0;
+  const price=parseFloat(document.getElementById('fb-price').value)||0;
+  const remark=document.getElementById('fb-remark').value.trim();
+  if(!code)return toast('請輸入股票代碼');
+  if(!lots||lots<=0)return toast('請輸入張數');
+  if(!price||price<=0)return toast('請輸入成交價');
+  if(!date)return toast('請選擇日期');
+  const feeIn=document.getElementById('fb-fee').value;
+  const fee=feeIn!==''?parseFloat(feeIn):Math.max(1,Math.round(lots*1000*price*0.001425*0.28));
+  const member=curFamilyMember();
+  if(!member)return toast('請先選擇成員');
+  const acc=getFamilyAccount(member);
+  // 找或建立持股
+  let h=acc.holdings.find(x=>x.code===code);
+  if(!h){h={id:uid(),code,name,url,transactions:[]};acc.holdings.push(h);}
+  else{if(name)h.name=name;if(url)h.url=url;}
+  const gross=lots*1000*price;
+  h.transactions.push({id:uid(),type:'buy',date,lots,price,fee,remark});
+  // 加入LOG
+  acc.log.push({id:uid(),date,type:'buy',code,name:h.name,lots,price,amount:gross+fee,fee,remark});
+  acc.log.sort((a,b)=>b.date.localeCompare(a.date));
+  save();closeModal('familyBuyModal');renderFamilyPage();toast(`💰 買入 ${code} ${lots}張`);
+}
+
+// ── 賣出 ──
+function openFamilySellModal(){
+  const member=curFamilyMember();
+  if(!member)return toast('請先選擇成員');
+  const acc=getFamilyAccount(member);
+  const sel=document.getElementById('fs-code');
+  sel.innerHTML='<option value="">— 選擇持股 —</option>'+
+    acc.holdings.filter(h=>calcFamilyHolding(h).lots>0)
+    .map(h=>`<option value="${h.code}">${h.code} ${h.name||''}</option>`).join('');
+  document.getElementById('fs-date').value=new Date().toISOString().slice(0,10);
+  document.getElementById('fs-lots').value='';
+  document.getElementById('fs-price').value='';
+  document.getElementById('fs-fee').value='';
+  document.getElementById('fs-remark').value='';
+  openModal('familySellModal');
+}
+function saveFamilySell(){
+  const code=document.getElementById('fs-code').value;
+  const date=document.getElementById('fs-date').value;
+  const lots=parseFloat(document.getElementById('fs-lots').value)||0;
+  const price=parseFloat(document.getElementById('fs-price').value)||0;
+  const remark=document.getElementById('fs-remark').value.trim();
+  if(!code)return toast('請選擇股票');
+  if(!lots||lots<=0)return toast('請輸入張數');
+  if(!price||price<=0)return toast('請輸入成交價');
+  if(!date)return toast('請選擇日期');
+  const feeIn=document.getElementById('fs-fee').value;
+  const gross=lots*1000*price;
+  const fee=feeIn!==''?parseFloat(feeIn):Math.round(gross*0.001425*0.28)+Math.round(gross*0.003);
+  const member=curFamilyMember();
+  const acc=getFamilyAccount(member);
+  const h=acc.holdings.find(x=>x.code===code);
+  if(!h)return toast('找不到持股');
+  h.transactions.push({id:uid(),type:'sell',date,lots,price,fee,remark});
+  acc.log.push({id:uid(),date,type:'sell',code,name:h.name,lots,price,amount:gross-fee,fee,remark});
+  acc.log.sort((a,b)=>b.date.localeCompare(a.date));
+  save();closeModal('familySellModal');renderFamilyPage();toast(`💸 賣出 ${code} ${lots}張`);
+}
+
+// ── 股息 ──
+function openFamilyDivModal(){
+  const member=curFamilyMember();
+  if(!member)return toast('請先選擇成員');
+  const acc=getFamilyAccount(member);
+  const sel=document.getElementById('fd-code');
+  sel.innerHTML='<option value="">— 選擇標的 —</option>'+
+    acc.holdings.map(h=>`<option value="${h.code}">${h.code} ${h.name||''}</option>`).join('');
+  document.getElementById('fd-date').value=new Date().toISOString().slice(0,10);
+  document.getElementById('fd-amount').value='';
+  document.getElementById('fd-remark').value='';
+  openModal('familyDivModal');
+}
+function saveFamilyDiv(){
+  const code=document.getElementById('fd-code').value;
+  const date=document.getElementById('fd-date').value;
+  const amount=parseFloat(document.getElementById('fd-amount').value)||0;
+  const remark=document.getElementById('fd-remark').value.trim();
+  if(!code)return toast('請選擇標的');
+  if(!amount||amount<=0)return toast('請輸入股息金額');
+  if(!date)return toast('請選擇日期');
+  const member=curFamilyMember();
+  const acc=getFamilyAccount(member);
+  const h=acc.holdings.find(x=>x.code===code);
+  acc.log.push({id:uid(),date,type:'div',code,name:h?.name||code,amount,remark});
+  acc.log.sort((a,b)=>b.date.localeCompare(a.date));
+  save();closeModal('familyDivModal');renderFamilyPage();toast(`🎁 ${code} 股息 $${Math.round(amount).toLocaleString()} 已記錄`);
+}
+
+// ── 計算持股 ──
+function calcFamilyHolding(h){
+  let lots=0,cost=0,realized=0;
+  (h.transactions||[]).sort((a,b)=>a.date.localeCompare(b.date)).forEach(t=>{
+    if(t.type==='buy'){lots+=t.lots;cost+=t.lots*1000*t.price+(t.fee||0);}
+    else if(t.type==='sell'){
+      const avgCost=lots>0?cost/lots/1000:0;
+      realized+=(t.price-avgCost)*t.lots*1000-(t.fee||0);
+      lots-=t.lots;cost=lots>0?avgCost*lots*1000:0;
+    }
+  });
+  const avgCost=lots>0?cost/(lots*1000):0;
+  const price=db.prices[h.code]?.price||0;
+  const mktVal=price>0?lots*1000*price:null;
+  const pnl=mktVal!=null?mktVal-cost:null;
+  return{lots,cost,avgCost,mktVal,pnl,realized};
+}
+
+// ── 更新股價 ──
+async function refreshFamilyPrices(){
+  const member=curFamilyMember();if(!member)return;
+  const acc=getFamilyAccount(member);
+  const codes=[...new Set(acc.holdings.map(h=>h.code))];
+  await Promise.all(codes.map(async c=>{
+    const p=await fetchPrice(c);
+    if(p)db.prices[c]=p;
+  }));
+  save();renderFamilyPage();toast('✅ 股價已更新');
+}
+
+// ── 主渲染 ──
+function renderFamilyPage(){
+  renderFamilyMemberSel();
+  const member=curFamilyMember();
+  const empty=document.getElementById('family-empty');
+  const content=document.getElementById('family-content');
+  const refreshBtn=document.getElementById('family-refresh-btn');
+  if(!member){
+    if(empty)empty.style.display='';
+    if(content)content.style.display='none';
+    if(refreshBtn)refreshBtn.style.display='none';
+    return;
+  }
+  if(empty)empty.style.display='none';
+  if(content)content.style.display='';
+  if(refreshBtn)refreshBtn.style.display='';
+  const acc=getFamilyAccount(member);
+  const fmt=v=>'$'+Math.round(v).toLocaleString();
+
+  // KPI
+  let tCost=0,tMkt=0,tPnl=0,tDiv=0;
+  acc.holdings.forEach(h=>{
+    const c=calcFamilyHolding(h);
+    tCost+=c.cost;
+    if(c.mktVal!=null)tMkt+=c.mktVal;
+    if(c.pnl!=null)tPnl+=c.pnl;
+  });
+  tDiv=(acc.log||[]).filter(l=>l.type==='div').reduce((s,l)=>s+(l.amount||0),0);
+  const roi=tCost>0?Math.round(tPnl/tCost*1000)/10:0;
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  set('fm-cost',fmt(tCost));
+  set('fm-mkt',tMkt>0?fmt(tMkt):'—');
+  const pnlEl=document.getElementById('fm-pnl');
+  if(pnlEl){pnlEl.textContent=(tPnl>=0?'+':'')+fmt(tPnl);pnlEl.style.color=tPnl>=0?'#dc2626':'#16a34a';}
+  set('fm-roi','投報率 '+(roi>=0?'+':'')+roi+'%');
+  set('fm-div',fmt(tDiv));
+
+  // 持股清單
+  const holdBody=document.getElementById('family-holdings-body');
+  if(holdBody){
+    const active=acc.holdings.filter(h=>calcFamilyHolding(h).lots>0);
+    holdBody.innerHTML=active.length===0
+      ?'<div style="text-align:center;color:#9ca3af;padding:30px;font-size:12px">尚無持股，點擊「💰 買入」新增</div>'
+      :active.map(h=>{
+        const c=calcFamilyHolding(h);
+        const price=db.prices[h.code]?.price;
+        const chg=db.prices[h.code]?.changePct;
+        const pnlColor=c.pnl==null?'#9ca3af':c.pnl>=0?'#dc2626':'#16a34a';
+        const chgColor=chg==null?'#9ca3af':chg>=0?'#dc2626':'#16a34a';
+        return`<div style="padding:12px 16px;border-bottom:1px solid #f5f7fa">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="font-size:14px;font-weight:800">
+                ${h.url?`<a href="${h.url}" target="_blank" onclick="event.stopPropagation()" style="color:#2563eb;text-decoration:none">${h.code} 🔗</a>`:h.code}
+              </div>
+              <div style="font-size:11px;color:#94a3b8">${h.name||''}</div>
+              ${chg!=null?`<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px;background:${chg>=0?'#fee2e2':'#dcfce7'};color:${chgColor}">${chg>=0?'+':''}${chg}%</span>`:''}
+            </div>
+            <div style="text-align:right;color:${pnlColor};font-weight:800;font-size:13px;font-family:'JetBrains Mono',monospace">
+              ${c.pnl!=null?(c.pnl>=0?'+':'')+Math.round(c.pnl).toLocaleString():'—'}
+            </div>
+          </div>
+          <div style="display:flex;gap:14px;font-size:11px;color:#64748b">
+            <span><span style="color:#9ca3af">張數</span> <b>${c.lots}</b></span>
+            <span><span style="color:#9ca3af">均成本</span> <b>$${c.avgCost.toFixed(2)}</b></span>
+            <span><span style="color:#9ca3af">現價</span> <b>${price?'$'+price:'—'}</b></span>
+            <span style="margin-left:auto"><span style="color:#9ca3af">市值</span> <b>${c.mktVal!=null?'$'+Math.round(c.mktVal).toLocaleString():'—'}</b></span>
+          </div>
+        </div>`;
+      }).join('');
+  }
+
+  // 歷史LOG
+  const logBody=document.getElementById('family-log-body');
+  if(logBody){
+    const logs=acc.log||[];
+    logBody.innerHTML=logs.length===0
+      ?'<div style="text-align:center;color:#9ca3af;padding:30px;font-size:12px">尚無記錄</div>'
+      :logs.map(l=>{
+        const typeMap={buy:'💰 買入',sell:'💸 賣出',div:'🎁 股息'};
+        const colorMap={buy:'#dc2626',sell:'#16a34a',div:'#7c3aed'};
+        const amtSign=l.type==='sell'||l.type==='div'?'+':'-';
+        const amtColor=l.type==='buy'?'#dc2626':'#16a34a';
+        return`<div style="padding:10px 14px;border-bottom:1px solid #f5f7fa;font-size:11px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
+            <div style="display:flex;align-items:center;gap:6px">
+              <span style="font-weight:700;color:${colorMap[l.type]}">${typeMap[l.type]||l.type}</span>
+              <span style="font-weight:700;color:#1e293b">${l.code}</span>
+              ${l.lots?`<span style="color:#9ca3af">${l.lots}張</span>`:''}
+            </div>
+            <span style="font-weight:800;font-family:'JetBrains Mono',monospace;color:${amtColor}">${amtSign}$${Math.round(l.amount||0).toLocaleString()}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;color:#9ca3af">
+            <span>${l.date} ${l.price?'@ $'+l.price:''} ${l.remark?'・'+l.remark:''}</span>
+          </div>
+        </div>`;
+      }).join('');
+  }
+}
+
 function renderFinPlanPage(){
   const body=document.getElementById('finplan-page-body');
   if(!body)return;
@@ -11293,6 +11732,7 @@ function dbShowPage(id){
   if(id==='analytics'){if(typeof renderAnalytics==='function')renderAnalytics();}
   if(id==='finplan')renderFinPlanPage();
   if(id==='pledge')renderPledgePage();
+  if(id==='family')renderFamilyPage();
 
   setTimeout(()=>{
     const mainEl=document.querySelector('.db-main');
