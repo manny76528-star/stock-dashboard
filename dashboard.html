@@ -3564,6 +3564,12 @@ body:not(.privacy) .privacy-mask{filter:none;}
   <div class="modal" style="max-width:440px;width:100%">
     <div class="mt"><div class="mt-title" id="familyBuyTitle">💰 買入股票</div><button onclick="closeModal('familyBuyModal')" style="background:none;border:none;font-size:20px;cursor:pointer;color:#94a3b8">✕</button></div>
     <div class="mb">
+      <div class="fg">
+        <label class="fl">選擇現有標的（或直接輸入新標的）</label>
+        <select class="fi" id="fb-existing" onchange="fillFamilyBuyFromExisting()">
+          <option value="">＋ 新增新標的</option>
+        </select>
+      </div>
       <div class="fg"><label class="fl">股票代碼</label><input class="fi" id="fb-code" placeholder="例：00878"></div>
       <div class="fg"><label class="fl">股票名稱</label><input class="fi" id="fb-name" placeholder="例：國泰永續高股息"></div>
       <div class="fg"><label class="fl">網址連結（選填）</label><input class="fi" id="fb-url" placeholder="https://..."></div>
@@ -11448,8 +11454,17 @@ function renderFamilyMemberSel(){
 }
 
 // ── 買入 ──
-function openFamilyBuyModal(txnId){
+function openFamilyBuyModal(){
+  const member=curFamilyMember();
+  if(!member)return toast('請先選擇成員');
+  const acc=getFamilyAccount(member);
   const today=new Date().toISOString().slice(0,10);
+  // 填入現有標的下拉
+  const sel=document.getElementById('fb-existing');
+  if(sel){
+    sel.innerHTML='<option value="">＋ 新增新標的</option>'+
+      acc.holdings.map(h=>`<option value="${h.code}">${h.code} ${h.name||''}</option>`).join('');
+  }
   document.getElementById('fb-code').value='';
   document.getElementById('fb-name').value='';
   document.getElementById('fb-url').value='';
@@ -11459,6 +11474,23 @@ function openFamilyBuyModal(txnId){
   document.getElementById('fb-fee').value='';
   document.getElementById('fb-remark').value='';
   openModal('familyBuyModal');
+}
+function fillFamilyBuyFromExisting(){
+  const code=document.getElementById('fb-existing').value;
+  if(!code){
+    document.getElementById('fb-code').value='';
+    document.getElementById('fb-name').value='';
+    document.getElementById('fb-url').value='';
+    return;
+  }
+  const member=curFamilyMember();
+  const acc=getFamilyAccount(member);
+  const h=acc.holdings.find(x=>x.code===code);
+  if(h){
+    document.getElementById('fb-code').value=h.code;
+    document.getElementById('fb-name').value=h.name||'';
+    document.getElementById('fb-url').value=h.url||'';
+  }
 }
 function saveFamilyBuy(){
   const code=document.getElementById('fb-code').value.trim().toUpperCase();
@@ -11660,7 +11692,7 @@ function renderFamilyPage(){
             </div>
           </div>
           <div style="display:flex;gap:14px;font-size:11px;color:#64748b">
-            <span><span style="color:#9ca3af">張數</span> <b>${c.lots}</b></span>
+            <span><span style="color:#9ca3af">持股</span> <b>${c.lotsDisplay}</b></span>
             <span><span style="color:#9ca3af">均成本</span> <b>$${c.avgCost.toFixed(2)}</b></span>
             <span><span style="color:#9ca3af">現價</span> <b>${price?'$'+price:'—'}</b></span>
             <span style="margin-left:auto"><span style="color:#9ca3af">市值</span> <b>${c.mktVal!=null?'$'+Math.round(c.mktVal).toLocaleString():'—'}</b></span>
