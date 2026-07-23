@@ -2395,7 +2395,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1784801215596,
+  "_ts": 1784801291908,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -4003,8 +4003,39 @@
     ],
     "accounts": {
       "媽媽": {
-        "holdings": [],
-        "log": []
+        "holdings": [
+          {
+            "id": "mrxcltwaigb",
+            "code": "00999A",
+            "name": "野村台灣高息",
+            "url": "https://www.wantgoo.com/stock/etf/00999a/dividend-policy/ex-dividend",
+            "transactions": [
+              {
+                "id": "mrxcltwateu",
+                "type": "buy",
+                "date": "2026-07-23",
+                "shares": 950,
+                "price": 10.6,
+                "fee": 4,
+                "remark": "媽媽存一萬元"
+              }
+            ]
+          }
+        ],
+        "log": [
+          {
+            "id": "mrxcltwaeqf",
+            "date": "2026-07-23",
+            "type": "buy",
+            "code": "00999A",
+            "name": "野村台灣高息",
+            "shares": 950,
+            "price": 10.6,
+            "amount": 10074,
+            "fee": 4,
+            "remark": "媽媽存一萬元"
+          }
+        ]
       }
     }
   }
