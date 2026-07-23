@@ -2395,7 +2395,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1784798423176,
+  "_ts": 1784798429224,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -3996,5 +3996,5 @@
       "note": ""
     }
   ],
-  "pledgeThreshold": 130
+  "pledgeThreshold": 150
 }
