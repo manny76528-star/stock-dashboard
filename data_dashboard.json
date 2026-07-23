@@ -2395,7 +2395,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1784800164401,
+  "_ts": 1784800173445,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -3996,5 +3996,11 @@
       "note": ""
     }
   ],
-  "pledgeThreshold": 150
+  "pledgeThreshold": 150,
+  "family": {
+    "members": [
+      "媽媽"
+    ],
+    "accounts": {}
+  }
 }
