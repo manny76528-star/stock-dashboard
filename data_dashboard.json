@@ -2412,7 +2412,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1784887090100,
+  "_ts": 1784887162574,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -4586,6 +4586,23 @@
                 "remark": ""
               }
             ]
+          },
+          {
+            "id": "mryrqbdwxat",
+            "code": "00982A",
+            "name": "主動群益台灣強棒",
+            "url": "https://www.wantgoo.com/stock/etf/00982a/dividend-policy/ex-dividend",
+            "transactions": [
+              {
+                "id": "mryrqbdwrc8",
+                "type": "buy",
+                "date": "2025-06-24",
+                "shares": 160,
+                "price": 10.8,
+                "fee": 1,
+                "remark": ""
+              }
+            ]
           }
         ],
         "log": [
@@ -4670,6 +4687,18 @@
             "shares": 28,
             "price": 11.55,
             "amount": 324.40000000000003,
+            "fee": 1,
+            "remark": ""
+          },
+          {
+            "id": "mryrqbdwm2d",
+            "date": "2025-06-24",
+            "type": "buy",
+            "code": "00982A",
+            "name": "主動群益台灣強棒",
+            "shares": 160,
+            "price": 10.8,
+            "amount": 1729,
             "fee": 1,
             "remark": ""
           }
