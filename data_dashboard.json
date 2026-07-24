@@ -2412,7 +2412,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1784883436280,
+  "_ts": 1784883908410,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -2471,6 +2471,24 @@
     }
   ],
   "journals": [
+    {
+      "id": "mrypsl73ivf",
+      "date": "2026-07-24",
+      "tags": [],
+      "market": "Google與Tesla 財報達標但自由現金流拉警報 導致分別下跌6.9%與14.5%\n中東戰爭持續加溫, 油價上升 殖利率失控 台股結束反彈今下跌1200點\n韓國股市因加強ETF槓桿監管 , 今下跌5.6% 已是今年以來的「第 10 次」熔斷",
+      "marketUrl": "",
+      "youtubeUrl": "",
+      "content": "",
+      "stockTags": [
+        "00981T"
+      ],
+      "eventCat": "總經面",
+      "behavior": "跌到有點煩躁",
+      "indexVal": 43655,
+      "stockPrices": null,
+      "aiAnalysis": null,
+      "images": []
+    },
     {
       "id": "mrq0ywj48ju",
       "date": "2026-07-18",
