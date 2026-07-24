@@ -2602,15 +2602,19 @@ body:not(.privacy) .privacy-mask{filter:none;}
 
           <!-- 歷史紀錄 -->
           <div class="trend-page-card" style="padding:0;overflow:hidden">
-            <div class="trend-page-hdr" style="padding:12px 16px;border-bottom:1px solid #f0f2f5;flex-direction:column;gap:8px;align-items:flex-start">
-              <span>📋 歷史紀錄</span>
-              <div style="display:flex;gap:6px;width:100%">
-                <select id="fm-log-year" onchange="renderFamilyLog()" style="flex:1;padding:4px 8px;border:1px solid #e2e8f0;border-radius:6px;font-size:11px;font-weight:700;color:#475569;background:#fff;cursor:pointer;outline:none">
+            <div class="trend-page-hdr" style="padding:10px 14px;border-bottom:1px solid #f0f2f5;flex-direction:column;align-items:flex-start;gap:8px">
+              <span style="font-size:13px;font-weight:700;color:#1e293b">📋 歷史紀錄</span>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;width:100%">
+                <select id="family-log-year" onchange="renderFamilyPage()" style="padding:4px 8px;border:1px solid #e2e8f0;border-radius:6px;font-size:11px;font-weight:700;color:#374151;background:#fff;cursor:pointer;outline:none">
                   <option value="">全部年份</option>
                 </select>
-                <select id="fm-log-month" onchange="renderFamilyLog()" style="flex:1;padding:4px 8px;border:1px solid #e2e8f0;border-radius:6px;font-size:11px;font-weight:700;color:#475569;background:#fff;cursor:pointer;outline:none">
+                <select id="family-log-month" onchange="renderFamilyPage()" style="padding:4px 8px;border:1px solid #e2e8f0;border-radius:6px;font-size:11px;font-weight:700;color:#374151;background:#fff;cursor:pointer;outline:none">
                   <option value="">全部月份</option>
                 </select>
+                <button id="flog-all" onclick="setFamilyLogType('')" style="padding:4px 10px;border:1px solid #2563eb;border-radius:6px;font-size:11px;font-weight:700;background:#2563eb;color:#fff;cursor:pointer">全部</button>
+                <button id="flog-buy" onclick="setFamilyLogType('buy')" style="padding:4px 10px;border:1px solid #e2e8f0;border-radius:6px;font-size:11px;font-weight:700;background:#fff;color:#374151;cursor:pointer">💰 買入</button>
+                <button id="flog-sell" onclick="setFamilyLogType('sell')" style="padding:4px 10px;border:1px solid #e2e8f0;border-radius:6px;font-size:11px;font-weight:700;background:#fff;color:#374151;cursor:pointer">💸 賣出</button>
+                <button id="flog-div" onclick="setFamilyLogType('div')" style="padding:4px 10px;border:1px solid #e2e8f0;border-radius:6px;font-size:11px;font-weight:700;background:#fff;color:#374151;cursor:pointer">🎁 股息</button>
               </div>
             </div>
             <div id="family-log-body" style="max-height:460px;overflow-y:auto"></div>
