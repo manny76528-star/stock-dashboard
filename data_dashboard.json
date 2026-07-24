@@ -2412,7 +2412,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1784887245358,
+  "_ts": 1784887268394,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -4619,6 +4619,15 @@
                 "price": 13.36,
                 "fee": 1,
                 "remark": ""
+              },
+              {
+                "id": "mryrslrygf4",
+                "type": "buy",
+                "date": "2026-04-14",
+                "shares": 105,
+                "price": 18.48,
+                "fee": 1,
+                "remark": ""
               }
             ]
           }
@@ -4670,6 +4679,18 @@
             "price": 10.86,
             "amount": 249880,
             "fee": 100,
+            "remark": ""
+          },
+          {
+            "id": "mryrslryqdx",
+            "date": "2026-04-14",
+            "type": "buy",
+            "code": "00982A",
+            "name": "主動群益台灣強棒",
+            "shares": 105,
+            "price": 18.48,
+            "amount": 1941.4,
+            "fee": 1,
             "remark": ""
           },
           {
