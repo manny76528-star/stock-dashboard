@@ -11699,9 +11699,10 @@ function editFamilyTxn(hId,txnId){
   const t=h.transactions.find(x=>x.id===txnId);
   if(!t)return;
   closeModal('familyDetailModal');
-  _familyEditTxn={hId,txnId};
+  // 先開 modal（會重置 _familyEditTxn=null），再設定編輯模式
   openFamilyBuyModal(hId);
   setTimeout(()=>{
+    _familyEditTxn={hId,txnId}; // 在 openFamilyBuyModal 之後才設定
     const shares=t.shares||(t.lots||0)*1000;
     document.getElementById('fb-date').value=t.date||'';
     document.getElementById('fb-lots').value=shares||'';
@@ -11754,7 +11755,13 @@ function saveFamilyBuy(){
     const h=acc.holdings.find(x=>x.id===hId);
     if(h){
       const t=h.transactions.find(x=>x.id===txnId);
-      if(t){t.date=date;t.shares=shares;t.price=price;t.fee=fee;t.remark=remark;}
+      if(t){
+        const oldCode=h.code;
+        t.date=date;t.shares=shares;t.price=price;t.fee=fee;t.remark=remark;
+        // 同步更新 log
+        const logEntry=acc.log.find(l=>l.type==='buy'&&l.code===oldCode&&l.date===t.date);
+        if(logEntry){logEntry.date=date;logEntry.shares=shares;logEntry.price=price;logEntry.amount=shares*price+fee;logEntry.fee=fee;logEntry.remark=remark;}
+      }
     }
     _familyEditTxn=null;
     save();closeModal('familyBuyModal');
