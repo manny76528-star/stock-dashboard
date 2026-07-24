@@ -2412,7 +2412,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1784886738830,
+  "_ts": 1784886862183,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -4505,6 +4505,41 @@
       "老婆": {
         "holdings": [],
         "log": []
+      },
+      "琁 & 軒": {
+        "holdings": [
+          {
+            "id": "mryrjvq363w",
+            "code": "00403A",
+            "name": "主動統一升級50",
+            "url": "https://www.wantgoo.com/stock/etf/00403a/dividend-policy/ex-dividend",
+            "transactions": [
+              {
+                "id": "mryrjvq319g",
+                "type": "buy",
+                "date": "2026-06-01",
+                "shares": 23000,
+                "price": 10.86,
+                "fee": 100,
+                "remark": ""
+              }
+            ]
+          }
+        ],
+        "log": [
+          {
+            "id": "mryrjvq38mq",
+            "date": "2026-06-01",
+            "type": "buy",
+            "code": "00403A",
+            "name": "主動統一升級50",
+            "shares": 23000,
+            "price": 10.86,
+            "amount": 249880,
+            "fee": 100,
+            "remark": ""
+          }
+        ]
       }
     }
   }
