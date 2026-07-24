@@ -2412,7 +2412,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1784872853191,
+  "_ts": 1784872870345,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -4113,15 +4113,6 @@
                 "price": 13.58,
                 "fee": 7,
                 "remark": "阿嬤給15,000"
-              },
-              {
-                "id": "mryj7mxnpbe",
-                "type": "buy",
-                "date": "2026-01-02",
-                "shares": 1224,
-                "price": 13.58,
-                "fee": 7,
-                "remark": "阿嬤給15,0000"
               }
             ]
           },
