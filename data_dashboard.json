@@ -2412,7 +2412,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1784871771569,
+  "_ts": 1784871816385,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -4104,6 +4104,15 @@
                 "price": 31.54,
                 "fee": 1,
                 "remark": ""
+              },
+              {
+                "id": "mryilexi87y",
+                "type": "buy",
+                "date": "2026-03-11",
+                "shares": 104,
+                "price": 22,
+                "fee": 1,
+                "remark": ""
               }
             ]
           },
@@ -4300,6 +4309,18 @@
             "amount": 15998.76,
             "fee": 6,
             "remark": "每月富邦薪水定期定額"
+          },
+          {
+            "id": "mryilexiqbk",
+            "date": "2026-03-11",
+            "type": "buy",
+            "code": "00981A",
+            "name": "主動統一台股增長",
+            "shares": 104,
+            "price": 22,
+            "amount": 2289,
+            "fee": 1,
+            "remark": ""
           },
           {
             "id": "mryibflqhh7",
