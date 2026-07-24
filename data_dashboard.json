@@ -2412,7 +2412,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1784887058394,
+  "_ts": 1784887090100,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -4575,6 +4575,15 @@
                 "price": 15.14,
                 "fee": 1,
                 "remark": ""
+              },
+              {
+                "id": "mryros7dcnp",
+                "type": "buy",
+                "date": "2026-03-18",
+                "shares": 19,
+                "price": 17.83,
+                "fee": 1,
+                "remark": ""
               }
             ]
           }
@@ -4614,6 +4623,18 @@
             "price": 10.86,
             "amount": 249880,
             "fee": 100,
+            "remark": ""
+          },
+          {
+            "id": "mryros7davv",
+            "date": "2026-03-18",
+            "type": "buy",
+            "code": "00980A",
+            "name": "主動野村臺灣優選",
+            "shares": 19,
+            "price": 17.83,
+            "amount": 339.77,
+            "fee": 1,
             "remark": ""
           },
           {
