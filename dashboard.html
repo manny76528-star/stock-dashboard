@@ -12028,46 +12028,32 @@ function renderFamilyTrendChart(acc){
   if(logs.length===0){canvas.style.display='none';return;}
   canvas.style.display='';
 
-  // 每個買入/賣出日期後的累積投入成本（含手續費）
+  // 每個日期計算累積投入成本
   const points=[];
   let cumCost=0;
   logs.forEach(l=>{
     if(l.type==='buy')cumCost+=l.amount||0;
     else if(l.type==='sell')cumCost-=Math.abs(l.amount||0);
-    // 同一天取最後一筆
     const last=points[points.length-1];
     if(last&&last.date===l.date)last.cost=Math.round(cumCost);
     else points.push({date:l.date,cost:Math.round(cumCost)});
   });
 
-  // 最後加一個「今天的市值」點
+  // 今天的市值
   const curMkt=acc.holdings.reduce((s,h)=>{
     const c=calcFamilyHolding(h);
     return s+(c.mktVal||0);
   },0);
   const today=new Date().toISOString().slice(0,10);
-  const datasets=[{
-    label:'累積投入成本',
-    data:points.map(p=>p.cost),
-    borderColor:'#2563eb',
-    backgroundColor:'rgba(37,99,235,0.08)',
-    tension:0.3,fill:true,pointRadius:3,borderWidth:2
-  }];
-  if(curMkt>0){
-    // 加市值線
-    const mktPoints=points.map((p,i)=>i===points.length-1?curMkt:null);
-    datasets.push({
-      label:'目前市值',
-      data:[...points.map(()=>null),curMkt],
-      borderColor:'#7c3aed',pointRadius:5,pointBackgroundColor:'#7c3aed',
-      borderWidth:0,showLine:false
-    });
-  }
+  if(!points.find(p=>p.date===today)&&curMkt>0)
+    points.push({date:today,cost:Math.round(cumCost)});
+
+  const labels=points.map(p=>p.date);
+  const costData=points.map(p=>p.cost);
+  // 市值只在最後一點顯示真實值，其他點用 null
+  const mktData=points.map((p,i)=>i===points.length-1&&curMkt>0?Math.round(curMkt):null);
 
   if(_familyTrendChart)_familyTrendChart.destroy();
-  const labels=[...points.map(p=>p.date)];
-  if(curMkt>0&&!labels.includes(today))labels.push(today);
-
   _familyTrendChart=new Chart(canvas,{
     type:'line',
     data:{
@@ -12075,24 +12061,25 @@ function renderFamilyTrendChart(acc){
       datasets:[
         {
           label:'累積投入成本',
-          data:points.map(p=>p.cost),
+          data:costData,
           borderColor:'#2563eb',
-          backgroundColor:'rgba(37,99,235,0.08)',
+          backgroundColor:'rgba(37,99,235,0.06)',
           tension:0.3,fill:true,pointRadius:3,borderWidth:2,spanGaps:true
         },
-        curMkt>0?{
+        {
           label:'目前市值 $'+Math.round(curMkt).toLocaleString(),
-          data:labels.map(l=>l===today?curMkt:null),
-          borderColor:'#dc2626',pointRadius:6,
-          pointBackgroundColor:curMkt>points[points.length-1]?.cost?'#dc2626':'#16a34a',
+          data:mktData,
+          borderColor:curMkt>=cumCost?'#dc2626':'#16a34a',
+          backgroundColor:'transparent',
+          pointRadius:7,pointBackgroundColor:curMkt>=cumCost?'#dc2626':'#16a34a',
           borderWidth:0,showLine:false,spanGaps:false
-        }:null
-      ].filter(Boolean)
+        }
+      ]
     },
     options:{
       responsive:true,
       plugins:{
-        legend:{display:true,labels:{font:{size:10},boxWidth:10}},
+        legend:{display:true,labels:{font:{size:10},boxWidth:10,padding:8}},
         tooltip:{callbacks:{label:ctx=>'$'+Math.round(ctx.raw||0).toLocaleString()}}
       },
       scales:{
