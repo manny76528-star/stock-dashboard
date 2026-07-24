@@ -3565,6 +3565,17 @@ body:not(.privacy) .privacy-mask{filter:none;}
   </div>
 </div>
 
+<!-- ══ 家族：持股詳情 Modal ══ -->
+<div class="mo" id="familyDetailModal" style="z-index:1600">
+  <div class="modal" style="max-width:760px;width:100%">
+    <div class="mt">
+      <div class="mt-title" id="family-detail-title">📊 持股詳情</div>
+      <button onclick="closeModal('familyDetailModal')" style="background:none;border:none;font-size:20px;cursor:pointer;color:#94a3b8">✕</button>
+    </div>
+    <div id="family-detail-body" style="padding:0;max-height:75vh;overflow-y:auto"></div>
+  </div>
+</div>
+
 <!-- ══ 家族：管理成員 Modal ══ -->
 <div class="mo" id="familyMemberModal">
   <div class="modal" style="max-width:400px;width:100%">
@@ -11453,6 +11464,91 @@ function getFamilyAccount(member){
 }
 
 // ── 成員管理 ──
+function openFamilyDetail(hId){
+  const member=curFamilyMember();
+  const acc=getFamilyAccount(member);
+  const h=acc.holdings.find(x=>x.id===hId);
+  if(!h)return;
+  const c=calcFamilyHolding(h);
+  const price=db.prices[h.code]?.price||0;
+  const pnlColor=c.pnl==null?'#9ca3af':c.pnl>=0?'#dc2626':'#16a34a';
+  const roi=c.cost>0?Math.round(c.pnl/c.cost*1000)/10:0;
+  document.getElementById('family-detail-title').textContent=h.code+' '+( h.name||'');
+
+  // KPI 行
+  let html=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:16px 20px;border-bottom:1px solid #f0f2f5">
+    <div><div style="font-size:10px;color:#9ca3af;margin-bottom:3px">持股</div><div style="font-size:16px;font-weight:800">${c.lotsDisplay}</div></div>
+    <div><div style="font-size:10px;color:#9ca3af;margin-bottom:3px">均成本</div><div style="font-size:16px;font-weight:800">$${c.avgCost.toFixed(4)}</div></div>
+    <div><div style="font-size:10px;color:#9ca3af;margin-bottom:3px">市值</div><div style="font-size:16px;font-weight:800">${c.mktVal!=null?'$'+Math.round(c.mktVal).toLocaleString():'—'}</div></div>
+    <div><div style="font-size:10px;color:#9ca3af;margin-bottom:3px">損益</div><div style="font-size:16px;font-weight:800;color:${pnlColor}">${c.pnl!=null?(c.pnl>=0?'+':'')+Math.round(c.pnl).toLocaleString():'—'}</div><div style="font-size:10px;color:${pnlColor}">${c.pnl!=null?(roi>=0?'+':'')+roi+'%':''}</div></div>
+  </div>`;
+
+  // 操作按鈕
+  html+=`<div style="display:flex;gap:8px;padding:12px 20px;border-bottom:1px solid #f0f2f5;flex-wrap:wrap">
+    <button onclick="closeModal('familyDetailModal');openFamilyBuyModal()" style="padding:6px 14px;background:#fee2e2;border:1px solid #fca5a5;color:#dc2626;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">💰 買入</button>
+    <button onclick="closeModal('familyDetailModal');openFamilySellModal()" style="padding:6px 14px;background:#dcfce7;border:1px solid #86efac;color:#15803d;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">💸 賣出</button>
+    <button onclick="closeModal('familyDetailModal');openFamilyDivModal()" style="padding:6px 14px;background:#fef3c7;border:1px solid #fcd34d;color:#92400e;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">🎁 股息</button>
+    ${h.url?`<a href="${h.url}" target="_blank" style="padding:6px 14px;background:#eff6ff;border:1px solid #bfdbfe;color:#2563eb;border-radius:7px;font-size:12px;font-weight:700;text-decoration:none">🔗 相關連結</a>`:''}
+    <button onclick="delFamilyHolding('${hId}')" style="padding:6px 14px;background:none;border:1px solid #fca5a5;color:#ef4444;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;margin-left:auto">🗑 刪除</button>
+  </div>`;
+
+  // 交易記錄
+  const txns=(h.transactions||[]).slice().sort((a,b)=>b.date.localeCompare(a.date));
+  html+=`<div style="padding:0">`;
+  html+=`<div style="padding:10px 20px;font-size:11px;font-weight:700;color:#9ca3af;border-bottom:1px solid #f5f7fa">📋 交易記錄（${txns.length}筆）</div>`;
+  html+=txns.map(t=>{
+    const isB=t.type==='buy';
+    const shares=t.shares||(t.lots||0)*1000;
+    const gross=shares*t.price;
+    const fee=t.fee||0;
+    // 每筆損益（用現價）
+    let txnPnl=null,txnRoi=null;
+    if(isB&&price>0){
+      const curVal=shares*price;
+      const buyCost=gross+fee;
+      txnPnl=curVal-buyCost;
+      txnRoi=buyCost>0?txnPnl/buyCost*100:0;
+    }
+    const txnColor=txnPnl==null?'#9ca3af':txnPnl>=0?'#dc2626':'#16a34a';
+    return`<div style="display:grid;grid-template-columns:60px 80px 55px 70px 80px 60px 80px auto;gap:6px;align-items:center;padding:8px 20px;border-bottom:1px solid #f8fafc;font-size:11px;font-family:'JetBrains Mono',monospace">
+      <span style="font-weight:700;color:${isB?'#dc2626':'#16a34a'}">${isB?'💰 買入':'💸 賣出'}</span>
+      <span>${t.date}</span>
+      <span>${shares}股</span>
+      <span>$${t.price.toFixed(2)}</span>
+      <span>$${Math.round(gross).toLocaleString()}</span>
+      <span style="color:#9ca3af;font-size:10px">${fee?'手續費$'+Math.round(fee):'—'}</span>
+      <span style="color:${txnColor};font-weight:700">${txnPnl!=null?(txnPnl>=0?'+':'')+Math.round(txnPnl).toLocaleString()+'<br><span style="font-size:9px">'+(txnRoi>=0?'+':'')+txnRoi.toFixed(2)+'%</span>':'—'}</span>
+      <button onclick="delFamilyTxn('${hId}','${t.id}')" style="border:none;background:none;color:#ef4444;cursor:pointer;font-size:11px;padding:2px 6px;font-family:'Noto Sans TC',sans-serif">刪</button>
+    </div>
+    ${t.remark?`<div style="padding:2px 20px 8px;font-size:10px;color:#94a3b8;font-family:'Noto Sans TC',sans-serif">📝 ${t.remark}</div>`:''}`;
+  }).join('');
+  html+='</div>';
+
+  document.getElementById('family-detail-body').innerHTML=html;
+  openModal('familyDetailModal');
+}
+
+function delFamilyHolding(hId){
+  if(!confirm('確定刪除此持股及所有交易記錄？'))return;
+  const member=curFamilyMember();
+  const acc=getFamilyAccount(member);
+  acc.holdings=acc.holdings.filter(h=>h.id!==hId);
+  // 同時清除LOG裡的記錄
+  const h=acc.holdings.find(x=>x.id===hId);
+  if(h)acc.log=(acc.log||[]).filter(l=>l.code!==h?.code);
+  save();closeModal('familyDetailModal');renderFamilyPage();toast('已刪除');
+}
+
+function delFamilyTxn(hId,txnId){
+  if(!confirm('確定刪除此筆交易？'))return;
+  const member=curFamilyMember();
+  const acc=getFamilyAccount(member);
+  const h=acc.holdings.find(x=>x.id===hId);
+  if(!h)return;
+  h.transactions=h.transactions.filter(t=>t.id!==txnId);
+  save();openFamilyDetail(hId);renderFamilyPage();toast('已刪除');
+}
+
 function openFamilyMemberModal(){
   renderFamilyMemberList();
   openModal('familyMemberModal');
@@ -11726,22 +11822,23 @@ function renderFamilyPage(){
         const chg=db.prices[h.code]?.changePct;
         const pnlColor=c.pnl==null?'#9ca3af':c.pnl>=0?'#dc2626':'#16a34a';
         const chgColor=chg==null?'#9ca3af':chg>=0?'#dc2626':'#16a34a';
-        return`<div style="padding:12px 16px;border-bottom:1px solid #f5f7fa">
+        const roi=c.cost>0?Math.round(c.pnl/c.cost*1000)/10:0;
+        return`<div onclick="openFamilyDetail('${h.id}')" style="padding:12px 16px;border-bottom:1px solid #f5f7fa;cursor:pointer;transition:background .12s" onmouseover="this.style.background='#f8faff'" onmouseout="this.style.background=''">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
             <div style="display:flex;align-items:center;gap:8px">
-              <div style="font-size:14px;font-weight:800">
-                ${h.url?`<a href="${h.url}" target="_blank" onclick="event.stopPropagation()" style="color:#2563eb;text-decoration:none">${h.code} 🔗</a>`:h.code}
-              </div>
+              <div style="font-size:14px;font-weight:800;color:#2563eb">${h.code}</div>
               <div style="font-size:11px;color:#94a3b8">${h.name||''}</div>
               ${chg!=null?`<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px;background:${chg>=0?'#fee2e2':'#dcfce7'};color:${chgColor}">${chg>=0?'+':''}${chg}%</span>`:''}
+              ${h.url?`<a href="${h.url}" target="_blank" onclick="event.stopPropagation()" style="font-size:11px;color:#94a3b8">🔗</a>`:''}
             </div>
-            <div style="text-align:right;color:${pnlColor};font-weight:800;font-size:13px;font-family:'JetBrains Mono',monospace">
-              ${c.pnl!=null?(c.pnl>=0?'+':'')+Math.round(c.pnl).toLocaleString():'—'}
+            <div style="text-align:right">
+              <div style="color:${pnlColor};font-weight:800;font-size:13px;font-family:'JetBrains Mono',monospace">${c.pnl!=null?(c.pnl>=0?'+':'')+Math.round(c.pnl).toLocaleString():'—'}</div>
+              <div style="font-size:10px;color:${pnlColor}">${c.pnl!=null?(roi>=0?'+':'')+roi+'%':''}</div>
             </div>
           </div>
-          <div style="display:flex;gap:14px;font-size:11px;color:#64748b">
+          <div style="display:flex;gap:14px;font-size:11px;color:#64748b;flex-wrap:wrap">
             <span><span style="color:#9ca3af">持股</span> <b>${c.lotsDisplay}</b></span>
-            <span><span style="color:#9ca3af">均成本</span> <b>$${c.avgCost.toFixed(2)}</b></span>
+            <span><span style="color:#9ca3af">均成本</span> <b>$${c.avgCost.toFixed(4)}</b></span>
             <span><span style="color:#9ca3af">現價</span> <b>${price?'$'+price:'—'}</b></span>
             <span style="margin-left:auto"><span style="color:#9ca3af">市值</span> <b>${c.mktVal!=null?'$'+Math.round(c.mktVal).toLocaleString():'—'}</b></span>
           </div>
