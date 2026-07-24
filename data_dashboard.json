@@ -2412,7 +2412,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1784906962693,
+  "_ts": 1784907028547,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -4503,8 +4503,39 @@
         ]
       },
       "老婆": {
-        "holdings": [],
-        "log": []
+        "holdings": [
+          {
+            "id": "mrz3k4t5q53",
+            "code": "00403A",
+            "name": "主動統一台股增長",
+            "url": "https://www.wantgoo.com/stock/etf/00981a/dividend-policy/ex-dividend",
+            "transactions": [
+              {
+                "id": "mrz3k4t5931",
+                "type": "buy",
+                "date": "2026-06-01",
+                "shares": 23000,
+                "price": 10.83,
+                "fee": 99,
+                "remark": ""
+              }
+            ]
+          }
+        ],
+        "log": [
+          {
+            "id": "mrz3k4t5fr2",
+            "date": "2026-06-01",
+            "type": "buy",
+            "code": "00403A",
+            "name": "主動統一台股增長",
+            "shares": 23000,
+            "price": 10.83,
+            "amount": 249189,
+            "fee": 99,
+            "remark": ""
+          }
+        ]
       },
       "琁 & 軒": {
         "holdings": [
