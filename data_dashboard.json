@@ -2412,7 +2412,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1784887736979,
+  "_ts": 1784887869257,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -4718,6 +4718,23 @@
                 "remark": ""
               }
             ]
+          },
+          {
+            "id": "mrys5henjvg",
+            "code": "00981A",
+            "name": "主動統一台股增長",
+            "url": "https://www.wantgoo.com/stock/etf/00981a/dividend-policy/ex-dividend",
+            "transactions": [
+              {
+                "id": "mrys5hengjx",
+                "type": "buy",
+                "date": "2025-07-16",
+                "shares": 35,
+                "price": 11.59,
+                "fee": 1,
+                "remark": ""
+              }
+            ]
           }
         ],
         "log": [
@@ -4922,6 +4939,18 @@
             "shares": 258,
             "price": 11.6,
             "amount": 2993.7999999999997,
+            "fee": 1,
+            "remark": ""
+          },
+          {
+            "id": "mrys5henhov",
+            "date": "2025-07-16",
+            "type": "buy",
+            "code": "00981A",
+            "name": "主動統一台股增長",
+            "shares": 35,
+            "price": 11.59,
+            "amount": 406.65,
             "fee": 1,
             "remark": ""
           },
