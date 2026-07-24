@@ -11485,9 +11485,9 @@ function openFamilyDetail(hId){
 
   // 操作按鈕
   html+=`<div style="display:flex;gap:8px;padding:12px 20px;border-bottom:1px solid #f0f2f5;flex-wrap:wrap">
-    <button onclick="closeModal('familyDetailModal');openFamilyBuyModal()" style="padding:6px 14px;background:#fee2e2;border:1px solid #fca5a5;color:#dc2626;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">💰 買入</button>
-    <button onclick="closeModal('familyDetailModal');openFamilySellModal()" style="padding:6px 14px;background:#dcfce7;border:1px solid #86efac;color:#15803d;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">💸 賣出</button>
-    <button onclick="closeModal('familyDetailModal');openFamilyDivModal()" style="padding:6px 14px;background:#fef3c7;border:1px solid #fcd34d;color:#92400e;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">🎁 股息</button>
+    <button onclick="closeModal('familyDetailModal');openFamilyBuyModal('${hId}')" style="padding:6px 14px;background:#fee2e2;border:1px solid #fca5a5;color:#dc2626;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">💰 買入</button>
+    <button onclick="closeModal('familyDetailModal');openFamilySellModal('${hId}')" style="padding:6px 14px;background:#dcfce7;border:1px solid #86efac;color:#15803d;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">💸 賣出</button>
+    <button onclick="closeModal('familyDetailModal');openFamilyDivModal('${hId}')" style="padding:6px 14px;background:#fef3c7;border:1px solid #fcd34d;color:#92400e;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">🎁 股息</button>
     ${h.url?`<a href="${h.url}" target="_blank" style="padding:6px 14px;background:#eff6ff;border:1px solid #bfdbfe;color:#2563eb;border-radius:7px;font-size:12px;font-weight:700;text-decoration:none">🔗 相關連結</a>`:''}
     <button onclick="delFamilyHolding('${hId}')" style="padding:6px 14px;background:none;border:1px solid #fca5a5;color:#ef4444;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;margin-left:auto">🗑 刪除</button>
   </div>`;
@@ -11519,6 +11519,7 @@ function openFamilyDetail(hId){
       <span style="color:#9ca3af;font-size:10px">${fee?'手續費$'+Math.round(fee):'—'}</span>
       <span style="color:${txnColor};font-weight:700">${txnPnl!=null?(txnPnl>=0?'+':'')+Math.round(txnPnl).toLocaleString()+'<br><span style="font-size:9px">'+(txnRoi>=0?'+':'')+txnRoi.toFixed(2)+'%</span>':'—'}</span>
       <button onclick="delFamilyTxn('${hId}','${t.id}')" style="border:none;background:none;color:#ef4444;cursor:pointer;font-size:11px;padding:2px 6px;font-family:'Noto Sans TC',sans-serif">刪</button>
+      <button onclick="editFamilyTxn('${hId}','${t.id}')" style="border:1px solid #e2e8f0;background:#f8fafc;border-radius:5px;color:#64748b;cursor:pointer;font-size:11px;padding:2px 6px;font-family:'Noto Sans TC',sans-serif">✏️</button>
     </div>
     ${t.remark?`<div style="padding:2px 20px 8px;font-size:10px;color:#94a3b8;font-family:'Noto Sans TC',sans-serif">📝 ${t.remark}</div>`:''}`;
   }).join('');
@@ -11612,6 +11613,106 @@ function openFamilyBuyModal(){
   document.getElementById('fb-remark').value='';
   openModal('familyBuyModal');
 }
+let _familyEditTxn=null; // {hId, txnId} 編輯模式
+
+function openFamilyBuyModal(hId){
+  const member=curFamilyMember();
+  if(!member)return toast('請先選擇成員');
+  const acc=getFamilyAccount(member);
+  const today=new Date().toISOString().slice(0,10);
+  // 填入現有標的下拉
+  const sel=document.getElementById('fb-existing');
+  if(sel){
+    sel.innerHTML='<option value="">＋ 新增新標的</option>'+
+      acc.holdings.map(h=>`<option value="${h.code}">${h.code} ${h.name||''}</option>`).join('');
+  }
+  // 若帶入 hId，直接選好標的
+  if(hId){
+    const h=acc.holdings.find(x=>x.id===hId);
+    if(h){
+      if(sel)sel.value=h.code;
+      document.getElementById('fb-code').value=h.code;
+      document.getElementById('fb-name').value=h.name||'';
+      document.getElementById('fb-url').value=h.url||'';
+    }
+  } else {
+    document.getElementById('fb-code').value='';
+    document.getElementById('fb-name').value='';
+    document.getElementById('fb-url').value='';
+    if(sel)sel.value='';
+  }
+  document.getElementById('fb-date').value=today;
+  document.getElementById('fb-lots').value='';
+  document.getElementById('fb-price').value='';
+  document.getElementById('fb-fee').value='';
+  document.getElementById('fb-remark').value='';
+  _familyEditTxn=null;
+  document.getElementById('familyBuyTitle').textContent='💰 買入股票';
+  document.querySelector('#familyBuyModal .btn-p').textContent='確認買入';
+  openModal('familyBuyModal');
+}
+
+function openFamilySellModal(hId){
+  const member=curFamilyMember();
+  if(!member)return toast('請先選擇成員');
+  const acc=getFamilyAccount(member);
+  const sel=document.getElementById('fs-code');
+  sel.innerHTML='<option value="">— 選擇持股 —</option>'+
+    acc.holdings.filter(h=>calcFamilyHolding(h).shares>0)
+    .map(h=>`<option value="${h.code}">${h.code} ${h.name||''}</option>`).join('');
+  // 若帶入 hId，直接選好
+  if(hId){
+    const h=acc.holdings.find(x=>x.id===hId);
+    if(h)sel.value=h.code;
+  }
+  document.getElementById('fs-date').value=new Date().toISOString().slice(0,10);
+  document.getElementById('fs-lots').value='';
+  document.getElementById('fs-price').value='';
+  document.getElementById('fs-fee').value='';
+  document.getElementById('fs-remark').value='';
+  openModal('familySellModal');
+}
+
+function openFamilyDivModal(hId){
+  const member=curFamilyMember();
+  if(!member)return toast('請先選擇成員');
+  const acc=getFamilyAccount(member);
+  const sel=document.getElementById('fd-code');
+  sel.innerHTML='<option value="">— 選擇標的 —</option>'+
+    acc.holdings.map(h=>`<option value="${h.code}">${h.code} ${h.name||''}</option>`).join('');
+  // 若帶入 hId，直接選好
+  if(hId){
+    const h=acc.holdings.find(x=>x.id===hId);
+    if(h)sel.value=h.code;
+  }
+  document.getElementById('fd-date').value=new Date().toISOString().slice(0,10);
+  document.getElementById('fd-amount').value='';
+  document.getElementById('fd-remark').value='';
+  openModal('familyDivModal');
+}
+
+function editFamilyTxn(hId,txnId){
+  const member=curFamilyMember();
+  const acc=getFamilyAccount(member);
+  const h=acc.holdings.find(x=>x.id===hId);
+  if(!h)return;
+  const t=h.transactions.find(x=>x.id===txnId);
+  if(!t)return;
+  closeModal('familyDetailModal');
+  _familyEditTxn={hId,txnId};
+  openFamilyBuyModal(hId);
+  setTimeout(()=>{
+    const shares=t.shares||(t.lots||0)*1000;
+    document.getElementById('fb-date').value=t.date||'';
+    document.getElementById('fb-lots').value=shares||'';
+    document.getElementById('fb-price').value=t.price||'';
+    document.getElementById('fb-fee').value=t.fee||'';
+    document.getElementById('fb-remark').value=t.remark||'';
+    document.getElementById('familyBuyTitle').textContent='✏️ 編輯買入記錄';
+    document.querySelector('#familyBuyModal .btn-p').textContent='💾 儲存修改';
+  },100);
+}
+
 function fillFamilyBuyFromExisting(){
   const code=document.getElementById('fb-existing').value;
   if(!code){
@@ -11646,6 +11747,20 @@ function saveFamilyBuy(){
   const member=curFamilyMember();
   if(!member)return toast('請先選擇成員');
   const acc=getFamilyAccount(member);
+
+  // 編輯模式
+  if(_familyEditTxn){
+    const {hId,txnId}=_familyEditTxn;
+    const h=acc.holdings.find(x=>x.id===hId);
+    if(h){
+      const t=h.transactions.find(x=>x.id===txnId);
+      if(t){t.date=date;t.shares=shares;t.price=price;t.fee=fee;t.remark=remark;}
+    }
+    _familyEditTxn=null;
+    save();closeModal('familyBuyModal');
+    openFamilyDetail(hId);renderFamilyPage();
+    return toast('✅ 已更新');
+  }
   let h=acc.holdings.find(x=>x.code===code);
   if(!h){h={id:uid(),code,name,url,transactions:[]};acc.holdings.push(h);}
   else{if(name)h.name=name;if(url)h.url=url;}
@@ -11902,65 +12017,80 @@ let _familyTrendChart=null;
 function renderFamilyTrendChart(acc){
   const canvas=document.getElementById('family-trend-chart');
   if(!canvas)return;
-  // 從LOG取買入日期，計算當時的持股市值（用現價模擬）
   const logs=[...(acc.log||[])].sort((a,b)=>a.date.localeCompare(b.date));
   if(logs.length===0){canvas.style.display='none';return;}
   canvas.style.display='';
 
-  // 計算每個日期的累積成本（用成本代替，因為歷史股價無法取得）
-  const dateMap={};
-  let cumShares=0,cumCost=0;
-  logs.filter(l=>l.type==='buy').forEach(l=>{
-    cumShares+=l.shares||0;
-    cumCost+=l.amount||0;
-    dateMap[l.date]={shares:cumShares,cost:cumCost};
-  });
-  logs.filter(l=>l.type==='sell').forEach(l=>{
-    cumShares-=l.shares||0;
-    dateMap[l.date]={shares:cumShares,cost:cumCost};
+  // 每個買入/賣出日期後的累積投入成本（含手續費）
+  const points=[];
+  let cumCost=0;
+  logs.forEach(l=>{
+    if(l.type==='buy')cumCost+=l.amount||0;
+    else if(l.type==='sell')cumCost-=Math.abs(l.amount||0);
+    // 同一天取最後一筆
+    const last=points[points.length-1];
+    if(last&&last.date===l.date)last.cost=Math.round(cumCost);
+    else points.push({date:l.date,cost:Math.round(cumCost)});
   });
 
-  // 用現在的市價計算各時間點的「當前價格×累積股數」
-  const dates=Object.keys(dateMap).sort();
-  const mktVals=dates.map(d=>{
-    const s=dateMap[d].shares;
-    // 用每個持股的現價計算
-    let totalMkt=0;
-    acc.holdings.forEach(h=>{
-      const price=db.prices[h.code]?.price||0;
-      const c=calcFamilyHolding(h);
-      if(price>0)totalMkt+=c.shares*price;
-    });
-    return totalMkt>0?Math.round(totalMkt):null;
-  });
-  // 最後一個點用現在的市值
-  const lastMkt=acc.holdings.reduce((s,h)=>{
-    const price=db.prices[h.code]?.price||0;
-    return s+(price>0?calcFamilyHolding(h).shares*price:0);
+  // 最後加一個「今天的市值」點
+  const curMkt=acc.holdings.reduce((s,h)=>{
+    const c=calcFamilyHolding(h);
+    return s+(c.mktVal||0);
   },0);
-  // 加今天
   const today=new Date().toISOString().slice(0,10);
-  if(!dates.includes(today)&&lastMkt>0){dates.push(today);mktVals.push(Math.round(lastMkt));}
+  const datasets=[{
+    label:'累積投入成本',
+    data:points.map(p=>p.cost),
+    borderColor:'#2563eb',
+    backgroundColor:'rgba(37,99,235,0.08)',
+    tension:0.3,fill:true,pointRadius:3,borderWidth:2
+  }];
+  if(curMkt>0){
+    // 加市值線
+    const mktPoints=points.map((p,i)=>i===points.length-1?curMkt:null);
+    datasets.push({
+      label:'目前市值',
+      data:[...points.map(()=>null),curMkt],
+      borderColor:'#7c3aed',pointRadius:5,pointBackgroundColor:'#7c3aed',
+      borderWidth:0,showLine:false
+    });
+  }
 
   if(_familyTrendChart)_familyTrendChart.destroy();
+  const labels=[...points.map(p=>p.date)];
+  if(curMkt>0&&!labels.includes(today))labels.push(today);
+
   _familyTrendChart=new Chart(canvas,{
     type:'line',
     data:{
-      labels:dates,
-      datasets:[{
-        label:'市值',
-        data:mktVals,
-        borderColor:'#7c3aed',
-        backgroundColor:'rgba(124,58,237,0.08)',
-        tension:0.3,spanGaps:true,pointRadius:4,fill:true
-      }]
+      labels,
+      datasets:[
+        {
+          label:'累積投入成本',
+          data:points.map(p=>p.cost),
+          borderColor:'#2563eb',
+          backgroundColor:'rgba(37,99,235,0.08)',
+          tension:0.3,fill:true,pointRadius:3,borderWidth:2,spanGaps:true
+        },
+        curMkt>0?{
+          label:'目前市值 $'+Math.round(curMkt).toLocaleString(),
+          data:labels.map(l=>l===today?curMkt:null),
+          borderColor:'#dc2626',pointRadius:6,
+          pointBackgroundColor:curMkt>points[points.length-1]?.cost?'#dc2626':'#16a34a',
+          borderWidth:0,showLine:false,spanGaps:false
+        }:null
+      ].filter(Boolean)
     },
     options:{
       responsive:true,
-      plugins:{legend:{display:false}},
+      plugins:{
+        legend:{display:true,labels:{font:{size:10},boxWidth:10}},
+        tooltip:{callbacks:{label:ctx=>'$'+Math.round(ctx.raw||0).toLocaleString()}}
+      },
       scales:{
-        x:{ticks:{font:{size:10},maxTicksLimit:6}},
-        y:{ticks:{callback:v=>'$'+(v>=1000?Math.round(v/1000)+'K':v),font:{size:10}}}
+        x:{ticks:{font:{size:10},maxTicksLimit:8}},
+        y:{ticks:{callback:v=>'$'+(v>=1000?(v/1000).toFixed(0)+'K':v),font:{size:10}}}
       }
     }
   });
