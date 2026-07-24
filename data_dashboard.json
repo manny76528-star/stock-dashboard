@@ -2412,7 +2412,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1784886908769,
+  "_ts": 1784886993157,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -4542,6 +4542,23 @@
                 "remark": ""
               }
             ]
+          },
+          {
+            "id": "mryrmon6p4z",
+            "code": "00980A",
+            "name": "主動野村臺灣優選",
+            "url": "https://www.wantgoo.com/stock/etf/00980a/dividend-policy/ex-dividend",
+            "transactions": [
+              {
+                "id": "mryrmon69ff",
+                "type": "buy",
+                "date": "2025-07-10",
+                "shares": 28,
+                "price": 11.55,
+                "fee": 1,
+                "remark": ""
+              }
+            ]
           }
         ],
         "log": [
@@ -4579,6 +4596,18 @@
             "price": 10.86,
             "amount": 249880,
             "fee": 100,
+            "remark": ""
+          },
+          {
+            "id": "mryrmon6jjz",
+            "date": "2025-07-10",
+            "type": "buy",
+            "code": "00980A",
+            "name": "主動野村臺灣優選",
+            "shares": 28,
+            "price": 11.55,
+            "amount": 324.40000000000003,
+            "fee": 1,
             "remark": ""
           }
         ]
