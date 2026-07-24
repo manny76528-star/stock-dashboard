@@ -11663,11 +11663,15 @@ async function refreshFamilyPrices(){
   const member=curFamilyMember();if(!member)return;
   const acc=getFamilyAccount(member);
   const codes=[...new Set(acc.holdings.map(h=>h.code))];
+  if(codes.length===0)return toast('尚無持股');
+  document.getElementById('family-refresh-btn').querySelector('button').textContent='🔄 更新中...';
   await Promise.all(codes.map(async c=>{
     const p=await fetchPrice(c);
     if(p)db.prices[c]=p;
   }));
-  save();renderFamilyPage();toast('✅ 股價已更新');
+  save();renderFamilyPage();
+  document.getElementById('family-refresh-btn').querySelector('button').textContent='🔄 更新股價';
+  toast('✅ 股價已更新');
 }
 
 // ── 主渲染 ──
@@ -11687,6 +11691,9 @@ function renderFamilyPage(){
   if(content)content.style.display='';
   if(refreshBtn)refreshBtn.style.display='';
   const acc=getFamilyAccount(member);
+  // 若持股有代碼但沒有價格，自動抓
+  const missingPrice=acc.holdings.some(h=>h.code&&!db.prices[h.code]);
+  if(missingPrice)refreshFamilyPrices();
   const fmt=v=>'$'+Math.round(v).toLocaleString();
 
   // KPI
@@ -11742,115 +11749,121 @@ function renderFamilyPage(){
       }).join('');
   }
 
-  // 歷史LOG年份下拉
-  const logs=acc.log||[];
-  const years=[...new Set(logs.map(l=>l.date?.slice(0,4)).filter(Boolean))].sort((a,b)=>b-a);
-  const yrSel=document.getElementById('fm-log-year');
-  if(yrSel){
-    const curYr=yrSel.value;
-    yrSel.innerHTML='<option value="">全部年份</option>'+years.map(y=>`<option value="${y}" ${y===curYr?'selected':''}>${y}年</option>`).join('');
-  }
-  const moSel=document.getElementById('fm-log-month');
-  if(moSel&&!moSel.innerHTML.includes('01月')){
-    moSel.innerHTML='<option value="">全部月份</option>'+
-      Array.from({length:12},(_,i)=>`<option value="${String(i+1).padStart(2,'0')}">${i+1}月</option>`).join('');
-  }
-
-  renderFamilyLog();
-  renderFamilyTrendChart(acc);
-}
-
-function renderFamilyLog(){
-  const member=curFamilyMember();if(!member)return;
-  const acc=getFamilyAccount(member);
+  // 歷史LOG（含年月篩選）
   const logBody=document.getElementById('family-log-body');
-  if(!logBody)return;
-  const yr=document.getElementById('fm-log-year')?.value||'';
-  const mo=document.getElementById('fm-log-month')?.value||'';
-  let logs=(acc.log||[]).filter(l=>{
-    if(yr&&!l.date?.startsWith(yr))return false;
-    if(mo&&l.date?.slice(5,7)!==mo)return false;
+  const yearSel=document.getElementById('family-log-year');
+  const monthSel=document.getElementById('family-log-month');
+  const logs=acc.log||[];
+
+  // 更新年份下拉
+  if(yearSel){
+    const years=[...new Set(logs.map(l=>l.date?.slice(0,4)).filter(Boolean))].sort().reverse();
+    const curYear=yearSel.value;
+    yearSel.innerHTML='<option value="">全部年份</option>'+years.map(y=>`<option value="${y}" ${y===curYear?'selected':''}>${y}年</option>`).join('');
+  }
+  // 更新月份下拉
+  if(monthSel){
+    const curMonth=monthSel.value;
+    monthSel.innerHTML='<option value="">全部月份</option>'+
+      Array.from({length:12},(_,i)=>i+1).map(m=>`<option value="${String(m).padStart(2,'0')}" ${String(m).padStart(2,'0')===curMonth?'selected':''}>${m}月</option>`).join('');
+  }
+  const filterYear=yearSel?.value||'';
+  const filterMonth=monthSel?.value||'';
+  const filteredLogs=logs.filter(l=>{
+    if(filterYear&&!l.date?.startsWith(filterYear))return false;
+    if(filterMonth&&l.date?.slice(5,7)!==filterMonth)return false;
     return true;
   });
-  const typeMap={buy:'💰 買入',sell:'💸 賣出',div:'🎁 股息'};
-  const colorMap={buy:'#dc2626',sell:'#16a34a',div:'#7c3aed'};
-  logBody.innerHTML=logs.length===0
-    ?'<div style="text-align:center;color:#9ca3af;padding:30px;font-size:12px">無記錄</div>'
-    :logs.map(l=>{
-      const amtColor=l.type==='buy'?'#dc2626':'#16a34a';
-      const amtSign=l.type==='buy'?'-':'+';
-      return`<div style="padding:10px 14px;border-bottom:1px solid #f5f7fa;font-size:11px">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
-          <div style="display:flex;align-items:center;gap:6px">
-            <span style="font-weight:700;color:${colorMap[l.type]}">${typeMap[l.type]||l.type}</span>
-            <span style="font-weight:700;color:#1e293b">${l.code}</span>
-            ${l.shares?`<span style="color:#9ca3af">${l.shares}股</span>`:''}
+
+  if(logBody){
+    logBody.innerHTML=filteredLogs.length===0
+      ?'<div style="text-align:center;color:#9ca3af;padding:30px;font-size:12px">尚無記錄</div>'
+      :filteredLogs.map(l=>{
+        const typeMap={buy:'💰 買入',sell:'💸 賣出',div:'🎁 股息'};
+        const colorMap={buy:'#dc2626',sell:'#16a34a',div:'#7c3aed'};
+        const amtColor=l.type==='buy'?'#dc2626':'#16a34a';
+        const amtSign=l.type==='buy'?'-':'+';
+        return`<div style="padding:10px 14px;border-bottom:1px solid #f5f7fa;font-size:11px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
+            <div style="display:flex;align-items:center;gap:6px">
+              <span style="font-weight:700;color:${colorMap[l.type]||'#64748b'}">${typeMap[l.type]||l.type}</span>
+              <span style="font-weight:700;color:#1e293b">${l.code}</span>
+              ${l.shares?`<span style="color:#9ca3af">${l.shares}股</span>`:''}
+            </div>
+            <span style="font-weight:800;font-family:'JetBrains Mono',monospace;color:${amtColor}">${amtSign}$${Math.round(l.amount||0).toLocaleString()}</span>
           </div>
-          <span style="font-weight:800;font-family:'JetBrains Mono',monospace;color:${amtColor}">${amtSign}$${Math.round(l.amount||0).toLocaleString()}</span>
-        </div>
-        <div style="color:#9ca3af">${l.date||''} ${l.price?'@ $'+l.price:''} ${l.remark?'・'+l.remark:''}</div>
-      </div>`;
-    }).join('');
+          <div style="color:#9ca3af">${l.date}${l.price?' @ $'+l.price:''}${l.remark?' ・'+l.remark:''}</div>
+        </div>`;
+      }).join('');
+  }
+
+  // 趨勢圖（以LOG裡每筆買入日期的市值）
+  renderFamilyTrendChart(acc);
 }
 
 let _familyTrendChart=null;
 function renderFamilyTrendChart(acc){
   const canvas=document.getElementById('family-trend-chart');
-  const empty=document.getElementById('family-trend-empty');
   if(!canvas)return;
-  // 從 log 裡每筆買/賣後計算當時市值快照
-  const snapPoints=[];
-  (acc.log||[]).slice().sort((a,b)=>(a.date||'').localeCompare(b.date||'')).forEach(l=>{
-    if(l.type==='buy'||l.type==='sell'){
-      // 計算所有持股當時的成本（用現價替代，因為沒有歷史股價）
-      let totalShares=0,totalCost=0;
-      acc.holdings.forEach(h=>{
-        const c=calcFamilyHolding(h);
-        totalShares+=c.shares;
-        totalCost+=c.cost;
-      });
-      const price=db.prices[l.code]?.price||0;
-      const mkt=price>0?totalShares*price:totalCost;
-      snapPoints.push({date:l.date,mkt:Math.round(mkt)});
-    }
-  });
-  // 加當下市值
-  let curMkt=0;
-  acc.holdings.forEach(h=>{
-    const c=calcFamilyHolding(h);
-    if(c.mktVal!=null)curMkt+=c.mktVal;
-  });
-  if(curMkt>0){
-    const today=new Date().toISOString().slice(0,10);
-    snapPoints.push({date:today,mkt:Math.round(curMkt)});
-  }
-  if(snapPoints.length<2){
-    canvas.style.display='none';
-    if(empty)empty.style.display='';
-    return;
-  }
+  // 從LOG取買入日期，計算當時的持股市值（用現價模擬）
+  const logs=[...(acc.log||[])].sort((a,b)=>a.date.localeCompare(b.date));
+  if(logs.length===0){canvas.style.display='none';return;}
   canvas.style.display='';
-  if(empty)empty.style.display='none';
+
+  // 計算每個日期的累積成本（用成本代替，因為歷史股價無法取得）
+  const dateMap={};
+  let cumShares=0,cumCost=0;
+  logs.filter(l=>l.type==='buy').forEach(l=>{
+    cumShares+=l.shares||0;
+    cumCost+=l.amount||0;
+    dateMap[l.date]={shares:cumShares,cost:cumCost};
+  });
+  logs.filter(l=>l.type==='sell').forEach(l=>{
+    cumShares-=l.shares||0;
+    dateMap[l.date]={shares:cumShares,cost:cumCost};
+  });
+
+  // 用現在的市價計算各時間點的「當前價格×累積股數」
+  const dates=Object.keys(dateMap).sort();
+  const mktVals=dates.map(d=>{
+    const s=dateMap[d].shares;
+    // 用每個持股的現價計算
+    let totalMkt=0;
+    acc.holdings.forEach(h=>{
+      const price=db.prices[h.code]?.price||0;
+      const c=calcFamilyHolding(h);
+      if(price>0)totalMkt+=c.shares*price;
+    });
+    return totalMkt>0?Math.round(totalMkt):null;
+  });
+  // 最後一個點用現在的市值
+  const lastMkt=acc.holdings.reduce((s,h)=>{
+    const price=db.prices[h.code]?.price||0;
+    return s+(price>0?calcFamilyHolding(h).shares*price:0);
+  },0);
+  // 加今天
+  const today=new Date().toISOString().slice(0,10);
+  if(!dates.includes(today)&&lastMkt>0){dates.push(today);mktVals.push(Math.round(lastMkt));}
+
   if(_familyTrendChart)_familyTrendChart.destroy();
   _familyTrendChart=new Chart(canvas,{
     type:'line',
     data:{
-      labels:snapPoints.map(s=>s.date),
+      labels:dates,
       datasets:[{
-        label:'股票市值',
-        data:snapPoints.map(s=>s.mkt),
-        borderColor:'#2563eb',
-        backgroundColor:'rgba(37,99,235,0.08)',
-        tension:0.3,fill:true,pointRadius:4,
-        borderWidth:2
+        label:'市值',
+        data:mktVals,
+        borderColor:'#7c3aed',
+        backgroundColor:'rgba(124,58,237,0.08)',
+        tension:0.3,spanGaps:true,pointRadius:4,fill:true
       }]
     },
     options:{
       responsive:true,
       plugins:{legend:{display:false}},
       scales:{
-        x:{ticks:{font:{size:10},maxTicksLimit:8}},
-        y:{ticks:{callback:v=>'$'+(v>=1000?(v/1000).toFixed(0)+'K':v),font:{size:10}}}
+        x:{ticks:{font:{size:10},maxTicksLimit:6}},
+        y:{ticks:{callback:v=>'$'+(v>=1000?Math.round(v/1000)+'K':v),font:{size:10}}}
       }
     }
   });
