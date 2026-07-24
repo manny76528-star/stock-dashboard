@@ -11975,20 +11975,25 @@ function renderFamilyMemberCards(){
     const holdingRows=sorted.map(h=>{
       const val=h.mktVal||h.cost;
       const pct=totalVal>0?Math.round(val/totalVal*100):0;
-      const bg=pct>=50?'#334155':pct>=20?'#e2e8f0':'#f1f5f9';
-      const fg=pct>=50?'#fff':'#334155';
-      const pfg=pct>=50?'rgba(255,255,255,0.7)':pct>=20?'#64748b':'#94a3b8';
-      return`<span style="display:inline-flex;align-items:center;background:${bg};color:${fg};font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;border:1px solid ${pct>=50?'#1e293b':pct>=20?'#cbd5e1':'#e2e8f0'}">${h.code}<span style="color:${pfg};font-weight:500;margin-left:3px">${pct}%</span></span>`;
+      const bg=pct>=50?'#2563eb':pct>=20?'#dbeafe':'#f1f5f9';
+      const fg=pct>=50?'#ffffff':pct>=20?'#1e40af':'#475569';
+      const border=pct>=50?'#1d4ed8':pct>=20?'#bfdbfe':'#e2e8f0';
+      return`<span style="display:inline-flex;align-items:center;gap:2px;background:${bg};color:${fg};font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;border:1px solid ${border};letter-spacing:.2px">${h.code} <span style="font-weight:500;opacity:.85">${pct}%</span></span>`;
     }).join('  ');
 
-    return`<div onclick="selectFamilyMember('${member}')" style="background:#fff;border:1px solid #e8edf2;border-radius:16px;padding:20px;cursor:pointer;transition:all .22s;box-shadow:0 4px 6px -1px rgba(0,0,0,.05),0 2px 4px -1px rgba(0,0,0,.03)" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 24px -4px rgba(0,0,0,.10),0 4px 8px -2px rgba(0,0,0,.05)';this.style.borderColor='#bfdbfe'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 6px -1px rgba(0,0,0,.05),0 2px 4px -1px rgba(0,0,0,.03)';this.style.borderColor='#e8edf2'">
-      <div style="font-size:14px;font-weight:600;color:#1e293b;margin-bottom:14px;letter-spacing:.2px">👤 ${member}</div>
-      <div style="margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #f1f5f9">
-        <div style="font-size:11px;font-weight:400;color:#64748b;letter-spacing:.3px;margin-bottom:4px">總資產</div>
-        <div style="font-size:1.6rem;font-weight:700;color:#0f172a;font-family:'JetBrains Mono',monospace;letter-spacing:-.5px">$${Math.round(totalVal).toLocaleString()}</div>
-        <div style="font-size:0.75rem;color:#64748b;margin-top:3px;font-weight:400">${active.length} 檔持股</div>
+    return`<div onclick="selectFamilyMember('${member}')" style="background:#ffffff;border:1px solid #e2e8f0;border-radius:16px;padding:24px;cursor:pointer;transition:all .22s cubic-bezier(.4,0,.2,1);box-shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04)" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 10px 30px -5px rgba(37,99,235,.12),0 4px 8px -2px rgba(0,0,0,.06)';this.style.borderColor='#93c5fd'" onmouseout="this.style.transform='';this.style.boxShadow='0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04)';this.style.borderColor='#e2e8f0'">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+        <div style="width:28px;height:28px;border-radius:50%;background:#e0f2fe;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <span style="font-size:13px;color:#0284c7">👤</span>
+        </div>
+        <div style="font-size:14px;font-weight:700;color:#0f172a;letter-spacing:.1px">${member}</div>
       </div>
-      <div style="display:flex;flex-wrap:wrap;gap:5px">${holdingRows||'<span style="font-size:11px;color:#94a3b8">尚無持股</span>'}</div>
+      <div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid #f1f5f9">
+        <div style="font-size:11px;font-weight:400;color:#94a3b8;letter-spacing:.4px;margin-bottom:6px;text-transform:uppercase">總資產</div>
+        <div style="font-size:1.75rem;font-weight:700;color:#1e3a8a;font-family:'JetBrains Mono',monospace;letter-spacing:-.5px;line-height:1.1">$${Math.round(totalVal).toLocaleString()}</div>
+        <div style="font-size:11px;color:#94a3b8;margin-top:6px;font-weight:400">${active.length} 檔持股</div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">${holdingRows||'<span style="font-size:11px;color:#94a3b8;font-style:italic">尚無持股</span>'}</div>
     </div>`;
   }).join('')+
   // 新增成員按鈕卡片
