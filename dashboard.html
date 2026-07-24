@@ -3435,8 +3435,10 @@ body:not(.privacy) .privacy-mask{filter:none;}
           </div>
         </div>
         <div style="margin-bottom:12px">
-          <span class="drawer-label">大盤環境 / 重大新聞</span>
-          <textarea class="drawer-textarea" id="j-market" rows="3" placeholder="今日大盤走勢、重要新聞..." oninput="autoSaveJournalDraft()"></textarea>
+          <span class="drawer-label">大盤環境 / 重大新聞（最多3則）</span>
+          <textarea class="drawer-textarea" id="j-market" rows="2" placeholder="第1則標題..." oninput="autoSaveJournalDraft()" style="border-radius:8px 8px 0 0;margin-bottom:2px"></textarea>
+          <textarea class="drawer-textarea" id="j-market2" rows="2" placeholder="第2則標題（選填）..." oninput="autoSaveJournalDraft()" style="border-radius:0;margin-bottom:2px"></textarea>
+          <textarea class="drawer-textarea" id="j-market3" rows="2" placeholder="第3則標題（選填）..." oninput="autoSaveJournalDraft()" style="border-radius:0 0 8px 8px"></textarea>
         </div>
         <div>
           <span class="drawer-label">個人操作記錄 / 心得</span>
@@ -3733,8 +3735,10 @@ body:not(.privacy) .privacy-mask{filter:none;}
     </div>
     <!-- 大盤環境 -->
     <div class="fg">
-      <label class="fl">🌐 大盤環境 / 重大新聞</label>
-      <textarea class="fi" id="j-market" rows="3" placeholder="今日大盤走勢、重要新聞、總體經濟事件..." style="resize:vertical" oninput="autoSaveJournalDraft()"></textarea>
+      <label class="fl">🌐 大盤環境 / 重大新聞（最多3則）</label>
+      <textarea class="fi" id="j-market" rows="2" placeholder="第1則標題..." style="resize:vertical;border-radius:8px 8px 0 0;margin-bottom:2px" oninput="autoSaveJournalDraft()"></textarea>
+      <textarea class="fi" id="j-market2" rows="2" placeholder="第2則標題（選填）..." style="resize:vertical;border-radius:0;margin-bottom:2px" oninput="autoSaveJournalDraft()"></textarea>
+      <textarea class="fi" id="j-market3" rows="2" placeholder="第3則標題（選填）..." style="resize:vertical;border-radius:0 0 8px 8px" oninput="autoSaveJournalDraft()"></textarea>
       <input class="fi" id="j-market-url" placeholder="🔗 新聞連結（選填，可點擊回看原文）" style="margin-top:6px">
     </div>
     <!-- 交易日誌 -->
@@ -9057,7 +9061,7 @@ function renderJournalChart(){
               const date=labels[items[0].dataIndex];
               const j=sorted.find(x=>x.date===date);
               if(!j)return[];
-              return j.market?['📰 '+j.market]:[];
+              const ms=[j.market,j.market2,j.market3].filter(Boolean);return ms.map((m,i)=>'📰 '+m);
             }
           },
           maxWidth:200,padding:10,boxWidth:10,bodyFont:{size:11},
@@ -9375,7 +9379,9 @@ function toggleYoutubeUrl(cb){
 
 function autoSaveJournalDraft(){
   const draft={
-    market:document.getElementById('j-market')?.value||'',
+    market:document.getElementById('j-market')?.value.trim()||'',
+    market2:document.getElementById('j-market2')?.value.trim()||'',
+    market3:document.getElementById('j-market3')?.value.trim()||'',
     content:document.getElementById('j-content')?.value||'',
     date:document.getElementById('j-date')?.value||'',
     savedAt:new Date().toISOString()
@@ -9402,6 +9408,8 @@ function _openJournalModalLegacy(id=null){
   document.getElementById('journal-modal-title').textContent=id?'✏️ 編輯日誌':'📓 新增交易日誌';
   document.getElementById('j-date').value=j?.date||new Date().toISOString().split('T')[0];
   document.getElementById('j-market').value=j?.market||'';
+  const m2=document.getElementById('j-market2');if(m2)m2.value=j?.market2||'';
+  const m3=document.getElementById('j-market3');if(m3)m3.value=j?.market3||'';
   const jmUrlEl=document.getElementById('j-market-url');if(jmUrlEl)jmUrlEl.value=j?.marketUrl||'';
   document.getElementById('j-content').value=j?.content||'';
   document.getElementById('j-stock-tags').value=(j?.stockTags||[]).join(' ');
@@ -9413,6 +9421,8 @@ function _openJournalModalLegacy(id=null){
       const ago=Math.round((Date.now()-new Date(draft.savedAt).getTime())/60000);
       if(confirm(`📝 發現 ${ago} 分鐘前的未儲存草稿：\n\n「${(draft.market||draft.content||'').slice(0,60)}...」\n\n要還原嗎？`)){
         if(draft.market)document.getElementById('j-market').value=draft.market;
+        if(draft.market2){const e=document.getElementById('j-market2');if(e)e.value=draft.market2;}
+        if(draft.market3){const e=document.getElementById('j-market3');if(e)e.value=draft.market3;}
         if(draft.content)document.getElementById('j-content').value=draft.content;
         if(draft.date)document.getElementById('j-date').value=draft.date;
       } else {
@@ -9581,6 +9591,8 @@ function saveJournal(){
     date,
     tags,
     market:document.getElementById('j-market').value.trim(),
+    market2:document.getElementById('j-market2')?.value.trim()||'',
+    market3:document.getElementById('j-market3')?.value.trim()||'',
     marketUrl:document.getElementById('j-market-url')?.value.trim()||'',
     youtubeUrl:document.getElementById('j-youtube-url')?.value.trim()||'',
     content:document.getElementById('j-content').value.trim(),
@@ -10904,7 +10916,7 @@ function renderOvJournal(){
       const style=tagColors[t]||'background:#f1f5f9;color:#374151';
       return`<span style="${style};padding:1px 6px;border-radius:4px;font-size:10px;font-weight:600">${t}</span>`;
     }).join('');
-    const title=(j.market||j.content||'（無標題）').slice(0,50);
+    const markets=[j.market,j.market2,j.market3].filter(Boolean);const title=(markets.join(' ｜ ')||j.content||'（無標題）').slice(0,80);
     return`<div class="ov-j-item" onclick="openSP('journal');setTimeout(()=>openJournalModal('${j.id}'),300)">
       <div class="ov-j-date">${j.date}</div>
       <div class="ov-j-title">${title}</div>
@@ -11008,8 +11020,14 @@ function renderJournalReadMode(id){
   // 大盤環境（大標題）
   const marketEl=document.getElementById('jdr-market');
   if(marketEl){
-    marketEl.textContent=j.market||'';
-    marketEl.style.display=j.market?'':'none';
+    const markets=[j.market,j.market2,j.market3].filter(Boolean);
+    if(markets.length===0){marketEl.innerHTML='';marketEl.style.display='none';}
+    else{
+      marketEl.innerHTML=markets.map((m,i)=>
+        `<div style="${i>0?'margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.1)':''}">${m}</div>`
+      ).join('');
+      marketEl.style.display='';
+    }
   }
 
   // 內容
@@ -11184,7 +11202,7 @@ function renderJournalPage(){
   let list=[...(db.journals||[])].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
   if(selYear!=='all')list=list.filter(j=>(j.date||'').startsWith(selYear));
   if(selTag)list=list.filter(j=>(j.tags||[]).includes(selTag));
-  if(q)list=list.filter(j=>(j.market||'').toLowerCase().includes(q)||(j.content||'').toLowerCase().includes(q));
+  if(q)list=list.filter(j=>(j.market||'').toLowerCase().includes(q)||(j.market2||'').toLowerCase().includes(q)||(j.market3||'').toLowerCase().includes(q)||(j.content||'').toLowerCase().includes(q));
 
   const tagColors={'看多':'background:#dbeafe;color:#1d4ed8','看空':'background:#dcfce7;color:#15803d',
     '買入':'background:#fef3c7;color:#92400e','賣出':'background:#fce7f3;color:#9d174d',
