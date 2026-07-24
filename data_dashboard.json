@@ -2412,7 +2412,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1784871188508,
+  "_ts": 1784871235142,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -4121,11 +4121,32 @@
                 "price": 8.31,
                 "fee": 20,
                 "remark": "大姑贈與5萬"
+              },
+              {
+                "id": "mryi8yfw8mu",
+                "type": "buy",
+                "date": "2026-07-24",
+                "shares": 6000,
+                "price": 8.18,
+                "fee": 20,
+                "remark": "大姑贈與5萬"
               }
             ]
           }
         ],
         "log": [
+          {
+            "id": "mryi8yfw0xg",
+            "date": "2026-07-24",
+            "type": "buy",
+            "code": "00405A",
+            "name": "主動富邦台灣龍耀",
+            "shares": 6000,
+            "price": 8.18,
+            "amount": 49100,
+            "fee": 20,
+            "remark": "大姑贈與5萬"
+          },
           {
             "id": "mryi7xtn4e2",
             "date": "2026-07-22",
