@@ -10919,7 +10919,7 @@ function renderOvJournal(){
     const markets=[j.market,j.market2,j.market3].filter(Boolean);
     return`<div class="ov-j-item" onclick="openSP('journal');setTimeout(()=>openJournalModal('${j.id}'),300)">
       <div class="ov-j-date">${j.date}</div>
-      ${markets.length?markets.map(m=>`<div class="ov-j-title">${m.slice(0,60)}</div>`).join(''):
+      ${markets.length?markets.map(m=>`<div class="ov-j-title">📰 ${m.slice(0,60)}</div>`).join(''):
         `<div class="ov-j-title">${(j.content||'（無標題）').slice(0,60)}</div>`}
       ${tags?`<div class="ov-j-tags" style="display:flex;gap:4px;margin-top:4px;flex-wrap:wrap">${tags}</div>`:''}
     </div>`;
@@ -11025,7 +11025,7 @@ function renderJournalReadMode(id){
     if(markets.length===0){marketEl.innerHTML='';marketEl.style.display='none';}
     else{
       marketEl.innerHTML=markets.map((m,i)=>
-        `<div style="${i>0?'margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.1)':''}">${m}</div>`
+        `<div style="${i>0?'margin-top:8px':''}">📰 ${m}</div>`
       ).join('');
       marketEl.style.display='';
     }
@@ -11226,7 +11226,7 @@ function renderJournalPage(){
       <div style="flex:1;min-width:0">
         <div style="margin-bottom:4px">
           ${markets.length
-            ? markets.map(m=>`<div style="font-size:13px;font-weight:600;color:#1e293b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.5">${m}</div>`).join('')
+            ? markets.map(m=>`<div style="font-size:13px;font-weight:600;color:#1e293b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.6">📰 ${m}</div>`).join('')
             : `<div style="font-size:13px;font-weight:600;color:#1e293b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${(j.content||'（無標題）').slice(0,80)}</div>`
           }
         </div>
