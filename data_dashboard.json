@@ -2412,7 +2412,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1784870993673,
+  "_ts": 1784871014541,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -4080,8 +4080,39 @@
         ]
       },
       "阿豪富邦": {
-        "holdings": [],
-        "log": []
+        "holdings": [
+          {
+            "id": "mryi48833xi",
+            "code": "00981A",
+            "name": "主動統一台股增長",
+            "url": "https://www.wantgoo.com/stock/etf/00981a/dividend-policy/ex-dividend",
+            "transactions": [
+              {
+                "id": "mryi48834nu",
+                "type": "buy",
+                "date": "2026-01-01",
+                "shares": 1224,
+                "price": 20,
+                "fee": 10,
+                "remark": ""
+              }
+            ]
+          }
+        ],
+        "log": [
+          {
+            "id": "mryi4883rwp",
+            "date": "2026-01-01",
+            "type": "buy",
+            "code": "00981A",
+            "name": "主動統一台股增長",
+            "shares": 1224,
+            "price": 20,
+            "amount": 24490,
+            "fee": 10,
+            "remark": ""
+          }
+        ]
       }
     }
   }
