@@ -2412,7 +2412,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1784874189815,
+  "_ts": 1784874204508,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -4426,6 +4426,15 @@
                 "price": 16.7,
                 "fee": 3,
                 "remark": "訂單滿載至2030年"
+              },
+              {
+                "id": "mryk0lm9va3",
+                "type": "buy",
+                "date": "2026-06-29",
+                "shares": 150,
+                "price": 16.94,
+                "fee": 1,
+                "remark": "訂單滿載至2030年"
               }
             ]
           }
@@ -4442,6 +4451,18 @@
             "amount": 14566,
             "fee": 6,
             "remark": "00981D資金轉移到此 , 參與AI成長"
+          },
+          {
+            "id": "mryk0lm94a1",
+            "date": "2026-06-29",
+            "type": "buy",
+            "code": "009805",
+            "name": "台新美國電力基建",
+            "shares": 150,
+            "price": 16.94,
+            "amount": 2542,
+            "fee": 1,
+            "remark": "訂單滿載至2030年"
           },
           {
             "id": "mryjx1mb5n7",
