@@ -2412,7 +2412,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1784871085427,
+  "_ts": 1784871188508,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -4106,9 +4106,38 @@
                 "remark": ""
               }
             ]
+          },
+          {
+            "id": "mryi7xtn6rf",
+            "code": "00405A",
+            "name": "主動富邦台灣龍耀",
+            "url": "https://www.wantgoo.com/stock/etf/00405a/dividend-policy/ex-dividend",
+            "transactions": [
+              {
+                "id": "mryi7xtnbuk",
+                "type": "buy",
+                "date": "2026-07-22",
+                "shares": 6000,
+                "price": 8.31,
+                "fee": 20,
+                "remark": "大姑贈與5萬"
+              }
+            ]
           }
         ],
         "log": [
+          {
+            "id": "mryi7xtn4e2",
+            "date": "2026-07-22",
+            "type": "buy",
+            "code": "00405A",
+            "name": "主動富邦台灣龍耀",
+            "shares": 6000,
+            "price": 8.31,
+            "amount": 49880,
+            "fee": 20,
+            "remark": "大姑贈與5萬"
+          },
           {
             "id": "mryi5qx2141",
             "date": "2026-05-29",
