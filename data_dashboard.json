@@ -2412,7 +2412,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1784887701989,
+  "_ts": 1784887730796,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -4615,7 +4615,7 @@
                 "id": "mryrs3zywt8",
                 "type": "buy",
                 "date": "2026-07-24",
-                "shares": 168,
+                "shares": 222,
                 "price": 13.36,
                 "fee": 1,
                 "remark": ""
@@ -4727,9 +4727,9 @@
             "type": "buy",
             "code": "00982A",
             "name": "主動群益台灣強棒",
-            "shares": 168,
+            "shares": 222,
             "price": 13.36,
-            "amount": 2245.48,
+            "amount": 2966.92,
             "fee": 1,
             "remark": ""
           },
