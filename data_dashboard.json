@@ -2412,7 +2412,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1784887938625,
+  "_ts": 1784887958775,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -4751,6 +4751,15 @@
                 "price": 13.45,
                 "fee": 1,
                 "remark": ""
+              },
+              {
+                "id": "mrys7eh5iid",
+                "type": "buy",
+                "date": "2025-10-20",
+                "shares": 51,
+                "price": 14.28,
+                "fee": 1,
+                "remark": ""
               }
             ]
           }
@@ -4921,6 +4930,18 @@
             "shares": 55,
             "price": 15.14,
             "amount": 833.7,
+            "fee": 1,
+            "remark": ""
+          },
+          {
+            "id": "mrys7eh5uxs",
+            "date": "2025-10-20",
+            "type": "buy",
+            "code": "00981A",
+            "name": "主動統一台股增長",
+            "shares": 51,
+            "price": 14.28,
+            "amount": 729.28,
             "fee": 1,
             "remark": ""
           },
