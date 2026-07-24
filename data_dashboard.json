@@ -2412,7 +2412,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1784886888826,
+  "_ts": 1784886908769,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -4531,11 +4531,32 @@
                 "price": 10.15,
                 "fee": 1,
                 "remark": ""
+              },
+              {
+                "id": "mryrkwaai81",
+                "type": "buy",
+                "date": "2026-07-13",
+                "shares": 50,
+                "price": 10.38,
+                "fee": 1,
+                "remark": ""
               }
             ]
           }
         ],
         "log": [
+          {
+            "id": "mryrkwaaa9c",
+            "date": "2026-07-13",
+            "type": "buy",
+            "code": "00403A",
+            "name": "主動統一升級50",
+            "shares": 50,
+            "price": 10.38,
+            "amount": 520,
+            "fee": 1,
+            "remark": ""
+          },
           {
             "id": "mryrkgwcs0j",
             "date": "2026-06-08",
