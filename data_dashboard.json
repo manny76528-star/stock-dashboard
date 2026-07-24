@@ -2412,7 +2412,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1784871235142,
+  "_ts": 1784871350702,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -4132,6 +4132,23 @@
                 "remark": "大姑贈與5萬"
               }
             ]
+          },
+          {
+            "id": "mryibflqnf6",
+            "code": "00986A",
+            "name": "主動台新龍頭成長",
+            "url": "https://www.wantgoo.com/stock/etf/00986a/dividend-policy/ex-dividend",
+            "transactions": [
+              {
+                "id": "mryibflqouv",
+                "type": "buy",
+                "date": "2026-02-26",
+                "shares": 4000,
+                "price": 12,
+                "fee": 19,
+                "remark": "每月富邦薪水定期定額"
+              }
+            ]
           }
         ],
         "log": [
@@ -4170,6 +4187,18 @@
             "amount": 1893.3999999999999,
             "fee": 1,
             "remark": ""
+          },
+          {
+            "id": "mryibflqhh7",
+            "date": "2026-02-26",
+            "type": "buy",
+            "code": "00986A",
+            "name": "主動台新龍頭成長",
+            "shares": 4000,
+            "price": 12,
+            "amount": 48019,
+            "fee": 19,
+            "remark": "每月富邦薪水定期定額"
           },
           {
             "id": "mryi589qu3e",
