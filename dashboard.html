@@ -10916,10 +10916,11 @@ function renderOvJournal(){
       const style=tagColors[t]||'background:#f1f5f9;color:#374151';
       return`<span style="${style};padding:1px 6px;border-radius:4px;font-size:10px;font-weight:600">${t}</span>`;
     }).join('');
-    const markets=[j.market,j.market2,j.market3].filter(Boolean);const title=(markets.join(' ｜ ')||j.content||'（無標題）').slice(0,80);
+    const markets=[j.market,j.market2,j.market3].filter(Boolean);
     return`<div class="ov-j-item" onclick="openSP('journal');setTimeout(()=>openJournalModal('${j.id}'),300)">
       <div class="ov-j-date">${j.date}</div>
-      <div class="ov-j-title">${title}</div>
+      ${markets.length?markets.map(m=>`<div class="ov-j-title">${m.slice(0,60)}</div>`).join(''):
+        `<div class="ov-j-title">${(j.content||'（無標題）').slice(0,60)}</div>`}
       ${tags?`<div class="ov-j-tags" style="display:flex;gap:4px;margin-top:4px;flex-wrap:wrap">${tags}</div>`:''}
     </div>`;
   }).join('');
@@ -11217,13 +11218,18 @@ function renderJournalPage(){
 
   container.innerHTML=list.map(j=>{
     const tags=(j.tags||[]).map(t=>`<span style="${tagColors[t]||'background:#f1f5f9;color:#374151'};padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600">${t}</span>`).join('');
-    const markets=[j.market,j.market2,j.market3].filter(Boolean);const title=(markets.length?markets.join(' ｜ '):j.content||'（無標題）').slice(0,120);
+    const markets=[j.market,j.market2,j.market3].filter(Boolean);
     const hasBt=j.backtest?.ret!=null;
     const btColor=hasBt?(j.backtest.ret>=0?'#dc2626':'#16a34a'):'#9ca3af';
     return`<div style="display:flex;align-items:flex-start;gap:12px;padding:12px 18px;border-bottom:1px solid #f5f5f5;cursor:pointer;transition:background .12s" onclick="openJournalDrawer('${j.id}')" onmouseover="this.style.background='#fafbff'" onmouseout="this.style.background=''">
       <div style="font-size:11px;font-weight:700;color:#9ca3af;white-space:nowrap;margin-top:2px;min-width:68px">${j.date}</div>
       <div style="flex:1;min-width:0">
-        <div style="font-size:13px;font-weight:600;color:#1e293b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:4px">${title}</div>
+        <div style="margin-bottom:4px">
+          ${markets.length
+            ? markets.map(m=>`<div style="font-size:13px;font-weight:600;color:#1e293b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.5">${m}</div>`).join('')
+            : `<div style="font-size:13px;font-weight:600;color:#1e293b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${(j.content||'（無標題）').slice(0,80)}</div>`
+          }
+        </div>
         <div style="display:flex;gap:4px;flex-wrap:wrap">${tags}${j.eventCat?`<span style="background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600">${j.eventCat}</span>`:''}${j.behavior?`<span style="background:#f3e8ff;color:#7e22ce;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600">${j.behavior}</span>`:''}</div>
       </div>
       ${hasBt?`<div style="font-size:12px;font-weight:800;color:${btColor};white-space:nowrap;font-family:'JetBrains Mono',monospace">${j.backtest.ret>=0?'+':''}${j.backtest.ret.toFixed(1)}%</div>`:''}
