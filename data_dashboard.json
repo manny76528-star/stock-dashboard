@@ -2412,7 +2412,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1784887268394,
+  "_ts": 1784887352668,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -4630,6 +4630,23 @@
                 "remark": ""
               }
             ]
+          },
+          {
+            "id": "mryruea2ksf",
+            "code": "00990A",
+            "name": "主動元大AI新經濟",
+            "url": "https://www.wantgoo.com/stock/etf/00990a/dividend-policy/ex-dividend",
+            "transactions": [
+              {
+                "id": "mryruea2rpq",
+                "type": "buy",
+                "date": "2026-01-07",
+                "shares": 230,
+                "price": 10.36,
+                "fee": 1,
+                "remark": ""
+              }
+            ]
           }
         ],
         "log": [
@@ -4702,6 +4719,18 @@
             "shares": 19,
             "price": 17.83,
             "amount": 339.77,
+            "fee": 1,
+            "remark": ""
+          },
+          {
+            "id": "mryruea2rid",
+            "date": "2026-01-07",
+            "type": "buy",
+            "code": "00990A",
+            "name": "主動元大AI新經濟",
+            "shares": 230,
+            "price": 10.36,
+            "amount": 2383.7999999999997,
             "fee": 1,
             "remark": ""
           },
