@@ -2412,7 +2412,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1784871601058,
+  "_ts": 1784871764047,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -4185,6 +4185,23 @@
                 "remark": "每月富邦薪水定期定額"
               }
             ]
+          },
+          {
+            "id": "mryikajmjwv",
+            "code": "00997A",
+            "name": "主動群益美國增長",
+            "url": "https://www.wantgoo.com/stock/etf/00997a/dividend-policy/ex-dividend",
+            "transactions": [
+              {
+                "id": "mryikajm28m",
+                "type": "buy",
+                "date": "2026-05-12",
+                "shares": 1220,
+                "price": 10.45,
+                "fee": 5,
+                "remark": ""
+              }
+            ]
           }
         ],
         "log": [
@@ -4258,6 +4275,18 @@
             "price": 31.54,
             "amount": 1893.3999999999999,
             "fee": 1,
+            "remark": ""
+          },
+          {
+            "id": "mryikajmk27",
+            "date": "2026-05-12",
+            "type": "buy",
+            "code": "00997A",
+            "name": "主動群益美國增長",
+            "shares": 1220,
+            "price": 10.45,
+            "amount": 12754,
+            "fee": 5,
             "remark": ""
           },
           {
