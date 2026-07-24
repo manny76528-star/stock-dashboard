@@ -2412,7 +2412,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1784887628226,
+  "_ts": 1784887651568,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -4580,7 +4580,7 @@
                 "id": "mryros7dcnp",
                 "type": "buy",
                 "date": "2026-03-18",
-                "shares": 19,
+                "shares": 16,
                 "price": 17.83,
                 "fee": 1,
                 "remark": ""
@@ -4835,9 +4835,9 @@
             "type": "buy",
             "code": "00980A",
             "name": "主動野村臺灣優選",
-            "shares": 19,
+            "shares": 16,
             "price": 17.83,
-            "amount": 339.77,
+            "amount": 286.28,
             "fee": 1,
             "remark": ""
           },
