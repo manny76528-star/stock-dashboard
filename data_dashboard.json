@@ -2412,7 +2412,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1784872425873,
+  "_ts": 1784872441612,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -4087,15 +4087,6 @@
             "name": "主動統一台股增長",
             "url": "https://www.wantgoo.com/stock/etf/00981a/dividend-policy/ex-dividend",
             "transactions": [
-              {
-                "id": "mryi589pccy",
-                "type": "buy",
-                "date": "2026-01-02",
-                "shares": 1224,
-                "price": 13.58,
-                "fee": 7,
-                "remark": ""
-              },
               {
                 "id": "mryi5qx2m1b",
                 "type": "buy",
