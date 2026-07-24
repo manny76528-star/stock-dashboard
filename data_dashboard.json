@@ -2412,7 +2412,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1784887543804,
+  "_ts": 1784887628226,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -4701,6 +4701,23 @@
                 "remark": ""
               }
             ]
+          },
+          {
+            "id": "mrys0ayrpcd",
+            "code": "00983A",
+            "name": "主動中信ARK創新",
+            "url": "https://www.wantgoo.com/stock/etf/00983a/dividend-policy/ex-dividend",
+            "transactions": [
+              {
+                "id": "mrys0ayrplu",
+                "type": "buy",
+                "date": "2025-07-29",
+                "shares": 258,
+                "price": 11.6,
+                "fee": 1,
+                "remark": ""
+              }
+            ]
           }
         ],
         "log": [
@@ -4893,6 +4910,18 @@
             "shares": 123,
             "price": 12.75,
             "amount": 1569.25,
+            "fee": 1,
+            "remark": ""
+          },
+          {
+            "id": "mrys0ayrfme",
+            "date": "2025-07-29",
+            "type": "buy",
+            "code": "00983A",
+            "name": "主動中信ARK創新",
+            "shares": 258,
+            "price": 11.6,
+            "amount": 2993.7999999999997,
             "fee": 1,
             "remark": ""
           },
