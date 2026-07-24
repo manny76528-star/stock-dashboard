@@ -2412,7 +2412,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1784873003094,
+  "_ts": 1784873071993,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -4128,15 +4128,6 @@
                 "date": "2026-07-22",
                 "shares": 6000,
                 "price": 8.31,
-                "fee": 20,
-                "remark": "大姑贈與5萬"
-              },
-              {
-                "id": "mryi8yfw8mu",
-                "type": "buy",
-                "date": "2026-07-24",
-                "shares": 6000,
-                "price": 8.18,
                 "fee": 20,
                 "remark": "大姑贈與5萬"
               },
