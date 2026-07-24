@@ -2412,7 +2412,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1784871066455,
+  "_ts": 1784871085427,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -4095,11 +4095,32 @@
                 "price": 13.58,
                 "fee": 7,
                 "remark": ""
+              },
+              {
+                "id": "mryi5qx2m1b",
+                "type": "buy",
+                "date": "2026-05-29",
+                "shares": 60,
+                "price": 31.54,
+                "fee": 1,
+                "remark": ""
               }
             ]
           }
         ],
         "log": [
+          {
+            "id": "mryi5qx2141",
+            "date": "2026-05-29",
+            "type": "buy",
+            "code": "00981A",
+            "name": "主動統一台股增長",
+            "shares": 60,
+            "price": 31.54,
+            "amount": 1893.3999999999999,
+            "fee": 1,
+            "remark": ""
+          },
           {
             "id": "mryi589qu3e",
             "date": "2026-01-02",
