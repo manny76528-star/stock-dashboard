@@ -2412,7 +2412,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1784871546663,
+  "_ts": 1784871571822,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -4174,6 +4174,15 @@
                 "price": 15.4,
                 "fee": 2,
                 "remark": ""
+              },
+              {
+                "id": "mryig681r9r",
+                "type": "buy",
+                "date": "2026-07-10",
+                "shares": 1072,
+                "price": 14.92,
+                "fee": 6,
+                "remark": "每月富邦薪水定期定額"
               }
             ]
           }
@@ -4202,6 +4211,18 @@
             "amount": 49880,
             "fee": 20,
             "remark": "大姑贈與5萬"
+          },
+          {
+            "id": "mryig681nm3",
+            "date": "2026-07-10",
+            "type": "buy",
+            "code": "00986A",
+            "name": "主動台新龍頭成長",
+            "shares": 1072,
+            "price": 14.92,
+            "amount": 16000.24,
+            "fee": 6,
+            "remark": "每月富邦薪水定期定額"
           },
           {
             "id": "mryifmt2p21",
