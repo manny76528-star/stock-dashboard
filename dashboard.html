@@ -3566,6 +3566,42 @@ body:not(.privacy) .privacy-mask{filter:none;}
   </div>
 </div>
 
+<!-- ══ 家族：快捷買入 Modal ══ -->
+<div class="mo" id="familyQuickBuyModal">
+  <div class="modal" style="max-width:400px;width:100%">
+    <div class="mt">
+      <div class="mt-title" id="fqb-title">+ 快捷買入</div>
+      <button onclick="closeModal('familyQuickBuyModal')" style="background:none;border:none;font-size:20px;cursor:pointer;color:#94a3b8">✕</button>
+    </div>
+    <div class="mb">
+      <div class="fg">
+        <label class="fl">標的</label>
+        <select class="fi" id="fqb-code-sel" onchange="fillQuickBuyCode()">
+          <option value="">— 選擇持倉標的 —</option>
+        </select>
+      </div>
+      <div class="fg" id="fqb-new-wrap" style="display:none">
+        <label class="fl">新標的代碼</label>
+        <input class="fi" id="fqb-new-code" placeholder="例：00878">
+      </div>
+      <div class="fg" id="fqb-new-name-wrap" style="display:none">
+        <label class="fl">標的名稱（選填）</label>
+        <input class="fi" id="fqb-new-name" placeholder="例：國泰永續高股息">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="fg"><label class="fl">買入日期</label><input class="fi" id="fqb-date" type="date"></div>
+        <div class="fg"><label class="fl">股數</label><input class="fi" id="fqb-shares" type="number" placeholder="例：500"></div>
+      </div>
+      <div class="fg"><label class="fl">買入單價</label><input class="fi" id="fqb-price" type="number" step="0.01" placeholder="例：21.50"></div>
+      <div class="fg"><label class="fl">備註（選填）</label><input class="fi" id="fqb-remark" placeholder="例：定期定額"></div>
+    </div>
+    <div class="br">
+      <button class="btn btn-s" onclick="closeModal('familyQuickBuyModal')">取消</button>
+      <button class="btn btn-p" onclick="saveQuickBuy()">確認存檔</button>
+    </div>
+  </div>
+</div>
+
 <!-- ══ 家族：持股詳情 Modal ══ -->
 <div class="mo" id="familyDetailModal" style="z-index:1600">
   <div class="modal" style="max-width:760px;width:100%">
@@ -11575,6 +11611,62 @@ function delFamilyTxn(hId,txnId){
   save();openFamilyDetail(hId);renderFamilyPage();toast('已刪除');
 }
 
+let _quickBuyMember='';
+
+function openFamilyQuickBuy(member){
+  _quickBuyMember=member;
+  document.getElementById('fqb-title').textContent='+ 買入（'+member+'）';
+  const acc=getFamilyAccount(member);
+  const sel=document.getElementById('fqb-code-sel');
+  sel.innerHTML='<option value="">— 選擇持倉標的 —</option>'+
+    acc.holdings.map(h=>`<option value="${h.code}">${h.code} ${h.name||''}</option>`).join('')+
+    '<option value="__new__">＋ 新增全新標的</option>';
+  sel.value='';
+  document.getElementById('fqb-new-wrap').style.display='none';
+  document.getElementById('fqb-new-name-wrap').style.display='none';
+  document.getElementById('fqb-date').value=new Date().toISOString().slice(0,10);
+  document.getElementById('fqb-shares').value='';
+  document.getElementById('fqb-price').value='';
+  document.getElementById('fqb-remark').value='';
+  openModal('familyQuickBuyModal');
+}
+
+function fillQuickBuyCode(){
+  const val=document.getElementById('fqb-code-sel').value;
+  const isNew=val==='__new__';
+  document.getElementById('fqb-new-wrap').style.display=isNew?'':'none';
+  document.getElementById('fqb-new-name-wrap').style.display=isNew?'':'none';
+}
+
+function saveQuickBuy(){
+  const member=_quickBuyMember;
+  if(!member)return;
+  const sel=document.getElementById('fqb-code-sel').value;
+  const isNew=sel==='__new__';
+  const code=isNew?document.getElementById('fqb-new-code').value.trim().toUpperCase():sel;
+  const name=isNew?document.getElementById('fqb-new-name').value.trim():'';
+  const date=document.getElementById('fqb-date').value;
+  const shares=parseFloat(document.getElementById('fqb-shares').value)||0;
+  const price=parseFloat(document.getElementById('fqb-price').value)||0;
+  const remark=document.getElementById('fqb-remark').value.trim();
+  if(!code)return toast('請選擇或輸入標的代碼');
+  if(!shares||shares<=0)return toast('請輸入股數');
+  if(!price||price<=0)return toast('請輸入買入單價');
+  if(!date)return toast('請選擇日期');
+  const fee=Math.max(1,Math.round(shares*price*0.001425*0.28));
+  const gross=shares*price;
+  const acc=getFamilyAccount(member);
+  let h=acc.holdings.find(x=>x.code===code);
+  if(!h){h={id:uid(),code,name:name||code,url:'',transactions:[]};acc.holdings.push(h);}
+  else if(name)h.name=name;
+  h.transactions.push({id:uid(),type:'buy',date,shares,price,fee,remark});
+  acc.log.push({id:uid(),date,type:'buy',code,name:h.name,shares,price,amount:gross+fee,fee,remark});
+  acc.log.sort((a,b)=>b.date.localeCompare(a.date));
+  save();closeModal('familyQuickBuyModal');
+  renderFamilyMemberCards();
+  toast(`✅ ${member} 買入 ${code} ${shares}股`);
+}
+
 function openFamilyMemberModal(){
   renderFamilyMemberList();
   openModal('familyMemberModal');
@@ -11981,18 +12073,29 @@ function renderFamilyMemberCards(){
       return`<span style="display:inline-flex;align-items:center;gap:2px;background:${bg};color:${fg};font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;border:1px solid ${border};letter-spacing:.2px">${h.code} <span style="font-weight:500;opacity:.85">${pct}%</span></span>`;
     }).join('  ');
 
-    return`<div onclick="selectFamilyMember('${member}')" style="background:#ffffff;border:1px solid #e2e8f0;border-radius:16px;padding:24px;cursor:pointer;transition:all .22s cubic-bezier(.4,0,.2,1);box-shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04)" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 10px 30px -5px rgba(37,99,235,.12),0 4px 8px -2px rgba(0,0,0,.06)';this.style.borderColor='#93c5fd'" onmouseout="this.style.transform='';this.style.boxShadow='0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04)';this.style.borderColor='#e2e8f0'">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
-        <div style="width:28px;height:28px;border-radius:50%;background:#e0f2fe;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-          <span style="font-size:13px;color:#0284c7">👤</span>
+    return`<div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:16px;padding:24px;cursor:pointer;transition:all .22s cubic-bezier(.4,0,.2,1);box-shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);position:relative" onclick="selectFamilyMember('${member}')" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 10px 30px -5px rgba(37,99,235,.12),0 4px 8px -2px rgba(0,0,0,.06)';this.style.borderColor='#93c5fd'" onmouseout="this.style.transform='';this.style.boxShadow='0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04)';this.style.borderColor='#e2e8f0'">
+      <!-- 頂部：名字 + 快捷買入按鈕 -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:28px;height:28px;border-radius:50%;background:#e0f2fe;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <span style="font-size:13px;color:#0284c7">👤</span>
+          </div>
+          <div style="font-size:14px;font-weight:700;color:#0f172a;letter-spacing:.1px">${member}</div>
         </div>
-        <div style="font-size:14px;font-weight:700;color:#0f172a;letter-spacing:.1px">${member}</div>
+        <button onclick="event.stopPropagation();openFamilyQuickBuy('${member}')"
+          style="padding:4px 10px;border:1px solid #e2e8f0;border-radius:8px;background:#f8fafc;color:#64748b;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap;font-family:'Noto Sans TC',sans-serif"
+          onmouseover="this.style.background='#f1f5f9';this.style.borderColor='#cbd5e1';this.style.color='#334155'"
+          onmouseout="this.style.background='#f8fafc';this.style.borderColor='#e2e8f0';this.style.color='#64748b'">+ 買入</button>
       </div>
+      <!-- 資產區 -->
       <div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid #f1f5f9">
-        <div style="font-size:11px;font-weight:400;color:#94a3b8;letter-spacing:.4px;margin-bottom:6px;text-transform:uppercase">總資產</div>
-        <div style="font-size:1.75rem;font-weight:700;color:#1e3a8a;font-family:'JetBrains Mono',monospace;letter-spacing:-.5px;line-height:1.1">$${Math.round(totalVal).toLocaleString()}</div>
-        <div style="font-size:11px;color:#94a3b8;margin-top:6px;font-weight:400">${active.length} 檔持股</div>
+        <div style="font-size:11px;font-weight:400;color:#94a3b8;letter-spacing:.4px;margin-bottom:4px;text-transform:uppercase">總資產</div>
+        <div style="display:flex;align-items:baseline;gap:8px">
+          <div style="font-size:1.75rem;font-weight:700;color:#1e3a8a;font-family:'JetBrains Mono',monospace;letter-spacing:-.5px;line-height:1.1">$${Math.round(totalVal).toLocaleString()}</div>
+          <div style="font-size:11px;color:#94a3b8;font-weight:400">${active.length} 檔</div>
+        </div>
       </div>
+      <!-- 持股膠囊 -->
       <div style="display:flex;flex-wrap:wrap;gap:6px">${holdingRows||'<span style="font-size:11px;color:#94a3b8;font-style:italic">尚無持股</span>'}</div>
     </div>`;
   }).join('')+
