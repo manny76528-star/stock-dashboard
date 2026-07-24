@@ -2412,7 +2412,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1784874019999,
+  "_ts": 1784874038624,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -4364,11 +4364,32 @@
                 "price": 13.8,
                 "fee": 83,
                 "remark": "00981D資金轉移到此 , 參與AI成長"
+              },
+              {
+                "id": "mryjx1mbjgd",
+                "type": "buy",
+                "date": "2026-06-04",
+                "shares": 20000,
+                "price": 13.75,
+                "fee": 110,
+                "remark": "00981D資金轉移到此 , 參與AI成長"
               }
             ]
           }
         ],
         "log": [
+          {
+            "id": "mryjx1mb5n7",
+            "date": "2026-06-04",
+            "type": "buy",
+            "code": "00997A",
+            "name": "主動群益美國增長",
+            "shares": 20000,
+            "price": 13.75,
+            "amount": 275110,
+            "fee": 110,
+            "remark": "00981D資金轉移到此 , 參與AI成長"
+          },
           {
             "id": "mryjwn90nsk",
             "date": "2026-06-03",
