@@ -9214,7 +9214,7 @@ function showJournalChartPopup(j,evt){
       <button onclick="document.getElementById('jchart-popup').style.display='none'" style="background:none;border:none;color:#94a3b8;cursor:pointer;font-size:14px">✕</button>
     </div>
     ${tags?`<div style="margin-bottom:6px">${tags}</div>`:''}
-    ${j.market?`<div style="color:#e2e8f0;font-size:12px;margin-bottom:8px">📰 ${j.market.slice(0,80)}</div>`:''}
+    ${[j.market,j.market2,j.market3].filter(Boolean).map(m=>`<div style="color:#e2e8f0;font-size:12px;margin-bottom:4px">📰 ${m.slice(0,80)}</div>`).join('')}
     <button onclick="openJournalModal('${j.id}');document.getElementById('jchart-popup').style.display='none'" style="width:100%;background:#3b82f6;color:#fff;border:none;border-radius:6px;padding:5px;font-size:11px;cursor:pointer">✏️ 開啟完整日誌</button>`;
   const x=Math.min((evt.native?.clientX||200)+10,window.innerWidth-320);
   const y=Math.min((evt.native?.clientY||200)-20,window.innerHeight-220);
@@ -9408,8 +9408,8 @@ function _openJournalModalLegacy(id=null){
   document.getElementById('journal-modal-title').textContent=id?'✏️ 編輯日誌':'📓 新增交易日誌';
   document.getElementById('j-date').value=j?.date||new Date().toISOString().split('T')[0];
   document.getElementById('j-market').value=j?.market||'';
-  const m2=document.getElementById('j-market2');if(m2)m2.value=j?.market2||'';
-  const m3=document.getElementById('j-market3');if(m3)m3.value=j?.market3||'';
+  const m2el=document.getElementById('j-market2');if(m2el)m2el.value=j?.market2||'';
+  const m3el=document.getElementById('j-market3');if(m3el)m3el.value=j?.market3||'';
   const jmUrlEl=document.getElementById('j-market-url');if(jmUrlEl)jmUrlEl.value=j?.marketUrl||'';
   document.getElementById('j-content').value=j?.content||'';
   document.getElementById('j-stock-tags').value=(j?.stockTags||[]).join(' ');
@@ -11101,6 +11101,8 @@ function fillJournalEditForm(id){
   const sv=(elId,val)=>{const el=document.getElementById(elId);if(el)el.value=val||'';};
   sv('j-date',j?.date||new Date().toISOString().split('T')[0]);
   sv('j-market',j?.market||'');
+  sv('j-market2',j?.market2||'');
+  sv('j-market3',j?.market3||'');
   sv('j-market-url',j?.marketUrl||'');
   sv('j-content',j?.content||'');
   sv('j-stock-tags',(j?.stockTags||[]).join(' '));
@@ -11215,7 +11217,7 @@ function renderJournalPage(){
 
   container.innerHTML=list.map(j=>{
     const tags=(j.tags||[]).map(t=>`<span style="${tagColors[t]||'background:#f1f5f9;color:#374151'};padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600">${t}</span>`).join('');
-    const title=(j.market||j.content||'（無標題）').slice(0,80);
+    const markets=[j.market,j.market2,j.market3].filter(Boolean);const title=(markets.length?markets.join(' ｜ '):j.content||'（無標題）').slice(0,120);
     const hasBt=j.backtest?.ret!=null;
     const btColor=hasBt?(j.backtest.ret>=0?'#dc2626':'#16a34a'):'#9ca3af';
     return`<div style="display:flex;align-items:flex-start;gap:12px;padding:12px 18px;border-bottom:1px solid #f5f5f5;cursor:pointer;transition:background .12s" onclick="openJournalDrawer('${j.id}')" onmouseover="this.style.background='#fafbff'" onmouseout="this.style.background=''">
