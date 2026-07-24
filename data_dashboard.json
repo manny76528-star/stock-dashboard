@@ -2412,7 +2412,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1784887393957,
+  "_ts": 1784887471282,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -4663,6 +4663,15 @@
                 "price": 12.19,
                 "fee": 1,
                 "remark": ""
+              },
+              {
+                "id": "mryrwybko5x",
+                "type": "buy",
+                "date": "2026-03-26",
+                "shares": 226,
+                "price": 12.43,
+                "fee": 1,
+                "remark": ""
               }
             ]
           }
@@ -4725,6 +4734,18 @@
             "shares": 105,
             "price": 18.48,
             "amount": 1941.4,
+            "fee": 1,
+            "remark": ""
+          },
+          {
+            "id": "mryrwybksbm",
+            "date": "2026-03-26",
+            "type": "buy",
+            "code": "00990A",
+            "name": "主動元大AI新經濟",
+            "shares": 226,
+            "price": 12.43,
+            "amount": 2810.18,
             "fee": 1,
             "remark": ""
           },
