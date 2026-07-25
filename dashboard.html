@@ -10432,63 +10432,33 @@ function renderInvestPage(){
         const c=calcInv(inv);
         const price=db.prices[inv.code]?.price;
         const chg=db.prices[inv.code]?.changePct;
+        const pnl=showDivRoi?c.pnlWithDiv:c.pnl;
+        const pnlPct=showDivRoi?c.pnlPctWithDiv:c.pnlPct;
+        const pnlColor=pnl==null?'#9ca3af':pnl>=0?'#dc2626':'#16a34a';
         const chgColor=chg==null?'#9ca3af':chg>=0?'#dc2626':'#16a34a';
-        const today=new Date().toISOString().slice(0,10);
-
-        // 股息：累計 + 即將入帳（從 db.dividends 撈，不創新輪子）
-        const paidDiv=(db.dividends||[]).filter(d=>d.code===inv.code&&!d.pending&&d.date<=today).reduce((s,d)=>s+d.amount,0);
-        const pendingDivs=(db.dividends||[]).filter(d=>d.code===inv.code&&d.date>today).sort((a,b)=>a.date.localeCompare(b.date));
-        const pendingDiv=pendingDivs.reduce((s,d)=>s+d.amount,0);
-        const nearDays=pendingDivs.length>0?Math.ceil((new Date(pendingDivs[0].date)-new Date(today))/86400000):0;
-        const showDiv=c.tLots>0||(paidDiv>0)||(pendingDiv>0);
-
-        // 質押維持率（從 db.pledgeAssets / db.flexLoans 撈，不創新輪子）
-        const pledgeFlex=(db.flexLoans||[]).filter(f=>f.calcPledge);
-        const pledgeLoan=pledgeFlex.reduce((s,f)=>s+(f.used||f.remain||0),0);
-        let pledgeMkt=0;
-        (db.pledgeAssets||[]).forEach(a=>{const p=db.prices[a.code]?.price||0;pledgeMkt+=p*(a.lots||0)*1000;});
-        const pledgeRatio=pledgeLoan>0?Math.round(pledgeMkt/pledgeLoan*1000)/10:0;
-        const prColor=pledgeRatio>=250?'#06b6d4':pledgeRatio>=160?'#f59e0b':'#f97316';
-        const showPledge=pledgeLoan>0&&pledgeMkt>0;
-
-        return`<div onclick="toggleInvDetail('${inv.id}')" style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;margin:10px 14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.04);transition:all .2s" onmouseover="this.style.boxShadow='0 6px 20px rgba(37,99,235,.10)';this.style.borderColor='#93c5fd'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,.04)';this.style.borderColor='#e2e8f0'">
-          <div style="padding:16px 18px">
-            <!-- 頂部：代碼 + 漲跌 + 快捷買入 -->
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-              <div style="display:flex;align-items:center;gap:8px">
-                <div style="font-size:15px;font-weight:800;color:#0f172a">
-                  ${inv.url?`<a href="${inv.url}" target="_blank" onclick="event.stopPropagation()" style="color:#2563eb;text-decoration:none">${inv.code} 🔗</a>`:inv.code}
-                </div>
-                <div style="font-size:11px;color:#94a3b8">${inv.name||''}</div>
-                ${chg!=null?`<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px;background:${chg>=0?'#fee2e2':'#dcfce7'};color:${chgColor}">${chg>=0?'+':''}${chg}%</span>`:''}
+        const mkt=c.mktVal??c.tCost;
+        return`<div onclick="toggleInvDetail('${inv.id}')" style="padding:12px 16px;border-bottom:1px solid #f5f7fa;cursor:pointer;transition:background .12s" onmouseover="this.style.background='#fafbff'" onmouseout="this.style.background=''">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="font-size:14px;font-weight:800;color:#1e293b">
+                ${inv.url
+                  ?`<a href="${inv.url}" target="_blank" onclick="event.stopPropagation()" style="color:#2563eb;text-decoration:none;font-weight:800">${inv.code} 🔗</a>`
+                  :inv.code}
               </div>
-              <button onclick="event.stopPropagation();openBuyModal('${inv.id}')"
-                style="padding:4px 10px;border:1px solid #e2e8f0;border-radius:8px;background:#f8fafc;color:#64748b;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;font-family:'Noto Sans TC',sans-serif"
-                onmouseover="this.style.background='#f1f5f9';this.style.borderColor='#cbd5e1'"
-                onmouseout="this.style.background='#f8fafc';this.style.borderColor='#e2e8f0'">+ 買入</button>
+              <div style="font-size:11px;color:#94a3b8">${inv.name||''}</div>
+              ${chg!=null?`<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px;background:${chg>=0?'#fee2e2':'#dcfce7'};color:${chgColor}">${chg>=0?'+':''}${chg}%</span>`:''}
             </div>
-            <!-- 持股資訊（隱藏市值與損益） -->
-            <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:${showDiv||showPledge?'14px':'0'}">
-              <div style="font-size:11px;color:#64748b"><span style="color:#9ca3af">張數</span> <b>${c.tLots}</b></div>
-              <div style="font-size:11px;color:#64748b"><span style="color:#9ca3af">均成本</span> <b class="privacy-mask">$${c.avgCost.toFixed(2)}</b></div>
-              <div style="font-size:11px;color:#64748b"><span style="color:#9ca3af">現價</span> <b>${price?'$'+price:'—'}</b></div>
+            <div style="text-align:right">
+              <div style="font-size:14px;font-weight:800;font-family:'JetBrains Mono',monospace;color:${pnlColor}" class="privacy-mask">${pnl!=null?(pnl>=0?'+':'')+Math.round(pnl).toLocaleString():'—'}</div>
+              <div style="font-size:10px;color:${pnlColor};font-weight:600">${pnlPct!=null?(pnlPct>=0?'+':'')+Math.round(pnlPct*10)/10+'%':''}</div>
             </div>
-            <!-- 股息資訊（有庫存或有股息才顯示） -->
-            ${showDiv?`<div style="padding:10px 12px;background:#fffbeb;border-radius:10px;border:1px solid #fef3c7;margin-bottom:${showPledge?'10px':'0'}">
-              <div style="font-size:10px;color:#94a3b8;margin-bottom:4px;letter-spacing:.3px">💰 ${inv.code} 股息</div>
-              <div style="font-size:1.1rem;font-weight:700;color:#f59e0b;font-family:'JetBrains Mono',monospace">累計：$${Math.round(paidDiv).toLocaleString()}${pendingDiv>0?` <span style="font-size:11px;color:#d97706;font-weight:500">（即將入帳 $${Math.round(pendingDiv).toLocaleString()}，${nearDays}天後）</span>`:''}
-              </div>
-            </div>`:''}
-            <!-- 質押維持率（有設定質押才顯示） -->
-            ${showPledge?`<div style="padding:10px 12px;background:#f8fafc;border-radius:10px;border:1px solid #e2e8f0">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-                <div style="font-size:10px;color:#94a3b8;letter-spacing:.3px">🔒 質押維持率</div>
-                <div style="font-size:1.1rem;font-weight:700;color:${prColor};font-family:'JetBrains Mono',monospace">${pledgeRatio}%</div>
-              </div>
-              <div style="height:8px;border-radius:999px;background:#e2e8f0;overflow:hidden">
-                <div style="height:8px;border-radius:999px;background:${prColor};width:${Math.min(pledgeRatio/3,100)}%;transition:width .5s"></div>
-              </div>
-            </div>`:''}
+          </div>
+          <div style="display:flex;gap:16px;flex-wrap:wrap">
+            <div style="font-size:11px;color:#64748b"><span style="color:#9ca3af">張數</span> <b>${c.tLots}</b></div>
+            <div style="font-size:11px;color:#64748b"><span style="color:#9ca3af">均成本</span> <b class="privacy-mask">$${c.avgCost.toFixed(2)}</b></div>
+            <div style="font-size:11px;color:#64748b"><span style="color:#9ca3af">現價</span> <b>${price?'$'+price:'—'}</b></div>
+            <div style="font-size:11px;color:#64748b;margin-left:auto"><span style="color:#9ca3af">市值</span> <b class="privacy-mask">$${Math.round(mkt).toLocaleString()}</b></div>
+            ${c.divTot>0?`<div style="font-size:11px;color:#dc2626;font-weight:700"><span style="color:#9ca3af">股息</span> <b class="privacy-mask">+$${Math.round(c.divTot).toLocaleString()}</b></div>`:''}
           </div>
         </div>`;
       }).join('');
