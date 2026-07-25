@@ -2218,6 +2218,16 @@ body:not(.privacy) .privacy-mask{filter:none;}
     </div>
 
     <!-- ══ 頁面：投資與觀察 ══ -->
+    <!-- ══ 投資第一層：卡片總覽 ══ -->
+    <div class="db-page" id="dbpage-invest-l1">
+      <div style="padding:20px 24px">
+        <!-- 股息 + 質押卡片 -->
+        <div id="invest-l1-body"></div>
+        <!-- 進入按鈕提示 -->
+        <div style="text-align:center;margin-top:8px;font-size:11px;color:#cbd5e1">點擊卡片查看詳細數據</div>
+      </div>
+    </div>
+
     <div class="db-page" id="dbpage-invest">
 
       <!-- KPI 頂部列 -->
@@ -3563,6 +3573,30 @@ body:not(.privacy) .privacy-mask{filter:none;}
       <div class="fg"><label class="fl">備註（選填）</label><input class="fi" id="pa-note" placeholder="例：待交割8張"></div>
     </div>
     <div class="br"><button class="btn btn-s" onclick="closeModal('pledgeAssetModal')">取消</button><button class="btn btn-p" onclick="savePledgeAsset()">儲存</button></div>
+  </div>
+</div>
+
+<!-- ══ 投資持股：鋼鐵信仰密碼鎖 ══ -->
+<div class="mo" id="invFaithModal">
+  <div class="modal" style="max-width:400px;width:100%;text-align:center">
+    <div style="padding:28px 24px 0">
+      <div style="font-size:32px;margin-bottom:12px">🚀</div>
+      <div style="font-size:15px;font-weight:800;color:#0f172a;margin-bottom:12px;line-height:1.5">全球 AI 革命現在才起步 15%</div>
+      <div style="font-size:13px;color:#475569;line-height:1.7;margin-bottom:20px;padding:14px;background:#f8fafc;border-radius:10px;border:1px solid #e2e8f0">
+        2030 年前訂單全數滿載！強者靈魂只專注長線配置，別為了一時手癢，隨便下車動搖發財大計！
+      </div>
+      <div class="fg" style="margin-bottom:20px">
+        <label class="fl" style="text-align:center;color:#64748b;font-size:12px">輸入密碼以進入詳細面板</label>
+        <input class="fi" id="inv-faith-pwd" type="password" placeholder="請輸入密碼"
+          oninput="checkInvFaithPwd()" onkeydown="if(event.key==='Enter')confirmInvFaithEntry()"
+          style="text-align:center;font-size:18px;letter-spacing:6px;font-weight:700">
+      </div>
+    </div>
+    <div class="br" style="padding:0 24px 24px;gap:10px">
+      <button class="btn btn-s" onclick="closeModal('invFaithModal');_invFaithTarget=''">取消</button>
+      <button id="inv-faith-confirm-btn" class="btn btn-p" disabled onclick="confirmInvFaithEntry()"
+        style="opacity:.4;cursor:not-allowed">確認進入</button>
+    </div>
   </div>
 </div>
 
@@ -10398,33 +10432,63 @@ function renderInvestPage(){
         const c=calcInv(inv);
         const price=db.prices[inv.code]?.price;
         const chg=db.prices[inv.code]?.changePct;
-        const pnl=showDivRoi?c.pnlWithDiv:c.pnl;
-        const pnlPct=showDivRoi?c.pnlPctWithDiv:c.pnlPct;
-        const pnlColor=pnl==null?'#9ca3af':pnl>=0?'#dc2626':'#16a34a';
         const chgColor=chg==null?'#9ca3af':chg>=0?'#dc2626':'#16a34a';
-        const mkt=c.mktVal??c.tCost;
-        return`<div onclick="toggleInvDetail('${inv.id}')" style="padding:12px 16px;border-bottom:1px solid #f5f7fa;cursor:pointer;transition:background .12s" onmouseover="this.style.background='#fafbff'" onmouseout="this.style.background=''">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-            <div style="display:flex;align-items:center;gap:8px">
-              <div style="font-size:14px;font-weight:800;color:#1e293b">
-                ${inv.url
-                  ?`<a href="${inv.url}" target="_blank" onclick="event.stopPropagation()" style="color:#2563eb;text-decoration:none;font-weight:800">${inv.code} 🔗</a>`
-                  :inv.code}
+        const today=new Date().toISOString().slice(0,10);
+
+        // 股息：累計 + 即將入帳（從 db.dividends 撈，不創新輪子）
+        const paidDiv=(db.dividends||[]).filter(d=>d.code===inv.code&&!d.pending&&d.date<=today).reduce((s,d)=>s+d.amount,0);
+        const pendingDivs=(db.dividends||[]).filter(d=>d.code===inv.code&&d.date>today).sort((a,b)=>a.date.localeCompare(b.date));
+        const pendingDiv=pendingDivs.reduce((s,d)=>s+d.amount,0);
+        const nearDays=pendingDivs.length>0?Math.ceil((new Date(pendingDivs[0].date)-new Date(today))/86400000):0;
+        const showDiv=c.tLots>0||(paidDiv>0)||(pendingDiv>0);
+
+        // 質押維持率（從 db.pledgeAssets / db.flexLoans 撈，不創新輪子）
+        const pledgeFlex=(db.flexLoans||[]).filter(f=>f.calcPledge);
+        const pledgeLoan=pledgeFlex.reduce((s,f)=>s+(f.used||f.remain||0),0);
+        let pledgeMkt=0;
+        (db.pledgeAssets||[]).forEach(a=>{const p=db.prices[a.code]?.price||0;pledgeMkt+=p*(a.lots||0)*1000;});
+        const pledgeRatio=pledgeLoan>0?Math.round(pledgeMkt/pledgeLoan*1000)/10:0;
+        const prColor=pledgeRatio>=250?'#06b6d4':pledgeRatio>=160?'#f59e0b':'#f97316';
+        const showPledge=pledgeLoan>0&&pledgeMkt>0;
+
+        return`<div onclick="toggleInvDetail('${inv.id}')" style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;margin:10px 14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.04);transition:all .2s" onmouseover="this.style.boxShadow='0 6px 20px rgba(37,99,235,.10)';this.style.borderColor='#93c5fd'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,.04)';this.style.borderColor='#e2e8f0'">
+          <div style="padding:16px 18px">
+            <!-- 頂部：代碼 + 漲跌 + 快捷買入 -->
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div style="font-size:15px;font-weight:800;color:#0f172a">
+                  ${inv.url?`<a href="${inv.url}" target="_blank" onclick="event.stopPropagation()" style="color:#2563eb;text-decoration:none">${inv.code} 🔗</a>`:inv.code}
+                </div>
+                <div style="font-size:11px;color:#94a3b8">${inv.name||''}</div>
+                ${chg!=null?`<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px;background:${chg>=0?'#fee2e2':'#dcfce7'};color:${chgColor}">${chg>=0?'+':''}${chg}%</span>`:''}
               </div>
-              <div style="font-size:11px;color:#94a3b8">${inv.name||''}</div>
-              ${chg!=null?`<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px;background:${chg>=0?'#fee2e2':'#dcfce7'};color:${chgColor}">${chg>=0?'+':''}${chg}%</span>`:''}
+              <button onclick="event.stopPropagation();openBuyModal('${inv.id}')"
+                style="padding:4px 10px;border:1px solid #e2e8f0;border-radius:8px;background:#f8fafc;color:#64748b;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;font-family:'Noto Sans TC',sans-serif"
+                onmouseover="this.style.background='#f1f5f9';this.style.borderColor='#cbd5e1'"
+                onmouseout="this.style.background='#f8fafc';this.style.borderColor='#e2e8f0'">+ 買入</button>
             </div>
-            <div style="text-align:right">
-              <div style="font-size:14px;font-weight:800;font-family:'JetBrains Mono',monospace;color:${pnlColor}" class="privacy-mask">${pnl!=null?(pnl>=0?'+':'')+Math.round(pnl).toLocaleString():'—'}</div>
-              <div style="font-size:10px;color:${pnlColor};font-weight:600">${pnlPct!=null?(pnlPct>=0?'+':'')+Math.round(pnlPct*10)/10+'%':''}</div>
+            <!-- 持股資訊（隱藏市值與損益） -->
+            <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:${showDiv||showPledge?'14px':'0'}">
+              <div style="font-size:11px;color:#64748b"><span style="color:#9ca3af">張數</span> <b>${c.tLots}</b></div>
+              <div style="font-size:11px;color:#64748b"><span style="color:#9ca3af">均成本</span> <b class="privacy-mask">$${c.avgCost.toFixed(2)}</b></div>
+              <div style="font-size:11px;color:#64748b"><span style="color:#9ca3af">現價</span> <b>${price?'$'+price:'—'}</b></div>
             </div>
-          </div>
-          <div style="display:flex;gap:16px;flex-wrap:wrap">
-            <div style="font-size:11px;color:#64748b"><span style="color:#9ca3af">張數</span> <b>${c.tLots}</b></div>
-            <div style="font-size:11px;color:#64748b"><span style="color:#9ca3af">均成本</span> <b class="privacy-mask">$${c.avgCost.toFixed(2)}</b></div>
-            <div style="font-size:11px;color:#64748b"><span style="color:#9ca3af">現價</span> <b>${price?'$'+price:'—'}</b></div>
-            <div style="font-size:11px;color:#64748b;margin-left:auto"><span style="color:#9ca3af">市值</span> <b class="privacy-mask">$${Math.round(mkt).toLocaleString()}</b></div>
-            ${c.divTot>0?`<div style="font-size:11px;color:#dc2626;font-weight:700"><span style="color:#9ca3af">股息</span> <b class="privacy-mask">+$${Math.round(c.divTot).toLocaleString()}</b></div>`:''}
+            <!-- 股息資訊（有庫存或有股息才顯示） -->
+            ${showDiv?`<div style="padding:10px 12px;background:#fffbeb;border-radius:10px;border:1px solid #fef3c7;margin-bottom:${showPledge?'10px':'0'}">
+              <div style="font-size:10px;color:#94a3b8;margin-bottom:4px;letter-spacing:.3px">💰 ${inv.code} 股息</div>
+              <div style="font-size:1.1rem;font-weight:700;color:#f59e0b;font-family:'JetBrains Mono',monospace">累計：$${Math.round(paidDiv).toLocaleString()}${pendingDiv>0?` <span style="font-size:11px;color:#d97706;font-weight:500">（即將入帳 $${Math.round(pendingDiv).toLocaleString()}，${nearDays}天後）</span>`:''}
+              </div>
+            </div>`:''}
+            <!-- 質押維持率（有設定質押才顯示） -->
+            ${showPledge?`<div style="padding:10px 12px;background:#f8fafc;border-radius:10px;border:1px solid #e2e8f0">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+                <div style="font-size:10px;color:#94a3b8;letter-spacing:.3px">🔒 質押維持率</div>
+                <div style="font-size:1.1rem;font-weight:700;color:${prColor};font-family:'JetBrains Mono',monospace">${pledgeRatio}%</div>
+              </div>
+              <div style="height:8px;border-radius:999px;background:#e2e8f0;overflow:hidden">
+                <div style="height:8px;border-radius:999px;background:${prColor};width:${Math.min(pledgeRatio/3,100)}%;transition:width .5s"></div>
+              </div>
+            </div>`:''}
           </div>
         </div>`;
       }).join('');
@@ -11693,6 +11757,36 @@ function saveQuickBuy(){
   toast(`✅ ${member} 買入 ${code} ${shares}股`);
 }
 
+let _invFaithTarget='';
+
+function openInvFaithModal(invId){
+  _invFaithTarget=invId;
+  const inp=document.getElementById('inv-faith-pwd');
+  if(inp)inp.value='';
+  const btn=document.getElementById('inv-faith-confirm-btn');
+  if(btn){btn.disabled=true;btn.style.opacity='.4';btn.style.cursor='not-allowed';}
+  openModal('invFaithModal');
+  setTimeout(()=>inp?.focus(),200);
+}
+
+function checkInvFaithPwd(){
+  const val=document.getElementById('inv-faith-pwd')?.value||'';
+  const btn=document.getElementById('inv-faith-confirm-btn');
+  if(!btn)return;
+  const ok=val===FAITH_PWD;
+  btn.disabled=!ok;
+  btn.style.opacity=ok?'1':'.4';
+  btn.style.cursor=ok?'pointer':'not-allowed';
+}
+
+function confirmInvFaithEntry(){
+  const val=document.getElementById('inv-faith-pwd')?.value||'';
+  if(val!==FAITH_PWD)return;
+  closeModal('invFaithModal');
+  toggleInvDetail(_invFaithTarget);
+  _invFaithTarget='';
+}
+
 let _faithTarget='';
 const FAITH_PWD='8443';
 
@@ -12399,6 +12493,116 @@ function renderFamilyTrendChart(acc){
   });
 }
 
+function renderInvestL1(){
+  // 切換到第一層頁面
+  document.querySelectorAll('.db-page').forEach(p=>p.classList.remove('active'));
+  const l1=document.getElementById('dbpage-invest-l1');
+  if(l1)l1.classList.add('active');
+  document.querySelectorAll('.db-nav-item').forEach(el=>el.classList.toggle('active',el.id==='nav-invest'));
+  const nameEl=document.getElementById('db-page-name');
+  if(nameEl)nameEl.textContent='投資與觀察';
+
+  const body=document.getElementById('invest-l1-body');
+  if(!body)return;
+  const today=new Date().toISOString().slice(0,10);
+
+  // 質押維持率（從現有邏輯撈）
+  const pledgeFlex=(db.flexLoans||[]).filter(f=>f.calcPledge);
+  const pledgeLoan=pledgeFlex.reduce((s,f)=>s+(f.used||f.remain||0),0);
+  let pledgeMkt=0;
+  (db.pledgeAssets||[]).forEach(a=>{const p=db.prices[a.code]?.price||0;pledgeMkt+=p*(a.lots||0)*1000;});
+  const pledgeRatio=pledgeLoan>0?Math.round(pledgeMkt/pledgeLoan*1000)/10:0;
+  const prColor=pledgeRatio>=250?'#06b6d4':pledgeRatio>=160?'#f59e0b':'#f97316';
+  const showPledge=pledgeLoan>0&&pledgeMkt>0;
+
+  // 總計股息
+  const totalPaidDiv=(db.dividends||[]).filter(d=>!d.pending&&d.date<=today).reduce((s,d)=>s+d.amount,0);
+  const pendingDivAll=(db.dividends||[]).filter(d=>d.date>today).sort((a,b)=>a.date.localeCompare(b.date));
+  const pendingDivTotal=pendingDivAll.reduce((s,d)=>s+d.amount,0);
+  const nearDays=pendingDivAll.length>0?Math.ceil((new Date(pendingDivAll[0].date)-new Date(today))/86400000):0;
+
+  // 持股清單（有庫存的）
+  const active=db.investments.filter(inv=>calcInv(inv).tLots>0);
+
+  body.innerHTML=`
+    <!-- 主卡片 -->
+    <div onclick="openInvFaithModal()" style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:24px;cursor:pointer;transition:all .22s;box-shadow:0 4px 6px -1px rgba(0,0,0,.05);margin-bottom:14px"
+      onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 30px -5px rgba(37,99,235,.12)';this.style.borderColor='#93c5fd'"
+      onmouseout="this.style.transform='';this.style.boxShadow='0 4px 6px -1px rgba(0,0,0,.05)';this.style.borderColor='#e2e8f0'">
+      <!-- 頂部：標題 + 快捷買入 -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="width:28px;height:28px;border-radius:50%;background:#e0f2fe;display:flex;align-items:center;justify-content:center">
+            <span style="font-size:13px;color:#0284c7">💼</span>
+          </div>
+          <div style="font-size:14px;font-weight:700;color:#0f172a">${active.length} 檔持股</div>
+        </div>
+        <button onclick="event.stopPropagation();openBuyModal()"
+          style="padding:4px 10px;border:1px solid #e2e8f0;border-radius:8px;background:#f8fafc;color:#64748b;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;font-family:'Noto Sans TC',sans-serif"
+          onmouseover="this.style.background='#f1f5f9';this.style.borderColor='#cbd5e1'"
+          onmouseout="this.style.background='#f8fafc';this.style.borderColor='#e2e8f0'">+ 買入</button>
+      </div>
+
+      <!-- 各持股股息列表 -->
+      ${active.map(inv=>{
+        const paidDiv=(db.dividends||[]).filter(d=>d.code===inv.code&&!d.pending&&d.date<=today).reduce((s,d)=>s+d.amount,0);
+        const pendingD=(db.dividends||[]).filter(d=>d.code===inv.code&&d.date>today).sort((a,b)=>a.date.localeCompare(b.date));
+        const pendingAmt=pendingD.reduce((s,d)=>s+d.amount,0);
+        const days=pendingD.length>0?Math.ceil((new Date(pendingD[0].date)-new Date(today))/86400000):0;
+        if(paidDiv===0&&pendingAmt===0)return'';
+        return`<div style="padding:10px 12px;background:#fffbeb;border-radius:10px;border:1px solid #fef3c7;margin-bottom:8px">
+          <div style="font-size:10px;color:#94a3b8;margin-bottom:3px">💰 ${inv.code} ${inv.name||''}</div>
+          <div style="font-size:1.1rem;font-weight:700;color:#f59e0b;font-family:'JetBrains Mono',monospace">
+            累計：$${Math.round(paidDiv).toLocaleString()}
+            ${pendingAmt>0?`<span style="font-size:11px;color:#d97706;font-weight:500">（即將入帳 $${Math.round(pendingAmt).toLocaleString()}，${days}天後）</span>`:''}
+          </div>
+        </div>`;
+      }).join('')}
+
+      <!-- 質押維持率 -->
+      ${showPledge?`<div style="padding:10px 12px;background:#f8fafc;border-radius:10px;border:1px solid #e2e8f0;margin-top:4px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <div style="font-size:10px;color:#94a3b8;letter-spacing:.3px">🔒 質押維持率</div>
+          <div style="font-size:1.2rem;font-weight:700;color:${prColor};font-family:'JetBrains Mono',monospace">${pledgeRatio}%</div>
+        </div>
+        <div style="height:8px;border-radius:999px;background:#e2e8f0;overflow:hidden">
+          <div style="height:8px;border-radius:999px;background:${prColor};width:${Math.min(pledgeRatio/3,100)}%;transition:width .5s"></div>
+        </div>
+      </div>`:''}
+    </div>`;
+}
+
+function openInvFaithModal(){
+  const inp=document.getElementById('inv-faith-pwd');
+  if(inp)inp.value='';
+  const btn=document.getElementById('inv-faith-confirm-btn');
+  if(btn){btn.disabled=true;btn.style.opacity='.4';btn.style.cursor='not-allowed';}
+  openModal('invFaithModal');
+  setTimeout(()=>inp?.focus(),200);
+}
+
+function checkInvFaithPwd(){
+  const val=document.getElementById('inv-faith-pwd')?.value||'';
+  const btn=document.getElementById('inv-faith-confirm-btn');
+  if(!btn)return;
+  const ok=val===FAITH_PWD;
+  btn.disabled=!ok;
+  btn.style.opacity=ok?'1':'.4';
+  btn.style.cursor=ok?'pointer':'not-allowed';
+}
+
+function confirmInvFaithEntry(){
+  const val=document.getElementById('inv-faith-pwd')?.value||'';
+  if(val!==FAITH_PWD)return;
+  closeModal('invFaithModal');
+  // 進入第二層完整頁面
+  document.querySelectorAll('.db-page').forEach(p=>p.classList.remove('active'));
+  const page=document.getElementById('dbpage-invest');
+  if(page)page.classList.add('active');
+  renderInvestPage();
+  _invFaithTarget='';
+}
+
 function renderFinPlanPage(){
   const body=document.getElementById('finplan-page-body');
   if(!body)return;
@@ -12437,7 +12641,8 @@ function dbShowPage(id){
     return;
   }
   if(id==='assets')renderAssetsPage();
-  if(id==='invest')renderInvestPage();
+  if(id==='invest'){renderInvestL1();return;}
+  if(id==='invest-detail'){renderInvestPage();return;}
   if(id==='trend')renderTrendPage();
   if(id==='journal')renderJournalPage();
   if(id==='dividend'){if(typeof renderDivs==='function')renderDivs();}
