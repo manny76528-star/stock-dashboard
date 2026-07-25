@@ -3566,6 +3566,29 @@ body:not(.privacy) .privacy-mask{filter:none;}
   </div>
 </div>
 
+<!-- ══ 家族：鋼鐵信仰密碼鎖 ══ -->
+<div class="mo" id="familyFaithModal">
+  <div class="modal" style="max-width:400px;width:100%;text-align:center">
+    <div style="padding:28px 24px 0">
+      <div style="font-size:32px;margin-bottom:12px">🛡️</div>
+      <div style="font-size:15px;font-weight:800;color:#0f172a;margin-bottom:12px;line-height:1.5">大盤長線必創歷史新高！</div>
+      <div style="font-size:13px;color:#475569;line-height:1.7;margin-bottom:20px;padding:14px;background:#f8fafc;border-radius:10px;border:1px solid #e2e8f0">
+        短線進出終將被市場淘汰，唯有長線配置才是發財大計。<br>你真的要為了一時手癢打破紀律嗎？
+      </div>
+      <div class="fg" style="margin-bottom:20px">
+        <label class="fl" style="text-align:center;color:#64748b;font-size:12px">輸入密碼以進入詳細面板</label>
+        <input class="fi" id="faith-pwd" type="password" placeholder="請輸入密碼" oninput="checkFaithPwd()"
+          style="text-align:center;font-size:18px;letter-spacing:6px;font-weight:700">
+      </div>
+    </div>
+    <div class="br" style="padding:0 24px 24px;gap:10px">
+      <button class="btn btn-s" onclick="closeModal('familyFaithModal');_faithTarget=''">取消</button>
+      <button id="faith-confirm-btn" class="btn btn-p" disabled onclick="confirmFaithEntry()"
+        style="opacity:.4;cursor:not-allowed">確認進入</button>
+    </div>
+  </div>
+</div>
+
 <!-- ══ 家族：快捷買入 Modal ══ -->
 <div class="mo" id="familyQuickBuyModal">
   <div class="modal" style="max-width:400px;width:100%">
@@ -11667,23 +11690,63 @@ function saveQuickBuy(){
   toast(`✅ ${member} 買入 ${code} ${shares}股`);
 }
 
+let _faithTarget='';
+const FAITH_PWD='8443';
+
+function openFamilyFaithModal(member){
+  _faithTarget=member;
+  const inp=document.getElementById('faith-pwd');
+  if(inp)inp.value='';
+  const btn=document.getElementById('faith-confirm-btn');
+  if(btn){btn.disabled=true;btn.style.opacity='.4';btn.style.cursor='not-allowed';}
+  openModal('familyFaithModal');
+  setTimeout(()=>inp?.focus(),200);
+}
+
+function checkFaithPwd(){
+  const val=document.getElementById('faith-pwd')?.value||'';
+  const btn=document.getElementById('faith-confirm-btn');
+  if(!btn)return;
+  const ok=val===FAITH_PWD;
+  btn.disabled=!ok;
+  btn.style.opacity=ok?'1':'.4';
+  btn.style.cursor=ok?'pointer':'not-allowed';
+}
+
+function confirmFaithEntry(){
+  const val=document.getElementById('faith-pwd')?.value||'';
+  if(val!==FAITH_PWD)return;
+  closeModal('familyFaithModal');
+  selectFamilyMember(_faithTarget);
+  _faithTarget='';
+}
+
 function openFamilyMemberModal(){
   renderFamilyMemberList();
   openModal('familyMemberModal');
 }
 function renderFamilyMemberList(){
   const f=getFamilyDB();
+  if(!db.family.targets)db.family.targets={};
   const el=document.getElementById('family-member-list');
   if(!el)return;
   el.innerHTML=f.members.length===0
     ?'<div style="color:#9ca3af;font-size:12px;text-align:center;padding:8px">尚無成員</div>'
     :f.members.map((m,i)=>`
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 4px;border-bottom:1px solid #f5f7fa">
-        <span style="font-size:14px;font-weight:700">${m}</span>
-        <div style="display:flex;gap:4px;align-items:center">
-          <button onclick="moveFamilyMember(${i},-1)" ${i===0?'disabled':''} style="border:1px solid #e2e8f0;background:#f8fafc;border-radius:5px;color:#64748b;cursor:pointer;font-size:12px;padding:2px 7px;opacity:${i===0?0.3:1}">↑</button>
-          <button onclick="moveFamilyMember(${i},1)" ${i===f.members.length-1?'disabled':''} style="border:1px solid #e2e8f0;background:#f8fafc;border-radius:5px;color:#64748b;cursor:pointer;font-size:12px;padding:2px 7px;opacity:${i===f.members.length-1?0.3:1}">↓</button>
-          <button onclick="delFamilyMember('${m}')" style="border:none;background:none;color:#ef4444;cursor:pointer;font-size:13px">🗑</button>
+      <div style="padding:10px 4px;border-bottom:1px solid #f5f7fa">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <span style="font-size:13px;font-weight:700;color:#0f172a">${m}</span>
+          <div style="display:flex;gap:4px;align-items:center">
+            <button onclick="moveFamilyMember(${i},-1)" ${i===0?'disabled':''} style="border:1px solid #e2e8f0;background:#f8fafc;border-radius:5px;color:#64748b;cursor:pointer;font-size:12px;padding:2px 7px;opacity:${i===0?0.3:1}">↑</button>
+            <button onclick="moveFamilyMember(${i},1)" ${i===f.members.length-1?'disabled':''} style="border:1px solid #e2e8f0;background:#f8fafc;border-radius:5px;color:#64748b;cursor:pointer;font-size:12px;padding:2px 7px;opacity:${i===f.members.length-1?0.3:1}">↓</button>
+            <button onclick="delFamilyMember('${m}')" style="border:none;background:none;color:#ef4444;cursor:pointer;font-size:13px">🗑</button>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="font-size:11px;color:#94a3b8;white-space:nowrap">目標 $</span>
+          <input type="number" value="${db.family.targets[m]||1000000}"
+            onchange="db.family.targets['${m}']=parseInt(this.value)||1000000;save();renderFamilyMemberCards()"
+            style="flex:1;padding:4px 8px;border:1px solid #e2e8f0;border-radius:6px;font-size:12px;font-weight:600;color:#1e293b;outline:none">
         </div>
       </div>`).join('');
 }
@@ -12062,6 +12125,10 @@ function renderFamilyMemberCards(){
       return{code:h.code,name:h.name,cost:c.cost,mktVal:c.mktVal};
     });
     const totalVal=totalMkt>0?totalMkt:totalCost;
+    // 目標金額（從 db 讀，預設 1000000）
+    if(!db.family.targets)db.family.targets={};
+    const target=db.family.targets[member]||1000000;
+    const pct=target>0?Math.round(totalVal/target*1000)/10:0;
     // 佔比排序
     const sorted=holdingData.sort((a,b)=>(b.mktVal||b.cost)-(a.mktVal||a.cost));
     const holdingRows=sorted.map(h=>{
@@ -12073,26 +12140,29 @@ function renderFamilyMemberCards(){
       return`<span style="display:inline-flex;align-items:center;gap:2px;background:${bg};color:${fg};font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;border:1px solid ${border};letter-spacing:.2px">${h.code} <span style="font-weight:500;opacity:.85">${pct}%</span></span>`;
     }).join('  ');
 
-    return`<div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:16px;padding:24px;cursor:pointer;transition:all .22s cubic-bezier(.4,0,.2,1);box-shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);position:relative" onclick="selectFamilyMember('${member}')" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 10px 30px -5px rgba(37,99,235,.12),0 4px 8px -2px rgba(0,0,0,.06)';this.style.borderColor='#93c5fd'" onmouseout="this.style.transform='';this.style.boxShadow='0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04)';this.style.borderColor='#e2e8f0'">
-      <!-- 頂部：名字 + 快捷買入按鈕 -->
+    return`<div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:16px;padding:24px;cursor:pointer;transition:all .22s cubic-bezier(.4,0,.2,1);box-shadow:0 4px 6px -1px rgba(0,0,0,.05);position:relative" onclick="openFamilyFaithModal('${member}')" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 10px 30px -5px rgba(37,99,235,.12),0 4px 8px -2px rgba(0,0,0,.06)';this.style.borderColor='#93c5fd'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 6px -1px rgba(0,0,0,.05)';this.style.borderColor='#e2e8f0'">
+      <!-- 頂部：名字 + 快捷買入 -->
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-        <div style="display:flex;align-items:center;gap:10px">
+        <div style="display:flex;align-items:center;gap:8px">
           <div style="width:28px;height:28px;border-radius:50%;background:#e0f2fe;display:flex;align-items:center;justify-content:center;flex-shrink:0">
             <span style="font-size:13px;color:#0284c7">👤</span>
           </div>
-          <div style="font-size:14px;font-weight:700;color:#0f172a;letter-spacing:.1px">${member}</div>
+          <div style="font-size:14px;font-weight:600;color:#0f172a">${member}</div>
         </div>
         <button onclick="event.stopPropagation();openFamilyQuickBuy('${member}')"
-          style="padding:4px 10px;border:1px solid #e2e8f0;border-radius:8px;background:#f8fafc;color:#64748b;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap;font-family:'Noto Sans TC',sans-serif"
+          style="padding:4px 10px;border:1px solid #e2e8f0;border-radius:8px;background:#f8fafc;color:#64748b;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;font-family:'Noto Sans TC',sans-serif"
           onmouseover="this.style.background='#f1f5f9';this.style.borderColor='#cbd5e1';this.style.color='#334155'"
           onmouseout="this.style.background='#f8fafc';this.style.borderColor='#e2e8f0';this.style.color='#64748b'">+ 買入</button>
       </div>
-      <!-- 資產區 -->
-      <div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid #f1f5f9">
-        <div style="font-size:11px;font-weight:400;color:#94a3b8;letter-spacing:.4px;margin-bottom:4px;text-transform:uppercase">總資產</div>
-        <div style="display:flex;align-items:baseline;gap:8px">
-          <div style="font-size:1.75rem;font-weight:700;color:#1e3a8a;font-family:'JetBrains Mono',monospace;letter-spacing:-.5px;line-height:1.1">$${Math.round(totalVal).toLocaleString()}</div>
-          <div style="font-size:11px;color:#94a3b8;font-weight:400">${active.length} 檔</div>
+      <!-- 達成率 + 進度條 -->
+      <div style="margin-bottom:16px">
+        <div style="font-size:1.8rem;font-weight:700;color:#2563eb;line-height:1;margin-bottom:8px">${pct}%</div>
+        <div style="height:10px;border-radius:999px;background:#e2e8f0;overflow:hidden;margin-bottom:8px">
+          <div style="height:10px;border-radius:999px;background:#2563eb;width:${Math.min(pct,100)}%;transition:width .5s ease"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-size:11px;color:#94a3b8">${active.length} 檔持股</div>
+          <div style="font-size:11px;color:#94a3b8">目標：$${Math.round(target).toLocaleString()}</div>
         </div>
       </div>
       <!-- 持股膠囊 -->
