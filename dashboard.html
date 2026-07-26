@@ -10519,8 +10519,8 @@ function renderInvestPage(){
   setKpi('inv-kpi-real',(tReal>=0?'+':'')+fmt(tReal),tReal>=0?'#dc2626':'#16a34a');
 
   // 淨資產（現金 + 股票市值 - 負債）
-  const tCash=(db.cashAccounts||[]).reduce((s,c)=>s+c.balance,0);
-  const tLoan=(db.loans||[]).filter(l=>!l.settled).reduce((s,l)=>s+l.remain,0);
+  const tCash=(db.cashAccounts||[]).reduce((s,c)=>s+(c.cash||0)+(c.d1||0)+(c.d2||0),0);
+  const tLoan=(db.loans||[]).filter(l=>!l.settled).reduce((s,l)=>s+(l.remain||calcLoanRemain(l)),0);
   const tFlex=(db.flexLoans||[]).reduce((s,f)=>s+(f.used||0),0);
   const netAssets=tCash+tMkt-tLoan-tFlex;
   const netEl=document.getElementById('inv-kpi-net');
