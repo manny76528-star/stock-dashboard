@@ -3575,6 +3575,27 @@ body:not(.privacy) .privacy-mask{filter:none;}
   </div>
 </div>
 
+<!-- ══ 股息目標設定 Modal ══ -->
+<div class="mo" id="divTargetModal">
+  <div class="modal" style="max-width:360px;width:100%">
+    <div class="mt">
+      <div class="mt-title">✏️ 設定年股息目標</div>
+      <button onclick="closeModal('divTargetModal')" style="background:none;border:none;font-size:20px;cursor:pointer;color:#94a3b8">✕</button>
+    </div>
+    <div class="mb">
+      <div class="fg">
+        <label class="fl">年股息目標金額（$）</label>
+        <input class="fi" id="div-target-input" type="number" placeholder="例：800000">
+      </div>
+      <div style="font-size:11px;color:#94a3b8;margin-top:4px">目前累積股息將以此金額計算達成率</div>
+    </div>
+    <div class="br">
+      <button class="btn btn-s" onclick="closeModal('divTargetModal')">取消</button>
+      <button class="btn btn-p" onclick="saveDivTarget()">儲存</button>
+    </div>
+  </div>
+</div>
+
 <!-- ══ 投資持股：鋼鐵信仰密碼鎖 ══ -->
 <div class="mo" id="invFaithModal">
   <div class="modal" style="max-width:400px;width:100%;text-align:center">
@@ -12711,6 +12732,9 @@ function _renderInvestL1Body(){
             <span style="font-size:13px;color:#0284c7">💼</span>
           </div>
           <div style="font-size:14px;font-weight:700;color:#0f172a">${active.length} 檔持股</div>
+          <button onclick="event.stopPropagation();openDivTargetModal()"
+            style="padding:2px 8px;border:1px solid #e2e8f0;border-radius:6px;background:#f8fafc;color:#94a3b8;font-size:10px;cursor:pointer;font-family:'Noto Sans TC',sans-serif"
+            onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='#f8fafc'">✏️ 股息目標</button>
         </div>
         <button onclick="event.stopPropagation();openInvModal()"
           style="padding:4px 10px;border:1px solid #e2e8f0;border-radius:8px;background:#f8fafc;color:#64748b;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;font-family:'Noto Sans TC',sans-serif"
@@ -12754,6 +12778,20 @@ function _renderInvestL1Body(){
 
       </div>
     </div>`;
+}
+
+function openDivTargetModal(){
+  if(!db.settings)db.settings={};
+  const el=document.getElementById('div-target-input');
+  if(el)el.value=db.settings.targetDividend||800000;
+  openModal('divTargetModal');
+}
+function saveDivTarget(){
+  const val=parseInt(document.getElementById('div-target-input')?.value)||800000;
+  if(!db.settings)db.settings={};
+  db.settings.targetDividend=val;
+  save();closeModal('divTargetModal');renderInvestL1();
+  toast('✅ 股息目標已設為 $'+val.toLocaleString());
 }
 
 function openInvFaithModal(){
