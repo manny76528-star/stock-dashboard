@@ -12719,45 +12719,39 @@ function _renderInvestL1Body(){
       </div>
 
       <!-- 雙欄核心 -->
-      <div style="display:grid;grid-template-columns:1fr${showPledge?' 1px 1fr':''}；gap:0">
-        <div style="display:grid;grid-template-columns:1fr${showPledge?` 1px 1fr`:''};">
+      <div style="display:grid;grid-template-columns:1fr${showPledge?' 1px 1fr':''};">
 
         <!-- 左：股息中心 -->
-        <div style="padding-right:${showPledge?'20px':'0'}">
-          <div style="font-size:10px;font-weight:600;color:#94a3b8;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px">💰 股息現金流</div>
-          <div style="font-size:1.8rem;font-weight:800;color:#f59e0b;font-family:'JetBrains Mono',monospace;line-height:1;margin-bottom:6px">$${Math.round(totalPaidDiv).toLocaleString()}</div>
-          <div style="font-size:1.1rem;font-weight:700;color:#0f172a;margin-bottom:8px">${divPct}%
-            <span style="font-size:10px;color:#94a3b8;font-weight:400">達成</span>
+        <div style="padding-right:${showPledge?'24px':'0'}">
+          <div style="font-size:10px;font-weight:600;color:#94a3b8;letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px">💰 股息現金流</div>
+          <div style="font-size:1.8rem;font-weight:800;color:#f59e0b;font-family:'JetBrains Mono',monospace;line-height:1;margin-bottom:10px">$${Math.round(totalPaidDiv).toLocaleString()}</div>
+          <div style="font-size:1.1rem;font-weight:700;color:#0f172a;margin-bottom:8px">${divPct}% <span style="font-size:10px;color:#94a3b8;font-weight:400">達成</span></div>
+          <div style="height:10px;border-radius:999px;background:#f1f5f9;overflow:hidden;margin-bottom:12px">
+            <div style="height:10px;border-radius:999px;background:${divBarColor};width:${Math.min(divPct,100)}%;transition:width .5s"></div>
           </div>
-          <div style="height:8px;border-radius:999px;background:#f1f5f9;overflow:hidden;margin-bottom:10px">
-            <div style="height:8px;border-radius:999px;background:${divBarColor};width:${Math.min(divPct,100)}%;transition:width .5s"></div>
-          </div>
-          ${nearDays>0?`<div style="font-size:11px;color:#64748b;display:flex;align-items:center;gap:4px">
+          ${nearDays>0?`<div style="font-size:11px;color:#94a3b8;display:flex;align-items:center;gap:5px">
             <span>📅</span>
-            <span style="color:#94a3b8">下期入帳</span>
+            <span>下期入帳</span>
             <span style="font-weight:700;color:#f59e0b">$${Math.round(nearAmt).toLocaleString()}</span>
-            <span style="color:#94a3b8">· ${nearDays}天後</span>
+            <span>· ${nearDays}天後</span>
           </div>`:''}
         </div>
 
         ${showPledge?`
         <!-- 分隔線 -->
-        <div style="width:1px;background:#f1f5f9;margin:0 20px"></div>
+        <div style="width:1px;background:#f1f5f9;margin:0 4px"></div>
 
         <!-- 右：質押安全盾 -->
-        <div>
-          <div style="font-size:10px;font-weight:600;color:#94a3b8;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px">🔒 質押安全</div>
-          <div style="font-size:1.8rem;font-weight:800;color:${prColor};font-family:'JetBrains Mono',monospace;line-height:1;margin-bottom:6px">${pledgeRatio}%</div>
+        <div style="padding-left:24px">
+          <div style="font-size:10px;font-weight:600;color:#94a3b8;letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px">🔒 質押安全</div>
+          <div style="font-size:1.8rem;font-weight:800;color:${prColor};font-family:'JetBrains Mono',monospace;line-height:1;margin-bottom:10px">${pledgeRatio}%</div>
           <div style="font-size:10px;color:#94a3b8;margin-bottom:8px">維持率</div>
-          <div style="height:8px;border-radius:999px;background:#f1f5f9;overflow:hidden;margin-bottom:10px">
-            <div style="height:8px;border-radius:999px;background:${prColor};width:${Math.min(pledgeRatio/3,100)}%;transition:width .5s"></div>
+          <div style="height:10px;border-radius:999px;background:#f1f5f9;overflow:hidden;margin-bottom:12px">
+            <div style="height:10px;border-radius:999px;background:${prColor};width:${Math.min(pledgeRatio/3,100)}%;transition:width .5s"></div>
           </div>
-          <div style="font-size:11px;color:#94a3b8">
-            ${pledgeRatio>=250?'🟢 極度安全':pledgeRatio>=160?'🟡 注意區間':'🔴 危險警示'}
-          </div>
+          <div style="font-size:11px;color:#94a3b8">狀態：${pledgeRatio>=250?'極度安全':pledgeRatio>=160?'注意區間':'危險警示'}</div>
         </div>`:''}
 
-        </div>
       </div>
     </div>`;
 }
