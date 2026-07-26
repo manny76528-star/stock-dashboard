@@ -12742,42 +12742,40 @@ function _renderInvestL1Body(){
           onmouseout="this.style.background='#f8fafc';this.style.borderColor='#e2e8f0'">+ 買入</button>
       </div>
 
-      <!-- 雙欄核心 -->
-      <div style="display:grid;grid-template-columns:1fr${showPledge?' 1px 1fr':''};">
+      <!-- 雙欄核心 7:3 -->
+      <div style="display:flex;gap:0">
 
-        <!-- 左：股息中心 -->
-        <div style="padding-right:${showPledge?'24px':'0'}">
+        <!-- 左 70%：股息中心 -->
+        <div style="flex:7;padding-right:20px;border-right:${showPledge?'1px solid #f1f5f9':'none'}">
           <div style="font-size:10px;font-weight:600;color:#94a3b8;letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px">💰 股息現金流</div>
           <div style="font-size:1.8rem;font-weight:800;color:#f59e0b;font-family:'JetBrains Mono',monospace;line-height:1;margin-bottom:10px">$${Math.round(totalPaidDiv).toLocaleString()}</div>
-          <div style="font-size:1.1rem;font-weight:700;color:#0f172a;margin-bottom:8px">${divPct}% <span style="font-size:10px;color:#94a3b8;font-weight:400">達成</span></div>
-          <div style="height:10px;border-radius:999px;background:#f1f5f9;overflow:hidden;margin-bottom:12px">
-            <div style="height:10px;border-radius:999px;background:${divBarColor};width:${Math.min(divPct,100)}%;transition:width .5s"></div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+            <span style="font-size:1.1rem;font-weight:700;color:#3b82f6">${divPct}%</span>
+            <span style="font-size:10px;color:#94a3b8">達成年目標</span>
           </div>
-          <!-- 各持股股息明細 -->
-          <div style="border-top:1px solid #f1f5f9;padding-top:10px;display:flex;flex-direction:column;gap:6px">
+          <div style="height:10px;border-radius:999px;background:#f1f5f9;overflow:hidden;margin-bottom:14px">
+            <div style="height:10px;border-radius:999px;background:#93c5fd;width:${Math.min(divPct,100)}%;transition:width .5s"></div>
+          </div>
+          <!-- 股息明細徽章 -->
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
           ${active.map(inv=>{
             const paidDiv=(db.dividends||[]).filter(d=>d.code===inv.code&&!d.pending&&d.date<=today).reduce((s,d)=>s+d.amount,0);
             const pendingD=(db.dividends||[]).filter(d=>d.code===inv.code&&d.date>today).sort((a,b)=>a.date.localeCompare(b.date));
             const pendingAmt=pendingD.length>0?pendingD[0].amount:0;
             const days=pendingD.length>0?Math.ceil((new Date(pendingD[0].date)-new Date(today))/86400000):0;
             if(paidDiv===0&&pendingAmt===0)return'';
-            return`<div style="display:flex;align-items:center;justify-content:space-between;font-size:11px">
-              <div style="display:flex;align-items:center;gap:6px">
-                <span style="color:#94a3b8">💰 ${inv.code}</span>
-                <span style="font-weight:700;color:#f59e0b;font-family:'JetBrains Mono',monospace">$${Math.round(paidDiv).toLocaleString()}</span>
-              </div>
-              ${pendingAmt>0?`<div style="color:#94a3b8;font-size:10px">📅 $${Math.round(pendingAmt).toLocaleString()} · ${days}天後</div>`:''}
+            return`<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:6px 10px;font-size:11px">
+              <div style="color:#94a3b8;font-size:9px;margin-bottom:2px">💰 ${inv.code}</div>
+              <div style="font-weight:700;color:#f59e0b;font-family:'JetBrains Mono',monospace">$${Math.round(paidDiv).toLocaleString()}</div>
+              ${pendingAmt>0?`<div style="color:#94a3b8;font-size:9px;margin-top:3px">📅 $${Math.round(pendingAmt).toLocaleString()} · ${days}天後</div>`:''}
             </div>`;
           }).join('')}
           </div>
         </div>
 
         ${showPledge?`
-        <!-- 分隔線 -->
-        <div style="width:1px;background:#f1f5f9;margin:0 4px"></div>
-
-        <!-- 右：質押安全盾 -->
-        <div style="padding-left:24px">
+        <!-- 右 30%：質押安全盾 -->
+        <div style="flex:3;padding-left:20px">
           <div style="font-size:10px;font-weight:600;color:#94a3b8;letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px">🔒 質押安全</div>
           <div style="font-size:1.8rem;font-weight:800;color:${prColor};font-family:'JetBrains Mono',monospace;line-height:1;margin-bottom:10px">${pledgeRatio}%</div>
           <div style="font-size:10px;color:#94a3b8;margin-bottom:8px">維持率</div>
