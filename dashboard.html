@@ -4757,6 +4757,17 @@ let showDivRoi=false;
 
 function render(){renderInv();renderInvTop3();renderLoans();renderFlex();renderCash();renderDivs();renderSum();updateWatchNavBadge();}
 
+function renderInvestL1(){
+  document.querySelectorAll('.db-page').forEach(p=>p.classList.remove('active'));
+  const l1=document.getElementById('dbpage-invest-l1');
+  if(l1)l1.classList.add('active');
+  document.querySelectorAll('.db-nav-item').forEach(el=>el.classList.toggle('active',el.id==='nav-invest'));
+  const nameEl=document.getElementById('db-page-name');
+  if(nameEl)nameEl.textContent='投資與觀察';
+  // 內容交給 block3 的完整版渲染
+  if(typeof _renderInvestL1Body==='function')_renderInvestL1Body();
+}
+
 function updateWatchNavBadge(){
   const badge=document.getElementById('nav-watch-badge');
   if(!badge)return;
@@ -7355,7 +7366,7 @@ undoStack=[JSON.stringify(db)];
 render();
 checkBkWarn();
 renderAssetsDeduct();
-setTimeout(renderInvestL1, 100); // 啟動時渲染第一層卡片
+renderInvestL1();
 // 啟動時先強制 Pull，確保拿到最新雲端資料後才開始
 _syncEnabled=false;
 setTimeout(async()=>{
@@ -12660,15 +12671,7 @@ function renderFamilyTrendChart(acc){
   });
 }
 
-function renderInvestL1(){
-  // 切換到第一層頁面
-  document.querySelectorAll('.db-page').forEach(p=>p.classList.remove('active'));
-  const l1=document.getElementById('dbpage-invest-l1');
-  if(l1)l1.classList.add('active');
-  document.querySelectorAll('.db-nav-item').forEach(el=>el.classList.toggle('active',el.id==='nav-invest'));
-  const nameEl=document.getElementById('db-page-name');
-  if(nameEl)nameEl.textContent='投資與觀察';
-
+function _renderInvestL1Body(){
   const body=document.getElementById('invest-l1-body');
   if(!body)return;
   const today=new Date().toISOString().slice(0,10);
