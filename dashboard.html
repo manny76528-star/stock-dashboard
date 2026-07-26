@@ -12753,13 +12753,23 @@ function _renderInvestL1Body(){
           <div style="height:10px;border-radius:999px;background:#f1f5f9;overflow:hidden;margin-bottom:12px">
             <div style="height:10px;border-radius:999px;background:${divBarColor};width:${Math.min(divPct,100)}%;transition:width .5s"></div>
           </div>
-          ${nearDays>0?`<div style="font-size:11px;color:#94a3b8;display:flex;align-items:center;gap:5px">
-            <span>📅</span>
-            <span>下期入帳</span>
-            <span style="font-weight:700;color:#f59e0b">$${Math.round(nearAmt).toLocaleString()}</span>
-            <span>· ${nearDays}天後</span>
-          </div>`:''}
-        </div>
+          <!-- 各持股股息明細 -->
+          <div style="border-top:1px solid #f1f5f9;padding-top:10px;display:flex;flex-direction:column;gap:6px">
+          ${active.map(inv=>{
+            const paidDiv=(db.dividends||[]).filter(d=>d.code===inv.code&&!d.pending&&d.date<=today).reduce((s,d)=>s+d.amount,0);
+            const pendingD=(db.dividends||[]).filter(d=>d.code===inv.code&&d.date>today).sort((a,b)=>a.date.localeCompare(b.date));
+            const pendingAmt=pendingD.length>0?pendingD[0].amount:0;
+            const days=pendingD.length>0?Math.ceil((new Date(pendingD[0].date)-new Date(today))/86400000):0;
+            if(paidDiv===0&&pendingAmt===0)return'';
+            return`<div style="display:flex;align-items:center;justify-content:space-between;font-size:11px">
+              <div style="display:flex;align-items:center;gap:6px">
+                <span style="color:#94a3b8">💰 ${inv.code}</span>
+                <span style="font-weight:700;color:#f59e0b;font-family:'JetBrains Mono',monospace">$${Math.round(paidDiv).toLocaleString()}</span>
+              </div>
+              ${pendingAmt>0?`<div style="color:#94a3b8;font-size:10px">📅 $${Math.round(pendingAmt).toLocaleString()} · ${days}天後</div>`:''}
+            </div>`;
+          }).join('')}
+          </div>
 
         ${showPledge?`
         <!-- 分隔線 -->
