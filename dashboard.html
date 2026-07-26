@@ -4762,6 +4762,19 @@ let showDivRoi=false;
 
 function render(){renderInv();renderInvTop3();renderLoans();renderFlex();renderCash();renderDivs();renderSum();updateWatchNavBadge();}
 
+function updateWatchNavBadge(){
+  const badge=document.getElementById('nav-watch-badge');
+  if(!badge)return;
+  const hits=(db.watchlist||[]).filter(w=>{
+    if(!w.target)return false;
+    const curPrice=db.prices[w.code]?.price;
+    if(!curPrice)return false;
+    return(w.alertDir==='below'&&curPrice<=w.target)||(w.alertDir==='above'&&curPrice>=w.target);
+  }).length;
+  if(hits>0){badge.textContent='🔔 '+hits+'檔達標';badge.style.display='';}
+  else{badge.style.display='none';}
+}
+
 function renderAssetsDeduct(){
   const sorted=[...db.loans]
     .map(l=>({l,days:daysUntilDeduct(parseInt(l.deductDay)||null)}))
