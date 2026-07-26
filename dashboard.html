@@ -7332,6 +7332,7 @@ setTimeout(async()=>{
         render();
         runDailyProcess(false);
         showSyncStatus('☁️ 已從雲端同步');
+        renderAssetsDeduct();
       }
     }
   }catch(e){console.warn('啟動Pull失敗:',e.message);}
@@ -7345,7 +7346,7 @@ setTimeout(async()=>{
 setInterval(async()=>{
   if(!_syncEnabled)return;
   const updated=await ghPull();
-  if(updated){render();runDailyProcess(false);showSyncStatus('☁️ 已從雲端同步');setTimeout(renderOvDashboard,100);}
+  if(updated){render();runDailyProcess(false);showSyncStatus('☁️ 已從雲端同步');setTimeout(renderOvDashboard,100);renderAssetsDeduct();}
   autoSnapshot(); // 週五15:00後自動拍照
 },5*60*1000);
 
