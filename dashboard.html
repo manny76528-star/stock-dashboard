@@ -10411,7 +10411,7 @@ function renderAssetsDeduct(){
     if(upcoming.length>0){
       const next=upcoming[0];
       const urgColor=next.daysLeft<=3?'#dc2626':next.daysLeft<=7?'#f59e0b':'#94a3b8';
-      navEl.innerHTML=`<span style="color:${urgColor}">下次 $${Math.round(next.monthly).toLocaleString()} · ${next.daysLeft}天後</span>`;
+      navEl.innerHTML=`<span style="color:${urgColor};font-size:9px">$${Math.round(next.monthly).toLocaleString()}(${next.daysLeft}天後)</span>`;
     } else {
       navEl.textContent='';
     }
