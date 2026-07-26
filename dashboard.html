@@ -12676,7 +12676,7 @@ function _renderInvestL1Body(){
   if(!body)return;
   const today=new Date().toISOString().slice(0,10);
 
-  // 質押維持率（從現有邏輯撈）
+  // 質押維持率
   const pledgeFlex=(db.flexLoans||[]).filter(f=>f.calcPledge);
   const pledgeLoan=pledgeFlex.reduce((s,f)=>s+(f.used||f.remain||0),0);
   let pledgeMkt=0;
@@ -12685,22 +12685,27 @@ function _renderInvestL1Body(){
   const prColor=pledgeRatio>=250?'#06b6d4':pledgeRatio>=160?'#f59e0b':'#f97316';
   const showPledge=pledgeLoan>0&&pledgeMkt>0;
 
-  // 總計股息
+  // 股息
   const totalPaidDiv=(db.dividends||[]).filter(d=>!d.pending&&d.date<=today).reduce((s,d)=>s+d.amount,0);
   const pendingDivAll=(db.dividends||[]).filter(d=>d.date>today).sort((a,b)=>a.date.localeCompare(b.date));
-  const pendingDivTotal=pendingDivAll.reduce((s,d)=>s+d.amount,0);
   const nearDays=pendingDivAll.length>0?Math.ceil((new Date(pendingDivAll[0].date)-new Date(today))/86400000):0;
+  const nearAmt=pendingDivAll.length>0?pendingDivAll[0].amount:0;
 
-  // 持股清單（有庫存的）
+  // 年股息目標
+  if(!db.settings)db.settings={};
+  const targetDiv=db.settings.targetDividend||800000;
+  const divPct=targetDiv>0?Math.round(totalPaidDiv/targetDiv*1000)/10:0;
+  const divBarColor=divPct>=80?'#fcd34d':divPct>=50?'#d8b4fe':'#93c5fd';
+
   const active=db.investments.filter(inv=>calcInv(inv).tLots>0);
 
   body.innerHTML=`
-    <!-- 主卡片 -->
     <div onclick="openInvFaithModal()" style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:24px;cursor:pointer;transition:all .22s;box-shadow:0 4px 6px -1px rgba(0,0,0,.05);margin-bottom:14px"
       onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 30px -5px rgba(37,99,235,.12)';this.style.borderColor='#93c5fd'"
       onmouseout="this.style.transform='';this.style.boxShadow='0 4px 6px -1px rgba(0,0,0,.05)';this.style.borderColor='#e2e8f0'">
-      <!-- 頂部：標題 + 快捷買入 -->
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+
+      <!-- 頂部：標題 + 買入 -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
         <div style="display:flex;align-items:center;gap:8px">
           <div style="width:28px;height:28px;border-radius:50%;background:#e0f2fe;display:flex;align-items:center;justify-content:center">
             <span style="font-size:13px;color:#0284c7">💼</span>
@@ -12713,32 +12718,47 @@ function _renderInvestL1Body(){
           onmouseout="this.style.background='#f8fafc';this.style.borderColor='#e2e8f0'">+ 買入</button>
       </div>
 
-      <!-- 各持股股息列表 -->
-      ${active.map(inv=>{
-        const paidDiv=(db.dividends||[]).filter(d=>d.code===inv.code&&!d.pending&&d.date<=today).reduce((s,d)=>s+d.amount,0);
-        const pendingD=(db.dividends||[]).filter(d=>d.code===inv.code&&d.date>today).sort((a,b)=>a.date.localeCompare(b.date));
-        const pendingAmt=pendingD.reduce((s,d)=>s+d.amount,0);
-        const days=pendingD.length>0?Math.ceil((new Date(pendingD[0].date)-new Date(today))/86400000):0;
-        if(paidDiv===0&&pendingAmt===0)return'';
-        return`<div style="padding:10px 12px;background:#fffbeb;border-radius:10px;border:1px solid #fef3c7;margin-bottom:8px">
-          <div style="font-size:10px;color:#94a3b8;margin-bottom:3px">💰 ${inv.code} ${inv.name||''}</div>
-          <div style="font-size:1.1rem;font-weight:700;color:#f59e0b;font-family:'JetBrains Mono',monospace">
-            累計：$${Math.round(paidDiv).toLocaleString()}
-            ${pendingAmt>0?`<span style="font-size:11px;color:#d97706;font-weight:500">（即將入帳 $${Math.round(pendingAmt).toLocaleString()}，${days}天後）</span>`:''}
-          </div>
-        </div>`;
-      }).join('')}
+      <!-- 雙欄核心 -->
+      <div style="display:grid;grid-template-columns:1fr${showPledge?' 1px 1fr':''}；gap:0">
+        <div style="display:grid;grid-template-columns:1fr${showPledge?` 1px 1fr`:''};">
 
-      <!-- 質押維持率 -->
-      ${showPledge?`<div style="padding:10px 12px;background:#f8fafc;border-radius:10px;border:1px solid #e2e8f0;margin-top:4px">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-          <div style="font-size:10px;color:#94a3b8;letter-spacing:.3px">🔒 質押維持率</div>
-          <div style="font-size:1.2rem;font-weight:700;color:${prColor};font-family:'JetBrains Mono',monospace">${pledgeRatio}%</div>
+        <!-- 左：股息中心 -->
+        <div style="padding-right:${showPledge?'20px':'0'}">
+          <div style="font-size:10px;font-weight:600;color:#94a3b8;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px">💰 股息現金流</div>
+          <div style="font-size:1.8rem;font-weight:800;color:#f59e0b;font-family:'JetBrains Mono',monospace;line-height:1;margin-bottom:6px">$${Math.round(totalPaidDiv).toLocaleString()}</div>
+          <div style="font-size:1.1rem;font-weight:700;color:#0f172a;margin-bottom:8px">${divPct}%
+            <span style="font-size:10px;color:#94a3b8;font-weight:400">達成</span>
+          </div>
+          <div style="height:8px;border-radius:999px;background:#f1f5f9;overflow:hidden;margin-bottom:10px">
+            <div style="height:8px;border-radius:999px;background:${divBarColor};width:${Math.min(divPct,100)}%;transition:width .5s"></div>
+          </div>
+          ${nearDays>0?`<div style="font-size:11px;color:#64748b;display:flex;align-items:center;gap:4px">
+            <span>📅</span>
+            <span style="color:#94a3b8">下期入帳</span>
+            <span style="font-weight:700;color:#f59e0b">$${Math.round(nearAmt).toLocaleString()}</span>
+            <span style="color:#94a3b8">· ${nearDays}天後</span>
+          </div>`:''}
         </div>
-        <div style="height:8px;border-radius:999px;background:#e2e8f0;overflow:hidden">
-          <div style="height:8px;border-radius:999px;background:${prColor};width:${Math.min(pledgeRatio/3,100)}%;transition:width .5s"></div>
+
+        ${showPledge?`
+        <!-- 分隔線 -->
+        <div style="width:1px;background:#f1f5f9;margin:0 20px"></div>
+
+        <!-- 右：質押安全盾 -->
+        <div>
+          <div style="font-size:10px;font-weight:600;color:#94a3b8;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px">🔒 質押安全</div>
+          <div style="font-size:1.8rem;font-weight:800;color:${prColor};font-family:'JetBrains Mono',monospace;line-height:1;margin-bottom:6px">${pledgeRatio}%</div>
+          <div style="font-size:10px;color:#94a3b8;margin-bottom:8px">維持率</div>
+          <div style="height:8px;border-radius:999px;background:#f1f5f9;overflow:hidden;margin-bottom:10px">
+            <div style="height:8px;border-radius:999px;background:${prColor};width:${Math.min(pledgeRatio/3,100)}%;transition:width .5s"></div>
+          </div>
+          <div style="font-size:11px;color:#94a3b8">
+            ${pledgeRatio>=250?'🟢 極度安全':pledgeRatio>=160?'🟡 注意區間':'🔴 危險警示'}
+          </div>
+        </div>`:''}
+
         </div>
-      </div>`:''}
+      </div>
     </div>`;
 }
 
