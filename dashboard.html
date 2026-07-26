@@ -12691,7 +12691,7 @@ function dbShowPage(id){
 
   // 各頁面邏輯
   if(id==='overview'){renderInvestL1();return;}
-  if(id==='assets')renderAssetsPage();
+  if(id==='assets'){renderAssetsPage();setTimeout(renderAssetsDeduct,100);}
   if(id==='invest'){renderInvestL1();return;}
   if(id==='invest-detail'){renderInvestPage();return;}
   if(id==='trend')renderTrendPage();
