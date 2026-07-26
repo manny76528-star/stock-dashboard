@@ -1954,6 +1954,10 @@ body:not(.privacy) .privacy-mask{filter:none;}
     </div>
 
     <div class="db-nav-section">分析與規劃</div>
+    <div class="db-nav-item" id="nav-watch" onclick="dbShowPage('watch')">
+      <span class="nav-icon">👁</span>觀察股
+      <span class="db-nav-badge" id="nav-watch-badge" style="background:#fef3c7;color:#92400e;display:none"></span>
+    </div>
     <div class="db-nav-item" id="nav-pledge" onclick="dbShowPage('pledge')">
       <span class="nav-icon">🔒</span>質押管理
       <span class="db-nav-badge" id="nav-pledge-badge" style="background:#fef3c7;color:#92400e"></span>
@@ -2259,8 +2263,8 @@ body:not(.privacy) .privacy-mask{filter:none;}
         </div>
       </div>
 
-      <div class="inv-page-grid">
-        <!-- 左：持股清單 -->
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <!-- 持股清單 -->
         <div class="inv-page-card" style="padding:0;overflow:hidden">
           <div class="inv-page-hdr" style="padding:12px 16px;border-bottom:1px solid #f0f2f5">
             <div class="inv-page-title">💼 目前持股</div>
@@ -2271,25 +2275,16 @@ body:not(.privacy) .privacy-mask{filter:none;}
           </div>
           <div id="invest-page-body"></div>
         </div>
-        <!-- 右：觀察股 + 甜甜圈 -->
-        <div style="display:flex;flex-direction:column;gap:16px">
-          <div class="inv-page-card">
-            <div class="inv-page-hdr">
-              <div class="inv-page-title">👁 觀察股區</div>
-              <button onclick="openSP('watch')" style="padding:5px 12px;background:#f8f9fa;border:1px solid #eaecf0;color:#374151;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">管理 ↗</button>
+        <!-- 持股佔比 -->
+        <div class="inv-page-card" style="padding:16px">
+          <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:12px">🥧 持股佔比</div>
+          <div style="position:relative;width:140px;height:140px;margin:0 auto">
+            <canvas id="invest-donut-mini" width="140" height="140"></canvas>
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none">
+              <div style="font-size:11px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#111827;text-align:center" id="invest-donut-mini-total" class="privacy-mask">—</div>
             </div>
-            <div id="invest-watch-body"></div>
           </div>
-          <div class="inv-page-card" style="padding:16px">
-            <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:12px">🥧 持股佔比</div>
-            <div style="position:relative;width:140px;height:140px;margin:0 auto">
-              <canvas id="invest-donut-mini" width="140" height="140"></canvas>
-              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none">
-                <div style="font-size:11px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#111827;text-align:center" id="invest-donut-mini-total" class="privacy-mask">—</div>
-              </div>
-            </div>
-            <div id="invest-donut-mini-legend" style="margin-top:12px;display:flex;flex-direction:column;gap:5px"></div>
-          </div>
+          <div id="invest-donut-mini-legend" style="margin-top:12px;display:flex;flex-direction:column;gap:5px"></div>
         </div>
       </div>
     </div>
@@ -2476,6 +2471,17 @@ body:not(.privacy) .privacy-mask{filter:none;}
 
 
     <!-- ══ 頁面：質押管理 ══ -->
+    <!-- ══ 頁面：觀察股 ══ -->
+    <div class="db-page" id="dbpage-watch">
+      <div class="trend-page-card" style="padding:0;overflow:hidden">
+        <div class="trend-page-hdr" style="padding:12px 18px;border-bottom:1px solid #f0f2f5">
+          <span>👁 觀察股</span>
+          <button onclick="openWatchModal()" style="padding:5px 12px;background:#eff6ff;border:1px solid #bfdbfe;color:#2563eb;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">＋ 新增</button>
+        </div>
+        <div id="watch-page-body" style="padding:12px"></div>
+      </div>
+    </div>
+
     <div class="db-page" id="dbpage-pledge">
       <!-- 整體維持率大卡 -->
       <div class="trend-page-card" style="padding:20px;margin-bottom:16px">
@@ -4605,6 +4611,7 @@ async function refreshPrices(){
   if(healthOpen)renderHealth();
   if(watchOpen)renderWatchlist();
   if(typeof renderPledgeOvOnly==='function')renderPledgeOvOnly();
+  updateWatchNavBadge();
   const n=new Date();
   const isAfterMarket=found.length===0&&notFound.length>0;
   let msg=isAfterMarket?'盤後 - 使用收盤價':'即時股價已更新 '+found.length+'檔';
@@ -4753,7 +4760,7 @@ function fmtF(n,d=2){return isNaN(n)?'—':n.toFixed(d);}
 // ═══════ RENDER ═══════
 let showDivRoi=false;
 
-function render(){renderInv();renderInvTop3();renderLoans();renderFlex();renderCash();renderDivs();renderSum();}
+function render(){renderInv();renderInvTop3();renderLoans();renderFlex();renderCash();renderDivs();renderSum();updateWatchNavBadge();}
 
 function renderAssetsDeduct(){
   const sorted=[...db.loans]
@@ -6258,6 +6265,7 @@ function saveFlex(){
   else db.flexLoans.push(obj);
   save();closeModal('flexModal');render();renderAssetsPage();
   if(typeof renderPledgeOvOnly==='function')renderPledgeOvOnly();
+  updateWatchNavBadge();
   toast('已儲存');
 }
 function delFlex(id){if(!doubleConfirm('確定要刪除這筆不限用途？'))return;db.flexLoans=db.flexLoans.filter(x=>x.id!==id);save();render();renderAssetsPage();toast('已刪除');}
@@ -8689,6 +8697,62 @@ function deleteWatch(){
   toast('已移除');
 }
 
+function updateWatchNavBadge(){
+  const badge=document.getElementById('nav-watch-badge');
+  if(!badge)return;
+  const hits=(db.watchlist||[]).filter(w=>{
+    if(!w.target)return false;
+    const curPrice=db.prices[w.code]?.price;
+    if(!curPrice)return false;
+    return (w.alertDir==='below'&&curPrice<=w.target)||(w.alertDir==='above'&&curPrice>=w.target);
+  }).length;
+  if(hits>0){badge.textContent='🔔 '+hits+'檔達標';badge.style.display='';}
+  else{badge.style.display='none';}
+}
+
+function renderWatchPage(){
+  if(!db.watchlist)db.watchlist=[];
+  updateWatchNavBadge();
+  const body=document.getElementById('watch-page-body');
+  if(!body)return;
+  if(db.watchlist.length===0){
+    body.innerHTML='<div style="text-align:center;color:#9ca3af;padding:40px;font-size:12px">尚無觀察股，點「＋ 新增」開始追蹤</div>';
+    return;
+  }
+  const priorityOrder={高:0,中:1,低:2};
+  const sorted=[...db.watchlist].sort((a,b)=>(priorityOrder[a.priority]||1)-(priorityOrder[b.priority]||1));
+  const priorityColor={高:'#dc2626',中:'#f59e0b',低:'#16a34a'};
+  const priorityBg={高:'#fef2f2',中:'#fffbeb',低:'#f0fdf4'};
+  body.innerHTML='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px">'+
+  sorted.map(w=>{
+    const price=db.prices[w.code];
+    const curPrice=price?.price;
+    const change=price?.change;
+    const changePct=price?.changePct;
+    let alertHtml='';
+    if(w.target&&curPrice){
+      const hit=(w.alertDir==='below'&&curPrice<=w.target)||(w.alertDir==='above'&&curPrice>=w.target);
+      if(hit)alertHtml='<div class="watch-alert">🔔 '+(w.alertDir==='below'?'已達目標買入價！':'已達目標賣出價！')+'</div>';
+    }
+    const priceColor=change>=0?'var(--gain)':'var(--loss)';
+    return'<div class="watch-card">'
+      +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">'
+      +'<div>'
+      +(w.url?'<a href="'+w.url+'" target="_blank" style="font-size:16px;font-weight:800;color:var(--accent);text-decoration:none">'+w.code+'</a>':'<span style="font-size:16px;font-weight:800;color:var(--accent)">'+w.code+'</span>')
+      +(w.name?'<span style="font-size:11px;color:var(--muted);margin-left:6px">'+w.name+'</span>':'')
+      +'<span style="display:inline-block;margin-left:8px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;background:'+priorityBg[w.priority||'中']+';color:'+priorityColor[w.priority||'中']+'">'+( w.priority||'中')+'</span>'
+      +'</div>'
+      +'<button data-wid="'+w.id+'" onclick="openWatchModal(this.dataset.wid)" style="background:none;border:1px solid var(--border);border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;color:#475569">✏️</button>'
+      +'</div>'
+      +(curPrice?'<div style="font-size:22px;font-weight:800;color:'+priceColor+'">$'+curPrice.toFixed(2)+'<span style="font-size:12px;margin-left:6px">'+(change>=0?'+':'')+change.toFixed(2)+'('+(changePct>=0?'+':'')+changePct.toFixed(2)+'%)</span></div>':'<div style="font-size:13px;color:var(--muted)">尚無股價</div>')
+      +(w.target?'<div style="font-size:11px;color:#64748b;margin-top:4px">🎯 目標：$'+w.target.toFixed(2)+' ('+(w.alertDir==='below'?'跌到買入':'漲到賣出')+')</div>':'')
+      +alertHtml
+      +(w.reason?'<div style="font-size:12px;color:#475569;background:#f8fafc;border-radius:6px;padding:6px 8px;margin-top:8px;border-left:3px solid var(--accent)">'+w.reason+'</div>':'')
+      +'<div style="font-size:10px;color:#cbd5e1;margin-top:6px">加入 '+w.addedDate+'</div>'
+      +'</div>';
+  }).join('')+'</div>';
+}
+
 function updateWatchCount(){
   const el=document.getElementById('watch-count');
   if(el)el.textContent=(db.watchlist||[]).length+'檔';
@@ -8699,6 +8763,7 @@ function renderWatchlist(){
   const grid=document.getElementById('watchlist-grid');
   if(!grid)return;
   updateWatchCount();
+  updateWatchNavBadge();
   if(db.watchlist.length===0){
     grid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:20px;font-size:13px">尚無觀察股，點「＋ 新增」開始追蹤</div>';
     return;
@@ -10241,6 +10306,7 @@ setTimeout(()=>applyPrivacy(),500); // 確保元素都渲染完
 // ── 新版頁面導航 ──
 const DB_PAGE_NAMES={
   overview:'數據總覽',assets:'資產與負債',invest:'投資與觀察',
+  watch:'觀察股',pledge:'質押管理',family:'家族帳戶',
   journal:'交易日誌',dividend:'股息管理',analytics:'投資分析',finplan:'財務規劃',trend:'資產趨勢'
 };
 // ══════════════════════════════════════
@@ -10863,6 +10929,7 @@ function renderOvKpi(){
   setC('ov-dr','負債比 '+dR+'%',dR>85?'dn':dR>70?'':'up');
   // 質押維持率
   if(typeof renderPledgeOvOnly==='function')renderPledgeOvOnly();
+  updateWatchNavBadge();
   // 渲染後重新套用隱私遮罩
   if(typeof applyPrivacy==='function')applyPrivacy();
 }
@@ -12734,6 +12801,7 @@ function dbShowPage(id){
   if(id==='dividend'){if(typeof renderDivs==='function')renderDivs();}
   if(id==='analytics'){if(typeof renderAnalytics==='function')renderAnalytics();}
   if(id==='finplan')renderFinPlanPage();
+  if(id==='watch')renderWatchPage();
   if(id==='pledge')renderPledgePage();
   if(id==='family')renderFamilyPage();
 
