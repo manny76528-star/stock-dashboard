@@ -12764,80 +12764,67 @@ function _renderInvestL1Body(){
         <!-- 左 70%：股息防禦塔 -->
         <div style="flex:7;padding-right:20px;border-right:${showPledge?'1px solid #f1f5f9':'none'}">
 
-          <!-- 上層：發薪 + 累積 左右並排 -->
-          <div style="display:flex;gap:12px;margin-bottom:16px;padding-bottom:16px;border-bottom:1px dashed #e2e8f0">
-
-            <!-- 左：下期發薪預告 -->
-            <div style="flex:1;background:#f0f9ff;border-radius:12px;padding:12px 14px">
-              <div style="font-size:10px;font-weight:600;color:#0369a1;letter-spacing:.3px;margin-bottom:6px">📅 下期發薪</div>
-              <div style="font-size:1.6rem;font-weight:800;color:#0284c7;font-family:'JetBrains Mono',monospace;line-height:1;margin-bottom:4px">
-                ${nearAmt>0?'$'+Math.round(nearAmt).toLocaleString():'—'}
+          <!-- 上層：下期發薪面板（含盈餘） -->
+          <div style="background:#f0f9ff;border-radius:12px;padding:12px 14px;margin-bottom:14px">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+              <div>
+                <div style="font-size:10px;font-weight:600;color:#0369a1;margin-bottom:6px">📅 下期發薪</div>
+                <div style="font-size:1.6rem;font-weight:800;color:#0284c7;font-family:'JetBrains Mono',monospace;line-height:1;margin-bottom:4px">${nearAmt>0?'$'+Math.round(nearAmt).toLocaleString():'—'}</div>
+                <div style="font-size:11px;color:#0369a1">${nearDays>0?nearDays+'天後入帳':'暫無預告'}</div>
               </div>
-              <div style="font-size:11px;color:#0369a1">${nearDays>0?nearDays+'天後入帳':'暫無預告'}</div>
+              ${totalMonthly>0?`<div style="text-align:right">
+                <div style="font-size:10px;font-weight:600;color:#0369a1;margin-bottom:6px">⚔️ 股息覆蓋借貸</div>
+                <div style="font-size:13px;font-weight:800;color:${surplus>=0?'#2563eb':'#dc2626'};font-family:'JetBrains Mono',monospace">${surplus>=0?'+$':'−$'}${Math.abs(Math.round(surplus)).toLocaleString()}</div>
+                <div style="font-size:10px;color:#93c5fd;margin-top:2px">${surplus>=0?'可無腦再加碼':''}</div>
+              </div>`:''}
             </div>
-
-            <!-- 右：歷史累積總股息 -->
-            <div style="flex:1;padding:12px 4px">
-              <div style="font-size:10px;font-weight:600;color:#94a3b8;letter-spacing:.3px;margin-bottom:6px">🏆 歷史累積</div>
-              <div style="font-size:1.6rem;font-weight:800;color:#334155;font-family:'JetBrains Mono',monospace;line-height:1;margin-bottom:4px">$${Math.round(totalPaidDiv).toLocaleString()}</div>
-              <div style="font-size:10px;color:#94a3b8">總戰果累積儲備中</div>
-            </div>
-
           </div>
 
-          <!-- 下層：借貸消滅戰場（左文字右進度條） -->
-          <div style="display:flex;flex-direction:column;gap:12px">
-
-            <!-- ⚔️ 借貸覆蓋率 -->
-            ${totalMonthly>0?`<div style="display:flex;align-items:center;gap:12px">
-              <div style="flex:0 0 auto;min-width:0">
-                <div style="font-size:10px;color:#94a3b8;margin-bottom:2px">⚔️ 股息覆蓋借貸</div>
-                <div style="font-size:12px;font-weight:700;color:${surplus>=0?'#2563eb':'#dc2626'};white-space:nowrap">
-                  ${surplus>=0?'+$':'−$'}${Math.abs(Math.round(surplus)).toLocaleString()}
-                  <span style="font-size:10px;font-weight:500;color:#93c5fd">${surplus>=0?'（可無腦再加碼）':''}</span>
-                </div>
+          <!-- 中層：歷史累積 + 股息達成率進度條 -->
+          <div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px dashed #e2e8f0">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px">
+              <div>
+                <span style="font-size:10px;color:#94a3b8">🏆 歷史累積</span>
+                <span style="font-size:1.2rem;font-weight:800;color:#334155;font-family:'JetBrains Mono',monospace;margin-left:8px">$${Math.round(totalPaidDiv).toLocaleString()}</span>
               </div>
-              <div style="flex:1">
-                <div style="height:10px;border-radius:999px;background:#f1f5f9;overflow:hidden">
-                  <div style="height:10px;border-radius:999px;background:#2563eb;width:${Math.min(coverPct,100)}%;transition:width .5s"></div>
-                </div>
-              </div>
-            </div>`:''}
-
-            <!-- 🏦 信貸清償進度 -->
-            ${lOrig>0?`<div style="display:flex;align-items:center;gap:12px">
-              <div style="flex:0 0 auto;min-width:0">
-                <div style="font-size:10px;color:#94a3b8;margin-bottom:2px">🏦 信貸清償</div>
-                <div style="font-size:12px;font-weight:700;color:#c084fc;white-space:nowrap">
-                  ${lPct}% 還清
-                  <span style="font-size:10px;font-weight:400;color:#94a3b8">剩 $${Math.round(lR/10000).toFixed(0)}萬</span>
-                </div>
-              </div>
-              <div style="flex:1">
-                <div style="height:10px;border-radius:999px;background:#f1f5f9;overflow:hidden">
-                  <div style="height:10px;border-radius:999px;background:#c084fc;width:${lPct}%;transition:width .5s"></div>
-                </div>
-              </div>
-            </div>`:''}
-
+              <div style="font-size:12px;font-weight:700;color:#3b82f6">${divPct}% 達成</div>
+            </div>
+            <div style="height:10px;border-radius:999px;background:#f1f5f9;overflow:hidden;margin-bottom:4px">
+              <div style="height:10px;border-radius:999px;background:#93c5fd;width:${Math.min(divPct,100)}%;transition:width .5s"></div>
+            </div>
+            <div style="font-size:10px;color:#94a3b8">年目標 $${Math.round(targetDiv/10000).toFixed(0)}萬</div>
           </div>
+
+          <!-- 下層：信貸清償 -->
+          ${lOrig>0?`<div style="display:flex;align-items:center;gap:12px">
+            <div style="flex:0 0 auto">
+              <div style="font-size:10px;color:#94a3b8;margin-bottom:2px">🏦 信貸清償</div>
+              <div style="font-size:12px;font-weight:700;color:#c084fc;white-space:nowrap">
+                ${lPct}% 還清 <span style="font-size:10px;font-weight:400;color:#94a3b8">剩 $${Math.round(lR/10000).toFixed(0)}萬</span>
+              </div>
+            </div>
+            <div style="flex:1">
+              <div style="height:10px;border-radius:999px;background:#f1f5f9;overflow:hidden">
+                <div style="height:10px;border-radius:999px;background:#c084fc;width:${lPct}%;transition:width .5s"></div>
+              </div>
+            </div>
+          </div>`:''}
+
         </div>
 
         ${showPledge?`
-        <!-- 右 30%：AAA 級防禦盾 -->
+        <!-- 右 30%：AAA 防禦盾 -->
         <div style="flex:3;padding-left:20px;font-family:'Microsoft JhengHei',-apple-system,sans-serif">
           <div style="font-size:10px;font-weight:700;color:#94a3b8;letter-spacing:.5px;margin-bottom:10px">🔒 質押安全</div>
-          <div style="font-size:1.8rem;font-weight:800;color:${prColor};font-family:'JetBrains Mono',-apple-system,monospace;line-height:1;margin-bottom:6px">${pledgeRatio}%</div>
-          <div style="font-size:10px;font-weight:600;color:#94a3b8;margin-bottom:8px">維持率</div>
-          <div style="height:10px;border-radius:999px;background:#f1f5f9;overflow:hidden;margin-bottom:10px">
-            <div style="height:10px;border-radius:999px;background:${prColor};width:${Math.min(Math.max((pledgeRatio-130)/2.2,0),100)}%;transition:width .5s"></div>
+          <div style="font-size:1.8rem;font-weight:800;color:${prColor};font-family:'JetBrains Mono',monospace;line-height:1;margin-bottom:6px">${pledgeRatio}%</div>
+          <div style="font-size:10px;color:#94a3b8;margin-bottom:8px">維持率</div>
+          <div style="height:10px;border-radius:999px;background:#f1f5f9;overflow:hidden;margin-bottom:8px">
+            <div style="height:10px;border-radius:999px;background:#f59e0b;width:82%;transition:width .5s"></div>
           </div>
-          <div style="font-size:11px;color:#94a3b8;margin-bottom:14px">狀態評級：風控高分過關 • 結構遠超 130% 生死線</div>
+          <div style="font-size:11px;color:#94a3b8;margin-bottom:14px">風控高分過關 • 遠超 130% 生死線</div>
           <div style="border-top:1px solid #f1f5f9;padding-top:12px">
-            <div style="font-size:12px;font-weight:800;color:#1e293b;margin-bottom:4px;font-family:'Microsoft JhengHei',-apple-system,sans-serif">🛡️ 防禦狀態</div>
-            <div style="font-size:11px;font-weight:700;color:#1e293b;margin-bottom:10px;font-family:'Microsoft JhengHei',-apple-system,sans-serif">結構穩健 • 安全邊際充足</div>
-            <div style="font-size:11px;font-weight:700;color:#1e293b;margin-bottom:3px;font-family:'Microsoft JhengHei',-apple-system,sans-serif">📊 風控評級</div>
-            <div style="font-size:11px;font-weight:800;color:#1e293b;font-family:'Microsoft JhengHei',-apple-system,sans-serif">AAA 級核心資產護城河</div>
+            <div style="font-size:1.2rem;font-weight:900;color:#0f172a;margin-bottom:8px;line-height:1.4;font-family:'Microsoft JhengHei',-apple-system,sans-serif">🛡️ 結構穩健<br>安全邊際充足</div>
+            <div style="font-size:1.2rem;font-weight:900;color:#0f172a;line-height:1.4;font-family:'Microsoft JhengHei',-apple-system,sans-serif">📊 AAA 級<br>核心資產護城河</div>
           </div>
         </div>`:''}
 
