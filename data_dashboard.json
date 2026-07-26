@@ -2412,7 +2412,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1785063104087,
+  "_ts": 1785063139623,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -2466,6 +2466,17 @@
       "target": 90,
       "alertDir": "below",
       "priority": "中",
+      "url": "",
+      "addedDate": "2026-07-26"
+    },
+    {
+      "id": "ms1oi4vmllq",
+      "code": "5534",
+      "name": "長虹",
+      "reason": "三次大波段明顯 碰觸到72 就會有殖利率保護",
+      "target": 73,
+      "alertDir": "below",
+      "priority": "高",
       "url": "",
       "addedDate": "2026-07-26"
     }
