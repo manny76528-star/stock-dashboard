@@ -4778,6 +4778,60 @@ let showDivRoi=false;
 
 function render(){renderInv();renderInvTop3();renderLoans();renderFlex();renderCash();renderDivs();renderSum();}
 
+function renderAssetsDeduct(){
+  const sorted=[...db.loans]
+    .map(l=>({l,days:daysUntilDeduct(parseInt(l.deductDay)||null)}))
+    .filter(x=>x.days!=null&&x.days<=45)
+    .sort((a,b)=>a.days-b.days);
+  const navEl=document.getElementById('nav-assets-deduct');
+  if(navEl){
+    if(sorted.length>0){
+      const next=sorted[0];
+      const urgColor=next.days<=3?'#dc2626':next.days<=7?'#f59e0b':'#94a3b8';
+      // 檢查帳戶餘額夠不夠
+      const deductBank=next.l.deductBank;
+      let sufficient=null;
+      if(deductBank){
+        const acc=db.cashAccounts.find(c=>c.bank===deductBank);
+        if(acc){
+          const bal=(acc.cash||0)+(acc.d1||0)+(acc.d2||0);
+          sufficient=bal>=(next.l.monthly||0);
+        }
+      }
+      const tag=sufficient===true?'<span style="color:#16a34a">✓足夠</span>':sufficient===false?'<span style="color:#dc2626">⚠️不足</span>':'';
+      navEl.innerHTML=`<span style="color:${urgColor};font-size:9px">$${Math.round(next.l.monthly||0).toLocaleString()} (${next.days}天後) ${tag}</span>`;
+    } else {
+      navEl.textContent='';
+    }
+  }
+  const el=document.getElementById('as-deduct-body');
+  if(!el)return;
+  if(sorted.length===0){el.innerHTML='<div style="padding:16px;text-align:center;color:#9ca3af;font-size:12px">近45天無扣款</div>';return;}
+  el.innerHTML=sorted.map(({l,days})=>{
+    const urgColor=days<=3?'#dc2626':days<=7?'#f59e0b':'#64748b';
+    const deductBank=l.deductBank;
+    let balText='';
+    if(deductBank){
+      const acc=db.cashAccounts.find(c=>c.bank===deductBank);
+      if(acc){
+        const bal=(acc.cash||0)+(acc.d1||0)+(acc.d2||0);
+        const ok=bal>=(l.monthly||0);
+        balText=`<span style="font-size:10px;font-weight:700;color:${ok?'#16a34a':'#dc2626'}">${ok?'✓ 足夠':'⚠️ 不足'} ($${Math.round(bal).toLocaleString()})</span>`;
+      }
+    }
+    return`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 18px;border-bottom:1px solid #f5f7fa">
+      <div>
+        <div style="font-size:13px;font-weight:700;color:#1e293b">${l.bank||'信貸'}</div>
+        <div style="font-size:11px;color:#9ca3af">每月${l.deductDay||''} ${balText}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:13px;font-weight:800;color:#dc2626;font-family:'JetBrains Mono',monospace">$${Math.round(l.monthly||0).toLocaleString()}</div>
+        <div style="font-size:11px;font-weight:700;color:${urgColor}">${days}天後</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
 // ── 資產分佈甜甜圈圖 ──
 let _invDonutChart=null;
 
@@ -7307,8 +7361,7 @@ undoStack=[JSON.stringify(db)];
 // 啟動時直接 render（不自動 Pull 避免覆蓋本地資料）
 render();
 checkBkWarn();
-// Pull完成後在block3函式都定義好後才呼叫
-setTimeout(()=>typeof renderAssetsDeduct==='function'&&renderAssetsDeduct(),0);
+renderAssetsDeduct();
 // 啟動時先強制 Pull，確保拿到最新雲端資料後才開始
 _syncEnabled=false;
 setTimeout(async()=>{
