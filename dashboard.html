@@ -2025,7 +2025,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
   <div class="db-content">
 
     <!-- ══ 頁面：數據總覽 ══ -->
-    <div class="db-page active" id="dbpage-overview">
+    <div class="db-page" id="dbpage-overview">
 
 <!-- 隱藏舊版 JS 依賴的 ids -->
 <div style="display:none">
@@ -2215,11 +2215,19 @@ body:not(.privacy) .privacy-mask{filter:none;}
           <div class="as-add-btn" onclick="openCashModal()">＋ 新增帳戶</div>
         </div>
       </div>
+
+      <!-- 近期扣款提醒 -->
+      <div class="trend-page-card" style="margin-top:16px;padding:0;overflow:hidden">
+        <div class="trend-page-hdr" style="padding:12px 18px;border-bottom:1px solid #f0f2f5">
+          <span>🏦 近期扣款提醒</span>
+        </div>
+        <div id="as-deduct-body" style="padding:8px 0"></div>
+      </div>
     </div>
 
     <!-- ══ 頁面：投資與觀察 ══ -->
     <!-- ══ 投資第一層：卡片總覽 ══ -->
-    <div class="db-page" id="dbpage-invest-l1">
+    <div class="db-page active" id="dbpage-invest-l1">
       <div style="padding:20px 24px">
         <!-- 股息 + 質押卡片 -->
         <div id="invest-l1-body"></div>
@@ -2230,8 +2238,16 @@ body:not(.privacy) .privacy-mask{filter:none;}
 
     <div class="db-page" id="dbpage-invest">
 
-      <!-- KPI 頂部列 -->
-      <div class="ov-kpi-grid" style="margin-bottom:16px">
+      <!-- KPI 頂部列（五格）-->
+      <div class="ov-kpi-grid" style="margin-bottom:16px;grid-template-columns:repeat(5,1fr)">
+        <!-- 淨資產 -->
+        <div class="ov-kpi-card">
+          <div class="ov-kpi-accent" style="background:#6366f1"></div>
+          <div class="ov-kpi-label" style="padding-left:8px">淨資產</div>
+          <div class="ov-kpi-val privacy-mask" id="inv-kpi-net" style="padding-left:8px">—</div>
+          <div class="ov-kpi-sub privacy-mask" id="inv-kpi-net-sub" style="padding-left:8px"></div>
+        </div>
+        <!-- 投資總損益 -->
         <div class="ov-kpi-card">
           <div class="ov-kpi-accent" style="background:#a8c5a0"></div>
           <div style="display:flex;align-items:flex-start;justify-content:space-between;padding-left:8px">
@@ -2244,23 +2260,26 @@ body:not(.privacy) .privacy-mask{filter:none;}
           <div class="ov-kpi-val privacy-mask" id="inv-kpi-pnl" style="padding-left:8px">—</div>
           <div class="ov-kpi-sub privacy-mask" id="inv-kpi-roi" style="padding-left:8px"></div>
         </div>
+        <!-- 股票市值 -->
         <div class="ov-kpi-card">
           <div class="ov-kpi-accent" style="background:#8fa8c8"></div>
           <div class="ov-kpi-label" style="padding-left:8px">股票市值</div>
           <div class="ov-kpi-val privacy-mask" id="inv-kpi-mkt" style="padding-left:8px">—</div>
           <div class="ov-kpi-sub" style="padding-left:8px">持倉總市值</div>
         </div>
+        <!-- 已實現損益 -->
         <div class="ov-kpi-card">
           <div class="ov-kpi-accent" style="background:#c9a99a"></div>
           <div class="ov-kpi-label" style="padding-left:8px">已實現損益</div>
           <div class="ov-kpi-val privacy-mask" id="inv-kpi-real" style="padding-left:8px">—</div>
           <div class="ov-kpi-sub" style="padding-left:8px">歷史賣出</div>
         </div>
+        <!-- 信貸負債比 -->
         <div class="ov-kpi-card">
-          <div class="ov-kpi-accent" style="background:#b5adc4"></div>
-          <div class="ov-kpi-label" style="padding-left:8px">累積股息</div>
-          <div class="ov-kpi-val privacy-mask" id="inv-kpi-div" style="padding-left:8px">—</div>
-          <div id="inv-kpi-div-sub" style="padding-left:8px;font-size:11px;color:#7c3aed;font-weight:700;margin-top:2px"></div>
+          <div class="ov-kpi-accent" style="background:#f59e0b"></div>
+          <div class="ov-kpi-label" style="padding-left:8px">信貸負債</div>
+          <div class="ov-kpi-val privacy-mask" id="inv-kpi-loan" style="padding-left:8px">—</div>
+          <div class="ov-kpi-sub" id="inv-kpi-loan-sub" style="padding-left:8px"></div>
         </div>
       </div>
 
@@ -10356,12 +10375,51 @@ function renderAssetsPage(){
         </div>`;
       }).join('')+'</div>';
     }
-  }
+  // 近期扣款提醒（搬到資產與負債頁）
+  renderAssetsDeduct();
 }
 
-// ══════════════════════════════════════
-// 投資與觀察分頁
-// ══════════════════════════════════════
+function renderAssetsDeduct(){
+  const el=document.getElementById('as-deduct-body');
+  if(!el)return;
+  // 複用 renderOvLoans 的邏輯，輸出到 as-deduct-body
+  const today=new Date();
+  const todayStr=today.toISOString().slice(0,10);
+  const upcoming=[];
+  db.loans.forEach(loan=>{
+    const monthly=loan.monthly||0;
+    if(!monthly)return;
+    const day=parseInt(loan.deductDay||0);
+    if(!day||day<1||day>31)return;
+    try{
+      const d=new Date(today.getFullYear(),today.getMonth(),day);
+      const deductDate=d>today?d:new Date(today.getFullYear(),today.getMonth()+1,day);
+      if(isNaN(deductDate.getTime()))return;
+      const daysLeft=Math.round((deductDate-today)/86400000);
+      if(daysLeft>45)return;
+      upcoming.push({name:loan.bank||'信貸',monthly,daysLeft,date:deductDate.toISOString().slice(0,10)});
+    }catch(e){}
+  });
+  upcoming.sort((a,b)=>a.daysLeft-b.daysLeft);
+  if(upcoming.length===0){
+    el.innerHTML='<div style="padding:16px;text-align:center;color:#9ca3af;font-size:12px">近30天無扣款</div>';
+    return;
+  }
+  el.innerHTML=upcoming.map(u=>{
+    const urgColor=u.daysLeft<=3?'#dc2626':u.daysLeft<=7?'#f59e0b':'#64748b';
+    return`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 18px;border-bottom:1px solid #f5f7fa">
+      <div>
+        <div style="font-size:13px;font-weight:700;color:#1e293b">${u.name}</div>
+        <div style="font-size:11px;color:#9ca3af">${u.date}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:13px;font-weight:800;color:#dc2626;font-family:'JetBrains Mono',monospace">$${Math.round(u.monthly).toLocaleString()}</div>
+        <div style="font-size:11px;font-weight:700;color:${urgColor}">${u.daysLeft}天後</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
 let _investMiniDonut=null;
 function updateRoiBtn(){
   ['roi-toggle-btn','inv-roi-btn'].forEach(id=>{
@@ -10401,7 +10459,33 @@ function renderInvestPage(){
   setKpi('inv-kpi-mkt',fmt(tMkt));
   setKpi('inv-kpi-real',(tReal>=0?'+':'')+fmt(tReal),tReal>=0?'#dc2626':'#16a34a');
 
-  // 累積股息：今年入帳
+  // 淨資產（現金 + 股票市值 - 負債）
+  const tCash=(db.cashAccounts||[]).reduce((s,c)=>s+c.balance,0);
+  const tLoan=(db.loans||[]).filter(l=>!l.settled).reduce((s,l)=>s+l.remain,0);
+  const tFlex=(db.flexLoans||[]).reduce((s,f)=>s+(f.used||0),0);
+  const netAssets=tCash+tMkt-tLoan-tFlex;
+  const netEl=document.getElementById('inv-kpi-net');
+  if(netEl){netEl.textContent=fmt(netAssets);netEl.style.color=netAssets>=0?'#1e293b':'#dc2626';}
+  // 較上週快照
+  const snapKeys=Object.keys(localStorage).filter(k=>k.startsWith('snap_')).sort().reverse();
+  if(snapKeys.length>0){
+    try{
+      const snap=JSON.parse(localStorage.getItem(snapKeys[0])||'{}');
+      const snapNet=(snap.cashAccounts||[]).reduce((s,c)=>s+c.balance,0)+
+        (snap.investments||[]).reduce((s,i)=>{const p=db.prices[i.code]?.price||0;const lots=i.txns?.reduce((a,t)=>a+(t.type==='buy'?t.lots:-t.lots),0)||0;return s+lots*1000*p;},0)-
+        (snap.loans||[]).filter(l=>!l.settled).reduce((s,l)=>s+l.remain,0)-
+        (snap.flexLoans||[]).reduce((s,f)=>s+(f.used||0),0);
+      const diff=netAssets-snapNet;
+      setKpi('inv-kpi-net-sub','較上週 '+(diff>=0?'+':'')+fmt(diff));
+    }catch(e){}
+  }
+
+  // 信貸負債比
+  const totalAssets=tCash+tMkt;
+  const loanRatio=totalAssets>0?Math.round((tLoan+tFlex)/totalAssets*1000)/10:0;
+  const loanEl=document.getElementById('inv-kpi-loan');
+  if(loanEl){loanEl.textContent=fmt(tLoan+tFlex);loanEl.style.color='#f59e0b';}
+  setKpi('inv-kpi-loan-sub','負債比 '+loanRatio+'%');
   const yr=new Date().getFullYear().toString();
   const tDivYr=(db.dividends||[]).filter(d=>!d.pending&&(d.date||'').startsWith(yr)).reduce((s,d)=>s+d.amount,0);
   setKpi('inv-kpi-div',fmt(tDivYr));
@@ -12507,7 +12591,7 @@ function renderInvestL1(){
           </div>
           <div style="font-size:14px;font-weight:700;color:#0f172a">${active.length} 檔持股</div>
         </div>
-        <button onclick="event.stopPropagation();openBuyModal()"
+        <button onclick="event.stopPropagation();openInvModal()"
           style="padding:4px 10px;border:1px solid #e2e8f0;border-radius:8px;background:#f8fafc;color:#64748b;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;font-family:'Noto Sans TC',sans-serif"
           onmouseover="this.style.background='#f1f5f9';this.style.borderColor='#cbd5e1'"
           onmouseout="this.style.background='#f8fafc';this.style.borderColor='#e2e8f0'">+ 買入</button>
@@ -12605,11 +12689,7 @@ function dbShowPage(id){
   if(nameEl)nameEl.textContent=DB_PAGE_NAMES[id]||id;
 
   // 各頁面邏輯
-  if(id==='overview'){render();setTimeout(renderOvDashboard,100);
-    const mainEl=document.querySelector('.db-main');
-    if(mainEl)mainEl.scrollTo({top:0,behavior:'smooth'});
-    return;
-  }
+  if(id==='overview'){renderInvestL1();return;}
   if(id==='assets')renderAssetsPage();
   if(id==='invest'){renderInvestL1();return;}
   if(id==='invest-detail'){renderInvestPage();return;}
