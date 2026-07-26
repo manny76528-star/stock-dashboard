@@ -12794,7 +12794,7 @@ function _renderInvestL1Body(){
                 <div style="font-size:10px;color:#94a3b8;margin-bottom:2px">⚔️ 股息覆蓋借貸</div>
                 <div style="font-size:12px;font-weight:700;color:${surplus>=0?'#2563eb':'#dc2626'};white-space:nowrap">
                   ${surplus>=0?'+$':'−$'}${Math.abs(Math.round(surplus)).toLocaleString()}
-                  <span style="font-size:10px;font-weight:500;color:#93c5fd">${coverPct}%</span>
+                  <span style="font-size:10px;font-weight:500;color:#93c5fd">${surplus>=0?'（可無腦再加碼）':''}</span>
                 </div>
               </div>
               <div style="flex:1">
@@ -12824,18 +12824,21 @@ function _renderInvestL1Body(){
         </div>
 
         ${showPledge?`
-        <!-- 右 30%：質押安全盾 -->
-        <div style="flex:3;padding-left:20px">
-          <div style="font-size:10px;font-weight:600;color:#94a3b8;letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px">🔒 質押安全</div>
-          <div style="font-size:1.8rem;font-weight:800;color:${prColor};font-family:'JetBrains Mono',monospace;line-height:1;margin-bottom:6px">${pledgeRatio}%</div>
-          <div style="font-size:10px;color:#94a3b8;margin-bottom:8px">維持率</div>
-          <div style="height:10px;border-radius:999px;background:#f1f5f9;overflow:hidden;margin-bottom:14px">
-            <div style="height:10px;border-radius:999px;background:${prColor};width:${Math.min(pledgeRatio/3,100)}%;transition:width .5s"></div>
+        <!-- 右 30%：AAA 級防禦盾 -->
+        <div style="flex:3;padding-left:20px;font-family:'Microsoft JhengHei',-apple-system,sans-serif">
+          <div style="font-size:10px;font-weight:700;color:#94a3b8;letter-spacing:.5px;margin-bottom:10px">🔒 質押安全</div>
+          <div style="font-size:1.8rem;font-weight:800;color:${prColor};font-family:'JetBrains Mono',-apple-system,monospace;line-height:1;margin-bottom:6px">${pledgeRatio}%</div>
+          <div style="font-size:10px;font-weight:600;color:#94a3b8;margin-bottom:8px">維持率</div>
+          <div style="height:10px;border-radius:999px;background:#f1f5f9;overflow:hidden;margin-bottom:10px">
+            <div style="height:10px;border-radius:999px;background:${prColor};width:${Math.min(Math.max((pledgeRatio-130)/2.2,0),100)}%;transition:width .5s"></div>
           </div>
-          <div style="font-size:12px;font-weight:600;color:#1e293b;margin-bottom:4px">🛡️ 防禦狀態</div>
-          <div style="font-size:11px;font-weight:700;color:#334155;margin-bottom:8px">結構穩健 • 安全邊際充足</div>
-          <div style="font-size:11px;color:#94a3b8">📊 風控評級</div>
-          <div style="font-size:11px;color:#94a3b8">AAA 級核心資產護城河</div>
+          <div style="font-size:11px;color:#94a3b8;margin-bottom:14px">狀態評級：風控高分過關 • 結構遠超 130% 生死線</div>
+          <div style="border-top:1px solid #f1f5f9;padding-top:12px">
+            <div style="font-size:12px;font-weight:800;color:#1e293b;margin-bottom:4px;font-family:'Microsoft JhengHei',-apple-system,sans-serif">🛡️ 防禦狀態</div>
+            <div style="font-size:11px;font-weight:700;color:#1e293b;margin-bottom:10px;font-family:'Microsoft JhengHei',-apple-system,sans-serif">結構穩健 • 安全邊際充足</div>
+            <div style="font-size:11px;font-weight:700;color:#1e293b;margin-bottom:3px;font-family:'Microsoft JhengHei',-apple-system,sans-serif">📊 風控評級</div>
+            <div style="font-size:11px;font-weight:800;color:#1e293b;font-family:'Microsoft JhengHei',-apple-system,sans-serif">AAA 級核心資產護城河</div>
+          </div>
         </div>`:''}
 
       </div>
