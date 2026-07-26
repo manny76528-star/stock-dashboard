@@ -1320,30 +1320,6 @@
         }
       ],
       "order": 16
-    },
-    {
-      "id": "ms1pi999sf1",
-      "code": "009805",
-      "name": "新光美國電力基建",
-      "lots": 100,
-      "avgPrice": 15,
-      "divPerShare": 0.1,
-      "note": "",
-      "url": "",
-      "holdType": "long",
-      "targetRoi": 5,
-      "transactions": [
-        {
-          "id": "ms1pi999icv",
-          "type": "buy",
-          "lots": 100,
-          "price": 15,
-          "date": "2026-07-26",
-          "fee": 0,
-          "remark": ""
-        }
-      ],
-      "order": 17
     }
   ],
   "loans": [
@@ -2437,7 +2413,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1785064824909,
+  "_ts": 1785064856785,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
