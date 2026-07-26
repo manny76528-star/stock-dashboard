@@ -1962,6 +1962,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
     <div class="db-nav-item" id="nav-assets" onclick="dbShowPage('assets')">
       <span class="nav-icon">🏦</span>資產與負債
       <span class="db-nav-badge" id="nav-flex-badge" style="display:none"></span>
+      <div id="nav-assets-deduct" style="font-size:10px;color:#94a3b8;margin-top:1px;font-weight:500;padding-left:24px"></div>
     </div>
     <div class="db-nav-item" id="nav-family" onclick="dbShowPage('family')">
       <span class="nav-icon">👨‍👩‍👧‍👦</span>家族帳戶
@@ -7305,6 +7306,7 @@ undoStack=[JSON.stringify(db)];
 // 啟動時直接 render（不自動 Pull 避免覆蓋本地資料）
 render();
 checkBkWarn();
+setTimeout(renderAssetsDeduct, 300); // 啟動時更新左側扣款提醒
 // 啟動時先強制 Pull，確保拿到最新雲端資料後才開始
 _syncEnabled=false;
 setTimeout(async()=>{
@@ -10402,6 +10404,18 @@ function renderAssetsDeduct(){
     }catch(e){}
   });
   upcoming.sort((a,b)=>a.daysLeft-b.daysLeft);
+
+  // 更新左側導航顯示最近一筆
+  const navEl=document.getElementById('nav-assets-deduct');
+  if(navEl){
+    if(upcoming.length>0){
+      const next=upcoming[0];
+      const urgColor=next.daysLeft<=3?'#dc2626':next.daysLeft<=7?'#f59e0b':'#94a3b8';
+      navEl.innerHTML=`<span style="color:${urgColor}">下次 $${Math.round(next.monthly).toLocaleString()} · ${next.daysLeft}天後</span>`;
+    } else {
+      navEl.textContent='';
+    }
+  }
   if(upcoming.length===0){
     el.innerHTML='<div style="padding:16px;text-align:center;color:#9ca3af;font-size:12px">近30天無扣款</div>';
     return;
