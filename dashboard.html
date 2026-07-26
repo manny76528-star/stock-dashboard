@@ -4776,7 +4776,7 @@ function fmtF(n,d=2){return isNaN(n)?'—':n.toFixed(d);}
 // ═══════ RENDER ═══════
 let showDivRoi=false;
 
-function render(){renderInv();renderInvTop3();renderLoans();renderFlex();renderCash();renderDivs();renderSum();}
+function render(){renderInv();renderInvTop3();renderLoans();renderFlex();renderCash();renderDivs();renderSum();renderAssetsDeduct();}
 
 // ── 資產分佈甜甜圈圖 ──
 let _invDonutChart=null;
@@ -10413,7 +10413,7 @@ function renderAssetsDeduct(){
     if(upcoming.length>0){
       const next=upcoming[0];
       const urgColor=next.daysLeft<=3?'#dc2626':next.daysLeft<=7?'#f59e0b':'#94a3b8';
-      navEl.innerHTML=`<span style="color:${urgColor};font-size:9px">$${Math.round(next.monthly).toLocaleString()}&nbsp;&nbsp;&nbsp;(${next.daysLeft}天後)</span>`;
+      navEl.innerHTML=`<span style="color:${urgColor};font-size:9px">$${Math.round(next.monthly).toLocaleString()} (${next.daysLeft}天後)</span>`;
     } else {
       navEl.textContent='';
     }
