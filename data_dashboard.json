@@ -1320,6 +1320,30 @@
         }
       ],
       "order": 16
+    },
+    {
+      "id": "ms1pg0lhh2x",
+      "code": "00985B",
+      "name": "中信美國公債0-1",
+      "lots": 100,
+      "avgPrice": 48,
+      "divPerShare": 0.05,
+      "note": "",
+      "url": "",
+      "holdType": "long",
+      "targetRoi": 5,
+      "transactions": [
+        {
+          "id": "ms1pg0lhw2p",
+          "type": "buy",
+          "lots": 100,
+          "price": 48,
+          "date": "2026-07-26",
+          "fee": 0,
+          "remark": ""
+        }
+      ],
+      "order": 17
     }
   ],
   "loans": [
@@ -2413,7 +2437,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1785064686190,
+  "_ts": 1785064720368,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
