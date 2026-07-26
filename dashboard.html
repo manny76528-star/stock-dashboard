@@ -7355,6 +7355,7 @@ undoStack=[JSON.stringify(db)];
 render();
 checkBkWarn();
 renderAssetsDeduct();
+setTimeout(renderInvestL1, 100); // 啟動時渲染第一層卡片
 // 啟動時先強制 Pull，確保拿到最新雲端資料後才開始
 _syncEnabled=false;
 setTimeout(async()=>{
@@ -7380,6 +7381,7 @@ setTimeout(async()=>{
         runDailyProcess(false);
         showSyncStatus('☁️ 已從雲端同步');
         renderAssetsDeduct();
+        renderInvestL1();
       }
     }
   }catch(e){console.warn('啟動Pull失敗:',e.message);}
