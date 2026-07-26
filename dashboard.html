@@ -1916,32 +1916,6 @@ body:not(.privacy) .privacy-mask{filter:none;}
 
 
 
-<!-- TREND CHART -->
-<div class="trend-section" style="margin-left:220px">
-  <div class="trend-hdr" onclick="toggleTrend()">
-    <span>📈 資產趨勢圖</span>
-    <div style="display:flex;gap:8px;align-items:center">
-      <button onclick="event.stopPropagation();recordSnapshot(true)" style="background:var(--gain);color:#fff;border:none;border-radius:6px;padding:4px 12px;font-size:11px;cursor:pointer;font-weight:600">📷 手動記錄</button>
-      <button onclick="event.stopPropagation();clearAndReRecord()" style="background:#e67e22;color:#fff;border:none;border-radius:6px;padding:4px 12px;font-size:11px;cursor:pointer;font-weight:600" title="清除今天的快照並重新計算">🔄 重算本次</button>
-      <span id="trend-hint" style="font-size:11px;color:var(--muted)">▼ 展開</span>
-    </div>
-  </div>
-  <div class="trend-body" id="trend-body">
-    <div class="trend-checks">
-      <label><input type="checkbox" id="tc-index" checked onchange="renderTrendChart()">📊 大盤指數</label>
-      <label><input type="checkbox" id="tc-net" checked onchange="renderTrendChart()">淨資產</label>
-      <label><input type="checkbox" id="tc-div" onchange="renderTrendChart()">每月股息</label>
-      <label><input type="checkbox" id="tc-cf" onchange="renderTrendChart()">每月現金流</label>
-      <label><input type="checkbox" id="tc-debt" onchange="renderTrendChart()">負債比(%)</label>
-      <select id="tc-year" onchange="renderTrendChart()" style="padding:3px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:11px;font-weight:700;color:#475569;background:#fff;cursor:pointer;outline:none;margin-left:auto">
-        <option value="all">全部年份</option>
-      </select>
-    </div>
-    <div style="position:relative;height:300px"><canvas id="trendCanvas"></canvas></div>
-    <div id="trend-table" style="margin-top:12px;font-size:11px;overflow-x:auto"></div>
-  </div>
-</div>
-
 <div class="db-app">
 
 <!-- ═══ 左側導航欄 ═══ -->
@@ -2399,7 +2373,10 @@ body:not(.privacy) .privacy-mask{filter:none;}
       <div class="trend-page-card">
         <div class="trend-page-hdr">
           <span>📈 淨資產趨勢（每週五快照）</span>
-          <button onclick="recordSnapshot(true)" style="padding:5px 12px;background:#eff6ff;border:1px solid #bfdbfe;color:#2563eb;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer">📷 手動記錄</button>
+          <div style="display:flex;gap:6px">
+            <button onclick="recordSnapshot(true)" style="padding:5px 12px;background:#eff6ff;border:1px solid #bfdbfe;color:#2563eb;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer">📷 手動記錄</button>
+            <button onclick="clearAndReRecord()" style="padding:5px 12px;background:#fff3e0;border:1px solid #ffb74d;color:#e67e22;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer">🔄 重算本次</button>
+          </div>
         </div>
         <div style="position:relative;height:380px">
           <canvas id="trend-page-canvas"></canvas>
