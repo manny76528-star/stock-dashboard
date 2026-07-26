@@ -7366,7 +7366,6 @@ undoStack=[JSON.stringify(db)];
 render();
 checkBkWarn();
 renderAssetsDeduct();
-renderInvestL1();
 // 啟動時先強制 Pull，確保拿到最新雲端資料後才開始
 _syncEnabled=false;
 setTimeout(async()=>{
@@ -7392,6 +7391,7 @@ setTimeout(async()=>{
         runDailyProcess(false);
         showSyncStatus('☁️ 已從雲端同步');
         renderAssetsDeduct();
+        renderInvestL1();
         renderInvestL1();
       }
     }
@@ -12900,6 +12900,7 @@ function toggleWatchlist(){}
 function toggleAnalytics(){}
 function toggleFinPlan(){}
 function toggleJournal(){}
+renderInvestL1(); // 啟動時渲染第一層
 </script>
 
 </div><!-- /main-content -->
