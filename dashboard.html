@@ -4776,7 +4776,7 @@ function fmtF(n,d=2){return isNaN(n)?'—':n.toFixed(d);}
 // ═══════ RENDER ═══════
 let showDivRoi=false;
 
-function render(){renderInv();renderInvTop3();renderLoans();renderFlex();renderCash();renderDivs();renderSum();renderAssetsDeduct();}
+function render(){renderInv();renderInvTop3();renderLoans();renderFlex();renderCash();renderDivs();renderSum();}
 
 // ── 資產分佈甜甜圈圖 ──
 let _invDonutChart=null;
@@ -7307,7 +7307,8 @@ undoStack=[JSON.stringify(db)];
 // 啟動時直接 render（不自動 Pull 避免覆蓋本地資料）
 render();
 checkBkWarn();
-renderAssetsDeduct(); // 啟動時更新左側扣款提醒
+// Pull完成後在block3函式都定義好後才呼叫
+setTimeout(()=>typeof renderAssetsDeduct==='function'&&renderAssetsDeduct(),0);
 // 啟動時先強制 Pull，確保拿到最新雲端資料後才開始
 _syncEnabled=false;
 setTimeout(async()=>{
