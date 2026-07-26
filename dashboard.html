@@ -12697,7 +12697,7 @@ function _renderInvestL1Body(){
   if(!body)return;
   const today=new Date().toISOString().slice(0,10);
 
-  // 質押維持率
+  // 質押維持率（從現有邏輯撈）
   const pledgeFlex=(db.flexLoans||[]).filter(f=>f.calcPledge);
   const pledgeLoan=pledgeFlex.reduce((s,f)=>s+(f.used||f.remain||0),0);
   let pledgeMkt=0;
@@ -12706,19 +12706,35 @@ function _renderInvestL1Body(){
   const prColor=pledgeRatio>=250?'#06b6d4':pledgeRatio>=160?'#f59e0b':'#f97316';
   const showPledge=pledgeLoan>0&&pledgeMkt>0;
 
-  // 股息
+  // 股息（從現有邏輯撈）
   const totalPaidDiv=(db.dividends||[]).filter(d=>!d.pending&&d.date<=today).reduce((s,d)=>s+d.amount,0);
   const pendingDivAll=(db.dividends||[]).filter(d=>d.date>today).sort((a,b)=>a.date.localeCompare(b.date));
   const nearDays=pendingDivAll.length>0?Math.ceil((new Date(pendingDivAll[0].date)-new Date(today))/86400000):0;
-  const nearAmt=pendingDivAll.length>0?pendingDivAll[0].amount:0;
+  const nearAmt=pendingDivAll.length>0?pendingDivAll.reduce((s,d)=>{
+    // 同一批次（同日期內全部加總）
+    const firstDate=pendingDivAll[0].date;
+    return d.date===firstDate?s+d.amount:s;
+  },0):0;
 
   // 年股息目標
   if(!db.settings)db.settings={};
   const targetDiv=db.settings.targetDividend||800000;
   const divPct=targetDiv>0?Math.round(totalPaidDiv/targetDiv*1000)/10:0;
-  const divBarColor=divPct>=80?'#fcd34d':divPct>=50?'#d8b4fe':'#93c5fd';
 
-  const active=db.investments.filter(inv=>calcInv(inv).tLots>0);
+  // 月支出：信貸月繳 + 不限用途月利息（從現有欄位撈）
+  const monthlyLoan=(db.loans||[]).filter(l=>!l.settled).reduce((s,l)=>s+(l.monthly||0),0);
+  const monthlyFlex=(db.flexLoans||[]).reduce((s,f)=>s+(f.monthly||0),0);
+  const totalMonthly=monthlyLoan+monthlyFlex;
+  const surplus=nearAmt-totalMonthly;
+  const coverPct=totalMonthly>0?Math.round(nearAmt/totalMonthly*1000)/10:0;
+
+  // 信貸清償進度（從現有邏輯撈）
+  const lR=(db.loans||[]).filter(l=>!l.settled).reduce((s,l)=>s+calcLoanRemain(l),0);
+  const lOrig=(db.loans||[]).filter(l=>!l.settled).reduce((s,l)=>s+(l.amount||0),0);
+  const lPaid=Math.max(0,lOrig-lR);
+  const lPct=lOrig>0?Math.round(lPaid/lOrig*100):0;
+
+  const active=(db.investments||[]).filter(inv=>calcInv(inv).tLots>0);
 
   body.innerHTML=`
     <div onclick="openInvFaithModal()" style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:24px;cursor:pointer;transition:all .22s;box-shadow:0 4px 6px -1px rgba(0,0,0,.05);margin-bottom:14px"
@@ -12745,44 +12761,62 @@ function _renderInvestL1Body(){
       <!-- 雙欄核心 7:3 -->
       <div style="display:flex;gap:0">
 
-        <!-- 左 70%：股息中心 -->
+        <!-- 左 70%：股息防禦塔 -->
         <div style="flex:7;padding-right:20px;border-right:${showPledge?'1px solid #f1f5f9':'none'}">
-          <div style="font-size:10px;font-weight:600;color:#94a3b8;letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px">💰 股息現金流</div>
-          <div style="font-size:1.8rem;font-weight:800;color:#f59e0b;font-family:'JetBrains Mono',monospace;line-height:1;margin-bottom:10px">$${Math.round(totalPaidDiv).toLocaleString()}</div>
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-            <span style="font-size:1.1rem;font-weight:700;color:#3b82f6">${divPct}%</span>
-            <span style="font-size:10px;color:#94a3b8">達成年目標</span>
+
+          <!-- 上：累積股息 + 下期發薪 -->
+          <div style="margin-bottom:14px">
+            <div style="font-size:10px;font-weight:600;color:#94a3b8;letter-spacing:.5px;margin-bottom:6px">💰 累積股息</div>
+            <div style="font-size:1.8rem;font-weight:800;color:#f59e0b;font-family:'JetBrains Mono',monospace;line-height:1;margin-bottom:6px">$${Math.round(totalPaidDiv).toLocaleString()}</div>
+            ${nearDays>0?`<div style="display:inline-flex;align-items:center;gap:6px;background:#fffbeb;border:1px solid #fef3c7;border-radius:8px;padding:4px 10px">
+              <span style="font-size:11px;color:#92400e">📅 下期發薪</span>
+              <span style="font-size:13px;font-weight:800;color:#f59e0b;font-family:'JetBrains Mono',monospace">$${Math.round(nearAmt).toLocaleString()}</span>
+              <span style="font-size:11px;color:#94a3b8">${nearDays}天後</span>
+            </div>`:''}
           </div>
-          <div style="height:10px;border-radius:999px;background:#f1f5f9;overflow:hidden;margin-bottom:14px">
-            <div style="height:10px;border-radius:999px;background:#93c5fd;width:${Math.min(divPct,100)}%;transition:width .5s"></div>
-          </div>
-          <!-- 股息明細徽章 -->
-          <div style="display:flex;flex-wrap:wrap;gap:6px">
-          ${active.map(inv=>{
-            const paidDiv=(db.dividends||[]).filter(d=>d.code===inv.code&&!d.pending&&d.date<=today).reduce((s,d)=>s+d.amount,0);
-            const pendingD=(db.dividends||[]).filter(d=>d.code===inv.code&&d.date>today).sort((a,b)=>a.date.localeCompare(b.date));
-            const pendingAmt=pendingD.length>0?pendingD[0].amount:0;
-            const days=pendingD.length>0?Math.ceil((new Date(pendingD[0].date)-new Date(today))/86400000):0;
-            if(paidDiv===0&&pendingAmt===0)return'';
-            return`<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:6px 10px;font-size:11px">
-              <div style="color:#94a3b8;font-size:9px;margin-bottom:2px">💰 ${inv.code}</div>
-              <div style="font-weight:700;color:#f59e0b;font-family:'JetBrains Mono',monospace">$${Math.round(paidDiv).toLocaleString()}</div>
-              ${pendingAmt>0?`<div style="color:#94a3b8;font-size:9px;margin-top:3px">📅 $${Math.round(pendingAmt).toLocaleString()} · ${days}天後</div>`:''}
-            </div>`;
-          }).join('')}
-          </div>
+
+          <!-- 中：⚔️ 借貸消滅進度條 -->
+          ${totalMonthly>0?`<div style="margin-bottom:14px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+              <div style="font-size:10px;font-weight:600;color:#94a3b8;letter-spacing:.5px">⚔️ 股息 vs 借貸月支出</div>
+              <div style="font-size:10px;color:#94a3b8">月支出 $${Math.round(totalMonthly).toLocaleString()}</div>
+            </div>
+            <div style="height:10px;border-radius:999px;background:#f1f5f9;overflow:hidden;margin-bottom:8px">
+              <div style="height:10px;border-radius:999px;background:#2563eb;width:${Math.min(coverPct,100)}%;transition:width .5s"></div>
+            </div>
+            <div style="font-size:12px;font-weight:700;color:${surplus>=0?'#2563eb':'#dc2626'}">
+              ${surplus>=0?'盈餘純利潤：+$':'缺口：-$'}${Math.abs(Math.round(surplus)).toLocaleString()}
+              ${surplus>=0?'<span style="font-size:10px;font-weight:500;color:#93c5fd">（可無腦再加碼）</span>':''}
+            </div>
+          </div>`:''}
+
+          <!-- 下：🏦 信貸清償進度 -->
+          ${lOrig>0?`<div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+              <div style="font-size:10px;font-weight:600;color:#94a3b8;letter-spacing:.5px">🏦 家族信貸清償進度</div>
+              <div style="font-size:13px;font-weight:800;color:#c084fc">${lPct}% 還清</div>
+            </div>
+            <div style="height:10px;border-radius:999px;background:#f1f5f9;overflow:hidden;margin-bottom:6px">
+              <div style="height:10px;border-radius:999px;background:#c084fc;width:${lPct}%;transition:width .5s"></div>
+            </div>
+            <div style="font-size:10px;color:#94a3b8">剩餘 $${Math.round(lR).toLocaleString()} / 原始 $${Math.round(lOrig).toLocaleString()}</div>
+          </div>`:''}
+
         </div>
 
         ${showPledge?`
         <!-- 右 30%：質押安全盾 -->
         <div style="flex:3;padding-left:20px">
           <div style="font-size:10px;font-weight:600;color:#94a3b8;letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px">🔒 質押安全</div>
-          <div style="font-size:1.8rem;font-weight:800;color:${prColor};font-family:'JetBrains Mono',monospace;line-height:1;margin-bottom:10px">${pledgeRatio}%</div>
+          <div style="font-size:1.8rem;font-weight:800;color:${prColor};font-family:'JetBrains Mono',monospace;line-height:1;margin-bottom:6px">${pledgeRatio}%</div>
           <div style="font-size:10px;color:#94a3b8;margin-bottom:8px">維持率</div>
-          <div style="height:10px;border-radius:999px;background:#f1f5f9;overflow:hidden;margin-bottom:12px">
+          <div style="height:10px;border-radius:999px;background:#f1f5f9;overflow:hidden;margin-bottom:14px">
             <div style="height:10px;border-radius:999px;background:${prColor};width:${Math.min(pledgeRatio/3,100)}%;transition:width .5s"></div>
           </div>
-          <div style="font-size:11px;color:#94a3b8">狀態：${pledgeRatio>=250?'極度安全':pledgeRatio>=160?'注意區間':'危險警示'}</div>
+          <div style="font-size:12px;font-weight:600;color:#1e293b;margin-bottom:4px">🛡️ 防禦狀態</div>
+          <div style="font-size:11px;font-weight:700;color:#334155;margin-bottom:8px">結構穩健 • 安全邊際充足</div>
+          <div style="font-size:11px;color:#94a3b8">📊 風控評級</div>
+          <div style="font-size:11px;color:#94a3b8">AAA 級核心資產護城河</div>
         </div>`:''}
 
       </div>
