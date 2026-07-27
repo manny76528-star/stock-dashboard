@@ -2414,7 +2414,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1785143229118,
+  "_ts": 1785143285606,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -4584,6 +4584,15 @@
                 "price": 10.38,
                 "fee": 1,
                 "remark": ""
+              },
+              {
+                "id": "ms307xwu76m",
+                "type": "buy",
+                "date": "2026-07-27",
+                "shares": 158,
+                "price": 9.56,
+                "fee": 1,
+                "remark": "零用錢 兒子存1100,女兒存400"
               }
             ]
           },
@@ -4818,6 +4827,18 @@
           }
         ],
         "log": [
+          {
+            "id": "ms307xwuf7y",
+            "date": "2026-07-27",
+            "type": "buy",
+            "code": "00403A",
+            "name": "主動統一升級50",
+            "shares": 158,
+            "price": 9.56,
+            "amount": 1511.48,
+            "fee": 1,
+            "remark": "零用錢 兒子存1100,女兒存400"
+          },
           {
             "id": "mryrs3zylzp",
             "date": "2026-07-24",
