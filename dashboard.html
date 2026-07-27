@@ -12561,7 +12561,7 @@ function renderFamilyPage(){
           </div>
           <div style="display:flex;gap:14px;font-size:11px;color:#64748b;flex-wrap:wrap">
             <span><span style="color:#9ca3af">持股</span> <b>${c.lotsDisplay}</b></span>
-            <span><span style="color:#9ca3af">均成本</span> <b>$${c.avgCost.toFixed(4)}</b></span>
+            <span><span style="color:#9ca3af">均成本</span> <b>$${c.avgCost.toFixed(2)}</b></span>
             <span><span style="color:#9ca3af">現價</span> <b>${price?'$'+price:'—'}</b></span>
             <span style="margin-left:auto"><span style="color:#9ca3af">市值</span> <b>${c.mktVal!=null?'$'+Math.round(c.mktVal).toLocaleString():'—'}</b></span>
           </div>
