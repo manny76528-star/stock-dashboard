@@ -2414,7 +2414,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1785143285606,
+  "_ts": 1785143363200,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -4095,6 +4095,15 @@
                 "price": 8.22,
                 "fee": 20,
                 "remark": "大姑贈與5萬"
+              },
+              {
+                "id": "ms309lskdlr",
+                "type": "buy",
+                "date": "2026-07-27",
+                "shares": 1750,
+                "price": 7.78,
+                "fee": 5,
+                "remark": "阿嬤支援小朋友學費"
               }
             ]
           },
@@ -4170,6 +4179,18 @@
           }
         ],
         "log": [
+          {
+            "id": "ms309lskyeq",
+            "date": "2026-07-27",
+            "type": "buy",
+            "code": "00405A",
+            "name": "主動富邦台灣龍耀",
+            "shares": 1750,
+            "price": 7.78,
+            "amount": 13620,
+            "fee": 5,
+            "remark": "阿嬤支援小朋友學費"
+          },
           {
             "id": "mryi8yfw0xg",
             "date": "2026-07-24",
