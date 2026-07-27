@@ -11828,7 +11828,7 @@ function openFamilyDetail(hId){
   // KPI 行
   let html=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:16px 20px;border-bottom:1px solid #f0f2f5">
     <div><div style="font-size:10px;color:#9ca3af;margin-bottom:3px">持股</div><div style="font-size:16px;font-weight:800">${c.lotsDisplay}</div></div>
-    <div><div style="font-size:10px;color:#9ca3af;margin-bottom:3px">均成本</div><div style="font-size:16px;font-weight:800">$${c.avgCost.toFixed(4)}</div></div>
+    <div><div style="font-size:10px;color:#9ca3af;margin-bottom:3px">均成本</div><div style="font-size:16px;font-weight:800">$${c.avgCost.toFixed(2)}</div></div>
     <div><div style="font-size:10px;color:#9ca3af;margin-bottom:3px">市值</div><div style="font-size:16px;font-weight:800">${c.mktVal!=null?'$'+Math.round(c.mktVal).toLocaleString():'—'}</div></div>
     <div><div style="font-size:10px;color:#9ca3af;margin-bottom:3px">損益</div><div style="font-size:16px;font-weight:800;color:${pnlColor}">${c.pnl!=null?(c.pnl>=0?'+':'')+Math.round(c.pnl).toLocaleString():'—'}</div><div style="font-size:10px;color:${pnlColor}">${c.pnl!=null?(roi>=0?'+':'')+roi+'%':''}</div></div>
   </div>`;
