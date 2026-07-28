@@ -2414,7 +2414,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1785231612949,
+  "_ts": 1785231626564,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -2502,7 +2502,13 @@
       "indexVal": 41603,
       "stockPrices": null,
       "aiAnalysis": null,
-      "images": []
+      "images": [],
+      "backtest": {
+        "ret": 0,
+        "stocks": {},
+        "retDate": "2026-07-28",
+        "note": ""
+      }
     },
     {
       "id": "mrypsl73ivf",
@@ -2522,7 +2528,13 @@
       "indexVal": 43655,
       "stockPrices": null,
       "aiAnalysis": null,
-      "images": []
+      "images": [],
+      "backtest": {
+        "ret": -4.7,
+        "stocks": {},
+        "retDate": "2026-07-28",
+        "note": ""
+      }
     },
     {
       "id": "mrq0ywj48ju",
@@ -2548,9 +2560,9 @@
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1784358118628_2l6a.jpg"
       ],
       "backtest": {
-        "ret": -0.52,
+        "ret": -2.5,
         "stocks": {},
-        "retDate": "2026-07-20",
+        "retDate": "2026-07-28",
         "note": ""
       }
     },
@@ -2572,7 +2584,13 @@
       "indexVal": 45000,
       "stockPrices": null,
       "aiAnalysis": null,
-      "images": []
+      "images": [],
+      "backtest": {
+        "ret": -7.55,
+        "stocks": {},
+        "retDate": "2026-07-28",
+        "note": ""
+      }
     },
     {
       "id": "mrk6czaqo4q",
@@ -2596,9 +2614,9 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": -5.11,
+        "ret": -7.01,
         "stocks": {},
-        "retDate": "2026-07-20",
+        "retDate": "2026-07-28",
         "note": ""
       }
     },
@@ -2625,13 +2643,13 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": -7.18,
+        "ret": -9.03,
         "stocks": {
-          "00981A": -12.94,
-          "00988A": -13.52,
-          "00981T": -2.45
+          "00981A": -14.45,
+          "00988A": -19.63,
+          "00981T": -3.92
         },
-        "retDate": "2026-07-20",
+        "retDate": "2026-07-28",
         "note": ""
       }
     },
@@ -2657,7 +2675,13 @@
       "indexVal": 45479,
       "stockPrices": null,
       "aiAnalysis": null,
-      "images": []
+      "images": [],
+      "backtest": {
+        "ret": -8.52,
+        "stocks": {},
+        "retDate": "2026-07-28",
+        "note": "這次恐慌是有道理的，市場確實下跌 -8.5%。"
+      }
     },
     {
       "id": "mr8zdxiq8j6",
@@ -2688,15 +2712,15 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": -8.82,
+        "ret": -10.64,
         "stocks": {
-          "00981A": -16.99,
-          "00988A": -20.5,
-          "009805": -3.57,
-          "00981T": -3.55,
-          "00864B": 1.35
+          "00981A": -18.43,
+          "00988A": -26.12,
+          "009805": -6.07,
+          "00981T": -5,
+          "00864B": 1.5
         },
-        "retDate": "2026-07-20",
+        "retDate": "2026-07-28",
         "note": ""
       }
     },
@@ -2725,13 +2749,13 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": -9.19,
-        "retDate": "2026-07-20",
-        "note": "這次恐慌是有道理的，市場確實下跌 -9.2%。",
+        "ret": -11,
+        "retDate": "2026-07-28",
+        "note": "這次恐慌是有道理的，市場確實下跌 -11.0%。",
         "stocks": {
-          "00981A": -19.19,
-          "00988A": -24.18,
-          "009805": -4.31
+          "00981A": -20.59,
+          "00988A": -29.53,
+          "009805": -6.79
         }
       }
     },
@@ -2762,14 +2786,14 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": -9.69,
-        "retDate": "2026-07-20",
+        "ret": -11.5,
+        "retDate": "2026-07-28",
         "note": "",
         "stocks": {
-          "00981T": -3.55,
-          "00864B": 1.88,
-          "00985B": 0.97,
-          "009805": -6.57
+          "00981T": -5,
+          "00864B": 2.03,
+          "00985B": 1.07,
+          "009805": -9
         }
       }
     },
@@ -2793,7 +2817,13 @@
       "indexVal": 45000,
       "stockPrices": null,
       "aiAnalysis": null,
-      "images": []
+      "images": [],
+      "backtest": {
+        "ret": -7.55,
+        "stocks": {},
+        "retDate": "2026-07-28",
+        "note": ""
+      }
     },
     {
       "id": "mqxl8mv5yxx",
@@ -2817,7 +2847,13 @@
       "indexVal": 44572,
       "stockPrices": null,
       "aiAnalysis": null,
-      "images": []
+      "images": [],
+      "backtest": {
+        "ret": -6.66,
+        "stocks": {},
+        "retDate": "2026-07-28",
+        "note": "這次恐慌是有道理的，市場確實下跌 -6.7%。"
+      }
     },
     {
       "id": "mqtbf0za3t0",
@@ -2846,12 +2882,12 @@
       "backtest": {
         "t5": 1.14,
         "note": "",
-        "ret": -8.23,
-        "retDate": "2026-07-20",
+        "ret": -10.06,
+        "retDate": "2026-07-28",
         "stocks": {
-          "00981A": -17.78,
-          "00988A": -28.22,
-          "009805": -5.26
+          "00981A": -19.21,
+          "00988A": -33.29,
+          "009805": -7.72
         }
       }
     },
@@ -2881,12 +2917,12 @@
         "t20": -0.68,
         "t60": -0.68,
         "note": "",
-        "ret": -9.87,
-        "retDate": "2026-07-20",
+        "ret": -11.67,
+        "retDate": "2026-07-28",
         "stocks": {
-          "00981A": -18.04,
-          "00988A": -27.75,
-          "009805": -5.81
+          "00981A": -19.46,
+          "00988A": -32.85,
+          "009805": -8.26
         }
       }
     },
@@ -2913,12 +2949,12 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": -11.08,
-        "retDate": "2026-07-20",
+        "ret": -12.86,
+        "retDate": "2026-07-28",
         "note": "",
         "stocks": {
-          "00981T": -3,
-          "00985B": 2.16
+          "00981T": -4.46,
+          "00985B": 2.26
         }
       }
     },
@@ -2945,11 +2981,11 @@
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1781506530190_lqa5.jpg"
       ],
       "backtest": {
-        "retDate": "2026-07-20",
-        "ret": -6.49,
+        "retDate": "2026-07-28",
+        "ret": -8.36,
         "stocks": {
-          "00981A": -17.7,
-          "00988A": -25.94
+          "00981A": -19.13,
+          "00988A": -31.17
         },
         "note": ""
       }
@@ -2982,12 +3018,12 @@
         "t5": 8.22,
         "note": "",
         "t20": 8.22,
-        "ret": -1.8,
-        "retDate": "2026-07-20",
+        "ret": -3.75,
+        "retDate": "2026-07-28",
         "stocks": {
-          "00981A": -13.35,
-          "00988A": -16.45,
-          "009805": 1.89
+          "00981A": -14.85,
+          "00988A": -22.35,
+          "009805": -0.75
         }
       }
     },
@@ -3024,14 +3060,14 @@
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1780998890271_prnw.jpg"
       ],
       "backtest": {
-        "retDate": "2026-07-20",
-        "ret": -5.82,
+        "retDate": "2026-07-28",
+        "ret": -7.69,
         "stocks": {
-          "00981A": -15.94,
-          "00988A": -22.83,
-          "009805": -2.41
+          "00981A": -17.4,
+          "00988A": -28.29,
+          "009805": -4.94
         },
-        "note": "這次恐慌是有道理的，市場確實下跌 -5.8%。"
+        "note": "這次恐慌是有道理的，市場確實下跌 -7.7%。"
       }
     },
     {
@@ -3046,8 +3082,8 @@
       "stockPrices": null,
       "images": [],
       "backtest": {
-        "ret": -7.06,
-        "retDate": "2026-07-20",
+        "ret": -8.92,
+        "retDate": "2026-07-28",
         "note": "",
         "stocks": {}
       }
@@ -3071,8 +3107,8 @@
         "t20": 2.69,
         "t60": 2.69,
         "note": "",
-        "ret": -6.82,
-        "retDate": "2026-07-20",
+        "ret": -8.68,
+        "retDate": "2026-07-28",
         "stocks": {}
       }
     },
@@ -3100,13 +3136,13 @@
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1780308765700_fwfw.jpg"
       ],
       "backtest": {
-        "ret": -6.37,
-        "retDate": "2026-07-20",
+        "ret": -8.24,
+        "retDate": "2026-07-28",
         "note": "",
         "stocks": {
-          "00981A": -18.3,
-          "00988A": -24.69,
-          "009805": -1.82
+          "00981A": -19.72,
+          "00988A": -30.01,
+          "009805": -4.36
         }
       }
     },
@@ -3131,7 +3167,13 @@
       "indexVal": 44733,
       "stockPrices": null,
       "aiAnalysis": null,
-      "images": []
+      "images": [],
+      "backtest": {
+        "ret": -7,
+        "stocks": {},
+        "retDate": "2026-07-28",
+        "note": ""
+      }
     },
     {
       "id": "mpp9ne00k5o",
@@ -3153,7 +3195,13 @@
       "indexVal": 43636,
       "stockPrices": null,
       "aiAnalysis": null,
-      "images": []
+      "images": [],
+      "backtest": {
+        "ret": -4.66,
+        "stocks": {},
+        "retDate": "2026-07-28",
+        "note": ""
+      }
     },
     {
       "id": "mpl1jtu6ssf",
@@ -3183,13 +3231,13 @@
       "backtest": {
         "t5": 7.19,
         "note": "",
-        "ret": -2.74,
-        "retDate": "2026-07-20",
+        "ret": -4.68,
+        "retDate": "2026-07-28",
         "stocks": {
-          "00403A": -12.29,
-          "00981A": -18.06,
-          "009805": -4.71,
-          "00864B": 3.6
+          "00403A": -14.93,
+          "00981A": -19.49,
+          "009805": -7.18,
+          "00864B": 3.75
         }
       }
     },
@@ -3213,12 +3261,12 @@
       },
       "images": [],
       "backtest": {
-        "ret": 0.43,
-        "retDate": "2026-07-20",
+        "ret": -1.57,
+        "retDate": "2026-07-28",
         "note": "",
         "stocks": {
-          "00981A": -13.52,
-          "00988A": -18.66
+          "00981A": -15.03,
+          "00988A": -24.41
         }
       }
     },
@@ -3243,7 +3291,13 @@
       "indexVal": 40176,
       "stockPrices": null,
       "aiAnalysis": null,
-      "images": []
+      "images": [],
+      "backtest": {
+        "ret": 3.55,
+        "stocks": {},
+        "retDate": "2026-07-28",
+        "note": ""
+      }
     },
     {
       "id": "mp3lm2vkqz8",
@@ -3267,11 +3321,11 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": 1.32,
-        "retDate": "2026-07-20",
+        "ret": -0.7,
+        "retDate": "2026-07-28",
         "note": "",
         "stocks": {
-          "00403A": -14.07
+          "00403A": -16.67
         }
       }
     },
@@ -3295,7 +3349,13 @@
       "indexVal": 41790,
       "stockPrices": null,
       "aiAnalysis": null,
-      "images": []
+      "images": [],
+      "backtest": {
+        "ret": -0.45,
+        "stocks": {},
+        "retDate": "2026-07-28",
+        "note": ""
+      }
     },
     {
       "id": "mowqohh2ku2",
@@ -3317,7 +3377,13 @@
       "indexVal": 41603,
       "stockPrices": null,
       "aiAnalysis": null,
-      "images": []
+      "images": [],
+      "backtest": {
+        "ret": 0,
+        "stocks": {},
+        "retDate": "2026-07-28",
+        "note": ""
+      }
     },
     {
       "id": "mov9f1luz22",
@@ -3335,11 +3401,11 @@
       },
       "images": [],
       "backtest": {
-        "ret": 1.23,
-        "retDate": "2026-07-20",
+        "ret": -0.79,
+        "retDate": "2026-07-28",
         "note": "",
         "stocks": {
-          "00864B": 2.56
+          "00864B": 2.72
         }
       }
     },
@@ -3361,11 +3427,11 @@
       },
       "images": [],
       "backtest": {
-        "ret": 3.19,
-        "retDate": "2026-07-20",
+        "ret": 1.13,
+        "retDate": "2026-07-28",
         "note": "",
         "stocks": {
-          "009805": -6.68
+          "009805": -9.1
         }
       }
     },
@@ -3385,11 +3451,11 @@
       },
       "images": [],
       "backtest": {
-        "ret": 4.12,
-        "retDate": "2026-07-20",
+        "ret": 2.05,
+        "retDate": "2026-07-28",
         "note": "",
         "stocks": {
-          "00950B": 1.29
+          "00950B": 0.43
         }
       }
     },
@@ -3411,11 +3477,11 @@
       },
       "images": [],
       "backtest": {
-        "ret": 4.29,
-        "retDate": "2026-07-20",
+        "ret": 2.21,
+        "retDate": "2026-07-28",
         "note": "",
         "stocks": {
-          "009805": -5.92
+          "009805": -8.36
         }
       }
     },
@@ -3437,11 +3503,11 @@
       },
       "images": [],
       "backtest": {
-        "ret": 9.05,
-        "retDate": "2026-07-20",
+        "ret": 6.88,
+        "retDate": "2026-07-28",
         "note": "",
         "stocks": {
-          "009805": -1.34
+          "009805": -3.9
         }
       }
     },
@@ -3465,10 +3531,10 @@
       "backtest": {
         "t5": 19.03,
         "note": "",
-        "ret": 8.01,
-        "retDate": "2026-07-20",
+        "ret": 5.85,
+        "retDate": "2026-07-28",
         "stocks": {
-          "009805": -1.4
+          "009805": -3.96
         }
       }
     },
@@ -3491,11 +3557,11 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": 7.15,
-        "retDate": "2026-07-20",
+        "ret": 5.02,
+        "retDate": "2026-07-28",
         "note": "",
         "stocks": {
-          "009819": -2.77
+          "009819": -2.67
         }
       }
     },
@@ -3517,7 +3583,13 @@
       "indexVal": 39616,
       "stockPrices": null,
       "aiAnalysis": null,
-      "images": []
+      "images": [],
+      "backtest": {
+        "ret": 5.02,
+        "stocks": {},
+        "retDate": "2026-07-28",
+        "note": ""
+      }
     },
     {
       "id": "mocr0ornnzo",
@@ -3537,11 +3609,11 @@
       },
       "images": [],
       "backtest": {
-        "ret": 9.04,
-        "retDate": "2026-07-20",
+        "ret": 6.86,
+        "retDate": "2026-07-28",
         "note": "",
         "stocks": {
-          "009805": -3.46
+          "009805": -5.96
         }
       }
     },
@@ -3564,11 +3636,11 @@
       },
       "images": [],
       "backtest": {
-        "ret": 12.56,
-        "retDate": "2026-07-20",
-        "note": "從寫日誌到現在已上漲 +12.6%！",
+        "ret": 10.31,
+        "retDate": "2026-07-28",
+        "note": "從寫日誌到現在已上漲 +10.3%！",
         "stocks": {
-          "009819": -16.78
+          "009819": -16.69
         }
       }
     },
@@ -3588,11 +3660,11 @@
       },
       "images": [],
       "backtest": {
-        "ret": 12.88,
-        "retDate": "2026-07-20",
-        "note": "從寫日誌到現在已上漲 +12.9%！",
+        "ret": 10.63,
+        "retDate": "2026-07-28",
+        "note": "從寫日誌到現在已上漲 +10.6%！",
         "stocks": {
-          "00864B": 2.56
+          "00864B": 2.72
         }
       }
     },
@@ -3610,9 +3682,9 @@
       "stockPrices": null,
       "images": [],
       "backtest": {
-        "ret": 14.86,
-        "retDate": "2026-07-20",
-        "note": "從寫日誌到現在已上漲 +14.9%！",
+        "ret": 12.57,
+        "retDate": "2026-07-28",
+        "note": "從寫日誌到現在已上漲 +12.6%！",
         "stocks": {}
       }
     },
@@ -3636,7 +3708,13 @@
       "indexVal": 36958,
       "stockPrices": null,
       "aiAnalysis": null,
-      "images": []
+      "images": [],
+      "backtest": {
+        "ret": 12.57,
+        "stocks": {},
+        "retDate": "2026-07-28",
+        "note": "從寫日誌到現在已上漲 +12.6%！"
+      }
     },
     {
       "id": "mo4fqsbtcx4",
@@ -3656,7 +3734,13 @@
       "indexVal": 36958,
       "stockPrices": null,
       "aiAnalysis": null,
-      "images": []
+      "images": [],
+      "backtest": {
+        "ret": 12.57,
+        "stocks": {},
+        "retDate": "2026-07-28",
+        "note": "從寫日誌到現在已上漲 +12.6%！"
+      }
     },
     {
       "id": "mo2r7qjwcey",
@@ -3676,7 +3760,13 @@
       "indexVal": 36804,
       "stockPrices": null,
       "aiAnalysis": null,
-      "images": []
+      "images": [],
+      "backtest": {
+        "ret": 13.04,
+        "stocks": {},
+        "retDate": "2026-07-28",
+        "note": "從寫日誌到現在已上漲 +13.0%！"
+      }
     },
     {
       "id": "mnzuqffpvo6",
@@ -3696,11 +3786,11 @@
       },
       "images": [],
       "backtest": {
-        "ret": 15.6,
-        "retDate": "2026-07-20",
-        "note": "事後證明：當時恐慌，但後來漲了 +15.6%，恐慌是過度的！",
+        "ret": 13.29,
+        "retDate": "2026-07-28",
+        "note": "事後證明：當時恐慌，但後來漲了 +13.3%，恐慌是過度的！",
         "stocks": {
-          "00864B": 1.97
+          "00864B": 2.12
         }
       }
     },
@@ -3723,9 +3813,9 @@
         "t5": 28.89,
         "t20": 28.89,
         "t60": 28.89,
-        "note": "從寫日誌到現在已上漲 +17.0%！",
-        "ret": 16.96,
-        "retDate": "2026-07-20",
+        "note": "從寫日誌到現在已上漲 +14.6%！",
+        "ret": 14.62,
+        "retDate": "2026-07-28",
         "stocks": {}
       }
     },
@@ -3747,7 +3837,13 @@
       "indexVal": 35457,
       "stockPrices": null,
       "aiAnalysis": null,
-      "images": []
+      "images": [],
+      "backtest": {
+        "ret": 17.33,
+        "stocks": {},
+        "retDate": "2026-07-28",
+        "note": "從寫日誌到現在已上漲 +17.3%！"
+      }
     },
     {
       "id": "mnzux5v3kmt",
@@ -3767,11 +3863,11 @@
       "images": [],
       "backtest": {
         "t5": 34.19,
-        "note": "從寫日誌到現在已上漲 +21.8%！",
+        "note": "從寫日誌到現在已上漲 +19.3%！",
         "t20": 34.19,
         "t60": 34.19,
-        "ret": 21.77,
-        "retDate": "2026-07-20",
+        "ret": 19.34,
+        "retDate": "2026-07-28",
         "stocks": {}
       }
     }
