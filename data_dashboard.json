@@ -2414,7 +2414,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1785231892671,
+  "_ts": 1785231927353,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -2506,7 +2506,13 @@
       "indexVal": 41603,
       "stockPrices": null,
       "aiAnalysis": null,
-      "images": []
+      "images": [],
+      "backtest": {
+        "ret": 0,
+        "stocks": {},
+        "retDate": "2026-07-28",
+        "note": ""
+      }
     },
     {
       "id": "mrypsl73ivf",
@@ -2555,7 +2561,13 @@
       "indexVal": 42671,
       "stockPrices": null,
       "aiAnalysis": null,
-      "images": []
+      "images": [],
+      "backtest": {
+        "ret": -2.5,
+        "stocks": {},
+        "retDate": "2026-07-28",
+        "note": ""
+      }
     },
     {
       "id": "mrkgy6prh0u",
@@ -2606,7 +2618,13 @@
       "indexVal": 44737,
       "stockPrices": null,
       "aiAnalysis": null,
-      "images": []
+      "images": [],
+      "backtest": {
+        "ret": -7.01,
+        "stocks": {},
+        "retDate": "2026-07-28",
+        "note": "這次恐慌是有道理的，市場確實下跌 -7.0%。"
+      }
     },
     {
       "id": "mrbw2pzhsfm",
@@ -3074,7 +3092,13 @@
       "indexVal": 45677,
       "stockPrices": null,
       "aiAnalysis": null,
-      "images": []
+      "images": [],
+      "backtest": {
+        "ret": -8.92,
+        "stocks": {},
+        "retDate": "2026-07-28",
+        "note": ""
+      }
     },
     {
       "id": "mpwh5xizswe",
