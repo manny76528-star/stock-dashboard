@@ -12704,7 +12704,7 @@ function _renderInvestL1Body(){
   (db.pledgeAssets||[]).forEach(a=>{const p=db.prices[a.code]?.price||0;pledgeMkt+=p*(a.lots||0)*1000;});
   const pledgeRatio=pledgeLoan>0?Math.round(pledgeMkt/pledgeLoan*1000)/10:0;
   const prColor=pledgeRatio>=250?'#06b6d4':pledgeRatio>=160?'#f59e0b':'#f97316';
-  const showPledge=pledgeLoan>0&&pledgeMkt>0;
+  const showPledge=pledgeLoan>0&&(db.pledgeAssets||[]).length>0;
 
   // 股息（從現有邏輯撈）
   const totalPaidDiv=(db.dividends||[]).filter(d=>!d.pending&&d.date<=today).reduce((s,d)=>s+d.amount,0);
