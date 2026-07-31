@@ -2195,6 +2195,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
       <div class="trend-page-card" style="margin-top:16px;padding:0;overflow:hidden">
         <div class="trend-page-hdr" style="padding:12px 18px;border-bottom:1px solid #f0f2f5">
           <span>🏦 近期扣款提醒</span>
+          <button onclick="openLoanHist()" style="padding:4px 10px;background:#f0fdf4;border:1px solid #bbf7d0;color:#16a34a;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer">📚 結清記錄</button>
         </div>
         <div id="as-deduct-body" style="padding:8px 0"></div>
       </div>
@@ -4823,7 +4824,7 @@ function renderAssetsDeduct(){
         }
       }
       const tag=sufficient===true?'<span style="color:#16a34a">✓足夠</span>':sufficient===false?'<span style="color:#dc2626">⚠️不足</span>':'';
-      navEl.innerHTML=`<span style="color:${urgColor};font-size:9px">$${Math.round(next.l.monthly||0).toLocaleString()} (${next.days}天後) ${tag}</span>`;
+      navEl.innerHTML=`<span style="color:${urgColor};font-size:9px">$${Math.round(next.l.monthly||0).toLocaleString()} (${next.days}天後)</span> ${tag}`;
     } else {
       navEl.textContent='';
     }
