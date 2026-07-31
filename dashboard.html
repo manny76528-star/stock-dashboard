@@ -10532,19 +10532,29 @@ function renderAssetsDeduct(){
     .filter(x=>x.days!=null&&x.days<=45)
     .sort((a,b)=>a.days-b.days);
 
-  // 左側導航顯示最近一筆（先更新，不依賴 as-deduct-body）
+  // 左側導航顯示最近一筆（含足夠/不足判斷）
   const navEl=document.getElementById('nav-assets-deduct');
   if(navEl){
     if(sorted.length>0){
       const next=sorted[0];
       const urgColor=next.days<=3?'#dc2626':next.days<=7?'#f59e0b':'#94a3b8';
-      navEl.innerHTML=`<span style="color:${urgColor};font-size:9px">$${Math.round(next.l.monthly||0).toLocaleString()} (${next.days}天後)</span>`;
+      const deductBank=next.l.deductBank;
+      let sufficient=null;
+      if(deductBank){
+        const acc=db.cashAccounts.find(c=>c.bank===deductBank);
+        if(acc){
+          const bal=(acc.cash||0)+(acc.d1||0)+(acc.d2||0);
+          sufficient=bal>=(next.l.monthly||0);
+        }
+      }
+      const tag=sufficient===true?'<span style="color:#16a34a;font-size:9px">✓足夠</span>':sufficient===false?'<span style="color:#dc2626;font-size:9px">⚠️不足</span>':'';
+      navEl.innerHTML=`<span style="color:${urgColor};font-size:9px">$${Math.round(next.l.monthly||0).toLocaleString()} (${next.days}天後)</span> ${tag}`;
     } else {
       navEl.textContent='';
     }
   }
 
-  // 資產頁內的清單（可選）
+  // 資產頁內的清單
   const el=document.getElementById('as-deduct-body');
   if(!el)return;
   if(sorted.length===0){
@@ -10553,10 +10563,20 @@ function renderAssetsDeduct(){
   }
   el.innerHTML=sorted.map(({l,days})=>{
     const urgColor=days<=3?'#dc2626':days<=7?'#f59e0b':'#64748b';
+    const deductBank=l.deductBank;
+    let balText='';
+    if(deductBank){
+      const acc=db.cashAccounts.find(c=>c.bank===deductBank);
+      if(acc){
+        const bal=(acc.cash||0)+(acc.d1||0)+(acc.d2||0);
+        const ok=bal>=(l.monthly||0);
+        balText=`<span style="font-size:10px;font-weight:700;color:${ok?'#16a34a':'#dc2626'}">${ok?'✓ 足夠':'⚠️ 不足'} ($${Math.round(bal).toLocaleString()})</span>`;
+      }
+    }
     return`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 18px;border-bottom:1px solid #f5f7fa">
       <div>
         <div style="font-size:13px;font-weight:700;color:#1e293b">${l.bank||'信貸'}</div>
-        <div style="font-size:11px;color:#9ca3af">每月${l.deductDay||''}</div>
+        <div style="font-size:11px;color:#9ca3af">每月${l.deductDay||''} ${balText}</div>
       </div>
       <div style="text-align:right">
         <div style="font-size:13px;font-weight:800;color:#dc2626;font-family:'JetBrains Mono',monospace">$${Math.round(l.monthly||0).toLocaleString()}</div>
