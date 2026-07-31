@@ -2431,7 +2431,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1785474503154,
+  "_ts": 1785474634761,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -2523,7 +2523,9 @@
       "indexVal": 39933,
       "stockPrices": null,
       "aiAnalysis": null,
-      "images": []
+      "images": [
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1785474628418_ke01.jpg"
+      ]
     },
     {
       "id": "ms4gt3qgy7e",
