@@ -2414,7 +2414,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1785490530325,
+  "_ts": 1785490579572,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -4747,9 +4747,38 @@
                 "remark": ""
               }
             ]
+          },
+          {
+            "id": "ms8qznntr5g",
+            "code": "2330",
+            "name": "台積電",
+            "url": "",
+            "transactions": [
+              {
+                "id": "ms8qznntv8e",
+                "type": "buy",
+                "date": "2026-07-28",
+                "shares": 5,
+                "price": 2220,
+                "fee": 4,
+                "remark": "阿嬤給老婆一萬"
+              }
+            ]
           }
         ],
         "log": [
+          {
+            "id": "ms8qznntvsh",
+            "date": "2026-07-28",
+            "type": "buy",
+            "code": "2330",
+            "name": "台積電",
+            "shares": 5,
+            "price": 2220,
+            "amount": 11104,
+            "fee": 4,
+            "remark": "阿嬤給老婆一萬"
+          },
           {
             "id": "mrz3k4t5fr2",
             "date": "2026-06-01",
