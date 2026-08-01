@@ -1407,7 +1407,7 @@
     {
       "id": "mncull1439i",
       "bank": "Line Bank",
-      "cash": 31000,
+      "cash": 18600,
       "d1Date": "",
       "d1": 0,
       "d2": 0
@@ -2431,7 +2431,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1785498250823,
+  "_ts": 1785558204944,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -4154,7 +4154,8 @@
     "mncue4nbehw_2026-06": true,
     "mncug22msvu_2026-06": true,
     "mncujjvii0z_2026-07": true,
-    "mncui6prd6f_2026-07": true
+    "mncui6prd6f_2026-07": true,
+    "mncujjvii0z_2026-08": true
   },
   "pledgeLoans": [],
   "pledgeAssets": [
