@@ -10386,6 +10386,8 @@ const MORANDI_OV=['#8fa8c8','#a8c5a0','#c9a99a','#b5adc4','#c4b89a','#9bbfbf','#
 // 資產與負債分頁
 // ══════════════════════════════════════
 function renderAssetsPage(){
+  // 現金帳戶（含待入帳股息）
+  if(typeof renderCash==='function')renderCash();
   // KPI
   const lR=db.loans.reduce((s,l)=>s+calcLoanRemain(l),0);
   const lM=db.loans.reduce((s,l)=>s+(l.monthly||0),0);
