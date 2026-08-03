@@ -1320,6 +1320,30 @@
         }
       ],
       "order": 16
+    },
+    {
+      "id": "msd2f1gzab9",
+      "code": "009826",
+      "name": "貝萊德世界股票",
+      "lots": 95,
+      "avgPrice": 10,
+      "divPerShare": 0,
+      "note": "",
+      "url": "https://tw.stock.yahoo.com/quote/009826.TW",
+      "holdType": "long",
+      "targetRoi": 5,
+      "transactions": [
+        {
+          "id": "msd2f1gzk6x",
+          "type": "buy",
+          "lots": 95,
+          "price": 10,
+          "date": "2026-08-03",
+          "fee": 0,
+          "remark": "小P： VT才是投資全球,才能跟隨全球需求上漲"
+        }
+      ],
+      "order": 17
     }
   ],
   "loans": [
@@ -2431,7 +2455,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1785751475118,
+  "_ts": 1785751637791,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
