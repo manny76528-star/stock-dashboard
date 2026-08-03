@@ -2381,7 +2381,7 @@
   ],
   "settings": {
     "title": "２０２６　資產損益表",
-    "targetDividend": 1000000
+    "targetDividend": 1500000
   },
   "archivedTxns": [
     {
@@ -2455,7 +2455,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1785751888651,
+  "_ts": 1785752010364,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
