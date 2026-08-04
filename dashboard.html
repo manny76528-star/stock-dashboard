@@ -4841,7 +4841,24 @@ function renderAssetsDeduct(){
         const acc=db.cashAccounts.find(c=>c.bank===deductBank);
         if(acc){
           const bal=(acc.cash||0)+(acc.d1||0)+(acc.d2||0);
-          sufficient=bal>=(next.l.monthly||0);
+          const todayD=new Date();const todayStr=todayD.toISOString().slice(0,10);
+          const dDay=parseInt(next.l.deductDay)||0;
+          const thisM=new Date(todayD.getFullYear(),todayD.getMonth(),dDay);
+          const deductDate=thisM>todayD?thisM:new Date(todayD.getFullYear(),todayD.getMonth()+1,dDay);
+          const deductDateStr=deductDate.toISOString().slice(0,10);
+          const preDivTotal=(db.dividends||[]).filter(d=>d.date&&d.date>todayStr&&d.date<=deductDateStr).reduce((s,d)=>s+(d.amount||0),0);
+          const upcoming=[];
+          (db.loans||[]).forEach(loan=>{
+            if(loan.deductBank!==deductBank||!loan.deductDay)return;
+            const d2=parseInt(loan.deductDay)||0;if(!d2)return;
+            for(let mo=0;mo<=2;mo++){
+              const dt=new Date(todayD.getFullYear(),todayD.getMonth()+mo,d2);
+              if(dt>todayD&&dt<=deductDate)upcoming.push(loan.monthly||0);
+            }
+          });
+          let runBal=bal+preDivTotal;
+          upcoming.forEach(m=>{runBal-=m;});
+          sufficient=runBal>=0;
         }
       }
       const tag=sufficient===true?'<span style="color:#16a34a">✓足夠</span>':sufficient===false?'<span style="color:#dc2626">⚠️不足</span>':'';
@@ -4861,8 +4878,29 @@ function renderAssetsDeduct(){
       const acc=db.cashAccounts.find(c=>c.bank===deductBank);
       if(acc){
         const bal=(acc.cash||0)+(acc.d1||0)+(acc.d2||0);
-        const ok=bal>=(l.monthly||0);
-        balText=`<span style="font-size:10px;font-weight:700;color:${ok?'#16a34a':'#dc2626'}">${ok?'✓ 足夠':'⚠️ 不足'} ($${Math.round(bal).toLocaleString()})</span>`;
+        // 計算扣款日（與信貸管理相同邏輯）
+        const todayD=new Date();
+        const todayStr=todayD.toISOString().slice(0,10);
+        const dDay=parseInt(l.deductDay)||0;
+        const thisMonth=new Date(todayD.getFullYear(),todayD.getMonth(),dDay);
+        const deductDate=thisMonth>todayD?thisMonth:new Date(todayD.getFullYear(),todayD.getMonth()+1,dDay);
+        const deductDateStr=deductDate.toISOString().slice(0,10);
+        // 扣款日前入帳的股息
+        const preDivTotal=(db.dividends||[]).filter(d=>d.date&&d.date>todayStr&&d.date<=deductDateStr).reduce((s,d)=>s+(d.amount||0),0);
+        // 同帳戶扣款日前的所有扣款（含本筆）
+        const upcoming=[];
+        (db.loans||[]).forEach(loan=>{
+          if(loan.deductBank!==deductBank||!loan.deductDay)return;
+          const d2=parseInt(loan.deductDay)||0;if(!d2)return;
+          for(let mo=0;mo<=2;mo++){
+            const dt=new Date(todayD.getFullYear(),todayD.getMonth()+mo,d2);
+            if(dt>todayD&&dt<=deductDate)upcoming.push({loanId:loan.id,monthly:loan.monthly||0});
+          }
+        });
+        let runBal=bal+preDivTotal;
+        upcoming.forEach(item=>{ runBal-=item.monthly; });
+        const ok=runBal>=0;
+        balText=`<span style="font-size:10px;font-weight:700;color:${ok?'#16a34a':'#dc2626'}">${ok?'✓ 足夠':'⚠️ 不足'}</span>`;
       }
     }
     return`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 18px;border-bottom:1px solid #f5f7fa">
@@ -10569,7 +10607,24 @@ function renderAssetsDeduct(){
         const acc=db.cashAccounts.find(c=>c.bank===deductBank);
         if(acc){
           const bal=(acc.cash||0)+(acc.d1||0)+(acc.d2||0);
-          sufficient=bal>=(next.l.monthly||0);
+          const todayD=new Date();const todayStr=todayD.toISOString().slice(0,10);
+          const dDay=parseInt(next.l.deductDay)||0;
+          const thisM=new Date(todayD.getFullYear(),todayD.getMonth(),dDay);
+          const deductDate=thisM>todayD?thisM:new Date(todayD.getFullYear(),todayD.getMonth()+1,dDay);
+          const deductDateStr=deductDate.toISOString().slice(0,10);
+          const preDivTotal=(db.dividends||[]).filter(d=>d.date&&d.date>todayStr&&d.date<=deductDateStr).reduce((s,d)=>s+(d.amount||0),0);
+          const upcoming=[];
+          (db.loans||[]).forEach(loan=>{
+            if(loan.deductBank!==deductBank||!loan.deductDay)return;
+            const d2=parseInt(loan.deductDay)||0;if(!d2)return;
+            for(let mo=0;mo<=2;mo++){
+              const dt=new Date(todayD.getFullYear(),todayD.getMonth()+mo,d2);
+              if(dt>todayD&&dt<=deductDate)upcoming.push(loan.monthly||0);
+            }
+          });
+          let runBal=bal+preDivTotal;
+          upcoming.forEach(m=>{runBal-=m;});
+          sufficient=runBal>=0;
         }
       }
       const tag=sufficient===true?'<span style="color:#16a34a;font-size:9px">✓足夠</span>':sufficient===false?'<span style="color:#dc2626;font-size:9px">⚠️不足</span>':'';
@@ -10594,8 +10649,29 @@ function renderAssetsDeduct(){
       const acc=db.cashAccounts.find(c=>c.bank===deductBank);
       if(acc){
         const bal=(acc.cash||0)+(acc.d1||0)+(acc.d2||0);
-        const ok=bal>=(l.monthly||0);
-        balText=`<span style="font-size:10px;font-weight:700;color:${ok?'#16a34a':'#dc2626'}">${ok?'✓ 足夠':'⚠️ 不足'} ($${Math.round(bal).toLocaleString()})</span>`;
+        // 計算扣款日（與信貸管理相同邏輯）
+        const todayD=new Date();
+        const todayStr=todayD.toISOString().slice(0,10);
+        const dDay=parseInt(l.deductDay)||0;
+        const thisMonth=new Date(todayD.getFullYear(),todayD.getMonth(),dDay);
+        const deductDate=thisMonth>todayD?thisMonth:new Date(todayD.getFullYear(),todayD.getMonth()+1,dDay);
+        const deductDateStr=deductDate.toISOString().slice(0,10);
+        // 扣款日前入帳的股息
+        const preDivTotal=(db.dividends||[]).filter(d=>d.date&&d.date>todayStr&&d.date<=deductDateStr).reduce((s,d)=>s+(d.amount||0),0);
+        // 同帳戶扣款日前的所有扣款（含本筆）
+        const upcoming=[];
+        (db.loans||[]).forEach(loan=>{
+          if(loan.deductBank!==deductBank||!loan.deductDay)return;
+          const d2=parseInt(loan.deductDay)||0;if(!d2)return;
+          for(let mo=0;mo<=2;mo++){
+            const dt=new Date(todayD.getFullYear(),todayD.getMonth()+mo,d2);
+            if(dt>todayD&&dt<=deductDate)upcoming.push({loanId:loan.id,monthly:loan.monthly||0});
+          }
+        });
+        let runBal=bal+preDivTotal;
+        upcoming.forEach(item=>{ runBal-=item.monthly; });
+        const ok=runBal>=0;
+        balText=`<span style="font-size:10px;font-weight:700;color:${ok?'#16a34a':'#dc2626'}">${ok?'✓ 足夠':'⚠️ 不足'}</span>`;
       }
     }
     return`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 18px;border-bottom:1px solid #f5f7fa">
