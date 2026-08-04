@@ -2455,7 +2455,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1785808392068,
+  "_ts": 1785808476105,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -4207,6 +4207,12 @@
       "code": "009805",
       "lots": 1,
       "note": "凱基匯撥過來的"
+    },
+    {
+      "id": "mse09a70uth",
+      "code": "009805",
+      "lots": 13,
+      "note": "凱基帳戶轉移過來補維持率的"
     }
   ],
   "pledgeThreshold": 150,
