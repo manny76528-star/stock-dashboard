@@ -2455,7 +2455,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1785808167219,
+  "_ts": 1785808276087,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -4620,15 +4620,6 @@
                 "price": 14.56,
                 "fee": 6,
                 "remark": "00981D資金轉移到此 , 參與AI成長"
-              },
-              {
-                "id": "mse02huioh2",
-                "type": "buy",
-                "date": "2026-08-04",
-                "shares": 330,
-                "price": 11.18,
-                "fee": 1,
-                "remark": "爸爸給兩千及9805股息"
               }
             ]
           },
