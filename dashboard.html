@@ -11938,12 +11938,14 @@ function delFamilyHolding(hId){
 }
 
 function delFamilyTxn(hId,txnId){
-  if(!confirm('確定刪除此筆交易？'))return;
+  if(!confirm('確定刪除此筆交易？交易記錄與對應的 log 都會一併刪除。'))return;
   const member=curFamilyMember();
   const acc=getFamilyAccount(member);
   const h=acc.holdings.find(x=>x.id===hId);
   if(!h)return;
   h.transactions=h.transactions.filter(t=>t.id!==txnId);
+  // 同步刪除對應的 log（透過 txnId 關聯）
+  if(acc.log)acc.log=acc.log.filter(l=>l.txnId!==txnId);
   save();openFamilyDetail(hId);renderFamilyPage();toast('已刪除');
 }
 
@@ -12300,9 +12302,10 @@ function saveFamilyBuy(){
   let h=acc.holdings.find(x=>x.code===code);
   if(!h){h={id:uid(),code,name,url,transactions:[]};acc.holdings.push(h);}
   else{if(name)h.name=name;if(url)h.url=url;}
+  const txnId=uid();
   const gross=shares*price;
-  h.transactions.push({id:uid(),type:'buy',date,shares,price,fee,remark}); // 存股數
-  acc.log.push({id:uid(),date,type:'buy',code,name:h.name,shares,price,amount:gross+fee,fee,remark});
+  h.transactions.push({id:txnId,type:'buy',date,shares,price,fee,remark}); // 存股數
+  acc.log.push({id:uid(),txnId,date,type:'buy',code,name:h.name,shares,price,amount:gross+fee,fee,remark});
   acc.log.sort((a,b)=>b.date.localeCompare(a.date));
   save();closeModal('familyBuyModal');renderFamilyPage();toast(`💰 買入 ${code} ${shares}股`);
 }
@@ -12340,8 +12343,9 @@ function saveFamilySell(){
   const acc=getFamilyAccount(member);
   const h=acc.holdings.find(x=>x.code===code);
   if(!h)return toast('找不到持股');
-  h.transactions.push({id:uid(),type:'sell',date,shares,price,fee,remark});
-  acc.log.push({id:uid(),date,type:'sell',code,name:h.name,shares,price,amount:gross-fee,fee,remark});
+  const sellTxnId=uid();
+  h.transactions.push({id:sellTxnId,type:'sell',date,shares,price,fee,remark});
+  acc.log.push({id:uid(),txnId:sellTxnId,date,type:'sell',code,name:h.name,shares,price,amount:gross-fee,fee,remark});
   acc.log.sort((a,b)=>b.date.localeCompare(a.date));
   save();closeModal('familySellModal');renderFamilyPage();toast(`💸 賣出 ${code} ${shares}股`);
 }
