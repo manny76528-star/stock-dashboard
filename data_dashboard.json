@@ -2455,7 +2455,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1785808804752,
+  "_ts": 1785819414069,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -4207,12 +4207,6 @@
       "code": "009805",
       "lots": 1,
       "note": "凱基匯撥過來的"
-    },
-    {
-      "id": "mse09a70uth",
-      "code": "009805",
-      "lots": 13,
-      "note": "凱基帳戶轉移過來補維持率的"
     }
   ],
   "pledgeThreshold": 150,
@@ -4626,6 +4620,15 @@
                 "price": 14.56,
                 "fee": 6,
                 "remark": "00981D資金轉移到此 , 參與AI成長"
+              },
+              {
+                "id": "mse6rpzdkh3",
+                "type": "buy",
+                "date": "2026-08-04",
+                "shares": 10,
+                "price": 10,
+                "fee": 1,
+                "remark": "測試"
               }
             ]
           },
@@ -4694,16 +4697,17 @@
         ],
         "log": [
           {
-            "id": "mse02huin6t",
+            "id": "mse6rpzdq3f",
+            "txnId": "mse6rpzdkh3",
             "date": "2026-08-04",
             "type": "buy",
             "code": "00997A",
             "name": "主動群益美國增長",
-            "shares": 330,
-            "price": 11.18,
-            "amount": 3690.4,
+            "shares": 10,
+            "price": 10,
+            "amount": 101,
             "fee": 1,
-            "remark": "爸爸給兩千及9805股息"
+            "remark": "測試"
           },
           {
             "id": "mryjxfhq5f7",
