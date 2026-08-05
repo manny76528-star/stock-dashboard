@@ -9920,8 +9920,12 @@ function saveJournal(){
     indexVal:parseFloat(document.getElementById('j-index')?.value)||null,
     stockPrices:(()=>{
       const prices={};
-      document.querySelectorAll('#j-stock-prices input[data-code]').forEach(el=>{
-        if(el.value)prices[el.dataset.code]=parseFloat(el.value);
+      // 同時檢查 Drawer 容器和舊 Modal 容器
+      const containers=['#j-stock-prices-container','#j-stock-prices'];
+      containers.forEach(sel=>{
+        document.querySelectorAll(sel+' input[data-code]').forEach(el=>{
+          if(el.value)prices[el.dataset.code]=parseFloat(el.value);
+        });
       });
       return Object.keys(prices).length>0?prices:null;
     })(),
