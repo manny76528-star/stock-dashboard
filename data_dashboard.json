@@ -2496,7 +2496,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1785922775166,
+  "_ts": 1785922869677,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -2566,6 +2566,28 @@
     }
   ],
   "journals": [
+    {
+      "id": "msfwd4u7wp4",
+      "date": "2026-08-05",
+      "tags": [],
+      "market": "〈台股開盤〉大漲逾1400點衝破4萬4收復季線 5天反彈幅度逾13%",
+      "market2": "",
+      "market3": "",
+      "marketUrl": "https://news.cnyes.com/news/id/6559895",
+      "youtubeUrl": "",
+      "content": "",
+      "stockTags": [
+        "00981A",
+        "00988A",
+        "009805"
+      ],
+      "eventCat": "技術面",
+      "behavior": "",
+      "indexVal": 44612,
+      "stockPrices": null,
+      "aiAnalysis": null,
+      "images": []
+    },
     {
       "id": "ms8s5bl497y",
       "date": "2026-07-31",
