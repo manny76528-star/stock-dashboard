@@ -2496,7 +2496,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1785925112344,
+  "_ts": 1785925130189,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -2584,7 +2584,11 @@
       "eventCat": "技術面",
       "behavior": "",
       "indexVal": 44612,
-      "stockPrices": null,
+      "stockPrices": {
+        "00981A": 28.46,
+        "00988A": 17.19,
+        "00981T": 12
+      },
       "aiAnalysis": null,
       "images": []
     },
@@ -2605,7 +2609,10 @@
       "eventCat": "技術面",
       "behavior": "阿豪の強心針",
       "indexVal": 43120,
-      "stockPrices": null,
+      "stockPrices": {
+        "0050": 102.85,
+        "00981A": 25.22
+      },
       "aiAnalysis": null,
       "images": [
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1785492469786_4tbx.jpg",
@@ -2633,7 +2640,11 @@
       "eventCat": "技術面",
       "behavior": "觸發PTSD",
       "indexVal": 39933,
-      "stockPrices": null,
+      "stockPrices": {
+        "00981A": 23.76,
+        "00988A": 14.21,
+        "009805": 15.02
+      },
       "aiAnalysis": null,
       "images": [
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1785474628418_ke01.jpg"
@@ -2665,7 +2676,11 @@
       "eventCat": "技術面",
       "behavior": "阿豪の強心針",
       "indexVal": 41603,
-      "stockPrices": null,
+      "stockPrices": {
+        "00981A": 26.45,
+        "00988A": 15.42,
+        "009805": 15.78
+      },
       "aiAnalysis": null,
       "images": [],
       "backtest": {
@@ -2691,7 +2706,9 @@
       "eventCat": "總經面",
       "behavior": "阿豪の強心針",
       "indexVal": 43655,
-      "stockPrices": null,
+      "stockPrices": {
+        "00981T": 11.92
+      },
       "aiAnalysis": null,
       "images": [],
       "backtest": {
@@ -2720,7 +2737,10 @@
       "eventCat": "技術面",
       "behavior": "跌到有點煩躁",
       "indexVal": 42671,
-      "stockPrices": null,
+      "stockPrices": {
+        "00981A": 29.3,
+        "00988A": 19.1
+      },
       "aiAnalysis": null,
       "images": [],
       "backtest": {
@@ -2777,7 +2797,11 @@
       "eventCat": "技術面",
       "behavior": "跌到有點煩躁",
       "indexVal": 44737,
-      "stockPrices": null,
+      "stockPrices": {
+        "00981A": 29.1,
+        "00988A": 18.49,
+        "00981T": 12.12
+      },
       "aiAnalysis": null,
       "images": [],
       "backtest": {
@@ -2840,7 +2864,11 @@
       "eventCat": "消息面",
       "behavior": "",
       "indexVal": 45479,
-      "stockPrices": null,
+      "stockPrices": {
+        "00981A": 30.55,
+        "00988A": 20.21,
+        "00981T": 12.32
+      },
       "aiAnalysis": null,
       "images": [],
       "backtest": {
@@ -2982,7 +3010,11 @@
       "eventCat": "",
       "behavior": "",
       "indexVal": 45000,
-      "stockPrices": null,
+      "stockPrices": {
+        "00981A": 30.15,
+        "00988A": 22.04,
+        "009805": 17.05
+      },
       "aiAnalysis": null,
       "images": [],
       "backtest": {
@@ -3012,7 +3044,11 @@
       "eventCat": "總經面",
       "behavior": "",
       "indexVal": 44572,
-      "stockPrices": null,
+      "stockPrices": {
+        "00981A": 29.91,
+        "00988A": 22.5,
+        "009805": 16.81
+      },
       "aiAnalysis": null,
       "images": [],
       "backtest": {
@@ -3338,7 +3374,10 @@
       "eventCat": "",
       "behavior": "",
       "indexVal": 44733,
-      "stockPrices": null,
+      "stockPrices": {
+        "00981A": 30.8,
+        "00988A": 20
+      },
       "aiAnalysis": null,
       "images": [],
       "backtest": {
@@ -3366,7 +3405,9 @@
       "eventCat": "",
       "behavior": "",
       "indexVal": 43636,
-      "stockPrices": null,
+      "stockPrices": {
+        "00981A": 30.72
+      },
       "aiAnalysis": null,
       "images": [],
       "backtest": {
@@ -3462,7 +3503,10 @@
       "eventCat": "",
       "behavior": "",
       "indexVal": 40176,
-      "stockPrices": null,
+      "stockPrices": {
+        "009805": 16.47,
+        "00403A": 9.72
+      },
       "aiAnalysis": null,
       "images": [],
       "backtest": {
@@ -3520,7 +3564,9 @@
       "eventCat": "",
       "behavior": "",
       "indexVal": 41790,
-      "stockPrices": null,
+      "stockPrices": {
+        "009805": 16.61
+      },
       "aiAnalysis": null,
       "images": [],
       "backtest": {
@@ -3548,7 +3594,9 @@
       "eventCat": "",
       "behavior": "",
       "indexVal": 41603,
-      "stockPrices": null,
+      "stockPrices": {
+        "009805": 16.8
+      },
       "aiAnalysis": null,
       "images": [],
       "backtest": {
@@ -3725,7 +3773,8 @@
       "behavior": "",
       "indexVal": 39616,
       "stockPrices": {
-        "009819": 10.1
+        "009819": 10.1,
+        "009805": 16.75
       },
       "aiAnalysis": null,
       "images": [],
@@ -3754,7 +3803,9 @@
       "eventCat": "",
       "behavior": "",
       "indexVal": 39616,
-      "stockPrices": null,
+      "stockPrices": {
+        "009805": 16.75
+      },
       "aiAnalysis": null,
       "images": [],
       "backtest": {
@@ -3879,7 +3930,9 @@
       "eventCat": "",
       "behavior": "",
       "indexVal": 36958,
-      "stockPrices": null,
+      "stockPrices": {
+        "009805": 16.3
+      },
       "aiAnalysis": null,
       "images": [],
       "backtest": {
@@ -3980,7 +4033,9 @@
         "00403A"
       ],
       "indexVal": 36296,
-      "stockPrices": null,
+      "stockPrices": {
+        "00403A": 10
+      },
       "images": [],
       "backtest": {
         "t5": 28.89,
