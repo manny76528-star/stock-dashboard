@@ -3445,9 +3445,27 @@ body:not(.privacy) .privacy-mask{filter:none;}
         </div>
         <div style="margin-bottom:12px">
           <span class="drawer-label">大盤環境 / 重大新聞（最多3則）</span>
-          <textarea class="drawer-textarea" id="j-market" rows="2" placeholder="第1則標題..." oninput="autoSaveJournalDraft()" style="border-radius:8px 8px 0 0;margin-bottom:2px"></textarea>
-          <textarea class="drawer-textarea" id="j-market2" rows="2" placeholder="第2則標題（選填）..." oninput="autoSaveJournalDraft()" style="border-radius:0;margin-bottom:2px"></textarea>
-          <textarea class="drawer-textarea" id="j-market3" rows="2" placeholder="第3則標題（選填）..." oninput="autoSaveJournalDraft()" style="border-radius:0 0 8px 8px"></textarea>
+          <div style="display:flex;gap:6px;align-items:flex-start;margin-bottom:2px">
+            <textarea class="drawer-textarea" id="j-market" rows="2" placeholder="第1則標題..." oninput="autoSaveJournalDraft()" style="flex:1;border-radius:8px;margin-bottom:0"></textarea>
+            <div style="display:flex;flex-direction:column;gap:4px;padding-top:2px">
+              <button id="j-market-color-r" onclick="setMarketColor(1,'red')" style="width:26px;height:26px;border-radius:6px;border:2px solid #e2e8f0;background:#fff;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center">🔴</button>
+              <button id="j-market-color-g" onclick="setMarketColor(1,'green')" style="width:26px;height:26px;border-radius:6px;border:2px solid #e2e8f0;background:#fff;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center">🟢</button>
+            </div>
+          </div>
+          <div style="display:flex;gap:6px;align-items:flex-start;margin-bottom:2px">
+            <textarea class="drawer-textarea" id="j-market2" rows="2" placeholder="第2則標題（選填）..." oninput="autoSaveJournalDraft()" style="flex:1;border-radius:8px;margin-bottom:0"></textarea>
+            <div style="display:flex;flex-direction:column;gap:4px;padding-top:2px">
+              <button id="j-market2-color-r" onclick="setMarketColor(2,'red')" style="width:26px;height:26px;border-radius:6px;border:2px solid #e2e8f0;background:#fff;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center">🔴</button>
+              <button id="j-market2-color-g" onclick="setMarketColor(2,'green')" style="width:26px;height:26px;border-radius:6px;border:2px solid #e2e8f0;background:#fff;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center">🟢</button>
+            </div>
+          </div>
+          <div style="display:flex;gap:6px;align-items:flex-start">
+            <textarea class="drawer-textarea" id="j-market3" rows="2" placeholder="第3則標題（選填）..." oninput="autoSaveJournalDraft()" style="flex:1;border-radius:8px;margin-bottom:0"></textarea>
+            <div style="display:flex;flex-direction:column;gap:4px;padding-top:2px">
+              <button id="j-market3-color-r" onclick="setMarketColor(3,'red')" style="width:26px;height:26px;border-radius:6px;border:2px solid #e2e8f0;background:#fff;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center">🔴</button>
+              <button id="j-market3-color-g" onclick="setMarketColor(3,'green')" style="width:26px;height:26px;border-radius:6px;border:2px solid #e2e8f0;background:#fff;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center">🟢</button>
+            </div>
+          </div>
         </div>
         <div>
           <span class="drawer-label">個人操作記錄 / 心得</span>
@@ -9379,7 +9397,15 @@ function renderJournalChart(){
               const date=labels[items[0].dataIndex];
               const j=sorted.find(x=>x.date===date);
               if(!j)return[];
-              const ms=[j.market,j.market2,j.market3].filter(Boolean);return ms.map((m,i)=>'📰 '+m);
+              const ms=[
+                {t:j.market,c:j.marketColor},
+                {t:j.market2,c:j.market2Color},
+                {t:j.market3,c:j.market3Color}
+              ].filter(m=>m.t);
+              return ms.map(m=>{
+                const col=m.c==='red'?'#dc2626':m.c==='green'?'#16a34a':'inherit';
+                return'📰 <span style="color:'+col+'">'+m.t+'</span>';
+              });
             }
           },
           maxWidth:200,padding:10,boxWidth:10,bodyFont:{size:11},
@@ -9700,6 +9726,9 @@ function autoSaveJournalDraft(){
     market:document.getElementById('j-market')?.value.trim()||'',
     market2:document.getElementById('j-market2')?.value.trim()||'',
     market3:document.getElementById('j-market3')?.value.trim()||'',
+    marketColor:window._marketColors?.[1]||'',
+    market2Color:window._marketColors?.[2]||'',
+    market3Color:window._marketColors?.[3]||'',
     content:document.getElementById('j-content')?.value||'',
     date:document.getElementById('j-date')?.value||'',
     savedAt:new Date().toISOString()
@@ -9727,6 +9756,9 @@ function _openJournalModalLegacy(id=null){
   document.getElementById('j-date').value=j?.date||new Date().toISOString().split('T')[0];
   document.getElementById('j-market').value=j?.market||'';
   const m2el=document.getElementById('j-market2');if(m2el)m2el.value=j?.market2||'';
+  // 還原顏色狀態
+  window._marketColors={1:j?.marketColor||'',2:j?.market2Color||'',3:j?.market3Color||''};
+  [1,2,3].forEach(n=>updateMarketColorBtn(n,window._marketColors[n]));
   const m3el=document.getElementById('j-market3');if(m3el)m3el.value=j?.market3||'';
   const jmUrlEl=document.getElementById('j-market-url');if(jmUrlEl)jmUrlEl.value=j?.marketUrl||'';
   document.getElementById('j-content').value=j?.content||'';
@@ -13010,6 +13042,26 @@ function saveFamilyTargetFromCard(){
   save();closeModal('familyTargetModal');
   renderFamilyMemberCards();
   toast('✅ '+member+' 目標已設為 $'+val.toLocaleString());
+}
+
+window._marketColors={1:'',2:'',3:''};
+function setMarketColor(n, color){
+  if(!window._marketColors)window._marketColors={1:'',2:'',3:''};
+  // 再點一次同色取消
+  if(window._marketColors[n]===color) window._marketColors[n]='';
+  else window._marketColors[n]=color;
+  updateMarketColorBtn(n, window._marketColors[n]);
+  autoSaveJournalDraft();
+}
+function updateMarketColorBtn(n, color){
+  const prefix = n===1?'j-market':n===2?'j-market2':'j-market3';
+  const rBtn=document.getElementById(prefix+'-color-r');
+  const gBtn=document.getElementById(prefix+'-color-g');
+  if(rBtn)rBtn.style.border=color==='red'?'2px solid #dc2626':'2px solid #e2e8f0';
+  if(gBtn)gBtn.style.border=color==='green'?'2px solid #16a34a':'2px solid #e2e8f0';
+  // 標題框文字顏色
+  const ta=document.getElementById(prefix==='j-market'?'j-market':prefix);
+  if(ta)ta.style.color=color==='red'?'#dc2626':color==='green'?'#16a34a':'';
 }
 
 function openInvFaithModal(){
