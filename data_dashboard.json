@@ -2496,7 +2496,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1785981404790,
+  "_ts": 1785981430469,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -4435,11 +4435,32 @@
                 "price": 10.73,
                 "fee": 2,
                 "remark": "媽媽存五千"
+              },
+              {
+                "id": "msgv8amuibp",
+                "type": "buy",
+                "date": "2026-08-06",
+                "shares": 932,
+                "price": 10.74,
+                "fee": 4,
+                "remark": "媽媽 8月存一萬"
               }
             ]
           }
         ],
         "log": [
+          {
+            "id": "msgv8amujtg",
+            "date": "2026-08-06",
+            "type": "buy",
+            "code": "00999A",
+            "name": "野村台灣高息",
+            "shares": 932,
+            "price": 10.74,
+            "amount": 10013.68,
+            "fee": 4,
+            "remark": "媽媽 8月存一萬"
+          },
           {
             "id": "mrxcltwaeqf",
             "date": "2026-07-23",
