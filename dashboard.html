@@ -4818,6 +4818,24 @@ let showDivRoi=false;
 
 function render(){renderInv();renderInvTop3();renderLoans();renderFlex();renderCash();renderDivs();renderSum();updateWatchNavBadge();}
 
+window._marketColors={1:'',2:'',3:''};
+function setMarketColor(n,color){
+  if(!window._marketColors)window._marketColors={1:'',2:'',3:''};
+  if(window._marketColors[n]===color)window._marketColors[n]='';
+  else window._marketColors[n]=color;
+  updateMarketColorBtn(n,window._marketColors[n]);
+  autoSaveJournalDraft();
+}
+function updateMarketColorBtn(n,color){
+  const prefix=n===1?'j-market':n===2?'j-market2':'j-market3';
+  const rBtn=document.getElementById(prefix+'-color-r');
+  const gBtn=document.getElementById(prefix+'-color-g');
+  if(rBtn)rBtn.style.border=color==='red'?'2px solid #dc2626':'2px solid #e2e8f0';
+  if(gBtn)gBtn.style.border=color==='green'?'2px solid #16a34a':'2px solid #e2e8f0';
+  const ta=document.getElementById(prefix);
+  if(ta)ta.style.color=color==='red'?'#dc2626':color==='green'?'#16a34a':'';
+}
+
 function renderInvestL1(){
   document.querySelectorAll('.db-page').forEach(p=>p.classList.remove('active'));
   const l1=document.getElementById('dbpage-invest-l1');
