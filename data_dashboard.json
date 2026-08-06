@@ -2496,7 +2496,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1786011529912,
+  "_ts": 1786011548466,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -2571,7 +2571,7 @@
       "date": "2026-08-05",
       "tags": [],
       "market": "〈台股開盤〉大漲逾1400點衝破4萬4收復季線 5天反彈幅度逾13%",
-      "market2": "",
+      "market2": "調停美伊戰爭結束有進展 荷姆茲海峽協議正在談判",
       "market3": "",
       "marketUrl": "https://news.cnyes.com/news/id/6559895",
       "youtubeUrl": "",
@@ -2587,20 +2587,10 @@
       "stockPrices": {
         "00981A": 28.46,
         "00988A": 17.19,
-        "00981T": 12
+        "00981T": 12.03
       },
       "aiAnalysis": null,
-      "images": [],
-      "backtest": {
-        "ret": 0,
-        "stocks": {
-          "00981A": 0,
-          "00988A": 0,
-          "00981T": 0
-        },
-        "retDate": "2026-08-05",
-        "note": ""
-      }
+      "images": []
     },
     {
       "id": "ms8s5bl497y",
