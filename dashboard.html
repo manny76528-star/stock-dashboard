@@ -9421,7 +9421,7 @@ function renderJournalChart(){
                 {t:j.market3,c:j.market3Color}
               ].filter(m=>m.t);
               return ms.map(m=>{
-                const col=m.c==='red'?'#dc2626':m.c==='green'?'#16a34a':'inherit';
+                const col=m.c==='red'?'#dc2626':m.c==='green'?'#16a34a':'#1e293b';
                 return'📰 <span style="color:'+col+'">'+m.t+'</span>';
               });
             }
@@ -9961,6 +9961,9 @@ function saveJournal(){
     market:document.getElementById('j-market').value.trim(),
     market2:document.getElementById('j-market2')?.value.trim()||'',
     market3:document.getElementById('j-market3')?.value.trim()||'',
+    marketColor:window._marketColors?.[1]||'',
+    market2Color:window._marketColors?.[2]||'',
+    market3Color:window._marketColors?.[3]||'',
     marketUrl:document.getElementById('j-market-url')?.value.trim()||'',
     youtubeUrl:document.getElementById('j-youtube-url')?.value.trim()||'',
     content:document.getElementById('j-content').value.trim(),
@@ -11420,7 +11423,7 @@ function renderOvJournal(){
     const markets=[j.market,j.market2,j.market3].filter(Boolean);
     return`<div class="ov-j-item" onclick="openSP('journal');setTimeout(()=>openJournalModal('${j.id}'),300)">
       <div class="ov-j-date">${j.date}</div>
-      ${markets.length?[j.market,j.market2,j.market3].filter(Boolean).map((m,i)=>{const c=[j.marketColor,j.market2Color,j.market3Color][i];const col=c==='red'?'#dc2626':c==='green'?'#16a34a':'';return`<div class="ov-j-title"${col?` style="color:${col}"`:''}}>📰 ${m.slice(0,60)}</div>`;}).join(''):
+      ${markets.length?[j.market,j.market2,j.market3].filter(Boolean).map((m,i)=>{const c=[j.marketColor,j.market2Color,j.market3Color][i];const col=c==='red'?'#dc2626':c==='green'?'#16a34a':'#1e293b';return`<div class="ov-j-title"${col?` style="color:${col}"`:''}}>📰 ${m.slice(0,60)}</div>`;}).join(''):
         `<div class="ov-j-title">${(j.content||'（無標題）').slice(0,60)}</div>`}
       ${tags?`<div class="ov-j-tags" style="display:flex;gap:4px;margin-top:4px;flex-wrap:wrap">${tags}</div>`:''}
     </div>`;
@@ -11526,7 +11529,7 @@ function renderJournalReadMode(id){
     if(markets.length===0){marketEl.innerHTML='';marketEl.style.display='none';}
     else{
       marketEl.innerHTML=markets.map((m,i)=>
-        `<div style="${i>0?'margin-top:8px':''};color:${[j.marketColor,j.market2Color,j.market3Color][i]==='red'?'#dc2626':[j.marketColor,j.market2Color,j.market3Color][i]==='green'?'#16a34a':'inherit'}">📰 ${m}</div>`
+        `<div style="${i>0?'margin-top:8px':''};color:${[j.marketColor,j.market2Color,j.market3Color][i]==='red'?'#dc2626':[j.marketColor,j.market2Color,j.market3Color][i]==='green'?'#16a34a':'#1e293b'}">📰 ${m}</div>`
       ).join('');
       marketEl.style.display='';
     }
