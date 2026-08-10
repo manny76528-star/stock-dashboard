@@ -7740,24 +7740,20 @@ setInterval(autoSnapshot, 15*60*1000);
 // ── 補拍：開啟頁面時檢查上週五有沒有快照 ──
 function checkMakeupSnapshot(){
   const today=new Date();
-  // 找上一個禮拜五
-  const dayOfWeek=today.getDay();
-  const daysBack=dayOfWeek===5?7:(dayOfWeek+2)%7+1; // 距離上個禮拜五幾天
+  const dayOfWeek=today.getDay(); // 0=日,1=月,...,5=五,6=六
+  // 往回找最近的週五（今天是週五則找7天前）
+  const daysToLastFri=dayOfWeek===5?7:(dayOfWeek-5+7)%7||7;
   const lastFri=new Date(today);
-  lastFri.setDate(today.getDate()-(dayOfWeek===5?7:(dayOfWeek===0?1:dayOfWeek+1)));
-  // 確保是上週五（不是今天）
-  if(lastFri.getDay()!==5)return;
+  lastFri.setDate(today.getDate()-daysToLastFri);
+  if(lastFri.getDay()!==5)return; // 安全確認
   const y=lastFri.getFullYear();
   const m=String(lastFri.getMonth()+1).padStart(2,'0');
   const d=String(lastFri.getDate()).padStart(2,'0');
   const dateKey=`${y}-${m}-${d}`;
   const snapshotKey='snap_done_'+dateKey;
-  // 已有快照或已補拍過，跳過
   if(localStorage.getItem(snapshotKey))return;
-  // 檢查 db.snapshots 裡有沒有上週五的快照
   const hasFriSnap=(db.snapshots||[]).some(s=>(s.ym||'').startsWith(dateKey));
   if(hasFriSnap){localStorage.setItem(snapshotKey,'1');return;}
-  // 沒有快照 → 補拍
   localStorage.setItem(snapshotKey,'1');
   console.log('📸 補拍上週五快照：'+dateKey);
   setTimeout(()=>{
