@@ -2520,7 +2520,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1786352689936,
+  "_ts": 1786352704132,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -4168,6 +4168,9 @@
       "market": "美以伊戰爭：巴基斯坦和平談判失敗 萬斯帶著「最後提議」離開巴基斯坦",
       "market2": "台股估值過高：台股股價淨值比(P/B)回到3.5倍的歷史新高，價格並不便宜",
       "market3": "",
+      "marketColor": "green",
+      "market2Color": "green",
+      "market3Color": "",
       "marketUrl": "https://www.bbc.com/zhongwen/articles/cjw81e6q10yo/trad",
       "youtubeUrl": "",
       "content": "美股道瓊、標普500、納斯達克今年表現相對落後，且本益比低於20倍，相較台股更具吸引力\n股添樂：\n台股與韓股位階較高，若要參與行情應鎖定強勢科技股；同時應增加美股配置並保留部分高利現金資\n產，以應對未來可能的波動",
@@ -4177,13 +4180,7 @@
       "indexVal": 35457,
       "stockPrices": null,
       "aiAnalysis": null,
-      "images": [],
-      "backtest": {
-        "ret": 26.71,
-        "stocks": {},
-        "retDate": "2026-08-10",
-        "note": "從寫日誌到現在已上漲 +26.7%！"
-      }
+      "images": []
     },
     {
       "id": "mnzux5v3kmt",
