@@ -7229,7 +7229,9 @@ async function recordSnapshot(manual=false){
   if(existing>=0)db.snapshots[existing]=snap;
   else db.snapshots.push(snap);
   db.snapshots.sort((a,b)=>a.ym.localeCompare(b.ym));
-  save();renderTrendChart();
+  save();
+  // 只在趨勢頁才渲染圖表，避免 canvas null 錯誤
+  if(document.getElementById('dbpage-trend')?.classList.contains('active'))renderTrendChart();
   if(manual)toast('✅ 已記錄 '+dateKey+' 快照（淨資產:$'+Math.round(net).toLocaleString()+'）');
   else console.log('Auto snapshot:',dateKey,'net:',Math.round(net),'index:',indexVal);
 }
