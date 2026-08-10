@@ -2421,10 +2421,10 @@
     },
     {
       "ym": "2026-08-10",
-      "net": 2930294,
+      "net": 2924294,
       "div": 89950,
       "cf": 1260,
-      "debtRatio": 82.1,
+      "debtRatio": 82.2,
       "indexVal": 44929,
       "holdings": [
         {
@@ -2520,7 +2520,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1786352238671,
+  "_ts": 1786352432988,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
