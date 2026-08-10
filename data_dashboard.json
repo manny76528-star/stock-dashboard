@@ -2520,7 +2520,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1786352601296,
+  "_ts": 1786352610262,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -3019,6 +3019,9 @@
       "market": "蘋果漲價衝擊，美PCE數據引升息預期，法人賣超2055億元",
       "market2": "台北股市 股王股后皆跌停 台股暴跌1683點 史上第3大",
       "market3": "",
+      "marketColor": "green",
+      "market2Color": "green",
+      "market3Color": "",
       "marketUrl": "https://ec.ltn.com.tw/article/paper/1760453",
       "youtubeUrl": "",
       "content": "美 PCE 數據超預期引發升息恐慌，加（Apple）漲價衝擊，全球金融市場血洗。\n韓國股市盤中再度觸發「融斷機制」。台股今日慘淪重災區，\n三大法人同步狂逃，瘋狂倒貨賣超 2055 億元。指標股信心崩盤\n\n記錄此點位，留待日後查看 K 線驗證是否為市場過度恐慌。",
@@ -3036,17 +3039,7 @@
         "009805": 16.81
       },
       "aiAnalysis": null,
-      "images": [],
-      "backtest": {
-        "ret": 0.09,
-        "stocks": {
-          "00981A": -4.85,
-          "00988A": -23.6,
-          "009805": -2.62
-        },
-        "retDate": "2026-08-05",
-        "note": ""
-      }
+      "images": []
     },
     {
       "id": "mqtbf0za3t0",
