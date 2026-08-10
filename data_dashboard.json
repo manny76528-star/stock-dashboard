@@ -2520,7 +2520,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1786352782661,
+  "_ts": 1786352788045,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -3656,6 +3656,9 @@
       "market": "台積電殺尾盤(-2.4%) 聯發科衝到3985元續創史高 台股收漲186點 4萬2得而復失",
       "market2": "法巴：下調GE Vernova(GEV.US)評級至\"中性\"燃氣輪機產能鎖定壓制後續增長\n009805 兩天回落5%",
       "market3": "",
+      "marketColor": "green",
+      "market2Color": "green",
+      "market3Color": "red",
       "marketUrl": "https://hk.investing.com/news/stock-market-news/article-1429284",
       "youtubeUrl": "",
       "content": "009805 這兩天出現不曉得跌幅 , 兩天回落5% 主要是GEV的產能滿載導致無法接新的高毛利單被調降評等 但我依然會把它當成未來3年的重要持股 , 因為產業趨勢明確性還是大於短期的震盪波動 , 我相信回頭看這5%一定只是小小波動, 且電池概念相關為主的009805定能再創新高",
@@ -3669,15 +3672,7 @@
         "009805": 16.61
       },
       "aiAnalysis": null,
-      "images": [],
-      "backtest": {
-        "ret": 7.51,
-        "stocks": {
-          "009805": -2.41
-        },
-        "retDate": "2026-08-10",
-        "note": ""
-      }
+      "images": []
     },
     {
       "id": "mowqohh2ku2",
