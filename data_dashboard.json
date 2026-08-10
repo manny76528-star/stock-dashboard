@@ -2520,7 +2520,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1786352704132,
+  "_ts": 1786352710894,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -4111,24 +4111,25 @@
         "看空"
       ],
       "market": "美股台股都反彈持續創新高 , 台幣從32 回落至31.55回檔幅度1.8%",
+      "market2": "",
+      "market3": "",
+      "marketColor": "red",
+      "market2Color": "green",
+      "market3Color": "",
       "marketUrl": "",
+      "youtubeUrl": "",
       "content": "這波反彈的力道真的很強大 , 台股 美股紛紛創新高 連帶台幣也從32元快速回落至31.55\n持有的短債遭受不小跌幅 , 今年這種台幣升值害怕的PTSD都會浮現 , 當下都會對持有的00864B害怕 , 但事後其實這都小事",
       "stockTags": [
         "00864B"
       ],
+      "eventCat": "",
+      "behavior": "",
       "indexVal": 36722,
       "stockPrices": {
         "00864B": 46.31
       },
-      "images": [],
-      "backtest": {
-        "ret": 22.35,
-        "retDate": "2026-08-10",
-        "note": "事後證明：當時恐慌，但後來漲了 +22.4%，恐慌是過度的！",
-        "stocks": {
-          "00864B": 1.84
-        }
-      }
+      "aiAnalysis": null,
+      "images": []
     },
     {
       "id": "mnzuszjkwdb",
