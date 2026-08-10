@@ -2520,7 +2520,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1786352576320,
+  "_ts": 1786352583354,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -2884,7 +2884,13 @@
         "賣出"
       ],
       "market": "這波由 Meta 計劃出售閒置 AI 算力引起的全球半導體與記憶體海嘯\n費半從事件爆發的 7月1日 兩交易日累積跌幅達 -11.37%。",
+      "market2": "",
+      "market3": "",
+      "marketColor": "green",
+      "market2Color": "green",
+      "market3Color": "",
       "marketUrl": "https://www.msn.com/zh-tw/news/world/%E6%99%B6%E7%89%87%E8%82%A1%E6%8B%96%E7%B4%AF%E7%BE%8E%E8%82%A1-%E7%BE%8E%E5%85%89-sandisk%E8%82%A1%E5%83%B9%E7%9A%86%E9%87%8D%E6%8C%AB/ar-AA270siE?ocid=finance-verthp-feeds&apiversion=v2&domshim=1&noservercache=1&noservertelemetry=1&batchservertelemetry=1&renderwebcomponents=1&wcseo=1",
+      "youtubeUrl": "",
       "content": "費半兩天累積的跌幅 , 已經創下兩天累積交易日的跌幅\n由於上周五美股休市 , 市場沉澱了兩天後 今天開盤紛紛開高\n韓國更是上漲3% 但隨即翻黑到跌3% , 台股開高走低但主流設備股幾乎重跌\n導致大盤雖紅 , 但主動ETF幾乎紛紛重挫 ,\n總總跡象顯示這波AI回調再沒有出現新利多時是很難扭轉趨勢的\n\n今天將訂單滿到2030的 009805賣出 , 主要是他與AI設備股連動太深了 , \n但上漲比例又跟不上, 目前將009805資金轉移到00981T , \n前陣子被我豬狗嫌的台幣匯率跟短債 幾乎紛紛創新高\n果然週期不拉長總就自己會是小丑一個",
       "stockTags": [
         "00981A",
@@ -2894,7 +2900,7 @@
         "00864B"
       ],
       "eventCat": "消息面",
-      "behavior": "停損離場",
+      "behavior": "",
       "indexVal": 46556,
       "stockPrices": {
         "00981A": 31.2,
@@ -2904,19 +2910,7 @@
         "00864B": 46.59
       },
       "aiAnalysis": null,
-      "images": [],
-      "backtest": {
-        "ret": -4.18,
-        "stocks": {
-          "00981A": -8.78,
-          "00988A": -17.47,
-          "009805": -2.56,
-          "00981T": -3.15,
-          "00864B": 1.09
-        },
-        "retDate": "2026-08-05",
-        "note": ""
-      }
+      "images": []
     },
     {
       "id": "mr3c1nmyqcp",
