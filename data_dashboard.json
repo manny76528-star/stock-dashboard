@@ -2520,7 +2520,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1786352710894,
+  "_ts": 1786352717305,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -4087,6 +4087,9 @@
       "market": "伊朗宣布荷姆茲海峽「完全開放」 油價應聲大跌逾10％",
       "market2": "00403A申購基金 尚有一個月空窗期,Parking至 位階相對低的00997A",
       "market3": "",
+      "marketColor": "red",
+      "market2Color": "",
+      "market3Color": "",
       "marketUrl": "https://www.ctee.com.tw/news/20260417702033-430702",
       "youtubeUrl": "",
       "content": "目前觀察美伊戰火已鈍化趨緩 , 且伊朗晚間宣布對外開放荷姆茲海峽 , 金融資產紛紛大漲\n原定申購00403A 但申購日後距離上市日期尚有約1個月 \n因此今天將預投入00403的資金先Parking 至 00997A *55張 (均價10.41)",
@@ -4096,13 +4099,7 @@
       "indexVal": 36804,
       "stockPrices": null,
       "aiAnalysis": null,
-      "images": [],
-      "backtest": {
-        "ret": 22.08,
-        "stocks": {},
-        "retDate": "2026-08-10",
-        "note": "從寫日誌到現在已上漲 +22.1%！"
-      }
+      "images": []
     },
     {
       "id": "mnzuqffpvo6",
