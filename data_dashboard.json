@@ -2520,7 +2520,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1786441126943,
+  "_ts": 1786441229141,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -5344,6 +5344,15 @@
                 "price": 11.6,
                 "fee": 1,
                 "remark": ""
+              },
+              {
+                "id": "msogzdk7heg",
+                "type": "buy",
+                "date": "2026-08-11",
+                "shares": 9,
+                "price": 12.11,
+                "fee": 1,
+                "remark": "軒_存100"
               }
             ]
           },
@@ -5402,6 +5411,18 @@
           }
         ],
         "log": [
+          {
+            "id": "msogzdk7u6w",
+            "date": "2026-08-11",
+            "type": "buy",
+            "code": "00983A",
+            "name": "主動中信ARK創新",
+            "shares": 9,
+            "price": 12.11,
+            "amount": 109.99,
+            "fee": 1,
+            "remark": "軒_存100"
+          },
           {
             "id": "msmz43teb9u",
             "date": "2026-08-10",
