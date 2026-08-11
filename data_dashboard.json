@@ -2520,7 +2520,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1786441288569,
+  "_ts": 1786441377682,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -4668,6 +4668,23 @@
                 "remark": ""
               }
             ]
+          },
+          {
+            "id": "msoh2k6e9iq",
+            "code": "009811",
+            "name": "統一美國50",
+            "url": "",
+            "transactions": [
+              {
+                "id": "msoh2k6ezyb",
+                "type": "buy",
+                "date": "2026-08-11",
+                "shares": 1100,
+                "price": 13.6,
+                "fee": 6,
+                "remark": "領981T股息_自己再多存1萬5"
+              }
+            ]
           }
         ],
         "log": [
@@ -4682,6 +4699,18 @@
             "amount": 20007.920000000002,
             "fee": 8,
             "remark": "每月定期定額_2萬"
+          },
+          {
+            "id": "msoh2k6e9jk",
+            "date": "2026-08-11",
+            "type": "buy",
+            "code": "009811",
+            "name": "統一美國50",
+            "shares": 1100,
+            "price": 13.6,
+            "amount": 14966,
+            "fee": 6,
+            "remark": "領981T股息_自己再多存1萬5"
           },
           {
             "id": "ms8hb10klrd",
