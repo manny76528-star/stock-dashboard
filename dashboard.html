@@ -7297,7 +7297,9 @@ function renderTrendChart(){
   if(showDiv)datasets.push({label:'每月股息',data:snaps.map(s=>s.div),borderColor:'#3498db',backgroundColor:'rgba(52,152,219,0.1)',tension:0.3,yAxisID:'yNet'});
   if(showCf)datasets.push({label:'每月現金流',data:snaps.map(s=>s.cf),borderColor:'#2ecc71',backgroundColor:'rgba(46,204,113,0.1)',tension:0.3,yAxisID:'yNet'});
   if(showDebt)datasets.push({label:'負債比(%)',data:snaps.map(s=>s.debtRatio),borderColor:'#f39c12',backgroundColor:'rgba(243,156,18,0.1)',tension:0.3,yAxisID:'y2'});
-  const ctx=document.getElementById('trendCanvas').getContext('2d');
+  const canvas=document.getElementById('trendCanvas');
+  if(!canvas)return; // 不在趨勢頁就不渲染
+  const ctx=canvas.getContext('2d');
   if(_trendChart)_trendChart.destroy();
   _trendChart=new Chart(ctx,{
     type:'line',
