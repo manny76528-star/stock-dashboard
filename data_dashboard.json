@@ -2445,18 +2445,18 @@
     },
     {
       "ym": "2026-08-11",
-      "net": 3029008,
+      "net": 2990458,
       "div": 89950,
       "cf": 1260,
-      "debtRatio": 81.6,
-      "indexVal": 44912,
+      "debtRatio": 81.8,
+      "indexVal": 45121,
       "holdings": [
         {
           "code": "00981T",
           "name": "平衡凱基雙核收息",
           "lots": 1285,
-          "price": 11.99,
-          "pnl": -311034
+          "price": 11.96,
+          "pnl": -349584
         },
         {
           "code": "009826",
@@ -2544,7 +2544,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1786440912163,
+  "_ts": 1786441105128,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
