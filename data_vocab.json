@@ -7784,7 +7784,7 @@
   ],
   "todayDate": "2026-04-20",
   "streak": 0,
-  "_ts": 1786529230967,
+  "_ts": 1786529254480,
   "weak": {
     "v1776614500732244e": true,
     "v1776614500732qwvc": true,
@@ -7892,7 +7892,8 @@
   "grammarWeak": {
     "gmrlv76cgqax": true,
     "gmrlv76cgo0i": true,
-    "gmrlv76cgrlf": true
+    "gmrlv76cgrlf": true,
+    "gmrlv76cgupo": true
   },
   "grammarDone": 21,
   "verb": [
