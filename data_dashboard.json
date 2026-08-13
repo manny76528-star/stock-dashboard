@@ -1362,6 +1362,30 @@
         }
       ],
       "order": 17
+    },
+    {
+      "id": "msrd1jhz4xv",
+      "code": "009823",
+      "name": "群益S&P500",
+      "lots": 92,
+      "avgPrice": 10.64,
+      "divPerShare": 0,
+      "note": "現股",
+      "url": "https://www.wantgoo.com/stock/etf/009823/dividend-policy/ex-dividend",
+      "holdType": "long",
+      "targetRoi": 5,
+      "transactions": [
+        {
+          "id": "msrd1jhzdx2",
+          "type": "buy",
+          "lots": 92,
+          "price": 10.64,
+          "date": "2026-08-13",
+          "fee": 0,
+          "remark": "VT轉移到S&P500 _ 主要是我看長期回測 S&P500贏VT很多"
+        }
+      ],
+      "order": 18
     }
   ],
   "loans": [
@@ -2538,7 +2562,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1786615889146,
+  "_ts": 1786616010209,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
