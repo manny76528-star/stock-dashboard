@@ -1481,7 +1481,7 @@
     {
       "id": "mneeom9dzod",
       "bank": "統一券商",
-      "cash": 10,
+      "cash": 184324,
       "d1Date": "",
       "d1": 0,
       "d2": 0
@@ -2562,7 +2562,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1786616020653,
+  "_ts": 1786616036529,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
