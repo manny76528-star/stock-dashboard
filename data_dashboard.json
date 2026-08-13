@@ -1341,6 +1341,24 @@
           "date": "2026-08-03",
           "fee": 0,
           "remark": "小P： VT才是投資全球,才能跟隨全球需求上漲"
+        },
+        {
+          "id": "msqw38ng2jz",
+          "type": "sell",
+          "lots": 95,
+          "price": 10.3,
+          "date": "2026-08-13",
+          "fee": 3326,
+          "lotRefs": [
+            {
+              "txnId": "msd2f1gzk6x",
+              "lots": 95,
+              "date": "2026-08-03"
+            }
+          ],
+          "remark": "轉移到S&P500 _ 009823 (回測SP500贏VT非常多)",
+          "mood": "😌 平靜",
+          "lossReason": "停利出場"
         }
       ],
       "order": 17
@@ -2520,7 +2538,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1786587463038,
+  "_ts": 1786587535997,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
