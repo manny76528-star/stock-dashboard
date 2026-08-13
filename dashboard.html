@@ -2625,7 +2625,16 @@ body:not(.privacy) .privacy-mask{filter:none;}
         <div class="trend-page-card" style="padding:0;overflow:hidden">
           <div class="trend-page-hdr" style="padding:12px 16px;border-bottom:1px solid #f0f2f5">
             <span>📈 市值趨勢</span>
-            <span style="font-size:11px;color:#9ca3af">（每次買入/賣出時記錄）</span>
+            <div style="display:flex;gap:12px;align-items:center">
+              <label style="font-size:11px;color:#64748b;display:flex;align-items:center;gap:4px;cursor:pointer">
+                <input type="checkbox" id="family-chart-cost" checked onchange="renderFamilyTrendChart(window._curFamilyAcc)">
+                <span style="color:#2563eb">● 投入成本</span>
+              </label>
+              <label style="font-size:11px;color:#64748b;display:flex;align-items:center;gap:4px;cursor:pointer">
+                <input type="checkbox" id="family-chart-mkt" checked onchange="renderFamilyTrendChart(window._curFamilyAcc)">
+                <span style="color:#dc2626">● 市值</span>
+              </label>
+            </div>
           </div>
           <div style="padding:16px">
             <canvas id="family-trend-chart" height="120"></canvas>
@@ -7229,6 +7238,24 @@ async function recordSnapshot(manual=false){
   if(existing>=0)db.snapshots[existing]=snap;
   else db.snapshots.push(snap);
   db.snapshots.sort((a,b)=>a.ym.localeCompare(b.ym));
+
+  // 順便記錄家族成員市值快照
+  if(db.family&&db.family.accounts){
+    Object.entries(db.family.accounts).forEach(([member,acc])=>{
+      const mkt=Math.round((acc.holdings||[]).reduce((s,h)=>{
+        const c=calcFamilyHolding(h);
+        return s+(c.mktVal||0);
+      },0));
+      if(mkt<=0)return;
+      if(!acc.mktHistory)acc.mktHistory=[];
+      // 同一日期更新，不重複
+      const idx=acc.mktHistory.findIndex(r=>r.date===dateKey);
+      if(idx>=0)acc.mktHistory[idx].mkt=mkt;
+      else acc.mktHistory.push({date:dateKey,mkt});
+      acc.mktHistory.sort((a,b)=>a.date.localeCompare(b.date));
+    });
+  }
+
   save();
   // 只在趨勢頁才渲染圖表，避免 canvas null 錯誤
   if(document.getElementById('dbpage-trend')?.classList.contains('active'))renderTrendChart();
@@ -12805,65 +12832,84 @@ function renderFamilyPage(){
 
 let _familyTrendChart=null;
 function renderFamilyTrendChart(acc){
+  if(!acc)return;
+  window._curFamilyAcc=acc; // 存起來供勾選框用
   const canvas=document.getElementById('family-trend-chart');
+  const emptyEl=document.getElementById('family-trend-empty');
   if(!canvas)return;
   const logs=[...(acc.log||[])].sort((a,b)=>a.date.localeCompare(b.date));
-  if(logs.length===0){canvas.style.display='none';return;}
-  canvas.style.display='';
+  const mktHistory=[...(acc.mktHistory||[])].sort((a,b)=>a.date.localeCompare(b.date));
 
-  // 每個日期計算累積投入成本
-  const points=[];
+  if(logs.length===0&&mktHistory.length===0){
+    canvas.style.display='none';
+    if(emptyEl)emptyEl.style.display='';
+    return;
+  }
+  canvas.style.display='';
+  if(emptyEl)emptyEl.style.display='none';
+
+  // 累積投入成本（從 log 計算每個日期的累積成本）
+  const costByDate={};
   let cumCost=0;
   logs.forEach(l=>{
     if(l.type==='buy')cumCost+=l.amount||0;
     else if(l.type==='sell')cumCost-=Math.abs(l.amount||0);
-    const last=points[points.length-1];
-    if(last&&last.date===l.date)last.cost=Math.round(cumCost);
-    else points.push({date:l.date,cost:Math.round(cumCost)});
+    costByDate[l.date]=Math.round(cumCost);
   });
 
-  // 今天的市值
-  const curMkt=acc.holdings.reduce((s,h)=>{
-    const c=calcFamilyHolding(h);
-    return s+(c.mktVal||0);
-  },0);
+  // 今天市值
   const today=new Date().toISOString().slice(0,10);
-  if(!points.find(p=>p.date===today)&&curMkt>0)
-    points.push({date:today,cost:Math.round(cumCost)});
+  const curMkt=Math.round((acc.holdings||[]).reduce((s,h)=>{
+    const c=calcFamilyHolding(h);return s+(c.mktVal||0);
+  },0));
 
-  const labels=points.map(p=>p.date);
-  const costData=points.map(p=>p.cost);
-  // 市值只在最後一點顯示真實值，其他點用 null
-  const mktData=points.map((p,i)=>i===points.length-1&&curMkt>0?Math.round(curMkt):null);
+  // 合併所有日期
+  const allDates=[...new Set([
+    ...Object.keys(costByDate),
+    ...mktHistory.map(r=>r.date),
+    ...(curMkt>0?[today]:[])
+  ])].sort();
+
+  // 填補成本（前向填充）
+  let lastCost=0;
+  const costData=allDates.map(d=>{
+    if(costByDate[d]!==undefined)lastCost=costByDate[d];
+    return lastCost;
+  });
+
+  // 市值資料（歷史快照 + 今日）
+  const mktMap={};
+  mktHistory.forEach(r=>mktMap[r.date]=r.mkt);
+  if(curMkt>0)mktMap[today]=curMkt;
+  const mktData=allDates.map(d=>mktMap[d]??null);
+
+  // 勾選狀態
+  const showCost=document.getElementById('family-chart-cost')?.checked!==false;
+  const showMkt=document.getElementById('family-chart-mkt')?.checked!==false;
+
+  const datasets=[];
+  if(showCost)datasets.push({
+    label:'累積投入成本',data:costData,
+    borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,0.06)',
+    tension:0.3,fill:true,pointRadius:2,borderWidth:2,spanGaps:true
+  });
+  if(showMkt)datasets.push({
+    label:'市值',data:mktData,
+    borderColor:curMkt>=lastCost?'#dc2626':'#16a34a',
+    backgroundColor:'transparent',
+    tension:0.3,fill:false,pointRadius:4,borderWidth:2,spanGaps:false,
+    pointBackgroundColor:curMkt>=lastCost?'#dc2626':'#16a34a'
+  });
 
   if(_familyTrendChart)_familyTrendChart.destroy();
   _familyTrendChart=new Chart(canvas,{
     type:'line',
-    data:{
-      labels,
-      datasets:[
-        {
-          label:'累積投入成本',
-          data:costData,
-          borderColor:'#2563eb',
-          backgroundColor:'rgba(37,99,235,0.06)',
-          tension:0.3,fill:true,pointRadius:3,borderWidth:2,spanGaps:true
-        },
-        {
-          label:'目前市值 $'+Math.round(curMkt).toLocaleString(),
-          data:mktData,
-          borderColor:curMkt>=cumCost?'#dc2626':'#16a34a',
-          backgroundColor:'transparent',
-          pointRadius:7,pointBackgroundColor:curMkt>=cumCost?'#dc2626':'#16a34a',
-          borderWidth:0,showLine:false,spanGaps:false
-        }
-      ]
-    },
+    data:{labels:allDates,datasets},
     options:{
       responsive:true,
       plugins:{
         legend:{display:true,labels:{font:{size:10},boxWidth:10,padding:8}},
-        tooltip:{callbacks:{label:ctx=>'$'+Math.round(ctx.raw||0).toLocaleString()}}
+        tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': $'+Math.round(ctx.raw||0).toLocaleString()}}
       },
       scales:{
         x:{ticks:{font:{size:10},maxTicksLimit:8}},
