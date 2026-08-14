@@ -1489,7 +1489,7 @@
     {
       "id": "mr1iz7mm2ls",
       "bank": "期貨",
-      "cash": 6,
+      "cash": 30000,
       "d1Date": "",
       "d1": 0,
       "d2": 0
@@ -2586,7 +2586,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1786694631846,
+  "_ts": 1786694636616,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
