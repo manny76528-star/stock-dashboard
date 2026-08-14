@@ -12121,6 +12121,22 @@ function delFamilyTxn(hId,txnId){
 
 let _quickBuyMember='';
 
+function openFamilyBuyForHolding(member, code){
+  // 先設定成員
+  _quickBuyMember = member;
+  const acc = getFamilyAccount(member);
+  // 開快捷買入 Modal
+  document.getElementById('fqb-title').textContent = '+ 買入（'+member+'）';
+  const sel = document.getElementById('fqb-code-sel');
+  sel.innerHTML = '<option value="">— 選擇持倉標的 —</option>'
+    + acc.holdings.map(h=>`<option value="${h.code}">${h.code} ${h.name||''}</option>`).join('')
+    + '<option value="__new__">＋ 新增全新標的</option>';
+  // 直接選到指定標的
+  sel.value = code;
+  onFqbCodeChange();
+  openModal('familyQuickBuyModal');
+}
+
 function openFamilyQuickBuy(member){
   _quickBuyMember=member;
   document.getElementById('fqb-title').textContent='+ 買入（'+member+'）';
@@ -12648,7 +12664,7 @@ function renderFamilyMemberCards(){
       const bg=pct>=50?'#2563eb':pct>=20?'#dbeafe':'#f1f5f9';
       const fg=pct>=50?'#ffffff':pct>=20?'#1e40af':'#475569';
       const border=pct>=50?'#1d4ed8':pct>=20?'#bfdbfe':'#e2e8f0';
-      return`<span style="display:inline-flex;align-items:center;gap:2px;background:${bg};color:${fg};font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;border:1px solid ${border};letter-spacing:.2px">${h.code} <span style="font-weight:500;opacity:.85">${pct}%</span></span>`;
+      return`<span onclick="event.stopPropagation();openFamilyBuyForHolding('${member}','${h.code}')" style="display:inline-flex;align-items:center;gap:2px;background:${bg};color:${fg};font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;border:1px solid ${border};letter-spacing:.2px;cursor:pointer" title="點擊快速買入 ${h.code}">${h.code} <span style="font-weight:500;opacity:.85">${pct}%</span></span>`;
     }).join('  ');
 
     return`<div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:16px;padding:24px;cursor:pointer;transition:all .22s cubic-bezier(.4,0,.2,1);box-shadow:0 4px 6px -1px rgba(0,0,0,.05);position:relative" onclick="openFamilyFaithModal('${member}')" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 10px 30px -5px rgba(37,99,235,.12),0 4px 8px -2px rgba(0,0,0,.06)';this.style.borderColor='#93c5fd'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 6px -1px rgba(0,0,0,.05)';this.style.borderColor='#e2e8f0'">
