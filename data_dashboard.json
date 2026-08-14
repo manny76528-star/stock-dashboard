@@ -960,6 +960,16 @@
           "fee": 38,
           "remark": "",
           "mood": "🤔 猶豫"
+        },
+        {
+          "id": "mssnw0sciaq",
+          "type": "buy",
+          "lots": 15,
+          "price": 12.04,
+          "date": "2026-08-14",
+          "fee": 72,
+          "remark": "",
+          "mood": "😌 平靜"
         }
       ],
       "order": 9
@@ -2586,7 +2596,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1786694636616,
+  "_ts": 1786694694632,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
