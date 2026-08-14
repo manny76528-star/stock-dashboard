@@ -13199,7 +13199,7 @@ function dbShowPage(id){
   if(id==='invest'){renderInvestL1();return;}
   if(id==='invest-detail'){renderInvestPage();return;}
   if(id==='trend')renderTrendPage();
-  if(id==='journal'){renderJournalPage();if(typeof renderJournal==='function')renderJournal();}
+  if(id==='journal'){renderJournalPage();setTimeout(()=>{if(typeof renderJournal==='function')renderJournal();},150);}
   if(id==='dividend'){if(typeof renderDivs==='function')renderDivs();}
   if(id==='analytics'){if(typeof renderAnalytics==='function')renderAnalytics();}
   if(id==='finplan')renderFinPlanPage();
