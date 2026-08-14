@@ -7443,7 +7443,17 @@ function openSnapDetail(ym){
   if(!snap)return;
   document.getElementById('snap-detail-title').textContent='📋 '+ym+' 持股明細';
   const body=document.getElementById('snap-detail-body');
-  const holdings=snap.holdings||[];
+  // 如果快照沒有持股明細，從 db.investments 即時產生（用 db.prices 的收盤價）
+  let holdings=snap.holdings||[];
+  if(holdings.length===0){
+    holdings=db.investments.map(inv=>{
+      const c=calcInv(inv);
+      if(c.tLots<=0)return null;
+      const price=db.prices[inv.code]?.price||null;
+      const pnl=price!=null?Math.round(c.tLots*1000*price-c.tCost):null;
+      return{code:inv.code,name:inv.name||'',lots:c.tLots,price,pnl};
+    }).filter(Boolean);
+  }
   if(holdings.length===0 && !snap.indexVal){
     body.innerHTML='<div style="text-align:center;padding:30px;color:#94a3b8">此快照無持股明細<br><span style="font-size:11px">（2026/05/22之後記錄的快照才有明細）</span></div>';
   } else {
