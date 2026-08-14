@@ -2494,30 +2494,6 @@
           "pnl": 30400
         }
       ]
-    },
-    {
-      "ym": "2026-08-14",
-      "net": 3053124,
-      "div": 89950,
-      "cf": 806,
-      "debtRatio": 81.7,
-      "indexVal": 45811,
-      "holdings": [
-        {
-          "code": "00981T",
-          "name": "平衡凱基雙核收息",
-          "lots": 1285,
-          "price": null,
-          "pnl": null
-        },
-        {
-          "code": "009823",
-          "name": "群益S&P500",
-          "lots": 92,
-          "price": null,
-          "pnl": null
-        }
-      ]
     }
   ],
   "settings": {
@@ -2596,7 +2572,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1786697927982,
+  "_ts": 1786697958024,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
