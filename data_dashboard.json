@@ -2562,7 +2562,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1786669600199,
+  "_ts": 1786669767696,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -2639,9 +2639,9 @@
       "market": "非農大爆冷！美國7月就業意外減少2.3萬人 聯準會9月升息機率驟降至4成",
       "market2": "輝達揪華爾街六巨擘 籌逾5,000億美元 AI 基建資金 黃仁勳：沒一家拒絕",
       "market3": "伊朗拒絕與美國談判　企圖「以拖待變」熬到川普總統任期結束",
-      "marketColor": "",
-      "market2Color": "",
-      "market3Color": "",
+      "marketColor": "red",
+      "market2Color": "red",
+      "market3Color": "green",
       "marketUrl": "https://tw.news.yahoo.com/%E4%BC%8A%E6%9C%97%E6%8B%92%E7%B5%95%E8%88%87%E7%BE%8E%E5%9C%8B%E8%AB%87%E5%88%A4-%E4%BC%81%E5%9C%96-%E4%BB%A5%E6%8B%96%E5%BE%85%E8%AE%8A-%E7%86%AC%E5%88%B0%E5%B7%9D%E6%99%AE%E7%B8%BD%E7%B5%B1%E4%BB%BB%E6%9C%9F%E7%B5%90%E6%9D%9F-064612998.html",
       "youtubeUrl": "",
       "content": "原本9月升息的概率被市場拉得很高 , 但公布的大非農爆冷讓市場暫時鬆一口氣\n不過隨即輝達要再為整個AI產業鏈籌資高達5,000億美元 讓昨天美股四大指數都收黑\n\n美國跟伊朗已經雙方騎虎難下, 好壞消息時常交叉出現 , 目前不盡快解決通膨再起\n跟升息這個話題都不會被解決 , 昨天TLT 甚至已經跌到82.2元 , 00950B也來到13.7元",
@@ -2661,18 +2661,7 @@
         "00403A": 9.94
       },
       "aiAnalysis": null,
-      "images": [],
-      "backtest": {
-        "ret": 1.99,
-        "stocks": {
-          "00981A": 4.25,
-          "00988A": 6.71,
-          "009805": 1.44,
-          "00403A": 3.62
-        },
-        "retDate": "2026-08-13",
-        "note": ""
-      }
+      "images": []
     },
     {
       "id": "msfwd4u7wp4",
