@@ -12358,6 +12358,15 @@ function openFamilyBuyModal(hId){
     document.getElementById('fb-url').value='';
     if(sel)sel.value='';
   }
+  // 當手動輸入代碼改變時，若不符合現有持股就清空 url
+  const fbCodeEl=document.getElementById('fb-code');
+  if(fbCodeEl){
+    fbCodeEl.oninput=function(){
+      const acc2=getFamilyAccount(curFamilyMember());
+      const match=acc2?.holdings.find(x=>x.code===this.value.trim().toUpperCase());
+      if(!match) document.getElementById('fb-url').value='';
+    };
+  }
   document.getElementById('fb-date').value=today;
   document.getElementById('fb-lots').value='';
   document.getElementById('fb-price').value='';
