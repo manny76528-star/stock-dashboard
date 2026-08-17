@@ -2596,7 +2596,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1786935739045,
+  "_ts": 1786935924956,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -5210,6 +5210,15 @@
                 "price": 11.53,
                 "fee": 1,
                 "remark": "配息後再買入"
+              },
+              {
+                "id": "mswnifaloys",
+                "type": "buy",
+                "date": "2026-08-17",
+                "shares": 800,
+                "price": 11.8,
+                "fee": 4,
+                "remark": "騰亦4台A680"
               }
             ]
           },
@@ -5277,6 +5286,18 @@
           }
         ],
         "log": [
+          {
+            "id": "mswnifalsbb",
+            "date": "2026-08-17",
+            "type": "buy",
+            "code": "00997A",
+            "name": "主動群益美國增長",
+            "shares": 800,
+            "price": 11.8,
+            "amount": 9444,
+            "fee": 4,
+            "remark": "騰亦4台A680"
+          },
           {
             "id": "msgxxvq37on",
             "date": "2026-08-06",
