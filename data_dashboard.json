@@ -2596,7 +2596,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1787029933805,
+  "_ts": 1787029946298,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -5242,7 +5242,7 @@
                 "id": "mswnifaloys",
                 "type": "buy",
                 "date": "2026-08-17",
-                "shares": 800,
+                "shares": 799,
                 "price": 11.8,
                 "fee": 4,
                 "remark": "騰亦4台A680"
