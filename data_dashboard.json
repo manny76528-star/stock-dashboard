@@ -2606,7 +2606,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1787048361180,
+  "_ts": 1787048494696,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -5225,7 +5225,8 @@
                 "shares": 15000,
                 "price": 13.8,
                 "fee": 83,
-                "remark": "00981D資金轉移到此 , 參與AI成長"
+                "remark": "00981D資金轉移到此 , 參與AI成長",
+                "txnId": "mryjwn90q84"
               },
               {
                 "id": "mryjx1mbjgd",
@@ -5234,7 +5235,8 @@
                 "shares": 20000,
                 "price": 13.75,
                 "fee": 110,
-                "remark": "00981D資金轉移到此 , 參與AI成長"
+                "remark": "00981D資金轉移到此 , 參與AI成長",
+                "txnId": "mryjx1mbjgd"
               },
               {
                 "id": "mryjxfhqr6n",
@@ -5243,7 +5245,8 @@
                 "shares": 1000,
                 "price": 14.56,
                 "fee": 6,
-                "remark": "00981D資金轉移到此 , 參與AI成長"
+                "remark": "00981D資金轉移到此 , 參與AI成長",
+                "txnId": "mryjxfhqr6n"
               },
               {
                 "id": "msgxxvq3ftc",
@@ -5252,7 +5255,8 @@
                 "shares": 100,
                 "price": 11.53,
                 "fee": 1,
-                "remark": "配息後再買入"
+                "remark": "配息後再買入",
+                "txnId": "msgxxvq3ftc"
               },
               {
                 "id": "mswnifaloys",
@@ -5261,7 +5265,8 @@
                 "shares": 799,
                 "price": 11.8,
                 "fee": 4,
-                "remark": "騰亦4台A680"
+                "remark": "騰亦4台A680",
+                "txnId": "mswnifaloys"
               },
               {
                 "id": "mswnitnp4k3",
@@ -5270,7 +5275,8 @@
                 "shares": 201,
                 "price": 11.8,
                 "fee": 1,
-                "remark": "健身器材出清$2500"
+                "remark": "健身器材出清$2500",
+                "txnId": "mswnitnp4k3"
               },
               {
                 "id": "msy8lis0q6f",
@@ -5357,7 +5363,8 @@
             "price": 11.8,
             "amount": 9432.2,
             "fee": 4,
-            "remark": "健身器材出清$2500"
+            "remark": "健身器材出清$2500",
+            "txnId": "mswnifaloys"
           },
           {
             "id": "mswnitnp7mi",
@@ -5369,7 +5376,8 @@
             "price": 11.8,
             "amount": 2372.8,
             "fee": 1,
-            "remark": "健身器材出清$2500"
+            "remark": "健身器材出清$2500",
+            "txnId": "mswnitnp4k3"
           },
           {
             "id": "msgxxvq37on",
@@ -5381,7 +5389,8 @@
             "price": 11.53,
             "amount": 1154,
             "fee": 1,
-            "remark": "配息後再買入"
+            "remark": "配息後再買入",
+            "txnId": "msgxxvq3ftc"
           },
           {
             "id": "mryjxfhq5f7",
@@ -5393,7 +5402,8 @@
             "price": 14.56,
             "amount": 14566,
             "fee": 6,
-            "remark": "00981D資金轉移到此 , 參與AI成長"
+            "remark": "00981D資金轉移到此 , 參與AI成長",
+            "txnId": "mryjxfhqr6n"
           },
           {
             "id": "mryk0xku34w",
@@ -5442,7 +5452,8 @@
             "price": 13.75,
             "amount": 275110,
             "fee": 110,
-            "remark": "00981D資金轉移到此 , 參與AI成長"
+            "remark": "00981D資金轉移到此 , 參與AI成長",
+            "txnId": "mryjx1mbjgd"
           },
           {
             "id": "mryjwn90nsk",
@@ -5454,7 +5465,8 @@
             "price": 13.8,
             "amount": 207083,
             "fee": 83,
-            "remark": "00981D資金轉移到此 , 參與AI成長"
+            "remark": "00981D資金轉移到此 , 參與AI成長",
+            "txnId": "mryjwn90q84"
           },
           {
             "id": "mryk0aa2eqm",
