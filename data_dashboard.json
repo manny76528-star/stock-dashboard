@@ -2606,7 +2606,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1787048677402,
+  "_ts": 1787048716589,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -5232,7 +5232,7 @@
                 "id": "mryjx1mbjgd",
                 "type": "buy",
                 "date": "2026-06-04",
-                "shares": 20000,
+                "shares": 21000,
                 "price": 13.75,
                 "fee": 110,
                 "remark": "00981D資金轉移到此 , 參與AI成長",
@@ -5277,15 +5277,6 @@
                 "fee": 1,
                 "remark": "健身器材出清$2500",
                 "txnId": "mswnitnp4k3"
-              },
-              {
-                "id": "msy8lis0q6f",
-                "type": "buy",
-                "date": "2026-06-05",
-                "shares": 1000,
-                "price": 13.75,
-                "fee": 5,
-                "remark": "00981D資金轉移到此 , 參與AI成長"
               }
             ]
           },
@@ -5430,27 +5421,14 @@
             "remark": "訂單滿載至2030年"
           },
           {
-            "id": "msy8lis08z5",
-            "txnId": "msy8lis0q6f",
-            "date": "2026-06-05",
-            "type": "buy",
-            "code": "00997A",
-            "name": "主動群益美國增長",
-            "shares": 1000,
-            "price": 13.75,
-            "amount": 13755,
-            "fee": 5,
-            "remark": "00981D資金轉移到此 , 參與AI成長"
-          },
-          {
             "id": "mryjx1mb5n7",
             "date": "2026-06-04",
             "type": "buy",
             "code": "00997A",
             "name": "主動群益美國增長",
-            "shares": 20000,
+            "shares": 21000,
             "price": 13.75,
-            "amount": 275110,
+            "amount": 288860,
             "fee": 110,
             "remark": "00981D資金轉移到此 , 參與AI成長",
             "txnId": "mryjx1mbjgd"
