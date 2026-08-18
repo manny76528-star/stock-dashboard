@@ -12483,10 +12483,19 @@ function saveFamilyBuy(){
       const t=h.transactions.find(x=>x.id===txnId);
       if(t){
         const oldCode=h.code;
+        const oldDate=t.date;
+        const oldShares=t.shares;
         t.date=date;t.shares=shares;t.price=price;t.fee=fee;t.remark=remark;
-        // 同步更新 log
-        const logEntry=acc.log.find(l=>l.type==='buy'&&l.code===oldCode&&l.date===t.date);
-        if(logEntry){logEntry.date=date;logEntry.shares=shares;logEntry.price=price;logEntry.amount=shares*price+fee;logEntry.fee=fee;logEntry.remark=remark;}
+        // 同步更新 log（優先用 txnId，fallback 用 code+date+shares）
+        const logEntry=acc.log.find(l=>
+          (l.txnId&&l.txnId===t.id) ||
+          (l.type==='buy'&&l.code===oldCode&&l.date===oldDate&&l.shares===oldShares)
+        );
+        if(logEntry){
+          logEntry.date=date;logEntry.shares=shares;logEntry.price=price;
+          logEntry.amount=shares*price+fee;logEntry.fee=fee;logEntry.remark=remark;
+          if(!logEntry.txnId)logEntry.txnId=t.id; // 補上 txnId
+        }
       }
     }
     _familyEditTxn=null;
