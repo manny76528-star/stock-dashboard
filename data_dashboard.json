@@ -2606,7 +2606,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1787048633467,
+  "_ts": 1787048645250,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -5262,7 +5262,7 @@
                 "id": "mswnifaloys",
                 "type": "buy",
                 "date": "2026-08-17",
-                "shares": 798,
+                "shares": 799,
                 "price": 11.8,
                 "fee": 4,
                 "remark": "騰亦4台A680",
@@ -5359,9 +5359,9 @@
             "type": "buy",
             "code": "00997A",
             "name": "主動群益美國增長",
-            "shares": 798,
+            "shares": 799,
             "price": 11.8,
-            "amount": 9420.400000000001,
+            "amount": 9432.2,
             "fee": 4,
             "remark": "騰亦4台A680",
             "txnId": "mswnifaloys"
