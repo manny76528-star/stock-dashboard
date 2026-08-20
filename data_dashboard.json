@@ -2606,7 +2606,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1787136030042,
+  "_ts": 1787219906930,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -2683,8 +2683,8 @@
       "market": "美債失控警報！30年期殖利率狂飆逼近歷史高位 原因一籮筐",
       "market2": "亞股開盤血崩！日經崩逾2000點、韓股暴跌6%",
       "market3": "",
-      "marketColor": "",
-      "market2Color": "",
+      "marketColor": "green",
+      "market2Color": "green",
       "market3Color": "",
       "marketUrl": "https://ec.ltn.com.tw/article/breakingnews/5544614",
       "youtubeUrl": "",
