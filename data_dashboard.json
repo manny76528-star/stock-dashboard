@@ -2606,7 +2606,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1787219906930,
+  "_ts": 1787220396027,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -2676,6 +2676,27 @@
     }
   ],
   "journals": [
+    {
+      "id": "mt1cvmkppaz",
+      "date": "2026-08-20",
+      "tags": [],
+      "market": "美財政部出招救市！ 掏40億「暴力購債」 長債空頭一夜炸翻",
+      "market2": "繼SK海力士40兆韓元回購註銷 三星擬砸逾百兆 創史上庫藏股",
+      "market3": "",
+      "marketColor": "red",
+      "market2Color": "red",
+      "market3Color": "",
+      "marketUrl": "https://tw.stock.yahoo.com/news/%E7%BE%8E%E8%B2%A1%E6%94%BF%E9%83%A8%E5%87%BA%E6%8B%9B%E6%95%91%E5%B8%82-%E6%8E%8F40%E5%84%84-%E6%9A%B4%E5%8A%9B%E8%B3%BC%E5%82%B5-%E9%95%B7%E5%82%B5%E7%A9%BA%E9%A0%AD-%E5%A4%9C%E7%82%B8%E7%BF%BB-003200931.html",
+      "youtubeUrl": "",
+      "content": "市場就是這麼千變萬化！ 昨天全球央行的長債利率幾乎走向失控\n當天晚上美國財政部宣布加大回收金額 為債市提供一定的流動率後\n長債利率從5.3%應聲回落到5.18% \n\n韓國兩大記憶體龍頭股紛紛實施了創紀錄的回購庫藏股 , 紛紛讓公司股票\n做了一個利多反應，這部分跟AI討論後 主要是 記憶體在這波AI浪潮下\nSK 及 三星真的是賺爆了 , 第二點則是沒有土地人力在支援擴廠了！\n因為擴廠後也要台積電等供應鏈有CoWos的產能 否則也沒用\n再來是怕跟過去幾個周期循環一樣 , 擴廠造成產能過剩！！",
+      "stockTags": [],
+      "eventCat": "總經面",
+      "behavior": "",
+      "indexVal": 44934,
+      "stockPrices": null,
+      "aiAnalysis": null,
+      "images": []
+    },
     {
       "id": "mszyndd9d52",
       "date": "2026-08-19",
