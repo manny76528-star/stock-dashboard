@@ -2606,7 +2606,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1787296343932,
+  "_ts": 1787296394537,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -4790,6 +4790,12 @@
       "code": "00981T",
       "lots": 15,
       "note": "統一質押_增貸18萬"
+    },
+    {
+      "id": "mt2m4jegbcu",
+      "code": "00997A",
+      "lots": 2,
+      "note": "凱基匯撥過來的"
     }
   ],
   "pledgeThreshold": 150,
