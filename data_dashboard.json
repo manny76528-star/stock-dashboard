@@ -2606,7 +2606,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1787296394537,
+  "_ts": 1787296444298,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -4796,6 +4796,12 @@
       "code": "00997A",
       "lots": 2,
       "note": "凱基匯撥過來的"
+    },
+    {
+      "id": "mt2m5lsjwos",
+      "code": "009823",
+      "lots": 92,
+      "note": "富邦匯撥過來的"
     }
   ],
   "pledgeThreshold": 150,
