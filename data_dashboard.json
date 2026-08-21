@@ -2606,7 +2606,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1787220396027,
+  "_ts": 1787282515737,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -5059,11 +5059,32 @@
                 "price": 13.6,
                 "fee": 6,
                 "remark": "領981T股息_自己再多存1萬5"
+              },
+              {
+                "id": "mt2dv2gck0k",
+                "type": "buy",
+                "date": "2026-08-21",
+                "shares": 350,
+                "price": 13.22,
+                "fee": 2,
+                "remark": "華固期貨 獲利金額"
               }
             ]
           }
         ],
         "log": [
+          {
+            "id": "mt2dv2gcxpq",
+            "date": "2026-08-21",
+            "type": "buy",
+            "code": "009811",
+            "name": "統一美國50",
+            "shares": 350,
+            "price": 13.22,
+            "amount": 4629,
+            "fee": 2,
+            "remark": "華固期貨 獲利金額"
+          },
           {
             "id": "msoh0nesuea",
             "date": "2026-08-11",
