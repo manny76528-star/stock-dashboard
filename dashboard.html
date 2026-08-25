@@ -7769,9 +7769,15 @@ function autoSnapshot(){
   // key 只用日期，不含 hour，確保每個禮拜五只拍一次
   const snapshotKey='snap_done_'+dateKey;
   if(localStorage.getItem(snapshotKey))return;
-  localStorage.setItem(snapshotKey,'1');
   if(!db.snapshots)db.snapshots=[];
-  setTimeout(()=>recordSnapshot(false),1500);
+  setTimeout(async()=>{
+    try{
+      await recordSnapshot(false);
+      localStorage.setItem(snapshotKey,'1'); // 成功後才設定 key
+    }catch(e){
+      console.warn('快照失敗，不設定key，下次會重試:',e.message);
+    }
+  },1500);
 }
 // 頁面載入時試一次
 autoSnapshot();
@@ -7795,11 +7801,15 @@ function checkMakeupSnapshot(){
   if(localStorage.getItem(snapshotKey))return;
   const hasFriSnap=(db.snapshots||[]).some(s=>(s.ym||'').startsWith(dateKey));
   if(hasFriSnap){localStorage.setItem(snapshotKey,'1');return;}
-  localStorage.setItem(snapshotKey,'1');
   console.log('📸 補拍上週五快照：'+dateKey);
-  setTimeout(()=>{
-    recordSnapshot(false);
-    toast('📸 已補拍 '+dateKey+' 的週五快照');
+  setTimeout(async()=>{
+    try{
+      await recordSnapshot(false);
+      localStorage.setItem(snapshotKey,'1'); // 成功後才設定 key
+      toast('📸 已補拍 '+dateKey+' 的週五快照');
+    }catch(e){
+      console.warn('補拍失敗，下次開啟會重試:',e.message);
+    }
   },2000);
 }
 // Pull 完成後（資料最新）才執行補拍檢查
