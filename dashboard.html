@@ -4661,7 +4661,9 @@ async function refreshPrices(){
   const watchCodes=(db.watchlist||[]).map(w=>w.code);
   // 擔保品清單裡的股票也一起抓（即使不在持股清單）
   const pledgeCodes=(db.pledgeAssets||[]).map(a=>a.code).filter(Boolean);
-  const allCodes=[...new Set([...activeCodes,...watchCodes,...pledgeCodes])];
+  // 家族帳戶的股票也一起抓
+  const familyCodes=Object.values(db.family?.accounts||{}).flatMap(acc=>(acc.holdings||[]).map(h=>h.code)).filter(Boolean);
+  const allCodes=[...new Set([...activeCodes,...watchCodes,...pledgeCodes,...familyCodes])];
   if(allCodes.length===0){document.getElementById('pstat').innerHTML='無持股';return;}
 
   const found=[], notFound=[];
