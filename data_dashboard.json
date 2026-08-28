@@ -2702,7 +2702,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1787910287039,
+  "_ts": 1787910324000,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -5733,6 +5733,15 @@
                 "price": 10.83,
                 "fee": 99,
                 "remark": ""
+              },
+              {
+                "id": "mtcrn6etzx1",
+                "type": "buy",
+                "date": "2026-08-28",
+                "shares": 300,
+                "price": 10.36,
+                "fee": 1,
+                "remark": "老婆自己加碼三千"
               }
             ]
           },
@@ -5755,6 +5764,19 @@
           }
         ],
         "log": [
+          {
+            "id": "mtcrn6etnmv",
+            "txnId": "mtcrn6etzx1",
+            "date": "2026-08-28",
+            "type": "buy",
+            "code": "00403A",
+            "name": "主動統一台股增長",
+            "shares": 300,
+            "price": 10.36,
+            "amount": 3109,
+            "fee": 1,
+            "remark": "老婆自己加碼三千"
+          },
           {
             "id": "ms8qznntvsh",
             "date": "2026-07-28",
