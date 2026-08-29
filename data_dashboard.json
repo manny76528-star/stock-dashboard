@@ -2702,7 +2702,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1788004490395,
+  "_ts": 1788004884201,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -2772,6 +2772,27 @@
     }
   ],
   "journals": [
+    {
+      "id": "mtebxxiyapd",
+      "date": "2026-08-29",
+      "tags": [],
+      "market": "輝達(NVDA)財報報喜單日狂飆近9%，AI伺服器強勁需求帶動營收翻倍！",
+      "market2": "",
+      "market3": "",
+      "marketColor": "red",
+      "market2Color": "",
+      "market3Color": "",
+      "marketUrl": "https://cmnews.com.tw/article/newsyoudeservetoknow-2a4b652a-a2b7-11f1-a216-30c51b949c8b",
+      "youtubeUrl": "",
+      "content": "輝達最新的財報超乎市場預期的好！！原本財報前 輝達連跌9天 下跌快10%\n市場總有說法叫早知道會財\"爆\" 實則市場從來不會知道 這在之前我早已驗證多次\nAI 算力建置無煞車跡象，產業鏈獲利引擎極度扎實。\n\n​1️⃣ 核心數據\n​營收 / 展望： $820 億（YoY +85\\%，優於預期）下季展望 $910 億（續創新高）。\n​資料中心： $752 億（YoY +92\\%，占比約 9 成）。其中 Compute $604 億、Networking $148 億（YoY +199\\%）。 ​獲利： 毛利率 75% ｜ EPS $1.87（YoY +98\\%）。\n​2️⃣ 業務與技術亮點\n​晶片需求爆棚： Blackwell 全面量產（Blackwell Ultra 順利），上一代 Hopper 雲端市場依舊全數售罄。\n​網絡架構急漲： NVLink 72 / Spectrum-X 出貨暴增近 2 倍，成為建置 AI 工廠剛性瓶頸。\n​Vera CPU 戰場： 鎖定 $2,000 億 TAM，已有近 $200 億訂單能見度。\n​3️⃣ 黃仁勳會後精華\n​Agentic AI 拐點： 推理端導入「長思考」機制，單次回答消耗算力呈幾何級數暴增。\n​CapEx 回報清晰： 雲端巨頭建置的是「AI 工廠」，具備明確 ROI，算力基礎設施遠未飽和。\n​中國市場： 財報與展望採最保守態度（0 計入），成長全靠全球市場驅動。",
+      "stockTags": [],
+      "eventCat": "總經面",
+      "behavior": "",
+      "indexVal": 46331,
+      "stockPrices": null,
+      "aiAnalysis": null,
+      "images": []
+    },
     {
       "id": "mt1cvmkppaz",
       "date": "2026-08-20",
