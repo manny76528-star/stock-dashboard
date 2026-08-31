@@ -2702,7 +2702,7 @@
       "manualCleared": true
     }
   ],
-  "_ts": 1788170640916,
+  "_ts": 1788170811033,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -2769,6 +2769,17 @@
       "priority": "高",
       "url": "",
       "addedDate": "2026-07-26"
+    },
+    {
+      "id": "mth2qbhr2ur",
+      "code": "3037",
+      "name": "欣興",
+      "reason": "PCB傳出洗產地的疑雲，公司說ABF沒這個疑慮\n目前Cowos離不開ABF不只產能緊繃且嚴重缺貨\n後續一定還會再創新高！！",
+      "target": 800,
+      "alertDir": "below",
+      "priority": "中",
+      "url": "",
+      "addedDate": "2026-08-31"
     }
   ],
   "journals": [
