@@ -2019,7 +2019,7 @@ function showCustOrders(custId){
   document.getElementById('cust-orders-body').innerHTML=orders.map(o=>{
     const calc=calcOrder(o);
     const st=o.status||'pending';
-    return`<tr style="border-bottom:1px solid #f1f5f9">
+    return`<tr onclick="showOrderDetail('${o.id}')" style="border-bottom:1px solid #f1f5f9;cursor:pointer;transition:background .15s" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background=''">
       <td style="padding:10px 12px;color:#64748b;white-space:nowrap">${fmtDate(o.date)||'—'}</td>
       <td style="padding:10px 12px">
         <div style="font-weight:600;color:#1e293b">${o.id?.slice(-6)||'—'}</div>
