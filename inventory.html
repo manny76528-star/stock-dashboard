@@ -620,6 +620,30 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
 </div>
 
 <!-- ══ 客戶 Modal ══ -->
+<div class="mo" id="cust-orders-modal">
+  <div class="modal" style="max-width:700px;width:100%">
+    <div class="modal-hdr">
+      <div class="modal-title" id="cust-orders-title">訂單明細</div>
+      <button class="modal-close" onclick="closeModal('cust-orders-modal')">✕</button>
+    </div>
+    <div style="max-height:60vh;overflow-y:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:13px">
+        <thead><tr style="background:#f8fafc">
+          <th style="padding:10px 12px;text-align:left;border-bottom:2px solid #e2e8f0;color:#64748b;font-size:11px">日期</th>
+          <th style="padding:10px 12px;text-align:left;border-bottom:2px solid #e2e8f0;color:#64748b;font-size:11px">訂單</th>
+          <th style="padding:10px 12px;text-align:right;border-bottom:2px solid #e2e8f0;color:#64748b;font-size:11px">金額</th>
+          <th style="padding:10px 12px;text-align:right;border-bottom:2px solid #e2e8f0;color:#64748b;font-size:11px">利潤</th>
+          <th style="padding:10px 12px;text-align:center;border-bottom:2px solid #e2e8f0;color:#64748b;font-size:11px">狀態</th>
+        </tr></thead>
+        <tbody id="cust-orders-body"></tbody>
+      </table>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('cust-orders-modal')">關閉</button>
+    </div>
+  </div>
+</div>
+
 <div class="mo" id="cust-modal">
   <div class="modal" style="max-width:440px">
     <div class="modal-title">👥 客戶資料</div>
@@ -1976,7 +2000,7 @@ function renderCustomers(){
     const s=custStats[c.id]||{cnt:0,profit:0,last:''};
     return`<tr>
       <td><b>${c.name}</b></td><td>${c.contact||'—'}</td><td>${c.phone||'—'}</td>
-      <td>${s.cnt}</td><td class="mono gain">${fmt(s.profit)}</td>
+      <td>${s.cnt>0?`<span onclick="showCustOrders('${c.id}')" style="color:#2563eb;font-weight:700;cursor:pointer;text-decoration:underline">${s.cnt}</span>`:'0'}</td><td class="mono gain">${fmt(s.profit)}</td>
       <td class="muted">${fmtDate(s.last)||'—'}</td>
       <td style="display:flex;gap:4px">
         <button class="btn btn-secondary" style="padding:4px 10px;font-size:11px" onclick="openCustModal('${c.id}')">編輯</button>
@@ -1984,6 +2008,29 @@ function renderCustomers(){
       </td>
     </tr>`;
   }).join('');
+}
+
+function showCustOrders(custId){
+  const c=db.customers.find(x=>x.id===custId);
+  const orders=db.orders.filter(o=>o.custId===custId).sort((a,b)=>b.date.localeCompare(a.date));
+  document.getElementById('cust-orders-title').textContent=(c?.name||'客戶')+' 的訂單明細（'+orders.length+'筆）';
+  const statusColor={pending:'#f59e0b',paid:'#16a34a',shipped:'#2563eb',done:'#16a34a',cancelled:'#ef4444'};
+  const statusLabel={pending:'待處理',paid:'已付款',shipped:'已出貨',done:'完成',cancelled:'取消'};
+  document.getElementById('cust-orders-body').innerHTML=orders.map(o=>{
+    const calc=calcOrder(o);
+    const st=o.status||'pending';
+    return`<tr style="border-bottom:1px solid #f1f5f9">
+      <td style="padding:10px 12px;color:#64748b;white-space:nowrap">${fmtDate(o.date)||'—'}</td>
+      <td style="padding:10px 12px">
+        <div style="font-weight:600;color:#1e293b">${o.id?.slice(-6)||'—'}</div>
+        <div style="font-size:11px;color:#94a3b8">${(o.items||[]).map(i=>i.name).join('、')||'—'}</div>
+      </td>
+      <td style="padding:10px 12px;text-align:right;font-weight:700;font-family:monospace">$${Math.round(calc.total).toLocaleString()}</td>
+      <td style="padding:10px 12px;text-align:right;font-weight:700;font-family:monospace;color:${calc.profit>=0?'#16a34a':'#ef4444'}">${calc.profit>=0?'+':''}$${Math.round(calc.profit).toLocaleString()}</td>
+      <td style="padding:10px 12px;text-align:center"><span style="padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;background:${statusColor[st]}20;color:${statusColor[st]}">${statusLabel[st]||st}</span></td>
+    </tr>`;
+  }).join('');
+  document.getElementById('cust-orders-modal').classList.add('open');
 }
 
 function openCustModal(id=null){
