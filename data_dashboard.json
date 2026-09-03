@@ -1422,17 +1422,6 @@
       "deductBank": "Line Bank"
     },
     {
-      "id": "mncui6prd6f",
-      "bank": "line Bank-3",
-      "rate": 3.8,
-      "amount": 250000,
-      "start": "2024-09-02",
-      "due": "2026-09-02",
-      "monthly": 10834,
-      "deductDay": "2號",
-      "deductBank": "Line Bank"
-    },
-    {
       "id": "mncujjvii0z",
       "bank": "line Bank-4",
       "rate": 4,
@@ -2700,9 +2689,21 @@
       "clearedDate": "2025-02-26",
       "note": "",
       "manualCleared": true
+    },
+    {
+      "id": "mncui6prd6f",
+      "bank": "line Bank-3",
+      "rate": 3.8,
+      "amount": 250000,
+      "start": "2024-09-02",
+      "due": "2026-09-02",
+      "monthly": 10834,
+      "deductDay": "2號",
+      "deductBank": "Line Bank",
+      "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1788327318965,
+  "_ts": 1788418092129,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
