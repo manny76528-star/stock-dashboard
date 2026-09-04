@@ -1348,10 +1348,23 @@ function renderReports(){
           </tr>`;
         }).join('');
     }
-    // 品項佔比圓餅圖（用現有圓餅圖邏輯）
+    // 品項佔比圓餅圖
     const pieCanvas=document.getElementById('pie-chart');
     const pieMode=_pieMode||'revenue';
     if(pieCanvas){
+      const itemMap={};
+      filteredOrders.forEach(o=>{
+        const c=calcOrder(o);
+        (o.items||[]).forEach(it=>{
+          const k=it.name||'其他';
+          if(!itemMap[k])itemMap[k]={rev:0,profit:0};
+          const qty=parseFloat(it.qty)||1;
+          const price=parseFloat(it.price)||0;
+          const cost=parseFloat(it.cost)||0;
+          itemMap[k].rev+=price*qty;
+          itemMap[k].profit+=(price-cost)*qty;
+        });
+      });
       const labels=Object.keys(itemMap);
       const vals=labels.map(k=>pieMode==='revenue'?itemMap[k].rev:itemMap[k].profit);
       const colors=['#6366f1','#f59e0b','#10b981','#ef4444','#3b82f6','#8b5cf6','#ec4899','#14b8a6'];
