@@ -1428,13 +1428,15 @@ function renderReports(){
         options:{plugins:{legend:{display:false}},cutout:'60%'}
       });
       const leg=document.getElementById('pie-legend');
-      if(leg)leg.innerHTML=pieRows.map(([name,val],i)=>`
-        <div style="display:flex;align-items:center;gap:8px;font-size:12px">
+      if(leg)leg.innerHTML=pieRows.map(([name,val],i)=>{
+        const periodKey=_reportMode==='month'?`${yr}-${mo.padStart(2,'0')}`:_reportMode==='year'?yr:'all';
+        return`<div onclick="showReportCustOrders('${name}','${periodKey}')" style="display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer;padding:4px 6px;border-radius:8px;transition:background .15s" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background=''">
           <span style="width:10px;height:10px;border-radius:50%;background:${colors[i]};flex-shrink:0"></span>
-          <span style="flex:1">${name}</span>
+          <span style="flex:1;color:#2563eb;text-decoration:underline">${name}</span>
           <span style="font-weight:700;font-family:var(--mono)">${fmt(val[_pieMode])}</span>
           <span style="color:#94a3b8">${pieTotal>0?Math.round(val[_pieMode]/pieTotal*100)+'%':'—'}</span>
-        </div>`).join('');
+        </div>`;
+      }).join('');
     } else {
       const leg=document.getElementById('pie-legend');
       if(leg)leg.innerHTML='<div style="color:#94a3b8;font-size:12px;text-align:center;padding:20px">此期間尚無資料</div>';
@@ -2010,6 +2012,41 @@ function renderCustomers(){
   }).join('');
 }
 
+function showReportCustOrders(custName, periodKey){
+  // 篩選該客戶在指定期間的訂單
+  let orders = db.orders.filter(o=>o.custName===custName);
+  if(periodKey==='all'){
+    // 不過濾
+  } else if(periodKey.length===4){
+    // 年份
+    orders = orders.filter(o=>o.date?.startsWith(periodKey));
+  } else {
+    // 月份 YYYY-MM
+    orders = orders.filter(o=>o.date?.startsWith(periodKey));
+  }
+  orders = orders.sort((a,b)=>b.date.localeCompare(a.date));
+
+  const periodLabel = periodKey==='all'?'全部':periodKey;
+  document.getElementById('cust-orders-title').textContent = custName+' · '+periodLabel+'（'+orders.length+'筆）';
+  const statusColor={pending:'#f59e0b',paid:'#16a34a',shipped:'#2563eb',done:'#16a34a',cancelled:'#ef4444'};
+  const statusLabel={pending:'待處理',paid:'已付款',shipped:'已出貨',done:'完成',cancelled:'取消'};
+  document.getElementById('cust-orders-body').innerHTML=orders.map(o=>{
+    const calc=calcOrder(o);
+    const st=o.status||'pending';
+    return`<tr onclick="showOrderDetail('${o.id}')" style="border-bottom:1px solid #f1f5f9;cursor:pointer;transition:background .15s" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background=''">
+      <td style="padding:10px 12px;color:#64748b;white-space:nowrap">${fmtDate(o.date)||'—'}</td>
+      <td style="padding:10px 12px">
+        <div style="font-weight:600;color:#1e293b">${o.id?.slice(-6)||'—'}</div>
+        <div style="font-size:11px;color:#94a3b8">${(o.items||[]).map(i=>i.name).join('、')||'—'}</div>
+      </td>
+      <td style="padding:10px 12px;text-align:right;font-weight:700;font-family:monospace">$${Math.round(calc.total).toLocaleString()}</td>
+      <td style="padding:10px 12px;text-align:right;font-weight:700;font-family:monospace;color:${calc.profit>=0?'#16a34a':'#ef4444'}">${calc.profit>=0?'+':''}$${Math.round(calc.profit).toLocaleString()}</td>
+      <td style="padding:10px 12px;text-align:center"><span style="padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;background:${statusColor[st]}20;color:${statusColor[st]}">${statusLabel[st]||st}</span></td>
+    </tr>`;
+  }).join('');
+  document.getElementById('cust-orders-modal').classList.add('open');
+}
+
 function showCustOrders(custId){
   const c=db.customers.find(x=>x.id===custId);
   const orders=db.orders.filter(o=>o.custId===custId).sort((a,b)=>b.date.localeCompare(a.date));
@@ -2030,6 +2067,45 @@ function showCustOrders(custId){
       <td style="padding:10px 12px;text-align:center"><span style="padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;background:${statusColor[st]}20;color:${statusColor[st]}">${statusLabel[st]||st}</span></td>
     </tr>`;
   }).join('');
+  document.getElementById('cust-orders-modal').classList.add('open');
+}
+
+function showReportCustOrders(custName, periodKey){
+  // 依期間篩選訂單
+  let orders=db.orders.filter(o=>o.custName===custName);
+  let periodLabel='';
+  if(periodKey==='all'){
+    periodLabel='全部';
+  } else if(periodKey.length===4){
+    // 年份
+    orders=orders.filter(o=>o.date?.startsWith(periodKey));
+    periodLabel=periodKey+'年';
+  } else {
+    // 月份 YYYY-MM
+    orders=orders.filter(o=>o.date?.startsWith(periodKey));
+    periodLabel=periodKey;
+  }
+  orders=orders.sort((a,b)=>b.date.localeCompare(a.date));
+
+  document.getElementById('cust-orders-title').textContent=custName+' · '+periodLabel+'（'+orders.length+'筆）';
+  const statusColor={pending:'#f59e0b',paid:'#16a34a',shipped:'#2563eb',done:'#16a34a',cancelled:'#ef4444'};
+  const statusLabel={pending:'待處理',paid:'已付款',shipped:'已出貨',done:'完成',cancelled:'取消'};
+  document.getElementById('cust-orders-body').innerHTML=orders.length===0
+    ?'<tr><td colspan="5" style="padding:20px;text-align:center;color:#94a3b8">此期間無訂單</td></tr>'
+    :orders.map(o=>{
+      const calc=calcOrder(o);
+      const st=o.status||'pending';
+      return`<tr onclick="showOrderDetail('${o.id}')" style="border-bottom:1px solid #f1f5f9;cursor:pointer;transition:background .15s" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background=''">
+        <td style="padding:10px 12px;color:#64748b;white-space:nowrap">${fmtDate(o.date)||'—'}</td>
+        <td style="padding:10px 12px">
+          <div style="font-weight:600;color:#1e293b">${o.id?.slice(-6)||'—'}</div>
+          <div style="font-size:11px;color:#94a3b8">${(o.items||[]).map(i=>i.name).join('、')||'—'}</div>
+        </td>
+        <td style="padding:10px 12px;text-align:right;font-weight:700;font-family:var(--mono)">$${Math.round(calc.total).toLocaleString()}</td>
+        <td style="padding:10px 12px;text-align:right;font-weight:700;font-family:var(--mono);color:${calc.profit>=0?'#16a34a':'#ef4444'}">${calc.profit>=0?'+':''}$${Math.round(calc.profit).toLocaleString()}</td>
+        <td style="padding:10px 12px;text-align:center"><span style="padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;background:${statusColor[st]}20;color:${statusColor[st]}">${statusLabel[st]||st}</span></td>
+      </tr>`;
+    }).join('');
   document.getElementById('cust-orders-modal').classList.add('open');
 }
 
