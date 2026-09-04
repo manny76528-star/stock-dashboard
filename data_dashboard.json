@@ -1434,7 +1434,7 @@
     },
     {
       "id": "mncul5vdg0j",
-      "bank": "line Bank-5",
+      "bank": "line Bank-51",
       "rate": 4,
       "amount": 330000,
       "start": "2025-11-12",
@@ -2727,7 +2727,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1788531719066,
+  "_ts": 1788531729054,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
