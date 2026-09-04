@@ -5468,14 +5468,18 @@ function renderLoans(){
         const prog=totalM>0?Math.round(passedM/totalM*100):paidPct;
         const barColor=prog>=67?'#f59e0b':prog>=34?'#c084fc':'#3b82f6';
         const milestone=leftM<=3?'🔥 最後衝刺！':leftM<=6?'⚡ 快到了！':'🎯 再撐 '+leftM+' 期就結清！';
+        const dots='●'.repeat(passedM)+'○'.repeat(leftM);
+        const dashPaid='─'.repeat(Math.max(0,Math.floor(passedM*1.2)-6));
+        const dashLeft='─'.repeat(Math.max(0,Math.floor(leftM*1.2)-6));
         return'<div style="padding:6px 0">'
-          +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">'
-            +'<span style="font-size:11px;font-weight:600;color:#64748b">【進度 '+prog+'%】</span>'
-            +'<span style="font-size:11px;font-weight:700;color:'+barColor+'">'+milestone+'</span>'
+          +'<div style="font-family:monospace;font-size:13px;letter-spacing:1px;color:#1e293b;line-height:1.4">'
+            +'<span style="color:'+barColor+'">'+('●'.repeat(passedM))+'</span>'
+            +'<span style="color:#cbd5e1">'+('○'.repeat(leftM))+'</span>'
           +'</div>'
-          +'<div style="height:10px;border-radius:999px;background:#f1f5f9;overflow:hidden">'
-            +'<div style="height:10px;border-radius:999px;background:'+barColor+';width:'+prog+'%;transition:width .5s"></div>'
+          +'<div style="font-family:monospace;font-size:10px;color:#94a3b8;line-height:1.2;white-space:nowrap">'
+            +'└'+dashPaid+'已還 '+passedM+' 期'+dashPaid+'┘└'+dashLeft+'剩 '+leftM+' 期'+dashLeft+'┘'
           +'</div>'
+          +'<div style="font-size:11px;font-weight:700;color:'+barColor+';margin-top:4px">'+milestone+'</div>'
         +'</div>';
       })()
       +'<div class="lc-nums">'
