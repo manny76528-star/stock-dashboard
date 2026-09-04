@@ -1484,13 +1484,18 @@ function renderReports(){
 // ── 客戶趨勢圖（傳入訂單陣列） ──
 function renderTrendChartForOrders(orders){
   const trendCanvas=document.getElementById('trend-chart');
-  if(!trendCanvas)return;
-  // 取最近12個月
+  if(!trendCanvas||orders.length===0)return;
+
+  // 從第一筆到最後一筆訂單日期動態產生月份
+  const sorted=[...orders].filter(o=>o.date).sort((a,b)=>a.date.localeCompare(b.date));
+  const firstDate=new Date(sorted[0].date);
+  const lastDate=new Date(sorted[sorted.length-1].date);
   const months=[];
-  const now=new Date();
-  for(let i=11;i>=0;i--){
-    const d=new Date(now.getFullYear(),now.getMonth()-i,1);
-    months.push(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'));
+  const cur=new Date(firstDate.getFullYear(),firstDate.getMonth(),1);
+  const end=new Date(lastDate.getFullYear(),lastDate.getMonth(),1);
+  while(cur<=end){
+    months.push(cur.getFullYear()+'-'+String(cur.getMonth()+1).padStart(2,'0'));
+    cur.setMonth(cur.getMonth()+1);
   }
   const trendRev=months.map(m=>{let s=0;orders.filter(o=>o.date?.startsWith(m)).forEach(o=>{s+=calcOrder(o).revenue;});return s||null;});
   const trendProfit=months.map(m=>{let s=0;orders.filter(o=>o.date?.startsWith(m)).forEach(o=>{s+=calcOrder(o).profit;});return s||null;});
@@ -1498,7 +1503,7 @@ function renderTrendChartForOrders(orders){
   _trendChart=new Chart(trendCanvas,{
     type:'line',
     data:{
-      labels:months.map(m=>m.slice(5)+'月'),
+      labels:months.map(m=>months.length>18?m.slice(0,7):m.slice(5)+'月'),
       datasets:[
         {label:'營收',data:trendRev,borderColor:'#7c3aed',backgroundColor:'rgba(124,58,237,0.08)',tension:0.3,spanGaps:true,pointRadius:4,fill:true,yAxisID:'yRev'},
         {label:'利潤',data:trendProfit,borderColor:'#16a34a',backgroundColor:'rgba(22,163,74,0.08)',tension:0.3,spanGaps:true,pointRadius:4,fill:true,yAxisID:'yProfit'}
