@@ -5458,10 +5458,24 @@ function renderLoans(){
           +balHtml
         +'</div>'
       +'</div>'
-      +'<div class="lc-prog-row">'
-        +'<div class="loan-progress-wrap" style="flex:1;margin:0"><div class="loan-progress-bar" style="width:'+paidPct+'%"></div></div>'
-        +'<span class="lc-pct">'+(paidPct>=80?'✓ ':'')+paidPct+'%</span>'
-      +'</div>'
+      // 計算期數
+      +(()=>{
+        if(!l.start||!l.due)return'<div class="lc-prog-row"><div class="loan-progress-wrap" style="flex:1;margin:0"><div class="loan-progress-bar" style="width:'+paidPct+'%"></div></div><span class="lc-pct">'+paidPct+'%</span></div>';
+        const startD=new Date(l.start),dueD=new Date(l.due),nowD=new Date();
+        const totalM=Math.round((dueD-startD)/2629800000);
+        const passedM=Math.max(0,Math.round((nowD-startD)/2629800000));
+        const leftM=Math.max(0,totalM-passedM);
+        const prog=totalM>0?Math.round(passedM/totalM*100):paidPct;
+        const barColor=prog>=67?'#f59e0b':prog>=34?'#c084fc':'#3b82f6';
+        const milestone=leftM<=3?'🔥 最後衝刺！':leftM<=6?'⚡ 快到了！':'🎯 再撐 '+leftM+' 期就結清！';
+        return'<div style="padding:8px 0 4px">'
+          +'<div style="font-size:11px;font-weight:600;color:#64748b;margin-bottom:5px">【進度 '+prog+'%】</div>'
+          +'<div style="height:10px;border-radius:999px;background:#f1f5f9;overflow:hidden;margin-bottom:6px">'
+            +'<div style="height:10px;border-radius:999px;background:'+barColor+';width:'+prog+'%;transition:width .5s"></div>'
+          +'</div>'
+          +'<div style="font-size:11px;font-weight:700;color:'+barColor+'">'+milestone+'</div>'
+        +'</div>';
+      })()
       +'<div class="lc-nums">'
         +'<div class="lc-row"><span class="lc-k">原始本金</span><span class="lc-v" style="color:#64748b">$'+(l.amount||0).toLocaleString()+'</span></div>'
         +'<div class="lc-row"><span class="lc-k">尚餘本金</span><span class="lc-v loss">$'+calcRem.toLocaleString()+'</span></div>'
