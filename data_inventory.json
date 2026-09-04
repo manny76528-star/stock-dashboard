@@ -5877,7 +5877,7 @@
       "custName": "騰亦資訊",
       "contact": "Jack歐",
       "phone": "07-5885038",
-      "note": "",
+      "note": "CINO A680",
       "items": [
         {
           "name": "掃描器 USB",
@@ -5897,9 +5897,9 @@
       ],
       "paid": true,
       "paidDate": "2026-04-13",
-      "createdAt": "2026-04-08T10:22:36.796Z",
       "vendorPaid": true,
-      "vendorPaidDate": ""
+      "vendorPaidDate": "",
+      "images": []
     },
     {
       "id": "mnpwgscymq8v",
@@ -6653,6 +6653,6 @@
     "bankCode": "013",
     "bankAccount": "061506186489"
   },
-  "_ts": 1787823103324,
+  "_ts": 1788515510283,
   "_vendorPaidBackfilled": true
 }
