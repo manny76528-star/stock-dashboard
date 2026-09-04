@@ -5468,17 +5468,18 @@ function renderLoans(){
         const prog=totalM>0?Math.round(passedM/totalM*100):paidPct;
         const barColor=prog>=67?'#f59e0b':prog>=34?'#c084fc':'#3b82f6';
         const milestone=leftM<=3?'🔥 最後衝刺！':leftM<=6?'⚡ 快到了！':'🎯 再撐 '+leftM+' 期就結清！';
-        const paidPct2=totalM>0?Math.round(passedM/totalM*100):0;
         return'<div style="padding:6px 0">'
-          +'<div style="font-family:monospace;font-size:12px;letter-spacing:2px;line-height:1.6;word-break:break-all">'
-            +'<span style="color:'+barColor+'">'+('●'.repeat(passedM))+'</span>'
-            +'<span style="color:#cbd5e1">'+('○'.repeat(leftM))+'</span>'
+          +'<div style="display:flex;width:100%;gap:1px;margin-bottom:4px">'
+            +Array.from({length:totalM},(_,i)=>{
+              const filled=i<passedM;
+              return'<div style="flex:1;height:14px;border-radius:2px;background:'+(filled?barColor:'#e2e8f0')+';min-width:0"></div>';
+            }).join('')
           +'</div>'
-          +'<div style="display:flex;font-size:10px;margin-top:2px">'
+          +'<div style="display:flex;font-size:10px;margin-bottom:4px">'
             +'<span style="flex:'+passedM+';color:'+barColor+';font-weight:700;white-space:nowrap">已還 '+passedM+' 期</span>'
             +'<span style="flex:'+leftM+';color:#94a3b8;font-weight:600;text-align:right;white-space:nowrap">剩 '+leftM+' 期</span>'
           +'</div>'
-          +'<div style="font-size:11px;font-weight:700;color:'+barColor+';margin-top:4px">'+milestone+'</div>'
+          +'<div style="font-size:11px;font-weight:700;color:'+barColor+'">'+milestone+'</div>'
         +'</div>';
       })()
       +'<div class="lc-nums">'
