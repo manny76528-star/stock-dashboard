@@ -5479,7 +5479,7 @@ function renderLoans(){
 
     card.querySelectorAll('[data-action]').forEach(btn=>{
       const act=btn.dataset.action;
-      btn.onclick=()=>{if(act==='editLoan')editLoan(l.id);else if(act==='delLoan')delLoan(l.id);};
+      btn.onclick=(e)=>{e.stopPropagation();if(act==='editLoan')editLoan(l.id);else if(act==='delLoan')delLoan(l.id);};
     });
     grid.appendChild(card);
   });
