@@ -5486,8 +5486,8 @@ function renderLoans(){
       +'<div class="lc-footer">'
         +afterHtml
         +'<div style="display:flex;gap:4px">'
-          +'<button class="irow-sm-btn" data-action="editLoan">✏️</button>'
-          +'<button class="irow-sm-btn del" data-action="delLoan">🗑</button>'
+          +'<button class="irow-sm-btn" onclick="event.stopPropagation();editLoan(\''+l.id+'\')">✏️</button>'
+          +'<button class="irow-sm-btn del" onclick="event.stopPropagation();delLoan(\''+l.id+'\')">🗑</button>'
         +'</div>'
       +'</div>';
 
