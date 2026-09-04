@@ -1313,7 +1313,13 @@ function renderReports(){
     const profLbl=document.getElementById('rpt-profit-label');if(profLbl)profLbl.textContent='累計利潤';
     const ordTitle=document.getElementById('rpt-orders-title');if(ordTitle)ordTitle.textContent=custName+' 全部歷史交易';
     const pieTitle=document.getElementById('pie-title');if(pieTitle)pieTitle.textContent=custName+' 各品項佔比';
-    const trendTitle=document.getElementById('rpt-trend-title');if(trendTitle)trendTitle.textContent='📈 '+custName+' 近12個月趨勢';
+    const trendTitle=document.getElementById('rpt-trend-title');
+    if(trendTitle){
+      const custOrds=db.orders.filter(o=>o.custName===custName&&o.date).sort((a,b)=>a.date.localeCompare(b.date));
+      const fromY=custOrds.length>0?custOrds[0].date.slice(0,7):'';
+      const toY=custOrds.length>0?custOrds[custOrds.length-1].date.slice(0,7):'';
+      trendTitle.textContent='📈 '+custName+(fromY?' ('+fromY+'～'+toY+')':'');
+    }
     // KPI
     let rev=0,profit=0;
     filteredOrders.forEach(o=>{const c=calcOrder(o);rev+=c.revenue;profit+=c.profit;});
