@@ -10209,7 +10209,7 @@ function renderJournal(){
             ${j.eventCat?`<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;background:rgba(251,191,36,.15);color:#fbbf24;border:1px solid rgba(251,191,36,.3)">${j.eventCat}</span>`:''}
             ${j.behavior?`<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;background:rgba(167,139,250,.15);color:#a78bfa;border:1px solid rgba(167,139,250,.3)">${j.behavior}</span>`:''}
             ${(j.stockTags||[]).map(t=>`<span onclick="event.stopPropagation();openStockTracker('${t}')" style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;background:rgba(56,189,248,.15);color:#38bdf8;border:1px solid rgba(56,189,248,.3);cursor:pointer;font-family:'JetBrains Mono',monospace" title="點擊查看 ${t} 所有記錄">${t}</span>`).join('')}
-            ${(j.images||[]).length>0?`<span style="display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;background:rgba(251,146,60,.15);color:#fb923c;border:1px solid rgba(251,146,60,.3)">🖼️ ${j.images.length}張圖</span>`:''}
+            ${(j.images||[]).length>0?`<div style="margin-top:3px"><span style="display:inline-block !important;font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;background:rgba(251,146,60,.15);color:#fb923c;border:1px solid rgba(251,146,60,.3)">🖼️ ${j.images.length}張圖</span></div>`:''}
             ${j.marketUrl?`<a href="${j.marketUrl}" target="_blank" onclick="event.stopPropagation()" style="font-size:11px;color:#93c5fd;text-decoration:none;white-space:nowrap" title="查看原文">🔗 原文</a>`:''}
           </div>
           <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
