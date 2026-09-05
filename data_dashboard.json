@@ -2727,7 +2727,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1788621716627,
+  "_ts": 1788621727068,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -4095,27 +4095,25 @@
         "重大事項"
       ],
       "market": "台股史上最瘋！ 00403A單日成交爆419萬張 淨值10.24、收10.8。\n63張申購今日10.8元賣出  <獲利4.9W>",
+      "market2": "",
+      "market3": "",
+      "marketColor": "red",
+      "market2Color": "red",
+      "market3Color": "red",
       "marketUrl": "https://udn.com/news/story/124061/9450957?from=udn-ch1_breaknews-1-cate5-news",
+      "youtubeUrl": "",
       "content": "63張申購今日10.8元 全數賣出獲利4.9萬 並同步轉移資金到009805,00981A",
       "stockTags": [
         "00403A"
       ],
       "eventCat": "個股操作",
-      "behavior": "獲利了結",
+      "behavior": "",
       "indexVal": 41898,
       "stockPrices": {
         "00403A": 10.8
       },
       "aiAnalysis": null,
-      "images": [],
-      "backtest": {
-        "ret": 11.11,
-        "retDate": "2026-09-05",
-        "note": "從寫日誌到現在已上漲 +11.1%！",
-        "stocks": {
-          "00403A": -5
-        }
-      }
+      "images": []
     },
     {
       "id": "mp11ukxy8t8",
