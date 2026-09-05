@@ -1263,9 +1263,17 @@ function setReportMode(mode){
     custSel.style.display=mode==='customer'?'':'none';
     // 更新客戶下拉選單
     if(mode==='customer'){
-      const custs=[...new Set(db.orders.map(o=>o.custName).filter(Boolean))].sort();
+      // 按利潤高低排序
+      const custProfits={};
+      db.orders.forEach(o=>{
+        if(!o.custName)return;
+        const c=calcOrder(o);
+        custProfits[o.custName]=(custProfits[o.custName]||0)+c.profit;
+      });
+      const custs=[...new Set(db.orders.map(o=>o.custName).filter(Boolean))]
+        .sort((a,b)=>(custProfits[b]||0)-(custProfits[a]||0));
       const curVal=custSel.value;
-      custSel.innerHTML='<option value="">— 選擇客戶 —</option>'+custs.map(n=>`<option value="${n}" ${n===curVal?'selected':''}>${n}</option>`).join('');
+      custSel.innerHTML='<option value="">— 選擇客戶 —</option>'+custs.map(n=>`<option value="${n}" ${n===curVal?'selected':''}>${n}（$${Math.round(custProfits[n]||0).toLocaleString()}）</option>`).join('');
     }
   }
   renderReports();
@@ -1525,11 +1533,11 @@ function renderTrendChartForOrders(orders){
   // 方案C：柔和漸層風（Notion/Figma）
   const ctx=trendCanvas.getContext('2d');
   const gradRev=ctx.createLinearGradient(0,0,0,280);
-  gradRev.addColorStop(0,'rgba(124,58,237,0.25)');
-  gradRev.addColorStop(1,'rgba(124,58,237,0)');
+  gradRev.addColorStop(0,'rgba(37,99,235,0.25)');
+  gradRev.addColorStop(1,'rgba(37,99,235,0)');
   const gradProfit=ctx.createLinearGradient(0,0,0,280);
-  gradProfit.addColorStop(0,'rgba(16,185,129,0.22)');
-  gradProfit.addColorStop(1,'rgba(16,185,129,0)');
+  gradProfit.addColorStop(0,'rgba(236,72,153,0.22)');
+  gradProfit.addColorStop(1,'rgba(236,72,153,0)');
 
   _trendChart=new Chart(trendCanvas,{
     type:'line',
@@ -1538,22 +1546,22 @@ function renderTrendChartForOrders(orders){
       datasets:[
         {
           label:'營收',data:trendRev,
-          borderColor:'rgba(124,58,237,0.3)',borderWidth:1.5,
+          borderColor:'rgba(37,99,235,0.3)',borderWidth:1.5,
           backgroundColor:gradRev,
           tension:0.45,spanGaps:true,
           pointRadius:ctx=>ctx.raw!=null?6:0,
           pointHoverRadius:ctx=>ctx.raw!=null?9:0,
-          pointBackgroundColor:'#7c3aed',pointBorderColor:'#fff',pointBorderWidth:2.5,
+          pointBackgroundColor:'#2563eb',pointBorderColor:'#fff',pointBorderWidth:2.5,
           fill:true,yAxisID:'yRev'
         },
         {
           label:'利潤',data:trendProfit,
-          borderColor:'rgba(16,185,129,0.3)',borderWidth:1.5,
+          borderColor:'rgba(236,72,153,0.3)',borderWidth:1.5,
           backgroundColor:gradProfit,
           tension:0.45,spanGaps:true,
           pointRadius:ctx=>ctx.raw!=null?6:0,
           pointHoverRadius:ctx=>ctx.raw!=null?9:0,
-          pointBackgroundColor:'#10b981',pointBorderColor:'#fff',pointBorderWidth:2.5,
+          pointBackgroundColor:'#ec4899',pointBorderColor:'#fff',pointBorderWidth:2.5,
           fill:true,yAxisID:'yProfit'
         }
       ]
@@ -1583,13 +1591,13 @@ function renderTrendChartForOrders(orders){
         yRev:{
           position:'left',
           grid:{color:'rgba(0,0,0,0.04)',lineWidth:1},
-          ticks:{callback:v=>v>=1000?'$'+(v/1000).toFixed(0)+'K':'$'+v,font:{size:10},color:'#7c3aed'},
+          ticks:{callback:v=>v>=1000?'$'+(v/1000).toFixed(0)+'K':'$'+v,font:{size:10},color:'#2563eb'},
           border:{dash:[4,4]}
         },
         yProfit:{
           position:'right',
           grid:{drawOnChartArea:false},
-          ticks:{callback:v=>v>=1000?'$'+(v/1000).toFixed(0)+'K':'$'+v,font:{size:10},color:'#10b981'},
+          ticks:{callback:v=>v>=1000?'$'+(v/1000).toFixed(0)+'K':'$'+v,font:{size:10},color:'#ec4899'},
           border:{dash:[4,4]}
         }
       }
