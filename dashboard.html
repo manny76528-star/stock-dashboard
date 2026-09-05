@@ -6618,17 +6618,17 @@ function renderDivChart(){
   const cumData=months.map(m=>{cum+=monthMap[m];return Math.round(cum);});
   const ctx=canvas.getContext('2d');
   const grad=ctx.createLinearGradient(0,0,0,200);
-  grad.addColorStop(0,'rgba(16,185,129,0.25)');
-  grad.addColorStop(1,'rgba(16,185,129,0)');
+  grad.addColorStop(0,'rgba(37,99,235,0.2)');
+  grad.addColorStop(1,'rgba(37,99,235,0)');
   if(_divTrendChart)_divTrendChart.destroy();
   _divTrendChart=new Chart(canvas,{
     type:'line',
     data:{labels:months,datasets:[{
       label:'累積股息',data:cumData,
-      borderColor:'rgba(16,185,129,0.4)',borderWidth:2,
+      borderColor:'rgba(37,99,235,0.4)',borderWidth:2,
       backgroundColor:grad,tension:0.45,fill:true,spanGaps:true,
       pointRadius:4,pointHoverRadius:7,
-      pointBackgroundColor:'#10b981',pointBorderColor:'#fff',pointBorderWidth:2
+      pointBackgroundColor:'#2563eb',pointBorderColor:'#fff',pointBorderWidth:2
     }]},
     options:{
       responsive:true,maintainAspectRatio:false,
@@ -11104,7 +11104,7 @@ function renderTrendPageChart(){
   // 強制套用高度
   setTimeout(()=>{
     canvas.style.height='240px';
-    canvas.style.maxHeight='230px';
+    canvas.style.maxHeight='240px';
   },50);
 }
 
