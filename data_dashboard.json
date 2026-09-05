@@ -2727,7 +2727,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1788621727068,
+  "_ts": 1788621741022,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -4336,25 +4336,25 @@
         "賣出"
       ],
       "market": "OpenAI營收成長不如預期引發AI板塊恐慌，費半指數重挫3.58%，台積電ADR跌3.12%。\n連帶重挫軟銀、甲骨文與CoreWeave等合作夥伴股價，",
+      "market2": "",
+      "market3": "",
+      "marketColor": "green",
+      "market2Color": "red",
+      "market3Color": "red",
       "marketUrl": "https://money.udn.com/money/story/123398/9470650",
+      "youtubeUrl": "",
       "content": "OpenAI營收成長不如預期引發AI板塊恐慌，費半指數重挫3.58%，台積電ADR跌3.12%。\n連帶009805 成分股主要四檔也都大跌2-4% , 今天先出清主要有兩個原因\n1. 離成本區太進 避免被打穿 賺錢變賠錢\n2. 先觀察趨勢 , 畢竟AI的成長動能是所有設備股及電力的先驅者(如美伊那些反而不擔心)\n3. 依然看好009805 未來五年的訂單確定性",
       "stockTags": [
         "009805"
       ],
+      "eventCat": "",
+      "behavior": "",
       "indexVal": 39303,
       "stockPrices": {
         "009805": 16.43
       },
-      "images": [],
-      "backtest": {
-        "t5": 19.03,
-        "note": "從寫日誌到現在已上漲 +18.4%！",
-        "ret": 18.44,
-        "retDate": "2026-09-05",
-        "stocks": {
-          "009805": -8.46
-        }
-      }
+      "aiAnalysis": null,
+      "images": []
     },
     {
       "id": "moh1faad29g",
