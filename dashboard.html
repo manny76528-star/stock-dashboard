@@ -11015,11 +11015,6 @@ let _trendPageChart=null;
 function renderTrendPage(){
   renderTrendPageChart();
   renderTrendPageTable();
-  // 渲染後套用隱私模式
-  setTimeout(()=>{
-    const trendCanvas=document.getElementById('trend-page-canvas');
-    if(trendCanvas)trendCanvas.style.filter=privacyOn?'blur(6px)':'none';
-  },100);
 }
 
 function renderTrendPageChart(){
