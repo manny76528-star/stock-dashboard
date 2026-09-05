@@ -12968,18 +12968,34 @@ function renderFamilyTrendChart(acc){
   const showCost=document.getElementById('family-chart-cost')?.checked!==false;
   const showMkt=document.getElementById('family-chart-mkt')?.checked!==false;
 
+  // 方案C 漸層風格
+  const ctx2=canvas.getContext('2d');
+  const gradCost=ctx2.createLinearGradient(0,0,0,280);
+  gradCost.addColorStop(0,'rgba(37,99,235,0.22)');
+  gradCost.addColorStop(1,'rgba(37,99,235,0)');
+  const mktColor=curMkt>=lastCost?'#dc2626':'#16a34a';
+  const gradMkt=ctx2.createLinearGradient(0,0,0,280);
+  gradMkt.addColorStop(0,curMkt>=lastCost?'rgba(220,38,38,0.2)':'rgba(22,163,74,0.2)');
+  gradMkt.addColorStop(1,curMkt>=lastCost?'rgba(220,38,38,0)':'rgba(22,163,74,0)');
+
   const datasets=[];
   if(showCost)datasets.push({
     label:'累積投入成本',data:costData,
-    borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,0.06)',
-    tension:0.3,fill:true,pointRadius:2,borderWidth:2,spanGaps:true
+    borderColor:'rgba(37,99,235,0.3)',borderWidth:1.5,
+    backgroundColor:gradCost,
+    tension:0.45,fill:true,spanGaps:true,
+    pointRadius:ctx=>ctx.raw!=null&&costByDate[allDates[ctx.dataIndex]]!==undefined?5:0,
+    pointHoverRadius:8,
+    pointBackgroundColor:'#2563eb',pointBorderColor:'#fff',pointBorderWidth:2
   });
   if(showMkt)datasets.push({
     label:'市值',data:mktData,
-    borderColor:curMkt>=lastCost?'#dc2626':'#16a34a',
-    backgroundColor:'transparent',
-    tension:0.3,fill:false,pointRadius:4,borderWidth:2,spanGaps:true,
-    pointBackgroundColor:curMkt>=lastCost?'#dc2626':'#16a34a'
+    borderColor:curMkt>=lastCost?'rgba(220,38,38,0.3)':'rgba(22,163,74,0.3)',borderWidth:1.5,
+    backgroundColor:gradMkt,
+    tension:0.45,fill:true,spanGaps:true,
+    pointRadius:ctx=>ctx.raw!=null?5:0,
+    pointHoverRadius:8,
+    pointBackgroundColor:mktColor,pointBorderColor:'#fff',pointBorderWidth:2
   });
 
   if(_familyTrendChart)_familyTrendChart.destroy();
@@ -12989,12 +13005,26 @@ function renderFamilyTrendChart(acc){
     options:{
       responsive:true,
       plugins:{
-        legend:{display:true,labels:{font:{size:10},boxWidth:10,padding:8}},
-        tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': $'+Math.round(ctx.raw||0).toLocaleString()}}
+        legend:{display:true,labels:{font:{size:10,family:'-apple-system,sans-serif'},boxWidth:12,padding:12,usePointStyle:true,pointStyle:'circle'}},
+        tooltip:{
+          backgroundColor:'rgba(255,255,255,0.95)',
+          titleColor:'#1e293b',bodyColor:'#64748b',
+          borderColor:'#e2e8f0',borderWidth:1,
+          padding:10,cornerRadius:10,
+          callbacks:{label:ctx=>ctx.dataset.label+': $'+Math.round(ctx.raw||0).toLocaleString()}
+        }
       },
       scales:{
-        x:{ticks:{font:{size:10},maxTicksLimit:8}},
-        y:{ticks:{callback:v=>'$'+(v>=1000?(v/1000).toFixed(0)+'K':v),font:{size:10}}}
+        x:{
+          grid:{color:'rgba(0,0,0,0.04)',lineWidth:1},
+          ticks:{font:{size:10,family:'-apple-system,sans-serif'},color:'#94a3b8'},
+          border:{dash:[4,4]}
+        },
+        y:{
+          grid:{color:'rgba(0,0,0,0.04)',lineWidth:1},
+          ticks:{callback:v=>'$'+(v>=1000?(v/1000).toFixed(0)+'K':v),font:{size:10},color:'#94a3b8'},
+          border:{dash:[4,4]}
+        }
       }
     }
   });
