@@ -2637,7 +2637,9 @@ body:not(.privacy) .privacy-mask{filter:none;}
             </div>
           </div>
           <div style="padding:16px">
-            <canvas id="family-trend-chart" height="120"></canvas>
+            <div style="position:relative;height:220px">
+            <canvas id="family-trend-chart"></canvas>
+            </div>
             <div id="family-trend-empty" style="display:none;text-align:center;color:#9ca3af;padding:30px;font-size:12px">記錄買賣後自動產生趨勢圖</div>
           </div>
         </div>
@@ -13003,7 +13005,7 @@ function renderFamilyTrendChart(acc){
     type:'line',
     data:{labels:allDates,datasets},
     options:{
-      responsive:true,
+      responsive:true,maintainAspectRatio:false,
       plugins:{
         legend:{display:true,labels:{font:{size:10,family:'-apple-system,sans-serif'},boxWidth:12,padding:12,usePointStyle:true,pointStyle:'circle'}},
         tooltip:{
