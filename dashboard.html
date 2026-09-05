@@ -2369,7 +2369,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
             <button onclick="clearAndReRecord()" style="padding:5px 12px;background:#fff3e0;border:1px solid #ffb74d;color:#e67e22;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer">🔄 重算本次</button>
           </div>
         </div>
-        <div style="position:relative;height:330px">
+        <div style="position:relative;height:280px">
           <canvas id="trend-page-canvas"></canvas>
         </div>
       </div>
@@ -10526,9 +10526,9 @@ function applyPrivacy(){
     if(btnSide)btnSide.textContent='👁 顯示金額';
     // 趨勢圖模糊
     const trendCanvas=document.getElementById('trend-page-canvas');
-    if(trendCanvas)trendCanvas.style.filter='blur(6px)';
+    if(trendCanvas)trendCanvas.style.filter='blur(12px) brightness(1.2)';
     const familyChart=document.getElementById('family-trend-chart');
-    if(familyChart)familyChart.style.filter='blur(6px)';
+    if(familyChart)familyChart.style.filter='blur(12px) brightness(1.2)';
   } else {
     document.body.classList.remove('privacy');
     document.querySelectorAll('.privacy-mask').forEach(el=>el.style.filter='none');
