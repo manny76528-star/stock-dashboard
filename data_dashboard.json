@@ -2727,7 +2727,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1788618474761,
+  "_ts": 1788618680696,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -3771,7 +3771,10 @@
         "009805": 15.9
       },
       "aiAnalysis": null,
-      "images": [],
+      "images": [
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1780998890270_1vwv.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1780998890271_prnw.jpg"
+      ],
       "backtest": {
         "ret": 7.69,
         "stocks": {
@@ -3813,8 +3816,11 @@
       },
       "aiAnalysis": null,
       "images": [
-        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1780998890270_1vwv.jpg",
-        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1780998890271_prnw.jpg"
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1780759458696_r98b.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1780759458699_8gbi.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1780759482383_h2cg.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1780759490665_a7kt.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1780760184414_lpxq.jpg"
       ],
       "backtest": {
         "ret": 3.28,
@@ -3846,13 +3852,7 @@
       "indexVal": 45677,
       "stockPrices": null,
       "aiAnalysis": null,
-      "images": [
-        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1780759458696_r98b.jpg",
-        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1780759458699_8gbi.jpg",
-        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1780759482383_h2cg.jpg",
-        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1780759490665_a7kt.jpg",
-        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1780760184414_lpxq.jpg"
-      ],
+      "images": [],
       "backtest": {
         "ret": 1.91,
         "stocks": {},
@@ -4064,9 +4064,7 @@
         "00988A": 20.36
       },
       "aiAnalysis": null,
-      "images": [
-        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1779269089530_i8vz.jpg"
-      ],
+      "images": [],
       "backtest": {
         "ret": 10.13,
         "stocks": {
@@ -4104,7 +4102,9 @@
         "00403A": 9.72
       },
       "aiAnalysis": null,
-      "images": [],
+      "images": [
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1779269089530_i8vz.jpg"
+      ],
       "backtest": {
         "ret": 15.87,
         "stocks": {
