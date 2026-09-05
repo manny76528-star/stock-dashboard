@@ -2727,7 +2727,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1788618368391,
+  "_ts": 1788618376115,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -3056,7 +3056,12 @@
         "00981A": 25.22
       },
       "aiAnalysis": null,
-      "images": [],
+      "images": [
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1785474628418_ke01.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1785492469784_peia.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1785492469786_4tbx.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1785492548374_cww2.jpg"
+      ],
       "backtest": {
         "ret": 7.96,
         "stocks": {
@@ -3200,7 +3205,10 @@
         "00988A": 19.1
       },
       "aiAnalysis": null,
-      "images": [],
+      "images": [
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1784357762731_ijon.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1784358118628_2l6a.jpg"
+      ],
       "backtest": {
         "ret": 9.09,
         "stocks": {
@@ -3270,7 +3278,9 @@
         "00981T": 12.12
       },
       "aiAnalysis": null,
-      "images": [],
+      "images": [
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1784004331044_3q8z.jpg"
+      ],
       "backtest": {
         "ret": 4.05,
         "stocks": {
@@ -3600,7 +3610,9 @@
         "009805": 17.1
       },
       "aiAnalysis": null,
-      "images": [],
+      "images": [
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1782381814232_0ti9.jpg"
+      ],
       "backtest": {
         "ret": 0.64,
         "stocks": {
@@ -3717,7 +3729,9 @@
         "00988A": 22.36
       },
       "aiAnalysis": null,
-      "images": [],
+      "images": [
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1781506530190_lqa5.jpg"
+      ],
       "backtest": {
         "ret": 2.54,
         "stocks": {
@@ -3999,7 +4013,9 @@
         "00864B": 45.58
       },
       "aiAnalysis": null,
-      "images": [],
+      "images": [
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1779703488343_ts4t.jpg"
+      ],
       "backtest": {
         "ret": 6.66,
         "stocks": {
