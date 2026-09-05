@@ -2727,7 +2727,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1788618680696,
+  "_ts": 1788618802648,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -3795,8 +3795,8 @@
       "market": "台指期夜盤一度殺逾4500點跌停、台股「多殺多」難逃！\n非農爆表重創降息夢！費半狂瀉10% 台積電ADR摔逾6% 創疫情以來最大單日跌幅",
       "market2": "",
       "market3": "",
-      "marketColor": "green",
-      "market2Color": "green",
+      "marketColor": "",
+      "market2Color": "",
       "market3Color": "",
       "marketUrl": "https://news.cnyes.com/news/id/6486593",
       "youtubeUrl": "",
@@ -3821,17 +3821,7 @@
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1780759482383_h2cg.jpg",
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1780759490665_a7kt.jpg",
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1780760184414_lpxq.jpg"
-      ],
-      "backtest": {
-        "ret": 3.28,
-        "stocks": {
-          "00981A": -3.38,
-          "00988A": -25.49,
-          "009805": -9.4
-        },
-        "retDate": "2026-09-05",
-        "note": ""
-      }
+      ]
     },
     {
       "id": "mpzbzbe2bto",
