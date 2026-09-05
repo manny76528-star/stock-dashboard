@@ -1541,8 +1541,9 @@ function renderTrendChartForOrders(orders){
           borderColor:'#7c3aed',borderWidth:2.5,
           backgroundColor:gradRev,
           tension:0.45,spanGaps:true,
-          pointRadius:3,pointHoverRadius:6,
-          pointBackgroundColor:'#7c3aed',pointBorderColor:'#fff',pointBorderWidth:2,
+          pointRadius:ctx=>ctx.raw!=null?6:0,
+          pointHoverRadius:ctx=>ctx.raw!=null?9:0,
+          pointBackgroundColor:'#7c3aed',pointBorderColor:'#fff',pointBorderWidth:2.5,
           fill:true,yAxisID:'yRev'
         },
         {
@@ -1550,8 +1551,9 @@ function renderTrendChartForOrders(orders){
           borderColor:'#10b981',borderWidth:2.5,
           backgroundColor:gradProfit,
           tension:0.45,spanGaps:true,
-          pointRadius:3,pointHoverRadius:6,
-          pointBackgroundColor:'#10b981',pointBorderColor:'#fff',pointBorderWidth:2,
+          pointRadius:ctx=>ctx.raw!=null?6:0,
+          pointHoverRadius:ctx=>ctx.raw!=null?9:0,
+          pointBackgroundColor:'#10b981',pointBorderColor:'#fff',pointBorderWidth:2.5,
           fill:true,yAxisID:'yProfit'
         }
       ]
