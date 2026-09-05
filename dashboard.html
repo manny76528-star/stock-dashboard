@@ -11055,6 +11055,12 @@ function renderTrendPageChart(){
       }
     }
   });
+  // 強制套用高度與隱私模糊
+  setTimeout(()=>{
+    canvas.style.height='280px';
+    canvas.style.maxHeight='280px';
+    canvas.style.filter=privacyOn?'blur(20px) brightness(1.3) opacity(0.6)':'none';
+  },50);
 }
 
 function renderTrendPageTable(){
