@@ -11703,6 +11703,8 @@ function fillJournalEditForm(id){
   if(ytWrap)ytWrap.style.display=ytChecked?'block':'none';
   if(ytUrl)ytUrl.value=j?.youtubeUrl||'';
 
+  // 圖片：同步到 _jImgs 暫存（儲存時需要）
+  window._jImgs=[...(j?.images||[])];
   const preview=document.getElementById('j-img-preview');
   if(preview)preview.innerHTML=(j?.images||[]).map((img,i)=>`
     <div style="position:relative">
