@@ -10524,21 +10524,22 @@ function applyPrivacy(){
     document.querySelectorAll('.privacy-mask').forEach(el=>el.style.filter='blur(8px)');
     if(btn)btn.textContent='👁 顯示金額';
     if(btnSide)btnSide.textContent='👁 顯示金額';
-    // 趨勢圖模糊
-    const trendCanvas=document.getElementById('trend-page-canvas');
-    if(trendCanvas)trendCanvas.style.filter='blur(12px) brightness(1.2)';
-    const familyChart=document.getElementById('family-trend-chart');
-    if(familyChart)familyChart.style.filter='blur(12px) brightness(1.2)';
+    // 趨勢圖白色遮罩
+    const tc=document.getElementById('trend-page-canvas');
+    if(tc){tc.style.opacity='0';document.getElementById('trend-privacy-overlay')?.remove();const ov=document.createElement('div');ov.id='trend-privacy-overlay';ov.style.cssText='position:absolute;inset:0;background:#f8fafc;display:flex;align-items:center;justify-content:center;border-radius:8px;z-index:1';ov.innerHTML='<span style="font-size:13px;color:#94a3b8;font-weight:600">🔒 顯示金額後可見</span>';tc.parentElement.appendChild(ov);}
+    const fc=document.getElementById('family-trend-chart');
+    if(fc){fc.style.opacity='0';document.getElementById('family-privacy-overlay')?.remove();const ov2=document.createElement('div');ov2.id='family-privacy-overlay';ov2.style.cssText='position:absolute;inset:0;background:#f8fafc;display:flex;align-items:center;justify-content:center;border-radius:8px;z-index:1';ov2.innerHTML='<span style="font-size:13px;color:#94a3b8;font-weight:600">🔒 顯示金額後可見</span>';fc.parentElement.appendChild(ov2);}
   } else {
     document.body.classList.remove('privacy');
     document.querySelectorAll('.privacy-mask').forEach(el=>el.style.filter='none');
     if(btn)btn.textContent='🙈 隱藏金額';
     if(btnSide)btnSide.textContent='🙈 隱藏金額';
-    // 趨勢圖恢復
-    const trendCanvas=document.getElementById('trend-page-canvas');
-    if(trendCanvas)trendCanvas.style.opacity='1';document.getElementById('trend-privacy-overlay')?.remove();;
-    const familyChart=document.getElementById('family-trend-chart');
-    if(familyChart)familyChart.style.opacity='1';document.getElementById('family-privacy-overlay')?.remove();;
+    const tc=document.getElementById('trend-page-canvas');
+    if(tc)tc.style.opacity='1';
+    document.getElementById('trend-privacy-overlay')?.remove();
+    const fc=document.getElementById('family-trend-chart');
+    if(fc)fc.style.opacity='1';
+    document.getElementById('family-privacy-overlay')?.remove();
   }
 }
 // 啟動時套用
@@ -11054,18 +11055,6 @@ function renderTrendPageChart(){
   setTimeout(()=>{
     canvas.style.height='280px';
     canvas.style.maxHeight='280px';
-    // 套用隱私遮罩
-    document.getElementById('trend-privacy-overlay')?.remove();
-    if(privacyOn){
-      canvas.style.opacity='0';
-      const ov2=document.createElement('div');
-      ov2.id='trend-privacy-overlay';
-      ov2.style.cssText='position:absolute;inset:0;background:#f8fafc;display:flex;align-items:center;justify-content:center;border-radius:8px;';
-      ov2.innerHTML='<span style="font-size:13px;color:#94a3b8;font-weight:600">🔒 顯示金額後可見</span>';
-      canvas.parentElement.appendChild(ov2);
-    } else {
-      canvas.style.opacity='1';
-    }
   },50);
 }
 
