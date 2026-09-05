@@ -2369,7 +2369,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
             <button onclick="clearAndReRecord()" style="padding:5px 12px;background:#fff3e0;border:1px solid #ffb74d;color:#e67e22;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer">🔄 重算本次</button>
           </div>
         </div>
-        <div style="position:relative;height:380px">
+        <div style="position:relative;height:330px">
           <canvas id="trend-page-canvas"></canvas>
         </div>
       </div>
@@ -7347,7 +7347,7 @@ function renderTrendChart(){
   if(showDiv)datasets.push({label:'每月股息',data:snaps.map(s=>s.div),borderColor:'#3498db',backgroundColor:'rgba(52,152,219,0.1)',tension:0.3,yAxisID:'yNet'});
   if(showCf)datasets.push({label:'每月現金流',data:snaps.map(s=>s.cf),borderColor:'#2ecc71',backgroundColor:'rgba(46,204,113,0.1)',tension:0.3,yAxisID:'yNet'});
   if(showDebt)datasets.push({label:'負債比(%)',data:snaps.map(s=>s.debtRatio),borderColor:'#f39c12',backgroundColor:'rgba(243,156,18,0.1)',tension:0.3,yAxisID:'y2'});
-  const canvas=document.getElementById('trendCanvas');
+  const canvas=document.getElementById('trend-page-canvas');
   if(!canvas)return; // 不在趨勢頁就不渲染
   const ctx=canvas.getContext('2d');
   if(_trendChart)_trendChart.destroy();
@@ -10525,7 +10525,7 @@ function applyPrivacy(){
     if(btn)btn.textContent='👁 顯示金額';
     if(btnSide)btnSide.textContent='👁 顯示金額';
     // 趨勢圖模糊
-    const trendCanvas=document.getElementById('trendCanvas');
+    const trendCanvas=document.getElementById('trend-page-canvas');
     if(trendCanvas)trendCanvas.style.filter='blur(6px)';
     const familyChart=document.getElementById('family-trend-chart');
     if(familyChart)familyChart.style.filter='blur(6px)';
@@ -10535,7 +10535,7 @@ function applyPrivacy(){
     if(btn)btn.textContent='🙈 隱藏金額';
     if(btnSide)btnSide.textContent='🙈 隱藏金額';
     // 趨勢圖恢復
-    const trendCanvas=document.getElementById('trendCanvas');
+    const trendCanvas=document.getElementById('trend-page-canvas');
     if(trendCanvas)trendCanvas.style.filter='none';
     const familyChart=document.getElementById('family-trend-chart');
     if(familyChart)familyChart.style.filter='none';
@@ -11017,7 +11017,7 @@ function renderTrendPage(){
   renderTrendPageTable();
   // 渲染後套用隱私模式
   setTimeout(()=>{
-    const trendCanvas=document.getElementById('trendCanvas');
+    const trendCanvas=document.getElementById('trend-page-canvas');
     if(trendCanvas)trendCanvas.style.filter=privacyOn?'blur(6px)':'none';
   },100);
 }
