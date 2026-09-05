@@ -10518,14 +10518,27 @@ function togglePrivacy(){
 }
 function applyPrivacy(){
   const btn=document.getElementById('privacy-btn');
+  const btnSide=document.getElementById('privacy-btn-side');
   if(privacyOn){
     document.body.classList.add('privacy');
     document.querySelectorAll('.privacy-mask').forEach(el=>el.style.filter='blur(8px)');
     if(btn)btn.textContent='👁 顯示金額';
+    if(btnSide)btnSide.textContent='👁 顯示金額';
+    // 趨勢圖模糊
+    const trendCanvas=document.getElementById('trendCanvas');
+    if(trendCanvas)trendCanvas.style.filter='blur(6px)';
+    const familyChart=document.getElementById('family-trend-chart');
+    if(familyChart)familyChart.style.filter='blur(6px)';
   } else {
     document.body.classList.remove('privacy');
     document.querySelectorAll('.privacy-mask').forEach(el=>el.style.filter='none');
     if(btn)btn.textContent='🙈 隱藏金額';
+    if(btnSide)btnSide.textContent='🙈 隱藏金額';
+    // 趨勢圖恢復
+    const trendCanvas=document.getElementById('trendCanvas');
+    if(trendCanvas)trendCanvas.style.filter='none';
+    const familyChart=document.getElementById('family-trend-chart');
+    if(familyChart)familyChart.style.filter='none';
   }
 }
 // 啟動時套用
