@@ -1538,7 +1538,7 @@ function renderTrendChartForOrders(orders){
       datasets:[
         {
           label:'營收',data:trendRev,
-          borderColor:'#7c3aed',borderWidth:2.5,
+          borderColor:'rgba(124,58,237,0.3)',borderWidth:1.5,
           backgroundColor:gradRev,
           tension:0.45,spanGaps:true,
           pointRadius:ctx=>ctx.raw!=null?6:0,
@@ -1548,7 +1548,7 @@ function renderTrendChartForOrders(orders){
         },
         {
           label:'利潤',data:trendProfit,
-          borderColor:'#10b981',borderWidth:2.5,
+          borderColor:'rgba(16,185,129,0.3)',borderWidth:1.5,
           backgroundColor:gradProfit,
           tension:0.45,spanGaps:true,
           pointRadius:ctx=>ctx.raw!=null?6:0,
