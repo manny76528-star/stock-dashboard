@@ -426,7 +426,7 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
     <!-- 趨勢圖 -->
     <div class="chart-wrap" style="margin-top:16px">
       <div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:14px" id="rpt-trend-title">📈 近12個月趨勢</div>
-      <div style="position:relative;max-height:220px;max-width:90%">
+      <div style="position:relative;max-height:280px;max-width:90%">
         <canvas id="trend-chart"></canvas>
       </div>
     </div>
@@ -1521,23 +1521,75 @@ function renderTrendChartForOrders(orders){
   const trendRev=months.map(m=>{let s=0;orders.filter(o=>o.date?.startsWith(m)).forEach(o=>{s+=calcOrder(o).revenue;});return s||null;});
   const trendProfit=months.map(m=>{let s=0;orders.filter(o=>o.date?.startsWith(m)).forEach(o=>{s+=calcOrder(o).profit;});return s||null;});
   if(_trendChart)_trendChart.destroy();
+
+  // 方案C：柔和漸層風（Notion/Figma）
+  const ctx=trendCanvas.getContext('2d');
+  const gradRev=ctx.createLinearGradient(0,0,0,280);
+  gradRev.addColorStop(0,'rgba(124,58,237,0.25)');
+  gradRev.addColorStop(1,'rgba(124,58,237,0)');
+  const gradProfit=ctx.createLinearGradient(0,0,0,280);
+  gradProfit.addColorStop(0,'rgba(16,185,129,0.22)');
+  gradProfit.addColorStop(1,'rgba(16,185,129,0)');
+
   _trendChart=new Chart(trendCanvas,{
     type:'line',
     data:{
       labels:months.map(m=>months.length>18?m.slice(0,7):m.slice(5)+'月'),
       datasets:[
-        {label:'營收',data:trendRev,borderColor:'#7c3aed',backgroundColor:'rgba(124,58,237,0.08)',tension:0.3,spanGaps:true,pointRadius:4,fill:true,yAxisID:'yRev'},
-        {label:'利潤',data:trendProfit,borderColor:'#16a34a',backgroundColor:'rgba(22,163,74,0.08)',tension:0.3,spanGaps:true,pointRadius:4,fill:true,yAxisID:'yProfit'}
+        {
+          label:'營收',data:trendRev,
+          borderColor:'#7c3aed',borderWidth:2.5,
+          backgroundColor:gradRev,
+          tension:0.45,spanGaps:true,
+          pointRadius:3,pointHoverRadius:6,
+          pointBackgroundColor:'#7c3aed',pointBorderColor:'#fff',pointBorderWidth:2,
+          fill:true,yAxisID:'yRev'
+        },
+        {
+          label:'利潤',data:trendProfit,
+          borderColor:'#10b981',borderWidth:2.5,
+          backgroundColor:gradProfit,
+          tension:0.45,spanGaps:true,
+          pointRadius:3,pointHoverRadius:6,
+          pointBackgroundColor:'#10b981',pointBorderColor:'#fff',pointBorderWidth:2,
+          fill:true,yAxisID:'yProfit'
+        }
       ]
     },
     options:{
       responsive:true,maintainAspectRatio:false,
       interaction:{mode:'index',intersect:false},
-      plugins:{legend:{position:'top',labels:{font:{size:11},boxWidth:10}}},
+      plugins:{
+        legend:{
+          position:'top',
+          labels:{font:{size:11,family:'-apple-system,sans-serif'},boxWidth:12,padding:16,usePointStyle:true,pointStyle:'circle'}
+        },
+        tooltip:{
+          backgroundColor:'rgba(255,255,255,0.95)',
+          titleColor:'#1e293b',bodyColor:'#64748b',
+          borderColor:'#e2e8f0',borderWidth:1,
+          padding:12,cornerRadius:10,
+          callbacks:{label:ctx=>' '+ctx.dataset.label+': $'+Math.round(ctx.raw||0).toLocaleString()}
+        }
+      },
       scales:{
-        x:{ticks:{font:{size:11}}},
-        yRev:{position:'left',ticks:{callback:v=>v>=1000?'$'+(v/1000).toFixed(0)+'K':'$'+v,font:{size:10}},title:{display:true,text:'營收',font:{size:10},color:'#7c3aed'}},
-        yProfit:{position:'right',grid:{drawOnChartArea:false},ticks:{callback:v=>v>=1000?'$'+(v/1000).toFixed(0)+'K':'$'+v,font:{size:10}},title:{display:true,text:'利潤',font:{size:10},color:'#16a34a'}}
+        x:{
+          grid:{color:'rgba(0,0,0,0.04)',lineWidth:1},
+          ticks:{font:{size:10,family:'-apple-system,sans-serif'},color:'#94a3b8'},
+          border:{dash:[4,4]}
+        },
+        yRev:{
+          position:'left',
+          grid:{color:'rgba(0,0,0,0.04)',lineWidth:1},
+          ticks:{callback:v=>v>=1000?'$'+(v/1000).toFixed(0)+'K':'$'+v,font:{size:10},color:'#7c3aed'},
+          border:{dash:[4,4]}
+        },
+        yProfit:{
+          position:'right',
+          grid:{drawOnChartArea:false},
+          ticks:{callback:v=>v>=1000?'$'+(v/1000).toFixed(0)+'K':'$'+v,font:{size:10},color:'#10b981'},
+          border:{dash:[4,4]}
+        }
       }
     }
   });
