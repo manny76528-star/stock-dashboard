@@ -2369,7 +2369,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
             <button onclick="clearAndReRecord()" style="padding:5px 12px;background:#fff3e0;border:1px solid #ffb74d;color:#e67e22;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer">🔄 重算本次</button>
           </div>
         </div>
-        <div style="position:relative;height:230px">
+        <div style="position:relative;height:240px">
           <canvas id="trend-page-canvas"></canvas>
         </div>
       </div>
@@ -11053,7 +11053,7 @@ function renderTrendPageChart(){
   });
   // 強制套用高度
   setTimeout(()=>{
-    canvas.style.height='230px';
+    canvas.style.height='240px';
     canvas.style.maxHeight='230px';
   },50);
 }
