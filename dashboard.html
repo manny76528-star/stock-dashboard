@@ -12273,18 +12273,20 @@ function delFamilyTxn(hId,txnId){
 let _quickBuyMember='';
 
 function openFamilyBuyForHolding(member, code){
-  // 先設定成員
   _quickBuyMember = member;
   const acc = getFamilyAccount(member);
-  // 開快捷買入 Modal
   document.getElementById('fqb-title').textContent = '+ 買入（'+member+'）';
   const sel = document.getElementById('fqb-code-sel');
   sel.innerHTML = '<option value="">— 選擇持倉標的 —</option>'
     + acc.holdings.map(h=>`<option value="${h.code}">${h.code} ${h.name||''}</option>`).join('')
     + '<option value="__new__">＋ 新增全新標的</option>';
-  // 直接選到指定標的
   sel.value = code;
   fillQuickBuyCode();
+  document.getElementById('fqb-date').value=new Date().toISOString().slice(0,10);
+  document.getElementById('fqb-shares').value='';
+  document.getElementById('fqb-price').value='';
+  document.getElementById('fqb-remark').value='';
+  showFqbSplitsIfNeeded(member);
   openModal('familyQuickBuyModal');
 }
 
