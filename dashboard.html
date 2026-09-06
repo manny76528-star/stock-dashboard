@@ -3742,6 +3742,21 @@ body:not(.privacy) .privacy-mask{filter:none;}
       </div>
       <div class="fg"><label class="fl">買入單價</label><input class="fi" id="fqb-price" type="number" step="0.01" placeholder="例：21.50"></div>
       <div class="fg"><label class="fl">備註（選填）</label><input class="fi" id="fqb-remark" placeholder="例：定期定額"></div>
+      <!-- 出資分配（琁 & 軒 帳戶才顯示）-->
+      <div id="fqb-splits-area" style="display:none;background:#f8fafc;border-radius:10px;padding:12px;margin-top:4px">
+        <div style="font-size:12px;font-weight:700;color:#64748b;margin-bottom:8px">💰 出資分配</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <div style="flex:1">
+            <label class="fl" id="fqb-split-name1" style="font-size:11px">軒</label>
+            <input class="fi" id="fqb-split-amt1" type="number" placeholder="0" oninput="onFqbSplitInput()" style="font-size:13px">
+          </div>
+          <div style="flex:1">
+            <label class="fl" id="fqb-split-name2" style="font-size:11px">琁</label>
+            <input class="fi" id="fqb-split-amt2" type="number" placeholder="0" oninput="onFqbSplitInput()" style="font-size:13px">
+          </div>
+        </div>
+        <div style="font-size:11px;color:#94a3b8;margin-top:6px" id="fqb-split-hint">總金額：$0</div>
+      </div>
     </div>
     <div class="br">
       <button class="btn btn-s" onclick="closeModal('familyQuickBuyModal')">取消</button>
@@ -12272,6 +12287,47 @@ function openFamilyBuyForHolding(member, code){
   openModal('familyQuickBuyModal');
 }
 
+function onFqbSplitInput(){
+  const a1=parseFloat(document.getElementById('fqb-split-amt1').value)||0;
+  const a2=parseFloat(document.getElementById('fqb-split-amt2').value)||0;
+  const shares=parseFloat(document.getElementById('fqb-shares').value)||0;
+  const price=parseFloat(document.getElementById('fqb-price').value)||0;
+  const total=Math.round(shares*price);
+  const hint=document.getElementById('fqb-split-hint');
+  if(hint)hint.textContent='總金額：$'+total.toLocaleString()+' | 已分配：$'+(a1+a2).toLocaleString()+(Math.abs(a1+a2-total)<=1?' ✅':' ⚠️ 差$'+Math.abs(a1+a2-total).toLocaleString());
+}
+
+function showFqbSplitsIfNeeded(member){
+  const acc=getFamilyAccount(member);
+  const area=document.getElementById('fqb-splits-area');
+  if(!area)return;
+  if(!acc.defaultSplits||acc.defaultSplits.length<2){area.style.display='none';return;}
+  area.style.display='';
+  const s=acc.defaultSplits;
+  const n1=document.getElementById('fqb-split-name1');
+  const n2=document.getElementById('fqb-split-name2');
+  if(n1)n1.textContent=s[0].name+' ('+s[0].pct+'%)';
+  if(n2)n2.textContent=s[1].name+' ('+s[1].pct+'%)';
+  document.getElementById('fqb-split-amt1').value='';
+  document.getElementById('fqb-split-amt2').value='';
+}
+
+function applyFqbSplitDefault(){
+  const member=_quickBuyMember;
+  const acc=getFamilyAccount(member);
+  if(!acc.defaultSplits||acc.defaultSplits.length<2)return;
+  const s=acc.defaultSplits;
+  const shares=parseFloat(document.getElementById('fqb-shares').value)||0;
+  const price=parseFloat(document.getElementById('fqb-price').value)||0;
+  const total=Math.round(shares*price);
+  if(total<=0)return;
+  const el1=document.getElementById('fqb-split-amt1');
+  const el2=document.getElementById('fqb-split-amt2');
+  if(el1)el1.value=Math.round(total*s[0].pct/100);
+  if(el2)el2.value=total-Math.round(total*s[0].pct/100);
+  onFqbSplitInput();
+}
+
 function openFamilyQuickBuy(member){
   _quickBuyMember=member;
   document.getElementById('fqb-title').textContent='+ 買入（'+member+'）';
@@ -12287,6 +12343,7 @@ function openFamilyQuickBuy(member){
   document.getElementById('fqb-shares').value='';
   document.getElementById('fqb-price').value='';
   document.getElementById('fqb-remark').value='';
+  showFqbSplitsIfNeeded(member);
   openModal('familyQuickBuyModal');
 }
 
@@ -12318,8 +12375,19 @@ function saveQuickBuy(){
   let h=acc.holdings.find(x=>x.code===code);
   if(!h){h={id:uid(),code,name:name||code,url:'',transactions:[]};acc.holdings.push(h);}
   else if(name)h.name=name;
-  h.transactions.push({id:uid(),type:'buy',date,shares,price,fee,remark});
-  acc.log.push({id:uid(),date,type:'buy',code,name:h.name,shares,price,amount:gross+fee,fee,remark});
+  const txnId=uid();
+  // 讀取出資分配
+  const fqbSplits=[];
+  const fqbArea=document.getElementById('fqb-splits-area');
+  if(fqbArea&&fqbArea.style.display!=='none'){
+    const s=(getFamilyAccount(member).defaultSplits)||[];
+    const a1=parseFloat(document.getElementById('fqb-split-amt1').value)||0;
+    const a2=parseFloat(document.getElementById('fqb-split-amt2').value)||0;
+    if(a1>0&&s[0])fqbSplits.push({name:s[0].name,amt:a1});
+    if(a2>0&&s[1])fqbSplits.push({name:s[1].name,amt:a2});
+  }
+  h.transactions.push({id:txnId,type:'buy',date,shares,price,fee,remark,...(fqbSplits.length?{splits:fqbSplits}:{})});
+  acc.log.push({id:uid(),txnId,date,type:'buy',code,name:h.name,shares,price,amount:gross+fee,fee,remark});
   acc.log.sort((a,b)=>b.date.localeCompare(a.date));
   save();closeModal('familyQuickBuyModal');
   renderFamilyMemberCards();
