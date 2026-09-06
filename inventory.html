@@ -272,7 +272,7 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
       <div class="kpi-card" onclick="showTab('reports')" style="cursor:pointer" title="查看報表">
         <div class="kpi-icon blue">💵</div>
         <div class="kpi-info">
-          <div class="kpi-label">本月總營收</div>
+          <div class="kpi-label">本年總營收</div>
           <div class="kpi-val" id="kpi-revenue">$0</div>
           <div class="kpi-sub" id="kpi-revenue-sub"></div>
         </div>
@@ -280,7 +280,7 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
       <div class="kpi-card" onclick="showTab('reports')" style="cursor:pointer" title="查看報表">
         <div class="kpi-icon green">💰</div>
         <div class="kpi-info">
-          <div class="kpi-label">本月總利潤</div>
+          <div class="kpi-label">本年總利潤</div>
           <div class="kpi-val" id="kpi-profit">$0</div>
           <div class="kpi-sub" id="kpi-profit-sub"></div>
         </div>
@@ -296,7 +296,7 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
       <div class="kpi-card" onclick="showTab('orders')" style="cursor:pointer" title="查看訂單記錄">
         <div class="kpi-icon red">📦</div>
         <div class="kpi-info">
-          <div class="kpi-label">本月訂單數</div>
+          <div class="kpi-label">本年訂單數</div>
           <div class="kpi-val" id="kpi-orders">0</div>
           <div class="kpi-sub" id="kpi-orders-sub"></div>
         </div>
@@ -1142,19 +1142,17 @@ function setPeriodYear(yr){
 }
 function renderOverview(){
   const now=new Date();
-  const ym=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
-  const monthLabel=now.getFullYear()+'年'+( now.getMonth()+1)+'月';
+  const yr=String(now.getFullYear());
+  const lastYr=String(now.getFullYear()-1);
+  const yearLabel=now.getFullYear()+'年度';
   const ovLabel=document.getElementById('ov-month-label');
-  if(ovLabel)ovLabel.textContent=monthLabel;
+  if(ovLabel)ovLabel.textContent=yearLabel;
   const custMonthTitle=document.getElementById('cust-month-title');
-  if(custMonthTitle)custMonthTitle.textContent=monthLabel+' 客戶營收分潤';
+  if(custMonthTitle)custMonthTitle.textContent=yearLabel+' 客戶營收分潤';
 
-  // 本月訂單
-  const thisMonthOrders=db.orders.filter(o=>o.date&&o.date.startsWith(ym));
-  const lastYm=now.getMonth()===0
-    ?(now.getFullYear()-1)+'-12'
-    :now.getFullYear()+'-'+String(now.getMonth()).padStart(2,'0');
-  const lastMonthOrders=db.orders.filter(o=>o.date&&o.date.startsWith(lastYm));
+  // 本年度訂單
+  const thisMonthOrders=db.orders.filter(o=>o.date&&o.date.startsWith(yr));
+  const lastMonthOrders=db.orders.filter(o=>o.date&&o.date.startsWith(lastYr));
 
   let rev=0,profit=0;
   thisMonthOrders.forEach(o=>{const c=calcOrder(o);rev+=c.revenue;profit+=c.profit;});
@@ -1172,8 +1170,8 @@ function renderOverview(){
   };
   const pctChg=(a,b)=>b>0?((a-b)/b*100).toFixed(1)+'%':'—';
   const upDown=(a,b)=>a>=b?'↑ ':'↓ ';
-  setKpi('kpi-revenue',fmt(rev),'kpi-revenue-sub',upDown(rev,lastRev)+pctChg(rev,lastRev)+'（較上月）',rev>=lastRev);
-  setKpi('kpi-profit',fmt(profit),'kpi-profit-sub',upDown(profit,lastProfit)+pctChg(profit,lastProfit)+'（較上月）',profit>=lastProfit);
+  setKpi('kpi-revenue',fmt(rev),'kpi-revenue-sub',upDown(rev,lastRev)+pctChg(rev,lastRev)+'（較去年）',rev>=lastRev);
+  setKpi('kpi-profit',fmt(profit),'kpi-profit-sub',upDown(profit,lastProfit)+pctChg(profit,lastProfit)+'（較去年）',profit>=lastProfit);
   const unpaidEl=document.getElementById('kpi-unpaid');if(unpaidEl)unpaidEl.textContent=fmt(unpaid);
   const unpaidSub=document.getElementById('kpi-unpaid-sub');if(unpaidSub)unpaidSub.textContent=unpaidOrders.length+'張未收款訂單';
   const ordEl=document.getElementById('kpi-orders');if(ordEl)ordEl.textContent=thisMonthOrders.length;
@@ -1237,8 +1235,9 @@ function renderOverview(){
   // 客戶追蹤提醒
   const trackList=document.getElementById('cust-track-list');
   if(trackList){
+    const TRACK_CUSTS=['騰亦資訊','河川企業社','訊控有限公司','興業企業行'];
     const custOrders={};
-    db.orders.filter(o=>o.custName&&o.date&&o.status!=='cancelled').forEach(o=>{
+    db.orders.filter(o=>o.custName&&TRACK_CUSTS.includes(o.custName)&&o.date&&o.status!=='cancelled').forEach(o=>{
       if(!custOrders[o.custName])custOrders[o.custName]=[];
       custOrders[o.custName].push(o.date);
     });
