@@ -2727,7 +2727,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1788711775441,
+  "_ts": 1788711883331,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -5068,7 +5068,8 @@
             "price": 10.74,
             "amount": 10013.68,
             "fee": 4,
-            "remark": "媽媽 8月存一萬"
+            "remark": "媽媽 8月存一萬",
+            "txnId": "msgv8amuibp"
           },
           {
             "id": "mrxcltwaeqf",
@@ -5080,7 +5081,8 @@
             "price": 10.6,
             "amount": 10074,
             "fee": 4,
-            "remark": "媽媽存一萬元"
+            "remark": "媽媽存一萬元",
+            "txnId": "mrxcltwateu"
           },
           {
             "id": "mrxct2vckiz",
@@ -5092,7 +5094,8 @@
             "price": 10.73,
             "amount": 5045.1,
             "fee": 2,
-            "remark": "媽媽存五千"
+            "remark": "媽媽存五千",
+            "txnId": "mrxct2vczgf"
           }
         ],
         "mktHistory": [
@@ -5320,7 +5323,8 @@
             "price": 13.22,
             "amount": 4629,
             "fee": 2,
-            "remark": "華固期貨 獲利金額"
+            "remark": "華固期貨 獲利金額",
+            "txnId": "mt2dv2gck0k"
           },
           {
             "id": "msoh0nesuea",
@@ -5332,7 +5336,8 @@
             "price": 14.97,
             "amount": 20007.920000000002,
             "fee": 8,
-            "remark": "每月定期定額_2萬"
+            "remark": "每月定期定額_2萬",
+            "txnId": "msoh0neshid"
           },
           {
             "id": "msoh2k6e9jk",
@@ -5344,7 +5349,8 @@
             "price": 13.6,
             "amount": 14966,
             "fee": 6,
-            "remark": "領981T股息_自己再多存1萬5"
+            "remark": "領981T股息_自己再多存1萬5",
+            "txnId": "msoh2k6ezyb"
           },
           {
             "id": "ms8hb10klrd",
@@ -5356,7 +5362,8 @@
             "price": 7.25,
             "amount": 2009.25,
             "fee": 1,
-            "remark": "阿嬤給2000 我清潔阿惟房間"
+            "remark": "阿嬤給2000 我清潔阿惟房間",
+            "txnId": "ms8hb10kt64"
           },
           {
             "id": "ms309lskyeq",
@@ -5368,7 +5375,8 @@
             "price": 7.78,
             "amount": 13620,
             "fee": 5,
-            "remark": "阿嬤支援小朋友學費"
+            "remark": "阿嬤支援小朋友學費",
+            "txnId": "ms309lskdlr"
           },
           {
             "id": "mryi8yfw0xg",
@@ -5392,7 +5400,8 @@
             "price": 8.31,
             "amount": 49880,
             "fee": 20,
-            "remark": "大姑贈與5萬"
+            "remark": "大姑贈與5萬",
+            "txnId": "mryi7xtnbuk"
           },
           {
             "id": "mryig681nm3",
@@ -5404,7 +5413,8 @@
             "price": 14.92,
             "amount": 16000.24,
             "fee": 6,
-            "remark": "每月富邦薪水定期定額"
+            "remark": "每月富邦薪水定期定額",
+            "txnId": "mryig681r9r"
           },
           {
             "id": "mryifmt2p21",
@@ -5416,7 +5426,8 @@
             "price": 15.4,
             "amount": 5084,
             "fee": 2,
-            "remark": ""
+            "remark": "",
+            "txnId": "mryifmt2it4"
           },
           {
             "id": "mryicj7bp8l",
@@ -5428,7 +5439,8 @@
             "price": 14.85,
             "amount": 16058.85,
             "fee": 6,
-            "remark": "每月富邦薪水定期定額"
+            "remark": "每月富邦薪水定期定額",
+            "txnId": "mryicj7blb3"
           },
           {
             "id": "mryi5qx2141",
@@ -5440,7 +5452,8 @@
             "price": 31.54,
             "amount": 1893.3999999999999,
             "fee": 1,
-            "remark": ""
+            "remark": "",
+            "txnId": "mryi5qx2m1b"
           },
           {
             "id": "mryikajmk27",
@@ -5452,7 +5465,8 @@
             "price": 10.45,
             "amount": 12754,
             "fee": 5,
-            "remark": ""
+            "remark": "",
+            "txnId": "mryikajm28m"
           },
           {
             "id": "mryibz0lbz7",
@@ -5464,7 +5478,8 @@
             "price": 14.46,
             "amount": 15998.76,
             "fee": 6,
-            "remark": "每月富邦薪水定期定額"
+            "remark": "每月富邦薪水定期定額",
+            "txnId": "mryibz0l8xx"
           },
           {
             "id": "mryilexiqbk",
@@ -5476,7 +5491,8 @@
             "price": 22,
             "amount": 2289,
             "fee": 1,
-            "remark": ""
+            "remark": "",
+            "txnId": "mryilexi87y"
           },
           {
             "id": "mryibflqhh7",
@@ -5488,7 +5504,8 @@
             "price": 12,
             "amount": 48019,
             "fee": 19,
-            "remark": "每月富邦薪水定期定額"
+            "remark": "每月富邦薪水定期定額",
+            "txnId": "mryibflqouv"
           },
           {
             "id": "mryi589qu3e",
@@ -5500,7 +5517,8 @@
             "price": 13.58,
             "amount": 16628.920000000002,
             "fee": 7,
-            "remark": "阿嬤給15,000"
+            "remark": "阿嬤給15,000",
+            "txnId": "mryiy3wp8t2"
           }
         ],
         "mktHistory": [
@@ -5730,7 +5748,8 @@
             "price": 17.36,
             "amount": 2049.48,
             "fee": 1,
-            "remark": "訂單滿載至2030年"
+            "remark": "訂單滿載至2030年",
+            "txnId": "mryk0xkukn1"
           },
           {
             "id": "mryk0lm94a1",
@@ -5742,7 +5761,8 @@
             "price": 16.94,
             "amount": 2542,
             "fee": 1,
-            "remark": "訂單滿載至2030年"
+            "remark": "訂單滿載至2030年",
+            "txnId": "mryk0lm9va3"
           },
           {
             "id": "mryjx1mb5n7",
@@ -5780,7 +5800,8 @@
             "price": 16.7,
             "amount": 7518,
             "fee": 3,
-            "remark": "訂單滿載至2030年"
+            "remark": "訂單滿載至2030年",
+            "txnId": "mryk0aa2ger"
           },
           {
             "id": "mryjzv4g3oo",
@@ -5792,7 +5813,8 @@
             "price": 16.7,
             "amount": 16707,
             "fee": 7,
-            "remark": "訂單滿載至2030年"
+            "remark": "訂單滿載至2030年",
+            "txnId": "mryjzv4gu26"
           },
           {
             "id": "mryjziij9ky",
@@ -5804,7 +5826,8 @@
             "price": 17.18,
             "amount": 9453,
             "fee": 4,
-            "remark": "訂單滿載至2030年"
+            "remark": "訂單滿載至2030年",
+            "txnId": "mryjziij3m4"
           },
           {
             "id": "mryjz00zucf",
@@ -5816,7 +5839,8 @@
             "price": 16.05,
             "amount": 188373.6,
             "fee": 75,
-            "remark": "訂單滿載至2030年"
+            "remark": "訂單滿載至2030年",
+            "txnId": "mryjz00zy2g"
           }
         ],
         "mktHistory": [
@@ -5920,7 +5944,8 @@
             "price": 2220,
             "amount": 11104,
             "fee": 4,
-            "remark": "阿嬤給老婆一萬"
+            "remark": "阿嬤給老婆一萬",
+            "txnId": "ms8qznntv8e"
           },
           {
             "id": "mrz3k4t5fr2",
@@ -5932,7 +5957,8 @@
             "price": 10.83,
             "amount": 249189,
             "fee": 99,
-            "remark": ""
+            "remark": "",
+            "txnId": "mrz3k4t5931"
           }
         ],
         "mktHistory": [
