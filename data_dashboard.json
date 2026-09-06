@@ -2727,7 +2727,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1788697385761,
+  "_ts": 1788697437341,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -5969,7 +5969,17 @@
                 "shares": 23000,
                 "price": 10.86,
                 "fee": 100,
-                "remark": ""
+                "remark": "",
+                "splits": [
+                  {
+                    "name": "軒",
+                    "amt": 142432
+                  },
+                  {
+                    "name": "琁",
+                    "amt": 107448
+                  }
+                ]
               },
               {
                 "id": "mryrkgwcav6",
@@ -5978,7 +5988,17 @@
                 "shares": 43,
                 "price": 10.15,
                 "fee": 1,
-                "remark": ""
+                "remark": "",
+                "splits": [
+                  {
+                    "name": "軒",
+                    "amt": 249
+                  },
+                  {
+                    "name": "琁",
+                    "amt": 188
+                  }
+                ]
               },
               {
                 "id": "mryrkwaai81",
@@ -5987,7 +6007,17 @@
                 "shares": 50,
                 "price": 10.38,
                 "fee": 1,
-                "remark": ""
+                "remark": "",
+                "splits": [
+                  {
+                    "name": "軒",
+                    "amt": 296
+                  },
+                  {
+                    "name": "琁",
+                    "amt": 224
+                  }
+                ]
               },
               {
                 "id": "ms307xwu76m",
@@ -5996,7 +6026,17 @@
                 "shares": 158,
                 "price": 9.56,
                 "fee": 1,
-                "remark": "零用錢 兒子存1100,女兒存400"
+                "remark": "零用錢 兒子存1100,女兒存400",
+                "splits": [
+                  {
+                    "name": "軒",
+                    "amt": 861
+                  },
+                  {
+                    "name": "琁",
+                    "amt": 650
+                  }
+                ]
               },
               {
                 "id": "msmz43tevv9",
@@ -6005,7 +6045,17 @@
                 "shares": 16,
                 "price": 9.88,
                 "fee": 1,
-                "remark": "軒_存錢150"
+                "remark": "軒_存錢150",
+                "splits": [
+                  {
+                    "name": "軒",
+                    "amt": 91
+                  },
+                  {
+                    "name": "琁",
+                    "amt": 68
+                  }
+                ]
               }
             ]
           },
@@ -6022,7 +6072,17 @@
                 "shares": 28,
                 "price": 11.55,
                 "fee": 1,
-                "remark": ""
+                "remark": "",
+                "splits": [
+                  {
+                    "name": "軒",
+                    "amt": 185
+                  },
+                  {
+                    "name": "琁",
+                    "amt": 139
+                  }
+                ]
               },
               {
                 "id": "mryrniqzryt",
@@ -6031,7 +6091,17 @@
                 "shares": 123,
                 "price": 12.75,
                 "fee": 1,
-                "remark": ""
+                "remark": "",
+                "splits": [
+                  {
+                    "name": "軒",
+                    "amt": 894
+                  },
+                  {
+                    "name": "琁",
+                    "amt": 675
+                  }
+                ]
               },
               {
                 "id": "mryro3qo10q",
@@ -6040,7 +6110,17 @@
                 "shares": 55,
                 "price": 15.14,
                 "fee": 1,
-                "remark": ""
+                "remark": "",
+                "splits": [
+                  {
+                    "name": "軒",
+                    "amt": 475
+                  },
+                  {
+                    "name": "琁",
+                    "amt": 359
+                  }
+                ]
               },
               {
                 "id": "mryros7dcnp",
@@ -6049,7 +6129,17 @@
                 "shares": 16,
                 "price": 17.83,
                 "fee": 1,
-                "remark": ""
+                "remark": "",
+                "splits": [
+                  {
+                    "name": "軒",
+                    "amt": 163
+                  },
+                  {
+                    "name": "琁",
+                    "amt": 123
+                  }
+                ]
               }
             ]
           },
@@ -6066,7 +6156,17 @@
                 "shares": 160,
                 "price": 10.8,
                 "fee": 1,
-                "remark": ""
+                "remark": "",
+                "splits": [
+                  {
+                    "name": "軒",
+                    "amt": 986
+                  },
+                  {
+                    "name": "琁",
+                    "amt": 743
+                  }
+                ]
               },
               {
                 "id": "mryrra6po4x",
@@ -6075,7 +6175,17 @@
                 "shares": 93,
                 "price": 13,
                 "fee": 1,
-                "remark": ""
+                "remark": "",
+                "splits": [
+                  {
+                    "name": "軒",
+                    "amt": 690
+                  },
+                  {
+                    "name": "琁",
+                    "amt": 520
+                  }
+                ]
               },
               {
                 "id": "mryrs3zywt8",
@@ -6084,7 +6194,17 @@
                 "shares": 217,
                 "price": 13.36,
                 "fee": 1,
-                "remark": ""
+                "remark": "",
+                "splits": [
+                  {
+                    "name": "軒",
+                    "amt": 1653
+                  },
+                  {
+                    "name": "琁",
+                    "amt": 1247
+                  }
+                ]
               },
               {
                 "id": "mryrslrygf4",
@@ -6093,7 +6213,17 @@
                 "shares": 105,
                 "price": 18.48,
                 "fee": 1,
-                "remark": ""
+                "remark": "",
+                "splits": [
+                  {
+                    "name": "軒",
+                    "amt": 1106
+                  },
+                  {
+                    "name": "琁",
+                    "amt": 835
+                  }
+                ]
               }
             ]
           },
@@ -6110,7 +6240,17 @@
                 "shares": 230,
                 "price": 10.36,
                 "fee": 1,
-                "remark": ""
+                "remark": "",
+                "splits": [
+                  {
+                    "name": "軒",
+                    "amt": 1359
+                  },
+                  {
+                    "name": "琁",
+                    "amt": 1025
+                  }
+                ]
               },
               {
                 "id": "mryruweui05",
@@ -6119,7 +6259,17 @@
                 "shares": 19,
                 "price": 11.04,
                 "fee": 1,
-                "remark": ""
+                "remark": "",
+                "splits": [
+                  {
+                    "name": "軒",
+                    "amt": 120
+                  },
+                  {
+                    "name": "琁",
+                    "amt": 91
+                  }
+                ]
               },
               {
                 "id": "mryrvant839",
@@ -6128,7 +6278,17 @@
                 "shares": 235,
                 "price": 12.19,
                 "fee": 1,
-                "remark": ""
+                "remark": "",
+                "splits": [
+                  {
+                    "name": "軒",
+                    "amt": 1634
+                  },
+                  {
+                    "name": "琁",
+                    "amt": 1232
+                  }
+                ]
               },
               {
                 "id": "mryrwybko5x",
@@ -6137,7 +6297,17 @@
                 "shares": 226,
                 "price": 12.43,
                 "fee": 1,
-                "remark": ""
+                "remark": "",
+                "splits": [
+                  {
+                    "name": "軒",
+                    "amt": 1602
+                  },
+                  {
+                    "name": "琁",
+                    "amt": 1208
+                  }
+                ]
               },
               {
                 "id": "mryrxng051s",
@@ -6146,7 +6316,17 @@
                 "shares": 9,
                 "price": 11.34,
                 "fee": 1,
-                "remark": ""
+                "remark": "",
+                "splits": [
+                  {
+                    "name": "軒",
+                    "amt": 59
+                  },
+                  {
+                    "name": "琁",
+                    "amt": 44
+                  }
+                ]
               },
               {
                 "id": "mryry0b8krg",
@@ -6155,7 +6335,17 @@
                 "shares": 49,
                 "price": 14.97,
                 "fee": 1,
-                "remark": ""
+                "remark": "",
+                "splits": [
+                  {
+                    "name": "軒",
+                    "amt": 419
+                  },
+                  {
+                    "name": "琁",
+                    "amt": 316
+                  }
+                ]
               },
               {
                 "id": "mryryia94ck",
@@ -6164,7 +6354,17 @@
                 "shares": 152,
                 "price": 17.55,
                 "fee": 1,
-                "remark": ""
+                "remark": "",
+                "splits": [
+                  {
+                    "name": "軒",
+                    "amt": 1521
+                  },
+                  {
+                    "name": "琁",
+                    "amt": 1148
+                  }
+                ]
               }
             ]
           },
@@ -6181,7 +6381,17 @@
                 "shares": 258,
                 "price": 11.6,
                 "fee": 1,
-                "remark": ""
+                "remark": "",
+                "splits": [
+                  {
+                    "name": "軒",
+                    "amt": 1707
+                  },
+                  {
+                    "name": "琁",
+                    "amt": 1287
+                  }
+                ]
               },
               {
                 "id": "msogzdk7heg",
@@ -6190,7 +6400,17 @@
                 "shares": 9,
                 "price": 12.11,
                 "fee": 1,
-                "remark": "軒_存100"
+                "remark": "軒_存100",
+                "splits": [
+                  {
+                    "name": "軒",
+                    "amt": 63
+                  },
+                  {
+                    "name": "琁",
+                    "amt": 47
+                  }
+                ]
               },
               {
                 "id": "mth2ac0c5ms",
@@ -6199,7 +6419,17 @@
                 "shares": 45,
                 "price": 12.34,
                 "fee": 1,
-                "remark": "姊姊_500"
+                "remark": "姊姊_500",
+                "splits": [
+                  {
+                    "name": "軒",
+                    "amt": 317
+                  },
+                  {
+                    "name": "琁",
+                    "amt": 239
+                  }
+                ]
               }
             ]
           },
@@ -6216,7 +6446,17 @@
                 "shares": 35,
                 "price": 11.59,
                 "fee": 1,
-                "remark": ""
+                "remark": "",
+                "splits": [
+                  {
+                    "name": "軒",
+                    "amt": 232
+                  },
+                  {
+                    "name": "琁",
+                    "amt": 175
+                  }
+                ]
               },
               {
                 "id": "mrys691yitk",
@@ -6225,7 +6465,17 @@
                 "shares": 111,
                 "price": 12.65,
                 "fee": 1,
-                "remark": ""
+                "remark": "",
+                "splits": [
+                  {
+                    "name": "軒",
+                    "amt": 801
+                  },
+                  {
+                    "name": "琁",
+                    "amt": 604
+                  }
+                ]
               },
               {
                 "id": "mrys6yxctm9",
@@ -6234,7 +6484,17 @@
                 "shares": 205,
                 "price": 13.45,
                 "fee": 1,
-                "remark": ""
+                "remark": "",
+                "splits": [
+                  {
+                    "name": "軒",
+                    "amt": 1572
+                  },
+                  {
+                    "name": "琁",
+                    "amt": 1186
+                  }
+                ]
               },
               {
                 "id": "mrys7eh5iid",
@@ -6243,7 +6503,17 @@
                 "shares": 51,
                 "price": 14.28,
                 "fee": 1,
-                "remark": ""
+                "remark": "",
+                "splits": [
+                  {
+                    "name": "軒",
+                    "amt": 416
+                  },
+                  {
+                    "name": "琁",
+                    "amt": 313
+                  }
+                ]
               },
               {
                 "id": "mrys7ypjvlf",
@@ -6252,7 +6522,17 @@
                 "shares": 124,
                 "price": 14.92,
                 "fee": 1,
-                "remark": ""
+                "remark": "",
+                "splits": [
+                  {
+                    "name": "軒",
+                    "amt": 1055
+                  },
+                  {
+                    "name": "琁",
+                    "amt": 796
+                  }
+                ]
               }
             ]
           }
@@ -6611,6 +6891,16 @@
           {
             "date": "2026-09-05",
             "mkt": 290809
+          }
+        ],
+        "defaultSplits": [
+          {
+            "name": "軒",
+            "pct": 57
+          },
+          {
+            "name": "琁",
+            "pct": 43
           }
         ]
       }
