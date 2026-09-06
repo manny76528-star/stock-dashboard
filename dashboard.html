@@ -12742,29 +12742,40 @@ function fillFamilySellInfo(){
 
   if(batchArea)batchArea.style.display='';
   if(batchList)batchList.innerHTML=activeBatches.map((b,i)=>`
-    <div style="padding:8px 10px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0">
-      <div style="display:flex;align-items:center;gap:8px">
-        <div style="flex:1;font-size:12px">
-          <div style="font-weight:700;color:#1e293b">${b.date} · $${b.price.toFixed(2)}</div>
-          <div style="color:#64748b;font-size:11px">可賣 ${b.remaining.toLocaleString()} 股</div>
-        </div>
-        <input type="number" min="0" max="${b.remaining}" placeholder="0"
-          id="fs-batch-${i}" data-max="${b.remaining}" data-buy-id="${b.id}" data-buy-price="${b.price}"
-          oninput="updateFsBatchTotal()"
-          style="width:90px;padding:6px 8px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-weight:700;text-align:right;outline:none"
-        >
-        <span style="font-size:11px;color:#94a3b8">股</span>
+    <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid #f1f5f9">
+      <input type="checkbox" id="fs-batch-chk-${i}" data-idx="${i}" data-max="${b.remaining}" data-buy-price="${b.price}" data-buy-id="${b.id}"
+        onchange="onFsBatchCheck(${i})" style="width:16px;height:16px;cursor:pointer">
+      <div style="flex:1;font-size:12px">
+        <div style="font-weight:700;color:#1e293b">${b.date} · $${b.price.toFixed(2)}</div>
+        <div style="color:#64748b;font-size:11px">可賣 ${b.remaining.toLocaleString()} 股</div>
       </div>
-      <div id="fs-batch-${i}-pnl" style="font-size:11px;margin-top:4px;color:#94a3b8">—</div>
-    </div>`).join('');
+      <input type="number" id="fs-batch-${i}" data-max="${b.remaining}" data-buy-price="${b.price}" data-buy-id="${b.id}"
+        value="${b.remaining}" min="0" max="${b.remaining}" step="1" disabled
+        oninput="updateFsBatchTotal()"
+        style="width:90px;padding:6px 8px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-weight:700;text-align:right;outline:none;background:#f8fafc">
+      <span style="font-size:11px;color:#94a3b8">股</span>
+    </div>
+    <div id="fs-batch-${i}-pnl" style="font-size:11px;padding:2px 12px 8px;color:#94a3b8;border-bottom:1px solid #f1f5f9">—</div>`).join('');
   updateFsBatchTotal();
 }
 
+function onFsBatchCheck(i){
+  const chk=document.getElementById('fs-batch-chk-'+i);
+  const qty=document.getElementById('fs-batch-'+i);
+  if(!qty)return;
+  qty.disabled=!chk.checked;
+  qty.style.background=chk.checked?'#fff':'#f8fafc';
+  if(chk.checked)qty.focus();
+  updateFsBatchTotal();
+}
 function updateFsBatchTotal(){
-  const inputs=[...document.querySelectorAll('[id^="fs-batch-"]')].filter(el=>el.tagName==='INPUT');
+  const inputs=[...document.querySelectorAll('[id^="fs-batch-"]')].filter(el=>el.tagName==='INPUT'&&el.type==='number');
   const sellPrice=parseFloat(document.getElementById('fs-price').value)||0;
   let total=0;
   inputs.forEach(el=>{
+    const i=el.id.replace('fs-batch-','');
+    const chk=document.getElementById('fs-batch-chk-'+i);
+    if(chk&&!chk.checked)return;
     const v=parseFloat(el.value)||0;
     const max=parseFloat(el.dataset.max)||0;
     const buyPrice=parseFloat(el.dataset.buyPrice)||0;
@@ -12772,17 +12783,14 @@ function updateFsBatchTotal(){
     else el.style.borderColor='#e2e8f0';
     const qty=Math.min(v,max);
     total+=qty;
-    // 更新損益顯示
-    const pnlEl=document.getElementById(el.id+'-pnl');
+    const pnlEl=document.getElementById('fs-batch-'+i+'-pnl');
     if(pnlEl){
       if(qty>0&&sellPrice>0&&buyPrice>0){
         const pnl=Math.round((sellPrice-buyPrice)*qty);
         const roi=(sellPrice-buyPrice)/buyPrice*100;
         const c=pnl>=0?'#dc2626':'#16a34a';
         pnlEl.innerHTML='<span style="color:'+c+';font-weight:700">'+(pnl>=0?'+':'')+pnl.toLocaleString()+' ('+(roi>=0?'+':'')+roi.toFixed(1)+'%)</span>';
-      } else {
-        pnlEl.textContent='—';
-      }
+      } else pnlEl.textContent='—';
     }
   });
   const totalEl=document.getElementById('fs-batch-total');
