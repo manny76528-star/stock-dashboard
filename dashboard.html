@@ -2630,6 +2630,13 @@ body:not(.privacy) .privacy-mask{filter:none;}
           </div>
         </div>
 
+        <!-- 姊弟結算 -->
+        <div id="family-split-card" style="display:none" class="trend-page-card" style="padding:0;overflow:hidden;margin-bottom:12px">
+          <div class="trend-page-hdr" style="padding:12px 16px;border-bottom:1px solid #f0f2f5">
+            <span>👧👦 出資結算</span>
+          </div>
+          <div id="family-split-body" style="padding:12px 16px"></div>
+        </div>
         <!-- 市值趨勢圖 -->
         <div class="trend-page-card" style="padding:0;overflow:hidden">
           <div class="trend-page-hdr" style="padding:12px 16px;border-bottom:1px solid #f0f2f5">
@@ -3790,6 +3797,21 @@ body:not(.privacy) .privacy-mask{filter:none;}
         <div class="fg"><label class="fl">手續費</label><input class="fi" id="fb-fee" type="number" placeholder="自動計算"></div>
       </div>
       <div class="fg"><label class="fl">備註（選填）</label><input class="fi" id="fb-remark" placeholder="例：股息再投入"></div>
+      <!-- 出資分配（琁 & 軒 帳戶才顯示）-->
+      <div id="fb-splits-area" style="display:none;background:#f8fafc;border-radius:10px;padding:12px;margin-top:4px">
+        <div style="font-size:12px;font-weight:700;color:#64748b;margin-bottom:8px">💰 出資分配</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <div style="flex:1">
+            <label class="fl" id="fb-split-name1" style="font-size:11px">軒</label>
+            <input class="fi" id="fb-split-amt1" type="number" placeholder="0" oninput="onSplitInput(1)" style="font-size:13px">
+          </div>
+          <div style="flex:1">
+            <label class="fl" id="fb-split-name2" style="font-size:11px">琁</label>
+            <input class="fi" id="fb-split-amt2" type="number" placeholder="0" oninput="onSplitInput(2)" style="font-size:13px">
+          </div>
+        </div>
+        <div style="font-size:11px;color:#94a3b8;margin-top:6px" id="fb-split-hint">總金額：$0</div>
+      </div>
     </div>
     <div class="br"><button class="btn btn-s" onclick="closeModal('familyBuyModal')">取消</button><button class="btn btn-p" onclick="saveFamilyBuy()">確認買入</button></div>
   </div>
@@ -12418,6 +12440,45 @@ function renderFamilyMemberSel(){
 }
 
 // ── 買入 ──
+function onSplitInput(){
+  const a1=parseFloat(document.getElementById('fb-split-amt1').value)||0;
+  const a2=parseFloat(document.getElementById('fb-split-amt2').value)||0;
+  const shares=parseFloat(document.getElementById('fb-shares').value)||0;
+  const price=parseFloat(document.getElementById('fb-price').value)||0;
+  const fee=parseFloat(document.getElementById('fb-fee').value)||0;
+  const total=Math.round(shares*price+fee);
+  const hint=document.getElementById('fb-split-hint');
+  if(hint)hint.textContent='總金額：$'+total.toLocaleString()+' | 已分配：$'+(a1+a2).toLocaleString()+(Math.abs(a1+a2-total)<=1?' ✅':' ⚠️ 差$'+Math.abs(a1+a2-total).toLocaleString());
+}
+function showFamilySplitsIfNeeded(member){
+  const acc=getFamilyAccount(member);
+  const area=document.getElementById('fb-splits-area');
+  if(!area)return;
+  if(!acc.defaultSplits||acc.defaultSplits.length<2){area.style.display='none';return;}
+  area.style.display='';
+  const s=acc.defaultSplits;
+  const n1=document.getElementById('fb-split-name1');
+  const n2=document.getElementById('fb-split-name2');
+  if(n1)n1.textContent=s[0].name+' ('+s[0].pct+'%)';
+  if(n2)n2.textContent=s[1].name+' ('+s[1].pct+'%)';
+}
+function applySplitDefault(){
+  const member=curFamilyMember();
+  const acc=getFamilyAccount(member);
+  if(!acc.defaultSplits||acc.defaultSplits.length<2)return;
+  const s=acc.defaultSplits;
+  const shares=parseFloat(document.getElementById('fb-shares').value)||0;
+  const price=parseFloat(document.getElementById('fb-price').value)||0;
+  const fee=parseFloat(document.getElementById('fb-fee').value)||0;
+  const total=Math.round(shares*price+fee);
+  if(total<=0)return;
+  const el1=document.getElementById('fb-split-amt1');
+  const el2=document.getElementById('fb-split-amt2');
+  if(el1)el1.value=Math.round(total*s[0].pct/100);
+  if(el2)el2.value=total-Math.round(total*s[0].pct/100);
+  onSplitInput();
+}
+
 function openFamilyBuyModal(){
   const member=curFamilyMember();
   if(!member)return toast('請先選擇成員');
@@ -12437,9 +12498,12 @@ function openFamilyBuyModal(){
   document.getElementById('fb-price').value='';
   document.getElementById('fb-fee').value='';
   document.getElementById('fb-remark').value='';
+  // 顯示出資分配欄位
+  showFamilySplitsIfNeeded(member);
+  document.getElementById('fb-split-amt1').value='';
+  document.getElementById('fb-split-amt2').value='';
   openModal('familyBuyModal');
-}
-let _familyEditTxn=null; // {hId, txnId} 編輯模式
+} // {hId, txnId} 編輯模式
 
 function openFamilyBuyModal(hId){
   const member=curFamilyMember();
@@ -12617,7 +12681,18 @@ function saveFamilyBuy(){
   else{if(name)h.name=name;if(url)h.url=url;}
   const txnId=uid();
   const gross=shares*price;
-  h.transactions.push({id:txnId,type:'buy',date,shares,price,fee,remark}); // 存股數
+  // 讀取出資分配
+  const splits=[];
+  const area=document.getElementById('fb-splits-area');
+  if(area&&area.style.display!=='none'){
+    const acc2=getFamilyAccount(member);
+    const s=acc2.defaultSplits||[];
+    const a1=parseFloat(document.getElementById('fb-split-amt1').value)||0;
+    const a2=parseFloat(document.getElementById('fb-split-amt2').value)||0;
+    if(a1>0&&s[0])splits.push({name:s[0].name,amt:a1});
+    if(a2>0&&s[1])splits.push({name:s[1].name,amt:a2});
+  }
+  h.transactions.push({id:txnId,type:'buy',date,shares,price,fee,remark,...(splits.length?{splits}:{})}); // 存股數
   acc.log.push({id:uid(),txnId,date,type:'buy',code,name:h.name,shares,price,amount:gross+fee,fee,remark});
   acc.log.sort((a,b)=>b.date.localeCompare(a.date));
   save();closeModal('familyBuyModal');renderFamilyPage();toast(`💰 買入 ${code} ${shares}股`);
@@ -12979,11 +13054,49 @@ function renderFamilyPage(){
       }).join('');
   }
 
+  // 姊弟結算（有 defaultSplits 才顯示）
+  renderFamilySplitSummary(member, acc, tMkt);
+
   // 趨勢圖（以LOG裡每筆買入日期的市值）
   renderFamilyTrendChart(acc);
 }
 
 let _familyTrendChart=null;
+function renderFamilySplitSummary(member, acc, curMkt){
+  const card=document.getElementById('family-split-card');
+  const body=document.getElementById('family-split-body');
+  if(!card||!body)return;
+  const splits=acc.defaultSplits;
+  if(!splits||splits.length<2){card.style.display='none';return;}
+  card.style.display='';
+  // 計算每人累積出資
+  const totals={};
+  splits.forEach(s=>totals[s.name]=0);
+  acc.holdings.forEach(h=>{
+    h.transactions.filter(t=>t.type==='buy'&&t.splits).forEach(t=>{
+      t.splits.forEach(sp=>{if(totals[sp.name]!==undefined)totals[sp.name]+=sp.amt||0;});
+    });
+  });
+  const grandTotal=Object.values(totals).reduce((s,v)=>s+v,0);
+  body.innerHTML=splits.map(s=>{
+    const amt=totals[s.name]||0;
+    const pct=grandTotal>0?Math.round(amt/grandTotal*100):s.pct;
+    const mktShare=curMkt>0?Math.round(curMkt*pct/100):0;
+    const pnl=mktShare-amt;
+    const pnlColor=pnl>=0?'#dc2626':'#16a34a';
+    return`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f5f7fa">
+      <div>
+        <div style="font-size:13px;font-weight:700;color:#1e293b">${s.name} <span style="font-size:11px;color:#94a3b8;font-weight:400">(${pct}%)</span></div>
+        <div style="font-size:11px;color:#64748b">出資 $${Math.round(amt).toLocaleString()}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:13px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#1e293b">$${mktShare.toLocaleString()}</div>
+        <div style="font-size:11px;font-weight:700;color:${pnlColor}">${pnl>=0?'+':''}$${Math.round(pnl).toLocaleString()}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
 function renderFamilyTrendChart(acc){
   if(!acc)return;
   window._curFamilyAcc=acc; // 存起來供勾選框用
