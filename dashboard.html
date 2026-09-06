@@ -12756,6 +12756,12 @@ function fillFamilySellInfo(){
       <span style="font-size:11px;color:#94a3b8">股</span>
     </div>
     <div id="fs-batch-${i}-pnl" style="font-size:11px;padding:2px 12px 8px;color:#94a3b8;border-bottom:1px solid #f1f5f9">—</div>`).join('');
+  // 自動帶入現價
+  const curPrice=db.prices[code]?.price;
+  if(curPrice){
+    const priceEl=document.getElementById('fs-price');
+    if(priceEl){priceEl.value=curPrice.toFixed(2);updateFsTotal();}
+  }
   updateFsBatchTotal();
 }
 
