@@ -2727,7 +2727,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1788704859109,
+  "_ts": 1788704893735,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -6140,6 +6140,15 @@
                     "amt": 129
                   }
                 ]
+              },
+              {
+                "id": "mtpwpkccx4v",
+                "type": "buy",
+                "date": "2026-09-06",
+                "shares": 100,
+                "price": 100,
+                "fee": 4,
+                "remark": ""
               }
             ]
           },
@@ -6538,6 +6547,19 @@
           }
         ],
         "log": [
+          {
+            "id": "mtpwpkccdio",
+            "txnId": "mtpwpkccx4v",
+            "date": "2026-09-06",
+            "type": "buy",
+            "code": "00980A",
+            "name": "主動野村臺灣優選",
+            "shares": 100,
+            "price": 100,
+            "amount": 10004,
+            "fee": 4,
+            "remark": ""
+          },
           {
             "id": "mth2ac0cgnk",
             "date": "2026-08-31",
