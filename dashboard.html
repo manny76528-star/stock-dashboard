@@ -13287,20 +13287,22 @@ function renderFamilyPage(){
   const fmt=v=>'$'+Math.round(v).toLocaleString();
 
   // KPI
-  let tCost=0,tMkt=0,tPnl=0,tDiv=0;
+  let tCost=0,tMkt=0,tPnl=0,tDiv=0,tRealized=0;
   acc.holdings.forEach(h=>{
     const c=calcFamilyHolding(h);
     tCost+=c.cost;
     if(c.mktVal!=null)tMkt+=c.mktVal;
     if(c.pnl!=null)tPnl+=c.pnl;
+    tRealized+=c.realized||0;
   });
+  const totalPnl=tPnl+tRealized; // 未實現 + 已實現
   tDiv=(acc.log||[]).filter(l=>l.type==='div').reduce((s,l)=>s+(l.amount||0),0);
-  const roi=tCost>0?Math.round(tPnl/tCost*1000)/10:0;
+  const roi=tCost>0?Math.round(totalPnl/tCost*1000)/10:0;
   const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
   set('fm-cost',fmt(tCost));
   set('fm-mkt',tMkt>0?fmt(tMkt):'—');
   const pnlEl=document.getElementById('fm-pnl');
-  if(pnlEl){pnlEl.textContent=(tPnl>=0?'+':'')+fmt(tPnl);pnlEl.style.color=tPnl>=0?'#dc2626':'#16a34a';}
+  if(pnlEl){pnlEl.textContent=(totalPnl>=0?'+':'')+fmt(totalPnl);pnlEl.style.color=totalPnl>=0?'#dc2626':'#16a34a';}
   set('fm-roi','投報率 '+(roi>=0?'+':'')+roi+'%');
   set('fm-div',fmt(tDiv));
 
@@ -13416,17 +13418,30 @@ function renderFamilyPage(){
             if(parts.length)pnlHtml=`<div style="margin-top:3px;font-size:10px;display:flex;gap:8px;flex-wrap:wrap">${parts.join('')}</div>`;
           }
         } else if(l.type==='sell'&&l.txnId){
-          // 賣出直接從log的amount算已實現
-          const acc2=getFamilyAccount(member);
-          // 找對應持股的FIFO已實現
-          const holding=(acc2.holdings||[]).find(h=>h.code===l.code);
-          if(holding){
-            // 在 sells 裡找對應的 txn
-            const sellTxn=(holding.transactions||[]).find(t=>t.id===l.txnId||t.txnId===l.txnId);
+          // FIFO計算賣出已實現損益
+          const batch=(fifoMap[l.code]||[]);
+          // 用此txnId對應的sells找已實現
+          const holding2=(acc.holdings||[]).find(h=>h.code===l.code);
+          if(holding2){
+            const sellTxn=(holding2.transactions||[]).find(t=>t.id===l.txnId);
             if(sellTxn){
-              const gross=(sellTxn.shares||0)*sellTxn.price;
-              const net=gross-(sellTxn.fee||0);
-              pnlHtml=`<div style="margin-top:3px;font-size:10px;color:#64748b">淨收入 $${Math.round(net).toLocaleString()}</div>`;
+              const sellShares=sellTxn.shares||0;
+              const sellPrice=sellTxn.price||0;
+              const fee=sellTxn.fee||0;
+              // FIFO計算這筆賣出的成本
+              const buyQueue=[...(holding2.transactions||[])].filter(t=>t.type==='buy').sort((a,b)=>a.date.localeCompare(b.date)).map(b=>({...b,rem:b.shares}));
+              const prevSells=[...(holding2.transactions||[])].filter(t=>t.type==='sell'&&t.date<sellTxn.date).sort((a,b)=>a.date.localeCompare(b.date));
+              prevSells.forEach(s=>{let r=s.shares;for(const b of buyQueue){if(r<=0)break;const tk=Math.min(b.rem,r);b.rem-=tk;r-=tk;}});
+              let cost=0,rem=sellShares;
+              for(const b of buyQueue){if(rem<=0)break;const tk=Math.min(b.rem,rem);cost+=tk*b.price;rem-=tk;}
+              const net=sellShares*sellPrice-fee;
+              const realPnl=Math.round(net-cost);
+              const realRoi=cost>0?realPnl/cost*100:0;
+              const c2=realPnl>=0?'#dc2626':'#16a34a';
+              pnlHtml=`<div style="margin-top:3px;font-size:10px;display:flex;gap:8px">
+                <span style="color:#64748b">淨收入 $${Math.round(net).toLocaleString()}</span>
+                <span style="color:${c2};font-weight:700">${realPnl>=0?'+':''}${realPnl.toLocaleString()} (${realRoi>=0?'+':''}${realRoi.toFixed(1)}%)</span>
+              </div>`;
             }
           }
         }
