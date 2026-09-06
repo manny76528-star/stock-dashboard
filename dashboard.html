@@ -3846,12 +3846,18 @@ body:not(.privacy) .privacy-mask{filter:none;}
         <select class="fi" id="fs-code" onchange="fillFamilySellInfo()"><option value="">— 選擇持股 —</option></select>
       </div>
       <div id="fs-avail" style="display:none;font-size:12px;color:#2563eb;font-weight:600;margin:-6px 0 8px;padding:6px 10px;background:#eff6ff;border-radius:8px">可賣：—</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div class="fg"><label class="fl">日期</label><input class="fi" id="fs-date" type="date"></div>
-        <div class="fg"><label class="fl">股數</label><input class="fi" id="fs-lots" type="number" placeholder="例：500" oninput="updateFsTotal()"></div>
+      <!-- 批次選擇 -->
+      <div id="fs-batch-area" style="display:none;margin-bottom:10px">
+        <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:6px">選擇批次</div>
+        <div id="fs-batch-list" style="display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto"></div>
+        <div id="fs-batch-total" style="font-size:12px;font-weight:700;color:#1e293b;margin-top:8px;padding:6px 10px;background:#f8fafc;border-radius:8px">總賣出：0 股</div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div class="fg"><label class="fl">成交價</label><input class="fi" id="fs-price" type="number" step="0.01" oninput="updateFsTotal()"></div>
+        <div class="fg"><label class="fl">賣出日期</label><input class="fi" id="fs-date" type="date"></div>
+        <div class="fg"><label class="fl">成交價（元/股）</label><input class="fi" id="fs-price" type="number" step="0.01" oninput="updateFsTotal()"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="fg" style="display:none"><label class="fl">股數</label><input class="fi" id="fs-lots" type="number" placeholder="例：500" oninput="updateFsTotal()"></div>
         <div class="fg"><label class="fl">手續費＋交易稅</label><input class="fi" id="fs-fee" type="number" placeholder="自動計算"></div>
       </div>
       <div class="fg"><label class="fl">備註（選填）</label><input class="fi" id="fs-remark" placeholder="例：繳電話費"></div>
@@ -12709,14 +12715,64 @@ function openFamilyBuyModal(hId){
 function fillFamilySellInfo(){
   const code=document.getElementById('fs-code').value;
   const avail=document.getElementById('fs-avail');
-  if(!code||!avail){if(avail)avail.style.display='none';return;}
+  const batchArea=document.getElementById('fs-batch-area');
+  const batchList=document.getElementById('fs-batch-list');
+  if(!code){
+    if(avail)avail.style.display='none';
+    if(batchArea)batchArea.style.display='none';
+    return;
+  }
   const member=curFamilyMember();
   const acc=getFamilyAccount(member);
   const h=acc.holdings.find(x=>x.code===code);
-  if(!h){avail.style.display='none';return;}
+  if(!h){if(avail)avail.style.display='none';if(batchArea)batchArea.style.display='none';return;}
   const c=calcFamilyHolding(h);
-  avail.style.display='';
-  avail.textContent='可賣：'+c.shares.toLocaleString()+' 股（'+Math.floor(c.shares/1000)+'張 '+c.shares%1000+'股）';
+  if(avail){avail.style.display='';avail.textContent='可賣：'+c.shares.toLocaleString()+' 股（'+Math.floor(c.shares/1000)+'張 '+c.shares%1000+'股）';}
+
+  // 建立批次列表（FIFO，有剩餘的買入批次）
+  const buys=[...(h.transactions||[])].filter(t=>t.type==='buy').sort((a,b)=>a.date.localeCompare(b.date));
+  const sells=[...(h.transactions||[])].filter(t=>t.type==='sell').sort((a,b)=>a.date.localeCompare(b.date));
+  // 計算每批剩餘股數
+  const batchRemain=buys.map(b=>({...b,remaining:b.shares||(b.lots||0)*1000}));
+  sells.forEach(s=>{
+    let rem=s.shares||(s.lots||0)*1000;
+    for(const b of batchRemain){if(rem<=0)break;const take=Math.min(b.remaining,rem);b.remaining-=take;rem-=take;}
+  });
+  const activeBatches=batchRemain.filter(b=>b.remaining>0);
+
+  if(batchArea)batchArea.style.display='';
+  if(batchList)batchList.innerHTML=activeBatches.map((b,i)=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0">
+      <div style="flex:1;font-size:12px">
+        <div style="font-weight:700;color:#1e293b">${b.date} · $${b.price.toFixed(2)}</div>
+        <div style="color:#64748b;font-size:11px">可賣 ${b.remaining.toLocaleString()} 股</div>
+      </div>
+      <input type="number" min="0" max="${b.remaining}" placeholder="0"
+        id="fs-batch-${i}" data-max="${b.remaining}" data-buy-id="${b.id}"
+        oninput="updateFsBatchTotal()"
+        style="width:90px;padding:6px 8px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-weight:700;text-align:right;outline:none"
+      >
+      <span style="font-size:11px;color:#94a3b8">股</span>
+    </div>`).join('');
+  updateFsBatchTotal();
+}
+
+function updateFsBatchTotal(){
+  const inputs=[...document.querySelectorAll('[id^="fs-batch-"]')];
+  let total=0;
+  inputs.forEach(el=>{
+    const v=parseFloat(el.value)||0;
+    const max=parseFloat(el.dataset.max)||0;
+    if(v>max){el.value=max;el.style.borderColor='#dc2626';}
+    else el.style.borderColor='#e2e8f0';
+    total+=Math.min(v,max);
+  });
+  const totalEl=document.getElementById('fs-batch-total');
+  if(totalEl)totalEl.textContent='總賣出：'+total.toLocaleString()+' 股';
+  // 同步到 fs-lots 供其他函式使用
+  const lotsEl=document.getElementById('fs-lots');
+  if(lotsEl)lotsEl.value=total;
+  updateFsTotal();
 }
 
 function updateFsTotal(){
