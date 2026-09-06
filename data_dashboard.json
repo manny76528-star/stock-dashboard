@@ -2727,7 +2727,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1788711643880,
+  "_ts": 1788711732664,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -6548,7 +6548,8 @@
             "price": 12.34,
             "amount": 556.3,
             "fee": 1,
-            "remark": "姊姊_500"
+            "remark": "姊姊_500",
+            "txnId": "mth2ac0c5ms"
           },
           {
             "id": "msogzdk7u6w",
@@ -6560,7 +6561,8 @@
             "price": 12.11,
             "amount": 109.99,
             "fee": 1,
-            "remark": "軒_存100"
+            "remark": "軒_存100",
+            "txnId": "msogzdk7heg"
           },
           {
             "id": "msmz43teb9u",
@@ -6572,7 +6574,8 @@
             "price": 9.88,
             "amount": 159.08,
             "fee": 1,
-            "remark": "軒_存錢150"
+            "remark": "軒_存錢150",
+            "txnId": "msmz43tevv9"
           },
           {
             "id": "ms307xwuf7y",
@@ -6584,7 +6587,8 @@
             "price": 9.56,
             "amount": 1511.48,
             "fee": 1,
-            "remark": "零用錢 兒子存1100,女兒存400"
+            "remark": "零用錢 兒子存1100,女兒存400",
+            "txnId": "ms307xwu76m"
           },
           {
             "id": "mryrs3zylzp",
@@ -6596,7 +6600,8 @@
             "price": 13.36,
             "amount": 2900.12,
             "fee": 1,
-            "remark": ""
+            "remark": "",
+            "txnId": "mryrs3zywt8"
           },
           {
             "id": "mryrkwaaa9c",
@@ -6608,7 +6613,8 @@
             "price": 10.38,
             "amount": 520,
             "fee": 1,
-            "remark": ""
+            "remark": "",
+            "txnId": "mryrkwaai81"
           },
           {
             "id": "mryrkgwcs0j",
@@ -6620,7 +6626,8 @@
             "price": 10.15,
             "amount": 437.45,
             "fee": 1,
-            "remark": ""
+            "remark": "",
+            "txnId": "mryrkgwcav6"
           },
           {
             "id": "mryrjvq38mq",
@@ -6632,7 +6639,8 @@
             "price": 10.86,
             "amount": 249880,
             "fee": 100,
-            "remark": ""
+            "remark": "",
+            "txnId": "mryrjvq319g"
           },
           {
             "id": "mryryia9kx5",
@@ -6644,7 +6652,8 @@
             "price": 17.55,
             "amount": 2668.6,
             "fee": 1,
-            "remark": ""
+            "remark": "",
+            "txnId": "mryryia94ck"
           },
           {
             "id": "mryry0b8p1b",
@@ -6656,7 +6665,8 @@
             "price": 14.97,
             "amount": 734.5300000000001,
             "fee": 1,
-            "remark": ""
+            "remark": "",
+            "txnId": "mryry0b8krg"
           },
           {
             "id": "mryrslryqdx",
@@ -6668,7 +6678,8 @@
             "price": 18.48,
             "amount": 1941.4,
             "fee": 1,
-            "remark": ""
+            "remark": "",
+            "txnId": "mryrslrygf4"
           },
           {
             "id": "mryrxng0vlp",
@@ -6680,7 +6691,8 @@
             "price": 11.34,
             "amount": 103.06,
             "fee": 1,
-            "remark": ""
+            "remark": "",
+            "txnId": "mryrxng051s"
           },
           {
             "id": "mryrwybksbm",
@@ -6692,7 +6704,8 @@
             "price": 12.43,
             "amount": 2810.18,
             "fee": 1,
-            "remark": ""
+            "remark": "",
+            "txnId": "mryrwybko5x"
           },
           {
             "id": "mryros7davv",
@@ -6704,7 +6717,8 @@
             "price": 17.83,
             "amount": 286.28,
             "fee": 1,
-            "remark": ""
+            "remark": "",
+            "txnId": "mryros7dcnp"
           },
           {
             "id": "mryrvantxes",
@@ -6716,7 +6730,8 @@
             "price": 12.19,
             "amount": 2865.65,
             "fee": 1,
-            "remark": ""
+            "remark": "",
+            "txnId": "mryrvant839"
           },
           {
             "id": "mryruweuwts",
@@ -6728,7 +6743,8 @@
             "price": 11.04,
             "amount": 210.76,
             "fee": 1,
-            "remark": ""
+            "remark": "",
+            "txnId": "mryruweui05"
           },
           {
             "id": "mryruea2rid",
@@ -6740,7 +6756,8 @@
             "price": 10.36,
             "amount": 2383.7999999999997,
             "fee": 1,
-            "remark": ""
+            "remark": "",
+            "txnId": "mryruea2rpq"
           },
           {
             "id": "mryro3qot32",
@@ -6752,7 +6769,8 @@
             "price": 15.14,
             "amount": 833.7,
             "fee": 1,
-            "remark": ""
+            "remark": "",
+            "txnId": "mryro3qo10q"
           },
           {
             "id": "mrys7ypjohk",
@@ -6764,7 +6782,8 @@
             "price": 14.92,
             "amount": 1851.08,
             "fee": 1,
-            "remark": ""
+            "remark": "",
+            "txnId": "mrys7ypjvlf"
           },
           {
             "id": "mrys7eh5uxs",
@@ -6776,7 +6795,8 @@
             "price": 14.28,
             "amount": 729.28,
             "fee": 1,
-            "remark": ""
+            "remark": "",
+            "txnId": "mrys7eh5iid"
           },
           {
             "id": "mryrra6p075",
@@ -6788,7 +6808,8 @@
             "price": 13,
             "amount": 1210,
             "fee": 1,
-            "remark": ""
+            "remark": "",
+            "txnId": "mryrra6po4x"
           },
           {
             "id": "mrys6yxc8fm",
@@ -6800,7 +6821,8 @@
             "price": 13.45,
             "amount": 2758.25,
             "fee": 1,
-            "remark": ""
+            "remark": "",
+            "txnId": "mrys6yxctm9"
           },
           {
             "id": "mryrniqzzv8",
@@ -6812,7 +6834,8 @@
             "price": 12.75,
             "amount": 1569.25,
             "fee": 1,
-            "remark": ""
+            "remark": "",
+            "txnId": "mryrniqzryt"
           },
           {
             "id": "mrys691yhyp",
@@ -6824,7 +6847,8 @@
             "price": 12.65,
             "amount": 1405.15,
             "fee": 1,
-            "remark": ""
+            "remark": "",
+            "txnId": "mrys691yitk"
           },
           {
             "id": "mrys0ayrfme",
@@ -6836,7 +6860,8 @@
             "price": 11.6,
             "amount": 2993.7999999999997,
             "fee": 1,
-            "remark": ""
+            "remark": "",
+            "txnId": "mrys0ayrplu"
           },
           {
             "id": "mrys5henhov",
@@ -6848,7 +6873,8 @@
             "price": 11.59,
             "amount": 406.65,
             "fee": 1,
-            "remark": ""
+            "remark": "",
+            "txnId": "mrys5hengjx"
           },
           {
             "id": "mryrmon6jjz",
@@ -6860,7 +6886,8 @@
             "price": 11.55,
             "amount": 324.40000000000003,
             "fee": 1,
-            "remark": ""
+            "remark": "",
+            "txnId": "mryrmon69ff"
           },
           {
             "id": "mryrqbdwm2d",
@@ -6872,7 +6899,8 @@
             "price": 10.8,
             "amount": 1729,
             "fee": 1,
-            "remark": ""
+            "remark": "",
+            "txnId": "mryrqbdwrc8"
           }
         ],
         "mktHistory": [
