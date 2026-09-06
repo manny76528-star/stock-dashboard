@@ -2641,7 +2641,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
         <div class="trend-page-card" style="padding:0;overflow:hidden">
           <div class="trend-page-hdr" style="padding:12px 16px;border-bottom:1px solid #f0f2f5">
             <span>📈 市值趨勢</span>
-            <div style="display:flex;gap:8px;align-items:center">
+            <div style="display:flex;gap:8px;align-items:center" class="family-chart-radio-area">
               <label style="font-size:11px;color:#64748b;display:flex;align-items:center;gap:3px;cursor:pointer">
                 <input type="radio" name="family-chart-mode" id="family-chart-all" value="all" checked onchange="renderFamilyTrendChart(window._curFamilyAcc)">
                 <span>合計</span>
@@ -12552,6 +12552,10 @@ function openFamilyBuyModal(hId){
   _familyEditTxn=null;
   document.getElementById('familyBuyTitle').textContent='💰 買入股票';
   document.querySelector('#familyBuyModal .btn-p').textContent='確認買入';
+  // 顯示出資分配欄位
+  showFamilySplitsIfNeeded(member);
+  document.getElementById('fb-split-amt1').value='';
+  document.getElementById('fb-split-amt2').value='';
   openModal('familyBuyModal');
 }
 
@@ -13060,6 +13064,12 @@ function renderFamilyPage(){
 
   // 姊弟結算（有 defaultSplits 才顯示）
   renderFamilySplitSummary(member, acc, tMkt);
+  // radio 切換只在有 defaultSplits 的帳戶顯示
+  const radioArea=document.querySelector('.family-chart-radio-area');
+  if(radioArea)radioArea.style.display=acc.defaultSplits?.length?'flex':'none';
+  // 重置 radio 為合計
+  const allRadio=document.getElementById('family-chart-all');
+  if(allRadio)allRadio.checked=true;
 
   // 趨勢圖（以LOG裡每筆買入日期的市值）
   renderFamilyTrendChart(acc);
