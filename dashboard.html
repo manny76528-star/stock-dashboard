@@ -3847,13 +3847,29 @@ body:not(.privacy) .privacy-mask{filter:none;}
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
         <div class="fg"><label class="fl">日期</label><input class="fi" id="fs-date" type="date"></div>
-        <div class="fg"><label class="fl">股數</label><input class="fi" id="fs-lots" type="number" placeholder="例：500"></div>
+        <div class="fg"><label class="fl">股數</label><input class="fi" id="fs-lots" type="number" placeholder="例：500" oninput="updateFsTotal()"></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div class="fg"><label class="fl">成交價</label><input class="fi" id="fs-price" type="number" step="0.01"></div>
+        <div class="fg"><label class="fl">成交價</label><input class="fi" id="fs-price" type="number" step="0.01" oninput="updateFsTotal()"></div>
         <div class="fg"><label class="fl">手續費＋交易稅</label><input class="fi" id="fs-fee" type="number" placeholder="自動計算"></div>
       </div>
       <div class="fg"><label class="fl">備註（選填）</label><input class="fi" id="fs-remark" placeholder="例：繳電話費"></div>
+      <!-- 出資分配（琁 & 軒 帳戶才顯示）-->
+      <div id="fs-splits-area" style="display:none;background:#f0fdf4;border-radius:10px;padding:12px;margin-top:4px">
+        <div style="font-size:12px;font-weight:700;color:#64748b;margin-bottom:8px">💰 賣出收益分配</div>
+        <div style="font-size:13px;font-weight:800;color:#1e293b;margin-bottom:10px" id="fs-total-display">賣出金額：$—</div>
+        <div style="display:flex;gap:8px;align-items:flex-start">
+          <div style="flex:1">
+            <label class="fl" id="fs-split-name1" style="font-size:11px">軒 (55%)</label>
+            <input class="fi" id="fs-split-amt1" type="number" placeholder="0" oninput="onFsSplitInput()" style="font-size:13px">
+          </div>
+          <div style="flex:1">
+            <label class="fl" id="fs-split-name2" style="font-size:11px">琁 (45%)</label>
+            <input class="fi" id="fs-split-amt2" type="number" placeholder="0" oninput="onFsSplitInput()" style="font-size:13px">
+          </div>
+        </div>
+        <div style="font-size:11px;margin-top:6px;font-weight:600" id="fs-split-hint">請填入各自收益</div>
+      </div>
     </div>
     <div class="br"><button class="btn btn-s" onclick="closeModal('familySellModal')">取消</button><button class="btn btn-p" onclick="saveFamilySell()">確認賣出</button></div>
   </div>
@@ -12666,6 +12682,65 @@ function openFamilyBuyModal(hId){
   openModal('familyBuyModal');
 }
 
+function updateFsTotal(){
+  const lots=parseFloat(document.getElementById('fs-lots').value)||0;
+  const price=parseFloat(document.getElementById('fs-price').value)||0;
+  const fee=parseFloat(document.getElementById('fs-fee').value)||0;
+  const total=Math.round(lots*price-fee);
+  const disp=document.getElementById('fs-total-display');
+  if(disp)disp.textContent='賣出金額：$'+total.toLocaleString();
+  if(total>0){
+    const member=curFamilyMember();
+    const acc=getFamilyAccount(member);
+    const s=acc.defaultSplits||[];
+    if(s.length>=2){
+      const el1=document.getElementById('fs-split-amt1');
+      const el2=document.getElementById('fs-split-amt2');
+      if(el1)el1.value=Math.round(total*s[0].pct/100);
+      if(el2)el2.value=total-Math.round(total*s[0].pct/100);
+      onFsSplitInput();
+    }
+  }
+}
+
+function onFsSplitInput(){
+  const a1=parseFloat(document.getElementById('fs-split-amt1').value)||0;
+  const a2=parseFloat(document.getElementById('fs-split-amt2').value)||0;
+  const lots=parseFloat(document.getElementById('fs-lots').value)||0;
+  const price=parseFloat(document.getElementById('fs-price').value)||0;
+  const fee=parseFloat(document.getElementById('fs-fee').value)||0;
+  const total=Math.round(lots*price-fee);
+  const hint=document.getElementById('fs-split-hint');
+  const sum=a1+a2;
+  const n1=document.getElementById('fs-split-name1');
+  const n2=document.getElementById('fs-split-name2');
+  const member=curFamilyMember();
+  const acc=getFamilyAccount(member);
+  const s=acc?.defaultSplits||[];
+  if(n1&&s[0])n1.textContent=s[0].name+' ('+(sum>0?Math.round(a1/sum*100):s[0].pct)+'%)';
+  if(n2&&s[1])n2.textContent=s[1].name+' ('+(sum>0?Math.round(a2/sum*100):s[1].pct)+'%)';
+  if(!hint)return;
+  const diff=Math.abs(sum-total);
+  if(diff<=1){hint.style.color='#16a34a';hint.textContent='✅ 分配合計 $'+sum.toLocaleString()+' = 賣出金額';}
+  else{hint.style.color='#dc2626';hint.textContent='⚠️ 差 $'+diff.toLocaleString()+' 需調整才能存檔';}
+}
+
+function showFsSplitsIfNeeded(member){
+  const acc=getFamilyAccount(member);
+  const area=document.getElementById('fs-splits-area');
+  if(!area)return;
+  if(!acc.defaultSplits||acc.defaultSplits.length<2){area.style.display='none';return;}
+  area.style.display='';
+  const s=acc.defaultSplits;
+  const n1=document.getElementById('fs-split-name1');
+  const n2=document.getElementById('fs-split-name2');
+  if(n1)n1.textContent=s[0].name+' ('+s[0].pct+'%)';
+  if(n2)n2.textContent=s[1].name+' ('+s[1].pct+'%)';
+  document.getElementById('fs-split-amt1').value='';
+  document.getElementById('fs-split-amt2').value='';
+  document.getElementById('fs-split-hint').textContent='請填入各自收益';
+}
+
 function openFamilySellModal(hId){
   const member=curFamilyMember();
   if(!member)return toast('請先選擇成員');
@@ -12684,6 +12759,7 @@ function openFamilySellModal(hId){
   document.getElementById('fs-price').value='';
   document.getElementById('fs-fee').value='';
   document.getElementById('fs-remark').value='';
+  showFsSplitsIfNeeded(curFamilyMember());
   openModal('familySellModal');
 }
 
@@ -12827,6 +12903,7 @@ function openFamilySellModal(){
   document.getElementById('fs-price').value='';
   document.getElementById('fs-fee').value='';
   document.getElementById('fs-remark').value='';
+  showFsSplitsIfNeeded(curFamilyMember());
   openModal('familySellModal');
 }
 function saveFamilySell(){
@@ -12847,7 +12924,20 @@ function saveFamilySell(){
   const h=acc.holdings.find(x=>x.code===code);
   if(!h)return toast('找不到持股');
   const sellTxnId=uid();
-  h.transactions.push({id:sellTxnId,type:'sell',date,shares,price,fee,remark});
+  // 讀取賣出收益分配
+  const fsSplits=[];
+  const fsArea=document.getElementById('fs-splits-area');
+  if(fsArea&&fsArea.style.display!=='none'){
+    const member2=curFamilyMember();
+    const s=(getFamilyAccount(member2).defaultSplits)||[];
+    const a1=parseFloat(document.getElementById('fs-split-amt1').value)||0;
+    const a2=parseFloat(document.getElementById('fs-split-amt2').value)||0;
+    const netAmt=Math.round(gross-fee);
+    if(Math.abs(a1+a2-netAmt)>1)return toast('⚠️ 分配合計 $'+(a1+a2).toLocaleString()+' 與賣出金額 $'+netAmt.toLocaleString()+' 不符');
+    if(a1>0&&s[0])fsSplits.push({name:s[0].name,amt:a1});
+    if(a2>0&&s[1])fsSplits.push({name:s[1].name,amt:a2});
+  }
+  h.transactions.push({id:sellTxnId,type:'sell',date,shares,price,fee,remark,...(fsSplits.length?{splits:fsSplits}:{})});
   acc.log.push({id:uid(),txnId:sellTxnId,date,type:'sell',code,name:h.name,shares,price,amount:gross-fee,fee,remark});
   acc.log.sort((a,b)=>b.date.localeCompare(a.date));
   save();closeModal('familySellModal');renderFamilyPage();toast(`💸 賣出 ${code} ${shares}股`);
