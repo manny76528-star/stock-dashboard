@@ -12460,8 +12460,8 @@ function saveQuickBuy(){
     const a1=parseFloat(document.getElementById('fqb-split-amt1').value)||0;
     const a2=parseFloat(document.getElementById('fqb-split-amt2').value)||0;
     const total=Math.round(shares*price);
-    // 驗證金額需 match
-    if(Math.abs(a1+a2-total)>1)return toast('⚠️ 出資合計 $'+(a1+a2).toLocaleString()+' 與成交金額 $'+total.toLocaleString()+' 不符，請調整');
+    // 只有有填入才驗證
+    if((a1>0||a2>0)&&Math.abs(a1+a2-total)>1)return toast('⚠️ 出資合計 $'+(a1+a2).toLocaleString()+' 與成交金額 $'+total.toLocaleString()+' 不符，請調整');
     if(a1>0&&s[0])fqbSplits.push({name:s[0].name,amt:a1});
     if(a2>0&&s[1])fqbSplits.push({name:s[1].name,amt:a2});
   }
@@ -12972,8 +12972,11 @@ function saveFamilySell(){
     const s=(getFamilyAccount(member2).defaultSplits)||[];
     const a1=parseFloat(document.getElementById('fs-split-amt1').value)||0;
     const a2=parseFloat(document.getElementById('fs-split-amt2').value)||0;
-    const netAmt=Math.round(gross-fee);
-    if(Math.abs(a1+a2-netAmt)>1)return toast('⚠️ 分配合計 $'+(a1+a2).toLocaleString()+' 與賣出金額 $'+netAmt.toLocaleString()+' 不符');
+    // 只有有填入才驗證
+    if(a1>0||a2>0){
+      const netAmt=Math.round(gross-fee);
+      if(Math.abs(a1+a2-netAmt)>1)return toast('⚠️ 分配合計 $'+(a1+a2).toLocaleString()+' 與賣出金額 $'+netAmt.toLocaleString()+' 不符');
+    }
     if(a1>0&&s[0])fsSplits.push({name:s[0].name,amt:a1});
     if(a2>0&&s[1])fsSplits.push({name:s[1].name,amt:a2});
   }
