@@ -357,6 +357,16 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
           </div>
         </div>
 
+        <!-- 客戶追蹤提醒 -->
+        <div class="sec">
+          <div class="sec-hdr"><span class="sec-title">📡 客戶追蹤提醒</span></div>
+          <div class="sec-body">
+            <div class="alert-list" id="cust-track-list">
+              <div style="color:#94a3b8;font-size:12px;text-align:center;padding:8px">計算中...</div>
+            </div>
+          </div>
+        </div>
+
         <!-- 快速統計 -->
         <div class="sec">
           <div class="sec-hdr"><span class="sec-title">📈 本月利潤率</span></div>
@@ -1222,6 +1232,47 @@ function renderOverview(){
           <div style="flex:1;font-size:12px">${a.msg}</div>
           <div style="font-size:10px;color:#94a3b8">${fmtDate(a.date)}</div>
           <div style="font-size:10px;background:#eff6ff;color:#2563eb;padding:2px 7px;border-radius:6px;font-weight:700">開啟 ›</div>
+        </div>`).join('');
+  }
+  // 客戶追蹤提醒
+  const trackList=document.getElementById('cust-track-list');
+  if(trackList){
+    const custOrders={};
+    db.orders.filter(o=>o.custName&&o.date&&o.status!=='cancelled').forEach(o=>{
+      if(!custOrders[o.custName])custOrders[o.custName]=[];
+      custOrders[o.custName].push(o.date);
+    });
+    const today2=new Date();
+    const trackItems=[];
+    Object.entries(custOrders).forEach(([name,dates])=>{
+      if(dates.length<2)return;
+      const sorted=dates.slice().sort();
+      const gaps=[];
+      for(let i=1;i<sorted.length;i++){
+        const d=Math.round((new Date(sorted[i])-new Date(sorted[i-1]))/(864e5));
+        gaps.push(d);
+      }
+      const avg=Math.round(gaps.reduce((s,v)=>s+v,0)/gaps.length);
+      const lastDate=sorted[sorted.length-1];
+      const daysSince=Math.round((today2-new Date(lastDate))/864e5);
+      if(daysSince>=avg){
+        const ratio=daysSince/avg;
+        const level=ratio>=2?'red':ratio>=1.5?'orange':'yellow';
+        const icon=ratio>=2?'🔴':ratio>=1.5?'🟠':'⚠️';
+        trackItems.push({name,avg,daysSince,level,icon,lastDate,ratio});
+      }
+    });
+    trackItems.sort((a,b)=>b.ratio-a.ratio);
+    trackList.innerHTML=trackItems.length===0
+      ?'<div style="color:#94a3b8;font-size:12px;text-align:center;padding:8px">🎉 所有客戶均在正常週期內</div>'
+      :trackItems.map(t=>`
+        <div class="alert-item" style="cursor:pointer" onclick="showCustOrders('${t.name}')">
+          <div class="alert-dot ${t.level}"></div>
+          <div style="flex:1;font-size:12px">
+            <div style="font-weight:700;color:#1e293b">${t.icon} ${t.name}</div>
+            <div style="color:#94a3b8;font-size:10px;margin-top:2px">平均 ${t.avg} 天・距今 ${t.daysSince} 天未下單</div>
+          </div>
+          <div style="font-size:10px;background:${t.level==='red'?'#fee2e2':t.level==='orange'?'#ffedd5':'#fefce8'};color:${t.level==='red'?'#dc2626':t.level==='orange'?'#ea580c':'#ca8a04'};padding:2px 7px;border-radius:6px;font-weight:700">聯繫 ›</div>
         </div>`).join('');
   }
 }
