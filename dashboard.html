@@ -3845,6 +3845,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
       <div class="fg"><label class="fl">股票代碼</label>
         <select class="fi" id="fs-code" onchange="fillFamilySellInfo()"><option value="">— 選擇持股 —</option></select>
       </div>
+      <div id="fs-avail" style="display:none;font-size:12px;color:#2563eb;font-weight:600;margin:-6px 0 8px;padding:6px 10px;background:#eff6ff;border-radius:8px">可賣：—</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
         <div class="fg"><label class="fl">日期</label><input class="fi" id="fs-date" type="date"></div>
         <div class="fg"><label class="fl">股數</label><input class="fi" id="fs-lots" type="number" placeholder="例：500" oninput="updateFsTotal()"></div>
@@ -12226,8 +12227,28 @@ function openFamilyDetail(hId){
     <button onclick="delFamilyHolding('${hId}')" style="padding:6px 14px;background:none;border:1px solid #fca5a5;color:#ef4444;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;margin-left:auto">🗑 刪除</button>
   </div>`;
 
-  // 交易記錄
+  // 交易記錄（FIFO計算賣出損益）
   const txns=(h.transactions||[]).slice().sort((a,b)=>b.date.localeCompare(a.date));
+
+  // FIFO計算：依時間正序建立買入queue
+  const buyQueue=[...(h.transactions||[])].filter(t=>t.type==='buy').sort((a,b)=>a.date.localeCompare(b.date)).map(t=>({...t,remaining:t.shares||(t.lots||0)*1000}));
+  const sellPnlMap={};
+  [...(h.transactions||[])].filter(t=>t.type==='sell').sort((a,b)=>a.date.localeCompare(b.date)).forEach(t=>{
+    const sellShares=t.shares||(t.lots||0)*1000;
+    const sellRev=sellShares*t.price-(t.fee||0);
+    let cost=0,remaining=sellShares;
+    for(const b of buyQueue){
+      if(remaining<=0)break;
+      if(b.remaining<=0)continue;
+      const take=Math.min(b.remaining,remaining);
+      const buyFeeShare=(b.fee||0)*(take/(b.shares||(b.lots||0)*1000));
+      cost+=take*b.price+buyFeeShare;
+      b.remaining-=take;remaining-=take;
+    }
+    const pnl=sellRev-cost;
+    sellPnlMap[t.id]={pnl,roi:cost>0?pnl/cost*100:0,cost};
+  });
+
   html+=`<div style="padding:0">`;
   html+=`<div style="padding:10px 20px;font-size:11px;font-weight:700;color:#9ca3af;border-bottom:1px solid #f5f7fa">📋 交易記錄（${txns.length}筆）</div>`;
   html+=txns.map(t=>{
@@ -12235,13 +12256,16 @@ function openFamilyDetail(hId){
     const shares=t.shares||(t.lots||0)*1000;
     const gross=shares*t.price;
     const fee=t.fee||0;
-    // 每筆損益（用現價）
+    // 買入：用現價計算未實現損益；賣出：用FIFO已實現損益
     let txnPnl=null,txnRoi=null;
     if(isB&&price>0){
       const curVal=shares*price;
       const buyCost=gross+fee;
       txnPnl=curVal-buyCost;
       txnRoi=buyCost>0?txnPnl/buyCost*100:0;
+    } else if(!isB&&sellPnlMap[t.id]){
+      txnPnl=sellPnlMap[t.id].pnl;
+      txnRoi=sellPnlMap[t.id].roi;
     }
     const txnColor=txnPnl==null?'#9ca3af':txnPnl>=0?'#dc2626':'#16a34a';
     return`<div style="display:grid;grid-template-columns:60px 80px 55px 70px 80px 60px 80px auto;gap:6px;align-items:center;padding:8px 20px;border-bottom:1px solid #f8fafc;font-size:11px;font-family:'JetBrains Mono',monospace">
@@ -12682,6 +12706,19 @@ function openFamilyBuyModal(hId){
   openModal('familyBuyModal');
 }
 
+function fillFamilySellInfo(){
+  const code=document.getElementById('fs-code').value;
+  const avail=document.getElementById('fs-avail');
+  if(!code||!avail){if(avail)avail.style.display='none';return;}
+  const member=curFamilyMember();
+  const acc=getFamilyAccount(member);
+  const h=acc.holdings.find(x=>x.code===code);
+  if(!h){avail.style.display='none';return;}
+  const c=calcFamilyHolding(h);
+  avail.style.display='';
+  avail.textContent='可賣：'+c.shares.toLocaleString()+' 股（'+Math.floor(c.shares/1000)+'張 '+c.shares%1000+'股）';
+}
+
 function updateFsTotal(){
   const lots=parseFloat(document.getElementById('fs-lots').value)||0;
   const price=parseFloat(document.getElementById('fs-price').value)||0;
@@ -12923,6 +12960,9 @@ function saveFamilySell(){
   const acc=getFamilyAccount(member);
   const h=acc.holdings.find(x=>x.code===code);
   if(!h)return toast('找不到持股');
+  // 防呆：賣出股數不能超過持股
+  const avail=calcFamilyHolding(h).shares;
+  if(shares>avail)return toast(`⚠️ 賣出 ${shares.toLocaleString()} 股超過持股 ${avail.toLocaleString()} 股！`);
   const sellTxnId=uid();
   // 讀取賣出收益分配
   const fsSplits=[];
