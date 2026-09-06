@@ -3738,24 +3738,25 @@ body:not(.privacy) .privacy-mask{filter:none;}
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
         <div class="fg"><label class="fl">買入日期</label><input class="fi" id="fqb-date" type="date"></div>
-        <div class="fg"><label class="fl">股數</label><input class="fi" id="fqb-shares" type="number" placeholder="例：500"></div>
+        <div class="fg"><label class="fl">股數</label><input class="fi" id="fqb-shares" type="number" placeholder="例：500" oninput="updateFqbTotal()"></div>
       </div>
-      <div class="fg"><label class="fl">買入單價</label><input class="fi" id="fqb-price" type="number" step="0.01" placeholder="例：21.50"></div>
+      <div class="fg"><label class="fl">買入單價</label><input class="fi" id="fqb-price" type="number" step="0.01" placeholder="例：21.50" oninput="updateFqbTotal()"></div>
       <div class="fg"><label class="fl">備註（選填）</label><input class="fi" id="fqb-remark" placeholder="例：定期定額"></div>
       <!-- 出資分配（琁 & 軒 帳戶才顯示）-->
       <div id="fqb-splits-area" style="display:none;background:#f8fafc;border-radius:10px;padding:12px;margin-top:4px">
         <div style="font-size:12px;font-weight:700;color:#64748b;margin-bottom:8px">💰 出資分配</div>
-        <div style="display:flex;gap:8px;align-items:center">
+        <div style="font-size:13px;font-weight:800;color:#1e293b;margin-bottom:10px" id="fqb-total-display">成交金額：$—</div>
+        <div style="display:flex;gap:8px;align-items:flex-start">
           <div style="flex:1">
-            <label class="fl" id="fqb-split-name1" style="font-size:11px">軒</label>
+            <label class="fl" id="fqb-split-name1" style="font-size:11px">軒 (55%)</label>
             <input class="fi" id="fqb-split-amt1" type="number" placeholder="0" oninput="onFqbSplitInput()" style="font-size:13px">
           </div>
           <div style="flex:1">
-            <label class="fl" id="fqb-split-name2" style="font-size:11px">琁</label>
+            <label class="fl" id="fqb-split-name2" style="font-size:11px">琁 (45%)</label>
             <input class="fi" id="fqb-split-amt2" type="number" placeholder="0" oninput="onFqbSplitInput()" style="font-size:13px">
           </div>
         </div>
-        <div style="font-size:11px;color:#94a3b8;margin-top:6px" id="fqb-split-hint">總金額：$0</div>
+        <div style="font-size:11px;margin-top:6px;font-weight:600" id="fqb-split-hint">請填入出資金額</div>
       </div>
     </div>
     <div class="br">
@@ -12287,6 +12288,27 @@ function openFamilyBuyForHolding(member, code){
   openModal('familyQuickBuyModal');
 }
 
+function updateFqbTotal(){
+  const shares=parseFloat(document.getElementById('fqb-shares').value)||0;
+  const price=parseFloat(document.getElementById('fqb-price').value)||0;
+  const total=Math.round(shares*price);
+  const disp=document.getElementById('fqb-total-display');
+  if(disp)disp.textContent='成交金額：$'+total.toLocaleString();
+  // 自動套用預設比例
+  if(total>0){
+    const member=_quickBuyMember;
+    const acc=getFamilyAccount(member);
+    const s=acc.defaultSplits||[];
+    if(s.length>=2){
+      const el1=document.getElementById('fqb-split-amt1');
+      const el2=document.getElementById('fqb-split-amt2');
+      if(el1)el1.value=Math.round(total*s[0].pct/100);
+      if(el2)el2.value=total-Math.round(total*s[0].pct/100);
+      onFqbSplitInput();
+    }
+  }
+}
+
 function onFqbSplitInput(){
   const a1=parseFloat(document.getElementById('fqb-split-amt1').value)||0;
   const a2=parseFloat(document.getElementById('fqb-split-amt2').value)||0;
@@ -12294,7 +12316,19 @@ function onFqbSplitInput(){
   const price=parseFloat(document.getElementById('fqb-price').value)||0;
   const total=Math.round(shares*price);
   const hint=document.getElementById('fqb-split-hint');
-  if(hint)hint.textContent='總金額：$'+total.toLocaleString()+' | 已分配：$'+(a1+a2).toLocaleString()+(Math.abs(a1+a2-total)<=1?' ✅':' ⚠️ 差$'+Math.abs(a1+a2-total).toLocaleString());
+  const sum=a1+a2;
+  // 動態顯示%
+  const n1=document.getElementById('fqb-split-name1');
+  const n2=document.getElementById('fqb-split-name2');
+  const acc=getFamilyAccount(_quickBuyMember);
+  const s=acc?.defaultSplits||[];
+  if(n1&&s[0])n1.textContent=s[0].name+' ('+(sum>0?Math.round(a1/sum*100):s[0].pct)+'%)';
+  if(n2&&s[1])n2.textContent=s[1].name+' ('+(sum>0?Math.round(a2/sum*100):s[1].pct)+'%)';
+  if(!hint)return;
+  if(total===0){hint.style.color='#94a3b8';hint.textContent='請先填入股數和單價';return;}
+  const diff=Math.abs(sum-total);
+  if(diff<=1){hint.style.color='#16a34a';hint.textContent='✅ 出資合計 $'+sum.toLocaleString()+' = 成交金額';}
+  else{hint.style.color='#dc2626';hint.textContent='⚠️ 差 $'+diff.toLocaleString()+' 需補齊才能存檔';}
 }
 
 function showFqbSplitsIfNeeded(member){
@@ -12383,6 +12417,9 @@ function saveQuickBuy(){
     const s=(getFamilyAccount(member).defaultSplits)||[];
     const a1=parseFloat(document.getElementById('fqb-split-amt1').value)||0;
     const a2=parseFloat(document.getElementById('fqb-split-amt2').value)||0;
+    const total=Math.round(shares*price);
+    // 驗證金額需 match
+    if(Math.abs(a1+a2-total)>1)return toast('⚠️ 出資合計 $'+(a1+a2).toLocaleString()+' 與成交金額 $'+total.toLocaleString()+' 不符，請調整');
     if(a1>0&&s[0])fqbSplits.push({name:s[0].name,amt:a1});
     if(a2>0&&s[1])fqbSplits.push({name:s[1].name,amt:a2});
   }
