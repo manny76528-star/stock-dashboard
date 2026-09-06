@@ -2727,7 +2727,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1788704793394,
+  "_ts": 1788704809138,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -6056,15 +6056,6 @@
                     "amt": 72
                   }
                 ]
-              },
-              {
-                "id": "mtpwnex1kau",
-                "type": "buy",
-                "date": "2026-09-06",
-                "shares": 100,
-                "price": 10,
-                "fee": 1,
-                "remark": ""
               }
             ]
           },
@@ -6547,19 +6538,6 @@
           }
         ],
         "log": [
-          {
-            "id": "mtpwnex194l",
-            "txnId": "mtpwnex1kau",
-            "date": "2026-09-06",
-            "type": "buy",
-            "code": "00403A",
-            "name": "主動統一升級50",
-            "shares": 100,
-            "price": 10,
-            "amount": 1001,
-            "fee": 1,
-            "remark": ""
-          },
           {
             "id": "mth2ac0cgnk",
             "date": "2026-08-31",
