@@ -13367,6 +13367,30 @@ function renderFamilyPage(){
     return true;
   });
 
+  // FIFO 計算：每個標的的買入批次剩餘量 & 已實現損益
+  const fifoMap={}; // {code: [{txnId, remaining, buyPrice, originalShares}]}
+  const realizedMap={}; // {txnId: {realizedShares, realizedPnl}}
+  acc.holdings.forEach(h=>{
+    const code=h.code;
+    const price=db.prices[code]?.price||0;
+    const buys=[...(h.transactions||[])].filter(t=>t.type==='buy').sort((a,b)=>a.date.localeCompare(b.date));
+    const sells=[...(h.transactions||[])].filter(t=>t.type==='sell').sort((a,b)=>a.date.localeCompare(b.date));
+    const queue=buys.map(b=>({txnId:b.id,remaining:b.shares||(b.lots||0)*1000,buyPrice:b.price,original:b.shares||(b.lots||0)*1000,realizedShares:0,realizedPnl:0}));
+    sells.forEach(s=>{
+      let rem=s.shares||(s.lots||0)*1000;
+      const sellNet=s.price-(s.fee||0)/rem;
+      for(const b of queue){
+        if(rem<=0)break;
+        const take=Math.min(b.remaining,rem);
+        b.realizedShares+=take;
+        b.realizedPnl+=Math.round((sellNet-b.buyPrice)*take);
+        b.remaining-=take;rem-=take;
+      }
+    });
+    queue.forEach(b=>{b.unRealizedPnl=price>0?Math.round((price-b.buyPrice)*b.remaining):null;});
+    fifoMap[code]=queue;
+  });
+
   if(logBody){
     logBody.innerHTML=filteredLogs.length===0
       ?'<div style="text-align:center;color:#9ca3af;padding:30px;font-size:12px">尚無記錄</div>'
@@ -13375,6 +13399,37 @@ function renderFamilyPage(){
         const colorMap={buy:'#dc2626',sell:'#16a34a',div:'#7c3aed'};
         const amtColor=l.type==='buy'?'#dc2626':'#16a34a';
         const amtSign=l.type==='buy'?'-':'+';
+        // 找買入批次的損益
+        let pnlHtml='';
+        if(l.type==='buy'&&l.txnId){
+          const batch=(fifoMap[l.code]||[]).find(b=>b.txnId===l.txnId);
+          if(batch){
+            const parts=[];
+            if(batch.remaining>0&&batch.unRealizedPnl!=null){
+              const c=batch.unRealizedPnl>=0?'#dc2626':'#16a34a';
+              parts.push(`<span style="color:${c};font-weight:700">未實現 ${batch.remaining}股 ${batch.unRealizedPnl>=0?'+':''}${batch.unRealizedPnl.toLocaleString()}</span>`);
+            }
+            if(batch.realizedShares>0){
+              const c=batch.realizedPnl>=0?'#dc2626':'#16a34a';
+              parts.push(`<span style="color:${c};font-weight:700">已實現 ${batch.realizedShares}股 ${batch.realizedPnl>=0?'+':''}${batch.realizedPnl.toLocaleString()}</span>`);
+            }
+            if(parts.length)pnlHtml=`<div style="margin-top:3px;font-size:10px;display:flex;gap:8px;flex-wrap:wrap">${parts.join('')}</div>`;
+          }
+        } else if(l.type==='sell'&&l.txnId){
+          // 賣出直接從log的amount算已實現
+          const acc2=getFamilyAccount(member);
+          // 找對應持股的FIFO已實現
+          const holding=(acc2.holdings||[]).find(h=>h.code===l.code);
+          if(holding){
+            // 在 sells 裡找對應的 txn
+            const sellTxn=(holding.transactions||[]).find(t=>t.id===l.txnId||t.txnId===l.txnId);
+            if(sellTxn){
+              const gross=(sellTxn.shares||0)*sellTxn.price;
+              const net=gross-(sellTxn.fee||0);
+              pnlHtml=`<div style="margin-top:3px;font-size:10px;color:#64748b">淨收入 $${Math.round(net).toLocaleString()}</div>`;
+            }
+          }
+        }
         return`<div style="padding:10px 14px;border-bottom:1px solid #f5f7fa;font-size:11px">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
             <div style="display:flex;align-items:center;gap:6px">
@@ -13385,6 +13440,7 @@ function renderFamilyPage(){
             <span style="font-weight:800;font-family:'JetBrains Mono',monospace;color:${amtColor}">${amtSign}$${Math.round(l.amount||0).toLocaleString()}</span>
           </div>
           <div style="color:#9ca3af">${l.date}${l.price?' @ $'+l.price:''}${l.remark?' ・'+l.remark:''}</div>
+          ${pnlHtml}
         </div>`;
       }).join('');
   }
