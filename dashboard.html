@@ -10807,7 +10807,7 @@ function renderAssetsPage(){
   if(cfWin){
     const expPct=pendingTotal>0?Math.round(totalOut/pendingTotal*100):0;
     const surPct=100-expPct;
-    if(barExpenseEl){barExpenseEl.style.width=expPct+'%';barExpenseEl.style.background='#3B6D11';}
+    if(barExpenseEl){barExpenseEl.style.width=expPct+'%';barExpenseEl.style.background='#22C55E';}
     if(barSurplusEl){barSurplusEl.style.width=surPct+'%';barSurplusEl.style.background='#FFB800';}
     if(battleLabelEl)battleLabelEl.innerHTML='<span style="color:#FFB800">🏆 勝利淨勝黃金區</span> <span style="color:#dc2626;font-family:\'JetBrains Mono\',monospace">+$'+fmt2(cfNet)+'</span>';
     if(battleSubEl)battleSubEl.textContent='敵軍戰損 ($'+fmt2(totalOut)+') vs. 黃金區 ($'+fmt2(cfNet)+')';
