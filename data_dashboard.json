@@ -2752,7 +2752,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1788771319882,
+  "_ts": 1788771541058,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -6107,6 +6107,25 @@
                     "amt": 72
                   }
                 ]
+              },
+              {
+                "id": "mtr0e1qv9z5",
+                "type": "buy",
+                "date": "2026-09-07",
+                "shares": 80,
+                "price": 10.45,
+                "fee": 1,
+                "remark": "",
+                "splits": [
+                  {
+                    "name": "軒",
+                    "amt": 610
+                  },
+                  {
+                    "name": "琁",
+                    "amt": 227
+                  }
+                ]
               }
             ]
           },
@@ -6589,6 +6608,19 @@
           }
         ],
         "log": [
+          {
+            "id": "mtr0e1qwk69",
+            "txnId": "mtr0e1qv9z5",
+            "date": "2026-09-07",
+            "type": "buy",
+            "code": "00403A",
+            "name": "主動統一升級50",
+            "shares": 80,
+            "price": 10.45,
+            "amount": 837,
+            "fee": 1,
+            "remark": ""
+          },
           {
             "id": "mth2ac0cgnk",
             "date": "2026-08-31",
