@@ -1396,6 +1396,30 @@
         }
       ],
       "order": 18
+    },
+    {
+      "id": "mtr06vpb51u",
+      "code": "00985B",
+      "name": "群益ESG投等債0-5",
+      "lots": 30,
+      "avgPrice": 10.09,
+      "divPerShare": 0.053,
+      "note": "質押中",
+      "url": "https://www.wantgoo.com/stock/etf/00985B/dividend-policy/ex-dividend",
+      "holdType": "long",
+      "targetRoi": 5,
+      "transactions": [
+        {
+          "id": "mtr06vpb6du",
+          "type": "buy",
+          "lots": 30,
+          "price": 10.09,
+          "date": "2026-09-07",
+          "fee": 0,
+          "remark": "台幣走強,且短債難得當天下跌0.5%,買入當作類現金"
+        }
+      ],
+      "order": 19
     }
   ],
   "loans": [
@@ -2727,7 +2751,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1788771104541,
+  "_ts": 1788771206637,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
