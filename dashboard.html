@@ -2159,24 +2159,34 @@ body:not(.privacy) .privacy-mask{filter:none;}
 
       <!-- 現金流月報 -->
       <div class="as-card" id="cashflow-card" style="margin-bottom:16px;padding:12px 16px">
-        <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:start;gap:12px;margin-bottom:14px">
-          <div>
-            <div style="font-size:11px;color:#9ca3af;font-weight:600;margin-bottom:5px">現金流入 📥</div>
-            <div style="font-size:20px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#1e293b" id="cf-inflow">—</div>
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) 36px minmax(0,1fr);gap:0;align-items:end">
+          <div style="padding-right:12px">
+            <div style="font-size:11px;color:#9ca3af;font-weight:600;margin-bottom:4px">現金流入 🏦</div>
+            <div style="font-size:20px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#1e293b;margin-bottom:8px" id="cf-inflow">—</div>
+            <div style="font-size:11px;font-weight:700;color:#185FA5;margin-bottom:5px">現金流部隊強度 (100%)</div>
+            <div style="height:10px;border-radius:5px;background:#e2e8f0;overflow:hidden"><div style="width:100%;height:100%;background:#185FA5;border-radius:5px"></div></div>
             <div style="font-size:10px;color:#94a3b8;margin-top:3px">每期股息入帳</div>
           </div>
-          <div style="display:flex;align-items:center;padding-top:16px;font-size:18px">⚔️</div>
-          <div style="text-align:right">
-            <div style="font-size:11px;color:#9ca3af;font-weight:600;margin-bottom:5px">每月固定支出 📤</div>
-            <div style="font-size:20px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#1e293b" id="cf-outflow">—</div>
-            <div style="font-size:10px;color:#94a3b8;margin-top:3px" id="cf-outflow-detail">信貸 + 不限用途</div>
+          <div style="font-size:22px;text-align:center;padding-bottom:14px">⚔️</div>
+          <div style="padding-left:12px">
+            <div style="font-size:11px;color:#9ca3af;font-weight:600;margin-bottom:4px">每月固定支出 💸</div>
+            <div style="font-size:20px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#1e293b;margin-bottom:8px" id="cf-outflow">—</div>
+            <div style="font-size:11px;font-weight:700;margin-bottom:5px" id="cf-battle-label">—</div>
+            <div style="height:10px;border-radius:5px;background:#e2e8f0;overflow:hidden">
+              <div style="display:flex;height:100%">
+                <div id="cf-bar-expense" style="height:100%;background:#3B6D11"></div>
+                <div id="cf-bar-surplus" style="height:100%"></div>
+              </div>
+            </div>
+            <div style="font-size:10px;color:#94a3b8;margin-top:3px" id="cf-battle-sub">—</div>
           </div>
         </div>
-        <div style="border-top:1px solid #f1f5f9;padding-top:12px;display:flex;justify-content:space-between;align-items:center">
-          <div style="font-size:12px;color:#64748b;font-weight:600">安全殘值</div>
+        <div style="font-size:10px;color:#94a3b8;text-align:right;margin-top:4px" id="cf-outflow-detail">—</div>
+        <div style="border-top:1px solid #f1f5f9;padding-top:10px;margin-top:10px;display:flex;justify-content:space-between;align-items:center">
+          <div style="font-size:12px;color:#64748b;font-weight:600" id="cf-result-label">—</div>
           <div style="display:flex;align-items:baseline;gap:8px">
             <span style="font-size:18px;font-weight:800;font-family:'JetBrains Mono',monospace" id="cf-surplus">—</span>
-            <span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px" id="cf-coverage">—</span>
+            <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px" id="cf-coverage">—</span>
           </div>
         </div>
       </div>
@@ -10769,29 +10779,53 @@ function renderAssetsPage(){
     }
   }
 
-  // 現金流月報
+  // 現金流月報（戰場儀表板）
   const loans=db.loans.filter(l=>!l.settled);
   const totalLoanM=loans.reduce((s,l)=>s+(l.monthly||0),0);
-  const flex=db.flexLoans||[];
-  const totalFlexM=flex.filter(f=>!f.settled).reduce((s,f)=>s+(f.monthly||0),0);
+  const flexArr=db.flexLoans||[];
+  const totalFlexM=flexArr.filter(f=>!f.settled).reduce((s,f)=>s+(f.monthly||0),0);
   const totalOut=totalLoanM+totalFlexM;
-  // 待入帳股息總額
   const pendingTotal=(db.dividends||[]).filter(d=>d.pending||(d.date&&d.date>todayStr)).reduce((s,d)=>s+(d.amount||0),0);
-  const surplus=pendingTotal-totalOut;
-  const coverage=totalOut>0?Math.round(pendingTotal/totalOut*1000)/10:0;
-  const surplusColor=surplus>=0?'#dc2626':'#16a34a';
-  const coverageColor=coverage>=100?'#dc2626':'#f59e0b';
-  const coverageBg=coverage>=100?'#fee2e2':'#fefce8';
-  const set2=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val;};
-  const setStyle=(id,prop,val)=>{const el=document.getElementById(id);if(el)el.style[prop]=val;};
-  set2('cf-inflow','$'+Math.round(pendingTotal).toLocaleString());
-  set2('cf-outflow','$'+Math.round(totalOut).toLocaleString());
-  set2('cf-outflow-detail','信貸 $'+Math.round(totalLoanM).toLocaleString()+' + 不限用途 $'+Math.round(totalFlexM).toLocaleString());
-  set2('cf-surplus',(surplus>=0?'+':'')+Math.round(surplus).toLocaleString());
-  setStyle('cf-surplus','color',surplusColor);
-  set2('cf-coverage','覆蓋率 '+coverage+'%');
-  setStyle('cf-coverage','background',coverageBg);
-  setStyle('cf-coverage','color',coverageColor);
+  const cfNet=Math.round(pendingTotal-totalOut);
+  const cfWin=pendingTotal>=totalOut;
+  const fmt2=n=>Math.abs(Math.round(n)).toLocaleString();
+  const setEl=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val;};
+  const setStyle2=(id,prop,val)=>{const el=document.getElementById(id);if(el)el.style[prop]=val;};
+
+  setEl('cf-inflow','$'+Math.round(pendingTotal).toLocaleString());
+  setEl('cf-outflow','$'+Math.round(totalOut).toLocaleString());
+  setEl('cf-outflow-detail','信貸 $'+Math.round(totalLoanM).toLocaleString()+' · 不限用途 $'+Math.round(totalFlexM).toLocaleString());
+
+  const barExpenseEl=document.getElementById('cf-bar-expense');
+  const barSurplusEl=document.getElementById('cf-bar-surplus');
+  const battleLabelEl=document.getElementById('cf-battle-label');
+  const battleSubEl=document.getElementById('cf-battle-sub');
+  const resultLabelEl=document.getElementById('cf-result-label');
+  const surplusEl=document.getElementById('cf-surplus');
+  const coverageEl=document.getElementById('cf-coverage');
+
+  if(cfWin){
+    const expPct=pendingTotal>0?Math.round(totalOut/pendingTotal*100):0;
+    const surPct=100-expPct;
+    if(barExpenseEl){barExpenseEl.style.width=expPct+'%';barExpenseEl.style.background='#3B6D11';}
+    if(barSurplusEl){barSurplusEl.style.width=surPct+'%';barSurplusEl.style.background='#FFB800';}
+    if(battleLabelEl)battleLabelEl.innerHTML='<span style="color:#FFB800">🏆 勝利淨勝黃金區</span> <span style="color:#dc2626;font-family:\'JetBrains Mono\',monospace">+$'+fmt2(cfNet)+'</span>';
+    if(battleSubEl)battleSubEl.textContent='敵軍戰損 ($'+fmt2(totalOut)+') vs. 黃金區 ($'+fmt2(cfNet)+')';
+    if(resultLabelEl)resultLabelEl.textContent='每月淨現金流';
+    if(surplusEl){surplusEl.textContent='+'+fmt2(cfNet);surplusEl.style.color='#dc2626';}
+    const cov=totalOut>0?Math.round(pendingTotal/totalOut*1000)/10:0;
+    if(coverageEl){coverageEl.textContent='覆蓋率 '+cov+'%';coverageEl.style.background='#fee2e2';coverageEl.style.color='#991b1b';}
+  } else {
+    const covPct=totalOut>0?Math.round(pendingTotal/totalOut*100):0;
+    if(barExpenseEl){barExpenseEl.style.width=covPct+'%';barExpenseEl.style.background='#888780';}
+    if(barSurplusEl){barSurplusEl.style.width=(100-covPct)+'%';barSurplusEl.style.background='#EA580C';barSurplusEl.style.animation='blink 1s infinite';}
+    if(battleLabelEl)battleLabelEl.innerHTML='<span style="color:#EA580C">⚠️ 防線崩潰！赤字 <span style="font-family:\'JetBrains Mono\',monospace">-$'+fmt2(Math.abs(cfNet))+'</span></span>';
+    if(battleSubEl)battleSubEl.textContent='股息全軍覆沒，超支 $'+fmt2(Math.abs(cfNet));
+    if(resultLabelEl)resultLabelEl.textContent='每月赤字';
+    if(surplusEl){surplusEl.textContent='-'+fmt2(Math.abs(cfNet));surplusEl.style.color='#3B6D11';}
+    const cov=totalOut>0?Math.round(pendingTotal/totalOut*100):0;
+    if(coverageEl){coverageEl.textContent='覆蓋率 '+cov+'%';coverageEl.style.background='#ffedd5';coverageEl.style.color='#9a3412';}
+  }
   const lb=document.getElementById('as-loan-body');
   if(lb){
     if(db.loans.length===0){
