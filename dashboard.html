@@ -10772,7 +10772,7 @@ function renderAssetsPage(){
   // 現金流月報
   const loans=db.loans.filter(l=>!l.settled);
   const totalLoanM=loans.reduce((s,l)=>s+(l.monthly||0),0);
-  const flex=db.flex||[];
+  const flex=db.flexLoans||[];
   const totalFlexM=flex.filter(f=>!f.settled).reduce((s,f)=>s+(f.monthly||0),0);
   const totalOut=totalLoanM+totalFlexM;
   // 待入帳股息總額
