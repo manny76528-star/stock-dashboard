@@ -1461,9 +1461,9 @@
       "name": "統一證券",
       "rate": 3.1,
       "limit": 13000000,
-      "used": 9700000,
-      "remain": 3300000,
-      "monthly": 25058,
+      "used": 10000000,
+      "remain": 3000000,
+      "monthly": 25833,
       "note": "一年一簽,賣出股票時還利息",
       "calcPledge": true
     }
@@ -2727,7 +2727,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1788771072918,
+  "_ts": 1788771104541,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
