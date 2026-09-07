@@ -2157,6 +2157,30 @@ body:not(.privacy) .privacy-mask{filter:none;}
         </div>
       </div>
 
+      <!-- 現金流月報 -->
+      <div class="as-card" id="cashflow-card" style="margin-bottom:16px;padding:16px 20px">
+        <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:start;gap:12px;margin-bottom:14px">
+          <div>
+            <div style="font-size:11px;color:#9ca3af;font-weight:600;margin-bottom:5px">現金流入 📥</div>
+            <div style="font-size:20px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#1e293b" id="cf-inflow">—</div>
+            <div style="font-size:10px;color:#94a3b8;margin-top:3px">每期股息入帳</div>
+          </div>
+          <div style="display:flex;align-items:center;padding-top:16px;font-size:18px">⚔️</div>
+          <div style="text-align:right">
+            <div style="font-size:11px;color:#9ca3af;font-weight:600;margin-bottom:5px">每月固定支出 📤</div>
+            <div style="font-size:20px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#1e293b" id="cf-outflow">—</div>
+            <div style="font-size:10px;color:#94a3b8;margin-top:3px" id="cf-outflow-detail">信貸 + 不限用途</div>
+          </div>
+        </div>
+        <div style="border-top:1px solid #f1f5f9;padding-top:12px;display:flex;justify-content:space-between;align-items:center">
+          <div style="font-size:12px;color:#64748b;font-weight:600">安全殘值</div>
+          <div style="display:flex;align-items:baseline;gap:8px">
+            <span style="font-size:18px;font-weight:800;font-family:'JetBrains Mono',monospace" id="cf-surplus">—</span>
+            <span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px" id="cf-coverage">—</span>
+          </div>
+        </div>
+      </div>
+
       <!-- 信貸管理（全寬） -->
       <div class="as-card" style="margin-bottom:16px">
         <div class="as-card-hdr">
@@ -2188,30 +2212,6 @@ body:not(.privacy) .privacy-mask{filter:none;}
           </div>
           <div id="as-cash-body"></div>
           <div class="as-add-btn" onclick="openCashModal()">＋ 新增帳戶</div>
-        </div>
-      </div>
-
-      <!-- 現金流月報 -->
-      <div class="as-card" id="cashflow-card" style="margin-bottom:16px;padding:16px 20px">
-        <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:start;gap:12px;margin-bottom:14px">
-          <div>
-            <div style="font-size:11px;color:#9ca3af;font-weight:600;margin-bottom:5px">現金流入 📥</div>
-            <div style="font-size:20px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#1e293b" id="cf-inflow">—</div>
-            <div style="font-size:10px;color:#94a3b8;margin-top:3px">每期股息入帳</div>
-          </div>
-          <div style="display:flex;align-items:center;padding-top:16px;font-size:18px">⚔️</div>
-          <div style="text-align:right">
-            <div style="font-size:11px;color:#9ca3af;font-weight:600;margin-bottom:5px">每月固定支出 📤</div>
-            <div style="font-size:20px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#1e293b" id="cf-outflow">—</div>
-            <div style="font-size:10px;color:#94a3b8;margin-top:3px" id="cf-outflow-detail">信貸 + 不限用途</div>
-          </div>
-        </div>
-        <div style="border-top:1px solid #f1f5f9;padding-top:12px;display:flex;justify-content:space-between;align-items:center">
-          <div style="font-size:12px;color:#64748b;font-weight:600">安全殘值</div>
-          <div style="display:flex;align-items:baseline;gap:8px">
-            <span style="font-size:18px;font-weight:800;font-family:'JetBrains Mono',monospace" id="cf-surplus">—</span>
-            <span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px" id="cf-coverage">—</span>
-          </div>
         </div>
       </div>
 
