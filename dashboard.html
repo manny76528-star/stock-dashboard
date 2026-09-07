@@ -2191,6 +2191,30 @@ body:not(.privacy) .privacy-mask{filter:none;}
         </div>
       </div>
 
+      <!-- 現金流月報 -->
+      <div class="as-card" id="cashflow-card" style="margin-bottom:16px;padding:16px 20px">
+        <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:start;gap:12px;margin-bottom:14px">
+          <div>
+            <div style="font-size:11px;color:#9ca3af;font-weight:600;margin-bottom:5px">現金流入 📥</div>
+            <div style="font-size:20px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#1e293b" id="cf-inflow">—</div>
+            <div style="font-size:10px;color:#94a3b8;margin-top:3px">每期股息入帳</div>
+          </div>
+          <div style="display:flex;align-items:center;padding-top:16px;font-size:18px">⚔️</div>
+          <div style="text-align:right">
+            <div style="font-size:11px;color:#9ca3af;font-weight:600;margin-bottom:5px">每月固定支出 📤</div>
+            <div style="font-size:20px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#1e293b" id="cf-outflow">—</div>
+            <div style="font-size:10px;color:#94a3b8;margin-top:3px" id="cf-outflow-detail">信貸 + 不限用途</div>
+          </div>
+        </div>
+        <div style="border-top:1px solid #f1f5f9;padding-top:12px;display:flex;justify-content:space-between;align-items:center">
+          <div style="font-size:12px;color:#64748b;font-weight:600">安全殘值</div>
+          <div style="display:flex;align-items:baseline;gap:8px">
+            <span style="font-size:18px;font-weight:800;font-family:'JetBrains Mono',monospace" id="cf-surplus">—</span>
+            <span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px" id="cf-coverage">—</span>
+          </div>
+        </div>
+      </div>
+
       <!-- 近期扣款提醒 -->
       <div class="trend-page-card" style="margin-top:16px;padding:0;overflow:hidden">
         <div class="trend-page-hdr" style="padding:12px 18px;border-bottom:1px solid #f0f2f5">
@@ -10745,7 +10769,29 @@ function renderAssetsPage(){
     }
   }
 
-  // 信貸列表 — 直接呼叫 renderLoans()，複製其輸出到 as-loan-body
+  // 現金流月報
+  const loans=db.loans.filter(l=>!l.settled);
+  const totalLoanM=loans.reduce((s,l)=>s+(l.monthly||0),0);
+  const flex=db.flex||[];
+  const totalFlexM=flex.filter(f=>!f.settled).reduce((s,f)=>s+(f.monthly||0),0);
+  const totalOut=totalLoanM+totalFlexM;
+  // 待入帳股息總額
+  const pendingTotal=(db.dividends||[]).filter(d=>d.pending||(d.date&&d.date>todayStr)).reduce((s,d)=>s+(d.amount||0),0);
+  const surplus=pendingTotal-totalOut;
+  const coverage=totalOut>0?Math.round(pendingTotal/totalOut*1000)/10:0;
+  const surplusColor=surplus>=0?'#dc2626':'#16a34a';
+  const coverageColor=coverage>=100?'#dc2626':'#f59e0b';
+  const coverageBg=coverage>=100?'#fee2e2':'#fefce8';
+  const set2=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val;};
+  const setStyle=(id,prop,val)=>{const el=document.getElementById(id);if(el)el.style[prop]=val;};
+  set2('cf-inflow','$'+Math.round(pendingTotal).toLocaleString());
+  set2('cf-outflow','$'+Math.round(totalOut).toLocaleString());
+  set2('cf-outflow-detail','信貸 $'+Math.round(totalLoanM).toLocaleString()+' + 不限用途 $'+Math.round(totalFlexM).toLocaleString());
+  set2('cf-surplus',(surplus>=0?'+':'')+Math.round(surplus).toLocaleString());
+  setStyle('cf-surplus','color',surplusColor);
+  set2('cf-coverage','覆蓋率 '+coverage+'%');
+  setStyle('cf-coverage','background',coverageBg);
+  setStyle('cf-coverage','color',coverageColor);
   const lb=document.getElementById('as-loan-body');
   if(lb){
     if(db.loans.length===0){
