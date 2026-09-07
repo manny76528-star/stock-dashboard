@@ -1235,7 +1235,7 @@ function renderOverview(){
   // 客戶追蹤提醒
   const trackList=document.getElementById('cust-track-list');
   if(trackList){
-    const TRACK_CUSTS=['騰亦資訊','河川企業社','訊控有限公司','興業企業行','福寶水產','泰茂企業行'];
+    const TRACK_CUSTS=['騰亦資訊','河川企業社','訊控有限公司','興業企業行','福寶水產','泰茂企業有限公司'];
     const custOrders={};
     db.orders.filter(o=>o.custName&&TRACK_CUSTS.includes(o.custName)&&o.date&&o.status!=='cancelled').forEach(o=>{
       if(!custOrders[o.custName])custOrders[o.custName]=[];
@@ -1265,7 +1265,7 @@ function renderOverview(){
     trackList.innerHTML=trackItems.length===0
       ?'<div style="color:#94a3b8;font-size:12px;text-align:center;padding:8px">🎉 所有客戶均在正常週期內</div>'
       :trackItems.map(t=>`
-        <div class="alert-item" style="cursor:pointer" onclick="showCustOrders('${t.name}')">
+        <div class="alert-item" style="cursor:pointer" onclick="showCustOrdersByName('${t.name}')">
           <div class="alert-dot ${t.level}"></div>
           <div style="flex:1;font-size:12px">
             <div style="font-weight:700;color:#1e293b">${t.icon} ${t.name}</div>
@@ -1273,6 +1273,16 @@ function renderOverview(){
           </div>
           <div style="font-size:10px;background:${t.level==='red'?'#fee2e2':t.level==='orange'?'#ffedd5':'#fefce8'};color:${t.level==='red'?'#dc2626':t.level==='orange'?'#ea580c':'#ca8a04'};padding:2px 7px;border-radius:6px;font-weight:700">聯繫 ›</div>
         </div>`).join('');
+  }
+}
+
+function showCustOrdersByName(name){
+  const c=db.customers.find(x=>x.name===name);
+  if(c)showCustOrders(c.id);
+  else{
+    // fallback：用custName直接找
+    const orders=db.orders.filter(o=>o.custName===name).sort((a,b)=>b.date.localeCompare(a.date));
+    showCustOrdersModal(name, orders);
   }
 }
 
