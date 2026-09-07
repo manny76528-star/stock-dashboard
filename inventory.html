@@ -348,7 +348,7 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
 
       <!-- 右側：系統提醒 -->
       <div style="display:flex;flex-direction:column;gap:16px">
-        <div class="sec">
+        <div class="sec" style="display:none">
           <div class="sec-hdr"><span class="sec-title">⚠️ 系統提醒</span></div>
           <div class="sec-body">
             <div class="alert-list" id="alert-list">
@@ -1235,7 +1235,7 @@ function renderOverview(){
   // 客戶追蹤提醒
   const trackList=document.getElementById('cust-track-list');
   if(trackList){
-    const TRACK_CUSTS=['騰亦資訊','河川企業社','訊控有限公司','興業企業行'];
+    const TRACK_CUSTS=['騰亦資訊','河川企業社','訊控有限公司','興業企業行','福寶水產','泰茂企業行'];
     const custOrders={};
     db.orders.filter(o=>o.custName&&TRACK_CUSTS.includes(o.custName)&&o.date&&o.status!=='cancelled').forEach(o=>{
       if(!custOrders[o.custName])custOrders[o.custName]=[];
