@@ -371,7 +371,7 @@
       "note": "",
       "items": [
         {
-          "name": "珠光紙 40米",
+          "name": "珠光紙 100*70*40米",
           "type": "paper",
           "subtype": "珠光紙",
           "spec": "40米",
@@ -419,7 +419,7 @@
       "note": "",
       "items": [
         {
-          "name": "珠光紙 40米",
+          "name": "珠光紙 100*70*40米",
           "type": "paper",
           "subtype": "珠光紙",
           "spec": "40米",
@@ -626,7 +626,7 @@
       "note": "",
       "items": [
         {
-          "name": "珠光紙 40米",
+          "name": "珠光紙 100*70*40米",
           "type": "paper",
           "subtype": "珠光紙",
           "spec": "40米",
@@ -799,7 +799,7 @@
       "note": "",
       "items": [
         {
-          "name": "珠光紙 40米",
+          "name": "珠光紙 100*70*40米",
           "type": "paper",
           "subtype": "珠光紙",
           "spec": "40米",
@@ -978,7 +978,7 @@
       "note": "",
       "items": [
         {
-          "name": "珠光紙 40米",
+          "name": "珠光紙 100*70*40米",
           "type": "paper",
           "subtype": "珠光紙",
           "spec": "40米",
@@ -1465,7 +1465,7 @@
       "note": "",
       "items": [
         {
-          "name": "珠光紙 40米",
+          "name": "珠光紙 100*70*40米",
           "type": "paper",
           "subtype": "珠光紙",
           "spec": "40米",
@@ -2141,7 +2141,7 @@
       "note": "",
       "items": [
         {
-          "name": "珠光紙 40米",
+          "name": "珠光紙 100*70*40米",
           "type": "paper",
           "subtype": "珠光紙",
           "spec": "40米",
@@ -2666,7 +2666,7 @@
       "note": "",
       "items": [
         {
-          "name": "珠光紙 40米",
+          "name": "珠光紙 100*70*40米",
           "type": "paper",
           "subtype": "珠光紙",
           "spec": "40米",
@@ -3426,7 +3426,7 @@
       "note": "",
       "items": [
         {
-          "name": "珠光紙 40米",
+          "name": "珠光紙 100*70*40米",
           "type": "paper",
           "subtype": "珠光紙",
           "spec": "40米",
@@ -3633,7 +3633,7 @@
       "note": "",
       "items": [
         {
-          "name": "珠光紙 40米",
+          "name": "珠光紙 100*70*40米",
           "type": "paper",
           "subtype": "珠光紙",
           "spec": "40米",
@@ -5014,7 +5014,7 @@
       "note": "",
       "items": [
         {
-          "name": "珠光紙 40米",
+          "name": "珠光紙 100*70*40米",
           "type": "paper",
           "subtype": "珠光紙",
           "spec": "40米",
@@ -5577,7 +5577,7 @@
       "note": "",
       "items": [
         {
-          "name": "珠光紙 40米",
+          "name": "珠光紙 100*70*40米",
           "type": "paper",
           "subtype": "珠光紙",
           "spec": "40米",
@@ -5781,7 +5781,7 @@
       "note": "",
       "items": [
         {
-          "name": "珠光紙 40米",
+          "name": "珠光紙 100*70*40米",
           "type": "paper",
           "subtype": "珠光紙",
           "spec": "40米",
@@ -6653,6 +6653,6 @@
     "bankCode": "013",
     "bankAccount": "061506186489"
   },
-  "_ts": 1788841975207,
+  "_ts": 1788842484468,
   "_vendorPaidBackfilled": true
 }
