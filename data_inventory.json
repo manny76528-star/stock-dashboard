@@ -6627,8 +6627,8 @@
       "id": "mnnd1cmy0dx8",
       "type": "ribbon",
       "sub": "抗刮碳帶",
-      "name": "TRS03+_ 110*91米",
-      "spec": "TRS03+_ 110*91米",
+      "name": "冷凍碳帶 110*91",
+      "spec": "110*91米",
       "cost": 60
     },
     {
@@ -6653,6 +6653,6 @@
     "bankCode": "013",
     "bankAccount": "061506186489"
   },
-  "_ts": 1788842554794,
+  "_ts": 1788842650144,
   "_vendorPaidBackfilled": true
 }
