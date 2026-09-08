@@ -1274,8 +1274,8 @@ function renderOverview(){
     trackList.innerHTML=custBlocks.length===0
       ?'<div style="color:#94a3b8;font-size:12px;text-align:center;padding:8px;width:100%">🎉 所有客戶品項均在正常週期內</div>'
       :custBlocks.map(({custName,itemResults,worstLevel})=>`
-        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;min-width:155px;flex-shrink:0;overflow:hidden;border-left:3px solid ${worstLevel==='red'?'#dc2626':worstLevel==='orange'?'#f97316':'#22c55e'}">
-          <div style="padding:8px 10px;border-bottom:1px solid #e2e8f0">
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;min-width:175px;flex-shrink:0;overflow:hidden;border-left:3px solid ${worstLevel==='red'?'#dc2626':worstLevel==='orange'?'#f97316':'#22c55e'}">
+          <div style="padding:10px 12px;border-bottom:1px solid #e2e8f0">
             <div style="font-size:11px;font-weight:700;color:#1e293b">${worstLevel==='red'?'🔴':worstLevel==='orange'?'⚠️':'✅'} ${custName}</div>
             <div style="font-size:9px;font-weight:600;margin-top:1px;color:${(()=>{const worst=itemResults.reduce((a,b)=>b.ratio>a.ratio?b:a);return worst.ratio>=1?'#dc2626':'#16a34a';})()}">${(()=>{const worst=itemResults.reduce((a,b)=>b.ratio>a.ratio?b:a);const over=worst.daysSince-worst.avg;return over>0?'超過 '+over+' 天':'還剩 '+Math.abs(over)+' 天';})()}</div>
             <div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px">
@@ -1284,10 +1284,10 @@ function renderOverview(){
             </div>
           </div>
           ${itemResults.map(r=>`
-            <div onclick="showItemTrackDetail('${custName}','${r.name}')" style="padding:6px 10px;border-bottom:1px solid #f1f5f9;cursor:pointer" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background=''">
-              <div style="font-size:10px;font-weight:600;color:#374151;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px">${r.name}</div>
+            <div onclick="showItemTrackDetail('${custName}','${r.name}')" style="padding:8px 12px;border-bottom:1px solid #f1f5f9;cursor:pointer" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background=''">
+              <div style="font-size:11px;font-weight:600;color:#374151;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:155px">${r.name}</div>
               <div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px">
-                <span style="font-size:9px;color:#94a3b8">均${r.avg}天・今${r.daysSince}天</span>
+                <span style="font-size:10px;color:#94a3b8">均${r.avg}天・今${r.daysSince}天</span>
                 <span style="font-size:8px;font-weight:700;padding:1px 4px;border-radius:3px;background:${r.level==='red'?'#fee2e2':r.level==='orange'?'#ffedd5':'#dcfce7'};color:${r.level==='red'?'#dc2626':r.level==='orange'?'#ea580c':'#16a34a'}">${r.level==='red'?'超標':r.level==='orange'?'注意':'正常'}</span>
               </div>
             </div>`).join('')}
