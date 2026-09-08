@@ -479,7 +479,7 @@
           "invoice": false
         },
         {
-          "name": "抗刮碳帶",
+          "name": "抗刮碳帶（停用）",
           "type": "ribbon",
           "subtype": "抗刮碳帶",
           "spec": "",
@@ -772,7 +772,7 @@
           "invoice": false
         },
         {
-          "name": "抗刮碳帶",
+          "name": "抗刮碳帶（停用）",
           "type": "ribbon",
           "subtype": "抗刮碳帶",
           "spec": "",
@@ -3177,7 +3177,7 @@
       "note": "",
       "items": [
         {
-          "name": "抗刮碳帶",
+          "name": "抗刮碳帶（停用）",
           "type": "ribbon",
           "subtype": "抗刮碳帶",
           "spec": "",
@@ -6653,6 +6653,6 @@
     "bankCode": "013",
     "bankAccount": "061506186489"
   },
-  "_ts": 1788862518509,
+  "_ts": 1788862620532,
   "_vendorPaidBackfilled": true
 }
