@@ -457,24 +457,24 @@
       "note": "",
       "items": [
         {
-          "name": "珠光紙",
+          "name": "珠光紙 90*70*40米",
           "type": "paper",
           "subtype": "珠光紙",
           "spec": "",
           "qty": 50,
           "sn": "",
-          "cost": 100,
+          "cost": 85,
           "price": 165,
           "invoice": false
         },
         {
-          "name": "珠光紙",
+          "name": "珠光紙 90*70*40米",
           "type": "paper",
           "subtype": "珠光紙",
           "spec": "",
           "qty": 50,
           "sn": "",
-          "cost": 100,
+          "cost": 85,
           "price": 165,
           "invoice": false
         },
@@ -761,13 +761,13 @@
       "note": "",
       "items": [
         {
-          "name": "珠光紙",
+          "name": "珠光紙 90*70*40米",
           "type": "paper",
           "subtype": "珠光紙",
           "spec": "",
           "qty": 100,
           "sn": "",
-          "cost": 110,
+          "cost": 85,
           "price": 160,
           "invoice": false
         },
@@ -2455,13 +2455,13 @@
       "note": "",
       "items": [
         {
-          "name": "珠光紙",
+          "name": "珠光紙 90*70*40米",
           "type": "paper",
           "subtype": "珠光紙",
           "spec": "",
           "qty": 100,
           "sn": "",
-          "cost": 110,
+          "cost": 85,
           "price": 160,
           "invoice": false
         }
@@ -3673,19 +3673,19 @@
       "note": "",
       "items": [
         {
-          "name": "珠光紙",
+          "name": "珠光紙 90*70*40米",
           "type": "paper",
           "subtype": "珠光紙",
           "spec": "",
           "qty": 320,
           "sn": "",
           "sns": [],
-          "cost": 80,
+          "cost": 85,
           "price": 130,
           "invoice": false
         },
         {
-          "name": "抗刮碳帶",
+          "name": "冷凍碳帶 110*91",
           "type": "ribbon",
           "subtype": "抗刮碳帶",
           "spec": "",
@@ -4561,7 +4561,7 @@
       "note": "",
       "items": [
         {
-          "name": "抗刮碳帶",
+          "name": "冷凍碳帶 110*91",
           "type": "ribbon",
           "subtype": "抗刮碳帶",
           "spec": "",
@@ -5447,7 +5447,7 @@
       "note": "<數量錯誤 下次注意> 不能缺少",
       "items": [
         {
-          "name": "珠光紙",
+          "name": "珠光紙 90*70*40米",
           "type": "paper",
           "subtype": "珠光紙",
           "spec": "",
@@ -5459,7 +5459,7 @@
           "invoice": false
         },
         {
-          "name": "抗刮碳帶",
+          "name": "冷凍碳帶 110*91",
           "type": "ribbon",
           "subtype": "抗刮碳帶",
           "spec": "",
@@ -5981,7 +5981,7 @@
       "note": "",
       "items": [
         {
-          "name": "抗刮碳帶",
+          "name": "冷凍碳帶 110*91",
           "type": "ribbon",
           "subtype": "抗刮碳帶",
           "spec": "",
@@ -6653,6 +6653,6 @@
     "bankCode": "013",
     "bankAccount": "061506186489"
   },
-  "_ts": 1788843394156,
+  "_ts": 1788862518509,
   "_vendorPaidBackfilled": true
 }
