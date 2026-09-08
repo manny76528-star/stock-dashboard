@@ -1262,7 +1262,7 @@ function renderOverview(){
       if(itemResults.length===0)return;
       // 客戶整體警示等級取最嚴重的
       const worstLevel=itemResults.some(r=>r.level==='red')?'red':itemResults.some(r=>r.level==='orange')?'orange':'green';
-      if(worstLevel==='green')return; // 全部正常不顯示
+      // 全部客戶都顯示（常駐）
       custBlocks.push({custName,itemResults,worstLevel});
     });
 
@@ -1277,6 +1277,7 @@ function renderOverview(){
         <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;min-width:155px;flex-shrink:0;overflow:hidden;border-left:3px solid ${worstLevel==='red'?'#dc2626':worstLevel==='orange'?'#f97316':'#22c55e'}">
           <div style="padding:8px 10px;border-bottom:1px solid #e2e8f0">
             <div style="font-size:11px;font-weight:700;color:#1e293b">${worstLevel==='red'?'🔴':worstLevel==='orange'?'⚠️':'✅'} ${custName}</div>
+            <div style="font-size:9px;font-weight:600;margin-top:1px;color:${(()=>{const worst=itemResults.reduce((a,b)=>b.ratio>a.ratio?b:a);return worst.ratio>=1?'#dc2626':'#16a34a';})()}">${(()=>{const worst=itemResults.reduce((a,b)=>b.ratio>a.ratio?b:a);const over=worst.daysSince-worst.avg;return over>0?'超過 '+over+' 天':'還剩 '+Math.abs(over)+' 天';})()}</div>
             <div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px">
               <span style="font-size:9px;color:#94a3b8">${itemResults.length}項追蹤</span>
               <span onclick="showCustOrdersByName('${custName}')" style="font-size:9px;color:#2563eb;font-weight:700;cursor:pointer">聯繫 ›</span>
