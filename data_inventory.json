@@ -98,7 +98,7 @@
           "invoice": true
         },
         {
-          "name": "抗刮碳帶 110*91",
+          "name": "抗刮碳帶 SP330 110*91（停用）",
           "type": "ribbon",
           "subtype": "抗刮碳帶",
           "spec": "SP330",
@@ -210,7 +210,7 @@
       "note": "",
       "items": [
         {
-          "name": "抗刮碳帶 110*91",
+          "name": "抗刮碳帶 SP330 110*91（停用）",
           "type": "ribbon",
           "subtype": "抗刮碳帶",
           "spec": "110*91",
@@ -318,7 +318,7 @@
           "invoice": false
         },
         {
-          "name": "抗刮碳帶 110*91",
+          "name": "抗刮碳帶 SP330 110*91（停用）",
           "type": "ribbon",
           "subtype": "抗刮碳帶",
           "spec": "100*91",
@@ -382,7 +382,7 @@
           "invoice": false
         },
         {
-          "name": "抗刮碳帶 110*91",
+          "name": "抗刮碳帶 SP330 110*91（停用）",
           "type": "ribbon",
           "subtype": "抗刮碳帶",
           "spec": "110*91",
@@ -6653,6 +6653,6 @@
     "bankCode": "013",
     "bankAccount": "061506186489"
   },
-  "_ts": 1788842484468,
+  "_ts": 1788842554794,
   "_vendorPaidBackfilled": true
 }
