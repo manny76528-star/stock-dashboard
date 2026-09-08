@@ -2299,7 +2299,7 @@
           "invoice": false
         },
         {
-          "name": "抗刮碳帶",
+          "name": "冷凍碳帶 110*91",
           "type": "ribbon",
           "subtype": "抗刮碳帶",
           "spec": "",
@@ -2742,7 +2742,7 @@
       "note": "",
       "items": [
         {
-          "name": "抗刮碳帶",
+          "name": "冷凍碳帶 110*91",
           "type": "ribbon",
           "subtype": "抗刮碳帶",
           "spec": "",
@@ -3307,7 +3307,7 @@
           "invoice": true
         },
         {
-          "name": "抗刮碳帶",
+          "name": "冷凍碳帶 110*91",
           "type": "ribbon",
           "subtype": "抗刮碳帶",
           "spec": "",
@@ -3801,7 +3801,7 @@
       "note": "",
       "items": [
         {
-          "name": "抗刮碳帶",
+          "name": "冷凍碳帶 110*91",
           "type": "ribbon",
           "subtype": "抗刮碳帶",
           "spec": "",
@@ -4827,7 +4827,7 @@
       "note": "",
       "items": [
         {
-          "name": "抗刮碳帶",
+          "name": "冷凍碳帶 110*91",
           "type": "ribbon",
           "subtype": "抗刮碳帶",
           "spec": "",
@@ -5351,7 +5351,7 @@
       "note": "",
       "items": [
         {
-          "name": "抗刮碳帶",
+          "name": "冷凍碳帶 110*91",
           "type": "ribbon",
           "subtype": "抗刮碳帶",
           "spec": "",
@@ -5911,7 +5911,7 @@
       "note": "",
       "items": [
         {
-          "name": "抗刮碳帶",
+          "name": "冷凍碳帶 110*91",
           "type": "ribbon",
           "subtype": "抗刮碳帶",
           "spec": "",
@@ -5951,7 +5951,7 @@
           "invoice": false
         },
         {
-          "name": "抗刮碳帶",
+          "name": "冷凍碳帶 110*91",
           "type": "ribbon",
           "subtype": "抗刮碳帶",
           "spec": "",
@@ -6653,6 +6653,6 @@
     "bankCode": "013",
     "bankAccount": "061506186489"
   },
-  "_ts": 1788843297757,
+  "_ts": 1788843313130,
   "_vendorPaidBackfilled": true
 }
