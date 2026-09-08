@@ -1854,7 +1854,7 @@
       "note": "進貨來源_政宏",
       "items": [
         {
-          "name": "條碼機 USB",
+          "name": "條碼機 USB（停用）",
           "type": "device",
           "subtype": "條碼機",
           "spec": "USB",
@@ -1940,7 +1940,7 @@
       "note": "政宏進貨",
       "items": [
         {
-          "name": "條碼機 USB",
+          "name": "條碼機 USB（停用）",
           "type": "device",
           "subtype": "條碼機",
           "spec": "USB",
@@ -1951,7 +1951,7 @@
           "invoice": false
         },
         {
-          "name": "掃描器",
+          "name": "掃描器（停用）",
           "type": "device",
           "subtype": "掃描器",
           "spec": "",
@@ -1962,7 +1962,7 @@
           "invoice": false
         },
         {
-          "name": "掃描器",
+          "name": "掃描器（停用）",
           "type": "device",
           "subtype": "掃描器",
           "spec": "",
@@ -2081,7 +2081,7 @@
       "note": "",
       "items": [
         {
-          "name": "條碼機 USB",
+          "name": "條碼機 USB（停用）",
           "type": "device",
           "subtype": "條碼機",
           "spec": "USB",
@@ -2092,7 +2092,7 @@
           "invoice": false
         },
         {
-          "name": "掃描器",
+          "name": "掃描器（停用）",
           "type": "device",
           "subtype": "掃描器",
           "spec": "",
@@ -2239,7 +2239,7 @@
           "invoice": false
         },
         {
-          "name": "抗刮碳帶",
+          "name": "抗刮碳帶 SP330（停用）",
           "type": "ribbon",
           "subtype": "抗刮碳帶",
           "spec": "",
@@ -2250,7 +2250,7 @@
           "invoice": false
         },
         {
-          "name": "抗刮碳帶",
+          "name": "抗刮碳帶 SP330（停用）",
           "type": "ribbon",
           "subtype": "抗刮碳帶",
           "spec": "",
@@ -2612,7 +2612,7 @@
       "note": "",
       "items": [
         {
-          "name": "條碼機 USB",
+          "name": "條碼機 USB（停用）",
           "type": "device",
           "subtype": "條碼機",
           "spec": "USB",
@@ -2883,7 +2883,7 @@
       "note": "其中一台來源 掛給佐茂取得",
       "items": [
         {
-          "name": "條碼機 USB",
+          "name": "條碼機 USB（停用）",
           "type": "device",
           "subtype": "條碼機",
           "spec": "USB",
@@ -2894,7 +2894,7 @@
           "invoice": false
         },
         {
-          "name": "條碼機 USB",
+          "name": "條碼機 USB（停用）",
           "type": "device",
           "subtype": "條碼機",
           "spec": "USB",
@@ -2905,7 +2905,7 @@
           "invoice": false
         },
         {
-          "name": "掃描器",
+          "name": "掃描器（停用）",
           "type": "device",
           "subtype": "掃描器",
           "spec": "",
@@ -2916,7 +2916,7 @@
           "invoice": false
         },
         {
-          "name": "掃描器",
+          "name": "掃描器（停用）",
           "type": "device",
           "subtype": "掃描器",
           "spec": "",
@@ -2927,7 +2927,7 @@
           "invoice": false
         },
         {
-          "name": "掃描器",
+          "name": "掃描器（停用）",
           "type": "device",
           "subtype": "掃描器",
           "spec": "",
@@ -2938,7 +2938,7 @@
           "invoice": false
         },
         {
-          "name": "掃描器",
+          "name": "掃描器（停用）",
           "type": "device",
           "subtype": "掃描器",
           "spec": "",
@@ -3041,7 +3041,7 @@
       "note": "",
       "items": [
         {
-          "name": "條碼機 USB",
+          "name": "條碼機 USB（停用）",
           "type": "device",
           "subtype": "條碼機",
           "spec": "USB",
@@ -3052,7 +3052,7 @@
           "invoice": false
         },
         {
-          "name": "條碼機 USB",
+          "name": "條碼機 USB（停用）",
           "type": "device",
           "subtype": "條碼機",
           "spec": "USB",
@@ -3063,7 +3063,7 @@
           "invoice": false
         },
         {
-          "name": "掃描器",
+          "name": "掃描器（停用）",
           "type": "device",
           "subtype": "掃描器",
           "spec": "",
@@ -3074,7 +3074,7 @@
           "invoice": false
         },
         {
-          "name": "掃描器",
+          "name": "掃描器（停用）",
           "type": "device",
           "subtype": "掃描器",
           "spec": "",
@@ -3973,7 +3973,7 @@
       "note": "5000塊 淘寶進貨的",
       "items": [
         {
-          "name": "掃描器",
+          "name": "掃描器（停用）",
           "type": "device",
           "subtype": "掃描器",
           "spec": "",
@@ -3987,7 +3987,7 @@
           "invoice": false
         },
         {
-          "name": "掃描器",
+          "name": "掃描器（停用）",
           "type": "device",
           "subtype": "掃描器",
           "spec": "",
@@ -4101,7 +4101,7 @@
       "note": "無帳_一台  (英特格) + CINO A680 (英特格)  , 另一台還掛長華帳上",
       "items": [
         {
-          "name": "掃描器",
+          "name": "掃描器（停用）",
           "type": "device",
           "subtype": "掃描器",
           "spec": "",
@@ -4217,7 +4217,7 @@
           "invoice": false
         },
         {
-          "name": "抗刮碳帶",
+          "name": "抗刮碳帶 SP330（停用）",
           "type": "ribbon",
           "subtype": "抗刮碳帶",
           "spec": "",
@@ -6653,6 +6653,6 @@
     "bankCode": "013",
     "bankAccount": "061506186489"
   },
-  "_ts": 1788842786374,
+  "_ts": 1788842862199,
   "_vendorPaidBackfilled": true
 }
