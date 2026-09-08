@@ -1232,47 +1232,152 @@ function renderOverview(){
           <div style="font-size:10px;background:#eff6ff;color:#2563eb;padding:2px 7px;border-radius:6px;font-weight:700">開啟 ›</div>
         </div>`).join('');
   }
-  // 客戶追蹤提醒
+  // 客戶追蹤提醒（品項級別）
   const trackList=document.getElementById('cust-track-list');
   if(trackList){
-    const TRACK_CUSTS=['騰亦資訊','河川企業社','訊控有限公司','興業企業行','福寶水產','泰茂企業有限公司'];
-    const custOrders={};
-    db.orders.filter(o=>o.custName&&TRACK_CUSTS.includes(o.custName)&&o.date&&o.status!=='cancelled').forEach(o=>{
-      if(!custOrders[o.custName])custOrders[o.custName]=[];
-      custOrders[o.custName].push(o.date);
-    });
+    const TRACK_CONFIG={
+      '騰亦資訊':{items:[{name:'CINO A680 USB',priceFilter:2351}]},
+      '河川企業社':{items:[{name:'珠光紙 40米'},{name:'珠光紙 100*70*40米'},{name:'冷凍碳帶 110*91'}]},
+      '訊控有限公司':{items:[{name:'珠光紙 90*90*50米'},{name:'抗刮碳帶 TRR03 100*300米 外捲'}]},
+      '興業企業行':{items:[{name:'冷凍碳帶 110*91'},{name:'100*100珠光紙'}]},
+      '福寶水產':{items:[{name:'珠光紙 90*70*40米'},{name:'冷凍碳帶 110*91'}]},
+      '泰茂企業有限公司':{items:[{name:'冷凍碳帶 110*91'}]},
+    };
     const today2=new Date();
-    const trackItems=[];
-    Object.entries(custOrders).forEach(([name,dates])=>{
-      if(dates.length<2)return;
-      const sorted=dates.slice().sort();
-      const gaps=[];
-      for(let i=1;i<sorted.length;i++){
-        const d=Math.round((new Date(sorted[i])-new Date(sorted[i-1]))/(864e5));
-        gaps.push(d);
-      }
-      const avg=Math.round(gaps.reduce((s,v)=>s+v,0)/gaps.length);
-      const lastDate=sorted[sorted.length-1];
-      const daysSince=Math.round((today2-new Date(lastDate))/864e5);
-      if(daysSince>=avg){
-        const ratio=daysSince/avg;
-        const level=ratio>=2?'red':ratio>=1.5?'orange':'yellow';
-        const icon=ratio>=2?'🔴':ratio>=1.5?'🟠':'⚠️';
-        trackItems.push({name,avg,daysSince,level,icon,lastDate,ratio});
-      }
+    const custBlocks=[];
+
+    Object.entries(TRACK_CONFIG).forEach(([custName,cfg])=>{
+      const itemResults=[];
+      cfg.items.forEach(({name,priceFilter})=>{
+        const dates=[];
+        db.orders.filter(o=>o.custName===custName&&o.date&&o.status!=='cancelled').forEach(o=>{
+          (o.items||[]).forEach(it=>{
+            if(it.name===name&&(!priceFilter||it.price==priceFilter))dates.push(o.date);
+          });
+        });
+        if(dates.length<2)return;
+        const sorted=[...new Set(dates)].sort();
+        const gaps=[];
+        for(let i=1;i<sorted.length;i++){
+          gaps.push(Math.round((new Date(sorted[i])-new Date(sorted[i-1]))/(864e5)));
+        }
+        const avg=Math.round(gaps.reduce((s,v)=>s+v,0)/gaps.length);
+        const lastDate=sorted[sorted.length-1];
+        const prevDate=sorted[sorted.length-2];
+        const lastGap=Math.round((new Date(lastDate)-new Date(prevDate))/(864e5));
+        const daysSince=Math.round((today2-new Date(lastDate))/864e5);
+        const ratio=avg>0?daysSince/avg:0;
+        const level=ratio>=2?'red':ratio>=1?'orange':'green';
+        const icon=ratio>=2?'🔴':ratio>=1?'⚠️':'✅';
+        itemResults.push({name,avg,daysSince,lastGap,lastDate,level,icon,ratio,sorted,gaps});
+      });
+
+      if(itemResults.length===0)return;
+      // 客戶整體警示等級取最嚴重的
+      const worstLevel=itemResults.some(r=>r.level==='red')?'red':itemResults.some(r=>r.level==='orange')?'orange':'green';
+      if(worstLevel==='green')return; // 全部正常不顯示
+      custBlocks.push({custName,itemResults,worstLevel});
     });
-    trackItems.sort((a,b)=>b.ratio-a.ratio);
-    trackList.innerHTML=trackItems.length===0
-      ?'<div style="color:#94a3b8;font-size:12px;text-align:center;padding:8px">🎉 所有客戶均在正常週期內</div>'
-      :trackItems.map(t=>`
-        <div class="alert-item" style="cursor:pointer" onclick="showCustOrdersByName('${t.name}')">
-          <div class="alert-dot ${t.level}"></div>
-          <div style="flex:1;font-size:12px">
-            <div style="font-weight:700;color:#1e293b">${t.icon} ${t.name}</div>
-            <div style="color:#94a3b8;font-size:10px;margin-top:2px">平均 ${t.avg} 天・距今 ${t.daysSince} 天未下單</div>
+
+    custBlocks.sort((a,b)=>{
+      const lv={red:3,orange:2,green:1};
+      return lv[b.worstLevel]-lv[a.worstLevel];
+    });
+
+    trackList.innerHTML=custBlocks.length===0
+      ?'<div style="color:#94a3b8;font-size:12px;text-align:center;padding:8px">🎉 所有客戶品項均在正常週期內</div>'
+      :custBlocks.map(({custName,itemResults,worstLevel})=>`
+        <div style="border-bottom:1px solid #f1f5f9;padding:8px 0">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <div style="font-weight:700;color:#1e293b;font-size:13px">${worstLevel==='red'?'🔴':worstLevel==='orange'?'🟠':'✅'} ${custName}</div>
+            <div onclick="showCustOrdersByName('${custName}')" style="font-size:10px;background:#eff6ff;color:#2563eb;padding:2px 8px;border-radius:6px;font-weight:700;cursor:pointer">聯繫 ›</div>
           </div>
-          <div style="font-size:10px;background:${t.level==='red'?'#fee2e2':t.level==='orange'?'#ffedd5':'#fefce8'};color:${t.level==='red'?'#dc2626':t.level==='orange'?'#ea580c':'#ca8a04'};padding:2px 7px;border-radius:6px;font-weight:700">聯繫 ›</div>
+          ${itemResults.filter(r=>r.level!=='green').map(r=>`
+            <div onclick="showItemTrackDetail('${custName}','${r.name}')" style="display:flex;align-items:center;gap:6px;padding:4px 8px;margin:2px 0;background:#f8fafc;border-radius:6px;cursor:pointer">
+              <span style="font-size:11px">${r.icon}</span>
+              <div style="flex:1;font-size:11px;color:#374151;font-weight:600">${r.name}</div>
+              <div style="font-size:10px;color:#94a3b8;text-align:right">
+                平均${r.avg}天・距今${r.daysSince}天
+              </div>
+            </div>`).join('')}
         </div>`).join('');
+  }
+}
+
+function showItemTrackDetail(custName, itemName){
+  const TRACK_CONFIG={
+    '騰亦資訊':{items:[{name:'CINO A680 USB',priceFilter:2351}]},
+    '河川企業社':{items:[{name:'珠光紙 40米'},{name:'珠光紙 100*70*40米'},{name:'冷凍碳帶 110*91'}]},
+    '訊控有限公司':{items:[{name:'珠光紙 90*90*50米'},{name:'抗刮碳帶 TRR03 100*300米 外捲'}]},
+    '興業企業行':{items:[{name:'冷凍碳帶 110*91'},{name:'100*100珠光紙'}]},
+    '福寶水產':{items:[{name:'珠光紙 90*70*40米'},{name:'冷凍碳帶 110*91'}]},
+    '泰茂企業有限公司':{items:[{name:'冷凍碳帶 110*91'}]},
+  };
+  const cfg=TRACK_CONFIG[custName]?.items.find(i=>i.name===itemName);
+  const dates=[];
+  db.orders.filter(o=>o.custName===custName&&o.date&&o.status!=='cancelled').forEach(o=>{
+    (o.items||[]).forEach(it=>{
+      if(it.name===itemName&&(!cfg?.priceFilter||it.price==cfg.priceFilter))dates.push(o.date);
+    });
+  });
+  const sorted=[...new Set(dates)].sort().reverse();
+  const gaps={};
+  for(let i=sorted.length-1;i>=1;i--){
+    const d=Math.round((new Date(sorted[i-1])-new Date(sorted[i]))/(864e5));
+    gaps[sorted[i-1]]=d;
+  }
+  const allGaps=Object.values(gaps);
+  const avg=allGaps.length>0?Math.round(allGaps.reduce((s,v)=>s+v,0)/allGaps.length):0;
+  const daysSince=Math.round((new Date()-new Date(sorted[0]))/864e5);
+
+  const html=`<div style="padding:16px">
+    <div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:4px">${custName}</div>
+    <div style="font-size:12px;color:#2563eb;font-weight:600;margin-bottom:12px">${itemName}</div>
+    <div style="display:flex;gap:12px;margin-bottom:12px">
+      <div style="flex:1;background:#f8fafc;border-radius:8px;padding:8px 12px;text-align:center">
+        <div style="font-size:10px;color:#94a3b8">平均間隔</div>
+        <div style="font-size:18px;font-weight:700;color:#1e293b">${avg}天</div>
+      </div>
+      <div style="flex:1;background:#f8fafc;border-radius:8px;padding:8px 12px;text-align:center">
+        <div style="font-size:10px;color:#94a3b8">距今</div>
+        <div style="font-size:18px;font-weight:700;color:${daysSince>=avg?'#dc2626':'#16a34a'}">${daysSince}天</div>
+      </div>
+      <div style="flex:1;background:#f8fafc;border-radius:8px;padding:8px 12px;text-align:center">
+        <div style="font-size:10px;color:#94a3b8">總次數</div>
+        <div style="font-size:18px;font-weight:700;color:#1e293b">${sorted.length}次</div>
+      </div>
+    </div>
+    <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:6px">📋 歷史紀錄</div>
+    <div style="max-height:250px;overflow-y:auto">
+      ${sorted.map((d,i)=>`
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f1f5f9;font-size:12px">
+          <span style="color:#374151;font-weight:600">${d}</span>
+          <span style="color:${i===0?'#94a3b8':gaps[d]>avg?'#dc2626':'#16a34a'};font-weight:600">
+            ${i===0?'最新':'+'+gaps[d]+'天'}
+          </span>
+        </div>`).join('')}
+    </div>
+  </div>`;
+
+  // 用現有modal顯示
+  const modal=document.getElementById('order-detail-modal');
+  if(modal){
+    const body=modal.querySelector('.mb')||modal.querySelector('[class*="body"]');
+    if(body)body.innerHTML=html;
+    modal.style.display='flex';
+  } else {
+    // 建立臨時modal
+    const m=document.createElement('div');
+    m.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:9999';
+    m.innerHTML=`<div style="background:#fff;border-radius:14px;width:360px;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid #f1f5f9">
+        <span style="font-weight:700;font-size:13px">品項追蹤詳情</span>
+        <button onclick="this.closest('[style*=fixed]').remove()" style="background:none;border:none;font-size:18px;cursor:pointer;color:#94a3b8">✕</button>
+      </div>
+      ${html}
+    </div>`;
+    m.onclick=e=>{if(e.target===m)m.remove();};
+    document.body.appendChild(m);
   }
 }
 
