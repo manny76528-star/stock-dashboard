@@ -268,7 +268,7 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
     </div>
 
     <!-- KPI 卡片 -->
-    <div class="kpi-grid">
+    <div class="kpi-grid" style="grid-template-columns:repeat(5,1fr)">
       <div class="kpi-card" onclick="showTab('reports')" style="cursor:pointer" title="查看報表">
         <div class="kpi-icon blue">💵</div>
         <div class="kpi-info">
@@ -293,12 +293,19 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
           <div class="kpi-sub" id="kpi-unpaid-sub" style="color:#f59e0b"></div>
         </div>
       </div>
-      <div class="kpi-card" onclick="showTab('orders')" style="cursor:pointer" title="查看訂單記錄">
-        <div class="kpi-icon red">📦</div>
+      <div class="kpi-card">
+        <div class="kpi-icon blue">📦</div>
         <div class="kpi-info">
           <div class="kpi-label">本年訂單數</div>
           <div class="kpi-val" id="kpi-orders">0</div>
           <div class="kpi-sub" id="kpi-orders-sub"></div>
+        </div>
+      </div>
+      <div class="kpi-card" style="border-left:3px solid #2563eb;text-align:center">
+        <div class="kpi-info" style="text-align:center;width:100%">
+          <div class="kpi-label">📈 年度利潤率</div>
+          <div style="font-size:28px;font-weight:800;font-family:var(--mono);color:#2563eb" id="kpi-margin">—</div>
+          <div style="font-size:10px;color:#94a3b8">利潤 / 營收</div>
         </div>
       </div>
     </div>
@@ -321,61 +328,41 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
       </div>
     </div>
 
-    <!-- 本月客戶營收表 + 系統提醒 -->
-    <div style="display:grid;grid-template-columns:1fr 340px;gap:16px;align-items:start">
-
-      <!-- 本月客戶表 -->
-      <div class="sec">
-        <div class="sec-hdr">
-          <span class="sec-title" id="cust-month-title">本月客戶營收分潤</span>
-        </div>
-        <div class="sec-body" style="padding:0;overflow-x:auto">
-          <table class="cust-month-table" id="cust-month-tbl">
-            <thead>
-              <tr>
-                <th>客戶名稱</th>
-                <th>總營收</th>
-                <th>總利潤</th>
-                <th>已收款</th>
-                <th>已開發票</th>
-                <th>最後更新</th>
-              </tr>
-            </thead>
-            <tbody id="cust-month-body"></tbody>
-          </table>
+    <!-- 客戶追蹤提醒（全寬） -->
+    <div class="sec" style="margin-bottom:16px">
+      <div class="sec-hdr"><span class="sec-title">📡 客戶追蹤提醒</span></div>
+      <div class="sec-body" style="padding:10px">
+        <div id="cust-track-list" style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px">
+          <div style="color:#94a3b8;font-size:12px;text-align:center;padding:8px">計算中...</div>
         </div>
       </div>
+    </div>
 
-      <!-- 右側：系統提醒 -->
-      <div style="display:flex;flex-direction:column;gap:16px">
-        <div class="sec" style="display:none">
-          <div class="sec-hdr"><span class="sec-title">⚠️ 系統提醒</span></div>
-          <div class="sec-body">
-            <div class="alert-list" id="alert-list">
-              <div style="color:#94a3b8;font-size:12px;text-align:center;padding:8px">無待處理項目</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 客戶追蹤提醒 -->
-        <div class="sec">
-          <div class="sec-hdr"><span class="sec-title">📡 客戶追蹤提醒</span></div>
-          <div class="sec-body">
-            <div class="alert-list" id="cust-track-list">
-              <div style="color:#94a3b8;font-size:12px;text-align:center;padding:8px">計算中...</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 快速統計 -->
-        <div class="sec">
-          <div class="sec-hdr"><span class="sec-title">📈 年度利潤率</span></div>
-          <div class="sec-body" style="text-align:center">
-            <div style="font-size:40px;font-weight:800;font-family:var(--mono);color:#2563eb" id="kpi-margin">—</div>
-            <div style="font-size:12px;color:#94a3b8;margin-top:4px">利潤 / 營收</div>
-          </div>
-        </div>
+    <!-- 客戶營收分潤（全寬） -->
+    <div class="sec">
+      <div class="sec-hdr">
+        <span class="sec-title" id="cust-month-title">2026年度 客戶營收分潤</span>
       </div>
+      <div class="sec-body" style="padding:0;overflow-x:auto">
+        <table class="cust-month-table" id="cust-month-tbl">
+          <thead>
+            <tr>
+              <th>客戶名稱</th>
+              <th>總營收</th>
+              <th>總利潤</th>
+              <th>已收款</th>
+              <th>已開發票</th>
+              <th>最後更新</th>
+            </tr>
+          </thead>
+          <tbody id="cust-month-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 隱藏的舊容器（保留ID供JS使用） -->
+    <div style="display:none">
+      <div id="alert-list"></div>
     </div>
   </div>
 
@@ -402,7 +389,7 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
     </div>
 
     <!-- KPI -->
-    <div class="kpi-grid">
+    <div class="kpi-grid" style="grid-template-columns:repeat(5,1fr)">
       <div class="kpi-card"><div class="kpi-icon blue">💵</div><div class="kpi-info"><div class="kpi-label" id="rpt-rev-label">本月營收</div><div class="kpi-val" id="m-revenue">$0</div></div></div>
       <div class="kpi-card"><div class="kpi-icon green">💰</div><div class="kpi-info"><div class="kpi-label" id="rpt-profit-label">本月利潤</div><div class="kpi-val" id="m-profit">$0</div></div></div>
       <div class="kpi-card"><div class="kpi-icon orange">📊</div><div class="kpi-info"><div class="kpi-label">利潤率</div><div class="kpi-val" id="m-margin">—</div></div></div>
@@ -1285,23 +1272,36 @@ function renderOverview(){
     });
 
     trackList.innerHTML=custBlocks.length===0
-      ?'<div style="color:#94a3b8;font-size:12px;text-align:center;padding:8px">🎉 所有客戶品項均在正常週期內</div>'
+      ?'<div style="color:#94a3b8;font-size:12px;text-align:center;padding:8px;width:100%">🎉 所有客戶品項均在正常週期內</div>'
       :custBlocks.map(({custName,itemResults,worstLevel})=>`
-        <div style="border-bottom:1px solid #f1f5f9;padding:8px 0">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-            <div style="font-weight:700;color:#1e293b;font-size:13px">${worstLevel==='red'?'🔴':worstLevel==='orange'?'🟠':'✅'} ${custName}</div>
-            <div onclick="showCustOrdersByName('${custName}')" style="font-size:10px;background:#eff6ff;color:#2563eb;padding:2px 8px;border-radius:6px;font-weight:700;cursor:pointer">聯繫 ›</div>
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;min-width:155px;flex-shrink:0;overflow:hidden;border-left:3px solid ${worstLevel==='red'?'#dc2626':worstLevel==='orange'?'#f97316':'#22c55e'}">
+          <div style="padding:8px 10px;border-bottom:1px solid #e2e8f0">
+            <div style="font-size:11px;font-weight:700;color:#1e293b">${worstLevel==='red'?'🔴':worstLevel==='orange'?'⚠️':'✅'} ${custName}</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px">
+              <span style="font-size:9px;color:#94a3b8">${itemResults.length}項追蹤</span>
+              <span onclick="showCustOrdersByName('${custName}')" style="font-size:9px;color:#2563eb;font-weight:700;cursor:pointer">聯繫 ›</span>
+            </div>
           </div>
-          ${itemResults.filter(r=>r.level!=='green').map(r=>`
-            <div onclick="showItemTrackDetail('${custName}','${r.name}')" style="display:flex;align-items:center;gap:6px;padding:4px 8px;margin:2px 0;background:#f8fafc;border-radius:6px;cursor:pointer">
-              <span style="font-size:11px">${r.icon}</span>
-              <div style="flex:1;font-size:11px;color:#374151;font-weight:600">${r.name}</div>
-              <div style="font-size:10px;color:#94a3b8;text-align:right">
-                平均${r.avg}天・距今${r.daysSince}天
+          ${itemResults.map(r=>`
+            <div onclick="showItemTrackDetail('${custName}','${r.name}')" style="padding:6px 10px;border-bottom:1px solid #f1f5f9;cursor:pointer" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background=''">
+              <div style="font-size:10px;font-weight:600;color:#374151;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px">${r.name}</div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px">
+                <span style="font-size:9px;color:#94a3b8">均${r.avg}天・今${r.daysSince}天</span>
+                <span style="font-size:8px;font-weight:700;padding:1px 4px;border-radius:3px;background:${r.level==='red'?'#fee2e2':r.level==='orange'?'#ffedd5':'#dcfce7'};color:${r.level==='red'?'#dc2626':r.level==='orange'?'#ea580c':'#16a34a'}">${r.level==='red'?'超標':r.level==='orange'?'注意':'正常'}</span>
               </div>
             </div>`).join('')}
         </div>`).join('');
   }
+}
+
+function openOrderModalWithCust(custName){
+  openOrderModal(null);
+  // 自動選好客戶
+  setTimeout(()=>{
+    const sel=document.getElementById('o-cust');
+    const c=db.customers.find(x=>x.name===custName);
+    if(sel&&c){sel.value=c.id;sel.dispatchEvent(new Event('change'));}
+  },100);
 }
 
 function showItemTrackDetail(custName, itemName){
@@ -1375,6 +1375,9 @@ function showItemTrackDetail(custName, itemName){
         <button onclick="this.closest('[style*=fixed]').remove()" style="background:none;border:none;font-size:18px;cursor:pointer;color:#94a3b8">✕</button>
       </div>
       ${html}
+      <div style="padding:12px 16px;border-top:1px solid #f1f5f9">
+        <button onclick="this.closest('[style*=fixed]').remove();openOrderModalWithCust('${custName}')" style="width:100%;padding:10px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">＋ 為 ${custName} 新增訂單</button>
+      </div>
     </div>`;
     m.onclick=e=>{if(e.target===m)m.remove();};
     document.body.appendChild(m);
