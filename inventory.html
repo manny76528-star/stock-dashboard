@@ -1354,7 +1354,7 @@ function showItemTrackDetail(custName, itemName){
         <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f1f5f9;font-size:12px">
           <span style="color:#374151;font-weight:600">${d}</span>
           <span style="color:${i===0?'#94a3b8':gaps[d]>avg?'#dc2626':'#16a34a'};font-weight:600">
-            ${i===0?'最新':'+'+gaps[d]+'天'}
+            ${i===0?'最新':gaps[d]!==undefined?'+'+gaps[d]+'天':'第一筆'}
           </span>
         </div>`).join('')}
     </div>
