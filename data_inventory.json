@@ -76,7 +76,7 @@
       "note": "",
       "items": [
         {
-          "name": "珠光紙 100*70",
+          "name": "珠光紙 100*70*40米",
           "type": "paper",
           "subtype": "珠光紙",
           "spec": "100*70",
@@ -87,7 +87,7 @@
           "invoice": true
         },
         {
-          "name": "珠光紙 70*40",
+          "name": "珠光紙 40米",
           "type": "paper",
           "subtype": "珠光紙",
           "spec": "70*40",
@@ -98,7 +98,7 @@
           "invoice": true
         },
         {
-          "name": "抗刮碳帶 SP330",
+          "name": "抗刮碳帶 110*91",
           "type": "ribbon",
           "subtype": "抗刮碳帶",
           "spec": "SP330",
@@ -221,7 +221,7 @@
           "invoice": false
         },
         {
-          "name": "珠光紙 70*40",
+          "name": "珠光紙 40米",
           "type": "paper",
           "subtype": "珠光紙",
           "spec": "70*40",
@@ -296,7 +296,7 @@
       "note": "",
       "items": [
         {
-          "name": "珠光紙 100*70",
+          "name": "珠光紙 100*70*40米",
           "type": "paper",
           "subtype": "珠光紙",
           "spec": "100*70",
@@ -307,7 +307,7 @@
           "invoice": false
         },
         {
-          "name": "珠光紙 70*40",
+          "name": "珠光紙 40米",
           "type": "paper",
           "subtype": "珠光紙",
           "spec": "70*40",
@@ -318,7 +318,7 @@
           "invoice": false
         },
         {
-          "name": "抗刮碳帶 100*91",
+          "name": "抗刮碳帶 110*91",
           "type": "ribbon",
           "subtype": "抗刮碳帶",
           "spec": "100*91",
@@ -6653,6 +6653,6 @@
     "bankCode": "013",
     "bankAccount": "061506186489"
   },
-  "_ts": 1788515523109,
+  "_ts": 1788841783997,
   "_vendorPaidBackfilled": true
 }
