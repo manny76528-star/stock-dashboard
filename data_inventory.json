@@ -3204,7 +3204,7 @@
       "note": "來源 : 長華",
       "items": [
         {
-          "name": "掃描器 USB",
+          "name": "CINO A680 USB",
           "type": "device",
           "subtype": "掃描器",
           "spec": "USB",
@@ -3502,7 +3502,7 @@
       "note": "來源 : 長華,新盛力",
       "items": [
         {
-          "name": "掃描器 USB",
+          "name": "CINO A680 USB",
           "type": "device",
           "subtype": "掃描器",
           "spec": "USB",
@@ -3513,7 +3513,7 @@
           "invoice": false
         },
         {
-          "name": "掃描器 USB",
+          "name": "CINO A680 USB",
           "type": "device",
           "subtype": "掃描器",
           "spec": "USB",
@@ -3771,7 +3771,7 @@
       "note": "  (雙葉/南樺)",
       "items": [
         {
-          "name": "掃描器 USB",
+          "name": "CINO A680 USB",
           "type": "device",
           "subtype": "掃描器",
           "spec": "USB",
@@ -3885,7 +3885,7 @@
       "note": "",
       "items": [
         {
-          "name": "掃描器 USB",
+          "name": "CINO A680 USB",
           "type": "device",
           "subtype": "掃描器",
           "spec": "USB",
@@ -3942,7 +3942,7 @@
       "note": "我是這樣KEY的 C4060420,C4060394,C4060400",
       "items": [
         {
-          "name": "掃描器 USB",
+          "name": "CINO A680 USB",
           "type": "device",
           "subtype": "掃描器",
           "spec": "USB",
@@ -4057,7 +4057,7 @@
       "note": "",
       "items": [
         {
-          "name": "掃描器 USB",
+          "name": "CINO A680 USB",
           "type": "device",
           "subtype": "掃描器",
           "spec": "USB",
@@ -4071,7 +4071,7 @@
           "invoice": false
         },
         {
-          "name": "掃描器 USB",
+          "name": "CINO A680 USB",
           "type": "device",
           "subtype": "掃描器",
           "spec": "USB",
@@ -4146,7 +4146,7 @@
       "note": "",
       "items": [
         {
-          "name": "掃描器 USB",
+          "name": "CINO A680 USB",
           "type": "device",
           "subtype": "掃描器",
           "spec": "USB",
@@ -4656,7 +4656,7 @@
       "note": "",
       "items": [
         {
-          "name": "掃描器 USB",
+          "name": "CINO A680 USB",
           "type": "device",
           "subtype": "掃描器",
           "spec": "USB",
@@ -4796,7 +4796,7 @@
       "note": "",
       "items": [
         {
-          "name": "掃描器 USB",
+          "name": "CINO A680 USB",
           "type": "device",
           "subtype": "掃描器",
           "spec": "USB",
@@ -4855,7 +4855,7 @@
       "note": "",
       "items": [
         {
-          "name": "掃描器 USB",
+          "name": "CINO A680 USB",
           "type": "device",
           "subtype": "掃描器",
           "spec": "USB",
@@ -4885,7 +4885,7 @@
       "note": "",
       "items": [
         {
-          "name": "掃描器 USB",
+          "name": "CINO A680 USB",
           "type": "device",
           "subtype": "掃描器",
           "spec": "USB",
@@ -5097,7 +5097,7 @@
       "note": "",
       "items": [
         {
-          "name": "掃描器 USB",
+          "name": "CINO A680 USB",
           "type": "device",
           "subtype": "掃描器",
           "spec": "USB",
@@ -5193,7 +5193,7 @@
       "note": "",
       "items": [
         {
-          "name": "掃描器 USB",
+          "name": "CINO A680 USB",
           "type": "device",
           "subtype": "掃描器",
           "spec": "USB",
@@ -5849,7 +5849,7 @@
       "note": "",
       "items": [
         {
-          "name": "掃描器 USB",
+          "name": "CINO A680 USB",
           "type": "device",
           "subtype": "掃描器",
           "spec": "USB",
@@ -5880,7 +5880,7 @@
       "note": "CINO A680",
       "items": [
         {
-          "name": "掃描器 USB",
+          "name": "CINO A680 USB",
           "type": "device",
           "subtype": "掃描器",
           "spec": "USB",
@@ -6192,7 +6192,7 @@
       "note": "",
       "items": [
         {
-          "name": "掃描器 CINO A680 USB",
+          "name": "CINO A680 USB",
           "type": "device",
           "subtype": "掃描器",
           "spec": "CINO A680 USB",
@@ -6221,7 +6221,7 @@
       "note": "",
       "items": [
         {
-          "name": "掃描器 CINO A680 USB",
+          "name": "CINO A680 USB",
           "type": "device",
           "subtype": "掃描器",
           "spec": "CINO A680 USB",
@@ -6280,7 +6280,7 @@
       "note": "CINO A680SR 黑貨",
       "items": [
         {
-          "name": "掃描器 CINO A680 USB",
+          "name": "CINO A680 USB",
           "type": "device",
           "subtype": "掃描器",
           "spec": "CINO A680 USB",
@@ -6653,6 +6653,6 @@
     "bankCode": "013",
     "bankAccount": "061506186489"
   },
-  "_ts": 1788862687262,
+  "_ts": 1788862902313,
   "_vendorPaidBackfilled": true
 }
