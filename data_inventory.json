@@ -2585,7 +2585,7 @@
       "note": "",
       "items": [
         {
-          "name": "珠光紙",
+          "name": "100*100珠光紙",
           "type": "paper",
           "subtype": "珠光紙",
           "spec": "",
@@ -3296,7 +3296,7 @@
       "note": "",
       "items": [
         {
-          "name": "珠光紙",
+          "name": "100*100珠光紙",
           "type": "paper",
           "subtype": "珠光紙",
           "spec": "",
@@ -4285,7 +4285,7 @@
       "note": "",
       "items": [
         {
-          "name": "珠光紙",
+          "name": "100*100珠光紙",
           "type": "paper",
           "subtype": "珠光紙",
           "spec": "",
@@ -4946,14 +4946,14 @@
       "note": "",
       "items": [
         {
-          "name": "珠光紙",
+          "name": "100*100珠光紙",
           "type": "paper",
           "subtype": "珠光紙",
           "spec": "",
           "qty": 60,
           "sn": "",
           "sns": [],
-          "cost": 130,
+          "cost": 140,
           "price": 250,
           "invoice": false
         }
@@ -5939,7 +5939,7 @@
       "note": "",
       "items": [
         {
-          "name": "珠光紙",
+          "name": "100*100珠光紙",
           "type": "paper",
           "subtype": "珠光紙",
           "spec": "",
@@ -6653,6 +6653,6 @@
     "bankCode": "013",
     "bankAccount": "061506186489"
   },
-  "_ts": 1788842862199,
+  "_ts": 1788843297757,
   "_vendorPaidBackfilled": true
 }
