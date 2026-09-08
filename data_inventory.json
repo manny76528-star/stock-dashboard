@@ -2352,7 +2352,7 @@
       "note": "",
       "items": [
         {
-          "name": "抗刮碳帶",
+          "name": "抗刮碳帶 SP330（停用）",
           "type": "ribbon",
           "subtype": "抗刮碳帶",
           "spec": "",
@@ -4297,14 +4297,14 @@
           "invoice": false
         },
         {
-          "name": "抗刮碳帶",
+          "name": "冷凍碳帶 110*91",
           "type": "ribbon",
           "subtype": "抗刮碳帶",
           "spec": "",
           "qty": 20,
           "sn": "",
           "sns": [],
-          "cost": 58,
+          "cost": 60,
           "price": 190,
           "invoice": false
         }
@@ -6653,6 +6653,6 @@
     "bankCode": "013",
     "bankAccount": "061506186489"
   },
-  "_ts": 1788843313130,
+  "_ts": 1788843394156,
   "_vendorPaidBackfilled": true
 }
