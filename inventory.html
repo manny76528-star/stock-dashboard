@@ -1334,7 +1334,7 @@ function showItemTrackDetail(custName, itemName){
 
   const gapBadge=(g)=>{
     if(g===undefined)return '';
-    if(g<=avg*0.3)return '<span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;background:#fef9c3;color:#854d0e;white-space:nowrap">⚡ 異常短</span>';
+    if(g<=avg*0.3)return '<span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;background:#fef9c3;color:#854d0e;white-space:nowrap">💪 高頻回購</span>';
     if(g>avg)return '<span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;background:#fee2e2;color:#dc2626;white-space:nowrap">🔴 超過均值</span>';
     return '<span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;background:#dcfce7;color:#16a34a;white-space:nowrap">✅ 正常</span>';
   };
