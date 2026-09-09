@@ -6332,6 +6332,38 @@
       "vendorPaid": true,
       "vendorPaidDate": "",
       "images": []
+    },
+    {
+      "id": "mttm9wml3hyt",
+      "date": "2026-09-09",
+      "custId": "mnncin3g7nas",
+      "custName": "公司旁_汽車保養廠",
+      "contact": "永通企業行輪胎",
+      "phone": "",
+      "note": "225/45/17 *2 , 245/40/17 *2 (15800 報 18500)",
+      "items": [
+        {
+          "name": "掃描器 輪胎",
+          "type": "device",
+          "subtype": "掃描器",
+          "spec": "輪胎",
+          "qty": 1,
+          "sn": "",
+          "sns": [],
+          "cost": 1,
+          "price": 2401,
+          "invoice": false
+        }
+      ],
+      "paid": true,
+      "paidDate": "2026-09-09",
+      "vendorPaid": true,
+      "vendorPaidDate": "2026-09-09",
+      "images": [
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/order-images/1788929170147_se2q.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/order-images/1788929173138_cwdt.jpg"
+      ],
+      "createdAt": "2026-09-09T04:47:10.701Z"
     }
   ],
   "customers": [
@@ -6653,6 +6685,6 @@
     "bankCode": "013",
     "bankAccount": "061506186489"
   },
-  "_ts": 1788862902313,
+  "_ts": 1788929233710,
   "_vendorPaidBackfilled": true
 }
