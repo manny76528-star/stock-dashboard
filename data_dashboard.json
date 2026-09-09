@@ -2752,7 +2752,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1788947115402,
+  "_ts": 1788947149152,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -5237,6 +5237,15 @@
                 "price": 8.83,
                 "fee": 1,
                 "remark": "永豐輪胎( 2400 )"
+              },
+              {
+                "id": "mttwxxtimcp",
+                "type": "buy",
+                "date": "2026-09-09",
+                "shares": 263,
+                "price": 8.8,
+                "fee": 1,
+                "remark": "期貨_獲利2300"
               }
             ]
           },
@@ -5359,6 +5368,19 @@
             "amount": 2411.59,
             "fee": 1,
             "remark": "永豐輪胎( 2400 )"
+          },
+          {
+            "id": "mttwxxti0na",
+            "txnId": "mttwxxtimcp",
+            "date": "2026-09-09",
+            "type": "buy",
+            "code": "00405A",
+            "name": "主動富邦台灣龍耀",
+            "shares": 263,
+            "price": 8.8,
+            "amount": 2315.4,
+            "fee": 1,
+            "remark": "期貨_獲利2300"
           },
           {
             "id": "mt2dv2gcxpq",
