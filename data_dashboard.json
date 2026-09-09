@@ -2752,7 +2752,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1788929259925,
+  "_ts": 1788929296662,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -5228,6 +5228,15 @@
                 "price": 7.25,
                 "fee": 1,
                 "remark": "阿嬤給2000 我清潔阿惟房間"
+              },
+              {
+                "id": "mttmbaqvev4",
+                "type": "buy",
+                "date": "2026-09-09",
+                "shares": 273,
+                "price": 8.83,
+                "fee": 1,
+                "remark": "永豐輪胎( 2400 )"
               }
             ]
           },
@@ -5338,6 +5347,19 @@
           }
         ],
         "log": [
+          {
+            "id": "mttmbaqv30i",
+            "txnId": "mttmbaqvev4",
+            "date": "2026-09-09",
+            "type": "buy",
+            "code": "00405A",
+            "name": "主動富邦台灣龍耀",
+            "shares": 273,
+            "price": 8.83,
+            "amount": 2411.59,
+            "fee": 1,
+            "remark": "永豐輪胎( 2400 )"
+          },
           {
             "id": "mt2dv2gcxpq",
             "date": "2026-08-21",
