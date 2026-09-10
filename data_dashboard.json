@@ -2752,7 +2752,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1789032074065,
+  "_ts": 1789032114177,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -5308,6 +5308,15 @@
                 "price": 14.97,
                 "fee": 8,
                 "remark": "每月定期定額_2萬"
+              },
+              {
+                "id": "mtvbj19360w",
+                "type": "buy",
+                "date": "2026-09-10",
+                "shares": 1379,
+                "price": 14.5,
+                "fee": 8,
+                "remark": "富邦每月定期定額"
               }
             ]
           },
@@ -5356,6 +5365,19 @@
           }
         ],
         "log": [
+          {
+            "id": "mtvbj193yjz",
+            "txnId": "mtvbj19360w",
+            "date": "2026-09-10",
+            "type": "buy",
+            "code": "00986A",
+            "name": "主動台新龍頭成長",
+            "shares": 1379,
+            "price": 14.5,
+            "amount": 20003.5,
+            "fee": 8,
+            "remark": "富邦每月定期定額"
+          },
           {
             "id": "mttmbaqv30i",
             "txnId": "mttmbaqvev4",
