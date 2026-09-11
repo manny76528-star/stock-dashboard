@@ -2752,7 +2752,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1789102343922,
+  "_ts": 1789102384919,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -5977,7 +5977,7 @@
                 "id": "mrz3k4t5931",
                 "type": "buy",
                 "date": "2026-06-01",
-                "shares": 23000,
+                "shares": 22000,
                 "price": 10.83,
                 "fee": 99,
                 "remark": ""
@@ -6066,9 +6066,9 @@
             "type": "buy",
             "code": "00403A",
             "name": "主動統一台股增長",
-            "shares": 23000,
+            "shares": 22000,
             "price": 10.83,
-            "amount": 249189,
+            "amount": 238359,
             "fee": 99,
             "remark": "",
             "txnId": "mrz3k4t5931"
