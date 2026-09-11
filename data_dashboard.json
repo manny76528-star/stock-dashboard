@@ -2752,7 +2752,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1789106548157,
+  "_ts": 1789106612789,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -5032,6 +5032,12 @@
       "code": "009823",
       "lots": 92,
       "note": "富邦匯撥過來的"
+    },
+    {
+      "id": "mtwjvsqvlvd",
+      "code": "00985B",
+      "lots": 30,
+      "note": ""
     }
   ],
   "pledgeThreshold": 150,
