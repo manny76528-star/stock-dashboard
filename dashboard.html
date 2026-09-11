@@ -3730,9 +3730,10 @@ body:not(.privacy) .privacy-mask{filter:none;}
   <div class="modal" style="max-width:400px;width:100%;text-align:center">
     <div style="padding:28px 24px 0">
       <div style="font-size:32px;margin-bottom:12px">🛡️</div>
-      <div style="font-size:15px;font-weight:800;color:#0f172a;margin-bottom:12px;line-height:1.5">大盤長線必創歷史新高！</div>
-      <div style="font-size:13px;color:#475569;line-height:1.7;margin-bottom:20px;padding:14px;background:#f8fafc;border-radius:10px;border:1px solid #e2e8f0">
-        短線進出終將被市場淘汰，唯有長線配置才是發財大計。<br>你真的要為了一時手癢打破紀律嗎？
+      <div style="font-size:15px;font-weight:800;color:#0f172a;margin-bottom:12px;line-height:1.5" id="faith-title">大盤長線必創歷史新高！</div>
+      <div style="font-size:13px;color:#475569;line-height:1.7;margin-bottom:20px;padding:14px;background:#f8fafc;border-radius:10px;border:1px solid #e2e8f0;position:relative">
+        <div id="faith-body">短線進出終將被市場淘汰，唯有長線配置才是發財大計。<br>你真的要為了一時手癢打破紀律嗎？</div>
+        <button onclick="openFaithEdit()" style="position:absolute;top:6px;right:8px;background:none;border:none;font-size:14px;cursor:pointer;color:#94a3b8;padding:2px 4px" title="編輯標語">✏️</button>
       </div>
       <div class="fg" style="margin-bottom:20px">
         <label class="fl" style="text-align:center;color:#64748b;font-size:12px">輸入密碼以進入詳細面板</label>
@@ -3744,6 +3745,24 @@ body:not(.privacy) .privacy-mask{filter:none;}
       <button class="btn btn-s" onclick="closeModal('familyFaithModal');_faithTarget=''">取消</button>
       <button id="faith-confirm-btn" class="btn btn-p" disabled onclick="confirmFaithEntry()"
         style="opacity:.4;cursor:not-allowed">確認進入</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 家族：編輯標語 Modal ══ -->
+<div class="mo" id="faithEditModal">
+  <div class="modal" style="max-width:400px;width:100%">
+    <div class="mt">
+      <div class="mt-title">✏️ 編輯鋼鐵信仰標語</div>
+      <button onclick="closeModal('faithEditModal')" style="background:none;border:none;font-size:20px;cursor:pointer;color:#94a3b8">✕</button>
+    </div>
+    <div class="mb">
+      <div class="fg"><label class="fl">標題</label><input class="fi" id="faith-edit-title" placeholder="例：大盤長線必創歷史新高！"></div>
+      <div class="fg"><label class="fl">內文</label><textarea class="fi" id="faith-edit-body" rows="4" placeholder="例：短線進出終將被市場淘汰..." style="resize:vertical;line-height:1.6"></textarea></div>
+    </div>
+    <div class="br">
+      <button class="btn btn-s" onclick="closeModal('faithEditModal')">取消</button>
+      <button class="btn btn-p" onclick="saveFaithText()">儲存</button>
     </div>
   </div>
 </div>
@@ -12600,6 +12619,50 @@ function openFamilyFaithModal(member){
   if(btn){btn.disabled=true;btn.style.opacity='.4';btn.style.cursor='not-allowed';}
   openModal('familyFaithModal');
   setTimeout(()=>inp?.focus(),200);
+}
+
+function openFamilyFaithModal(member){
+  _faithTarget=member;
+  const inp=document.getElementById('faith-pwd');
+  if(inp)inp.value='';
+  const btn=document.getElementById('faith-confirm-btn');
+  if(btn){btn.disabled=true;btn.style.opacity='.4';btn.style.cursor='not-allowed';}
+  // 載入該帳戶的標語
+  const texts=(db.settings?.faithTexts||{})[member]||{};
+  const titleEl=document.getElementById('faith-title');
+  const bodyEl=document.getElementById('faith-body');
+  if(titleEl)titleEl.textContent=texts.title||'大盤長線必創歷史新高！';
+  if(bodyEl)bodyEl.innerHTML=(texts.body||'短線進出終將被市場淘汰，唯有長線配置才是發財大計。<br>你真的要為了一時手癢打破紀律嗎？');
+  openModal('familyFaithModal');
+  setTimeout(()=>inp?.focus(),200);
+}
+
+function openFaithEdit(){
+  const member=_faithTarget;
+  const texts=(db.settings?.faithTexts||{})[member]||{};
+  const t=document.getElementById('faith-edit-title');
+  const b=document.getElementById('faith-edit-body');
+  if(t)t.value=texts.title||'大盤長線必創歷史新高！';
+  if(b)b.value=texts.body||'短線進出終將被市場淘汰，唯有長線配置才是發財大計。\n你真的要為了一時手癢打破紀律嗎？';
+  openModal('faithEditModal');
+}
+
+function saveFaithText(){
+  const member=_faithTarget;
+  const title=document.getElementById('faith-edit-title')?.value?.trim();
+  const body=document.getElementById('faith-edit-body')?.value?.trim();
+  if(!title||!body)return toast('請填入標題和內文');
+  if(!db.settings)db.settings={};
+  if(!db.settings.faithTexts)db.settings.faithTexts={};
+  db.settings.faithTexts[member]={title,body:body.replace(/\n/g,'<br>')};
+  save();
+  // 更新顯示
+  const titleEl=document.getElementById('faith-title');
+  const bodyEl=document.getElementById('faith-body');
+  if(titleEl)titleEl.textContent=title;
+  if(bodyEl)bodyEl.innerHTML=body.replace(/\n/g,'<br>');
+  closeModal('faithEditModal');
+  toast('✅ 標語已更新');
 }
 
 function checkFaithPwd(){
