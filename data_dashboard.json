@@ -2752,7 +2752,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1789102166062,
+  "_ts": 1789102343922,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -5990,6 +5990,15 @@
                 "price": 10.36,
                 "fee": 1,
                 "remark": "老婆自己加碼三千"
+              },
+              {
+                "id": "mtwhcav7fcz",
+                "type": "buy",
+                "date": "2026-09-11",
+                "shares": 162,
+                "price": 10.2,
+                "fee": 1,
+                "remark": "老婆搶單獎金"
               }
             ]
           },
@@ -6012,6 +6021,19 @@
           }
         ],
         "log": [
+          {
+            "id": "mtwhcav7fhr",
+            "txnId": "mtwhcav7fcz",
+            "date": "2026-09-11",
+            "type": "buy",
+            "code": "00403A",
+            "name": "主動統一台股增長",
+            "shares": 162,
+            "price": 10.2,
+            "amount": 1653.3999999999999,
+            "fee": 1,
+            "remark": "老婆搶單獎金"
+          },
           {
             "id": "mtcrn6etnmv",
             "txnId": "mtcrn6etzx1",
