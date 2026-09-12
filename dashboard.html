@@ -5591,12 +5591,14 @@ function renderLoans(){
       +(()=>{
         if(!l.start||!l.due)return'<div class="lc-prog-row"><div class="loan-progress-wrap" style="flex:1;margin:0"><div class="loan-progress-bar" style="width:'+paidPct+'%"></div></div><span class="lc-pct">'+paidPct+'%</span></div>';
         const startD=new Date(l.start),dueD=new Date(l.due),nowD=new Date();
-        const totalM=Math.round((dueD-startD)/2629800000);
-        // 今天 >= 扣款日 則當月算已還
         const payDay=l.day||parseInt((l.start||'').slice(8))||1;
-        const todayDay=nowD.getDate();
-        const rawPassedM=Math.max(0,Math.round((nowD-startD)/2629800000));
-        const passedM=Math.max(0,todayDay>=payDay?rawPassedM:rawPassedM-1);
+        // 第一期 = 開始日下個月扣款日
+        const firstPay=new Date(startD.getFullYear(),startD.getMonth()+1,payDay);
+        const totalM=Math.max(0,Math.round((dueD-firstPay)/2629800000)+1);
+        // 今天是否已達本月扣款日
+        const thisMonthPay=new Date(nowD.getFullYear(),nowD.getMonth(),payDay);
+        const effectiveNow=nowD>=thisMonthPay?nowD:new Date(nowD.getFullYear(),nowD.getMonth(),payDay-1);
+        const passedM=Math.max(0,effectiveNow>=firstPay?Math.round((effectiveNow-firstPay)/2629800000)+1:0);
         const leftM=Math.max(0,totalM-passedM);
         const prog=totalM>0?Math.round(passedM/totalM*100):paidPct;
         const barColor=prog>=67?'#f59e0b':prog>=34?'#c084fc':'#3b82f6';
