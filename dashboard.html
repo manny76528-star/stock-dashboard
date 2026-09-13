@@ -10765,14 +10765,15 @@ function toggleCfChart(){
 function _initCfDebtChart(){
   const canvas=document.getElementById('cf-debt-chart');
   if(!canvas)return;
-  function ym(s){const[y,m]=s.split('-').map(Number);return y*12+m;}
-  const loanData=[
-    {amount:800000,monthly:17807,startYM:ym('2024-05'),endYM:ym('2028-06')},
-    {amount:350000,monthly:6319, startYM:ym('2024-08'),endYM:ym('2029-09')},
-    {amount:250000,monthly:10834,startYM:ym('2024-09'),endYM:ym('2026-09')},
-    {amount:420000,monthly:12400,startYM:ym('2025-07'),endYM:ym('2028-06')},
-    {amount:330000,monthly:9495, startYM:ym('2025-11'),endYM:ym('2028-11')},
-  ];
+  function ym(s){if(!s)return 0;const[y,m]=s.slice(0,7).split('-').map(Number);return y*12+m;}
+  // 動態抓取：還款中 + 已結清的Line Bank
+  const activeLoanData=(db.loans||[]).filter(l=>l.start&&l.due).map(l=>({
+    amount:l.amount,monthly:l.monthly,startYM:ym(l.start),endYM:ym(l.due)
+  }));
+  const clearedLoanData=(db.clearedLoans||[]).filter(l=>l.bank&&l.bank.includes('Bank')&&l.start&&l.clearedDate).map(l=>({
+    amount:l.amount,monthly:l.monthly,startYM:ym(l.start),endYM:ym(l.clearedDate)
+  }));
+  const loanData=[...activeLoanData,...clearedLoanData];
   function getDebt(l,y){
     if(y<l.startYM||y>l.endYM)return 0;
     return Math.max(0,Math.round(l.monthly*(l.endYM-y)));
