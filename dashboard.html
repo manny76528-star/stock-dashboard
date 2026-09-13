@@ -10805,13 +10805,20 @@ function _initCfDebtChart(){
     pts.push({label,value:tot,rawYM:y});
   }
   const miles={};
-  const joinEvents2=[ym('2024-08'),ym('2024-09'),ym('2025-07'),ym('2025-11')];
-  const clearEvents2=[ym('2026-09')];
+  // 動態建立里程碑：從db抓實際加入/結清事件
+  const joinMap2={};
+  const clearMap2={};
+  (db.loans||[]).forEach(l=>{
+    if(l.start){const k=ym(l.start.slice(0,7));joinMap2[k]='📍 '+l.bank+' 加入（$'+(l.amount/10000).toFixed(0)+'萬）';}
+  });
+  (db.clearedLoans||[]).filter(l=>l.bank&&l.bank.includes('Bank')).forEach(l=>{
+    if(l.clearedDate){const k=ym(l.clearedDate.slice(0,7));clearMap2[k]='🎉 '+l.bank+' 結清！（$'+(l.amount/10000).toFixed(0)+'萬）';}
+  });
   const joinIdx2=new Set();
   const clearIdx2=new Set();
   pts.forEach((p,i)=>{
-    if(joinEvents2.includes(p.rawYM))joinIdx2.add(i);
-    if(clearEvents2.includes(p.rawYM)&&p.rawYM<=e0)clearIdx2.add(i);
+    if(joinMap2[p.rawYM])joinIdx2.add(i);
+    if(clearMap2[p.rawYM])clearIdx2.add(i);
   });
   if(window.Chart){
     new window.Chart(canvas,{
@@ -10838,9 +10845,9 @@ function _initCfDebtChart(){
             title:ctx=>{const p=pts[ctx[0].dataIndex];return Math.floor(p.rawYM/12)+'年'+p.rawYM%12+'月';},
             label:ctx=>'總負債：$'+ctx.raw.toLocaleString(),
             afterLabel:ctx=>{
-              const i=ctx.dataIndex;
-              if(clearIdx2.has(i))return '🎉 信貸結清！';
-              if(joinIdx2.has(i))return '📍 新增信貸加入';
+              const p=pts[ctx.dataIndex];
+              if(clearMap2[p.rawYM])return clearMap2[p.rawYM];
+              if(joinMap2[p.rawYM])return joinMap2[p.rawYM];
               return '';
             }
           }
