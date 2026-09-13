@@ -10778,11 +10778,13 @@ function _initCfDebtChart(){
     if(y<l.startYM||y>l.endYM)return 0;
     return Math.max(0,Math.round(l.monthly*(l.endYM-y)));
   }
-  const s0=ym('2024-05'),e0=ym('2029-10');
+  const s0=ym('2024-05'),e0=ym('2030-01');
   const pts=[];
-  for(let y=s0;y<=e0;y+=3){
+  for(let y=s0;y<=e0;y++){
     const tot=loanData.reduce((s,l)=>s+getDebt(l,y),0);
-    pts.push({label:y%12===5?String(Math.floor(y/12)):'',value:tot,rawYM:y});
+    const yr=Math.floor(y/12),mo=y%12;
+    const label=(mo===1||mo===5||mo===9)?String(yr)+(mo===1?'':'-'+String(mo).padStart(2,'0')):''
+    pts.push({label,value:tot,rawYM:y});
   }
   const miles={};
   [{y:ym('2026-09'),n:'Bank-3結清'},{y:ym('2028-06'),n:'Bank-1/4結清'},{y:ym('2028-11'),n:'Bank-5結清'},{y:ym('2029-09'),n:'Bank-2結清'}].forEach(m=>{
