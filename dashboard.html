@@ -10805,8 +10805,13 @@ function _initCfDebtChart(){
     pts.push({label,value:tot,rawYM:y});
   }
   const miles={};
-  [{y:ym('2024-08'),n:'Bank-2加入'},{y:ym('2024-09'),n:'Bank-3加入'},{y:ym('2025-07'),n:'Bank-4加入'},{y:ym('2025-11'),n:'Bank-5加入'},{y:ym('2026-09'),n:'Bank-3結清'}].forEach(m=>{
-    if(m.y<=e0){const i=pts.findIndex(p=>p.rawYM===m.y);if(i>=0)miles[i]=m.n;}
+  const joinEvents2=[ym('2024-08'),ym('2024-09'),ym('2025-07'),ym('2025-11')];
+  const clearEvents2=[ym('2026-09')];
+  const joinIdx2=new Set();
+  const clearIdx2=new Set();
+  pts.forEach((p,i)=>{
+    if(joinEvents2.includes(p.rawYM))joinIdx2.add(i);
+    if(clearEvents2.includes(p.rawYM)&&p.rawYM<=e0)clearIdx2.add(i);
   });
   if(window.Chart){
     new window.Chart(canvas,{
@@ -10816,11 +10821,11 @@ function _initCfDebtChart(){
         borderColor:'#DAA520',borderWidth:2,
         backgroundColor:'rgba(218,165,32,0.07)',
         fill:true,tension:0.3,
-        pointRadius:pts.map((_,i)=>miles[i]?6:3),
-        pointHoverRadius:7,
-        pointBackgroundColor:pts.map((_,i)=>miles[i]?'#fff':'#DAA520'),
-        pointBorderColor:'#DAA520',
-        pointBorderWidth:pts.map((_,i)=>miles[i]?2:0),
+        pointRadius:pts.map((_,i)=>clearIdx2.has(i)?8:joinIdx2.has(i)?7:2),
+        pointHoverRadius:9,
+        pointBackgroundColor:pts.map((_,i)=>clearIdx2.has(i)?'#dc2626':joinIdx2.has(i)?'#fff':'#DAA520'),
+        pointBorderColor:pts.map((_,i)=>clearIdx2.has(i)?'#dc2626':'#DAA520'),
+        pointBorderWidth:pts.map((_,i)=>clearIdx2.has(i)?0:joinIdx2.has(i)?2:0),
       }]},
       options:{
         responsive:true,maintainAspectRatio:false,
@@ -10832,7 +10837,12 @@ function _initCfDebtChart(){
           callbacks:{
             title:ctx=>{const p=pts[ctx[0].dataIndex];return Math.floor(p.rawYM/12)+'年'+p.rawYM%12+'月';},
             label:ctx=>'總負債：$'+ctx.raw.toLocaleString(),
-            afterLabel:ctx=>miles[ctx.dataIndex]?'📍 '+miles[ctx.dataIndex]:''
+            afterLabel:ctx=>{
+              const i=ctx.dataIndex;
+              if(clearIdx2.has(i))return '🎉 信貸結清！';
+              if(joinIdx2.has(i))return '📍 新增信貸加入';
+              return '';
+            }
           }
         }},
         scales:{
