@@ -2192,14 +2192,9 @@ body:not(.privacy) .privacy-mask{filter:none;}
         </div>
         <!-- 還款進度展開區 -->
         <div id="cf-chart-panel" style="display:none;border-top:1px solid #f1f5f9;margin-top:12px;padding-top:12px">
-          <div style="font-size:12px;font-weight:700;color:#64748b;margin-bottom:10px">📊 Line Bank 還款進度</div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
-            <span style="font-size:10px;background:#f1f5f9;border-left:2px solid #2a78d6;padding:3px 8px;border-radius:4px;color:#475569">Bank-1 $800K → 2028-06</span>
-            <span style="font-size:10px;background:#f1f5f9;border-left:2px solid #1baf7a;padding:3px 8px;border-radius:4px;color:#475569">Bank-2 $350K → 2029-09</span>
-            <span style="font-size:10px;background:#f1f5f9;border-left:2px solid #eb6834;padding:3px 8px;border-radius:4px;color:#94a3b8;opacity:0.7">Bank-3 ✅ 結清</span>
-            <span style="font-size:10px;background:#f1f5f9;border-left:2px solid #eda100;padding:3px 8px;border-radius:4px;color:#475569">Bank-4 $420K → 2028-06</span>
-            <span style="font-size:10px;background:#f1f5f9;border-left:2px solid #e87ba4;padding:3px 8px;border-radius:4px;color:#475569">Bank-5 $330K → 2028-11</span>
-          </div>
+          <div style="font-size:12px;font-weight:700;color:#64748b;margin-bottom:8px">📊 Line Bank 還款進度</div>
+          <div id="cf-loan-cards-active" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px"></div>
+          <div id="cf-loan-cards-cleared" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;opacity:0.6"></div>
           <div style="position:relative;height:200px"><canvas id="cf-debt-chart"></canvas></div>
         </div>
       </div>
@@ -10774,6 +10769,27 @@ function _initCfDebtChart(){
     amount:l.amount,monthly:l.monthly,startYM:ym(l.start),endYM:ym(l.clearedDate)
   }));
   const loanData=[...activeLoanData,...clearedLoanData];
+  // 動態渲染信貸小卡片
+  const colors=['#2a78d6','#1baf7a','#eb6834','#eda100','#e87ba4','#8b5cf6','#ec4899','#06b6d4'];
+  const activeCards=document.getElementById('cf-loan-cards-active');
+  const clearedCards=document.getElementById('cf-loan-cards-cleared');
+  if(activeCards){
+    activeCards.innerHTML=(db.loans||[]).filter(l=>l.start&&l.due).map((l,i)=>{
+      const color=colors[i%colors.length];
+      const amt='$'+(l.amount/10000).toFixed(0)+'萬';
+      const end=l.due.slice(0,7);
+      return `<span style="font-size:10px;background:#f1f5f9;border-left:2px solid ${color};padding:3px 8px;border-radius:4px;color:#475569">${l.bank} ${amt} → ${end}</span>`;
+    }).join('');
+  }
+  if(clearedCards){
+    const lineBankCleared=(db.clearedLoans||[]).filter(l=>l.bank&&l.bank.includes('Bank')&&l.clearedDate);
+    clearedCards.innerHTML=lineBankCleared.length===0?'':
+      '<span style="font-size:10px;color:#94a3b8;margin-right:4px">已結清：</span>'+
+      lineBankCleared.map(l=>{
+        const amt='$'+(l.amount/10000).toFixed(0)+'萬';
+        return `<span style="font-size:10px;background:#f1f5f9;border-left:2px solid #94a3b8;padding:3px 8px;border-radius:4px;color:#94a3b8">${l.bank} ✅ ${amt}</span>`;
+      }).join('');
+  }
   function getDebt(l,y){
     if(y<l.startYM||y>l.endYM)return 0;
     return Math.max(0,Math.round(l.monthly*(l.endYM-y)));
