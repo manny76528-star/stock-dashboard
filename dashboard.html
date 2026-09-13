@@ -2194,7 +2194,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
         <div id="cf-chart-panel" style="display:none;border-top:1px solid #f1f5f9;margin-top:12px;padding-top:12px">
           <div style="font-size:12px;font-weight:700;color:#64748b;margin-bottom:8px">📊 Line Bank 還款進度</div>
           <div id="cf-loan-cards-active" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px"></div>
-          <div id="cf-loan-cards-cleared" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;opacity:0.6"></div>
+          <div id="cf-loan-cards-cleared" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;align-items:center"></div>
           <div style="position:relative;height:200px"><canvas id="cf-debt-chart"></canvas></div>
         </div>
       </div>
@@ -10774,7 +10774,7 @@ function _initCfDebtChart(){
   const activeCards=document.getElementById('cf-loan-cards-active');
   const clearedCards=document.getElementById('cf-loan-cards-cleared');
   if(activeCards){
-    activeCards.innerHTML=(db.loans||[]).filter(l=>l.start&&l.due).map((l,i)=>{
+    activeCards.innerHTML='<span style="font-size:10px;color:#64748b;font-weight:600;margin-right:4px">清償中：</span>'+(db.loans||[]).filter(l=>l.start&&l.due).map((l,i)=>{
       const color=colors[i%colors.length];
       const amt='$'+(l.amount/10000).toFixed(0)+'萬';
       const end=l.due.slice(0,7);
@@ -10784,28 +10784,29 @@ function _initCfDebtChart(){
   if(clearedCards){
     const lineBankCleared=(db.clearedLoans||[]).filter(l=>l.bank&&l.bank.includes('Bank')&&l.clearedDate);
     clearedCards.innerHTML=lineBankCleared.length===0?'':
-      '<span style="font-size:10px;color:#94a3b8;margin-right:4px">已結清：</span>'+
+      '<span style="font-size:10px;color:#64748b;font-weight:600;margin-right:4px">已結清：</span>'+
       lineBankCleared.map(l=>{
         const amt='$'+(l.amount/10000).toFixed(0)+'萬';
-        return `<span style="font-size:10px;background:#f1f5f9;border-left:2px solid #94a3b8;padding:3px 8px;border-radius:4px;color:#94a3b8">${l.bank} ✅ ${amt}</span>`;
+        return `<span style="font-size:10px;background:#f1f5f9;border-left:2px solid #94a3b8;padding:3px 8px;border-radius:4px;color:#94a3b8;opacity:0.7">${l.bank} ✅ ${amt}</span>`;
       }).join('');
   }
   function getDebt(l,y){
     if(y<l.startYM||y>l.endYM)return 0;
     return Math.max(0,Math.round(l.monthly*(l.endYM-y)));
   }
-  const s0=ym('2024-05'),e0=ym('2030-01');
+  const s0=ym('2024-05');
+  const nowD2=new Date();
+  const e0=nowD2.getFullYear()*12+nowD2.getMonth()+1;
   const pts=[];
   for(let y=s0;y<=e0;y++){
     const tot=loanData.reduce((s,l)=>s+getDebt(l,y),0);
     const yr=Math.floor(y/12),mo=y%12;
-    const label=(mo===1||mo===5||mo===9)?String(yr)+(mo===1?'':'-'+String(mo).padStart(2,'0')):''
+    const label=(mo===1||mo===5||mo===9)?String(yr)+(mo===1?'':'-'+String(mo).padStart(2,'0')):'';
     pts.push({label,value:tot,rawYM:y});
   }
   const miles={};
-  [{y:ym('2026-09'),n:'Bank-3結清'},{y:ym('2028-06'),n:'Bank-1/4結清'},{y:ym('2028-11'),n:'Bank-5結清'},{y:ym('2029-09'),n:'Bank-2結清'}].forEach(m=>{
-    const i=pts.findIndex(p=>Math.abs(p.rawYM-m.y)<=3);
-    if(i>=0)miles[i]=m.n;
+  [{y:ym('2024-08'),n:'Bank-2加入'},{y:ym('2024-09'),n:'Bank-3加入'},{y:ym('2025-07'),n:'Bank-4加入'},{y:ym('2025-11'),n:'Bank-5加入'},{y:ym('2026-09'),n:'Bank-3結清'}].forEach(m=>{
+    if(m.y<=e0){const i=pts.findIndex(p=>p.rawYM===m.y);if(i>=0)miles[i]=m.n;}
   });
   if(window.Chart){
     new window.Chart(canvas,{
