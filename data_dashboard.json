@@ -2797,7 +2797,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1789450606087,
+  "_ts": 1789451156805,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -2878,6 +2878,27 @@
     }
   ],
   "journals": [
+    {
+      "id": "mu290km0m4x",
+      "date": "2026-09-15",
+      "tags": [],
+      "market": "CPI 與 PPI 雙超預期！10年債殖利率破 5%，聯準會升息幾成定局",
+      "market2": "AI 三大巨頭齊發聲：呼籲放緩資本支出，市場面臨評價面修正",
+      "market3": "美伊衝突僵局難解！原油供應隱憂加劇，油價飆升衝擊通膨",
+      "marketColor": "green",
+      "market2Color": "green",
+      "market3Color": "green",
+      "marketUrl": "",
+      "youtubeUrl": "",
+      "content": "近期市場由「高油價 ➔ 核心通膨難降 ➔ 美債殖利率破5% ➔ 聯準會確定升息」的宏觀邏輯主導 ，目前甚至傳出如果不降息反而會引發美債利率再度上揚\n原因就是CPI PPI沒有得到控制, 卻受限於總統而不敢收息引發獨立機關隱憂\n\n在流動性與資金成本收緊的環境下，AI 科技巨頭放緩支出的表態進一步壓抑了市場的風險偏好。建議投資人在未來一至兩週的交易日中，操作轉趨防禦，密切關注油價是否站穩百元之上，以及科技權值股在評價面修正時的支撐力道。",
+      "stockTags": [],
+      "eventCat": "",
+      "behavior": "",
+      "indexVal": 45511,
+      "stockPrices": null,
+      "aiAnalysis": null,
+      "images": []
+    },
     {
       "id": "mth2mo86d7d",
       "date": "2026-08-31",
