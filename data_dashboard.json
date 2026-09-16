@@ -1697,6 +1697,16 @@
       "perShare": 0.082,
       "amount": 106600,
       "pending": false
+    },
+    {
+      "id": "mu3n3rqzje9",
+      "code": "00981T",
+      "exDate": "2026-09-16",
+      "date": "2026-10-15",
+      "lots": 1300,
+      "perShare": 0.082,
+      "amount": 106600,
+      "pending": true
     }
   ],
   "snapshots": [
@@ -2797,7 +2807,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1789535159949,
+  "_ts": 1789535286831,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
