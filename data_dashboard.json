@@ -2797,7 +2797,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1789535125102,
+  "_ts": 1789535159949,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -5502,11 +5502,33 @@
                 "price": 13.22,
                 "fee": 2,
                 "remark": "華固期貨 獲利金額"
+              },
+              {
+                "id": "mu3n11up2ip",
+                "type": "buy",
+                "date": "2026-09-16",
+                "shares": 550,
+                "price": 13.22,
+                "fee": 3,
+                "remark": "註冊費伙食費減免_加碼股市"
               }
             ]
           }
         ],
         "log": [
+          {
+            "id": "mu3n11upjc6",
+            "txnId": "mu3n11up2ip",
+            "date": "2026-09-16",
+            "type": "buy",
+            "code": "009811",
+            "name": "統一美國50",
+            "shares": 550,
+            "price": 13.22,
+            "amount": 7274,
+            "fee": 3,
+            "remark": "註冊費伙食費減免_加碼股市"
+          },
           {
             "id": "mtvbj193yjz",
             "txnId": "mtvbj19360w",
