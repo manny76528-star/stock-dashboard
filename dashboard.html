@@ -12305,33 +12305,74 @@ function renderPledgePage(){
       </div>`;
   }
 
-  // 渲染擔保品清單
+  // 渲染擔保品清單（同品項分組）
   const assetBody=document.getElementById('pledge-asset-body');
   if(assetBody){
-    assetBody.innerHTML=db.pledgeAssets.length===0
-      ?'<div style="text-align:center;color:#9ca3af;padding:20px;font-size:12px">尚無擔保品記錄</div>'
-      :db.pledgeAssets.map(a=>{
-        const price=db.prices[a.code]?.price||0;
-        const mkt=price*(a.lots||0)*1000;
-        return`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 8px;border-bottom:1px solid #f5f7fa">
-          <div>
-            <div style="font-size:13px;font-weight:700;color:#1e293b">${a.code} <span style="font-size:11px;color:#9ca3af;font-weight:400">${a.lots||0}張</span></div>
-            <div style="font-size:11px;color:#9ca3af">現價 <span class="privacy-mask">$${price||'—'}</span> ${a.note?'・'+a.note:''}</div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <div style="text-align:right">
-              <div style="font-size:14px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#16a34a" class="privacy-mask">$${Math.round(mkt).toLocaleString()}</div>
-              <div style="font-size:10px;color:#9ca3af">${threshold>0?'警戒 $'+(totalLoan*threshold/100/(totalLots*1000)).toFixed(2):''}</div>
+    if(db.pledgeAssets.length===0){
+      assetBody.innerHTML='<div style="text-align:center;color:#9ca3af;padding:20px;font-size:12px">尚無擔保品記錄</div>';
+    } else {
+      // 按代碼分組
+      const grouped={};
+      db.pledgeAssets.forEach(a=>{
+        if(!grouped[a.code])grouped[a.code]=[];
+        grouped[a.code].push(a);
+      });
+      const warningPrice=totalLots>0?(totalLoan*threshold/100)/(totalLots*1000):0;
+      assetBody.innerHTML=Object.entries(grouped).map(([code,assets])=>{
+        const price=db.prices[code]?.price||0;
+        const totalLotsCode=assets.reduce((s,a)=>s+(a.lots||0),0);
+        const totalMktCode=price*totalLotsCode*1000;
+        const hasMultiple=assets.length>1;
+        const groupId='pg-'+code;
+        return`<div style="border-bottom:1px solid #f5f7fa">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 8px;cursor:pointer" onclick="togglePledgeGroup('${groupId}')">
+            <div style="display:flex;align-items:center;gap:8px">
+              ${hasMultiple?`<span id="${groupId}-arrow" style="font-size:11px;color:#94a3b8">▶</span>`:''}
+              <div>
+                <div style="font-size:13px;font-weight:700;color:#1e293b">${code} <span style="font-size:11px;color:#9ca3af;font-weight:400">${totalLotsCode}張${hasMultiple?' ('+assets.length+'筆)':''}</span></div>
+                <div style="font-size:11px;color:#9ca3af">現價 <span class="privacy-mask">$${price||'—'}</span>${warningPrice>0?' ・警戒 $'+warningPrice.toFixed(2):''}</div>
+              </div>
             </div>
-            <button onclick="editPledgeAsset('${a.id}')" style="padding:3px 8px;border:1px solid #e2e8f0;border-radius:6px;background:#f8fafc;font-size:11px;cursor:pointer">✏️</button>
-            <button onclick="delPledgeAsset('${a.id}')" style="padding:3px 8px;border:none;background:none;color:#ef4444;font-size:11px;cursor:pointer">🗑</button>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="text-align:right">
+                <div style="font-size:14px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#16a34a" class="privacy-mask">$${Math.round(totalMktCode).toLocaleString()}</div>
+              </div>
+              ${!hasMultiple?`
+                <button onclick="event.stopPropagation();editPledgeAsset('${assets[0].id}')" style="padding:3px 8px;border:1px solid #e2e8f0;border-radius:6px;background:#f8fafc;font-size:11px;cursor:pointer">✏️</button>
+                <button onclick="event.stopPropagation();delPledgeAsset('${assets[0].id}')" style="padding:3px 8px;border:none;background:none;color:#ef4444;font-size:11px;cursor:pointer">🗑</button>
+              `:''}
+            </div>
           </div>
+          ${hasMultiple?`<div id="${groupId}" style="display:none;background:#f8fafc;border-top:1px solid #f1f5f9">
+            ${assets.map(a=>`
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 8px 7px 28px;border-bottom:1px solid #f1f5f9">
+                <div>
+                  <div style="font-size:12px;font-weight:600;color:#374151">${a.lots}張</div>
+                  ${a.note?`<div style="font-size:10px;color:#94a3b8">${a.note}</div>`:''}
+                </div>
+                <div style="display:flex;align-items:center;gap:6px">
+                  <div style="font-size:12px;font-weight:700;color:#16a34a" class="privacy-mask">$${Math.round(price*(a.lots||0)*1000).toLocaleString()}</div>
+                  <button onclick="editPledgeAsset('${a.id}')" style="padding:2px 6px;border:1px solid #e2e8f0;border-radius:5px;background:#fff;font-size:10px;cursor:pointer">✏️</button>
+                  <button onclick="delPledgeAsset('${a.id}')" style="padding:2px 6px;border:none;background:none;color:#ef4444;font-size:10px;cursor:pointer">🗑</button>
+                </div>
+              </div>`).join('')}
+          </div>`:''}
         </div>`;
       }).join('')+
       `<div style="padding:10px 8px;text-align:right;font-size:12px;font-weight:700;color:#64748b;border-top:2px solid #f0f2f5">
         合計市值：<span style="color:#16a34a;font-family:'JetBrains Mono',monospace">$${Math.round(totalMkt).toLocaleString()}</span>
       </div>`;
+    }
   }
+}
+
+function togglePledgeGroup(id){
+  const el=document.getElementById(id);
+  const arrow=document.getElementById(id+'-arrow');
+  if(!el)return;
+  const isOpen=el.style.display==='none';
+  el.style.display=isOpen?'block':'none';
+  if(arrow)arrow.textContent=isOpen?'▼':'▶';
 }
 
 function updatePledgeOvKpi(ratio,color,dangerPrice,warnPrice){
