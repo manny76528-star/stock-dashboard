@@ -2126,15 +2126,15 @@ function fillCustInfo(custId){
 }
 
 function quickAddItem(name,cost,price){
-  // 找對應商品
+  // 從商品管理找對應品項
   const prod=db.products?.find(p=>p.name===name||p.spec===name);
   addItemRow({
     name:name,
-    spec:name,
+    spec:prod?.spec||name,
+    subtype:prod?.sub||'',
+    type:prod?.type||'paper',
     cost:prod?.cost||cost||0,
     price:price||0,
-    type:prod?.type||'paper',
-    subtype:prod?.subtype||'',
     qty:1
   });
 }
