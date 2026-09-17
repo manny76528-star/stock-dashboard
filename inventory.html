@@ -541,6 +541,7 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
         <select class="fi" id="o-cust" onchange="onCustChange(this.value)">
           <option value="">-- 選擇客戶 --</option>
         </select>
+        <div id="cust-item-hint" style="display:none;flex-wrap:wrap;gap:6px;margin-top:6px;align-items:center"></div>
       </div>
     </div>
     <div class="fr">
@@ -2106,6 +2107,36 @@ function fillCustInfo(custId){
   if(!c)return;
   document.getElementById('o-contact').value=c.contact||'';
   document.getElementById('o-phone').value=c.phone||'';
+  // 顯示該客戶的常用品項快速建議
+  const CUST_ITEMS={
+    '騰亦資訊':[{name:'CINO A680 USB',type:'device',cost:1,price:2351}],
+    '河川企業社':[{name:'珠光紙 40米',type:'paper',cost:120},{name:'珠光紙 100*70*40米',type:'paper',cost:165},{name:'冷凍碳帶 110*91',type:'ribbon',cost:60}],
+    '訊控有限公司':[{name:'珠光紙 90*90*50米',type:'paper',cost:170},{name:'抗刮碳帶 TRR03 100*300米 外捲',type:'ribbon',cost:300}],
+    '興業企業行':[{name:'100*100珠光紙',type:'paper',cost:140},{name:'冷凍碳帶 110*91',type:'ribbon',cost:60}],
+    '福寶水產':[{name:'珠光紙 90*70*40米',type:'paper',cost:85},{name:'冷凍碳帶 110*91',type:'ribbon',cost:60}],
+    '泰茂企業有限公司':[{name:'冷凍碳帶 110*91',type:'ribbon',cost:60}],
+  };
+  const items=CUST_ITEMS[c.name];
+  const hintEl=document.getElementById('cust-item-hint');
+  if(!hintEl)return;
+  if(!items||items.length===0){hintEl.style.display='none';return;}
+  hintEl.style.display='flex';
+  hintEl.innerHTML='<span style="font-size:11px;color:#64748b;font-weight:600;margin-right:6px">常用品項：</span>'+
+    items.map(it=>`<button onclick="quickAddItem('${it.name}',${it.cost||0},${it.price||0})" style="font-size:11px;background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe;border-radius:6px;padding:3px 10px;cursor:pointer;white-space:nowrap">＋ ${it.name}</button>`).join('');
+}
+
+function quickAddItem(name,cost,price){
+  // 找對應商品
+  const prod=db.products?.find(p=>p.name===name||p.spec===name);
+  addItemRow({
+    name:name,
+    spec:name,
+    cost:prod?.cost||cost||0,
+    price:price||0,
+    type:prod?.type||'paper',
+    subtype:prod?.subtype||'',
+    qty:1
+  });
 }
 
 function saveOrder(){
