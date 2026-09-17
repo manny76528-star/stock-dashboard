@@ -6364,6 +6364,39 @@
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/order-images/1788929173138_cwdt.jpg"
       ],
       "createdAt": "2026-09-09T04:47:10.701Z"
+    },
+    {
+      "id": "mu5cbcu2754k",
+      "date": "2026-09-17",
+      "custId": "mnmofk0w94kc",
+      "custName": "興業企業行",
+      "contact": "黃柏堯先生",
+      "phone": "07-6109199",
+      "note": "",
+      "items": [
+        {
+          "name": "銅版紙 100*100珠光紙",
+          "type": "paper",
+          "subtype": "銅版紙",
+          "spec": "100*100珠光紙",
+          "qty": 30,
+          "sn": "",
+          "sns": [],
+          "cost": 140,
+          "price": 270,
+          "invoice": false
+        }
+      ],
+      "paid": false,
+      "paidDate": "",
+      "vendorPaid": false,
+      "vendorPaidDate": "",
+      "images": [
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/order-images/1789638057935_hdu7.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/order-images/1789638061463_yq94.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/order-images/1789638065242_0w0a.jpg"
+      ],
+      "createdAt": "2026-09-17T09:41:36.314Z"
     }
   ],
   "customers": [
@@ -6685,6 +6718,6 @@
     "bankCode": "013",
     "bankAccount": "061506186489"
   },
-  "_ts": 1788929233710,
+  "_ts": 1789638099323,
   "_vendorPaidBackfilled": true
 }
