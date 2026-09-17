@@ -6375,7 +6375,7 @@
       "note": "",
       "items": [
         {
-          "name": "銅版紙 100*100珠光紙",
+          "name": "100*100珠光紙",
           "type": "paper",
           "subtype": "銅版紙",
           "spec": "100*100珠光紙",
@@ -6718,6 +6718,6 @@
     "bankCode": "013",
     "bankAccount": "061506186489"
   },
-  "_ts": 1789638099323,
+  "_ts": 1789638549394,
   "_vendorPaidBackfilled": true
 }
