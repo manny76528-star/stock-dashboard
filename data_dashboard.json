@@ -2807,7 +2807,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1789714023158,
+  "_ts": 1789714066662,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -5398,6 +5398,15 @@
                 "price": 8.8,
                 "fee": 1,
                 "remark": "華固期貨_獲利2300"
+              },
+              {
+                "id": "mu6ljn5nw0x",
+                "type": "buy",
+                "date": "2026-09-18",
+                "shares": 237,
+                "price": 8.71,
+                "fee": 1,
+                "remark": "長虹期貨獲利"
               }
             ]
           },
@@ -5526,6 +5535,19 @@
           }
         ],
         "log": [
+          {
+            "id": "mu6ljn5nlpf",
+            "txnId": "mu6ljn5nw0x",
+            "date": "2026-09-18",
+            "type": "buy",
+            "code": "00405A",
+            "name": "主動富邦台灣龍耀",
+            "shares": 237,
+            "price": 8.71,
+            "amount": 2065.27,
+            "fee": 1,
+            "remark": "長虹期貨獲利"
+          },
           {
             "id": "mu3n11upjc6",
             "txnId": "mu3n11up2ip",
