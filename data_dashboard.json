@@ -2838,7 +2838,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1789740547025,
+  "_ts": 1789740988999,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -2919,6 +2919,27 @@
     }
   ],
   "journals": [
+    {
+      "id": "mu71kok56yc",
+      "date": "2026-09-18",
+      "tags": [],
+      "market": "華許展現鷹式立場 Fed 升息1碼 並預期年底前再升1碼 市場不確定性消失",
+      "market2": "不跟進美國升息！台灣央行勇敢利率「連10凍」　再鬆綁房市信用管制",
+      "market3": "",
+      "marketColor": "red",
+      "market2Color": "red",
+      "market3Color": "",
+      "marketUrl": "https://money.udn.com/money/story/5599/9761883",
+      "youtubeUrl": "",
+      "content": "前幾日美債殖利率破 5% 及 Fed 釋放鷹派訊息的重壓下，全球股市經歷了劇烈修正。今日開盤後，買盤明顯回流，顯示市場已將「年底前再升 1 碼」的預期完全定價",
+      "stockTags": [],
+      "eventCat": "總經面",
+      "behavior": "",
+      "indexVal": 47181,
+      "stockPrices": null,
+      "aiAnalysis": null,
+      "images": []
+    },
     {
       "id": "mu290km0m4x",
       "date": "2026-09-15",
