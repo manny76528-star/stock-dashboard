@@ -2858,7 +2858,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1789744805312,
+  "_ts": 1789744808645,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -7450,5 +7450,160 @@
       "阿豪凱基": 1000000
     }
   },
-  "fundDeductionLogs": []
+  "fundDeductionLogs": [
+    {
+      "id": "mu73ujt67qh",
+      "fundId": "mu737brxc3e",
+      "fundName": "統一奔騰基金",
+      "date": "2026-09-17",
+      "amount": 1000
+    },
+    {
+      "id": "mu73ujt6zfs",
+      "fundId": "mu73ajshs13",
+      "fundName": "安聯台灣科技基金",
+      "date": "2026-09-17",
+      "amount": 1000
+    },
+    {
+      "id": "mu73ujt6q5p",
+      "fundId": "mu737brxc3e",
+      "fundName": "統一奔騰基金",
+      "date": "2026-09-15",
+      "amount": 1000
+    },
+    {
+      "id": "mu73ujt6lok",
+      "fundId": "mu73ajshs13",
+      "fundName": "安聯台灣科技基金",
+      "date": "2026-09-15",
+      "amount": 1000
+    },
+    {
+      "id": "mu73ujt6lch",
+      "fundId": "mu737brxc3e",
+      "fundName": "統一奔騰基金",
+      "date": "2026-09-10",
+      "amount": 1000
+    },
+    {
+      "id": "mu73ujt6lfc",
+      "fundId": "mu73ajshs13",
+      "fundName": "安聯台灣科技基金",
+      "date": "2026-09-10",
+      "amount": 4600
+    },
+    {
+      "id": "mu73ujt64el",
+      "fundId": "mu73ajshs13",
+      "fundName": "安聯台灣科技基金",
+      "date": "2026-09-03",
+      "amount": 1500
+    },
+    {
+      "id": "mu73ujt6tx7",
+      "fundId": "mu737brxc3e",
+      "fundName": "統一奔騰基金",
+      "date": "2026-08-24",
+      "amount": 1500
+    },
+    {
+      "id": "mu73ujt63n7",
+      "fundId": "mu73ajshs13",
+      "fundName": "安聯台灣科技基金",
+      "date": "2026-08-17",
+      "amount": 1500
+    },
+    {
+      "id": "mu73ujt6xi8",
+      "fundId": "mu737brxc3e",
+      "fundName": "統一奔騰基金",
+      "date": "2026-08-10",
+      "amount": 1500
+    },
+    {
+      "id": "mu73ujt613m",
+      "fundId": "mu73ajshs13",
+      "fundName": "安聯台灣科技基金",
+      "date": "2026-08-03",
+      "amount": 1500
+    },
+    {
+      "id": "mu73ujt6szf",
+      "fundId": "mu737brxc3e",
+      "fundName": "統一奔騰基金",
+      "date": "2026-07-24",
+      "amount": 1500
+    },
+    {
+      "id": "mu73ujt6kv1",
+      "fundId": "mu73ajshs13",
+      "fundName": "安聯台灣科技基金",
+      "date": "2026-07-17",
+      "amount": 1500
+    },
+    {
+      "id": "mu73ujt6tbw",
+      "fundId": "mu737brxc3e",
+      "fundName": "統一奔騰基金",
+      "date": "2026-07-13",
+      "amount": 1500
+    },
+    {
+      "id": "mu73ujt6y4i",
+      "fundId": "mu73ajshs13",
+      "fundName": "安聯台灣科技基金",
+      "date": "2026-07-02",
+      "amount": 1500
+    },
+    {
+      "id": "mu73ujt63ye",
+      "fundId": "mu737brxc3e",
+      "fundName": "統一奔騰基金",
+      "date": "2026-06-25",
+      "amount": 1500
+    },
+    {
+      "id": "mu73ujt6k8j",
+      "fundId": "mu73ajshs13",
+      "fundName": "安聯台灣科技基金",
+      "date": "2026-06-18",
+      "amount": 1500
+    },
+    {
+      "id": "mu73ujt64dq",
+      "fundId": "mu737brxc3e",
+      "fundName": "統一奔騰基金",
+      "date": "2026-06-11",
+      "amount": 1500
+    },
+    {
+      "id": "mu73ujt6l7w",
+      "fundId": "mu73ajshs13",
+      "fundName": "安聯台灣科技基金",
+      "date": "2026-06-04",
+      "amount": 1500
+    },
+    {
+      "id": "mu73ujt6hch",
+      "fundId": "mu737brxc3e",
+      "fundName": "統一奔騰基金",
+      "date": "2026-05-25",
+      "amount": 1500
+    },
+    {
+      "id": "mu73ujt6sp0",
+      "fundId": "mu73ajshs13",
+      "fundName": "安聯台灣科技基金",
+      "date": "2026-05-20",
+      "amount": 1500
+    },
+    {
+      "id": "mu73ujt6d6q",
+      "fundId": "mu737brxc3e",
+      "fundName": "統一奔騰基金",
+      "date": "2026-05-13",
+      "amount": 1500
+    }
+  ]
 }
