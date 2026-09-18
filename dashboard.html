@@ -3328,6 +3328,21 @@ body:not(.privacy) .privacy-mask{filter:none;}
   </div>
 </div>
 
+<!-- ══ 定期基金扣款設定 ══ -->
+<div class="mo" id="fundSettingsModal">
+  <div class="modal" style="max-width:400px;width:100%">
+    <div class="mt">
+      <div class="mt-title">📅 定期基金扣款設定</div>
+      <button onclick="closeModal('fundSettingsModal')" style="background:none;border:none;font-size:20px;cursor:pointer;color:#94a3b8">✕</button>
+    </div>
+    <div class="mb" id="fund-settings-body" style="max-height:60vh;overflow-y:auto"></div>
+    <div class="br">
+      <button class="btn btn-s" onclick="closeModal('fundSettingsModal')">取消</button>
+      <button class="btn btn-p" onclick="saveFundSettings()">💾 儲存</button>
+    </div>
+  </div>
+</div>
+
 <!-- ══ 持股清單 Modal ══ -->
 <div class="mo" id="fp-stocks-modal" style="z-index:9000;display:none">
   <div class="modal" style="max-width:700px;width:100%">
@@ -5832,6 +5847,62 @@ function renderCash(){
 
     const footer=document.createElement('div');footer.className='cash-card-footer';
     if(isLineBank){
+      // 定期基金扣款區塊
+      const funds=db.settings?.fundDeductions||[];
+      if(funds.length===0){
+        const emptyFund=document.createElement('div');
+        emptyFund.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-top:1px solid #f1f5f9';
+        emptyFund.innerHTML='<span style="font-size:11px;color:#94a3b8">📅 定期基金扣款</span><button onclick="openFundSettings()" style="padding:2px 8px;background:#eff6ff;border:0.5px solid #bfdbfe;border-radius:5px;font-size:10px;cursor:pointer;color:#2563eb;font-weight:600">＋ 設定</button>';
+        card.appendChild(emptyFund);
+      }
+      if(funds.length>0){
+        const fundWrap=document.createElement('div');
+        fundWrap.style.cssText='border-top:1px solid #f1f5f9';
+        const weeklyTotal=funds.reduce((s,f)=>{
+          const days=(f.days||[]).length;
+          return s+(f.amount||0)*days;
+        },0);
+        // 第一層
+        const l1=document.createElement('div');
+        l1.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:10px 14px;cursor:pointer';
+        l1.innerHTML='<div style="display:flex;align-items:center;gap:8px"><span style="font-size:14px">📅</span><div><div style="font-size:12px;font-weight:700;color:#374151">定期基金扣款</div><div style="font-size:11px;color:#dc2626;font-weight:600">每週 -$'+weeklyTotal.toLocaleString()+'</div></div></div><div style="display:flex;align-items:center;gap:6px"><span id="fund-l2-arr" style="font-size:10px;color:#94a3b8">▶</span><button onclick="event.stopPropagation();openFundSettings()" style="padding:2px 8px;background:#f1f5f9;border:0.5px solid #e2e8f0;border-radius:5px;font-size:10px;cursor:pointer;color:#64748b">⚙️</button></div>';
+        // 第二層
+        const l2=document.createElement('div');
+        l2.id='fund-l2';
+        l2.style.cssText='display:none;background:#f8fafc;border-top:1px solid #f1f5f9';
+        // 各基金行
+        let totalCum=0,totalCount=0;
+        funds.forEach(f=>{
+          const records=(db.fundDeductionLogs||[]).filter(r=>r.fundId===f.id);
+          const cum=records.reduce((s,r)=>s+(r.amount||0),0);
+          const cnt=records.length;
+          totalCum+=cum;totalCount+=cnt;
+          const dayNames=['','一','二','三','四','五'];
+          const daysStr=(f.days||[]).map(d=>'週'+dayNames[d]).join('、');
+          const row=document.createElement('div');
+          row.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:7px 14px;border-bottom:1px solid #f1f5f9';
+          row.innerHTML='<div><div style="font-size:12px;font-weight:600;color:#1e293b">'+f.name+'</div><div style="font-size:10px;color:#94a3b8">'+daysStr+' 各 $'+(f.amount||0).toLocaleString()+'</div></div><div style="text-align:right"><div style="font-size:11px;font-weight:700;color:#dc2626">-$'+((f.days||[]).length*(f.amount||0)).toLocaleString()+'/週</div><div style="font-size:10px;color:#94a3b8">累積 $'+cum.toLocaleString()+'（'+cnt+'次）</div></div>';
+          l2.appendChild(row);
+        });
+        // 總計 + 趨勢
+        const totalRow=document.createElement('div');
+        totalRow.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:8px 14px;background:#fff';
+        totalRow.innerHTML='<div><div style="font-size:10px;color:#94a3b8">📊 總累積投入</div><div style="font-size:13px;font-weight:700;font-family:\'JetBrains Mono\',monospace;color:#374151">$'+totalCum.toLocaleString()+'（'+totalCount+'次）</div></div><button onclick="toggleFundChart()" style="padding:3px 10px;background:#f1f5f9;border:0.5px solid #e2e8f0;border-radius:6px;font-size:10px;cursor:pointer;color:#374151;font-weight:600" id="fund-trend-btn">📈 趨勢 ▶</button>';
+        l2.appendChild(totalRow);
+        // 第三層：趨勢圖
+        const l3=document.createElement('div');
+        l3.id='fund-l3';
+        l3.style.cssText='display:none;padding:12px 14px;border-top:1px solid #f1f5f9;background:#fff';
+        l3.innerHTML='<div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:8px">📈 累積投入走勢</div><div id="fund-legend" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;font-size:10px;color:#64748b"></div><div style="position:relative;height:160px"><canvas id="fundTrendChart"></canvas></div>';
+        l2.appendChild(l3);
+        l1.onclick=function(){
+          const open=l2.style.display==='none';
+          l2.style.display=open?'block':'none';
+          document.getElementById('fund-l2-arr').textContent=open?'▼':'▶';
+        };
+        fundWrap.appendChild(l1);fundWrap.appendChild(l2);
+        card.appendChild(fundWrap);
+      }
       const depBtn=document.createElement('button');depBtn.className='card-act-btn';
       depBtn.style.cssText='background:#eff6ff;color:#2563eb';depBtn.textContent='💵 入金';
       depBtn.onclick=function(){quickDeposit(c.id,c.bank);};footer.appendChild(depBtn);
@@ -10863,6 +10934,138 @@ function _initCfDebtChart(){
       }
     });
   }
+}
+
+let _fundChartInited=false;
+function toggleFundChart(){
+  const l3=document.getElementById('fund-l3');
+  const btn=document.getElementById('fund-trend-btn');
+  if(!l3)return;
+  const open=l3.style.display==='none';
+  l3.style.display=open?'block':'none';
+  if(btn)btn.textContent=open?'📈 趨勢 ▼':'📈 趨勢 ▶';
+  if(open&&!_fundChartInited){_fundChartInited=true;_initFundChart();}
+}
+
+function _initFundChart(){
+  const canvas=document.getElementById('fundTrendChart');
+  const legend=document.getElementById('fund-legend');
+  if(!canvas)return;
+  const funds=db.settings?.fundDeductions||[];
+  const logs=db.fundDeductionLogs||[];
+  if(logs.length===0){canvas.parentElement.innerHTML='<div style="text-align:center;color:#94a3b8;padding:20px;font-size:12px">尚無扣款紀錄</div>';return;}
+  const allDates=[...new Set(logs.map(l=>l.date))].sort();
+  const colors=['#2563eb','#f97316','#16a34a','#8b5cf6','#ec4899'];
+  const datasets=[];
+  funds.forEach((f,i)=>{
+    let cum=0;
+    const data=allDates.map(d=>{
+      const dayLogs=logs.filter(l=>l.fundId===f.id&&l.date<=d);
+      return dayLogs.reduce((s,l)=>s+(l.amount||0),0);
+    });
+    datasets.push({label:f.name,data,borderColor:colors[i%colors.length],borderWidth:2,pointRadius:2,tension:0.3,fill:false});
+    if(legend)legend.innerHTML+='<span><span style="display:inline-block;width:10px;height:3px;background:'+colors[i%colors.length]+';vertical-align:middle;margin-right:4px"></span>'+f.name+'</span>';
+  });
+  // 總計虛線
+  const totalData=allDates.map(d=>logs.filter(l=>l.date<=d).reduce((s,l)=>s+(l.amount||0),0));
+  datasets.push({label:'總計',data:totalData,borderColor:'#64748b',borderWidth:2,pointRadius:2,tension:0.3,borderDash:[4,4],fill:false});
+  if(legend)legend.innerHTML+='<span><span style="display:inline-block;width:10px;height:3px;background:#64748b;vertical-align:middle;margin-right:4px;border-top:2px dashed #64748b"></span>總計</span>';
+  const labels=allDates.map(d=>{const mo=d.slice(5,7);const day=d.slice(8,10);return mo+'/'+day;});
+  if(window.Chart){
+    new window.Chart(canvas,{
+      type:'line',
+      data:{labels,datasets},
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        interaction:{mode:'index',intersect:false},
+        plugins:{legend:{display:false},tooltip:{
+          backgroundColor:'rgba(255,255,255,0.97)',titleColor:'#0b0b0b',bodyColor:'#52514e',
+          borderColor:'rgba(11,11,11,0.1)',borderWidth:1,padding:8,cornerRadius:8,
+          callbacks:{label:ctx=>ctx.dataset.label+'：$'+ctx.raw.toLocaleString()}
+        }},
+        scales:{
+          x:{grid:{display:false},ticks:{font:{size:9},color:'#898781',maxRotation:0,maxTicksLimit:8}},
+          y:{position:'right',min:0,grid:{color:'rgba(0,0,0,0.04)'},ticks:{font:{size:9},color:'#898781',callback:v=>'$'+(v/10000).toFixed(0)+'萬'},border:{display:false}}
+        }
+      }
+    });
+  }
+}
+
+function openFundSettings(){
+  if(!db.settings)db.settings={};
+  if(!db.settings.fundDeductions)db.settings.fundDeductions=[];
+  const funds=db.settings.fundDeductions;
+  const dayNames=['','一','二','三','四','五'];
+  const el=document.getElementById('fund-settings-modal');
+  if(el){
+    document.getElementById('fund-settings-body').innerHTML=funds.map((f,i)=>`
+      <div style="background:#f8fafc;border-radius:8px;padding:12px;margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <input value="${f.name}" oninput="db.settings.fundDeductions[${i}].name=this.value" style="font-size:13px;font-weight:700;border:none;background:transparent;border-bottom:1px dashed #e2e8f0;outline:none;color:#1e293b;width:160px">
+          <button onclick="delFundSetting(${i})" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:14px">🗑</button>
+        </div>
+        <div style="display:flex;gap:5px;margin-bottom:8px">
+          ${[1,2,3,4,5].map(d=>`<button onclick="toggleFundDay(${i},${d},this)" style="width:32px;height:32px;border-radius:7px;border:1.5px solid ${(f.days||[]).includes(d)?'#2563eb':'#e2e8f0'};background:${(f.days||[]).includes(d)?'#2563eb':'#fff'};color:${(f.days||[]).includes(d)?'#fff':'#94a3b8'};font-size:12px;font-weight:600;cursor:pointer">週${dayNames[d]}</button>`).join('')}
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#64748b">
+          每次 <input type="number" value="${f.amount||0}" oninput="db.settings.fundDeductions[${i}].amount=+this.value" style="width:90px;padding:3px 8px;border:1px solid #e2e8f0;border-radius:6px;font-size:13px;font-weight:700"> 元
+        </div>
+      </div>`).join('')+
+      `<button onclick="addFundSetting()" style="width:100%;padding:8px;border:1.5px dashed #e2e8f0;border-radius:8px;background:none;font-size:12px;color:#94a3b8;cursor:pointer;font-weight:600">＋ 新增基金</button>`;
+    openModal('fundSettingsModal');
+  }
+}
+
+function toggleFundDay(fundIdx,day,btn){
+  const f=db.settings.fundDeductions[fundIdx];
+  if(!f.days)f.days=[];
+  const has=f.days.includes(day);
+  if(has)f.days=f.days.filter(d=>d!==day);
+  else f.days.push(day);
+  btn.style.background=has?'#fff':'#2563eb';
+  btn.style.borderColor=has?'#e2e8f0':'#2563eb';
+  btn.style.color=has?'#94a3b8':'#fff';
+}
+
+function addFundSetting(){
+  if(!db.settings.fundDeductions)db.settings.fundDeductions=[];
+  db.settings.fundDeductions.push({id:uid(),name:'新基金',days:[],amount:5000});
+  openFundSettings();
+}
+
+function delFundSetting(idx){
+  db.settings.fundDeductions.splice(idx,1);
+  openFundSettings();
+}
+
+function saveFundSettings(){
+  // 自動判斷今天是否應該扣款
+  checkFundDeductions();
+  save();
+  closeModal('fundSettingsModal');
+  render();renderAssetsPage();
+  toast('✅ 基金扣款設定已儲存');
+}
+
+function checkFundDeductions(){
+  const funds=db.settings?.fundDeductions||[];
+  if(funds.length===0)return;
+  const today=new Date();
+  const todayStr=today.toISOString().slice(0,10);
+  const dow=today.getDay(); // 0=日,1=一...5=五
+  if(dow===0||dow===6)return; // 週末不扣
+  if(!db.fundDeductionLogs)db.fundDeductionLogs=[];
+  funds.forEach(f=>{
+    if(!(f.days||[]).includes(dow))return;
+    const alreadyDone=db.fundDeductionLogs.find(l=>l.fundId===f.id&&l.date===todayStr);
+    if(alreadyDone)return;
+    // 自動記錄今天扣款
+    db.fundDeductionLogs.push({id:uid(),fundId:f.id,fundName:f.name,date:todayStr,amount:f.amount||0});
+    // 從Line Bank扣除
+    const lb=db.cashAccounts?.find(a=>a.bank==='Line Bank');
+    if(lb)lb.cash=(lb.cash||0)-(f.amount||0);
+  });
 }
 
 function renderAssetsPage(){
