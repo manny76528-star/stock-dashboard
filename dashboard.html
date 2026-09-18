@@ -11006,7 +11006,7 @@ function openFundSettings(){
   if(!db.settings.fundDeductions)db.settings.fundDeductions=[];
   const funds=db.settings.fundDeductions;
   const dayNames=['','一','二','三','四','五'];
-  const el=document.getElementById('fund-settings-modal');
+  const el=document.getElementById('fundSettingsModal');
   if(el){
     document.getElementById('fund-settings-body').innerHTML=funds.map((f,i)=>`
       <div style="background:#f8fafc;border-radius:8px;padding:12px;margin-bottom:8px">
