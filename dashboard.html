@@ -10936,6 +10936,51 @@ function _initCfDebtChart(){
   }
 }
 
+function toggleFundL3As(btn){
+  const l3=btn.closest('.fund-l2-detail').querySelector('.fund-l3-as');
+  const canvas=btn.closest('.fund-l2-detail').querySelector('.fund-as-canvas');
+  const legend=btn.closest('.fund-l2-detail').querySelector('.fund-as-legend');
+  if(!l3)return;
+  const open=l3.style.display==='none';
+  l3.style.display=open?'block':'none';
+  btn.textContent=open?'📈 趨勢 ▼':'📈 趨勢 ▶';
+  if(open&&canvas&&!canvas.dataset.inited){
+    canvas.dataset.inited='1';
+    const funds=db.settings?.fundDeductions||[];
+    const logs=db.fundDeductionLogs||[];
+    if(logs.length===0){canvas.parentElement.innerHTML='<div style="text-align:center;color:#94a3b8;padding:16px;font-size:11px">尚無扣款紀錄</div>';return;}
+    const allDates=[...new Set(logs.map(l=>l.date))].sort();
+    const colors=['#2563eb','#f97316','#16a34a','#8b5cf6'];
+    const datasets=[];
+    funds.forEach((f,i)=>{
+      const data=allDates.map(d=>logs.filter(l=>l.fundId===f.id&&l.date<=d).reduce((s,l)=>s+(l.amount||0),0));
+      datasets.push({label:f.name,data,borderColor:colors[i%colors.length],borderWidth:2,pointRadius:2,tension:0.3,fill:false});
+      if(legend)legend.innerHTML+='<span><span style="display:inline-block;width:10px;height:3px;background:'+colors[i%colors.length]+';vertical-align:middle;margin-right:4px"></span>'+f.name+'</span>';
+    });
+    const totalData=allDates.map(d=>logs.filter(l=>l.date<=d).reduce((s,l)=>s+(l.amount||0),0));
+    datasets.push({label:'總計',data:totalData,borderColor:'#64748b',borderWidth:2,pointRadius:2,tension:0.3,borderDash:[4,4],fill:false});
+    if(legend)legend.innerHTML+='<span style="color:#64748b">-- 總計</span>';
+    const labels=allDates.map(d=>d.slice(5).replace('-','/'));
+    if(window.Chart){
+      new window.Chart(canvas,{
+        type:'line',data:{labels,datasets},
+        options:{responsive:true,maintainAspectRatio:false,
+          interaction:{mode:'index',intersect:false},
+          plugins:{legend:{display:false},tooltip:{
+            backgroundColor:'rgba(255,255,255,0.97)',titleColor:'#0b0b0b',bodyColor:'#52514e',
+            borderColor:'rgba(11,11,11,0.1)',borderWidth:1,padding:8,cornerRadius:8,
+            callbacks:{label:ctx=>ctx.dataset.label+'：$'+ctx.raw.toLocaleString()}
+          }},
+          scales:{
+            x:{grid:{display:false},ticks:{font:{size:9},color:'#898781',maxRotation:0,maxTicksLimit:8}},
+            y:{position:'right',min:0,grid:{color:'rgba(0,0,0,0.04)'},ticks:{font:{size:9},color:'#898781',callback:v=>'$'+(v/10000).toFixed(0)+'萬'},border:{display:false}}
+          }
+        }
+      });
+    }
+  }
+}
+
 function toggleFundL2(el){
   const l2=el.nextElementSibling;
   const arr=el.querySelector('.fund-arr');
@@ -11288,7 +11333,7 @@ function renderAssetsPage(){
             const fds=db.settings?.fundDeductions||[];
             if(fds.length===0)return '<div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:11px;color:#94a3b8">📅 定期基金扣款</span><button onclick="openFundSettings()" style="padding:2px 8px;background:#eff6ff;border:0.5px solid #bfdbfe;border-radius:5px;font-size:10px;cursor:pointer;color:#2563eb;font-weight:600">＋ 設定</button></div>';
             const weeklyTotal=fds.reduce((s,f)=>s+(f.amount||0)*(f.days||[]).length,0);
-            return '<div style="display:flex;justify-content:space-between;align-items:center;cursor:pointer" onclick="toggleFundL2(this)"><div><span style="font-size:11px;font-weight:700;color:#374151">📅 定期基金扣款</span><span style="font-size:11px;color:#dc2626;font-weight:600;margin-left:8px">每週 -$'+weeklyTotal.toLocaleString()+'</span></div><div style="display:flex;align-items:center;gap:4px"><span class="fund-arr" style="font-size:10px;color:#94a3b8">▶</span><button onclick="event.stopPropagation();openFundSettings()" style="padding:2px 6px;background:#f1f5f9;border:0.5px solid #e2e8f0;border-radius:5px;font-size:10px;cursor:pointer;color:#64748b">⚙️</button></div></div><div class="fund-l2-detail" style="display:none;margin-top:6px">'+fds.map(f=>{const logs=(db.fundDeductionLogs||[]).filter(r=>r.fundId===f.id);const cum=logs.reduce((s,r)=>s+(r.amount||0),0);const dayNames=['','一','二','三','四','五'];const daysStr=(f.days||[]).map(d=>'週'+dayNames[d]).join('、');return'<div style="display:flex;justify-content:space-between;font-size:10px;padding:3px 0;border-top:1px solid #f8f8f8"><span style="color:#64748b">'+f.name+' <span style="color:#94a3b8">'+daysStr+'</span></span><span style="color:#dc2626;font-weight:700">累積 $'+cum.toLocaleString()+'</span></div>';}).join('')+'<div style="display:flex;justify-content:space-between;font-size:11px;padding:4px 0;border-top:1px solid #f1f5f9;margin-top:2px"><span style="color:#64748b;font-weight:600">📊 總累積</span><span style="font-weight:700;color:#374151">$'+(db.fundDeductionLogs||[]).reduce((s,r)=>s+(r.amount||0),0).toLocaleString()+'</span></div></div>';
+            return '<div style="display:flex;justify-content:space-between;align-items:center;cursor:pointer" onclick="toggleFundL2(this)"><div><span style="font-size:11px;font-weight:700;color:#374151">📅 定期基金扣款</span><span style="font-size:11px;color:#dc2626;font-weight:600;margin-left:8px">每週 -$'+weeklyTotal.toLocaleString()+'</span></div><div style="display:flex;align-items:center;gap:4px"><span class="fund-arr" style="font-size:10px;color:#94a3b8">▶</span><button onclick="event.stopPropagation();openFundSettings()" style="padding:2px 6px;background:#f1f5f9;border:0.5px solid #e2e8f0;border-radius:5px;font-size:10px;cursor:pointer;color:#64748b">⚙️</button></div></div><div class="fund-l2-detail" style="display:none;margin-top:6px">'+fds.map(f=>{const logs=(db.fundDeductionLogs||[]).filter(r=>r.fundId===f.id);const cum=logs.reduce((s,r)=>s+(r.amount||0),0);const dayNames=['','一','二','三','四','五'];const daysStr=(f.days||[]).map(d=>'週'+dayNames[d]).join('、');return'<div style="display:flex;justify-content:space-between;font-size:10px;padding:3px 0;border-top:1px solid #f8f8f8"><span style="color:#64748b">'+f.name+' <span style="color:#94a3b8">'+daysStr+'</span></span><span style="color:#dc2626;font-weight:700">累積 $'+cum.toLocaleString()+'</span></div>';}).join('')+'<div style="display:flex;justify-content:space-between;font-size:11px;padding:4px 0;border-top:1px solid #f1f5f9;margin-top:2px;align-items:center"><div><span style="color:#64748b;font-weight:600">📊 總累積</span> <span style="font-weight:700;color:#374151">$'+(db.fundDeductionLogs||[]).reduce((s,r)=>s+(r.amount||0),0).toLocaleString()+'</span></div><button onclick="toggleFundL3As(this)" style="padding:2px 8px;background:#f1f5f9;border:0.5px solid #e2e8f0;border-radius:5px;font-size:10px;cursor:pointer;color:#374151;font-weight:600">📈 趨勢 ▶</button></div><div class="fund-l3-as" style="display:none;margin-top:8px"><div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:6px">📈 累積投入走勢</div><div class="fund-as-legend" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px;font-size:10px;color:#64748b"></div><div style="position:relative;height:150px"><canvas class="fund-as-canvas"></canvas></div></div></div>';
           })()}</div>`:''}
         </div>`;
       }).join('')+'</div>';
