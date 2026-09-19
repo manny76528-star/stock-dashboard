@@ -10998,6 +10998,26 @@ function toggleFundLog(id){
   if(arr)arr.textContent=open?'▼':'▶';
 }
 
+function toggleFundEnabledBtn(idx,btn){
+  if(!db.settings?.fundDeductions?.[idx])return;
+  const cur=db.settings.fundDeductions[idx].enabled!==false;
+  db.settings.fundDeductions[idx].enabled=!cur;
+  // 更新按鈕外觀
+  if(!cur){
+    btn.style.border='1.5px solid #2563eb';
+    btn.style.background='#eff6ff';
+    btn.style.color='#2563eb';
+    btn.textContent='✅ 啟用';
+  } else {
+    btn.style.border='1.5px solid #e2e8f0';
+    btn.style.background='#f8fafc';
+    btn.style.color='#94a3b8';
+    btn.textContent='⏸ 暫停';
+  }
+  save();
+  render();renderAssetsPage();
+}
+
 function toggleFundEnabled(idx,cb){
   if(!db.settings?.fundDeductions?.[idx])return;
   db.settings.fundDeductions[idx].enabled=cb.checked;
@@ -11084,15 +11104,9 @@ function openFundSettings(){
             <div style="font-size:10px;color:#94a3b8;margin-bottom:3px">基金名稱</div>
             <input value="${f.name||''}" placeholder="例：元大台灣50" oninput="db.settings.fundDeductions[${i}].name=this.value" style="font-size:13px;font-weight:700;border:1px solid #e2e8f0;border-radius:6px;padding:4px 8px;background:#fff;outline:none;color:#1e293b;width:90%">
           </div>
-          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;margin-left:10px">
-            <div style="font-size:9px;color:#94a3b8">${f.enabled!==false?'啟用':'暫停'}</div>
-            <label style="position:relative;width:36px;height:20px;display:inline-block">
-              <input type="checkbox" ${f.enabled!==false?'checked':''} onchange="toggleFundEnabled(${i},this)" style="opacity:0;width:0;height:0">
-              <span style="position:absolute;cursor:pointer;inset:0;background:${f.enabled!==false?'#2563eb':'#e2e8f0'};border-radius:20px;transition:.2s">
-                <span style="position:absolute;width:16px;height:16px;background:#fff;border-radius:50%;top:2px;left:${f.enabled!==false?'18px':'2px'};transition:.2s"></span>
-              </span>
-            </label>
-          </div>
+          <button onclick="toggleFundEnabledBtn(${i},this)" style="padding:3px 10px;border-radius:6px;border:1.5px solid ${f.enabled!==false?'#2563eb':'#e2e8f0'};background:${f.enabled!==false?'#eff6ff':'#f8fafc'};color:${f.enabled!==false?'#2563eb':'#94a3b8'};font-size:11px;font-weight:700;cursor:pointer;margin-left:10px;white-space:nowrap">
+            ${f.enabled!==false?'✅ 啟用':'⏸ 暫停'}
+          </button>
           <button onclick="delFundSetting(${i})" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:14px;margin-left:6px">🗑</button>
         </div>
         <div style="font-size:10px;color:#94a3b8;margin-bottom:5px">扣款日</div>
