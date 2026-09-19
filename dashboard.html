@@ -1934,9 +1934,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
       <span class="db-nav-badge" id="nav-flex-badge" style="display:none"></span>
       <div id="nav-assets-deduct" style="font-size:9px;color:#94a3b8;font-weight:500;padding-left:25px;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:-4px"></div>
     </div>
-    <div class="db-nav-item" id="nav-family" onclick="dbShowPage('family')">
-      <span class="nav-icon">👨‍👩‍👧‍👦</span>家族帳戶
-    </div>
+
 
     <div class="db-nav-section">記錄</div>
     <div class="db-nav-item" id="nav-journal" onclick="dbShowPage('journal')" style="position:relative">
@@ -2327,7 +2325,119 @@ body:not(.privacy) .privacy-mask{filter:none;}
           <div id="invest-donut-mini-legend" style="margin-top:12px;display:flex;flex-direction:column;gap:5px"></div>
         </div>
       </div>
+    
+      <!-- ══ 家族帳戶 ══ -->
+      <!-- 頂部：選擇成員 -->
+      <div class="trend-page-card" style="padding:14px 18px;margin-bottom:16px">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <div style="font-size:14px;font-weight:800;color:#1e293b">👨‍👩‍👧‍👦 家族帳戶</div>
+          <button id="family-back-btn" onclick="backToFamilyCards()" style="display:none;padding:6px 12px;background:#f1f5f9;border:1px solid #e2e8f0;color:#475569;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">← 返回總覽</button>
+          <select id="family-member-sel" onchange="renderFamilyPage()" style="display:none">
+            <option value="">— 選擇成員 —</option>
+          </select>
+          <button onclick="openFamilyMemberModal()" style="padding:6px 14px;background:#eff6ff;border:1px solid #bfdbfe;color:#2563eb;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">⚙️ 管理成員</button>
+          <div id="family-refresh-btn" style="display:none">
+            <button onclick="refreshFamilyPrices()" style="padding:6px 14px;background:#f3f4f6;border:1px solid #e2e8f0;color:#374151;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">🔄 更新股價</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 成員卡片網格（未選成員時顯示） -->
+      <div id="family-cards-grid" style="display:none">
+        <div id="family-member-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px"></div>
+      </div>
+      <!-- 未選成員提示（無成員時） -->
+      <div id="family-empty" style="text-align:center;padding:60px;color:#9ca3af;display:none">
+        <div style="font-size:48px;margin-bottom:12px">👨‍👩‍👧‍👦</div>
+        <div style="font-size:16px;font-weight:700;margin-bottom:6px">尚無家族成員</div>
+        <div style="font-size:13px">點擊「⚙️ 管理成員」新增</div>
+      </div>
+
+      <!-- 成員內容區 -->
+      <div id="family-content" style="display:none">
+        <!-- KPI -->
+        <div class="ov-kpi-grid" style="margin-bottom:16px" id="family-kpi-grid">
+          <div class="ov-kpi-card"><div class="ov-kpi-accent" style="background:#8fa8c8"></div><div class="ov-kpi-label" style="padding-left:8px">總投入成本</div><div class="ov-kpi-val" id="fm-cost" style="padding-left:8px">—</div></div>
+          <div class="ov-kpi-card"><div class="ov-kpi-accent" style="background:#a8c5a0"></div><div class="ov-kpi-label" style="padding-left:8px">股票市值</div><div class="ov-kpi-val" id="fm-mkt" style="padding-left:8px">—</div></div>
+          <div class="ov-kpi-card"><div class="ov-kpi-accent" style="background:#c9a99a"></div><div class="ov-kpi-label" style="padding-left:8px">損益</div><div class="ov-kpi-val" id="fm-pnl" style="padding-left:8px">—</div><div class="ov-kpi-sub" id="fm-roi" style="padding-left:8px"></div></div>
+          <div class="ov-kpi-card"><div class="ov-kpi-accent" style="background:#b5adc4"></div><div class="ov-kpi-label" style="padding-left:8px">累積股息</div><div class="ov-kpi-val" id="fm-div" style="padding-left:8px">—</div></div>
+        </div>
+
+        <!-- 持股 + 歷史紀錄 -->
+        <div style="display:grid;grid-template-columns:1fr 340px;gap:16px;margin-bottom:16px">
+          <!-- 持股清單 -->
+          <div class="trend-page-card" style="padding:0;overflow:hidden">
+            <div class="trend-page-hdr" style="padding:12px 16px;border-bottom:1px solid #f0f2f5">
+              <span>💼 持股清單</span>
+              <div style="display:flex;gap:6px">
+                <button onclick="openFamilyBuyModal()" style="padding:5px 12px;background:#fee2e2;border:1px solid #fca5a5;color:#dc2626;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">💰 買入</button>
+                <button onclick="openFamilySellModal()" style="padding:5px 12px;background:#dcfce7;border:1px solid #86efac;color:#15803d;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">💸 賣出</button>
+                <button onclick="openFamilyDivModal()" style="padding:5px 12px;background:#fef3c7;border:1px solid #fcd34d;color:#92400e;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">🎁 股息</button>
+              </div>
+            </div>
+            <div id="family-holdings-body"></div>
+          </div>
+
+          <!-- 歷史紀錄 -->
+          <div class="trend-page-card" style="padding:0;overflow:hidden">
+            <div class="trend-page-hdr" style="padding:10px 14px;border-bottom:1px solid #f0f2f5;flex-direction:column;align-items:flex-start;gap:8px">
+              <span style="font-size:13px;font-weight:700;color:#1e293b">📋 歷史紀錄</span>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;width:100%">
+                <select id="family-log-year" onchange="renderFamilyPage()" style="padding:4px 8px;border:1px solid #e2e8f0;border-radius:6px;font-size:11px;font-weight:700;color:#374151;background:#fff;cursor:pointer;outline:none">
+                  <option value="">全部年份</option>
+                </select>
+                <select id="family-log-month" onchange="renderFamilyPage()" style="padding:4px 8px;border:1px solid #e2e8f0;border-radius:6px;font-size:11px;font-weight:700;color:#374151;background:#fff;cursor:pointer;outline:none">
+                  <option value="">全部月份</option>
+                </select>
+                <select id="flog-type" onchange="setFamilyLogType(this.value)" style="padding:4px 8px;border:1px solid #e2e8f0;border-radius:6px;font-size:11px;font-weight:700;color:#374151;background:#fff;cursor:pointer;outline:none">
+                  <option value="">全部類型</option>
+                  <option value="buy">💰 買入</option>
+                  <option value="sell">💸 賣出</option>
+                  <option value="div">🎁 股息</option>
+                </select>
+              </div>
+            </div>
+            <div id="family-log-body" style="max-height:460px;overflow-y:auto"></div>
+          </div>
+        </div>
+
+        <!-- 姊弟結算 -->
+        <div id="family-split-card" style="display:none" class="trend-page-card" style="padding:0;overflow:hidden;margin-bottom:12px">
+          <div class="trend-page-hdr" style="padding:12px 16px;border-bottom:1px solid #f0f2f5">
+            <span>👧👦 出資結算</span>
+          </div>
+          <div id="family-split-body" style="padding:12px 16px"></div>
+        </div>
+        <!-- 市值趨勢圖 -->
+        <div class="trend-page-card" style="padding:0;overflow:hidden">
+          <div class="trend-page-hdr" style="padding:12px 16px;border-bottom:1px solid #f0f2f5">
+            <span>📈 市值趨勢</span>
+            <div style="display:flex;gap:8px;align-items:center" class="family-chart-radio-area">
+              <label style="font-size:11px;color:#64748b;display:flex;align-items:center;gap:3px;cursor:pointer">
+                <input type="radio" name="family-chart-mode" id="family-chart-all" value="all" checked onchange="renderFamilyTrendChart(window._curFamilyAcc)">
+                <span>合計</span>
+              </label>
+              <label style="font-size:11px;color:#64748b;display:flex;align-items:center;gap:3px;cursor:pointer">
+                <input type="radio" name="family-chart-mode" id="family-chart-xuan" value="軒" onchange="renderFamilyTrendChart(window._curFamilyAcc)">
+                <span>軒</span>
+              </label>
+              <label style="font-size:11px;color:#64748b;display:flex;align-items:center;gap:3px;cursor:pointer">
+                <input type="radio" name="family-chart-mode" id="family-chart-qi" value="琁" onchange="renderFamilyTrendChart(window._curFamilyAcc)">
+                <span>琁</span>
+              </label>
+            </div>
+          </div>
+          <div style="padding:16px">
+            <div style="position:relative;height:220px">
+            <canvas id="family-trend-chart"></canvas>
+            </div>
+            <div id="family-trend-empty" style="display:none;text-align:center;color:#9ca3af;padding:30px;font-size:12px">記錄買賣後自動產生趨勢圖</div>
+          </div>
+        </div>
+      </div>
     </div>
+    </div>
+
 
     <!-- ══ 頁面：交易日誌 ══ -->
     <div class="db-page" id="dbpage-journal">
@@ -2598,118 +2708,6 @@ body:not(.privacy) .privacy-mask{filter:none;}
             <span id="pledge-warn-ratio" style="font-size:10px;color:#92400e"></span>
           </div>
           <div id="pledge-asset-body"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ══ 頁面：家族帳戶 ══ -->
-    <div class="db-page" id="dbpage-family">
-      <!-- 頂部：選擇成員 -->
-      <div class="trend-page-card" style="padding:14px 18px;margin-bottom:16px">
-        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-          <div style="font-size:14px;font-weight:800;color:#1e293b">👨‍👩‍👧‍👦 家族帳戶</div>
-          <button id="family-back-btn" onclick="backToFamilyCards()" style="display:none;padding:6px 12px;background:#f1f5f9;border:1px solid #e2e8f0;color:#475569;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">← 返回總覽</button>
-          <select id="family-member-sel" onchange="renderFamilyPage()" style="display:none">
-            <option value="">— 選擇成員 —</option>
-          </select>
-          <button onclick="openFamilyMemberModal()" style="padding:6px 14px;background:#eff6ff;border:1px solid #bfdbfe;color:#2563eb;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">⚙️ 管理成員</button>
-          <div id="family-refresh-btn" style="display:none">
-            <button onclick="refreshFamilyPrices()" style="padding:6px 14px;background:#f3f4f6;border:1px solid #e2e8f0;color:#374151;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">🔄 更新股價</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- 成員卡片網格（未選成員時顯示） -->
-      <div id="family-cards-grid" style="display:none">
-        <div id="family-member-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px"></div>
-      </div>
-      <!-- 未選成員提示（無成員時） -->
-      <div id="family-empty" style="text-align:center;padding:60px;color:#9ca3af;display:none">
-        <div style="font-size:48px;margin-bottom:12px">👨‍👩‍👧‍👦</div>
-        <div style="font-size:16px;font-weight:700;margin-bottom:6px">尚無家族成員</div>
-        <div style="font-size:13px">點擊「⚙️ 管理成員」新增</div>
-      </div>
-
-      <!-- 成員內容區 -->
-      <div id="family-content" style="display:none">
-        <!-- KPI -->
-        <div class="ov-kpi-grid" style="margin-bottom:16px" id="family-kpi-grid">
-          <div class="ov-kpi-card"><div class="ov-kpi-accent" style="background:#8fa8c8"></div><div class="ov-kpi-label" style="padding-left:8px">總投入成本</div><div class="ov-kpi-val" id="fm-cost" style="padding-left:8px">—</div></div>
-          <div class="ov-kpi-card"><div class="ov-kpi-accent" style="background:#a8c5a0"></div><div class="ov-kpi-label" style="padding-left:8px">股票市值</div><div class="ov-kpi-val" id="fm-mkt" style="padding-left:8px">—</div></div>
-          <div class="ov-kpi-card"><div class="ov-kpi-accent" style="background:#c9a99a"></div><div class="ov-kpi-label" style="padding-left:8px">損益</div><div class="ov-kpi-val" id="fm-pnl" style="padding-left:8px">—</div><div class="ov-kpi-sub" id="fm-roi" style="padding-left:8px"></div></div>
-          <div class="ov-kpi-card"><div class="ov-kpi-accent" style="background:#b5adc4"></div><div class="ov-kpi-label" style="padding-left:8px">累積股息</div><div class="ov-kpi-val" id="fm-div" style="padding-left:8px">—</div></div>
-        </div>
-
-        <!-- 持股 + 歷史紀錄 -->
-        <div style="display:grid;grid-template-columns:1fr 340px;gap:16px;margin-bottom:16px">
-          <!-- 持股清單 -->
-          <div class="trend-page-card" style="padding:0;overflow:hidden">
-            <div class="trend-page-hdr" style="padding:12px 16px;border-bottom:1px solid #f0f2f5">
-              <span>💼 持股清單</span>
-              <div style="display:flex;gap:6px">
-                <button onclick="openFamilyBuyModal()" style="padding:5px 12px;background:#fee2e2;border:1px solid #fca5a5;color:#dc2626;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">💰 買入</button>
-                <button onclick="openFamilySellModal()" style="padding:5px 12px;background:#dcfce7;border:1px solid #86efac;color:#15803d;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">💸 賣出</button>
-                <button onclick="openFamilyDivModal()" style="padding:5px 12px;background:#fef3c7;border:1px solid #fcd34d;color:#92400e;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">🎁 股息</button>
-              </div>
-            </div>
-            <div id="family-holdings-body"></div>
-          </div>
-
-          <!-- 歷史紀錄 -->
-          <div class="trend-page-card" style="padding:0;overflow:hidden">
-            <div class="trend-page-hdr" style="padding:10px 14px;border-bottom:1px solid #f0f2f5;flex-direction:column;align-items:flex-start;gap:8px">
-              <span style="font-size:13px;font-weight:700;color:#1e293b">📋 歷史紀錄</span>
-              <div style="display:flex;gap:6px;flex-wrap:wrap;width:100%">
-                <select id="family-log-year" onchange="renderFamilyPage()" style="padding:4px 8px;border:1px solid #e2e8f0;border-radius:6px;font-size:11px;font-weight:700;color:#374151;background:#fff;cursor:pointer;outline:none">
-                  <option value="">全部年份</option>
-                </select>
-                <select id="family-log-month" onchange="renderFamilyPage()" style="padding:4px 8px;border:1px solid #e2e8f0;border-radius:6px;font-size:11px;font-weight:700;color:#374151;background:#fff;cursor:pointer;outline:none">
-                  <option value="">全部月份</option>
-                </select>
-                <select id="flog-type" onchange="setFamilyLogType(this.value)" style="padding:4px 8px;border:1px solid #e2e8f0;border-radius:6px;font-size:11px;font-weight:700;color:#374151;background:#fff;cursor:pointer;outline:none">
-                  <option value="">全部類型</option>
-                  <option value="buy">💰 買入</option>
-                  <option value="sell">💸 賣出</option>
-                  <option value="div">🎁 股息</option>
-                </select>
-              </div>
-            </div>
-            <div id="family-log-body" style="max-height:460px;overflow-y:auto"></div>
-          </div>
-        </div>
-
-        <!-- 姊弟結算 -->
-        <div id="family-split-card" style="display:none" class="trend-page-card" style="padding:0;overflow:hidden;margin-bottom:12px">
-          <div class="trend-page-hdr" style="padding:12px 16px;border-bottom:1px solid #f0f2f5">
-            <span>👧👦 出資結算</span>
-          </div>
-          <div id="family-split-body" style="padding:12px 16px"></div>
-        </div>
-        <!-- 市值趨勢圖 -->
-        <div class="trend-page-card" style="padding:0;overflow:hidden">
-          <div class="trend-page-hdr" style="padding:12px 16px;border-bottom:1px solid #f0f2f5">
-            <span>📈 市值趨勢</span>
-            <div style="display:flex;gap:8px;align-items:center" class="family-chart-radio-area">
-              <label style="font-size:11px;color:#64748b;display:flex;align-items:center;gap:3px;cursor:pointer">
-                <input type="radio" name="family-chart-mode" id="family-chart-all" value="all" checked onchange="renderFamilyTrendChart(window._curFamilyAcc)">
-                <span>合計</span>
-              </label>
-              <label style="font-size:11px;color:#64748b;display:flex;align-items:center;gap:3px;cursor:pointer">
-                <input type="radio" name="family-chart-mode" id="family-chart-xuan" value="軒" onchange="renderFamilyTrendChart(window._curFamilyAcc)">
-                <span>軒</span>
-              </label>
-              <label style="font-size:11px;color:#64748b;display:flex;align-items:center;gap:3px;cursor:pointer">
-                <input type="radio" name="family-chart-mode" id="family-chart-qi" value="琁" onchange="renderFamilyTrendChart(window._curFamilyAcc)">
-                <span>琁</span>
-              </label>
-            </div>
-          </div>
-          <div style="padding:16px">
-            <div style="position:relative;height:220px">
-            <canvas id="family-trend-chart"></canvas>
-            </div>
-            <div id="family-trend-empty" style="display:none;text-align:center;color:#9ca3af;padding:30px;font-size:12px">記錄買賣後自動產生趨勢圖</div>
-          </div>
         </div>
       </div>
     </div>
