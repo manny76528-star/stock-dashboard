@@ -11298,13 +11298,13 @@ function renderAssetsPage(){
             <div style="font-size:10px;color:#94a3b8;text-align:right">已還 ${paidPeriods} 期・剩 ${remainPeriods} 期・到期 ${dueStr}</div>
           </div>
           <div id="${lid}" style="display:none;background:#fff;border-top:1px solid #fff0ec;padding:10px 14px">
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px 16px;margin-bottom:8px">
-              <div style="display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:1px solid #f8f8f8"><span style="color:#94a3b8">原始本金</span><span style="font-weight:700;font-family:'JetBrains Mono',monospace">$${(l.amount||0).toLocaleString()}</span></div>
-              <div style="display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:1px solid #f8f8f8"><span style="color:#94a3b8">尚餘本金</span><span style="font-weight:700;font-family:'JetBrains Mono',monospace;color:#dc2626">$${Math.round(calcRem).toLocaleString()}</span></div>
-              <div style="display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:1px solid #f8f8f8"><span style="color:#94a3b8">月還款</span><span style="font-weight:700;font-family:'JetBrains Mono',monospace">$${(l.monthly||0).toLocaleString()}</span></div>
-              <div style="display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:1px solid #f8f8f8"><span style="color:#94a3b8">扣款日</span><span style="font-weight:700">${l.deductDay||'—'}${dDays!=null?' ('+dDays+'天)':''}</span></div>
-              <div style="display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:1px solid #f8f8f8"><span style="color:#94a3b8">到期日</span><span style="font-weight:700">${l.due||'—'}</span></div>
-              <div style="display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:1px solid #f8f8f8"><span style="color:#94a3b8">扣款帳戶</span><span style="font-weight:700">${l.deductBank||'—'}</span></div>
+            <div style="display:flex;flex-direction:column;gap:3px;margin-bottom:8px">
+              <div style="display:grid;grid-template-columns:56px 1fr;font-size:11px;padding:3px 0;border-bottom:1px solid #f8f8f8"><span style="color:#94a3b8">原始本金</span><span style="font-weight:700;font-family:'JetBrains Mono',monospace">$${(l.amount||0).toLocaleString()}</span></div>
+              <div style="display:grid;grid-template-columns:56px 1fr;font-size:11px;padding:3px 0;border-bottom:1px solid #f8f8f8"><span style="color:#94a3b8">尚餘本金</span><span style="font-weight:700;font-family:'JetBrains Mono',monospace;color:#dc2626">$${Math.round(calcRem).toLocaleString()}</span></div>
+              <div style="display:grid;grid-template-columns:56px 1fr;font-size:11px;padding:3px 0;border-bottom:1px solid #f8f8f8"><span style="color:#94a3b8">月還款</span><span style="font-weight:700;font-family:'JetBrains Mono',monospace">$${(l.monthly||0).toLocaleString()}</span></div>
+              <div style="display:grid;grid-template-columns:56px 1fr;font-size:11px;padding:3px 0;border-bottom:1px solid #f8f8f8"><span style="color:#94a3b8">扣款日</span><span style="font-weight:700">${l.deductDay||'—'}${dDays!=null?' ('+dDays+'天)':''}</span></div>
+              <div style="display:grid;grid-template-columns:56px 1fr;font-size:11px;padding:3px 0;border-bottom:1px solid #f8f8f8"><span style="color:#94a3b8">到期日</span><span style="font-weight:700">${l.due||'—'}</span></div>
+              <div style="display:grid;grid-template-columns:56px 1fr;font-size:11px;padding:3px 0;border-bottom:1px solid #f8f8f8"><span style="color:#94a3b8">扣款帳戶</span><span style="font-weight:700">${l.deductBank||'—'}</span></div>
             </div>
             <div style="display:flex;gap:6px">
               <button onclick="editLoan('${l.id}')" style="padding:4px 10px;border:1px solid #e2e8f0;border-radius:6px;background:#f8fafc;font-size:11px;cursor:pointer">✏️ 編輯</button>
