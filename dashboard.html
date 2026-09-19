@@ -2158,41 +2158,41 @@ body:not(.privacy) .privacy-mask{filter:none;}
       </div>
 
       <!-- 現金流月報 -->
-      <div class="as-card" id="cashflow-card" style="margin-bottom:16px;padding:12px 16px;position:relative">
-        <button onclick="toggleCfChart()" id="cf-chart-btn" style="position:absolute;top:10px;right:12px;background:#f1f5f9;border:0.5px solid #e2e8f0;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:500;cursor:pointer;color:#64748b;white-space:nowrap;line-height:1.4">📊 還款進度</button>
+      <div class="as-card" id="cashflow-card" style="margin-bottom:16px;padding:12px 16px;position:relative;background:#eff6ff;border:1px solid #bfdbfe">
+        <button onclick="toggleCfChart()" id="cf-chart-btn" style="position:absolute;top:10px;right:12px;background:#fff;border:0.5px solid #bfdbfe;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:500;cursor:pointer;color:#1d4ed8;white-space:nowrap;line-height:1.4">📊 還款進度</button>
         <div style="display:grid;grid-template-columns:minmax(0,1fr) 36px minmax(0,1fr);gap:0;align-items:end">
           <div style="padding-right:12px">
-            <div style="font-size:11px;color:#9ca3af;font-weight:600;margin-bottom:4px">現金流入 🏦</div>
+            <div style="font-size:11px;color:#3b82f6;font-weight:600;margin-bottom:4px">現金流入 🏦</div>
             <div style="font-size:20px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#1e293b;margin-bottom:8px" id="cf-inflow">—</div>
             <div style="font-size:11px;font-weight:700;color:#185FA5;margin-bottom:5px">現金流部隊強度 (100%)</div>
-            <div style="height:10px;border-radius:5px;background:#e2e8f0;overflow:hidden"><div style="width:100%;height:100%;background:#185FA5;border-radius:5px"></div></div>
-            <div style="font-size:10px;color:#94a3b8;margin-top:3px">每期股息入帳</div>
+            <div style="height:10px;border-radius:5px;background:#bfdbfe;overflow:hidden"><div style="width:100%;height:100%;background:#185FA5;border-radius:5px"></div></div>
+            <div style="font-size:10px;color:#3b82f6;margin-top:3px">每期股息入帳</div>
           </div>
           <div style="font-size:22px;text-align:center;padding-bottom:14px">⚔️</div>
           <div style="padding-left:12px">
-            <div style="font-size:11px;color:#9ca3af;font-weight:600;margin-bottom:4px">每月固定支出 💸</div>
+            <div style="font-size:11px;color:#3b82f6;font-weight:600;margin-bottom:4px">每月固定支出 💸</div>
             <div style="font-size:20px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#1e293b;margin-bottom:8px" id="cf-outflow">—</div>
             <div style="font-size:11px;font-weight:700;margin-bottom:5px" id="cf-battle-label">—</div>
-            <div style="height:10px;border-radius:5px;background:#e2e8f0;overflow:hidden">
+            <div style="height:10px;border-radius:5px;background:#bfdbfe;overflow:hidden">
               <div style="display:flex;height:100%">
                 <div id="cf-bar-expense" style="height:100%;background:#22C55E"></div>
                 <div id="cf-bar-surplus" style="height:100%"></div>
               </div>
             </div>
-            <div style="font-size:10px;color:#94a3b8;margin-top:3px" id="cf-battle-sub">—</div>
+            <div style="font-size:10px;color:#3b82f6;margin-top:3px" id="cf-battle-sub">—</div>
           </div>
         </div>
-        <div style="font-size:10px;color:#94a3b8;text-align:right;margin-top:4px" id="cf-outflow-detail">—</div>
-        <div style="border-top:1px solid #f1f5f9;padding-top:10px;margin-top:10px;display:flex;justify-content:space-between;align-items:center">
-          <div style="font-size:12px;color:#64748b;font-weight:600" id="cf-result-label">—</div>
+        <div style="font-size:10px;color:#3b82f6;text-align:right;margin-top:4px" id="cf-outflow-detail">—</div>
+        <div style="border-top:1px solid #bfdbfe;padding-top:10px;margin-top:10px;display:flex;justify-content:space-between;align-items:center">
+          <div style="font-size:12px;color:#1d4ed8;font-weight:600" id="cf-result-label">—</div>
           <div style="display:flex;align-items:baseline;gap:8px">
             <span style="font-size:18px;font-weight:800;font-family:'JetBrains Mono',monospace" id="cf-surplus">—</span>
             <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px" id="cf-coverage">—</span>
           </div>
         </div>
         <!-- 還款進度展開區 -->
-        <div id="cf-chart-panel" style="display:none;border-top:1px solid #f1f5f9;margin-top:12px;padding-top:12px">
-          <div style="font-size:12px;font-weight:700;color:#64748b;margin-bottom:8px">📊 Line Bank 還款進度</div>
+        <div id="cf-chart-panel" style="display:none;border-top:1px solid #bfdbfe;margin-top:12px;padding-top:12px">
+          <div style="font-size:12px;font-weight:700;color:#1d4ed8;margin-bottom:8px">📊 Line Bank 還款進度</div>
           <div id="cf-loan-cards-active" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px"></div>
           <div id="cf-loan-cards-cleared" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;align-items:center"></div>
           <div style="position:relative;height:200px"><canvas id="cf-debt-chart"></canvas></div>
@@ -2200,9 +2200,9 @@ body:not(.privacy) .privacy-mask{filter:none;}
       </div>
 
       <!-- 信貸管理（全寬） -->
-      <div class="as-card" style="margin-bottom:16px">
-        <div class="as-card-hdr">
-          <div class="as-card-title">🏦 信貸管理 <span id="as-loan-remain" style="font-size:13px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#16a34a;margin-left:6px"></span></div>
+      <div class="as-card" style="margin-bottom:16px;background:#fff7f5;border:1px solid #fdddd6">
+        <div class="as-card-hdr" style="border-bottom:1px solid #fdddd6">
+          <div class="as-card-title" style="color:#c2410c">🏦 信貸管理 <span id="as-loan-remain" style="font-size:13px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#dc2626;margin-left:6px"></span></div>
           <button onclick="openSP('health')" style="display:none"></button>
           <span class="as-card-badge" id="as-loan-badge" style="background:#fee2e2;color:#b91c1c"></span>
         </div>
@@ -2213,10 +2213,10 @@ body:not(.privacy) .privacy-mask{filter:none;}
       <!-- 現金帳戶（70%）+ 不限用途（30%） -->
       <div style="display:grid;grid-template-columns:70% 30%;gap:16px;margin-bottom:16px;align-items:start">
         <!-- 現金帳戶 70% -->
-        <div class="as-card">
-          <div class="as-card-hdr">
-            <div class="as-card-title">💵 現金帳戶</div>
-            <span class="as-card-badge" id="as-cash-badge" style="background:#dcfce7;color:#15803d"></span>
+        <div class="as-card" style="background:#faf5ff;border:1px solid #e9d5ff">
+          <div class="as-card-hdr" style="border-bottom:1px solid #e9d5ff">
+            <div class="as-card-title" style="color:#7c3aed">💵 現金帳戶</div>
+            <span class="as-card-badge" id="as-cash-badge" style="background:#ede9fe;color:#7c3aed"></span>
           </div>
           <div id="as-cash-body"></div>
           <div class="as-add-btn" onclick="openCashModal()">＋ 新增帳戶</div>
@@ -2234,10 +2234,10 @@ body:not(.privacy) .privacy-mask{filter:none;}
       </div>
 
       <!-- 近期扣款提醒 -->
-      <div class="trend-page-card" style="margin-top:16px;padding:0;overflow:hidden">
-        <div class="trend-page-hdr" style="padding:12px 18px;border-bottom:1px solid #f0f2f5">
-          <span>🏦 近期扣款提醒</span>
-          <button onclick="openLoanHist()" style="padding:4px 10px;background:#f0fdf4;border:1px solid #bbf7d0;color:#16a34a;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer">📚 結清記錄</button>
+      <div style="margin-top:16px;border-radius:14px;overflow:hidden;border:1px solid #fef08a;background:#fffef0">
+        <div style="padding:12px 18px;border-bottom:1px solid #fef08a;display:flex;align-items:center;justify-content:space-between">
+          <span style="font-size:13px;font-weight:700;color:#a16207">🔔 近期扣款提醒</span>
+          <button onclick="openLoanHist()" style="padding:4px 10px;background:#fff;border:1px solid #fde68a;color:#a16207;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer">📚 結清記錄</button>
         </div>
         <div id="as-deduct-body" style="padding:8px 0"></div>
       </div>
@@ -5074,7 +5074,7 @@ function renderAssetsDeduct(){
   if(!el)return;
   if(sorted.length===0){el.innerHTML='<div style="padding:16px;text-align:center;color:#9ca3af;font-size:12px">近45天無扣款</div>';return;}
   el.innerHTML=sorted.map(({l,days})=>{
-    const urgColor=days<=3?'#dc2626':days<=7?'#f59e0b':'#64748b';
+    const urgColor='#dc2626';
     const deductBank=l.deductBank;
     let balText='';
     if(deductBank){
@@ -5225,7 +5225,7 @@ function renderInvTop3(){
         <div style="font-size:10px;color:#9ca3af;margin-top:1px">${c.tLots}張 · ${price?'$'+price:'—'}</div>
       </div>
       <div style="text-align:right">
-        <div style="font-size:13px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#374151" class="privacy-mask">$${Math.round(mkt).toLocaleString()}</div>
+        <div style="font-size:13px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#2563eb" class="privacy-mask">$${Math.round(mkt).toLocaleString()}</div>
         <div style="font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace" class="privacy-mask" style="color:${(c.pnl||0)>=0?'#dc2626':'#16a34a'}">${(c.pnl||0)>=0?'+':''}${Math.round(c.pnl||0).toLocaleString()}</div>
       </div>
     </div>`;
@@ -11317,8 +11317,8 @@ function renderAssetsPage(){
 
         if(isLineBank){
           const nearestDays=pendingDivs30.length>0?Math.ceil((new Date(pendingDivs30[0].date)-new Date())/86400000):null;
-          return`<div style="grid-column:1/-1;background:#fff;border-radius:12px;border:1px solid #eaecf0;box-shadow:0 2px 8px rgba(0,0,0,.04);overflow:hidden">
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #f1f5f9">
+          return`<div style="grid-column:1/-1;background:linear-gradient(135deg,#fffbeb,#fefce8);border-radius:12px;border:1.5px solid #DAA520;box-shadow:0 4px 16px rgba(218,165,32,.15);overflow:hidden">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #fde68a">
               <div style="display:flex;align-items:center;gap:8px">
                 <span style="font-size:14px;font-weight:800;color:#1e293b">🏦 ${acc.bank}</span>
                 <span style="font-size:9px;background:#dcfce7;color:#15803d;padding:2px 7px;border-radius:4px;font-weight:700">主帳戶</span>
@@ -11435,7 +11435,7 @@ function renderAssetsDeduct(){
     return;
   }
   el.innerHTML=sorted.map(({l,days})=>{
-    const urgColor=days<=3?'#dc2626':days<=7?'#f59e0b':'#64748b';
+    const urgColor='#dc2626';
     const deductBank=l.deductBank;
     let balText='';
     if(deductBank){
