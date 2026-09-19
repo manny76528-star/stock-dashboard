@@ -2762,7 +2762,7 @@
           4
         ],
         "amount": 1250,
-        "enabled": true
+        "enabled": false
       },
       {
         "id": "mu73ajshs13",
@@ -2771,7 +2771,8 @@
           2,
           4
         ],
-        "amount": 1250
+        "amount": 1250,
+        "enabled": false
       }
     ]
   },
@@ -2859,7 +2860,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1789827840028,
+  "_ts": 1789827842955,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
