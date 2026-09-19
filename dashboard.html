@@ -4983,7 +4983,7 @@ function fmtF(n,d=2){return isNaN(n)?'—':n.toFixed(d);}
 // ═══════ RENDER ═══════
 let showDivRoi=false;
 
-function render(){renderInv();renderInvTop3();renderLoans();renderFlex();renderCash();renderDivs();renderSum();updateWatchNavBadge();}
+function render(){renderInv();renderInvTop3();renderLoans();renderFlex();renderCash();renderDivs();renderSum();updateWatchNavBadge();renderFamilyMemberCards();}
 
 window._marketColors={1:'',2:'',3:''};
 function setMarketColor(n,color){
@@ -14691,7 +14691,7 @@ function dbShowPage(id){
   // 各頁面邏輯
   if(id==='overview'){renderInvestL1();return;}
   if(id==='assets'){renderAssetsPage();setTimeout(renderAssetsDeduct,100);}
-  if(id==='invest'){renderInvestL1();return;}
+  if(id==='invest'){renderInvestL1();renderFamilyMemberCards();return;}
   if(id==='invest-detail'){renderInvestPage();return;}
   if(id==='trend')renderTrendPage();
   if(id==='journal'){renderJournalPage();setTimeout(()=>{if(typeof renderJournal==='function')renderJournal();},150);}
