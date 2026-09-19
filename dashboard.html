@@ -2210,19 +2210,9 @@ body:not(.privacy) .privacy-mask{filter:none;}
         <div class="as-add-btn" onclick="openLoanModal()">＋ 新增信貸</div>
       </div>
 
-      <!-- 不限用途 + 現金帳戶（並排） -->
-      <div class="as-grid" style="margin-bottom:16px">
-        <!-- 不限用途 -->
-        <div class="as-card">
-          <div class="as-card-hdr">
-            <div class="as-card-title">💳 不限用途額度</div>
-            <span class="as-card-badge" id="as-flex-badge" style="background:#dbeafe;color:#1d4ed8"></span>
-          </div>
-          <div id="as-flex-body"></div>
-          <div class="as-add-btn" onclick="openFlexModal()">＋ 新增不限用途</div>
-        </div>
-
-        <!-- 現金帳戶 -->
+      <!-- 現金帳戶（70%）+ 不限用途（30%） -->
+      <div style="display:grid;grid-template-columns:70% 30%;gap:16px;margin-bottom:16px;align-items:start">
+        <!-- 現金帳戶 70% -->
         <div class="as-card">
           <div class="as-card-hdr">
             <div class="as-card-title">💵 現金帳戶</div>
@@ -2230,6 +2220,16 @@ body:not(.privacy) .privacy-mask{filter:none;}
           </div>
           <div id="as-cash-body"></div>
           <div class="as-add-btn" onclick="openCashModal()">＋ 新增帳戶</div>
+        </div>
+
+        <!-- 不限用途 30% -->
+        <div class="as-card">
+          <div class="as-card-hdr">
+            <div class="as-card-title">💳 不限用途額度</div>
+            <span class="as-card-badge" id="as-flex-badge" style="background:#dbeafe;color:#1d4ed8"></span>
+          </div>
+          <div id="as-flex-body"></div>
+          <div class="as-add-btn" onclick="openFlexModal()">＋ 新增不限用途</div>
         </div>
       </div>
 
@@ -11306,7 +11306,7 @@ function renderAssetsPage(){
         .sort((a,b)=>a.date.localeCompare(b.date));
       const pendingTotal30=pendingDivs30.reduce((s,d)=>s+d.amount,0);
 
-      cb.innerHTML=`<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;padding:16px">`+
+      cb.innerHTML=`<div style="display:flex;flex-direction:column;gap:10px;padding:12px">`+
       db.cashAccounts.map(acc=>{
         const bal=(acc.cash||0)+(acc.d1||0)+(acc.d2||0);
         const hasD1=acc.d1&&acc.d1!==0, hasD2=acc.d2&&acc.d2!==0;
@@ -11361,21 +11361,18 @@ function renderAssetsPage(){
           </div>`;
         }
 
-        return`<div style="background:#fff;border-radius:12px;border:1px solid #eaecf0;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.04)">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-            <div style="font-size:13px;font-weight:800;color:#1e293b">${acc.bank||acc.name||'帳戶'}</div>
-            <div style="display:flex;gap:6px">
-              <button onclick="event.stopPropagation();editCash('${acc.id}')" style="width:28px;height:28px;background:#f8f9fa;border:1px solid #e2e8f0;border-radius:7px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center">✏️</button>
-              <button onclick="event.stopPropagation();delCash('${acc.id}')" style="width:28px;height:28px;background:#fff;border:1px solid #fca5a5;border-radius:7px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center">🗑</button>
+        return`<div style="background:#fff;border-radius:10px;border:1px solid #eaecf0;padding:10px 14px;display:flex;align-items:center;justify-content:space-between">
+          <div style="flex:1">
+            <div style="font-size:12px;font-weight:700;color:#1e293b;margin-bottom:2px">${acc.bank||acc.name||'帳戶'}</div>
+            <div style="font-size:10px;color:#9ca3af">現金 $${(acc.cash||0).toLocaleString()}${hasD1?` · D+1 $${acc.d1.toLocaleString()}`:''}${hasD2?` · D+2 $${acc.d2.toLocaleString()}`:''}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="font-size:15px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#dc2626">$${Math.abs(bal).toLocaleString()}</div>
+            <div style="display:flex;gap:4px">
+              <button onclick="event.stopPropagation();editCash('${acc.id}')" style="width:24px;height:24px;background:#f8f9fa;border:1px solid #e2e8f0;border-radius:6px;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center">✏️</button>
+              <button onclick="event.stopPropagation();delCash('${acc.id}')" style="width:24px;height:24px;background:#fff;border:1px solid #fca5a5;border-radius:6px;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center">🗑</button>
             </div>
           </div>
-          <div style="font-size:11px;color:#9ca3af;margin-bottom:2px">總餘額</div>
-          <div style="font-size:18px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#dc2626;margin-bottom:8px">$${Math.abs(bal).toLocaleString()}</div>
-          <div style="font-size:11px;padding:4px 0;border-top:1px solid #f5f5f5;display:flex;justify-content:space-between">
-            <span style="color:#9ca3af">現金</span><span style="font-weight:700" >$${(acc.cash||0).toLocaleString()}</span>
-          </div>
-          ${hasD1?`<div style="font-size:11px;padding:4px 0;border-top:1px solid #f5f5f5;display:flex;justify-content:space-between"><span style="color:#9ca3af">交割 D+1</span><span style="font-weight:700;color:${acc.d1<0?'#16a34a':'#dc2626'}" class="privacy-mask">$${acc.d1.toLocaleString()}</span></div>`:''}
-          ${hasD2?`<div style="font-size:11px;padding:4px 0;border-top:1px solid #f5f5f5;display:flex;justify-content:space-between"><span style="color:#9ca3af">交割 D+2</span><span style="font-weight:700;color:${acc.d2<0?'#16a34a':'#dc2626'}" class="privacy-mask">$${acc.d2.toLocaleString()}</span></div>`:''}
         </div>`;
       }).join('')+'</div>';
     }
