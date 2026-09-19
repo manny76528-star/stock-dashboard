@@ -5108,13 +5108,10 @@ function renderAssetsDeduct(){
         balText=`<span style="font-size:10px;font-weight:700;color:${ok?'#16a34a':'#dc2626'}">${ok?'✓ 足夠':'⚠️ 不足'}</span>`;
       }
     }
-    return`<div style="margin:0 8px 6px;background:#fff;border-radius:7px;padding:8px 10px;border:1px solid #fef08a">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
-        <span style="font-size:11px;font-weight:700;color:#a16207">${l.bank||'信貸'}</span>
-        ${balText}
-      </div>
-      <div style="font-size:14px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#dc2626">$${Math.round(l.monthly||0).toLocaleString()}</div>
-      <div style="font-size:10px;color:#94a3b8;margin-top:1px">${l.deductDay||''} · ${days}天後</div>
+    return`<div style="background:#fff;border-radius:7px;padding:7px 8px;border:1px solid #fef08a">
+      <div style="font-size:10px;font-weight:700;color:#a16207">${l.bank||'信貸'}</div>
+      <div style="font-size:13px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#dc2626">$${Math.round(l.monthly||0).toLocaleString()}</div>
+      <div style="font-size:9px;color:#94a3b8;margin-top:1px">${l.deductDay||''} · ${days}天後 ${balText}</div>
     </div>`;
   }).join('');
 }
@@ -11298,7 +11295,7 @@ function renderAssetsPage(){
           if(a.days===null)return 1;if(b.days===null)return -1;
           return a.days-b.days;
         });
-      lb.innerHTML=sorted2.map(({l,days:sortDays},idx)=>{
+      lb.innerHTML='<div style="display:grid;grid-template-columns:1fr 1fr;gap:0">'+sorted2.map(({l,days:sortDays},idx)=>{
         const calcRem=calcLoanRemain(l);
         const totalPeriods=Math.round((l.amount||0)/(l.monthly||1));
         const paidPeriods=totalPeriods-Math.round(calcRem/(l.monthly||1));
@@ -11321,7 +11318,7 @@ function renderAssetsPage(){
           }
         }
         const lid='asl-'+l.id;
-        return`<div style="border-bottom:1px solid #fff0ec">
+        const isRight=(idx%2===1);const isLastRow=(idx>=sorted2.length-2);return`<div style="border-bottom:${isLastRow?'none':'1px solid #fff0ec'};border-right:${isRight?'none':'1px solid #fff0ec'}">
           <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px 4px;cursor:pointer" onclick="toggleAsLoan('${lid}')">
             <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
               <span style="font-size:11px;font-weight:800;color:#c2410c">${circleNums[idx]||idx+1}</span>
@@ -11352,7 +11349,7 @@ function renderAssetsPage(){
             </div>
           </div>
         </div>`;
-      }).join('');
+      }).join('')+'</div>';
 
     }
   }
@@ -11563,24 +11560,21 @@ function renderAssetsDeduct(){
     el.innerHTML='<div style="padding:16px;text-align:center;color:#9ca3af;font-size:12px">近45天無扣款</div>';
     return;
   }
-  el.innerHTML=sorted.map(({l,days})=>{
-    const urgColor='#dc2626';
+  const totalMonthly=sorted.reduce((s,{l})=>s+(l.monthly||0),0);
+  el.innerHTML='<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:8px">'+sorted.map(({l,days})=>{
     const deductBank=l.deductBank;
     let balText='';
     if(deductBank){
       const acc=db.cashAccounts.find(c=>c.bank===deductBank);
       if(acc){
         const bal=(acc.cash||0)+(acc.d1||0)+(acc.d2||0);
-        // 計算扣款日（與信貸管理相同邏輯）
         const todayD=new Date();
         const todayStr=todayD.toISOString().slice(0,10);
         const dDay=parseInt(l.deductDay)||0;
         const thisMonth=new Date(todayD.getFullYear(),todayD.getMonth(),dDay);
         const deductDate=thisMonth>todayD?thisMonth:new Date(todayD.getFullYear(),todayD.getMonth()+1,dDay);
         const deductDateStr=deductDate.toISOString().slice(0,10);
-        // 扣款日前入帳的股息
         const preDivTotal=(db.dividends||[]).filter(d=>d.date&&d.date>todayStr&&d.date<=deductDateStr).reduce((s,d)=>s+(d.amount||0),0);
-        // 同帳戶扣款日前的所有扣款（含本筆）
         const upcoming=[];
         (db.loans||[]).forEach(loan=>{
           if(loan.deductBank!==deductBank||!loan.deductDay)return;
@@ -11591,20 +11585,21 @@ function renderAssetsDeduct(){
           }
         });
         let runBal=bal+preDivTotal;
-        upcoming.forEach(item=>{ runBal-=item.monthly; });
+        upcoming.forEach(item=>{runBal-=item.monthly;});
         const ok=runBal>=0;
-        balText=`<span style="font-size:10px;font-weight:700;color:${ok?'#16a34a':'#dc2626'}">${ok?'✓ 足夠':'⚠️ 不足'}</span>`;
+        balText=`<span style="font-size:9px;font-weight:700;color:${ok?'#16a34a':'#dc2626'}">${ok?'✓':'⚠️'}</span>`;
       }
     }
-    return`<div style="margin:0 8px 6px;background:#fff;border-radius:7px;padding:8px 10px;border:1px solid #fef08a">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
-        <span style="font-size:11px;font-weight:700;color:#a16207">${l.bank||'信貸'}</span>
-        ${balText}
-      </div>
-      <div style="font-size:14px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#dc2626">$${Math.round(l.monthly||0).toLocaleString()}</div>
-      <div style="font-size:10px;color:#94a3b8;margin-top:1px">${l.deductDay||''} · ${days}天後</div>
+    return`<div style="background:#fff;border-radius:7px;padding:7px 8px;border:1px solid #fef08a">
+      <div style="font-size:10px;font-weight:700;color:#a16207">${l.bank||'信貸'}</div>
+      <div style="font-size:13px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#dc2626">$${Math.round(l.monthly||0).toLocaleString()}</div>
+      <div style="font-size:9px;color:#94a3b8;margin-top:1px">${l.deductDay||''} · ${days}天後 ${balText}</div>
     </div>`;
-  }).join('');
+  }).join('')+
+  `<div style="grid-column:1/-1;background:#fee2e2;border-radius:7px;padding:6px 8px;border:1px solid #fca5a5;display:flex;justify-content:space-between;align-items:center">
+    <span style="font-size:10px;color:#94a3b8">本月總扣款</span>
+    <span style="font-size:14px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#dc2626">$${totalMonthly.toLocaleString()}</span>
+  </div>`+'</div>';
 }
 
 let _investMiniDonut=null;
