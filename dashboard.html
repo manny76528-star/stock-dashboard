@@ -71,6 +71,7 @@ html,body{margin:0;padding:0;width:100%;min-height:100vh;}
   display:flex;flex-direction:column;
   height:100vh;
   overflow-y:auto;
+  overflow-x:hidden;
 }
 
 /* 頂部欄 */
@@ -114,7 +115,7 @@ html,body{margin:0;padding:0;width:100%;min-height:100vh;}
 .db-kpi-sub{font-size:11px;margin-top:4px;color:#94a3b8;}
 
 /* 頁面標籤頁（用於各功能區切換） */
-.db-page{display:none;}
+.db-page{display:none;max-width:100%;overflow-x:hidden;}
 .db-page.active{display:block;}
 .mono{font-family:'JetBrains Mono',monospace;}
 .gain{color:var(--gain);}.loss{color:var(--loss);}.bold{font-weight:700;}
