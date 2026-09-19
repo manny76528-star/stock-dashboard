@@ -2271,7 +2271,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
 
       <!-- 成員卡片網格（未選成員時顯示） -->
       <div id="family-cards-grid" style="display:none">
-        <div id="family-member-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px"></div>
+        <div id="family-member-cards" style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px"></div>
       </div>
       <!-- 未選成員提示（無成員時） -->
       <div id="family-empty" style="text-align:center;padding:60px;color:#9ca3af;display:none">
@@ -4448,8 +4448,8 @@ function renderInvestL1(){
   if(nameEl)nameEl.textContent='投資與觀察';
   // 內容交給 block3 的完整版渲染
   if(typeof _renderInvestL1Body==='function')_renderInvestL1Body();
+  if(typeof renderFamilyMemberCards==='function')renderFamilyMemberCards();
 }
-
 function updateWatchNavBadge(){
   const badge=document.getElementById('nav-watch-badge');
   if(!badge)return;
@@ -14127,7 +14127,7 @@ function dbShowPage(id){
   // 各頁面邏輯
   if(id==='overview'){renderInvestL1();return;}
   if(id==='assets'){renderAssetsPage();setTimeout(renderAssetsDeduct,100);}
-  if(id==='invest'){renderInvestL1();renderFamilyMemberCards();return;}
+  if(id==='invest'){renderInvestL1();if(typeof renderFamilyMemberCards==='function')renderFamilyMemberCards();return;}
   if(id==='invest-detail'){renderInvestPage();return;}
   if(id==='trend')renderTrendPage();
   if(id==='journal'){renderJournalPage();setTimeout(()=>{if(typeof renderJournal==='function')renderJournal();},150);}
