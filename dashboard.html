@@ -2133,10 +2133,10 @@ body:not(.privacy) .privacy-mask{filter:none;}
           <div style="padding:8px 8px 0">
             <div style="display:flex;justify-content:space-between;font-size:10px;color:#9ca3af;margin-bottom:4px">
               <span>已還款進度</span>
-              <span id="as-loan-pct">—</span>
+              <span id="as-loan-pct" style="display:none">—</span>
             </div>
-            <div style="height:6px;background:#f1f5f9;border-radius:3px;overflow:hidden">
-              <div id="as-loan-prog" style="height:6px;background:linear-gradient(to right,#16a34a,#22c55e);border-radius:3px;width:0%;transition:width .5s"></div>
+            <div style="height:12px;background:#f1f5f9;border-radius:6px;overflow:hidden">
+              <div id="as-loan-prog" style="height:12px;background:linear-gradient(to right,#16a34a,#22c55e);border-radius:6px;width:0%;transition:width .5s;display:flex;align-items:center;justify-content:flex-end;padding-right:5px"><span id="as-loan-pct-inner" style="font-size:8px;font-weight:800;color:#fff;white-space:nowrap"></span></div>
             </div>
             <div style="font-size:10px;color:#9ca3af;margin-top:3px" id="as-loan-prog-sub"></div>
           </div>
@@ -10981,9 +10981,11 @@ function renderAssetsPage(){
   const lPct=lOrig>0?Math.round(lPaid/lOrig*100):0;
   const progEl=document.getElementById('as-loan-prog');
   const pctEl=document.getElementById('as-loan-pct');
+  const pctInnerEl=document.getElementById('as-loan-pct-inner');
   const subEl=document.getElementById('as-loan-prog-sub');
   if(progEl)progEl.style.width=lPct+'%';
   if(pctEl)pctEl.textContent=lPct+'%';
+  if(pctInnerEl)pctInnerEl.textContent=lPct+'%';
   if(subEl)subEl.textContent='已還 $'+Math.round(lPaid).toLocaleString()+' / 原始 $'+Math.round(lOrig).toLocaleString();
   set('as-flex-total',fmtM(fU));
   // 月繳字體放大+綠色（錢流出）
