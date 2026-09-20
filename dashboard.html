@@ -14300,13 +14300,13 @@ function _renderInvestL1Body(){
                 <div style="font-size:10px;color:#94a3b8;margin-bottom:2px">🏆 歷史累積</div>
                 <div style="font-size:12px;font-weight:800;color:#334155;font-family:'JetBrains Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
                   $${Math.round(totalPaidDiv).toLocaleString()}
-                  <span style="font-size:11px;font-weight:700;color:#3b82f6;margin-left:4px">${divPct}%</span>
+
                   <span style="font-size:9px;color:#94a3b8"> 目標$${Math.round(targetDiv/10000).toFixed(0)}萬</span>
                 </div>
               </div>
               <div style="flex:1">
-                <div style="height:12px;border-radius:999px;background:#f1f5f9;overflow:hidden">
-                  <div style="height:12px;border-radius:999px;background:#93c5fd;width:${Math.min(divPct,100)}%;transition:width .5s;display:flex;align-items:center;justify-content:flex-end;padding-right:5px"><span style="font-size:8px;font-weight:800;color:#fff;white-space:nowrap">${divPct}%</span></div>
+                <div style="height:14px;border-radius:999px;background:#f1f5f9;overflow:hidden">
+                  <div style="height:14px;border-radius:999px;background:#93c5fd;width:${Math.min(divPct,100)}%;transition:width .5s;display:flex;align-items:center;justify-content:flex-end;padding-right:6px"><span style="font-size:9px;font-weight:800;color:#fff;white-space:nowrap">${divPct}%</span></div>
                 </div>
               </div>
             </div>
@@ -14317,12 +14317,12 @@ function _renderInvestL1Body(){
             <div style="flex:0 0 180px;overflow:hidden">
               <div style="font-size:10px;color:#94a3b8;margin-bottom:2px">🏦 信貸清償</div>
               <div style="font-size:12px;font-weight:700;color:#c084fc;white-space:nowrap">
-                ${lPct}% 還清<span style="font-size:9px;font-weight:400;color:#94a3b8"> 剩$${Math.round(lR/10000).toFixed(0)}萬</span>
+                距離還清<span style="font-size:9px;font-weight:400;color:#94a3b8"> 剩$${Math.round(lR/10000).toFixed(0)}萬</span>
               </div>
             </div>
             <div style="flex:1">
-              <div style="height:12px;border-radius:999px;background:#f1f5f9;overflow:hidden">
-                <div style="height:12px;border-radius:999px;background:#c084fc;width:${lPct}%;transition:width .5s;display:flex;align-items:center;justify-content:flex-end;padding-right:5px"><span style="font-size:8px;font-weight:800;color:#fff;white-space:nowrap">${lPct}%</span></div>
+              <div style="height:14px;border-radius:999px;background:#f1f5f9;overflow:hidden">
+                <div style="height:14px;border-radius:999px;background:#c084fc;width:${lPct}%;transition:width .5s;display:flex;align-items:center;justify-content:flex-end;padding-right:6px"><span style="font-size:9px;font-weight:800;color:#fff;white-space:nowrap">${lPct}%</span></div>
               </div>
             </div>
           </div>`:''}
