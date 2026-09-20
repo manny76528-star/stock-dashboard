@@ -13767,8 +13767,8 @@ function renderFamilyMemberCards(){
       <!-- 達成率 + 進度條 -->
       <div style="margin-bottom:16px">
         <div style="font-size:1.8rem;font-weight:700;color:${pct>=80?'#fcd34d':pct>=50?'#d8b4fe':'#93c5fd'};line-height:1;margin-bottom:8px">${pct}%</div>
-        <div style="height:10px;border-radius:999px;background:#e2e8f0;overflow:hidden;margin-bottom:8px">
-          <div style="height:10px;border-radius:999px;background:${pct>=80?'#fcd34d':pct>=50?'#d8b4fe':'#93c5fd'};width:${Math.min(pct,100)}%;transition:width .5s ease"></div>
+        <div style="height:12px;border-radius:999px;background:#e2e8f0;overflow:hidden;margin-bottom:8px">
+          <div style="height:12px;border-radius:999px;background:${pct>=80?'#fcd34d':pct>=50?'#d8b4fe':'#93c5fd'};width:${Math.min(pct,100)}%;transition:width .5s ease;display:flex;align-items:center;justify-content:flex-end;padding-right:5px"><span style="font-size:8px;font-weight:800;color:#fff;white-space:nowrap">${pct}%</span></div>
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center">
           <div style="font-size:11px;color:#94a3b8">${active.length} 檔持股</div>
@@ -14305,8 +14305,8 @@ function _renderInvestL1Body(){
                 </div>
               </div>
               <div style="flex:1">
-                <div style="height:10px;border-radius:999px;background:#f1f5f9;overflow:hidden">
-                  <div style="height:10px;border-radius:999px;background:#93c5fd;width:${Math.min(divPct,100)}%;transition:width .5s"></div>
+                <div style="height:12px;border-radius:999px;background:#f1f5f9;overflow:hidden">
+                  <div style="height:12px;border-radius:999px;background:#93c5fd;width:${Math.min(divPct,100)}%;transition:width .5s;display:flex;align-items:center;justify-content:flex-end;padding-right:5px"><span style="font-size:8px;font-weight:800;color:#fff;white-space:nowrap">${divPct}%</span></div>
                 </div>
               </div>
             </div>
@@ -14321,8 +14321,8 @@ function _renderInvestL1Body(){
               </div>
             </div>
             <div style="flex:1">
-              <div style="height:10px;border-radius:999px;background:#f1f5f9;overflow:hidden">
-                <div style="height:10px;border-radius:999px;background:#c084fc;width:${lPct}%;transition:width .5s"></div>
+              <div style="height:12px;border-radius:999px;background:#f1f5f9;overflow:hidden">
+                <div style="height:12px;border-radius:999px;background:#c084fc;width:${lPct}%;transition:width .5s;display:flex;align-items:center;justify-content:flex-end;padding-right:5px"><span style="font-size:8px;font-weight:800;color:#fff;white-space:nowrap">${lPct}%</span></div>
               </div>
             </div>
           </div>`:''}
