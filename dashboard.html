@@ -10704,10 +10704,26 @@ function _initCfDebtChart(){
             title:ctx=>{const p=pts[ctx[0].dataIndex];return Math.floor(p.rawYM/12)+'年'+p.rawYM%12+'月';},
             label:ctx=>'總負債：$'+ctx.raw.toLocaleString(),
             afterLabel:ctx=>{
-              const p=pts[ctx.dataIndex];
-              if(clearMap2[p.rawYM])return clearMap2[p.rawYM];
-              if(joinMap2[p.rawYM])return joinMap2[p.rawYM];
-              return '';
+              const i=ctx.dataIndex;
+              const p=pts[i];
+              const lines=[];
+              if(i>0){
+                const diff=pts[i].value-pts[i-1].value;
+                if(diff<0) lines.push('↓ 較上月減少 $'+Math.abs(diff).toLocaleString());
+                else if(diff>0) lines.push('↑ 較上月增加 $'+diff.toLocaleString());
+              }
+              if(clearMap2[p.rawYM])lines.push(clearMap2[p.rawYM]);
+              if(joinMap2[p.rawYM])lines.push(joinMap2[p.rawYM]);
+              return lines;
+            },
+            afterLabelColor:ctx=>{
+              const i=ctx.dataIndex;
+              if(i>0){
+                const diff=pts[i].value-pts[i-1].value;
+                if(diff<0) return {borderColor:'#dc2626',backgroundColor:'#dc2626'};
+                if(diff>0) return {borderColor:'#f59e0b',backgroundColor:'#f59e0b'};
+              }
+              return {borderColor:'#94a3b8',backgroundColor:'#94a3b8'};
             }
           }
         }},
