@@ -11116,10 +11116,10 @@ function renderAssetsPage(){
             <span id="${lid}-arr" style="font-size:10px;color:#94a3b8">▶</span>
           </div>
           <div style="padding:4px 14px 10px;cursor:pointer" onclick="toggleAsLoan('${lid}')">
-            <div style="height:8px;background:#fdddd6;border-radius:4px;overflow:hidden;margin-bottom:4px">
-              <div style="height:100%;border-radius:4px;background:#60a5fa;width:${pct}%"></div>
+            <div style="height:16px;background:#fdddd6;border-radius:8px;overflow:hidden;margin-bottom:4px">
+              <div style="height:100%;border-radius:8px;background:#60a5fa;width:${pct}%;display:flex;align-items:center;justify-content:flex-end;padding-right:6px"><span style="font-size:10px;font-weight:800;color:#fff;white-space:nowrap">${pct}%</span></div>
             </div>
-            <div style="font-size:10px;color:#94a3b8;text-align:right">已還 ${paidPeriods} 期・剩 ${remainPeriods} 期・到期 ${dueStr}</div>
+            <div style="font-size:9px;color:#94a3b8;text-align:right">已還 ${paidPeriods} 期・剩 ${remainPeriods} 期・到期 ${dueStr}</div>
           </div>
           <div id="${lid}" style="display:none;background:#fff;border-top:1px solid #fff0ec;padding:10px 14px">
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 8px;margin-bottom:8px">
