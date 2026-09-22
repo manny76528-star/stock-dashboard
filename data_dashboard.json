@@ -1497,7 +1497,7 @@
     {
       "id": "mncull1439i",
       "bank": "Line Bank",
-      "cash": 56000,
+      "cash": 15000,
       "d1Date": "",
       "d1": 0,
       "d2": 0
@@ -2860,7 +2860,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1790069450714,
+  "_ts": 1790071798345,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -7606,6 +7606,20 @@
       "fundName": "統一奔騰基金",
       "date": "2026-05-13",
       "amount": 1500
+    },
+    {
+      "id": "mucifsagfqa",
+      "fundId": "mu737brxc3e",
+      "fundName": "統一奔騰基金",
+      "date": "2026-09-22",
+      "amount": 1250
+    },
+    {
+      "id": "mucifsag4q7",
+      "fundId": "mu73ajshs13",
+      "fundName": "安聯台灣科技基金",
+      "date": "2026-09-22",
+      "amount": 1250
     }
   ]
 }
