@@ -7590,6 +7590,7 @@ undoStack=[JSON.stringify(db)];
 // 啟動時直接 render（不自動 Pull 避免覆蓋本地資料）
 render();
 checkBkWarn();
+checkFundDeductions();
 renderAssetsDeduct();
 // 啟動時先強制 Pull，確保拿到最新雲端資料後才開始
 _syncEnabled=false;
@@ -7614,6 +7615,7 @@ setTimeout(async()=>{
         localStorage.setItem(STORE,JSON.stringify(db));
         render();
         runDailyProcess(false);
+        checkFundDeductions();
         showSyncStatus('☁️ 已從雲端同步');
         renderAssetsDeduct();
         renderInvestL1();
