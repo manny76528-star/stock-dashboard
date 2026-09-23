@@ -11113,8 +11113,21 @@ function renderAssetsPage(){
           const acc=db.cashAccounts.find(c=>c.bank===l.deductBank);
           if(acc){
             const accBal=(acc.cash||0)+(acc.d1||0)+(acc.d2||0);
-            const ok=accBal>=(l.monthly||0);
-            const diff=accBal-(l.monthly||0);
+            const todayD=new Date();
+            const dDay=parseInt(l.deductDay)||0;
+            const thisMonth=new Date(todayD.getFullYear(),todayD.getMonth(),dDay);
+            const deductDate=thisMonth>todayD?thisMonth:new Date(todayD.getFullYear(),todayD.getMonth()+1,dDay);
+            // 計算在此筆扣款日前，同帳戶所有先扣的款項（用日期數字比較）
+            const upcoming=[];
+            (db.loans||[]).forEach(loan=>{
+              if(loan.deductBank!==l.deductBank||!loan.deductDay||loan.id===l.id)return;
+              const d2=parseInt(loan.deductDay)||0;if(!d2)return;
+              // 只要 d2 在 dDay 之前（同月先扣），或 dDay 已過本月則下月比較
+              if(d2<dDay) upcoming.push(loan.monthly||0);
+            });
+            const runBal=accBal-upcoming.reduce((s,v)=>s+v,0);
+            const ok=runBal>=(l.monthly||0);
+            const diff=runBal-(l.monthly||0);
             surplusHtml=ok
               ?`<span style="font-size:10px;font-weight:700;color:#dc2626;background:#fee2e2;padding:1px 6px;border-radius:4px;margin-left:4px">✓ 足夠 +$${Math.abs(diff).toLocaleString()}</span>`
               :`<span style="font-size:10px;font-weight:700;color:#16a34a;background:#dcfce7;padding:1px 6px;border-radius:4px;margin-left:4px">⚠️ 不足 -$${Math.abs(diff).toLocaleString()}</span>`;
