@@ -7615,12 +7615,12 @@ setTimeout(async()=>{
         localStorage.setItem(STORE,JSON.stringify(db));
         render();
         runDailyProcess(false);
-        checkFundDeductions();
         showSyncStatus('☁️ 已從雲端同步');
         renderAssetsDeduct();
         renderInvestL1();
         renderInvestL1();
       }
+      checkFundDeductions();
     }
   }catch(e){console.warn('啟動Pull失敗:',e.message);}
   _syncEnabled=true;
