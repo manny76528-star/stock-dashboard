@@ -167,7 +167,13 @@ async function loadData(){
     db = JSON.parse(new TextDecoder().decode(bytes));
     const now = new Date();
     document.getElementById('last-update').textContent = '更新：'+now.getHours()+':'+String(now.getMinutes()).padStart(2,'0');
+    // 先渲染一次（無價格）
     renderAll();
+    // 抓即時價格後再渲染
+    fetchAllPrices().then(()=>{
+      renderAll();
+      document.getElementById('last-update').textContent += ' 含即時價格';
+    });
   }catch(e){
     document.getElementById('last-update').textContent = '載入失敗';
     document.querySelectorAll('.page').forEach(p=>{
@@ -179,9 +185,39 @@ async function loadData(){
 function fmtM(v){return '$'+(Math.round(v)||0).toLocaleString();}
 function fmtPct(v){return Math.round(v||0)+'%';}
 
+const CF_WORKER = 'https://dashboard-sync.manny76528.workers.dev';
+let _prices = {}; // 本地快取
+
+async function fetchAllPrices(){
+  if(!db) return;
+  // 收集所有需要的 code
+  const codes = new Set();
+  (db.investments||[]).forEach(inv=>(inv.transactions||[]).forEach(t=>{if(t.type==='buy')codes.add(inv.code);}));
+  Object.values(db.family?.accounts||{}).forEach(acc=>(acc.holdings||[]).forEach(h=>codes.add(h.code)));
+  (db.watchlist||[]).forEach(w=>codes.add(w.code));
+  (db.pledgeAssets||[]).forEach(a=>a.code&&codes.add(a.code));
+  
+  const allCodes = [...codes].filter(Boolean);
+  if(allCodes.length===0) return;
+  
+  await Promise.all(allCodes.map(async code=>{
+    try{
+      const r = await fetch(CF_WORKER+'/price?code='+code+'&t='+Date.now());
+      if(r.ok){
+        const d = await r.json();
+        if(d.price) _prices[code] = d.price;
+      }
+    }catch(e){}
+  }));
+  
+  // 更新 db.prices 結構
+  if(!db.prices) db.prices = {};
+  Object.entries(_prices).forEach(([k,v])=>db.prices[k]={price:v});
+}
+
 function getPrice(code){
-  // 從 db.prices 取即時價格
-  if(db.prices&&db.prices[code]) return db.prices[code];
+  if(_prices[code]) return _prices[code];
+  if(db.prices&&db.prices[code]?.price) return db.prices[code].price;
   return 0;
 }
 
