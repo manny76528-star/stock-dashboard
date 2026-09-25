@@ -684,18 +684,18 @@ function renderTrend(){
     </div>`;
 }
 
-// 計算家族成員持倉
+// 計算家族成員持倉（用 shares 股數）
 function calcFamilyHolding(h){
   const txns = h.transactions||[];
-  let lots=0, cost=0;
+  let shares=0, cost=0;
   txns.forEach(t=>{
-    if(t.type==='buy'){lots+=t.lots||0;cost+=(t.lots||0)*(t.price||0)*1000;}
-    else if(t.type==='sell'){lots-=t.lots||0;}
+    if(t.type==='buy'){shares+=t.shares||t.lots*1000||0;cost+=(t.shares||t.lots*1000||0)*(t.price||0);}
+    else if(t.type==='sell'){shares-=t.shares||t.lots*1000||0;}
   });
   const curPrice = getPrice(h.code)||0;
-  const mktVal = lots*curPrice*1000;
+  const mktVal = shares*curPrice;
   const divAmt = (h.dividends||[]).reduce((s,d)=>s+(d.amount||0),0);
-  return{lots, cost, mktVal, divAmt, curPrice};
+  return{shares, cost, mktVal, divAmt, curPrice};
 }
 
 // ── 家族帳戶 ──
@@ -724,7 +724,7 @@ function renderFamily(){
         const pct=totalCost>0?Math.round(pnlWithDiv/totalCost*100):0;
         const barColor=pct>=80?'#fcd34d':pct>=50?'#d8b4fe':'#93c5fd';
         const activeLots=holdings.reduce((s,h)=>{
-          const c=calcFamilyHolding(h);return s+(c.lots>0?1:0);
+          const c=calcFamilyHolding(h);return s+(c.shares>0?1:0);
         },0);
         return`<div class="member-card">
           <div class="member-name">👤 ${m}</div>
