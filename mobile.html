@@ -684,32 +684,53 @@ function renderTrend(){
     </div>`;
 }
 
+// 計算家族成員持倉
+function calcFamilyHolding(h){
+  const txns = h.transactions||[];
+  let lots=0, cost=0;
+  txns.forEach(t=>{
+    if(t.type==='buy'){lots+=t.lots||0;cost+=(t.lots||0)*(t.price||0)*1000;}
+    else if(t.type==='sell'){lots-=t.lots||0;}
+  });
+  const curPrice = getPrice(h.code)||0;
+  const mktVal = lots*curPrice*1000;
+  const divAmt = (h.dividends||[]).reduce((s,d)=>s+(d.amount||0),0);
+  return{lots, cost, mktVal, divAmt, curPrice};
+}
+
 // ── 家族帳戶 ──
 function renderFamily(){
   const el = document.getElementById('page-family');
   if(!db){el.innerHTML='<div class="loading">無資料</div>';return;}
   const family = db.family||{};
   const accounts = family.accounts||{};
-  const members = Object.keys(accounts);
-  if(members.length===0){el.innerHTML='<div class="card"><div class="loading">尚無家族成員</div></div>';return;}
+  const memberNames = family.members||Object.keys(accounts);
+  if(memberNames.length===0){el.innerHTML='<div class="card"><div class="loading">尚無家族成員</div></div>';return;}
 
   el.innerHTML = `<div class="card">
     <div class="card-hdr"><div class="card-title">👨‍👩‍👧‍👦 家族帳戶</div></div>
     <div class="family-grid">
-      ${members.map(m=>{
+      ${memberNames.filter(m=>accounts[m]).map(m=>{
         const acc=accounts[m];
         const holdings=acc.holdings||[];
-        const cost=holdings.reduce((s,h)=>s+(h.avgCost||h.avgPrice||0)*(h.lots||0)*1000,0);
-        const mkt=holdings.reduce((s,h)=>s+(getPrice(h.code)||h.curPrice||0)*(h.lots||0)*1000,0);
-        const divAmt=holdings.reduce((s,h)=>s+(h.divTotal||h.totalDiv||0),0);
-        const pnlWithDiv=mkt-cost+divAmt;
-        const pct=cost>0?Math.round(pnlWithDiv/cost*100):0;
+        let totalCost=0, totalMkt=0, totalDiv=0;
+        holdings.forEach(h=>{
+          const c=calcFamilyHolding(h);
+          totalCost+=c.cost;
+          totalMkt+=c.mktVal;
+          totalDiv+=c.divAmt;
+        });
+        const pnlWithDiv=totalMkt-totalCost+totalDiv;
+        const pct=totalCost>0?Math.round(pnlWithDiv/totalCost*100):0;
         const barColor=pct>=80?'#fcd34d':pct>=50?'#d8b4fe':'#93c5fd';
+        const activeLots=holdings.reduce((s,h)=>{
+          const c=calcFamilyHolding(h);return s+(c.lots>0?1:0);
+        },0);
         return`<div class="member-card">
           <div class="member-name">👤 ${m}</div>
           <div class="member-roi" style="color:${pct>=0?'var(--red)':'#16a34a'}">${pct>=0?'+':''}${pct}%</div>
           <div class="member-bar"><div class="member-bar-inner" style="width:${Math.min(Math.abs(pct),100)}%;background:${barColor}"><span style="font-size:7px;font-weight:800;color:#fff;white-space:nowrap">${pct}%</span></div></div>
-          <div class="member-holds">${holdings.length}檔持股</div>
+          <div class="member-holds">${activeLots}檔持股</div>
         </div>`;
       }).join('')}
     </div>
