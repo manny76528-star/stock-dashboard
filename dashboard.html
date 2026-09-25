@@ -7621,6 +7621,7 @@ setTimeout(async()=>{
         renderInvestL1();
       }
       checkFundDeductions();
+      autoSnapshot();
     }
   }catch(e){console.warn('啟動Pull失敗:',e.message);}
   _syncEnabled=true;
