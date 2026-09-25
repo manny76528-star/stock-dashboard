@@ -192,7 +192,8 @@ async function fetchAllPrices(){
   if(!db) return;
   // 收集所有需要的 code
   const codes = new Set();
-  (db.investments||[]).forEach(inv=>(inv.transactions||[]).forEach(t=>{if(t.type==='buy')codes.add(inv.code);}));
+  // 所有 investments 的 code（不管有無 transactions）
+  (db.investments||[]).forEach(inv=>{if(inv.lots>0||inv.code)codes.add(inv.code);});
   Object.values(db.family?.accounts||{}).forEach(acc=>(acc.holdings||[]).forEach(h=>codes.add(h.code)));
   (db.watchlist||[]).forEach(w=>codes.add(w.code));
   (db.pledgeAssets||[]).forEach(a=>a.code&&codes.add(a.code));
@@ -222,16 +223,16 @@ function getPrice(code){
 }
 
 function getInvHoldings(){
-  // 計算每個 investment 的當前持倉（扣掉賣出）
   return (db.investments||[]).map(inv=>{
-    const txns = inv.transactions||[];
-    let lots=0, cost=0;
-    txns.forEach(t=>{
-      if(t.type==='buy'){lots+=t.lots||0;cost+=(t.lots||0)*(t.price||0)*1000;}
-      else if(t.type==='sell'){lots-=t.lots||0;}
-    });
-    // 如果有 lots 直接存在 inv 用那個
-    const activeLots = inv.lots||lots;
+    // 優先用 inv.lots（直接欄位），否則從 transactions 算
+    let activeLots = inv.lots||0;
+    if(!activeLots){
+      const txns = inv.transactions||[];
+      txns.forEach(t=>{
+        if(t.type==='buy') activeLots+=t.lots||0;
+        else if(t.type==='sell') activeLots-=t.lots||0;
+      });
+    }
     const avgPrice = inv.avgPrice||inv.avgCost||0;
     const curPrice = getPrice(inv.code);
     const mktVal = activeLots*curPrice*1000;
@@ -684,18 +685,28 @@ function renderTrend(){
     </div>`;
 }
 
-// 計算家族成員持倉（用 shares 股數）
+// 計算家族成員持倉（與 dashboard.html 完全相同邏輯）
 function calcFamilyHolding(h){
-  const txns = h.transactions||[];
-  let shares=0, cost=0;
-  txns.forEach(t=>{
-    if(t.type==='buy'){shares+=t.shares||t.lots*1000||0;cost+=(t.shares||t.lots*1000||0)*(t.price||0);}
-    else if(t.type==='sell'){shares-=t.shares||t.lots*1000||0;}
+  let shares=0,cost=0,realized=0;
+  (h.transactions||[]).slice().sort((a,b)=>a.date.localeCompare(b.date)).forEach(t=>{
+    const s=t.shares||(t.lots||0)*1000;
+    if(t.type==='buy'){
+      shares+=s;
+      cost+=s*t.price+(t.fee||0);
+    } else if(t.type==='sell'){
+      const avgCost=shares>0?cost/shares:0;
+      const sellShares=t.shares||(t.lots||0)*1000;
+      realized+=(t.price-avgCost)*sellShares-(t.fee||0);
+      shares-=sellShares;
+      cost=shares>0?avgCost*shares:0;
+    }
   });
-  const curPrice = getPrice(h.code)||0;
-  const mktVal = shares*curPrice;
-  const divAmt = (h.dividends||[]).reduce((s,d)=>s+(d.amount||0),0);
-  return{shares, cost, mktVal, divAmt, curPrice};
+  const avgCost=shares>0?cost/shares:0;
+  const price=getPrice(h.code)||0;
+  const mktVal=price>0?shares*price:null;
+  const pnl=mktVal!=null?mktVal-cost:null;
+  const divAmt=(h.dividends||[]).reduce((s,d)=>s+(d.amount||0),0);
+  return{shares, cost, avgCost, mktVal, pnl, realized, divAmt, curPrice:price};
 }
 
 // ── 家族帳戶 ──
@@ -713,14 +724,15 @@ function renderFamily(){
       ${memberNames.filter(m=>accounts[m]).map(m=>{
         const acc=accounts[m];
         const holdings=acc.holdings||[];
-        let totalCost=0, totalMkt=0, totalDiv=0;
+        let totalCost=0, totalMkt=0, totalDiv=0, totalRealized=0;
         holdings.forEach(h=>{
           const c=calcFamilyHolding(h);
           totalCost+=c.cost;
-          totalMkt+=c.mktVal;
-          totalDiv+=c.divAmt;
+          totalMkt+=c.mktVal||0;
+          totalDiv+=c.divAmt||0;
+          totalRealized+=c.realized||0;
         });
-        const pnlWithDiv=totalMkt-totalCost+totalDiv;
+        const pnlWithDiv=totalMkt-totalCost+totalDiv+totalRealized;
         const pct=totalCost>0?Math.round(pnlWithDiv/totalCost*100):0;
         const barColor=pct>=80?'#fcd34d':pct>=50?'#d8b4fe':'#93c5fd';
         const activeLots=holdings.reduce((s,h)=>{
