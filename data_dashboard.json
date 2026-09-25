@@ -1475,9 +1475,9 @@
       "name": "永豐銀行",
       "rate": 3.1,
       "limit": 3000000,
-      "used": 2867309,
-      "remain": 132691,
-      "monthly": 7407,
+      "used": 2887309,
+      "remain": 112691,
+      "monthly": 7459,
       "note": "每個月自動扣除利息 要注意餘額",
       "calcPledge": false
     },
@@ -1497,7 +1497,7 @@
     {
       "id": "mncull1439i",
       "bank": "Line Bank",
-      "cash": 15000,
+      "cash": 12500,
       "d1Date": "",
       "d1": 0,
       "d2": 0
@@ -2860,7 +2860,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1790146188758,
+  "_ts": 1790350665929,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -7619,6 +7619,20 @@
       "fundId": "mu73ajshs13",
       "fundName": "安聯台灣科技基金",
       "date": "2026-09-22",
+      "amount": 1250
+    },
+    {
+      "id": "muf36hcfhbl",
+      "fundId": "mu737brxc3e",
+      "fundName": "統一奔騰基金",
+      "date": "2026-09-24",
+      "amount": 1250
+    },
+    {
+      "id": "muf36hcfw0a",
+      "fundId": "mu73ajshs13",
+      "fundName": "安聯台灣科技基金",
+      "date": "2026-09-24",
       "amount": 1250
     }
   ]
