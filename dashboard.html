@@ -303,6 +303,14 @@ body:not(.privacy) .privacy-mask{filter:none;}
 #main-content{display:none;}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+// 自動偵測手機，跳轉到手機版
+(function(){
+  if(window.innerWidth < 768 && !window.location.search.includes('force=pc')){
+    window.location.href = 'mobile.html';
+  }
+})();
+</script>
 </head>
 <body>
 
@@ -1986,6 +1994,11 @@ body:not(.privacy) .privacy-mask{filter:none;}
 
   <!-- 頂部欄 -->
   <div class="db-topbar">
+  <div style="position:absolute;top:10px;right:120px;z-index:999">
+    <a href="mobile.html" style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:20px;font-size:11px;font-weight:700;color:#64748b;text-decoration:none">
+      📱 手機版
+    </a>
+  </div>
     <div class="db-topbar-left">
       <div class="db-page-name" id="db-page-name">投資與觀察</div>
     </div>
