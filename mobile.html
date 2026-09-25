@@ -179,6 +179,31 @@ async function loadData(){
 function fmtM(v){return '$'+(Math.round(v)||0).toLocaleString();}
 function fmtPct(v){return Math.round(v||0)+'%';}
 
+function getPrice(code){
+  // 從 db.prices 取即時價格
+  if(db.prices&&db.prices[code]) return db.prices[code];
+  return 0;
+}
+
+function getInvHoldings(){
+  // 計算每個 investment 的當前持倉（扣掉賣出）
+  return (db.investments||[]).map(inv=>{
+    const txns = inv.transactions||[];
+    let lots=0, cost=0;
+    txns.forEach(t=>{
+      if(t.type==='buy'){lots+=t.lots||0;cost+=(t.lots||0)*(t.price||0)*1000;}
+      else if(t.type==='sell'){lots-=t.lots||0;}
+    });
+    // 如果有 lots 直接存在 inv 用那個
+    const activeLots = inv.lots||lots;
+    const avgPrice = inv.avgPrice||inv.avgCost||0;
+    const curPrice = getPrice(inv.code);
+    const mktVal = activeLots*curPrice*1000;
+    const costVal = activeLots*avgPrice*1000;
+    return {...inv, activeLots, avgPrice, curPrice, mktVal, costVal, pnl:mktVal-costVal};
+  }).filter(i=>i.activeLots>0);
+}
+
 function renderAll(){
   renderInvest();
   renderAssets();
@@ -196,7 +221,7 @@ function renderInvest(){
   const el = document.getElementById('page-invest');
   if(!db){el.innerHTML='<div class="loading">無資料</div>';return;}
   
-  const inv = db.investments||[];
+  const inv = getInvHoldings();
   const loans = db.loans||[];
   const divs = db.dividends||[];
   const snaps = db.snapshots||[];
@@ -272,16 +297,14 @@ function renderInvest(){
         <div style="margin-top:10px">
           <div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:8px">持股明細</div>
           ${inv.map(s=>{
-            const pnl = ((s.curPrice||0)-(s.avgCost||0))*(s.lots||0)*1000;
-            const pnlPct = s.avgCost>0?Math.round(((s.curPrice||0)-(s.avgCost||0))/s.avgCost*100):0;
             return`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f8f8f8">
               <div>
                 <div style="font-size:12px;font-weight:700;color:var(--text)">${s.code} ${s.name||''}</div>
-                <div style="font-size:10px;color:var(--sub)">${s.lots||0}張 · 均價$${(s.avgCost||0).toFixed(2)}</div>
+                <div style="font-size:10px;color:var(--sub)">${s.activeLots}張 · 均$${s.avgPrice.toFixed(2)} → 現$${s.curPrice.toFixed(2)}</div>
               </div>
               <div style="text-align:right">
-                <div style="font-size:13px;font-weight:800;font-family:monospace;color:${pnl>=0?'#dc2626':'#16a34a'}">${pnl>=0?'+':''}${fmtM(pnl)}</div>
-                <div style="font-size:10px;color:${pnlPct>=0?'#dc2626':'#16a34a'}">${pnlPct>=0?'+':''}${pnlPct}%</div>
+                <div style="font-size:13px;font-weight:800;font-family:monospace;color:${s.pnl>=0?'#dc2626':'#16a34a'}">${s.pnl>=0?'+':''}${fmtM(s.pnl)}</div>
+                <div style="font-size:10px;color:${s.pnl>=0?'#dc2626':'#16a34a'}">${s.costVal>0?(s.pnl>=0?'+':'')+Math.round(s.pnl/s.costVal*100)+'%':''}</div>
               </div>
             </div>`;
           }).join('')}
@@ -426,17 +449,19 @@ function renderAssets(){
         <span style="font-size:11px;font-weight:800;font-family:monospace;color:var(--blue)">${fmtM(totalFlex)}</span>
       </div>
       ${flex.map(f=>{
-        const usedPct=f.limit>0?Math.round(f.balance/f.limit*100):0;
+        const used=f.used||0;
+        const limit=f.limit||0;
+        const usedPct=limit>0?Math.round(used/limit*100):0;
         return`<div style="padding:10px 14px;border-bottom:1px solid #f8f8f8">
           <div style="display:flex;justify-content:space-between;margin-bottom:5px">
-            <span style="font-size:12px;font-weight:700;color:var(--text)">${f.bank}</span>
+            <span style="font-size:12px;font-weight:700;color:var(--text)">${f.name||f.bank||'—'}</span>
             <span style="font-size:11px;color:var(--sub)">月繳 ${fmtM(f.monthly||0)}</span>
           </div>
           <div style="height:8px;background:#f1f5f9;border-radius:4px;overflow:hidden;margin-bottom:4px">
             <div style="width:${usedPct}%;height:100%;background:#f97316;border-radius:4px"></div>
           </div>
           <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--sub)">
-            <span>已用 ${usedPct}%</span><span>${fmtM(f.balance)} / ${fmtM(f.limit)}</span>
+            <span>已用 ${usedPct}%</span><span>${fmtM(used)} / ${fmtM(limit)}</span>
           </div>
         </div>`;
       }).join('')}
@@ -448,16 +473,22 @@ function renderAssets(){
 function renderJournal(){
   const el = document.getElementById('page-journal');
   if(!db){el.innerHTML='<div class="loading">無資料</div>';return;}
-  const journals = (db.journals||[]).slice().reverse().slice(0,30);
+  const journals = (db.journals||[]).slice().reverse().slice(0,20);
+  const catColor={'總經面':'#3b82f6','技術面':'#8b5cf6','基本面':'#10b981','心理面':'#f59e0b'};
   el.innerHTML = `<div class="card">
     <div class="card-hdr"><div class="card-title">📓 交易日誌</div><span style="font-size:10px;color:var(--sub)">最近 ${journals.length} 筆</span></div>
-    ${journals.map(j=>`<div class="div-row" style="padding:10px 14px">
-      <div>
-        <div style="font-size:12px;font-weight:700;color:var(--text)">${j.type==='buy'?'買入':'賣出'} ${j.code} ${j.name||''}</div>
-        <div style="font-size:10px;color:var(--sub)">${j.date||'—'} · ${j.lots||0}張 · $${(j.price||0).toFixed(2)}</div>
-      </div>
-      <div style="text-align:right;font-size:13px;font-weight:800;font-family:monospace;color:${j.type==='buy'?'var(--red)':'#16a34a'}">${j.type==='buy'?'-':'+'}${fmtM((j.lots||0)*(j.price||0)*1000)}</div>
-    </div>`).join('')}
+    ${journals.map(j=>{
+      const cat=j.eventCat||'';
+      const color=catColor[cat]||'#94a3b8';
+      return`<div style="padding:10px 14px;border-bottom:1px solid #f8f8f8">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <span style="font-size:10px;font-weight:700;color:#fff;background:${color};padding:1px 6px;border-radius:4px">${cat||'—'}</span>
+          <span style="font-size:10px;color:var(--sub)">${j.date||'—'}</span>
+        </div>
+        ${j.market?`<div style="font-size:11px;color:var(--sub);margin-bottom:3px">📰 ${j.market.slice(0,40)}${j.market.length>40?'...':''}</div>`:''}
+        ${j.content?`<div style="font-size:12px;color:var(--text);line-height:1.5">${j.content.slice(0,80)}${j.content.length>80?'...':''}</div>`:''}
+      </div>`;
+    }).join('')}
   </div>`;
 }
 
@@ -498,16 +529,21 @@ function renderWatch(){
   const list = db.watchlist||[];
   el.innerHTML = `<div class="card">
     <div class="card-hdr"><div class="card-title">👁 觀察股清單</div><span style="font-size:10px;color:var(--sub)">${list.length} 檔</span></div>
-    ${list.map(w=>`<div class="watch-item">
-      <div>
-        <div style="font-size:12px;font-weight:700;color:var(--text)">${w.code} ${w.name||''}</div>
-        <div style="font-size:10px;color:var(--sub)">${w.note||'—'}</div>
-      </div>
-      <div style="text-align:right">
-        <div style="font-size:13px;font-weight:800;font-family:monospace;color:var(--text)">$${(w.price||0).toFixed(2)}</div>
-        ${w.target?`<div style="font-size:10px;color:var(--sub)">目標 $${w.target}</div>`:''}
-      </div>
-    </div>`).join('')}
+    ${list.map(w=>{
+      const cur=getPrice(w.code);
+      const tgt=parseFloat(w.target)||0;
+      const diff=cur&&tgt?((cur-tgt)/tgt*100).toFixed(1):null;
+      return`<div class="watch-item">
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--text)">${w.code} ${w.name||''}</div>
+          <div style="font-size:10px;color:var(--sub)">${w.reason?.slice(0,30)||'—'}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:13px;font-weight:800;font-family:monospace;color:var(--text)">${cur?'$'+cur.toFixed(2):'—'}</div>
+          ${tgt?`<div style="font-size:10px;color:var(--sub)">目標 $${tgt}${diff?` (${diff>0?'+':''}${diff}%)`:''}</div>`:''}
+        </div>
+      </div>`;
+    }).join('')}
   </div>`;
 }
 
@@ -517,8 +553,8 @@ function renderPledge(){
   if(!db){el.innerHTML='<div class="loading">無資料</div>';return;}
   const assets = db.pledgeAssets||[];
   const pLoans = db.pledgeLoans||[];
-  const mktTotal = assets.reduce((s,a)=>s+(a.lots||0)*(a.price||0)*1000,0);
-  const debtTotal = pLoans.reduce((s,l)=>s+(l.balance||0),0);
+  const mktTotal = assets.reduce((s,a)=>s+(a.lots||0)*(getPrice(a.code)||a.price||0)*1000,0);
+  const debtTotal = pLoans.reduce((s,l)=>s+(l.balance||l.amount||0),0);
   const ratio = debtTotal>0?Math.round(mktTotal/debtTotal*100):999;
   const ratioColor = ratio>=160?'#16a34a':ratio>=130?'#f59e0b':'#dc2626';
   const threshold = db.pledgeThreshold||130;
@@ -538,10 +574,11 @@ function renderPledge(){
     <div class="card">
       <div class="card-hdr"><div class="card-title">📦 擔保品</div></div>
       ${assets.map(a=>{
-        const mkt=(a.lots||0)*(a.price||0)*1000;
+        const curP=getPrice(a.code)||a.price||0;
+        const mkt=(a.lots||0)*curP*1000;
         return`<div style="padding:10px 14px;border-bottom:1px solid #f8f8f8">
           <div style="display:flex;justify-content:space-between">
-            <div><div style="font-size:12px;font-weight:700;color:var(--text)">${a.code} ${a.name||''}</div><div style="font-size:10px;color:var(--sub)">${a.lots||0}張 · $${(a.price||0).toFixed(2)}</div></div>
+            <div><div style="font-size:12px;font-weight:700;color:var(--text)">${a.code} ${a.name||''}</div><div style="font-size:10px;color:var(--sub)">${a.lots||0}張 · $${curP.toFixed(2)}</div></div>
             <div style="font-size:14px;font-weight:800;font-family:monospace;color:var(--red)">${fmtM(mkt)}</div>
           </div>
         </div>`;
@@ -553,9 +590,9 @@ function renderPledge(){
 function renderAnalytics(){
   const el = document.getElementById('page-analytics');
   if(!db){el.innerHTML='<div class="loading">無資料</div>';return;}
-  const inv = db.investments||[];
-  const totalCost = inv.reduce((s,i)=>s+(i.avgCost||0)*(i.lots||0)*1000,0);
-  const totalMkt = inv.reduce((s,i)=>s+(i.curPrice||0)*(i.lots||0)*1000,0);
+  const holdings = getInvHoldings();
+  const totalCost = holdings.reduce((s,i)=>s+i.costVal,0);
+  const totalMkt = holdings.reduce((s,i)=>s+i.mktVal,0);
   const totalPnl = totalMkt-totalCost;
   const totalPnlPct = totalCost>0?Math.round(totalPnl/totalCost*100):0;
   const totalDiv = (db.dividends||[]).reduce((s,d)=>s+(d.amount||0),0);
@@ -572,15 +609,11 @@ function renderAnalytics(){
           <div class="kpi"><div class="kpi-l">未含息損益</div><div class="kpi-v" style="color:${totalPnl>=0?'var(--red)':'#16a34a'}">${totalPnl>=0?'+':''}${fmtM(totalPnl)}</div><div class="kpi-s">${totalPnlPct>=0?'+':''}${totalPnlPct}%</div></div>
           <div class="kpi"><div class="kpi-l">含息損益</div><div class="kpi-v" style="color:${pnlWithDiv>=0?'var(--red)':'#16a34a'}">${pnlWithDiv>=0?'+':''}${fmtM(pnlWithDiv)}</div><div class="kpi-s">${pnlWithDivPct>=0?'+':''}${pnlWithDivPct}%</div></div>
         </div>
-        ${inv.map(s=>{
-          const cost=(s.avgCost||0)*(s.lots||0)*1000;
-          const mkt=(s.curPrice||0)*(s.lots||0)*1000;
-          const pnl=mkt-cost;
-          const pct=cost>0?Math.round(pnl/cost*100):0;
+        ${holdings.map(s=>{
           return`<div style="padding:8px 0;border-bottom:1px solid #f8f8f8">
             <div style="display:flex;justify-content:space-between;align-items:center">
-              <div><div style="font-size:12px;font-weight:700;color:var(--text)">${s.code} ${s.name||''}</div><div style="font-size:10px;color:var(--sub)">${s.lots||0}張 · 均$${(s.avgCost||0).toFixed(2)} → 現$${(s.curPrice||0).toFixed(2)}</div></div>
-              <div style="text-align:right"><div style="font-size:13px;font-weight:800;font-family:monospace;color:${pnl>=0?'var(--red)':'#16a34a'}">${pnl>=0?'+':''}${fmtM(pnl)}</div><div style="font-size:10px;color:${pct>=0?'var(--red)':'#16a34a'}">${pct>=0?'+':''}${pct}%</div></div>
+              <div><div style="font-size:12px;font-weight:700;color:var(--text)">${s.code} ${s.name||''}</div><div style="font-size:10px;color:var(--sub)">${s.activeLots}張 · 均$${s.avgPrice.toFixed(2)} → 現$${s.curPrice.toFixed(2)}</div></div>
+              <div style="text-align:right"><div style="font-size:13px;font-weight:800;font-family:monospace;color:${s.pnl>=0?'var(--red)':'#16a34a'}">${s.pnl>=0?'+':''}${fmtM(s.pnl)}</div><div style="font-size:10px;color:${s.pnl>=0?'var(--red)':'#16a34a'}">${s.costVal>0?(s.pnl>=0?'+':'')+Math.round(s.pnl/s.costVal*100)+'%':''}</div></div>
             </div>
           </div>`;
         }).join('')}
@@ -630,9 +663,9 @@ function renderFamily(){
       ${members.map(m=>{
         const acc=accounts[m];
         const holdings=acc.holdings||[];
-        const cost=holdings.reduce((s,h)=>s+(h.avgCost||0)*(h.lots||0)*1000,0);
-        const mkt=holdings.reduce((s,h)=>s+(h.curPrice||0)*(h.lots||0)*1000,0);
-        const divAmt=holdings.reduce((s,h)=>s+(h.divTotal||0),0);
+        const cost=holdings.reduce((s,h)=>s+(h.avgCost||h.avgPrice||0)*(h.lots||0)*1000,0);
+        const mkt=holdings.reduce((s,h)=>s+(getPrice(h.code)||h.curPrice||0)*(h.lots||0)*1000,0);
+        const divAmt=holdings.reduce((s,h)=>s+(h.divTotal||h.totalDiv||0),0);
         const pnlWithDiv=mkt-cost+divAmt;
         const pct=cost>0?Math.round(pnlWithDiv/cost*100):0;
         const barColor=pct>=80?'#fcd34d':pct>=50?'#d8b4fe':'#93c5fd';
