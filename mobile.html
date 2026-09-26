@@ -343,7 +343,7 @@ function renderInvest(){
   const totalMonthly=monthlyLoan+monthlyFlex;
   const surplus=nearAmt-totalMonthly;
   const lR=(db.loans||[]).filter(l=>!l.settled).reduce((s,l)=>s+calcLoanRemain(l),0);
-  const lOrig=(db.loans||[]).filter(l=>!l.settled).reduce((s,l)=>s+(l.amount||0),0)+(db.clearedLoans||[]).reduce((s,l)=>s+(l.amount||0),0);
+  const lOrig=(db.loans||[]).reduce((s,l)=>s+(l.amount||0),0);
   const lPaid=Math.max(0,lOrig-lR);
   const lPct=lOrig>0?Math.round(lPaid/lOrig*100):0;
   const inv=(db.investments||[]).map(i=>({...i,...calcInv(i)})).filter(i=>i.tLots>0);
