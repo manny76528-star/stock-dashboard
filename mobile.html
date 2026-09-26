@@ -123,13 +123,6 @@ let db = null;
 const PAGES = [
   {id:'invest', label:'📈 投資'},
   {id:'assets', label:'🏦 資產負債'},
-  {id:'journal', label:'📓 日誌'},
-  {id:'dividend', label:'💰 股息'},
-  {id:'watch', label:'👁 觀察股'},
-  {id:'pledge', label:'🔒 質押'},
-  {id:'analytics', label:'📊 分析'},
-  {id:'trend', label:'📉 趨勢'},
-  {id:'family', label:'👨‍👩‍👧‍👦 家族'},
 ];
 
 // 建立 tabs 和 pages
@@ -330,24 +323,9 @@ function renderInvest(){
             </div>
           </div>
         </div>
-        ${inv.length>0?`
-        <div style="margin-top:10px">
-          <div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:8px">持股明細</div>
-          ${inv.map(s=>{
-            return`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f8f8f8">
-              <div>
-                <div style="font-size:12px;font-weight:700;color:var(--text)">${s.code} ${s.name||''}</div>
-                <div style="font-size:10px;color:var(--sub)">${s.activeLots}張 · 均$${s.avgPrice.toFixed(2)} → 現$${s.curPrice.toFixed(2)}</div>
-              </div>
-              <div style="text-align:right">
-                <div style="font-size:13px;font-weight:800;font-family:monospace;color:${s.pnl>=0?'#dc2626':'#16a34a'}">${s.pnl>=0?'+':''}${fmtM(s.pnl)}</div>
-                <div style="font-size:10px;color:${s.pnl>=0?'#dc2626':'#16a34a'}">${s.costVal>0?(s.pnl>=0?'+':'')+Math.round(s.pnl/s.costVal*100)+'%':''}</div>
-              </div>
-            </div>`;
-          }).join('')}
-        </div>`:''}
       </div>
-    </div>`;
+    </div>
+    ${renderFamilyHTML()}`;
 }
 
 // ── 資產與負債 ──
@@ -709,49 +687,59 @@ function calcFamilyHolding(h){
   return{shares, cost, avgCost, mktVal, pnl, realized, divAmt, curPrice:price};
 }
 
-// ── 家族帳戶 ──
-function renderFamily(){
-  const el = document.getElementById('page-family');
-  if(!db){el.innerHTML='<div class="loading">無資料</div>';return;}
+// ── 家族帳戶（回傳 HTML 字串，嵌入投資頁） ──
+function renderFamilyHTML(){
+  if(!db) return '';
   const family = db.family||{};
   const accounts = family.accounts||{};
   const targets = family.targets||{};
   const memberNames = family.members||Object.keys(accounts);
-  if(memberNames.length===0){el.innerHTML='<div class="card"><div class="loading">尚無家族成員</div></div>';return;}
+  if(memberNames.length===0) return '';
 
-  el.innerHTML = `<div class="card">
+  const members = memberNames.filter(m=>accounts[m]).map(m=>{
+    const acc=accounts[m];
+    const holdings=acc.holdings||[];
+    let totalMkt=0;
+    let activeHoldings=[];
+    holdings.forEach(h=>{
+      const c=calcFamilyHolding(h);
+      if(c.shares>0){totalMkt+=c.mktVal||0;activeHoldings.push({h,c});}
+    });
+    const target=targets[m]||0;
+    const pct=target>0?Math.round(totalMkt/target*100):0;
+    const barColor=pct>=80?'#fcd34d':pct>=50?'#d8b4fe':'#93c5fd';
+
+    // 持股膠囊（比照網頁版：最大持股藍底，其他淡藍）
+    const caps=activeHoldings.map(({h,c},i)=>{
+      const wt=totalMkt>0?Math.round((c.mktVal||0)/totalMkt*100):0;
+      const isBig=i===0;
+      return`<span style="display:inline-flex;align-items:center;gap:2px;background:${isBig?'#2563eb':'#dbeafe'};color:${isBig?'#fff':'#1e40af'};font-size:9px;font-weight:700;padding:3px 8px;border-radius:12px;border:1px solid ${isBig?'#1d4ed8':'#bfdbfe'}">${h.code} <span style="opacity:.85">${wt}%</span></span>`;
+    }).join(' ');
+
+    return`<div style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:10px 12px;box-shadow:0 2px 6px rgba(0,0,0,.04)">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <div style="width:26px;height:26px;border-radius:50%;background:#e0f2fe;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span style="font-size:12px;color:#0284c7">👤</span></div>
+        <div style="font-size:13px;font-weight:600;color:#0f172a">${m}</div>
+      </div>
+      <div style="font-size:1.6rem;font-weight:700;color:${barColor};line-height:1;margin-bottom:6px">${pct}%</div>
+      <div style="height:12px;border-radius:999px;background:#e2e8f0;overflow:hidden;margin-bottom:6px">
+        <div style="height:12px;border-radius:999px;background:${barColor};width:${Math.min(pct,100)}%;display:flex;align-items:center;justify-content:flex-end;padding-right:4px">
+          <span style="font-size:7px;font-weight:800;color:#fff;white-space:nowrap">${pct}%</span>
+        </div>
+      </div>
+      <div style="font-size:10px;color:#94a3b8;margin-bottom:7px">${activeHoldings.length} 檔持股</div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px">${caps}</div>
+    </div>`;
+  }).join('');
+
+  return`<div class="card" style="margin-top:0">
     <div class="card-hdr"><div class="card-title">👨‍👩‍👧‍👦 家族帳戶</div></div>
-    <div class="family-grid">
-      ${memberNames.filter(m=>accounts[m]).map(m=>{
-        const acc=accounts[m];
-        const holdings=acc.holdings||[];
-        let totalMkt=0;
-        let activeCount=0;
-        holdings.forEach(h=>{
-          const c=calcFamilyHolding(h);
-          if(c.shares>0){totalMkt+=c.mktVal||0;activeCount++;}
-        });
-        const target=targets[m]||0;
-        const pct=target>0?Math.round(totalMkt/target*100):0;
-        const barColor=pct>=80?'#fcd34d':pct>=50?'#d8b4fe':'#93c5fd';
-        // 持股膠囊
-        const caps=holdings.filter(h=>calcFamilyHolding(h).shares>0).map(h=>{
-          const allMkt=holdings.filter(x=>calcFamilyHolding(x).shares>0).reduce((s,x)=>s+(calcFamilyHolding(x).mktVal||0),0);
-          const hc=calcFamilyHolding(h);
-          const wt=allMkt>0?Math.round((hc.mktVal||0)/allMkt*100):0;
-          return`<span style="display:inline-flex;align-items:center;gap:2px;background:#2563eb;color:#fff;font-size:9px;font-weight:700;padding:3px 7px;border-radius:12px">${h.code} ${wt}%</span>`;
-        }).join(' ');
-        return`<div class="member-card">
-          <div class="member-name">👤 ${m}</div>
-          <div class="member-roi" style="color:#d8b4fe">${pct}%</div>
-          <div class="member-bar"><div class="member-bar-inner" style="width:${Math.min(pct,100)}%;background:${barColor}"><span style="font-size:7px;font-weight:800;color:#fff;white-space:nowrap">${pct}%</span></div></div>
-          <div class="member-holds" style="margin-bottom:6px">${activeCount} 檔持股</div>
-          <div style="display:flex;flex-wrap:wrap;gap:4px">${caps}</div>
-        </div>`;
-      }).join('')}
-    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px">${members}</div>
   </div>`;
 }
+
+// ── 家族帳戶（保留空函式，renderAll 不會出錯） ──
+function renderFamily(){}
 
 function calcLoanRemain(l){
   const rate=(l.rate||0)/100/12;
