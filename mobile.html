@@ -215,23 +215,101 @@ function getPrice(code){
   return 0;
 }
 
-function getInvHoldings(){
-  return (db.investments||[]).map(inv=>{
-    // 優先用 inv.lots（直接欄位），否則從 transactions 算
-    let activeLots = inv.lots||0;
-    if(!activeLots){
-      const txns = inv.transactions||[];
-      txns.forEach(t=>{
-        if(t.type==='buy') activeLots+=t.lots||0;
-        else if(t.type==='sell') activeLots-=t.lots||0;
-      });
+function buildLots(inv){
+  const lots=[];
+  (inv.transactions||[]).forEach(t=>{
+    if(t.type==='buy')lots.push({txnId:t.id,date:t.date,price:t.price,original:t.lots,remaining:t.lots,fee:t.fee||0});
+    else{
+      const refs=t.lotRefs;
+      if(refs&&refs.length){refs.forEach(ref=>{const l=lots.find(x=>x.txnId===ref.txnId);if(l)l.remaining=Math.max(0,l.remaining-ref.lots);});}
+      else{let s=t.lots;for(const l of lots){if(s<=0)break;const tk=Math.min(l.remaining,s);l.remaining-=tk;s-=tk;}}
     }
-    const avgPrice = inv.avgPrice||inv.avgCost||0;
-    const curPrice = getPrice(inv.code);
-    const mktVal = activeLots*curPrice*1000;
-    const costVal = activeLots*avgPrice*1000;
-    return {...inv, activeLots, avgPrice, curPrice, mktVal, costVal, pnl:mktVal-costVal};
-  }).filter(i=>i.activeLots>0);
+  });
+  // If no buy transactions but has initial lots, create virtual buy lot
+  // But only if there are no sell transactions either (otherwise all sold)
+  const hasSell=(inv.transactions||[]).some(t=>t.type==='sell');
+  const hasBuy=(inv.transactions||[]).some(t=>t.type==='buy');
+  if(lots.length===0 && !hasBuy && !hasSell && (inv.lots||0)>0){
+    lots.push({txnId:'init-'+inv.id,date:inv.initDate||'2020-01-01',price:inv.avgPrice||0,original:inv.lots,remaining:inv.lots,fee:0,isInit:true});
+  }
+  return lots;
+}
+
+
+function calcInv(inv){
+  const lots=buildLots(inv);
+  const active=lots.filter(l=>l.remaining>0);
+  let tLots=0,tCost=0;
+  active.forEach(l=>{tLots+=l.remaining;tCost+=l.remaining*1000*l.price+(l.fee*(l.remaining/l.original));});
+  // Only use inv.lots fallback when truly no transactions AND no active lots from buildLots
+  if(tLots===0 && !(inv.transactions||[]).length){tLots=inv.lots||0;tCost=tLots*1000*(inv.avgPrice||0);}
+  const avgCost=tLots>0?tCost/(tLots*1000):(inv.avgPrice||0);
+  // realized
+  let realized=0;
+  const rLots=[];
+  (inv.transactions||[]).forEach(t=>{
+    if(t.type==='buy')rLots.push({txnId:t.id,price:t.price,original:t.lots,remaining:t.lots,fee:t.fee||0});
+    else{
+      const rev=t.lots*1000*t.price-(t.fee||0);
+      let cost=0;
+      if(t.lotRefs&&t.lotRefs.length){
+        t.lotRefs.forEach(ref=>{
+          const l=rLots.find(x=>x.txnId===ref.txnId);
+          if(l){cost+=ref.lots*1000*l.price+(l.fee*(ref.lots/l.original));l.remaining=Math.max(0,l.remaining-ref.lots);}
+          else{
+            // 找不到批次，用均價估算
+            if(inv.avgPrice>0)cost+=ref.lots*1000*inv.avgPrice;
+          }
+        });
+      } else {
+        // FIFO: match sell lots to buy lots
+        let s=t.lots;
+        for(const l of rLots){
+          if(s<=0)break;
+          const tk=Math.min(l.remaining,s);
+          const lotFee=l.original>0?l.fee*(tk/l.original):0;
+          cost+=tk*1000*l.price+lotFee;
+          l.remaining-=tk;s-=tk;
+        }
+        // If still have unmatched lots (s>0), use weighted avg of remaining rLots
+        if(s>0){
+          const remainLots=rLots.filter(l=>l.remaining>0);
+          if(remainLots.length>0){
+            const avgP=remainLots.reduce((sum,l)=>sum+l.price*l.remaining,0)/remainLots.reduce((sum,l)=>sum+l.remaining,0);
+            cost+=s*1000*avgP;
+          } else if(inv.avgPrice>0){
+            cost+=s*1000*inv.avgPrice;
+          }
+        }
+      }
+      if(cost<=0&&t.lots>0&&inv.avgPrice>0)cost=t.lots*1000*inv.avgPrice;
+      realized+=rev-cost;
+    }
+  });
+  if(!db.prices)db.prices={};
+  const cp=db.prices[inv.code];
+  const curPrice=cp?cp.price:null;
+  const mktVal=curPrice?tLots*1000*curPrice:null;
+  // 未實現損益 = 市值 - 成本 - 預估賣出費用（手續費+證交稅）
+  const sellFeeRate=0.001425*0.28+0.003; // 手續費2.8折 + 證交稅0.3%
+  const estSellFee=mktVal!==null?Math.round(mktVal*sellFeeRate):0;
+  const pnl=mktVal!==null?mktVal-tCost-estSellFee:null;
+  const pnlPct=tCost>0&&pnl!==null?pnl/tCost*100:null;
+  const _td=new Date().toISOString().split('T')[0];
+  const divTot=(db.dividends||[])
+    .filter(d=>d.code===inv.code&&!d.pending&&(!d.date||d.date<=_td))
+    .reduce((s,d)=>s+d.amount,0);
+  const moDivAmt=tLots>0&&inv.divPerShare?(tLots*1000*inv.divPerShare):0; // 月配息：張數×1000×每月配息
+  // 含息損益 = 未實現損益 + 累積股息
+  const pnlWithDiv = pnl !== null ? pnl + divTot : (divTot > 0 ? divTot : null);
+  const pnlPctWithDiv = tCost > 0 && pnlWithDiv !== null ? pnlWithDiv / tCost * 100 : null;
+  return{tLots,tCost,avgCost,curPrice,mktVal,pnl,pnlPct,pnlWithDiv,pnlPctWithDiv,realized,divTot,moDivAmt,activeLots:active};
+}
+
+
+// getInvHoldings 使用 calcInv（與網頁版相同邏輯）
+function getInvHoldings(){
+  return (db.investments||[]).map(inv=>({...inv,...calcInv(inv)})).filter(i=>i.tLots>0);
 }
 
 function renderAll(){
@@ -244,33 +322,33 @@ function renderInvest(){
   const el = document.getElementById('page-invest');
   if(!db){el.innerHTML='<div class="loading">無資料</div>';return;}
   
-  const inv = getInvHoldings();
-  const loans = db.loans||[];
-  const divs = db.dividends||[];
-  const snaps = db.snapshots||[];
-  
-  // 股息計算
-  const today = new Date().toISOString().slice(0,10);
-  const nextDiv = divs.filter(d=>d.date&&d.date>today).sort((a,b)=>a.date.localeCompare(b.date))[0];
-  const totalDiv = divs.reduce((s,d)=>s+(d.amount||0),0);
-  const totalLoan = loans.reduce((s,l)=>s+(l.remain||calcLoanRemain(l)||0),0);
-  const origLoan = loans.reduce((s,l)=>s+(l.amount||0),0)+(db.clearedLoans||[]).reduce((s,l)=>s+(l.amount||0),0);
-  const lPct = origLoan>0?Math.round((origLoan-totalLoan)/origLoan*100):0;
-  const divGoal = db.settings?.divGoal||1500000;
-  const divPct = Math.round(totalDiv/divGoal*100);
-  
-  // 月股息
-  const monthDiv = divs.filter(d=>d.date&&d.date>=today).slice(0,1).reduce((s,d)=>s+(d.amount||0),0);
-  const monthLoan = loans.reduce((s,l)=>s+(l.monthly||0),0);
-  const surplus = (nextDiv?.amount||0) - monthLoan;
-  
-  // 質押
-  const pledgeAssets = db.pledgeAssets||[];
-  const pledgeLoans = db.pledgeLoans||[];
-  const mktTotal = pledgeAssets.reduce((s,a)=>s+(a.lots||0)*(a.price||0)*1000,0);
-  const pledgeDebt = pledgeLoans.reduce((s,l)=>s+(l.balance||0),0);
-  const ratio = pledgeDebt>0?Math.round(mktTotal/pledgeDebt*100):999;
-  const ratioColor = ratio>=160?'#16a34a':ratio>=130?'#f59e0b':'#dc2626';
+  // 完全照抄 dashboard.html 的 _renderInvestL1Body 計算邏輯
+  const today=new Date().toISOString().slice(0,10);
+  const pledgeFlex=(db.flexLoans||[]).filter(f=>f.calcPledge);
+  const pledgeLoan=pledgeFlex.reduce((s,f)=>s+(f.used||f.remain||0),0);
+  let pledgeMkt=0;
+  (db.pledgeAssets||[]).forEach(a=>{const p=getPrice(a.code)||0;pledgeMkt+=p*(a.lots||0)*1000;});
+  const pledgeRatio=pledgeLoan>0?Math.round(pledgeMkt/pledgeLoan*1000)/10:0;
+  const prColor=pledgeRatio>=250?'#06b6d4':pledgeRatio>=160?'#f59e0b':'#f97316';
+  const showPledge=pledgeLoan>0&&(db.pledgeAssets||[]).length>0;
+  const totalPaidDiv=(db.dividends||[]).filter(d=>!d.pending&&d.date<=today).reduce((s,d)=>s+d.amount,0);
+  const pendingDivAll=(db.dividends||[]).filter(d=>d.date>today).sort((a,b)=>a.date.localeCompare(b.date));
+  const nearAmt=pendingDivAll.length>0?pendingDivAll.reduce((s,d)=>d.date===pendingDivAll[0].date?s+d.amount:s,0):0;
+  const nearDate=pendingDivAll.length>0?pendingDivAll[0].date:'';
+  const nearDays=nearDate?Math.ceil((new Date(nearDate)-new Date(today))/86400000):0;
+  const targetDiv=db.settings?.targetDividend||800000;
+  const divPct=targetDiv>0?Math.round(totalPaidDiv/targetDiv*1000)/10:0;
+  const monthlyLoan=(db.loans||[]).filter(l=>!l.settled).reduce((s,l)=>s+(l.monthly||0),0);
+  const monthlyFlex=(db.flexLoans||[]).reduce((s,f)=>s+(f.monthly||0),0);
+  const totalMonthly=monthlyLoan+monthlyFlex;
+  const surplus=nearAmt-totalMonthly;
+  const lR=(db.loans||[]).filter(l=>!l.settled).reduce((s,l)=>s+calcLoanRemain(l),0);
+  const lOrig=(db.loans||[]).filter(l=>!l.settled).reduce((s,l)=>s+(l.amount||0),0)+(db.clearedLoans||[]).reduce((s,l)=>s+(l.amount||0),0);
+  const lPaid=Math.max(0,lOrig-lR);
+  const lPct=lOrig>0?Math.round(lPaid/lOrig*100):0;
+  const inv=(db.investments||[]).map(i=>({...i,...calcInv(i)})).filter(i=>i.tLots>0);
+  const ratio=showPledge?pledgeRatio:0;
+  const ratioColor=prColor;
 
   el.innerHTML = `
     <div class="card">
@@ -281,8 +359,8 @@ function renderInvest(){
         <div class="kpi-grid">
           <div class="kpi">
             <div class="kpi-l">📅 下期發薪</div>
-            <div class="kpi-v" style="color:#2563eb">${nextDiv?fmtM(nextDiv.amount):'—'}</div>
-            <div class="kpi-s">${nextDiv?nextDiv.date+' 入帳':'尚無安排'}</div>
+            <div class="kpi-v" style="color:#2563eb">${nearAmt?fmtM(nearAmt):'—'}</div>
+            <div class="kpi-s">${nearDate?nearDate+' ('+nearDays+'天後)':'尚無安排'}</div>
           </div>
           <div class="kpi">
             <div class="kpi-l">⚔️ 股息覆蓋借貸</div>
@@ -291,18 +369,18 @@ function renderInvest(){
           </div>
         </div>
         <div class="bar-wrap">
-          <div class="bar-label"><span>🏆 歷史累積 ${fmtM(totalDiv)}</span><span>目標${fmtM(divGoal)}</span></div>
+          <div class="bar-label"><span>🏆 歷史累積 ${fmtM(totalPaidDiv)}</span><span>目標${fmtM(targetDiv)}</span></div>
           <div class="bar" style="background:#dbeafe"><div class="bar-inner" style="width:${Math.min(divPct,100)}%;background:#93c5fd"><span class="bar-pct">${divPct}%</span></div></div>
         </div>
         <div class="bar-wrap">
-          <div class="bar-label"><span>🏦 距離還清</span><span>剩${fmtM(totalLoan)}</span></div>
+          <div class="bar-label"><span>🏦 距離還清</span><span>剩${fmtM(lR)}</span></div>
           <div class="bar" style="background:#f3e8ff"><div class="bar-inner" style="width:${Math.min(lPct,100)}%;background:#c084fc"><span class="bar-pct">${lPct}%</span></div></div>
         </div>
         <div style="background:#fafafa;border-radius:10px;padding:12px;margin-top:4px">
           <div style="font-size:10px;color:var(--sub);margin-bottom:3px">🔒 質押安全 · 維持率</div>
-          <div class="pledge-val" style="color:${ratioColor}">${ratio===999?'—':ratio+'%'}</div>
+          <div class="pledge-val" style="color:${ratioColor}">${showPledge?pledgeRatio+'%':'—'}</div>
           <div style="height:6px;background:#f1f5f9;border-radius:3px;overflow:hidden;margin:6px 0">
-            <div style="width:${Math.min(ratio/3,100)}%;height:100%;background:${ratioColor};border-radius:3px"></div>
+            <div style="width:${showPledge?Math.min(pledgeRatio/3,100):0}%;height:100%;background:${ratioColor};border-radius:3px"></div>
           </div>
           <div style="font-size:10px;color:var(--sub)">維持率130%生死線</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
@@ -735,11 +813,22 @@ function renderFamilyHTML(){
 function renderFamily(){}
 
 function calcLoanRemain(l){
-  const rate=(l.rate||0)/100/12;
-  const n=Math.round((l.amount||0)/(l.monthly||1));
-  if(rate===0)return(l.amount||0);
-  return(l.amount||0)*Math.pow(1+rate,n)-(l.monthly||0)*(Math.pow(1+rate,n)-1)/rate;
+  if(!l.amount||!l.rate||!l.start||!l.monthly)return l.remain||0;
+  const start=new Date(l.start);
+  const today=new Date();
+  // 計算已還幾期：考慮本月扣款日是否已到
+  const deductDay=parseInt(l.deductDay)||start.getDate();
+  let paid=(today.getFullYear()-start.getFullYear())*12+(today.getMonth()-start.getMonth());
+  // 如果今天還沒到本月扣款日，則本月這期還沒扣，paid 要減1
+  if(today.getDate()<deductDay) paid=Math.max(0,paid-1);
+  const mr=l.rate/100/12;
+  if(mr>0){
+    const rem=l.amount*Math.pow(1+mr,paid)-l.monthly*(Math.pow(1+mr,paid)-1)/mr;
+    return Math.max(0,Math.round(rem));
+  }
+  return Math.max(0,l.amount-l.monthly*paid);
 }
+
 
 // 啟動
 loadData();
