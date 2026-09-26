@@ -237,13 +237,6 @@ function getInvHoldings(){
 function renderAll(){
   renderInvest();
   renderAssets();
-  renderJournal();
-  renderDividend();
-  renderWatch();
-  renderPledge();
-  renderAnalytics();
-  renderTrend();
-  renderFamily();
 }
 
 // ── 投資與觀察 ──
@@ -487,7 +480,7 @@ function renderAssets(){
 // ── 交易日誌 ──
 function renderJournal(){
   const el = document.getElementById('page-journal');
-  if(!db){el.innerHTML='<div class="loading">無資料</div>';return;}
+  if(!el||!db){el.innerHTML='<div class="loading">無資料</div>';return;}
   const journals = (db.journals||[]).slice().reverse().slice(0,20);
   const catColor={'總經面':'#3b82f6','技術面':'#8b5cf6','基本面':'#10b981','心理面':'#f59e0b'};
   el.innerHTML = `<div class="card">
@@ -510,7 +503,7 @@ function renderJournal(){
 // ── 股息管理 ──
 function renderDividend(){
   const el = document.getElementById('page-dividend');
-  if(!db){el.innerHTML='<div class="loading">無資料</div>';return;}
+  if(!el||!db){el.innerHTML='<div class="loading">無資料</div>';return;}
   const divs = (db.dividends||[]).slice().sort((a,b)=>(b.date||'').localeCompare(a.date||''));
   const total = divs.reduce((s,d)=>s+(d.amount||0),0);
   const today = new Date().toISOString().slice(0,10);
@@ -540,7 +533,7 @@ function renderDividend(){
 // ── 觀察股 ──
 function renderWatch(){
   const el = document.getElementById('page-watch');
-  if(!db){el.innerHTML='<div class="loading">無資料</div>';return;}
+  if(!el||!db){el.innerHTML='<div class="loading">無資料</div>';return;}
   const list = db.watchlist||[];
   el.innerHTML = `<div class="card">
     <div class="card-hdr"><div class="card-title">👁 觀察股清單</div><span style="font-size:10px;color:var(--sub)">${list.length} 檔</span></div>
@@ -565,7 +558,7 @@ function renderWatch(){
 // ── 質押管理 ──
 function renderPledge(){
   const el = document.getElementById('page-pledge');
-  if(!db){el.innerHTML='<div class="loading">無資料</div>';return;}
+  if(!el||!db){el.innerHTML='<div class="loading">無資料</div>';return;}
   const assets = db.pledgeAssets||[];
   const pLoans = db.pledgeLoans||[];
   const mktTotal = assets.reduce((s,a)=>s+(a.lots||0)*(getPrice(a.code)||a.price||0)*1000,0);
@@ -604,7 +597,7 @@ function renderPledge(){
 // ── 投資分析 ──
 function renderAnalytics(){
   const el = document.getElementById('page-analytics');
-  if(!db){el.innerHTML='<div class="loading">無資料</div>';return;}
+  if(!el||!db){el.innerHTML='<div class="loading">無資料</div>';return;}
   const holdings = getInvHoldings();
   const totalCost = holdings.reduce((s,i)=>s+i.costVal,0);
   const totalMkt = holdings.reduce((s,i)=>s+i.mktVal,0);
@@ -639,7 +632,7 @@ function renderAnalytics(){
 // ── 資產趨勢 ──
 function renderTrend(){
   const el = document.getElementById('page-trend');
-  if(!db){el.innerHTML='<div class="loading">無資料</div>';return;}
+  if(!el||!db){el.innerHTML='<div class="loading">無資料</div>';return;}
   const snaps = (db.snapshots||[]).slice().reverse().slice(0,12);
   el.innerHTML = `
     <div class="card">
