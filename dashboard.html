@@ -4294,6 +4294,98 @@ async function ghPush(){
   try{
     db._ts=Date.now();
     localStorage.setItem(STORE,JSON.stringify(db));
+
+    // ── 計算 mobile_cache（手機版直接讀，零計算）──
+    try{
+      const today=new Date().toISOString().slice(0,10);
+      const pledgeFlex=(db.flexLoans||[]).filter(f=>f.calcPledge);
+      const pledgeLoan=pledgeFlex.reduce((s,f)=>s+(f.used||0),0);
+      let pledgeMkt=0;
+      (db.pledgeAssets||[]).forEach(a=>{const p=db.prices?.[a.code]?.price||0;pledgeMkt+=p*(a.lots||0)*1000;});
+      const pledgeRatio=pledgeLoan>0?Math.round(pledgeMkt/pledgeLoan*1000)/10:0;
+      const totalPaidDiv=(db.dividends||[]).filter(d=>!d.pending&&d.date<=today).reduce((s,d)=>s+d.amount,0);
+      const pendingDivAll=(db.dividends||[]).filter(d=>d.date>today).sort((a,b)=>a.date.localeCompare(b.date));
+      const nearAmt=pendingDivAll.length>0?pendingDivAll.reduce((s,d)=>d.date===pendingDivAll[0].date?s+d.amount:s,0):0;
+      const nearDate=pendingDivAll.length>0?pendingDivAll[0].date:'';
+      const nearDays=nearDate?Math.ceil((new Date(nearDate)-new Date(today))/86400000):0;
+      const targetDiv=db.settings?.targetDividend||800000;
+      const divPct=targetDiv>0?Math.round(totalPaidDiv/targetDiv*1000)/10:0;
+      const monthlyLoan=(db.loans||[]).filter(l=>!l.settled).reduce((s,l)=>s+(l.monthly||0),0);
+      const monthlyFlex=(db.flexLoans||[]).reduce((s,f)=>s+(f.monthly||0),0);
+      const totalMonthly=monthlyLoan+monthlyFlex;
+      const surplus=nearAmt-totalMonthly;
+      const lR=(db.loans||[]).filter(l=>!l.settled).reduce((s,l)=>s+calcLoanRemain(l),0);
+      const lOrig=(db.loans||[]).reduce((s,l)=>s+(l.amount||0),0);
+      const lPct=lOrig>0?Math.round(Math.max(0,lOrig-lR)/lOrig*100):0;
+      const activeInv=(db.investments||[]).map(i=>calcInv(i)).filter(i=>i.tLots>0);
+
+      // 家族帳戶
+      const familyCache={};
+      const targets=db.family?.targets||{};
+      const members=db.family?.members||Object.keys(db.family?.accounts||{});
+      members.forEach(m=>{
+        const acc=(db.family?.accounts||{})[m];
+        if(!acc)return;
+        let totalMkt=0;
+        const caps=[];
+        (acc.holdings||[]).forEach(h=>{
+          const c=calcFamilyHolding(h);
+          if(c.shares>0){
+            const mkt=c.mktVal||0;
+            totalMkt+=mkt;
+            caps.push({code:h.code,mkt});
+          }
+        });
+        const target=targets[m]||0;
+        const pct=target>0?Math.round(totalMkt/target*100):0;
+        caps.forEach(c=>{c.wt=totalMkt>0?Math.round(c.mkt/totalMkt*100):0;});
+        familyCache[m]={pct,totalMkt,caps,activeCount:caps.length};
+      });
+
+      // 信貸管理
+      const loansCache=(db.loans||[]).map(l=>{
+        const rem=calcLoanRemain(l);
+        const orig=l.amount||0;
+        const total=Math.round(orig/(l.monthly||1));
+        const paid=total-Math.round(rem/(l.monthly||1));
+        const pct=total>0?Math.round(paid/total*100):0;
+        const dDay=parseInt(l.deductDay)||0;
+        const acc=l.deductBank?(db.cashAccounts||[]).find(c=>c.bank===l.deductBank):null;
+        let ok=true,diff=0;
+        if(acc){
+          const bal=(acc.cash||0)+(acc.d1||0)+(acc.d2||0);
+          const prior=(db.loans||[]).filter(x=>x.deductBank===l.deductBank&&x.id!==l.id&&(parseInt(x.deductDay)||0)<dDay).reduce((s,x)=>s+(x.monthly||0),0);
+          diff=bal-prior-(l.monthly||0);
+          ok=diff>=0;
+        }
+        const todayD=new Date();
+        const thisM=new Date(todayD.getFullYear(),todayD.getMonth(),dDay);
+        const deductDate=thisM>todayD?thisM:new Date(todayD.getFullYear(),todayD.getMonth()+1,dDay);
+        const days=dDay?Math.ceil((deductDate-todayD)/86400000):null;
+        return{bank:l.bank,monthly:l.monthly,deductDay:l.deductDay,days,pct,paid,remain:total-paid,ok,diff:Math.abs(diff)};
+      });
+
+      // 現金帳戶
+      const cashTotal=(db.cashAccounts||[]).reduce((s,c)=>s+(c.cash||0)+(c.d1||0)+(c.d2||0),0);
+
+      db.mobile_cache={
+        updatedAt:today,
+        invest:{
+          activeCount:activeInv.length,
+          nearAmt,nearDate,nearDays,
+          surplus,totalMonthly,
+          totalPaidDiv,targetDiv,divPct,
+          lR:Math.round(lR),lOrig,lPct,
+          pledgeRatio,pledgeLoan,showPledge:pledgeLoan>0&&(db.pledgeAssets||[]).length>0
+        },
+        family:{members,data:familyCache},
+        loans:loansCache,
+        loanTotal:Math.round(lR),
+        monthLoan:monthlyLoan,
+        cashTotal,
+      };
+    }catch(e){console.warn('mobile_cache計算失敗:',e.message);}
+
     const syncDb={...db};
     delete syncDb._backup;
     delete syncDb.prices;
