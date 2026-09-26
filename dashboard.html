@@ -4319,27 +4319,34 @@ async function ghPush(){
       const lPct=lOrig>0?Math.round(Math.max(0,lOrig-lR)/lOrig*100):0;
       const activeInv=(db.investments||[]).map(i=>calcInv(i)).filter(i=>i.tLots>0);
 
-      // 家族帳戶
+      // 家族帳戶（完全照 renderFamilyMemberCards 邏輯）
       const familyCache={};
       const targets=db.family?.targets||{};
       const members=db.family?.members||Object.keys(db.family?.accounts||{});
       members.forEach(m=>{
         const acc=(db.family?.accounts||{})[m];
         if(!acc)return;
-        let totalMkt=0;
-        const caps=[];
+        let totalCost=0,totalMkt=0;
+        const holdingData=[];
         (acc.holdings||[]).forEach(h=>{
           const c=calcFamilyHolding(h);
           if(c.shares>0){
-            const mkt=c.mktVal||0;
-            totalMkt+=mkt;
-            caps.push({code:h.code,mkt});
+            totalCost+=c.cost;
+            if(c.mktVal!=null)totalMkt+=c.mktVal;
+            holdingData.push({code:h.code,cost:c.cost,mktVal:c.mktVal});
           }
         });
-        const target=targets[m]||0;
-        const pct=target>0?Math.round(totalMkt/target*100):0;
-        caps.forEach(c=>{c.wt=totalMkt>0?Math.round(c.mkt/totalMkt*100):0;});
-        familyCache[m]={pct,totalMkt,caps,activeCount:caps.length};
+        const totalVal=totalCost; // 進度條用投入資金
+        const target=targets[m]||1000000;
+        const pct=target>0?Math.round(totalVal/target*1000)/10:0;
+        // 佔比排序（照 dashboard 邏輯）
+        const sorted=holdingData.sort((a,b)=>(b.mktVal||b.cost)-(a.mktVal||a.cost));
+        const caps=sorted.map(h=>{
+          const val=h.mktVal||h.cost;
+          const wt=totalVal>0?Math.round(val/totalVal*100):0;
+          return{code:h.code,wt};
+        });
+        familyCache[m]={pct,totalCost,totalMkt,caps,activeCount:holdingData.length};
       });
 
       // 信貸管理
