@@ -159,13 +159,11 @@ async function loadData(){
     for(let i=0;i<binStr.length;i++) bytes[i] = binStr.charCodeAt(i);
     db = JSON.parse(new TextDecoder().decode(bytes));
     const now = new Date();
-    document.getElementById('last-update').textContent = '更新：'+now.getHours()+':'+String(now.getMinutes()).padStart(2,'0');
-    // 先渲染一次（無價格）
-    renderAll();
-    // 抓即時價格後再渲染
+    document.getElementById('last-update').textContent = '價格載入中...';
+    // 先抓價格，再渲染（避免質押維持率顯示 0%）
     fetchAllPrices().then(()=>{
       renderAll();
-      document.getElementById('last-update').textContent += ' 含即時價格';
+      document.getElementById('last-update').textContent = '更新：'+now.getHours()+':'+String(now.getMinutes()).padStart(2,'0');
     });
   }catch(e){
     document.getElementById('last-update').textContent = '載入失敗';
