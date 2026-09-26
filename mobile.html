@@ -181,27 +181,37 @@ let _prices = {}; // 本地快取
 
 async function fetchAllPrices(){
   if(!db) return;
-  // 收集所有需要的 code
+
+  // 先嘗試從 prices.json 批次載入（GitHub Actions 每日更新）
+  try{
+    const baseUrl = window.location.href.replace(/mobile\.html.*$/, '');
+    const r = await fetch(baseUrl+'prices.json?t='+Date.now());
+    if(r.ok){
+      const j = await r.json();
+      if(j&&typeof j==='object'){
+        Object.entries(j).forEach(([k,v])=>{
+          if(v?.price) _prices[k]=v.price;
+          else if(typeof v==='number') _prices[k]=v;
+        });
+      }
+    }
+  }catch(e){console.warn('prices.json載入失敗:', e.message);}
+
+  // 收集所有需要的 code，對還沒有價格的再用 CF_WORKER 補
   const codes = new Set();
-  // 所有 investments 的 code（不管有無 transactions）
-  (db.investments||[]).forEach(inv=>{if(inv.lots>0||inv.code)codes.add(inv.code);});
+  (db.investments||[]).forEach(inv=>{if(inv.code)codes.add(inv.code);});
   Object.values(db.family?.accounts||{}).forEach(acc=>(acc.holdings||[]).forEach(h=>codes.add(h.code)));
   (db.watchlist||[]).forEach(w=>codes.add(w.code));
   (db.pledgeAssets||[]).forEach(a=>a.code&&codes.add(a.code));
-  
-  const allCodes = [...codes].filter(Boolean);
-  if(allCodes.length===0) return;
-  
-  await Promise.all(allCodes.map(async code=>{
+
+  const missingCodes = [...codes].filter(c=>c&&!_prices[c]);
+  await Promise.all(missingCodes.map(async code=>{
     try{
       const r = await fetch(CF_WORKER+'/price?code='+code+'&t='+Date.now());
-      if(r.ok){
-        const d = await r.json();
-        if(d.price) _prices[code] = d.price;
-      }
+      if(r.ok){const d=await r.json();if(d.price)_prices[code]=d.price;}
     }catch(e){}
   }));
-  
+
   // 更新 db.prices 結構
   if(!db.prices) db.prices = {};
   Object.entries(_prices).forEach(([k,v])=>db.prices[k]={price:v});
@@ -367,7 +377,7 @@ function renderInvest(){
           </div>
         </div>
         <div class="bar-wrap">
-          <div class="bar-label"><span>🏆 歷史累積 ${fmtM(totalPaidDiv)}</span><span>目標${fmtM(targetDiv)}</span></div>
+          <div class="bar-label"><span>🏆 歷史累積 ${fmtM(totalPaidDiv)}</span><span>目標$${Math.round(targetDiv/10000)}萬</span></div>
           <div class="bar" style="background:#dbeafe"><div class="bar-inner" style="width:${Math.min(divPct,100)}%;background:#93c5fd"><span class="bar-pct">${divPct}%</span></div></div>
         </div>
         <div class="bar-wrap">
