@@ -2891,7 +2891,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1790403995867,
+  "_ts": 1790509693053,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -7688,12 +7688,12 @@
     }
   ],
   "mobile_cache": {
-    "updatedAt": "2026-09-26",
+    "updatedAt": "2026-09-27",
     "invest": {
       "activeCount": 3,
       "nearAmt": 106600,
       "nearDate": "2026-10-15",
-      "nearDays": 19,
+      "nearDays": 18,
       "surplus": 27287,
       "totalMonthly": 79313,
       "totalPaidDiv": 705075,
@@ -7718,11 +7718,11 @@
         "阿豪凱基": {
           "pct": 75,
           "totalCost": 750111.0800000001,
-          "totalMkt": 644565,
+          "totalMkt": 655070,
           "caps": [
             {
               "code": "00997A",
-              "wt": 58
+              "wt": 59
             },
             {
               "code": "009805",
@@ -7734,15 +7734,15 @@
         "阿豪富邦": {
           "pct": 32.3,
           "totalCost": 323248.1,
-          "totalMkt": 369484.4,
+          "totalMkt": 375049.8,
           "caps": [
             {
               "code": "00986A",
-              "wt": 46
+              "wt": 47
             },
             {
               "code": "00405A",
-              "wt": 42
+              "wt": 43
             },
             {
               "code": "00981A",
@@ -7762,11 +7762,11 @@
         "媽媽": {
           "pct": 31.4,
           "totalCost": 25132.78,
-          "totalMkt": 26483.52,
+          "totalMkt": 26695.2,
           "caps": [
             {
               "code": "00999A",
-              "wt": 105
+              "wt": 106
             }
           ],
           "activeCount": 1
@@ -7774,7 +7774,7 @@
         "琁 & 軒": {
           "pct": 47.8,
           "totalCost": 286726.24000000005,
-          "totalMkt": 306555.3500000001,
+          "totalMkt": 307965.72000000003,
           "caps": [
             {
               "code": "00403A",
@@ -7830,7 +7830,7 @@
         "bank": "line Bank-1",
         "monthly": 17807,
         "deductDay": "13號",
-        "days": 17,
+        "days": 16,
         "pct": 58,
         "paid": 26,
         "remain": 19,
@@ -7841,7 +7841,7 @@
         "bank": "line Bank-2",
         "monthly": 6319,
         "deductDay": "14號",
-        "days": 18,
+        "days": 17,
         "pct": 38,
         "paid": 21,
         "remain": 34,
@@ -7852,7 +7852,7 @@
         "bank": "line Bank-4",
         "monthly": 12400,
         "deductDay": "1號",
-        "days": 5,
+        "days": 4,
         "pct": 38,
         "paid": 13,
         "remain": 21,
@@ -7863,7 +7863,7 @@
         "bank": "line Bank-5",
         "monthly": 9495,
         "deductDay": "12號",
-        "days": 16,
+        "days": 15,
         "pct": 26,
         "paid": 9,
         "remain": 26,
