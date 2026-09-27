@@ -2891,7 +2891,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1790510487613,
+  "_ts": 1790525010796,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -7830,7 +7830,7 @@
         "bank": "line Bank-1",
         "monthly": 17807,
         "deductDay": "13號",
-        "days": 16,
+        "days": 15,
         "pct": 58,
         "paid": 26,
         "remain": 19,
@@ -7841,7 +7841,7 @@
         "bank": "line Bank-2",
         "monthly": 6319,
         "deductDay": "14號",
-        "days": 17,
+        "days": 16,
         "pct": 38,
         "paid": 21,
         "remain": 34,
@@ -7852,7 +7852,7 @@
         "bank": "line Bank-4",
         "monthly": 12400,
         "deductDay": "1號",
-        "days": 4,
+        "days": 3,
         "pct": 38,
         "paid": 13,
         "remain": 21,
@@ -7863,7 +7863,7 @@
         "bank": "line Bank-5",
         "monthly": 9495,
         "deductDay": "12號",
-        "days": 15,
+        "days": 14,
         "pct": 26,
         "paid": 9,
         "remain": 26,
