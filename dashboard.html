@@ -1994,16 +1994,13 @@ body:not(.privacy) .privacy-mask{filter:none;}
 
   <!-- 頂部欄 -->
   <div class="db-topbar">
-  <div style="position:absolute;top:10px;right:120px;z-index:999">
-    <a href="mobile.html" style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:20px;font-size:11px;font-weight:700;color:#64748b;text-decoration:none">
-      📱 手機版
-    </a>
-  </div>
     <div class="db-topbar-left">
       <div class="db-page-name" id="db-page-name">投資與觀察</div>
     </div>
     <div class="db-topbar-right">
       <span id="pstat" style="font-size:11px;color:#94a3b8;font-weight:600"></span>
+      <button onclick="refreshPricesBtn()" id="refresh-price-btn" style="padding:5px 12px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;font-size:11px;font-weight:700;color:#16a34a;cursor:pointer">💹 刷新價格</button>
+      <a href="mobile.html" style="padding:5px 12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:11px;font-weight:700;color:#64748b;text-decoration:none">📱 手機版</a>
       <a href="index.html" class="db-btn neutral" style="font-size:11px;padding:5px 12px">🏠 主目錄</a>
     </div>
   </div>
@@ -4710,6 +4707,14 @@ async function fetchPrice(code){
   }catch(e){console.warn('即時股價失敗:',e.message);}
   await loadPrices();
   return _pm[code.toUpperCase()]?{..._pm[code.toUpperCase()],ts:Date.now()}:null;
+}
+
+async function refreshPricesBtn(){
+  const btn=document.getElementById('refresh-price-btn');
+  if(btn){btn.textContent='⏳ 更新中...';btn.disabled=true;}
+  await refreshPrices();
+  if(btn){btn.textContent='💹 刷新價格';btn.disabled=false;}
+  toast('✅ 價格已更新');
 }
 
 async function refreshPrices(){
