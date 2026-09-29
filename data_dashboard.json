@@ -1497,7 +1497,7 @@
     {
       "id": "mncull1439i",
       "bank": "Line Bank",
-      "cash": 27000,
+      "cash": 24500,
       "d1Date": "",
       "d1": 0,
       "d2": 0
@@ -2891,7 +2891,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1790525010796,
+  "_ts": 1790684238838,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -7685,15 +7685,29 @@
       "fundName": "安聯台灣科技基金",
       "date": "2026-09-24",
       "amount": 1250
+    },
+    {
+      "id": "mummwtpiwwn",
+      "fundId": "mu737brxc3e",
+      "fundName": "統一奔騰基金",
+      "date": "2026-09-29",
+      "amount": 1250
+    },
+    {
+      "id": "mummwtpivs2",
+      "fundId": "mu73ajshs13",
+      "fundName": "安聯台灣科技基金",
+      "date": "2026-09-29",
+      "amount": 1250
     }
   ],
   "mobile_cache": {
-    "updatedAt": "2026-09-27",
+    "updatedAt": "2026-09-29",
     "invest": {
       "activeCount": 3,
       "nearAmt": 106600,
       "nearDate": "2026-10-15",
-      "nearDays": 18,
+      "nearDays": 16,
       "surplus": 27287,
       "totalMonthly": 79313,
       "totalPaidDiv": 705075,
@@ -7702,7 +7716,7 @@
       "lR": 1068161,
       "lOrig": 1900000,
       "lPct": 44,
-      "pledgeRatio": 172.8,
+      "pledgeRatio": 171.1,
       "pledgeLoan": 10000000,
       "showPledge": true
     },
@@ -7718,11 +7732,11 @@
         "阿豪凱基": {
           "pct": 75,
           "totalCost": 750111.0800000001,
-          "totalMkt": 655070,
+          "totalMkt": 644409,
           "caps": [
             {
               "code": "00997A",
-              "wt": 59
+              "wt": 58
             },
             {
               "code": "009805",
@@ -7734,7 +7748,7 @@
         "阿豪富邦": {
           "pct": 32.3,
           "totalCost": 323248.1,
-          "totalMkt": 375049.8,
+          "totalMkt": 371912.08,
           "caps": [
             {
               "code": "00986A",
@@ -7742,7 +7756,7 @@
             },
             {
               "code": "00405A",
-              "wt": 43
+              "wt": 42
             },
             {
               "code": "00981A",
@@ -7762,11 +7776,11 @@
         "媽媽": {
           "pct": 31.4,
           "totalCost": 25132.78,
-          "totalMkt": 26695.2,
+          "totalMkt": 26412.960000000003,
           "caps": [
             {
               "code": "00999A",
-              "wt": 106
+              "wt": 105
             }
           ],
           "activeCount": 1
@@ -7774,11 +7788,11 @@
         "琁 & 軒": {
           "pct": 47.8,
           "totalCost": 286726.24000000005,
-          "totalMkt": 307965.72000000003,
+          "totalMkt": 302974.00999999995,
           "caps": [
             {
               "code": "00403A",
-              "wt": 89
+              "wt": 87
             },
             {
               "code": "00981A",
@@ -7806,11 +7820,11 @@
         "老婆": {
           "pct": 42.9,
           "totalCost": 257155.47,
-          "totalMkt": 261463.51000000004,
+          "totalMkt": 257412.05,
           "caps": [
             {
               "code": "00403A",
-              "wt": 95
+              "wt": 93
             },
             {
               "code": "2330",
@@ -7830,49 +7844,49 @@
         "bank": "line Bank-1",
         "monthly": 17807,
         "deductDay": "13號",
-        "days": 15,
+        "days": 14,
         "pct": 58,
         "paid": 26,
         "remain": 19,
         "ok": false,
-        "diff": 12702
+        "diff": 15202
       },
       {
         "bank": "line Bank-2",
         "monthly": 6319,
         "deductDay": "14號",
-        "days": 16,
+        "days": 15,
         "pct": 38,
         "paid": 21,
         "remain": 34,
         "ok": false,
-        "diff": 19021
+        "diff": 21521
       },
       {
         "bank": "line Bank-4",
         "monthly": 12400,
         "deductDay": "1號",
-        "days": 3,
+        "days": 2,
         "pct": 38,
         "paid": 13,
         "remain": 21,
         "ok": true,
-        "diff": 14600
+        "diff": 12100
       },
       {
         "bank": "line Bank-5",
         "monthly": 9495,
         "deductDay": "12號",
-        "days": 14,
+        "days": 13,
         "pct": 26,
         "paid": 9,
         "remain": 26,
         "ok": true,
-        "diff": 5105
+        "diff": 2605
       }
     ],
     "loanTotal": 1068161,
     "monthLoan": 46021,
-    "cashTotal": 57030
+    "cashTotal": 54530
   }
 }
