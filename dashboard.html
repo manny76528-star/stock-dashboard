@@ -7900,6 +7900,27 @@ function runDailyProcess(force){
     }
   });
 
+  // 5. 定期基金自動扣款（週一=1...週五=5）
+  const dow=twNow.getUTCDay();
+  if(dow>=1&&dow<=5){
+    const funds=db.settings?.fundDeductions||[];
+    if(!db.fundDeductionLogs)db.fundDeductionLogs=[];
+    funds.forEach(f=>{
+      if(f.enabled===false)return;
+      if(!(f.days||[]).includes(dow))return;
+      const FUND_KEY='fund_done_'+f.id+'_'+todayStr;
+      if(!force&&localStorage.getItem(FUND_KEY))return;
+      const alreadyDone=db.fundDeductionLogs.find(l=>l.fundId===f.id&&l.date===todayStr);
+      if(alreadyDone){localStorage.setItem(FUND_KEY,'1');return;}
+      db.fundDeductionLogs.push({id:uid(),fundId:f.id,fundName:f.name,date:todayStr,amount:f.amount||0});
+      const lb=db.cashAccounts?.find(a=>a.bank&&a.bank.toLowerCase().includes('line'));
+      if(lb)lb.cash=(lb.cash||0)-(f.amount||0);
+      localStorage.setItem(FUND_KEY,'1');
+      msgs.push('📅 基金扣款 '+f.name+' -$'+(f.amount||0).toLocaleString());
+      changed=true;
+    });
+  }
+
   if(changed){
     save();
     render();
