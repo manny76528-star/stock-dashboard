@@ -1393,6 +1393,16 @@
           "date": "2026-08-13",
           "fee": 0,
           "remark": "VT轉移到S&P500 _ 主要是我看長期回測 S&P500贏VT很多"
+        },
+        {
+          "id": "mupbvcobqpc",
+          "type": "buy",
+          "lots": 29,
+          "price": 10.5,
+          "date": "2026-10-01",
+          "fee": 121,
+          "remark": "看好AI 及美國國力長期向上",
+          "mood": ""
         }
       ],
       "order": 18
@@ -2909,7 +2919,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1790846631428,
+  "_ts": 1790846674135,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
