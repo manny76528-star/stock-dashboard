@@ -2891,7 +2891,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1790846421119,
+  "_ts": 1790846470753,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -5520,6 +5520,15 @@
                 "price": 8.71,
                 "fee": 1,
                 "remark": "長虹期貨獲利"
+              },
+              {
+                "id": "mupbqzqtexz",
+                "type": "buy",
+                "date": "2026-10-01",
+                "shares": 862,
+                "price": 9.3,
+                "fee": 3,
+                "remark": "公司中秋禮金 全額買入"
               }
             ]
           },
@@ -5648,6 +5657,19 @@
           }
         ],
         "log": [
+          {
+            "id": "mupbqzqt7i2",
+            "txnId": "mupbqzqtexz",
+            "date": "2026-10-01",
+            "type": "buy",
+            "code": "00405A",
+            "name": "主動富邦台灣龍耀",
+            "shares": 862,
+            "price": 9.3,
+            "amount": 8019.6,
+            "fee": 3,
+            "remark": "公司中秋禮金 全額買入"
+          },
           {
             "id": "mu6ljn5nlpf",
             "txnId": "mu6ljn5nw0x",
@@ -7778,17 +7800,17 @@
           "activeCount": 2
         },
         "阿豪富邦": {
-          "pct": 32.3,
-          "totalCost": 323248.1,
-          "totalMkt": 371912.08,
+          "pct": 33.1,
+          "totalCost": 331267.7,
+          "totalMkt": 379885.58,
           "caps": [
             {
               "code": "00986A",
-              "wt": 47
+              "wt": 46
             },
             {
               "code": "00405A",
-              "wt": 42
+              "wt": 44
             },
             {
               "code": "00981A",
