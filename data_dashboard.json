@@ -1418,6 +1418,24 @@
           "fee": 121,
           "remark": "台幣走強,且短債難得當天下跌0.5%,買入當作類現金 且之前賣在10.27",
           "mood": ""
+        },
+        {
+          "id": "mupbufpz9q6",
+          "type": "sell",
+          "lots": 30,
+          "price": 10.09,
+          "date": "2026-10-01",
+          "fee": 1029,
+          "lotRefs": [
+            {
+              "txnId": "mtr06vpb6du",
+              "lots": 30,
+              "date": "2026-09-07"
+            }
+          ],
+          "remark": "轉移到009823_長期持有看好AI",
+          "mood": "",
+          "lossReason": ""
         }
       ],
       "order": 19
@@ -2891,7 +2909,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1790846573738,
+  "_ts": 1790846631428,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -7758,7 +7776,7 @@
   "mobile_cache": {
     "updatedAt": "2026-10-01",
     "invest": {
-      "activeCount": 3,
+      "activeCount": 2,
       "nearAmt": 106600,
       "nearDate": "2026-10-15",
       "nearDays": 14,
