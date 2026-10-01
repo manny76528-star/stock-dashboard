@@ -7735,8 +7735,10 @@ setTimeout(async()=>{
         renderAssetsDeduct();
         renderInvestL1();
         renderInvestL1();
+      } else {
+        // 本地資料較新，直接執行（不覆蓋本地）
+        runDailyProcess(false);
       }
-      checkFundDeductions();
       autoSnapshot();
     }
   }catch(e){console.warn('啟動Pull失敗:',e.message);}
@@ -7957,8 +7959,7 @@ function forceDailyProcess(){
   if(results.length===0)toast('今日無需執行連動（日期不符或無資料）');
 }
 
-// 啟動時自動執行
-runDailyProcess(false);
+// 啟動時不執行 runDailyProcess，等 Pull 完成後才執行（避免被雲端資料覆蓋）
 
 
 // Auto snapshot on 1st of each month
