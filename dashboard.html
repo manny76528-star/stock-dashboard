@@ -11267,9 +11267,10 @@ function renderAssetsPage(){
             const runBal=accBal-upcoming.reduce((s,v)=>s+v,0);
             const ok=runBal>=(l.monthly||0);
             const diff=runBal-(l.monthly||0);
+            const daysTxt=dDays!=null?(ok?` · ${dDays}天後`:` · ${dDays}天後❗`):'';
             surplusHtml=ok
-              ?`<span style="font-size:10px;font-weight:700;color:#dc2626;background:#fee2e2;padding:1px 6px;border-radius:4px;margin-left:4px">✓ 足夠 +$${Math.abs(diff).toLocaleString()}</span>`
-              :`<span style="font-size:10px;font-weight:700;color:#16a34a;background:#dcfce7;padding:1px 6px;border-radius:4px;margin-left:4px">⚠️ 不足 -$${Math.abs(diff).toLocaleString()}</span>`;
+              ?`<span style="font-size:10px;font-weight:700;color:#dc2626;background:#fee2e2;padding:1px 6px;border-radius:4px;margin-left:4px">✓ 足夠 +$${Math.abs(diff).toLocaleString()}</span><span style="font-size:9px;color:#94a3b8">${daysTxt}</span>`
+              :`<span style="font-size:10px;font-weight:700;color:#16a34a;background:#dcfce7;padding:1px 6px;border-radius:4px;margin-left:4px">⚠️ 不足 -$${Math.abs(diff).toLocaleString()}</span><span style="font-size:10px;font-weight:700;color:#dc2626">${daysTxt}</span>`;
           }
         }
         const lid='asl-'+l.id;
