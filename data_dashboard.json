@@ -1503,9 +1503,9 @@
       "name": "永豐銀行",
       "rate": 3.1,
       "limit": 3000000,
-      "used": 2887309,
-      "remain": 112691,
-      "monthly": 7459,
+      "used": 2924309,
+      "remain": 75691,
+      "monthly": 7554,
       "note": "每個月自動扣除利息 要注意餘額",
       "calcPledge": false
     },
@@ -2943,7 +2943,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1790936875633,
+  "_ts": 1790936957143,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -7863,8 +7863,8 @@
       "nearAmt": 106600,
       "nearDate": "2026-10-15",
       "nearDays": 13,
-      "surplus": 27287,
-      "totalMonthly": 79313,
+      "surplus": 27192,
+      "totalMonthly": 79408,
       "totalPaidDiv": 705075,
       "targetDiv": 1500000,
       "divPct": 47,
