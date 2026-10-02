@@ -7604,7 +7604,8 @@ function renderTrendChart(){
     tblHtml+='</tr>';
   });
   tblHtml+='</tbody></table></div>';
-  document.getElementById('trend-table').innerHTML=tblHtml;
+  const trendTable=document.getElementById('trend-table');
+  if(trendTable)trendTable.innerHTML=tblHtml;
 }
 
 // ═══ EDIT TITLE ═══
