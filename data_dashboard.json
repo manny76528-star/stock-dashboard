@@ -2919,7 +2919,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1790847183656,
+  "_ts": 1790934424027,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -7792,12 +7792,12 @@
     }
   ],
   "mobile_cache": {
-    "updatedAt": "2026-10-01",
+    "updatedAt": "2026-10-02",
     "invest": {
       "activeCount": 2,
       "nearAmt": 106600,
       "nearDate": "2026-10-15",
-      "nearDays": 14,
+      "nearDays": 13,
       "surplus": 27287,
       "totalMonthly": 79313,
       "totalPaidDiv": 705075,
@@ -7878,11 +7878,11 @@
         "琁 & 軒": {
           "pct": 47.9,
           "totalCost": 287226.80000000005,
-          "totalMkt": 309914.75,
+          "totalMkt": 313423.69999999995,
           "caps": [
             {
               "code": "00403A",
-              "wt": 89
+              "wt": 90
             },
             {
               "code": "00981A",
@@ -7910,11 +7910,11 @@
         "老婆": {
           "pct": 42.9,
           "totalCost": 257155.47,
-          "totalMkt": 262553.59,
+          "totalMkt": 265889.49,
           "caps": [
             {
               "code": "00403A",
-              "wt": 95
+              "wt": 97
             },
             {
               "code": "2330",
@@ -7934,7 +7934,7 @@
         "bank": "line Bank-1",
         "monthly": 17807,
         "deductDay": "13號",
-        "days": 12,
+        "days": 11,
         "pct": 58,
         "paid": 26,
         "remain": 19,
@@ -7945,7 +7945,7 @@
         "bank": "line Bank-2",
         "monthly": 6319,
         "deductDay": "14號",
-        "days": 13,
+        "days": 12,
         "pct": 38,
         "paid": 21,
         "remain": 34,
@@ -7956,7 +7956,7 @@
         "bank": "line Bank-4",
         "monthly": 12400,
         "deductDay": "1號",
-        "days": 31,
+        "days": 30,
         "pct": 41,
         "paid": 14,
         "remain": 20,
@@ -7967,7 +7967,7 @@
         "bank": "line Bank-5",
         "monthly": 9495,
         "deductDay": "12號",
-        "days": 11,
+        "days": 10,
         "pct": 26,
         "paid": 9,
         "remain": 26,
