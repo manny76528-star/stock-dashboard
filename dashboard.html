@@ -7509,6 +7509,7 @@ function renderTrendChart(){
   const canvas=document.getElementById('trend-page-canvas');
   if(!canvas)return; // 不在趨勢頁就不渲染
   const ctx=canvas.getContext('2d');
+  if(_trendPageChart){_trendPageChart.destroy();_trendPageChart=null;}
   if(_trendChart)_trendChart.destroy();
   _trendChart=new Chart(ctx,{
     type:'line',
@@ -11766,6 +11767,7 @@ function renderTrendPageChart(){
   if(showNet)datasets.push({label:'淨資產',data:snaps.map(s=>s.net),borderColor:'#8fa8c8',backgroundColor:grad,borderWidth:2,tension:0.4,fill:true,pointRadius:3,yAxisID:'yL'});
   if(showIndex){const indexData=snaps.map(s=>s.indexVal||null);const indexSegs=buildIndexSegments(indexData,'yR');indexSegs.forEach(seg=>datasets.push(seg));}
   if(showDiv)datasets.push({label:'每月股息',data:snaps.map(s=>s.div),borderColor:'#c9a99a',borderWidth:2,tension:0.4,fill:false,pointRadius:3,yAxisID:'yL'});
+  if(_trendChart){_trendChart.destroy();_trendChart=null;}
   if(_trendPageChart)_trendPageChart.destroy();
   _trendPageChart=new Chart(canvas,{
     type:'line',data:{labels,datasets},
