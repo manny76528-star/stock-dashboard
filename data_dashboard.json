@@ -2943,7 +2943,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1791194445812,
+  "_ts": 1791194537459,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -7093,6 +7093,21 @@
                     "amt": 250
                   }
                 ]
+              },
+              {
+                "id": "muv2z9q7vmf",
+                "type": "buy",
+                "date": "2026-10-05",
+                "shares": 32,
+                "price": 13.4,
+                "fee": 1,
+                "remark": "兒子存錢",
+                "splits": [
+                  {
+                    "name": "軒",
+                    "amt": 429
+                  }
+                ]
               }
             ]
           },
@@ -7201,6 +7216,19 @@
           }
         ],
         "log": [
+          {
+            "id": "muv2z9q7lza",
+            "txnId": "muv2z9q7vmf",
+            "date": "2026-10-05",
+            "type": "buy",
+            "code": "00983A",
+            "name": "主動中信ARK創新",
+            "shares": 32,
+            "price": 13.4,
+            "amount": 429.8,
+            "fee": 1,
+            "remark": "兒子存錢"
+          },
           {
             "id": "mupbpxfvi6d",
             "txnId": "mupbpxfvrvd",
@@ -7948,8 +7976,8 @@
         },
         "琁 & 軒": {
           "pct": 47.9,
-          "totalCost": 287226.80000000005,
-          "totalMkt": 314136.26,
+          "totalCost": 287656.60000000003,
+          "totalMkt": 314560.58,
           "caps": [
             {
               "code": "00403A",
@@ -7973,7 +8001,7 @@
             },
             {
               "code": "00983A",
-              "wt": 1
+              "wt": 2
             }
           ],
           "activeCount": 6
