@@ -2943,7 +2943,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1790937274739,
+  "_ts": 1791194445812,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -5352,6 +5352,12 @@
       "code": "009823",
       "lots": 92,
       "note": "富邦匯撥過來的"
+    },
+    {
+      "id": "muv2xb0n9t7",
+      "code": "009823",
+      "lots": 29,
+      "note": ""
     }
   ],
   "pledgeThreshold": 150,
@@ -7857,12 +7863,12 @@
     }
   ],
   "mobile_cache": {
-    "updatedAt": "2026-10-02",
+    "updatedAt": "2026-10-05",
     "invest": {
       "activeCount": 2,
       "nearAmt": 106600,
       "nearDate": "2026-10-15",
-      "nearDays": 13,
+      "nearDays": 10,
       "surplus": 27192,
       "totalMonthly": 79408,
       "totalPaidDiv": 705075,
@@ -7871,7 +7877,7 @@
       "lR": 1056637,
       "lOrig": 1900000,
       "lPct": 44,
-      "pledgeRatio": 167.4,
+      "pledgeRatio": 170.5,
       "pledgeLoan": 10000000,
       "showPledge": true
     },
@@ -7903,7 +7909,7 @@
         "阿豪富邦": {
           "pct": 33.1,
           "totalCost": 331267.7,
-          "totalMkt": 387700.83999999997,
+          "totalMkt": 387820.83999999997,
           "caps": [
             {
               "code": "00986A",
@@ -7999,7 +8005,7 @@
         "bank": "line Bank-1",
         "monthly": 17807,
         "deductDay": "13號",
-        "days": 11,
+        "days": 8,
         "pct": 58,
         "paid": 26,
         "remain": 19,
@@ -8010,7 +8016,7 @@
         "bank": "line Bank-2",
         "monthly": 6319,
         "deductDay": "14號",
-        "days": 12,
+        "days": 9,
         "pct": 38,
         "paid": 21,
         "remain": 34,
@@ -8021,7 +8027,7 @@
         "bank": "line Bank-4",
         "monthly": 12400,
         "deductDay": "1號",
-        "days": 30,
+        "days": 27,
         "pct": 41,
         "paid": 14,
         "remain": 20,
@@ -8032,7 +8038,7 @@
         "bank": "line Bank-5",
         "monthly": 9495,
         "deductDay": "12號",
-        "days": 10,
+        "days": 7,
         "pct": 26,
         "paid": 9,
         "remain": 26,
