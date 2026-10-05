@@ -2943,7 +2943,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1791194561525,
+  "_ts": 1791194581929,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -7965,11 +7965,11 @@
         "媽媽": {
           "pct": 31.4,
           "totalCost": 25132.78,
-          "totalMkt": 26812.8,
+          "totalMkt": 27659.52,
           "caps": [
             {
               "code": "00999A",
-              "wt": 107
+              "wt": 110
             }
           ],
           "activeCount": 1
