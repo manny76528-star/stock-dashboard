@@ -1588,7 +1588,7 @@
     {
       "id": "mr1iz7mm2ls",
       "bank": "期貨",
-      "cash": 30000,
+      "cash": 3,
       "d1Date": "",
       "d1": 0,
       "d2": 0
@@ -2990,7 +2990,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1791278670425,
+  "_ts": 1791278681059,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -8145,6 +8145,6 @@
     ],
     "loanTotal": 1056637,
     "monthLoan": 46021,
-    "cashTotal": 35530
+    "cashTotal": 5533
   }
 }
