@@ -1472,6 +1472,30 @@
         }
       ],
       "order": 19
+    },
+    {
+      "id": "muwh0dvpqng",
+      "code": "00924",
+      "name": "復華S&P500成長",
+      "lots": 37,
+      "avgPrice": 34.29,
+      "divPerShare": 0,
+      "note": "",
+      "url": "",
+      "holdType": "long",
+      "targetRoi": 5,
+      "transactions": [
+        {
+          "id": "muwh0dvp6mz",
+          "type": "buy",
+          "lots": 37,
+          "price": 34.29,
+          "date": "2026-10-06",
+          "fee": 0,
+          "remark": "排除傳產 保留前200大的SP500"
+        }
+      ],
+      "order": 20
     }
   ],
   "loans": [
@@ -2966,7 +2990,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1791278486897,
+  "_ts": 1791278570290,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -7916,7 +7940,7 @@
   "mobile_cache": {
     "updatedAt": "2026-10-06",
     "invest": {
-      "activeCount": 1,
+      "activeCount": 2,
       "nearAmt": 106600,
       "nearDate": "2026-10-15",
       "nearDays": 9,
