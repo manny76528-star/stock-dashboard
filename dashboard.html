@@ -7906,6 +7906,7 @@ function runDailyProcess(force){
 
   // 5. 定期基金自動扣款（週一=1...週五=5）
   const dow=twNow.getUTCDay();
+  console.log('[基金扣款] dow:'+dow+' todayStr:'+todayStr+' force:'+force);
   if(dow>=1&&dow<=5){
     const funds=db.settings?.fundDeductions||[];
     if(!db.fundDeductionLogs)db.fundDeductionLogs=[];
@@ -7913,8 +7914,10 @@ function runDailyProcess(force){
       if(f.enabled===false)return;
       if(!(f.days||[]).includes(dow))return;
       const FUND_KEY='fund_done_'+f.id+'_'+todayStr;
-      if(!force&&localStorage.getItem(FUND_KEY))return;
+      const lsKey=localStorage.getItem(FUND_KEY);
       const alreadyDone=db.fundDeductionLogs.find(l=>l.fundId===f.id&&l.date===todayStr);
+      console.log('[基金扣款]',f.name,'lsKey:'+lsKey,'alreadyDone:'+!!alreadyDone);
+      if(!force&&lsKey)return;
       if(alreadyDone){localStorage.setItem(FUND_KEY,'1');return;}
       db.fundDeductionLogs.push({id:uid(),fundId:f.id,fundName:f.name,date:todayStr,amount:f.amount||0});
       const lb=db.cashAccounts?.find(a=>a.bank&&a.bank.toLowerCase().includes('line'));
