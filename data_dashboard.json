@@ -1403,6 +1403,29 @@
           "fee": 121,
           "remark": "看好AI 及美國國力長期向上",
           "mood": ""
+        },
+        {
+          "id": "muwgylj9wmj",
+          "type": "sell",
+          "lots": 121,
+          "price": 10.55,
+          "date": "2026-10-06",
+          "fee": 4339,
+          "lotRefs": [
+            {
+              "txnId": "msrd1jhzdx2",
+              "lots": 92,
+              "date": "2026-08-13"
+            },
+            {
+              "txnId": "mupbvcobqpc",
+              "lots": 29,
+              "date": "2026-10-01"
+            }
+          ],
+          "remark": "持股轉移到排除傳產的SP500_00924",
+          "mood": "",
+          "lossReason": ""
         }
       ],
       "order": 18
@@ -2943,7 +2966,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1791194656323,
+  "_ts": 1791278486897,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -7891,12 +7914,12 @@
     }
   ],
   "mobile_cache": {
-    "updatedAt": "2026-10-05",
+    "updatedAt": "2026-10-06",
     "invest": {
-      "activeCount": 2,
+      "activeCount": 1,
       "nearAmt": 106600,
       "nearDate": "2026-10-15",
-      "nearDays": 10,
+      "nearDays": 9,
       "surplus": 27192,
       "totalMonthly": 79408,
       "totalPaidDiv": 705075,
@@ -8033,7 +8056,7 @@
         "bank": "line Bank-1",
         "monthly": 17807,
         "deductDay": "13號",
-        "days": 8,
+        "days": 7,
         "pct": 58,
         "paid": 26,
         "remain": 19,
@@ -8044,7 +8067,7 @@
         "bank": "line Bank-2",
         "monthly": 6319,
         "deductDay": "14號",
-        "days": 9,
+        "days": 8,
         "pct": 38,
         "paid": 21,
         "remain": 34,
@@ -8055,7 +8078,7 @@
         "bank": "line Bank-4",
         "monthly": 12400,
         "deductDay": "1號",
-        "days": 27,
+        "days": 26,
         "pct": 41,
         "paid": 14,
         "remain": 20,
@@ -8066,7 +8089,7 @@
         "bank": "line Bank-5",
         "monthly": 9495,
         "deductDay": "12號",
-        "days": 7,
+        "days": 6,
         "pct": 26,
         "paid": 9,
         "remain": 26,
