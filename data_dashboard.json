@@ -1572,7 +1572,7 @@
     {
       "id": "mncull1439i",
       "bank": "Line Bank",
-      "cash": 43467,
+      "cash": 40967,
       "d1Date": "",
       "d1": 0,
       "d2": 0
@@ -2990,7 +2990,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1791278720844,
+  "_ts": 1791278797416,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -7957,6 +7957,20 @@
       "fundName": "安聯台灣科技基金",
       "date": "2026-10-01",
       "amount": 1250
+    },
+    {
+      "id": "muwh594nzav",
+      "fundId": "mu737brxc3e",
+      "fundName": "統一奔騰基金",
+      "date": "2026-10-06",
+      "amount": 1250
+    },
+    {
+      "id": "muwh594nmqi",
+      "fundId": "mu73ajshs13",
+      "fundName": "安聯台灣科技基金",
+      "date": "2026-10-06",
+      "amount": 1250
     }
   ],
   "mobile_cache": {
@@ -8107,7 +8121,7 @@
         "paid": 26,
         "remain": 19,
         "ok": true,
-        "diff": 3765
+        "diff": 1265
       },
       {
         "bank": "line Bank-2",
@@ -8118,7 +8132,7 @@
         "paid": 21,
         "remain": 34,
         "ok": false,
-        "diff": 2554
+        "diff": 5054
       },
       {
         "bank": "line Bank-4",
@@ -8129,7 +8143,7 @@
         "paid": 14,
         "remain": 20,
         "ok": true,
-        "diff": 31067
+        "diff": 28567
       },
       {
         "bank": "line Bank-5",
@@ -8140,11 +8154,11 @@
         "paid": 9,
         "remain": 26,
         "ok": true,
-        "diff": 21572
+        "diff": 19072
       }
     ],
     "loanTotal": 1056637,
     "monthLoan": 46021,
-    "cashTotal": 43500
+    "cashTotal": 41000
   }
 }
