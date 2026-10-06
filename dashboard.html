@@ -4483,6 +4483,7 @@ async function manualSync(){
   _ghSha='';
   const updated=await ghPull();
   if(updated){render();runDailyProcess(false);}
+  else{runDailyProcess(false);}
   // Pull 完成後執行自動快照
   autoSnapshot();
   await ghPush();
@@ -7755,6 +7756,7 @@ setInterval(async()=>{
   if(!_syncEnabled)return;
   const updated=await ghPull();
   if(updated){render();runDailyProcess(false);showSyncStatus('☁️ 已從雲端同步');setTimeout(renderOvDashboard,100);renderAssetsDeduct();}
+  else{runDailyProcess(false);}
   autoSnapshot(); // 週五15:00後自動拍照
 },5*60*1000);
 
