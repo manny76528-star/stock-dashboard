@@ -7713,6 +7713,11 @@ checkBkWarn();
 renderAssetsDeduct();
 // 啟動時先強制 Pull，確保拿到最新雲端資料後才開始
 _syncEnabled=false;
+// 啟動時清掉今天的 fund key，讓 alreadyDone 防重複（避免舊 key 擋住新一天的扣款）
+(function(){
+  const todayStr=new Date(Date.now()+8*3600000).toISOString().slice(0,10);
+  Object.keys(localStorage).filter(k=>k.startsWith('fund_done_')&&k.endsWith(todayStr)).forEach(k=>localStorage.removeItem(k));
+})();
 setTimeout(async()=>{
   try{
     const r=await fetch(GH_API+'?t='+Date.now());
