@@ -11268,13 +11268,16 @@ function renderAssetsPage(){
             const dDay=parseInt(l.deductDay)||0;
             const thisMonth=new Date(todayD.getFullYear(),todayD.getMonth(),dDay);
             const deductDate=thisMonth>todayD?thisMonth:new Date(todayD.getFullYear(),todayD.getMonth()+1,dDay);
-            // 計算在此筆扣款日前，同帳戶所有先扣的款項（用日期數字比較）
+            // 計算在此筆扣款日前，同帳戶所有先扣的款項（用實際日期比較，與扣款提醒邏輯一致）
             const upcoming=[];
+            const todayD2=new Date();
             (db.loans||[]).forEach(loan=>{
               if(loan.deductBank!==l.deductBank||!loan.deductDay||loan.id===l.id)return;
               const d2=parseInt(loan.deductDay)||0;if(!d2)return;
-              // 只要 d2 在 dDay 之前（同月先扣），或 dDay 已過本月則下月比較
-              if(d2<dDay) upcoming.push(loan.monthly||0);
+              for(let mo=0;mo<=2;mo++){
+                const dt=new Date(todayD2.getFullYear(),todayD2.getMonth()+mo,d2);
+                if(dt>todayD2&&dt<=deductDate){upcoming.push(loan.monthly||0);break;}
+              }
             });
             const runBal=accBal-upcoming.reduce((s,v)=>s+v,0);
             const ok=runBal>=(l.monthly||0);
