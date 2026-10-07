@@ -2990,7 +2990,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1791281533748,
+  "_ts": 1791349405416,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -5653,6 +5653,15 @@
                 "price": 9.3,
                 "fee": 3,
                 "remark": "公司中秋禮金 全額買入"
+              },
+              {
+                "id": "muxn6mlztfa",
+                "type": "buy",
+                "date": "2026-10-07",
+                "shares": 3000,
+                "price": 9.67,
+                "fee": 12,
+                "remark": "2026/10月業績獎金"
               }
             ]
           },
@@ -5781,6 +5790,19 @@
           }
         ],
         "log": [
+          {
+            "id": "muxn6mlzygc",
+            "txnId": "muxn6mlztfa",
+            "date": "2026-10-07",
+            "type": "buy",
+            "code": "00405A",
+            "name": "主動富邦台灣龍耀",
+            "shares": 3000,
+            "price": 9.67,
+            "amount": 29022,
+            "fee": 12,
+            "remark": "2026/10月業績獎金"
+          },
           {
             "id": "mupbqzqt7i2",
             "txnId": "mupbqzqtexz",
@@ -7960,12 +7982,12 @@
     }
   ],
   "mobile_cache": {
-    "updatedAt": "2026-10-06",
+    "updatedAt": "2026-10-07",
     "invest": {
       "activeCount": 2,
       "nearAmt": 106600,
       "nearDate": "2026-10-15",
-      "nearDays": 9,
+      "nearDays": 8,
       "surplus": 27135,
       "totalMonthly": 79465,
       "totalPaidDiv": 705075,
@@ -8004,21 +8026,21 @@
           "activeCount": 2
         },
         "阿豪富邦": {
-          "pct": 33.1,
-          "totalCost": 331267.7,
-          "totalMkt": 397212.12,
+          "pct": 36,
+          "totalCost": 360289.7,
+          "totalMkt": 426612.12,
           "caps": [
             {
-              "code": "00986A",
-              "wt": 47
+              "code": "00405A",
+              "wt": 51
             },
             {
-              "code": "00405A",
-              "wt": 46
+              "code": "00986A",
+              "wt": 43
             },
             {
               "code": "00981A",
-              "wt": 14
+              "wt": 13
             },
             {
               "code": "009811",
@@ -8102,7 +8124,7 @@
         "bank": "line Bank-1",
         "monthly": 17807,
         "deductDay": "13號",
-        "days": 7,
+        "days": 6,
         "pct": 58,
         "paid": 26,
         "remain": 19,
@@ -8113,7 +8135,7 @@
         "bank": "line Bank-2",
         "monthly": 6319,
         "deductDay": "14號",
-        "days": 8,
+        "days": 7,
         "pct": 38,
         "paid": 21,
         "remain": 34,
@@ -8124,7 +8146,7 @@
         "bank": "line Bank-4",
         "monthly": 12400,
         "deductDay": "1號",
-        "days": 26,
+        "days": 25,
         "pct": 41,
         "paid": 14,
         "remain": 20,
@@ -8135,7 +8157,7 @@
         "bank": "line Bank-5",
         "monthly": 9495,
         "deductDay": "12號",
-        "days": 6,
+        "days": 5,
         "pct": 26,
         "paid": 9,
         "remain": 26,
