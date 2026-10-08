@@ -3138,6 +3138,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
     <div class="br">
       <button class="btn btn-s" onclick="closeModal('fundSettingsModal')">取消</button>
       <button class="btn btn-p" onclick="saveFundSettings()">💾 儲存</button>
+      <button class="btn" style="background:#f0fdf4;border:1px solid #bbf7d0;color:#16a34a;font-weight:700" onclick="runFundDeductNow()">▶ 執行今日扣款</button>
     </div>
   </div>
 </div>
@@ -11091,6 +11092,34 @@ function addFundSetting(){
 function delFundSetting(idx){
   db.settings.fundDeductions.splice(idx,1);
   openFundSettings();
+}
+
+function runFundDeductNow(){
+  const twNow=new Date(Date.now()+8*3600000);
+  const todayStr=twNow.toISOString().slice(0,10);
+  const dow=twNow.getUTCDay();
+  if(dow===0||dow===6){toast('⚠️ 今天是週末，不執行扣款');return;}
+  const funds=db.settings?.fundDeductions||[];
+  if(!db.fundDeductionLogs)db.fundDeductionLogs=[];
+  const lineBank=db.cashAccounts?.find(a=>a.bank&&a.bank.toLowerCase().includes('line'));
+  let count=0;
+  funds.forEach(f=>{
+    if(f.enabled===false)return;
+    const alreadyDone=db.fundDeductionLogs.find(l=>l.fundId===f.id&&l.date===todayStr);
+    if(alreadyDone){toast('⚠️ '+f.name+' 今天已扣款');return;}
+    db.fundDeductionLogs.push({id:uid(),fundId:f.id,fundName:f.name,date:todayStr,amount:f.amount||0});
+    if(lineBank)lineBank.cash=(lineBank.cash||0)-(f.amount||0);
+    const FUND_KEY='fund_done_'+f.id+'_'+todayStr;
+    localStorage.setItem(FUND_KEY,'1');
+    count++;
+  });
+  if(count>0){
+    save();
+    toast('✅ 已執行 '+count+' 筆基金扣款');
+    closeModal('fundSettingsModal');
+  } else {
+    toast('今天無需扣款或已全部扣完');
+  }
 }
 
 function saveFundSettings(){
