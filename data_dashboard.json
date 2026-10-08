@@ -2990,7 +2990,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1791453868298,
+  "_ts": 1791453875279,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -5393,12 +5393,6 @@
       "code": "00997A",
       "lots": 2,
       "note": "凱基匯撥過來的"
-    },
-    {
-      "id": "muv2xb0n9t7",
-      "code": "009823",
-      "lots": 29,
-      "note": ""
     }
   ],
   "pledgeThreshold": 150,
@@ -8018,7 +8012,7 @@
       "lR": 1056637,
       "lOrig": 1900000,
       "lPct": 44,
-      "pledgeRatio": 161.4,
+      "pledgeRatio": 158.3,
       "pledgeLoan": 10000000,
       "showPledge": true
     },
