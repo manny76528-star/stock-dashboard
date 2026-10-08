@@ -1572,7 +1572,7 @@
     {
       "id": "mncull1439i",
       "bank": "Line Bank",
-      "cash": 40500,
+      "cash": 38000,
       "d1Date": "",
       "d1": 0,
       "d2": 0
@@ -2990,7 +2990,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1791453345429,
+  "_ts": 1791453743489,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -7993,6 +7993,20 @@
       "fundName": "安聯台灣科技基金",
       "date": "2026-10-06",
       "amount": 1250
+    },
+    {
+      "id": "muzdaydl2iy",
+      "fundId": "mu737brxc3e",
+      "fundName": "統一奔騰基金",
+      "date": "2026-10-08",
+      "amount": 1250
+    },
+    {
+      "id": "muzdaydldq2",
+      "fundId": "mu73ajshs13",
+      "fundName": "安聯台灣科技基金",
+      "date": "2026-10-08",
+      "amount": 1250
     }
   ],
   "mobile_cache": {
@@ -8010,7 +8024,7 @@
       "lR": 1056637,
       "lOrig": 1900000,
       "lPct": 44,
-      "pledgeRatio": 171.3,
+      "pledgeRatio": 171.2,
       "pledgeLoan": 10000000,
       "showPledge": true
     },
@@ -8026,7 +8040,7 @@
         "阿豪凱基": {
           "pct": 75,
           "totalCost": 750111.0800000001,
-          "totalMkt": 670342,
+          "totalMkt": 670856,
           "caps": [
             {
               "code": "00997A",
@@ -8034,7 +8048,7 @@
             },
             {
               "code": "009805",
-              "wt": 28
+              "wt": 29
             }
           ],
           "activeCount": 2
@@ -8042,11 +8056,11 @@
         "阿豪富邦": {
           "pct": 36.4,
           "totalCost": 363558.16000000003,
-          "totalMkt": 429887.92000000004,
+          "totalMkt": 426138.96,
           "caps": [
             {
               "code": "00405A",
-              "wt": 51
+              "wt": 50
             },
             {
               "code": "00986A",
@@ -8070,11 +8084,11 @@
         "媽媽": {
           "pct": 31.4,
           "totalCost": 25132.78,
-          "totalMkt": 27683.039999999997,
+          "totalMkt": 27142.079999999998,
           "caps": [
             {
               "code": "00999A",
-              "wt": 110
+              "wt": 108
             }
           ],
           "activeCount": 1
@@ -8082,11 +8096,11 @@
         "琁 & 軒": {
           "pct": 47.9,
           "totalCost": 287656.60000000003,
-          "totalMkt": 324633.71,
+          "totalMkt": 320878.1,
           "caps": [
             {
               "code": "00403A",
-              "wt": 93
+              "wt": 92
             },
             {
               "code": "00981A",
@@ -8114,11 +8128,11 @@
         "老婆": {
           "pct": 43.1,
           "totalCost": 258755.27,
-          "totalMkt": 275862.13999999996,
+          "totalMkt": 272748.87999999995,
           "caps": [
             {
               "code": "00403A",
-              "wt": 100
+              "wt": 99
             },
             {
               "code": "2330",
@@ -8142,8 +8156,8 @@
         "pct": 58,
         "paid": 26,
         "remain": 19,
-        "ok": true,
-        "diff": 798
+        "ok": false,
+        "diff": 1702
       },
       {
         "bank": "line Bank-2",
@@ -8154,7 +8168,7 @@
         "paid": 21,
         "remain": 34,
         "ok": false,
-        "diff": 5521
+        "diff": 8021
       },
       {
         "bank": "line Bank-4",
@@ -8165,7 +8179,7 @@
         "paid": 14,
         "remain": 20,
         "ok": true,
-        "diff": 28100
+        "diff": 25600
       },
       {
         "bank": "line Bank-5",
@@ -8176,11 +8190,11 @@
         "paid": 9,
         "remain": 26,
         "ok": true,
-        "diff": 18605
+        "diff": 16105
       }
     ],
     "loanTotal": 1056637,
     "monthLoan": 46021,
-    "cashTotal": 40533
+    "cashTotal": 38033
   }
 }
