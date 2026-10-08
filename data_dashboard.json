@@ -2990,7 +2990,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1791455047350,
+  "_ts": 1791455699590,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -3071,6 +3071,39 @@
     }
   ],
   "journals": [
+    {
+      "id": "muzegvq34zv",
+      "date": "2026-10-08",
+      "tags": [
+        "重大事項"
+      ],
+      "market": "告誡自己：永遠記住差點被自己蠢到破產、信用全毀的這一天。",
+      "market2": "",
+      "market3": "",
+      "marketColor": "green",
+      "market2Color": "",
+      "market3Color": "",
+      "marketUrl": "",
+      "youtubeUrl": "",
+      "content": "🚨 致命盲點\n•\t無知換股：盲目賣出 120 萬 股票並立刻買進新標的。\n•\t忘記質押：徹底忘記股票已質押借款 60%，賣出時本金遭券商直接扣除，瞬間造成50 萬交割款黑洞。\n•\t\n💣 差點引爆的連鎖效應\n若非哥哥在最後關頭出手湊齊 40 萬，一旦提報違約交割：\n•\t不限用途質押立刻中斷。\n•\t300 萬理財型房貸 與 4 筆信貸 將面臨銀行抽銀根、要求提前清償。\n•\t信用評分徹底歸零，財務生命直接絕路。\n\n🛠️ 鋼鐵交易紀律\n1.\t涉及質押股票：絕對禁止在未精算交割款前，進行當日「賣 A 買 B」換股。\n2.\t下單唯一前提：手動登入網銀，親眼確認可用現金額度，絕不看股票市值。\n3.\t時刻保持清醒：槓桿是借來的債，不是自己本金！運氣只有一次，絕不再犯。",
+      "stockTags": [
+        "00981A",
+        "00988A",
+        "00981T"
+      ],
+      "eventCat": "個股操作",
+      "behavior": "觸發PTSD",
+      "indexVal": 49313,
+      "stockPrices": {
+        "00981A": 32.24,
+        "00988A": 17.32,
+        "00981T": 11.66
+      },
+      "aiAnalysis": null,
+      "images": [
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1791455398766_n77a.jpg"
+      ]
+    },
     {
       "id": "muqtf0sflwg",
       "date": "2026-10-02",
