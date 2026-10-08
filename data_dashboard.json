@@ -1561,9 +1561,9 @@
       "name": "統一證券",
       "rate": 3.4,
       "limit": 13000000,
-      "used": 10000000,
-      "remain": 3000000,
-      "monthly": 28333,
+      "used": 10006000,
+      "remain": 2994000,
+      "monthly": 28350,
       "note": "一年一簽,賣出股票時還利息",
       "calcPledge": true
     }
@@ -2990,7 +2990,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1791453968180,
+  "_ts": 1791454771678,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -8010,16 +8010,16 @@
       "nearAmt": 106600,
       "nearDate": "2026-10-15",
       "nearDays": 7,
-      "surplus": 24635,
-      "totalMonthly": 81965,
+      "surplus": 24618,
+      "totalMonthly": 81982,
       "totalPaidDiv": 705075,
       "targetDiv": 1500000,
       "divPct": 47,
       "lR": 1056637,
       "lOrig": 1900000,
       "lPct": 44,
-      "pledgeRatio": 171.1,
-      "pledgeLoan": 10000000,
+      "pledgeRatio": 171,
+      "pledgeLoan": 10006000,
       "showPledge": true
     },
     "family": {
