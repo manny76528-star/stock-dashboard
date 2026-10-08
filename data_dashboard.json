@@ -1580,7 +1580,7 @@
     {
       "id": "mneeom9dzod",
       "bank": "統一券商",
-      "cash": 100000,
+      "cash": 6,
       "d1Date": "",
       "d1": 0,
       "d2": 0
@@ -2990,7 +2990,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1791454826062,
+  "_ts": 1791454832168,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -8189,6 +8189,6 @@
     ],
     "loanTotal": 1056637,
     "monthLoan": 46021,
-    "cashTotal": 200003
+    "cashTotal": 100009
   }
 }
