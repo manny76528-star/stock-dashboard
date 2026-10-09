@@ -2864,6 +2864,30 @@
           "pnl": -10581
         }
       ]
+    },
+    {
+      "ym": "2026-10-09",
+      "net": 2478893,
+      "div": 91000,
+      "cf": 8889,
+      "debtRatio": 85,
+      "indexVal": 49313,
+      "holdings": [
+        {
+          "code": "00981T",
+          "name": "平衡凱基雙核收息",
+          "lots": 1300,
+          "price": 11.66,
+          "pnl": -740856
+        },
+        {
+          "code": "00924",
+          "name": "復華S&P500成長",
+          "lots": 37,
+          "price": 34.59,
+          "pnl": 11100
+        }
+      ]
     }
   ],
   "settings": {
@@ -2990,7 +3014,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1791455797162,
+  "_ts": 1791535247250,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -5544,6 +5568,10 @@
           {
             "date": "2026-10-02",
             "mkt": 26578
+          },
+          {
+            "date": "2026-10-09",
+            "mkt": 27142
           }
         ]
       },
@@ -6141,6 +6169,10 @@
           {
             "date": "2026-10-02",
             "mkt": 385234
+          },
+          {
+            "date": "2026-10-09",
+            "mkt": 426139
           }
         ]
       },
@@ -6479,6 +6511,10 @@
           {
             "date": "2026-10-02",
             "mkt": 663833
+          },
+          {
+            "date": "2026-10-09",
+            "mkt": 670856
           }
         ]
       },
@@ -6675,6 +6711,10 @@
           {
             "date": "2026-10-02",
             "mkt": 265889
+          },
+          {
+            "date": "2026-10-09",
+            "mkt": 272765
           }
         ]
       },
@@ -7751,6 +7791,10 @@
           {
             "date": "2026-10-02",
             "mkt": 314136
+          },
+          {
+            "date": "2026-10-09",
+            "mkt": 320644
           }
         ],
         "defaultSplits": [
@@ -8018,12 +8062,12 @@
     }
   ],
   "mobile_cache": {
-    "updatedAt": "2026-10-08",
+    "updatedAt": "2026-10-09",
     "invest": {
       "activeCount": 2,
       "nearAmt": 106600,
       "nearDate": "2026-10-15",
-      "nearDays": 7,
+      "nearDays": 6,
       "surplus": 24489,
       "totalMonthly": 82111,
       "totalPaidDiv": 705075,
@@ -8160,7 +8204,7 @@
         "bank": "line Bank-1",
         "monthly": 17807,
         "deductDay": "13號",
-        "days": 5,
+        "days": 4,
         "pct": 58,
         "paid": 26,
         "remain": 19,
@@ -8171,7 +8215,7 @@
         "bank": "line Bank-2",
         "monthly": 6319,
         "deductDay": "14號",
-        "days": 6,
+        "days": 5,
         "pct": 38,
         "paid": 21,
         "remain": 34,
@@ -8182,7 +8226,7 @@
         "bank": "line Bank-4",
         "monthly": 12400,
         "deductDay": "1號",
-        "days": 24,
+        "days": 23,
         "pct": 41,
         "paid": 14,
         "remain": 20,
@@ -8193,7 +8237,7 @@
         "bank": "line Bank-5",
         "monthly": 9495,
         "deductDay": "12號",
-        "days": 4,
+        "days": 3,
         "pct": 26,
         "paid": 9,
         "remain": 26,
