@@ -7748,7 +7748,22 @@ setTimeout(async()=>{
         // 本地資料較新，直接執行（不覆蓋本地）
         runDailyProcess(false);
       }
-      autoSnapshot();
+      // Pull 完成後直接嘗試拍照（繞過 autoSnapshot 的 setTimeout，更可靠）
+      if(new Date().getDay()===5&&new Date().getHours()>=15){
+        const dateKey=new Date().toISOString().slice(0,10);
+        const snapKey='snap_done_'+dateKey;
+        if(!localStorage.getItem(snapKey)){
+          setTimeout(async()=>{
+            try{
+              await recordSnapshot(false);
+              localStorage.setItem(snapKey,'1');
+              console.log('✅ Pull後自動快照成功');
+            }catch(e){console.warn('Pull後快照失敗:',e.message);}
+          },2000);
+        }
+      } else {
+        autoSnapshot();
+      }
     }
   }catch(e){console.warn('啟動Pull失敗:',e.message);}
   _syncEnabled=true;
