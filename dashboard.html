@@ -5848,6 +5848,22 @@ function renderCash(){
     grid.appendChild(card);
   });
 
+  // 更新基金扣款狀態（第一層顯示）
+  const fundStatusEl=document.getElementById('fund-deduct-status');
+  if(fundStatusEl){
+    const allLogs2=db.fundDeductionLogs||[];
+    const lastLog2=allLogs2.length>0?allLogs2.reduce((a,b)=>a.date>b.date?a:b):null;
+    const lastDate2=lastLog2?.date||null;
+    const daysSince2=lastDate2?Math.floor((Date.now()-new Date(lastDate2))/(86400000)):999;
+    const isOverdue2=daysSince2>3;
+    if(lastDate2){
+      const dateDisp=lastDate2.slice(5).replace('-','/');
+      fundStatusEl.innerHTML=`<span style="font-size:10px;font-weight:600;color:${isOverdue2?'#f59e0b':'#16a34a'}">${isOverdue2?'⚠️':'✓'} 基金扣款：${daysSince2}天前(${dateDisp})</span> <button onclick="event.stopPropagation();runFundDeductNow()" style="padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;${isOverdue2?'background:linear-gradient(135deg,#dc2626,#f97316);border:none;color:#fff;animation:fundPulse 1.2s infinite':'background:#f0fdf4;border:1px solid #bbf7d0;color:#16a34a'}">▶ 執行</button>`;
+    } else {
+      fundStatusEl.innerHTML='';
+    }
+  }
+
   const totEl=document.getElementById('c-tot');if(totEl)totEl.textContent='$'+tB.toLocaleString();
   const badge=document.getElementById('cash-tot-badge');
   if(badge){badge.textContent='$'+Math.abs(tB).toLocaleString();badge.style.color=tB>=0?'var(--gain)':'var(--loss)';}
@@ -15032,6 +15048,7 @@ renderInvestL1(); // 啟動時渲染第一層
           <span>總餘額 <b id="cash-tot-badge" style="color:#2563eb">—</b></span>
           <span>待入帳 <b id="cash-pending-badge" style="color:#7c3aed">—</b><span id="cash-next-div" style="font-size:11px;color:#d97706;font-weight:600;font-family:'JetBrains Mono',monospace;margin-left:4px"></span></span>
           <div id="cash-acct-summary" style="display:none"></div>
+          <span id="fund-deduct-status"></span>
         </div>
         <span style="display:none" id="c-tot">—</span>
       </div>
