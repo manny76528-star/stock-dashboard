@@ -3014,7 +3014,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1791559319790,
+  "_ts": 1791644899250,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -8062,12 +8062,12 @@
     }
   ],
   "mobile_cache": {
-    "updatedAt": "2026-10-09",
+    "updatedAt": "2026-10-10",
     "invest": {
       "activeCount": 2,
       "nearAmt": 106600,
       "nearDate": "2026-10-15",
-      "nearDays": 6,
+      "nearDays": 5,
       "surplus": 24489,
       "totalMonthly": 82111,
       "totalPaidDiv": 705075,
@@ -8204,7 +8204,7 @@
         "bank": "line Bank-1",
         "monthly": 17807,
         "deductDay": "13號",
-        "days": 4,
+        "days": 3,
         "pct": 58,
         "paid": 26,
         "remain": 19,
@@ -8215,7 +8215,7 @@
         "bank": "line Bank-2",
         "monthly": 6319,
         "deductDay": "14號",
-        "days": 5,
+        "days": 4,
         "pct": 38,
         "paid": 21,
         "remain": 34,
@@ -8226,7 +8226,7 @@
         "bank": "line Bank-4",
         "monthly": 12400,
         "deductDay": "1號",
-        "days": 23,
+        "days": 22,
         "pct": 41,
         "paid": 14,
         "remain": 20,
@@ -8237,7 +8237,7 @@
         "bank": "line Bank-5",
         "monthly": 9495,
         "deductDay": "12號",
-        "days": 3,
+        "days": 2,
         "pct": 26,
         "paid": 9,
         "remain": 26,
