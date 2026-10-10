@@ -254,6 +254,8 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 
 /* SECTION CARD EXTRA POLISH */
 .sec{animation:fadeInUp .3s ease both;}
+/* 基金扣款按鈕動畫 */
+@keyframes fundPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.85;transform:scale(1.03)}}
 /* ═══ PRIVACY MODE ═══ */
 .privacy-mask{
   filter:blur(8px);
@@ -5765,10 +5767,40 @@ function renderCash(){
           const days=(f.days||[]).length;
           return s+(f.amount||0)*days;
         },0);
+        // 計算上次執行天數
+        const allLogs=db.fundDeductionLogs||[];
+        const lastLog=allLogs.length>0?allLogs.reduce((a,b)=>a.date>b.date?a:b):null;
+        const lastDate=lastLog?.date||null;
+        const daysSince=lastDate?Math.floor((Date.now()-new Date(lastDate))/(86400000)):999;
+        // 最大扣款間隔（週二、週四，最多間隔3天）
+        const maxInterval=3;
+        const isOverdue=daysSince>maxInterval;
+        const lastTxt=lastDate?`${isOverdue?'⚠️':'✓'} 上次執行：${daysSince}天前 (${lastDate.slice(5).replace('-','/')})`:'尚未執行';
+        const lastColor=isOverdue?'#f59e0b':'#16a34a';
+        const btnStyle=isOverdue
+          ?'padding:5px 10px;background:linear-gradient(135deg,#dc2626,#f97316);border:none;border-radius:8px;font-size:11px;font-weight:800;color:#fff;cursor:pointer;animation:fundPulse 1.2s infinite'
+          :'padding:5px 10px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;font-size:11px;font-weight:700;color:#16a34a;cursor:pointer';
         // 第一層
         const l1=document.createElement('div');
-        l1.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:10px 14px;cursor:pointer';
-        l1.innerHTML='<div style="display:flex;align-items:center;gap:8px"><span style="font-size:14px">📅</span><div><div style="font-size:12px;font-weight:700;color:#374151">定期基金扣款</div><div style="font-size:11px;color:#dc2626;font-weight:600">每週 -$'+weeklyTotal.toLocaleString()+'</div></div></div><div style="display:flex;align-items:center;gap:6px"><span id="fund-l2-arr" style="font-size:10px;color:#94a3b8">▶</span><button onclick="event.stopPropagation();openFundSettings()" style="padding:2px 8px;background:#f1f5f9;border:0.5px solid #e2e8f0;border-radius:5px;font-size:10px;cursor:pointer;color:#64748b">⚙️</button></div>';
+        l1.style.cssText='padding:10px 14px;border-top:none;cursor:pointer';
+        l1.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:${daysSince<999?'6':'0'}px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:14px">📅</span>
+            <div>
+              <div style="font-size:12px;font-weight:700;color:#374151">定期基金扣款</div>
+              <div style="font-size:11px;color:#dc2626;font-weight:600">每週 -$${weeklyTotal.toLocaleString()}</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span id="fund-l2-arr" style="font-size:10px;color:#94a3b8">▶</span>
+            <button onclick="event.stopPropagation();openFundSettings()" style="padding:2px 8px;background:#f1f5f9;border:0.5px solid #e2e8f0;border-radius:5px;font-size:10px;cursor:pointer;color:#64748b">⚙️</button>
+          </div>
+        </div>
+        ${daysSince<999?`<div style="display:flex;justify-content:space-between;align-items:center;background:#f8fafc;border-radius:8px;padding:7px 10px">
+          <span style="font-size:10px;font-weight:600;color:${lastColor}">${lastTxt}</span>
+          <button onclick="event.stopPropagation();runFundDeductNow()" style="${btnStyle}">▶ 執行今日</button>
+        </div>`:''}
+        `;
         // 第二層
         const l2=document.createElement('div');
         l2.id='fund-l2';
