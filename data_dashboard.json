@@ -1572,7 +1572,7 @@
     {
       "id": "mncull1439i",
       "bank": "Line Bank",
-      "cash": 72698,
+      "cash": 97500,
       "d1Date": "",
       "d1": 0,
       "d2": 0
@@ -3014,7 +3014,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1791876793206,
+  "_ts": 1791887131262,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -5386,9 +5386,7 @@
     "mncui6prd6f_2026-09": true,
     "mncul5vdg0j_2026-09": true,
     "mncue4nbehw_2026-09": true,
-    "mncug22msvu_2026-09": true,
-    "mncul5vdg0j_2026-10": true,
-    "mncue4nbehw_2026-10": true
+    "mncug22msvu_2026-09": true
   },
   "pledgeLoans": [],
   "pledgeAssets": [
@@ -8061,23 +8059,37 @@
       "fundName": "安聯台灣科技基金",
       "date": "2026-10-08",
       "amount": 1250
+    },
+    {
+      "id": "mv6jbyixtel",
+      "fundId": "mu737brxc3e",
+      "fundName": "統一奔騰基金",
+      "date": "2026-10-13",
+      "amount": 1250
+    },
+    {
+      "id": "mv6jbyixboz",
+      "fundId": "mu73ajshs13",
+      "fundName": "安聯台灣科技基金",
+      "date": "2026-10-13",
+      "amount": 1250
     }
   ],
   "mobile_cache": {
-    "updatedAt": "2026-10-10",
+    "updatedAt": "2026-10-13",
     "invest": {
       "activeCount": 2,
       "nearAmt": 106600,
       "nearDate": "2026-10-15",
-      "nearDays": 5,
+      "nearDays": 2,
       "surplus": 24489,
       "totalMonthly": 82111,
       "totalPaidDiv": 705075,
       "targetDiv": 1500000,
       "divPct": 47,
-      "lR": 1056637,
+      "lR": 1031097,
       "lOrig": 1900000,
-      "lPct": 44,
+      "lPct": 46,
       "pledgeRatio": 171,
       "pledgeLoan": 10006000,
       "showPledge": true
@@ -8206,49 +8218,49 @@
         "bank": "line Bank-1",
         "monthly": 17807,
         "deductDay": "13號",
-        "days": 3,
-        "pct": 58,
-        "paid": 26,
-        "remain": 19,
+        "days": 31,
+        "pct": 60,
+        "paid": 27,
+        "remain": 18,
         "ok": true,
-        "diff": 60298
+        "diff": 57798
       },
       {
         "bank": "line Bank-2",
         "monthly": 6319,
         "deductDay": "14號",
-        "days": 4,
+        "days": 1,
         "pct": 38,
         "paid": 21,
         "remain": 34,
         "ok": true,
-        "diff": 53979
+        "diff": 51479
       },
       {
         "bank": "line Bank-4",
         "monthly": 12400,
         "deductDay": "1號",
-        "days": 22,
+        "days": 19,
         "pct": 41,
         "paid": 14,
         "remain": 20,
         "ok": true,
-        "diff": 87600
+        "diff": 85100
       },
       {
         "bank": "line Bank-5",
         "monthly": 9495,
         "deductDay": "12號",
-        "days": 2,
-        "pct": 26,
-        "paid": 9,
-        "remain": 26,
+        "days": 30,
+        "pct": 29,
+        "paid": 10,
+        "remain": 25,
         "ok": true,
-        "diff": 78105
+        "diff": 75605
       }
     ],
-    "loanTotal": 1056637,
+    "loanTotal": 1031097,
     "monthLoan": 46021,
-    "cashTotal": 100009
+    "cashTotal": 97509
   }
 }
