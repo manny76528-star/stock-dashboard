@@ -3014,7 +3014,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1791974075069,
+  "_ts": 1791974127317,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -6583,6 +6583,15 @@
                 "price": 11.42,
                 "fee": 1,
                 "remark": "老婆定期定額"
+              },
+              {
+                "id": "mv7z4l49cmb",
+                "type": "buy",
+                "date": "2026-10-13",
+                "shares": 71,
+                "price": 11.29,
+                "fee": 1,
+                "remark": ""
               }
             ]
           },
@@ -6622,6 +6631,19 @@
           }
         ],
         "log": [
+          {
+            "id": "mv7z4l49nos",
+            "txnId": "mv7z4l49cmb",
+            "date": "2026-10-13",
+            "type": "buy",
+            "code": "00403A",
+            "name": "主動統一台股增長",
+            "shares": 71,
+            "price": 11.29,
+            "amount": 802.5899999999999,
+            "fee": 1,
+            "remark": ""
+          },
           {
             "id": "muwh2j59tfd",
             "txnId": "muwh2j59ni9",
@@ -8214,9 +8236,9 @@
           "activeCount": 6
         },
         "老婆": {
-          "pct": 43.1,
-          "totalCost": 258755.27,
-          "totalMkt": 272765.48,
+          "pct": 43.3,
+          "totalCost": 259557.86,
+          "totalMkt": 273567.07,
           "caps": [
             {
               "code": "00403A",
