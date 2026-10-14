@@ -3014,7 +3014,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1791974127317,
+  "_ts": 1791974178778,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -5698,6 +5698,15 @@
                 "price": 9.67,
                 "fee": 12,
                 "remark": "2026/10月業績獎金"
+              },
+              {
+                "id": "mv7z5ots4yv",
+                "type": "buy",
+                "date": "2026-10-14",
+                "shares": 215,
+                "price": 9.42,
+                "fee": 1,
+                "remark": "股票配息投入"
               }
             ]
           },
@@ -5835,6 +5844,19 @@
           }
         ],
         "log": [
+          {
+            "id": "mv7z5otsn23",
+            "txnId": "mv7z5ots4yv",
+            "date": "2026-10-14",
+            "type": "buy",
+            "code": "00405A",
+            "name": "主動富邦台灣龍耀",
+            "shares": 215,
+            "price": 9.42,
+            "amount": 2026.3,
+            "fee": 1,
+            "remark": "股票配息投入"
+          },
           {
             "id": "mv7z3gsr3mr",
             "txnId": "mv7z3gsrku7",
@@ -8164,9 +8186,9 @@
           "activeCount": 2
         },
         "阿豪富邦": {
-          "pct": 38.4,
-          "totalCost": 383564.16000000003,
-          "totalMkt": 446150.16000000003,
+          "pct": 38.6,
+          "totalCost": 385590.46,
+          "totalMkt": 448220.61000000004,
           "caps": [
             {
               "code": "00405A",
