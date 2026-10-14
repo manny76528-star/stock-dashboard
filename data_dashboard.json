@@ -1572,7 +1572,7 @@
     {
       "id": "mncull1439i",
       "bank": "Line Bank",
-      "cash": 91181,
+      "cash": 97500,
       "d1Date": "",
       "d1": 0,
       "d2": 0
@@ -3014,7 +3014,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1791957458590,
+  "_ts": 1791974075069,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -5386,8 +5386,7 @@
     "mncui6prd6f_2026-09": true,
     "mncul5vdg0j_2026-09": true,
     "mncue4nbehw_2026-09": true,
-    "mncug22msvu_2026-09": true,
-    "mncug22msvu_2026-10": true
+    "mncug22msvu_2026-09": true
   },
   "pledgeLoans": [],
   "pledgeAssets": [
@@ -5770,6 +5769,15 @@
                 "price": 14.5,
                 "fee": 8,
                 "remark": "富邦每月定期定額"
+              },
+              {
+                "id": "mv7z3gsrku7",
+                "type": "buy",
+                "date": "2026-10-12",
+                "shares": 1320,
+                "price": 15.15,
+                "fee": 8,
+                "remark": "每月定期定額"
               }
             ]
           },
@@ -5827,6 +5835,19 @@
           }
         ],
         "log": [
+          {
+            "id": "mv7z3gsr3mr",
+            "txnId": "mv7z3gsrku7",
+            "date": "2026-10-12",
+            "type": "buy",
+            "code": "00986A",
+            "name": "主動台新龍頭成長",
+            "shares": 1320,
+            "price": 15.15,
+            "amount": 20006,
+            "fee": 8,
+            "remark": "每月定期定額"
+          },
           {
             "id": "muxn6mlzygc",
             "txnId": "muxn6mlztfa",
@@ -8077,18 +8098,18 @@
     }
   ],
   "mobile_cache": {
-    "updatedAt": "2026-10-13",
+    "updatedAt": "2026-10-14",
     "invest": {
       "activeCount": 2,
       "nearAmt": 106600,
       "nearDate": "2026-10-15",
-      "nearDays": 2,
+      "nearDays": 1,
       "surplus": 24489,
       "totalMonthly": 82111,
       "totalPaidDiv": 705075,
       "targetDiv": 1500000,
       "divPct": 47,
-      "lR": 1031097,
+      "lR": 1025458,
       "lOrig": 1900000,
       "lPct": 46,
       "pledgeRatio": 171,
@@ -8121,17 +8142,17 @@
           "activeCount": 2
         },
         "阿豪富邦": {
-          "pct": 36.4,
-          "totalCost": 363558.16000000003,
-          "totalMkt": 426138.96,
+          "pct": 38.4,
+          "totalCost": 383564.16000000003,
+          "totalMkt": 446150.16000000003,
           "caps": [
             {
               "code": "00405A",
-              "wt": 50
+              "wt": 48
             },
             {
               "code": "00986A",
-              "wt": 43
+              "wt": 46
             },
             {
               "code": "00981A",
@@ -8139,7 +8160,7 @@
             },
             {
               "code": "009811",
-              "wt": 8
+              "wt": 7
             },
             {
               "code": "00997A",
@@ -8219,7 +8240,7 @@
         "bank": "line Bank-1",
         "monthly": 17807,
         "deductDay": "13號",
-        "days": 31,
+        "days": 30,
         "pct": 60,
         "paid": 27,
         "remain": 18,
@@ -8230,10 +8251,10 @@
         "bank": "line Bank-2",
         "monthly": 6319,
         "deductDay": "14號",
-        "days": 1,
-        "pct": 38,
-        "paid": 21,
-        "remain": 34,
+        "days": 31,
+        "pct": 40,
+        "paid": 22,
+        "remain": 33,
         "ok": true,
         "diff": 51479
       },
@@ -8241,7 +8262,7 @@
         "bank": "line Bank-4",
         "monthly": 12400,
         "deductDay": "1號",
-        "days": 19,
+        "days": 18,
         "pct": 41,
         "paid": 14,
         "remain": 20,
@@ -8252,7 +8273,7 @@
         "bank": "line Bank-5",
         "monthly": 9495,
         "deductDay": "12號",
-        "days": 30,
+        "days": 29,
         "pct": 29,
         "paid": 10,
         "remain": 25,
@@ -8260,7 +8281,7 @@
         "diff": 75605
       }
     ],
-    "loanTotal": 1031097,
+    "loanTotal": 1025458,
     "monthLoan": 46021,
     "cashTotal": 97509
   }
