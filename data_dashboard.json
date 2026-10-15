@@ -3014,7 +3014,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1792060145225,
+  "_ts": 1792060152665,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -3114,7 +3114,13 @@
       "indexVal": 46970,
       "stockPrices": null,
       "aiAnalysis": null,
-      "images": []
+      "images": [],
+      "backtest": {
+        "ret": 0,
+        "stocks": {},
+        "retDate": "2026-10-15",
+        "note": ""
+      }
     },
     {
       "id": "muzegvq34zv",
@@ -3147,7 +3153,17 @@
       "aiAnalysis": null,
       "images": [
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1791455398766_n77a.jpg"
-      ]
+      ],
+      "backtest": {
+        "ret": -4.75,
+        "stocks": {
+          "00981A": -8.81,
+          "00988A": -11.2,
+          "00981T": 0
+        },
+        "retDate": "2026-10-15",
+        "note": ""
+      }
     },
     {
       "id": "muqtf0sflwg",
@@ -3168,7 +3184,13 @@
       "indexVal": 48476,
       "stockPrices": null,
       "aiAnalysis": null,
-      "images": []
+      "images": [],
+      "backtest": {
+        "ret": -3.11,
+        "stocks": {},
+        "retDate": "2026-10-15",
+        "note": ""
+      }
     },
     {
       "id": "mu71kok56yc",
@@ -3189,7 +3211,13 @@
       "indexVal": 47181,
       "stockPrices": null,
       "aiAnalysis": null,
-      "images": []
+      "images": [],
+      "backtest": {
+        "ret": -0.45,
+        "stocks": {},
+        "retDate": "2026-10-15",
+        "note": ""
+      }
     },
     {
       "id": "mu290km0m4x",
@@ -3212,9 +3240,9 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": 0,
+        "ret": 3.21,
         "stocks": {},
-        "retDate": "2026-09-15",
+        "retDate": "2026-10-15",
         "note": ""
       }
     },
@@ -3239,9 +3267,9 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": -1.34,
+        "ret": 1.83,
         "stocks": {},
-        "retDate": "2026-09-15",
+        "retDate": "2026-10-15",
         "note": ""
       }
     },
@@ -3266,9 +3294,9 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": -1.77,
+        "ret": 1.38,
         "stocks": {},
-        "retDate": "2026-09-15",
+        "retDate": "2026-10-15",
         "note": ""
       }
     },
@@ -3293,9 +3321,9 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": 1.28,
+        "ret": 4.53,
         "stocks": {},
-        "retDate": "2026-09-15",
+        "retDate": "2026-10-15",
         "note": ""
       }
     },
@@ -3320,9 +3348,9 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": 1.77,
+        "ret": 5.03,
         "stocks": {},
-        "retDate": "2026-09-15",
+        "retDate": "2026-10-15",
         "note": ""
       }
     },
@@ -3353,11 +3381,11 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": -0.75,
+        "ret": 2.43,
         "stocks": {
-          "2330": -0.62
+          "2330": 1.67
         },
-        "retDate": "2026-09-15",
+        "retDate": "2026-10-15",
         "note": ""
       }
     },
@@ -3392,14 +3420,14 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": 0.86,
+        "ret": 4.1,
         "stocks": {
-          "00981A": 0.45,
-          "00988A": -5.32,
-          "009805": -8.31,
-          "00403A": 0.1
+          "00981A": 2.33,
+          "00988A": -7.07,
+          "009805": -6.31,
+          "00403A": 4.43
         },
-        "retDate": "2026-09-15",
+        "retDate": "2026-10-15",
         "note": ""
       }
     },
@@ -3432,13 +3460,13 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": 2.02,
+        "ret": 5.29,
         "stocks": {
-          "00981A": 1.41,
-          "00988A": -8.84,
-          "00981T": -2.58
+          "00981A": 3.3,
+          "00988A": -10.53,
+          "00981T": -3.08
         },
-        "retDate": "2026-09-15",
+        "retDate": "2026-10-15",
         "note": ""
       }
     },
@@ -3471,7 +3499,16 @@
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1785492469784_peia.jpg",
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1785492469786_4tbx.jpg",
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1785492548374_cww2.jpg"
-      ]
+      ],
+      "backtest": {
+        "ret": 8.93,
+        "stocks": {
+          "0050": 0.93,
+          "00981A": 16.57
+        },
+        "retDate": "2026-10-15",
+        "note": ""
+      }
     },
     {
       "id": "ms7cnaa4wdz",
@@ -3506,7 +3543,18 @@
       "aiAnalysis": null,
       "images": [
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1791455749087_ai4h.jpg"
-      ]
+      ],
+      "backtest": {
+        "ret": 17.62,
+        "stocks": {
+          "00981A": 23.74,
+          "00988A": 8.23,
+          "009805": -0.13,
+          "00403A": 22.55
+        },
+        "retDate": "2026-10-15",
+        "note": "事後證明：當時恐慌，但後來漲了 +17.6%，恐慌是過度的！"
+      }
     },
     {
       "id": "ms4gt3qgy7e",
@@ -3539,14 +3587,14 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": 9.39,
+        "ret": 12.9,
         "stocks": {
-          "00981A": 9.11,
-          "00988A": 1.62,
-          "009805": -6.97
+          "00981A": 11.15,
+          "00988A": -0.26,
+          "009805": -4.94
         },
-        "retDate": "2026-09-15",
-        "note": "事後證明：當時恐慌，但後來漲了 +9.4%，恐慌是過度的！"
+        "retDate": "2026-10-15",
+        "note": "事後證明：當時恐慌，但後來漲了 +12.9%，恐慌是過度的！"
       }
     },
     {
@@ -3574,11 +3622,11 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": 4.25,
+        "ret": 7.59,
         "stocks": {
-          "00981T": -1.68
+          "00981T": -2.18
         },
-        "retDate": "2026-09-15",
+        "retDate": "2026-10-15",
         "note": ""
       }
     },
@@ -3614,13 +3662,13 @@
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1784358118628_2l6a.jpg"
       ],
       "backtest": {
-        "ret": 6.66,
+        "ret": 10.07,
         "stocks": {
-          "00981A": -1.5,
-          "00988A": -17.96
+          "00981A": 0.34,
+          "00988A": -19.48
         },
-        "retDate": "2026-09-15",
-        "note": "事後證明：當時恐慌，但後來漲了 +6.7%，恐慌是過度的！"
+        "retDate": "2026-10-15",
+        "note": "事後證明：當時恐慌，但後來漲了 +10.1%，恐慌是過度的！"
       }
     },
     {
@@ -3646,9 +3694,9 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": 1.14,
+        "ret": 4.38,
         "stocks": {},
-        "retDate": "2026-09-15",
+        "retDate": "2026-10-15",
         "note": ""
       }
     },
@@ -3686,13 +3734,13 @@
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1784004331044_3q8z.jpg"
       ],
       "backtest": {
-        "ret": 1.73,
+        "ret": 4.99,
         "stocks": {
-          "00981A": -0.82,
-          "00988A": -15.25,
-          "00981T": -3.3
+          "00981A": 1.03,
+          "00988A": -16.82,
+          "00981T": -3.8
         },
-        "retDate": "2026-09-15",
+        "retDate": "2026-10-15",
         "note": ""
       }
     },
@@ -3727,14 +3775,14 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": -0.49,
+        "ret": 2.7,
         "stocks": {
-          "00981A": -2.99,
-          "00988A": -18.17,
-          "00981T": -4.33,
-          "00403A": -4.42
+          "00981A": -1.18,
+          "00988A": -19.69,
+          "00981T": -4.82,
+          "00403A": -0.29
         },
-        "retDate": "2026-09-15",
+        "retDate": "2026-10-15",
         "note": ""
       }
     },
@@ -3769,13 +3817,13 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": 0.07,
+        "ret": 3.28,
         "stocks": {
-          "00981A": -5.53,
-          "00988A": -22.46,
-          "00981T": -4.87
+          "00981A": -3.76,
+          "00988A": -23.9,
+          "00981T": -5.36
         },
-        "retDate": "2026-09-15",
+        "retDate": "2026-10-15",
         "note": ""
       }
     },
@@ -3814,15 +3862,15 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": -2.24,
+        "ret": 0.89,
         "stocks": {
-          "00981A": -7.5,
-          "00988A": -24.77,
-          "009805": -12.62,
-          "00981T": -5.41,
-          "00864B": -1.01
+          "00981A": -5.77,
+          "00988A": -26.16,
+          "009805": -10.71,
+          "00981T": -5.89,
+          "00864B": 0.77
         },
-        "retDate": "2026-09-15",
+        "retDate": "2026-10-15",
         "note": ""
       }
     },
@@ -3857,13 +3905,13 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": -2.64,
+        "ret": 0.48,
         "stocks": {
-          "00981A": -9.95,
-          "00988A": -28.25,
-          "009805": -13.29
+          "00981A": -8.27,
+          "00988A": -29.58,
+          "009805": -11.4
         },
-        "retDate": "2026-09-15",
+        "retDate": "2026-10-15",
         "note": ""
       }
     },
@@ -3894,14 +3942,14 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": -3.18,
-        "retDate": "2026-09-15",
+        "ret": -0.08,
+        "retDate": "2026-10-15",
         "note": "",
         "stocks": {
-          "00981T": -5.41,
-          "00864B": -0.5,
-          "00985B": -1.94,
-          "009805": -15.34
+          "00981T": -5.89,
+          "00864B": 1.29,
+          "00985B": -1.07,
+          "009805": -13.49
         }
       }
     },
@@ -3934,13 +3982,13 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": 1.14,
+        "ret": 4.38,
         "stocks": {
-          "00981A": -4.28,
-          "00988A": -28.9,
-          "009805": -13.9
+          "00981A": -2.49,
+          "00988A": -30.22,
+          "009805": -12.02
         },
-        "retDate": "2026-09-15",
+        "retDate": "2026-10-15",
         "note": ""
       }
     },
@@ -3975,14 +4023,14 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": 2.11,
+        "ret": 5.38,
         "stocks": {
-          "00981A": -3.51,
-          "00988A": -30.36,
-          "009805": -12.67
+          "00981A": -1.71,
+          "00988A": -31.64,
+          "009805": -10.77
         },
-        "retDate": "2026-09-15",
-        "note": ""
+        "retDate": "2026-10-15",
+        "note": "事後證明：當時恐慌，但後來漲了 +5.4%，恐慌是過度的！"
       }
     },
     {
@@ -4018,13 +4066,13 @@
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1782381814232_0ti9.jpg"
       ],
       "backtest": {
-        "ret": -1.61,
+        "ret": 1.55,
         "stocks": {
-          "00981A": -8.38,
-          "00988A": -32.08,
-          "009805": -14.15
+          "00981A": -6.67,
+          "00988A": -33.33,
+          "009805": -12.28
         },
-        "retDate": "2026-09-15",
+        "retDate": "2026-10-15",
         "note": ""
       }
     },
@@ -4057,13 +4105,13 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": -3.38,
+        "ret": -0.28,
         "stocks": {
-          "00981A": -8.67,
-          "00988A": -31.63,
-          "009805": -14.65
+          "00981A": -6.96,
+          "00988A": -32.9,
+          "009805": -12.79
         },
-        "retDate": "2026-09-15",
+        "retDate": "2026-10-15",
         "note": ""
       }
     },
@@ -4098,13 +4146,13 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": -4.67,
+        "ret": -1.61,
         "stocks": {
-          "00981T": -4.87,
-          "00985B": -0.79,
-          "00403A": -12.57
+          "00981T": -5.36,
+          "00985B": 0.1,
+          "00403A": -8.79
         },
-        "retDate": "2026-09-15",
+        "retDate": "2026-10-15",
         "note": ""
       }
     },
@@ -4137,12 +4185,12 @@
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1781506530190_lqa5.jpg"
       ],
       "backtest": {
-        "ret": 0.25,
+        "ret": 3.46,
         "stocks": {
-          "00981A": -8.29,
-          "00988A": -29.92
+          "00981A": -6.58,
+          "00988A": -31.22
         },
-        "retDate": "2026-09-15",
+        "retDate": "2026-10-15",
         "note": ""
       }
     },
@@ -4180,14 +4228,14 @@
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1780998890271_prnw.jpg"
       ],
       "backtest": {
-        "ret": 5.29,
+        "ret": 8.66,
         "stocks": {
-          "00981A": -3.45,
-          "00988A": -20.94,
-          "009805": -7.67
+          "00981A": -1.64,
+          "00988A": -22.4,
+          "009805": -5.66
         },
-        "retDate": "2026-09-15",
-        "note": "事後證明：當時恐慌，但後來漲了 +5.3%，恐慌是過度的！"
+        "retDate": "2026-10-15",
+        "note": "事後證明：當時恐慌，但後來漲了 +8.7%，恐慌是過度的！"
       }
     },
     {
@@ -4227,13 +4275,13 @@
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1780760184414_lpxq.jpg"
       ],
       "backtest": {
-        "ret": 0.98,
+        "ret": 4.21,
         "stocks": {
-          "00981A": -6.33,
-          "00988A": -26.98,
-          "009805": -11.57
+          "00981A": -4.58,
+          "00988A": -28.33,
+          "009805": -9.64
         },
-        "retDate": "2026-09-15",
+        "retDate": "2026-10-15",
         "note": ""
       }
     },
@@ -4258,9 +4306,9 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": -0.36,
+        "ret": 2.83,
         "stocks": {},
-        "retDate": "2026-09-15",
+        "retDate": "2026-10-15",
         "note": ""
       }
     },
@@ -4283,8 +4331,8 @@
         "t20": 2.69,
         "t60": 2.69,
         "note": "",
-        "ret": -0.1,
-        "retDate": "2026-09-15",
+        "ret": 3.1,
+        "retDate": "2026-10-15",
         "stocks": {}
       }
     },
@@ -4312,13 +4360,13 @@
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1780308765700_fwfw.jpg"
       ],
       "backtest": {
-        "ret": 0.38,
-        "retDate": "2026-09-15",
+        "ret": 3.6,
+        "retDate": "2026-10-15",
         "note": "",
         "stocks": {
-          "00981A": -8.96,
-          "00988A": -28.74,
-          "009805": -11.03
+          "00981A": -7.26,
+          "00988A": -30.06,
+          "009805": -9.09
         }
       }
     },
@@ -4351,12 +4399,12 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": 1.74,
+        "ret": 5,
         "stocks": {
-          "00981A": -6.3,
-          "00988A": -21.65
+          "00981A": -4.55,
+          "00988A": -23.1
         },
-        "retDate": "2026-09-15",
+        "retDate": "2026-10-15",
         "note": ""
       }
     },
@@ -4387,11 +4435,11 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": 4.3,
+        "ret": 7.64,
         "stocks": {
-          "00981A": -6.05
+          "00981A": -4.3
         },
-        "retDate": "2026-09-15",
+        "retDate": "2026-10-15",
         "note": ""
       }
     },
@@ -4430,14 +4478,14 @@
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1779703488343_ts4t.jpg"
       ],
       "backtest": {
-        "ret": 4.28,
+        "ret": 7.62,
         "stocks": {
-          "00403A": -5.95,
-          "00981A": -8.7,
-          "009805": -13.65,
-          "00864B": 1.18
+          "00403A": -1.89,
+          "00981A": -6.99,
+          "009805": -11.76,
+          "00864B": 3.01
         },
-        "retDate": "2026-09-15",
+        "retDate": "2026-10-15",
         "note": ""
       }
     },
@@ -4470,13 +4518,13 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": 7.67,
+        "ret": 11.12,
         "stocks": {
-          "00981A": -3.64,
-          "00988A": -23.04
+          "00981A": -1.84,
+          "00988A": -24.46
         },
-        "retDate": "2026-09-15",
-        "note": ""
+        "retDate": "2026-10-15",
+        "note": "從寫日誌到現在已上漲 +11.1%！"
       }
     },
     {
@@ -4510,13 +4558,13 @@
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1779269089530_i8vz.jpg"
       ],
       "backtest": {
-        "ret": 13.28,
+        "ret": 16.91,
         "stocks": {
-          "009805": -10.87,
-          "00403A": 2.37
+          "009805": -8.93,
+          "00403A": 6.79
         },
-        "retDate": "2026-09-15",
-        "note": "從寫日誌到現在已上漲 +13.3%！"
+        "retDate": "2026-10-15",
+        "note": "從寫日誌到現在已上漲 +16.9%！"
       }
     },
     {
@@ -4547,12 +4595,12 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": 8.62,
+        "ret": 12.11,
         "stocks": {
-          "00403A": -7.87
+          "00403A": -3.89
         },
-        "retDate": "2026-09-15",
-        "note": ""
+        "retDate": "2026-10-15",
+        "note": "從寫日誌到現在已上漲 +12.1%！"
       }
     },
     {
@@ -4582,12 +4630,12 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": 8.9,
+        "ret": 12.4,
         "stocks": {
-          "009805": -11.62
+          "009805": -9.69
         },
-        "retDate": "2026-09-15",
-        "note": ""
+        "retDate": "2026-10-15",
+        "note": "從寫日誌到現在已上漲 +12.4%！"
       }
     },
     {
@@ -4617,12 +4665,12 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": 9.39,
+        "ret": 12.9,
         "stocks": {
-          "009805": -12.62
+          "009805": -10.71
         },
-        "retDate": "2026-09-15",
-        "note": ""
+        "retDate": "2026-10-15",
+        "note": "從寫日誌到現在已上漲 +12.9%！"
       }
     },
     {
@@ -4650,12 +4698,12 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": 8.53,
+        "ret": 12.01,
         "stocks": {
-          "00864B": 0.17
+          "00864B": 1.98
         },
-        "retDate": "2026-09-15",
-        "note": ""
+        "retDate": "2026-10-15",
+        "note": "從寫日誌到現在已上漲 +12.0%！"
       }
     },
     {
@@ -4676,11 +4724,11 @@
       },
       "images": [],
       "backtest": {
-        "ret": 10.63,
-        "retDate": "2026-09-15",
-        "note": "從寫日誌到現在已上漲 +10.6%！",
+        "ret": 14.18,
+        "retDate": "2026-10-15",
+        "note": "從寫日誌到現在已上漲 +14.2%！",
         "stocks": {
-          "009805": -15.44
+          "009805": -13.59
         }
       }
     },
@@ -4700,11 +4748,11 @@
       },
       "images": [],
       "backtest": {
-        "ret": 11.63,
-        "retDate": "2026-09-15",
-        "note": "從寫日誌到現在已上漲 +11.6%！",
+        "ret": 15.21,
+        "retDate": "2026-10-15",
+        "note": "從寫日誌到現在已上漲 +15.2%！",
         "stocks": {
-          "00950B": -4.29
+          "00950B": -3.57
         }
       }
     },
@@ -4735,12 +4783,12 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": 11.81,
+        "ret": 15.39,
         "stocks": {
-          "009805": -14.75
+          "009805": -12.89
         },
-        "retDate": "2026-09-15",
-        "note": "從寫日誌到現在已上漲 +11.8%！"
+        "retDate": "2026-10-15",
+        "note": "從寫日誌到現在已上漲 +15.4%！"
       }
     },
     {
@@ -4761,11 +4809,11 @@
       },
       "images": [],
       "backtest": {
-        "ret": 16.92,
-        "retDate": "2026-09-15",
-        "note": "從寫日誌到現在已上漲 +16.9%！",
+        "ret": 20.66,
+        "retDate": "2026-10-15",
+        "note": "從寫日誌到現在已上漲 +20.7%！",
         "stocks": {
-          "009805": -10.6
+          "009805": -8.65
         }
       }
     },
@@ -4796,12 +4844,12 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": 15.8,
+        "ret": 19.51,
         "stocks": {
-          "009805": -10.65
+          "009805": -8.7
         },
-        "retDate": "2026-09-15",
-        "note": "從寫日誌到現在已上漲 +15.8%！"
+        "retDate": "2026-10-15",
+        "note": "從寫日誌到現在已上漲 +19.5%！"
       }
     },
     {
@@ -4829,12 +4877,12 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": 14.88,
+        "ret": 18.56,
         "stocks": {
-          "009819": -6.34
+          "009819": -4.16
         },
-        "retDate": "2026-09-15",
-        "note": "從寫日誌到現在已上漲 +14.9%！"
+        "retDate": "2026-10-15",
+        "note": "從寫日誌到現在已上漲 +18.6%！"
       }
     },
     {
@@ -4859,12 +4907,12 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": 14.88,
+        "ret": 18.56,
         "stocks": {
-          "009805": -12.36
+          "009805": -10.45
         },
-        "retDate": "2026-09-15",
-        "note": "從寫日誌到現在已上漲 +14.9%！"
+        "retDate": "2026-10-15",
+        "note": "從寫日誌到現在已上漲 +18.6%！"
       }
     },
     {
@@ -4894,12 +4942,12 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": 16.9,
+        "ret": 20.65,
         "stocks": {
-          "009805": -12.51
+          "009805": -10.61
         },
-        "retDate": "2026-09-15",
-        "note": "從寫日誌到現在已上漲 +16.9%！"
+        "retDate": "2026-10-15",
+        "note": "從寫日誌到現在已上漲 +20.6%！"
       }
     },
     {
@@ -4921,11 +4969,11 @@
       },
       "images": [],
       "backtest": {
-        "ret": 20.67,
-        "retDate": "2026-09-15",
-        "note": "從寫日誌到現在已上漲 +20.7%！",
+        "ret": 24.54,
+        "retDate": "2026-10-15",
+        "note": "從寫日誌到現在已上漲 +24.5%！",
         "stocks": {
-          "009819": -19.83
+          "009819": -17.97
         }
       }
     },
@@ -4954,12 +5002,12 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": 21.02,
+        "ret": 24.9,
         "stocks": {
-          "00864B": 0.17
+          "00864B": 1.98
         },
-        "retDate": "2026-09-15",
-        "note": "從寫日誌到現在已上漲 +21.0%！"
+        "retDate": "2026-10-15",
+        "note": "從寫日誌到現在已上漲 +24.9%！"
       }
     },
     {
@@ -4985,10 +5033,10 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": 23.14,
+        "ret": 27.09,
         "stocks": {},
-        "retDate": "2026-09-15",
-        "note": "從寫日誌到現在已上漲 +23.1%！"
+        "retDate": "2026-10-15",
+        "note": "從寫日誌到現在已上漲 +27.1%！"
       }
     },
     {
@@ -5018,12 +5066,12 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": 23.14,
+        "ret": 27.09,
         "stocks": {
-          "009805": -9.94
+          "009805": -7.98
         },
-        "retDate": "2026-09-15",
-        "note": "從寫日誌到現在已上漲 +23.1%！"
+        "retDate": "2026-10-15",
+        "note": "從寫日誌到現在已上漲 +27.1%！"
       }
     },
     {
@@ -5046,10 +5094,10 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": 23.14,
+        "ret": 27.09,
         "stocks": {},
-        "retDate": "2026-09-15",
-        "note": "從寫日誌到現在已上漲 +23.1%！"
+        "retDate": "2026-10-15",
+        "note": "從寫日誌到現在已上漲 +27.1%！"
       }
     },
     {
@@ -5075,10 +5123,10 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": 23.66,
+        "ret": 27.62,
         "stocks": {},
-        "retDate": "2026-09-15",
-        "note": "從寫日誌到現在已上漲 +23.7%！"
+        "retDate": "2026-10-15",
+        "note": "從寫日誌到現在已上漲 +27.6%！"
       }
     },
     {
@@ -5108,12 +5156,12 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": 23.93,
+        "ret": 27.91,
         "stocks": {
-          "00864B": -0.41
+          "00864B": 1.38
         },
-        "retDate": "2026-09-15",
-        "note": "事後證明：當時恐慌，但後來漲了 +23.9%，恐慌是過度的！"
+        "retDate": "2026-10-15",
+        "note": "事後證明：當時恐慌，但後來漲了 +27.9%，恐慌是過度的！"
       }
     },
     {
@@ -5139,10 +5187,10 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": 25.39,
+        "ret": 29.41,
         "stocks": {},
-        "retDate": "2026-09-15",
-        "note": "從寫日誌到現在已上漲 +25.4%！"
+        "retDate": "2026-10-15",
+        "note": "從寫日誌到現在已上漲 +29.4%！"
       }
     },
     {
@@ -5168,10 +5216,10 @@
       "aiAnalysis": null,
       "images": [],
       "backtest": {
-        "ret": 28.36,
+        "ret": 32.47,
         "stocks": {},
-        "retDate": "2026-09-15",
-        "note": "從寫日誌到現在已上漲 +28.4%！"
+        "retDate": "2026-10-15",
+        "note": "從寫日誌到現在已上漲 +32.5%！"
       }
     },
     {
@@ -5192,11 +5240,11 @@
       "images": [],
       "backtest": {
         "t5": 34.19,
-        "note": "從寫日誌到現在已上漲 +30.6%！",
+        "note": "從寫日誌到現在已上漲 +34.7%！",
         "t20": 34.19,
         "t60": 34.19,
-        "ret": 30.55,
-        "retDate": "2026-09-15",
+        "ret": 34.74,
+        "retDate": "2026-10-15",
         "stocks": {}
       }
     }
