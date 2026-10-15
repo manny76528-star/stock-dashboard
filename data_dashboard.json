@@ -1550,9 +1550,9 @@
       "name": "永豐銀行",
       "rate": 3.1,
       "limit": 3000000,
-      "used": 2996309,
-      "remain": 3691,
-      "monthly": 7740,
+      "used": 2913334,
+      "remain": 86666,
+      "monthly": 7526,
       "note": "每個月自動扣除利息 要注意餘額",
       "calcPledge": false
     },
@@ -3014,7 +3014,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1792043020528,
+  "_ts": 1792058945910,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -8142,17 +8142,17 @@
     }
   ],
   "mobile_cache": {
-    "updatedAt": "2026-10-14",
+    "updatedAt": "2026-10-15",
     "invest": {
       "activeCount": 2,
-      "nearAmt": 106600,
-      "nearDate": "2026-10-15",
-      "nearDays": 1,
-      "surplus": 24489,
-      "totalMonthly": 82111,
-      "totalPaidDiv": 705075,
+      "nearAmt": 0,
+      "nearDate": "",
+      "nearDays": 0,
+      "surplus": -81897,
+      "totalMonthly": 81897,
+      "totalPaidDiv": 811675,
       "targetDiv": 1500000,
-      "divPct": 47,
+      "divPct": 54.1,
       "lR": 1025458,
       "lOrig": 1900000,
       "lPct": 46,
@@ -8284,49 +8284,49 @@
         "bank": "line Bank-1",
         "monthly": 17807,
         "deductDay": "13號",
-        "days": 30,
+        "days": 29,
         "pct": 60,
         "paid": 27,
         "remain": 18,
         "ok": true,
-        "diff": 57798
+        "diff": 164398
       },
       {
         "bank": "line Bank-2",
         "monthly": 6319,
         "deductDay": "14號",
-        "days": 31,
+        "days": 30,
         "pct": 40,
         "paid": 22,
         "remain": 33,
         "ok": true,
-        "diff": 51479
+        "diff": 158079
       },
       {
         "bank": "line Bank-4",
         "monthly": 12400,
         "deductDay": "1號",
-        "days": 18,
+        "days": 17,
         "pct": 41,
         "paid": 14,
         "remain": 20,
         "ok": true,
-        "diff": 85100
+        "diff": 191700
       },
       {
         "bank": "line Bank-5",
         "monthly": 9495,
         "deductDay": "12號",
-        "days": 29,
+        "days": 28,
         "pct": 29,
         "paid": 10,
         "remain": 25,
         "ok": true,
-        "diff": 75605
+        "diff": 182205
       }
     ],
     "loanTotal": 1025458,
     "monthLoan": 46021,
-    "cashTotal": 97509
+    "cashTotal": 204109
   }
 }
