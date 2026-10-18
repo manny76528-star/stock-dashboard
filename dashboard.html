@@ -3151,7 +3151,6 @@ body:not(.privacy) .privacy-mask{filter:none;}
     <div class="br">
       <button class="btn btn-s" onclick="closeModal('fundSettingsModal')">取消</button>
       <button class="btn btn-p" onclick="saveFundSettings()">💾 儲存</button>
-      <button class="btn" style="background:#f0fdf4;border:1px solid #bbf7d0;color:#16a34a;font-weight:700" onclick="runFundDeductNow()">▶ 執行今日扣款</button>
     </div>
   </div>
 </div>
@@ -5869,10 +5868,7 @@ function renderCash(){
             <button onclick="event.stopPropagation();openFundSettings()" style="padding:2px 8px;background:#f1f5f9;border:0.5px solid #e2e8f0;border-radius:5px;font-size:10px;cursor:pointer;color:#64748b">⚙️</button>
           </div>
         </div>
-        ${daysSince<999?`<div style="display:flex;justify-content:space-between;align-items:center;background:#f8fafc;border-radius:8px;padding:7px 10px">
-          <span style="font-size:10px;font-weight:600;color:${lastColor}">${lastTxt}</span>
-          <button onclick="event.stopPropagation();runFundDeductNow()" style="${btnStyle}">▶ 執行今日</button>
-        </div>`:''}
+        ${fundStatusLine(false)}
         `;
         // 第二層
         const l2=document.createElement('div');
@@ -5923,19 +5919,7 @@ function renderCash(){
 
   // 更新基金扣款狀態（第一層顯示）
   const fundStatusEl=document.getElementById('fund-deduct-status');
-  if(fundStatusEl){
-    const allLogs2=db.fundDeductionLogs||[];
-    const lastLog2=allLogs2.length>0?allLogs2.reduce((a,b)=>a.date>b.date?a:b):null;
-    const lastDate2=lastLog2?.date||null;
-    const daysSince2=lastDate2?Math.floor((Date.now()-new Date(lastDate2))/(86400000)):999;
-    const isOverdue2=daysSince2>3;
-    if(lastDate2){
-      const dateDisp=lastDate2.slice(5).replace('-','/');
-      fundStatusEl.innerHTML=`<span style="font-size:10px;font-weight:600;color:${isOverdue2?'#f59e0b':'#16a34a'}">${isOverdue2?'⚠️':'✓'} 基金扣款：${daysSince2}天前(${dateDisp})</span> <button onclick="event.stopPropagation();runFundDeductNow()" style="padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;${isOverdue2?'background:linear-gradient(135deg,#dc2626,#f97316);border:none;color:#fff;animation:fundPulse 1.2s infinite':'background:#f0fdf4;border:1px solid #bbf7d0;color:#16a34a'}">▶ 執行</button>`;
-    } else {
-      fundStatusEl.innerHTML='';
-    }
-  }
+  if(fundStatusEl)fundStatusEl.innerHTML=fundStatusLine(true);
 
   const totEl=document.getElementById('c-tot');if(totEl)totEl.textContent='$'+tB.toLocaleString();
   const badge=document.getElementById('cash-tot-badge');
@@ -11085,6 +11069,94 @@ function delLineBankProtected(id){
   delCash(id);
 }
 
+// ══ 定期基金：前次扣款狀態（含漏扣偵測）══
+function _twToday(){return new Date(Date.now()+8*3600000).toISOString().slice(0,10);}
+function _addDays(ds,n){const d=new Date(ds+'T00:00:00Z');d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10);}
+function _dowOf(ds){return new Date(ds+'T00:00:00Z').getUTCDay();}
+const _WK=['日','一','二','三','四','五','六'];
+function fundDeductStatus(){
+  const funds=(db.settings?.fundDeductions||[]).filter(f=>f.enabled!==false);
+  const logs=db.fundDeductionLogs||[];
+  if(!funds.length)return null;
+  const today=_twToday();
+  const last=logs.length?logs.reduce((a,b)=>a.date>b.date?a:b).date:null;
+  // 漏扣：每檔基金從它最後一筆的隔天到昨天（最多回看 30 天），該扣的日子沒有紀錄
+  const missed=new Set();
+  funds.forEach(f=>{
+    const mine=logs.filter(l=>l.fundId===f.id).map(l=>l.date);
+    if(!mine.length)return;
+    const have=new Set(mine);
+    let d=_addDays(mine.reduce((a,b)=>a>b?a:b),1);
+    const start30=_addDays(today,-30); if(d<start30)d=start30;
+    for(;d<today;d=_addDays(d,1)){if((f.days||[]).includes(_dowOf(d))&&!have.has(d))missed.add(d);}
+  });
+  // 下次扣款日（今天還沒扣也算今天）
+  let next=null;
+  for(let i=0;i<14&&!next;i++){
+    const d=_addDays(today,i);
+    if(funds.some(f=>(f.days||[]).includes(_dowOf(d))&&!(i===0&&logs.some(l=>l.fundId===f.id&&l.date===d))))next=d;
+  }
+  const daysSince=last?Math.round((new Date(today+'T00:00:00Z')-new Date(last+'T00:00:00Z'))/86400000):null;
+  return{last,daysSince,missed:[...missed].sort(),next,today};
+}
+function _md(ds){return ds.slice(5).replace('-','/');}
+function fundStatusLine(compact){
+  const s=fundDeductStatus(); if(!s||!s.last)return '';
+  const dayTxt=s.daysSince===0?'今天':s.daysSince+'天前';
+  const nextTxt=s.next?(s.next===s.today?'今天':'週'+_WK[_dowOf(s.next)]+' '+_md(s.next)):'';
+  if(s.missed.length){
+    const m=s.missed.map(_md).join('、');
+    return compact
+      ?`<span style="font-size:10px;font-weight:700;color:#b45309">⚠️ 基金前次扣款 ${dayTxt}(${_md(s.last)}) · ${m} 漏扣</span>`
+      :`<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;background:#fef3c7;border:1px solid #fde68a;border-radius:8px;padding:6px 10px;margin-top:6px"><span style="font-size:11px;font-weight:700;color:#b45309">⚠️ 前次扣款 ${dayTxt}（${_md(s.last)}）· ${m} 漏扣</span>${nextTxt?`<span style="font-size:10px;color:#b45309">下次 ${nextTxt}</span>`:''}</div>`;
+  }
+  return compact
+    ?`<span style="font-size:10px;font-weight:600;color:#16a34a">✓ 基金前次扣款 ${dayTxt}(${_md(s.last)})</span>`
+    :`<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;background:#f8fafc;border-radius:8px;padding:6px 10px;margin-top:6px"><span style="font-size:11px;font-weight:600;color:#16a34a">✓ 前次扣款 ${dayTxt}（${_md(s.last)}）</span>${nextTxt?`<span style="font-size:10px;color:#64748b">下次 ${nextTxt}</span>`:''}</div>`;
+}
+
+// ══ 定期基金：扣款紀錄（本月／全部 依年月折疊）══
+const _fundLogView={};            // fundId -> 'm' | 'a'
+const _fundLogOpen=new Set();     // 已展開的 年/月 群組
+function fundLogBoxHTML(fundId){
+  const logs=(db.fundDeductionLogs||[]).filter(r=>r.fundId===fundId).sort((a,b)=>b.date.localeCompare(a.date));
+  const view=_fundLogView[fundId]||'m';
+  const today=_twToday(), ym=today.slice(0,7), yr=today.slice(0,4);
+  const money=v=>'-$'+(v||0).toLocaleString();
+  const sum=a=>a.reduce((s,r)=>s+(r.amount||0),0);
+  const tab=(v,t)=>`<button onclick="event.stopPropagation();setFundLogView('${fundId}','${v}')" style="padding:2px 10px;border-radius:999px;font-size:10px;font-weight:700;cursor:pointer;border:1px solid ${view===v?'#93c5fd':'#e2e8f0'};background:${view===v?'#eff6ff':'#fff'};color:${view===v?'#1d4ed8':'#64748b'}">${t}</button>`;
+  const line=r=>`<div style="display:flex;justify-content:space-between;padding:3px 10px 3px 26px;font-size:11px"><span style="color:#64748b">${_md(r.date)} 週${_WK[_dowOf(r.date)]}</span><span style="font-weight:700;color:#dc2626;font-family:'JetBrains Mono',monospace">${money(r.amount)}</span></div>`;
+  const grp=(key,label,list,bold,inner,defOpen)=>{
+    const open=_fundLogOpen.has(key)||(defOpen&&!_fundLogOpen.has('x'+key));
+    return`<div onclick="event.stopPropagation();toggleFundLogGroup('${key}',${defOpen?1:0})" style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;border-top:1px solid #f1f5f9;cursor:pointer;font-size:11px;${bold?'background:#f8fafc;font-weight:800;color:#1e293b':'color:#374151;font-weight:600'}"><span><span style="display:inline-block;width:12px;color:#94a3b8">${open?'▾':'▸'}</span>${label} · ${list.length} 次</span><span style="font-family:'JetBrains Mono',monospace;color:${bold?'#1e293b':'#dc2626'}">${money(sum(list))}</span></div>${open?inner():''}`;
+  };
+  let body='';
+  if(view==='m'){
+    const mine=logs.filter(r=>r.date.startsWith(ym));
+    body=`<div style="display:flex;justify-content:space-between;padding:5px 10px;background:#f8fafc;font-size:10px;color:#64748b"><span>${ym.replace('-',' 年 ')} 月 · ${mine.length} 次</span><span style="font-family:'JetBrains Mono',monospace">${money(sum(mine))}</span></div>`+
+      (mine.length?mine.map(r=>line(r).replace('padding:3px 10px 3px 26px','padding:3px 10px')).join(''):'<div style="padding:8px;text-align:center;color:#94a3b8;font-size:11px">本月尚無扣款</div>');
+  } else {
+    const years=[...new Set(logs.map(r=>r.date.slice(0,4)))];
+    body=years.map(y=>{
+      const yl=logs.filter(r=>r.date.startsWith(y));
+      return grp('y'+fundId+y,y+' 年',yl,true,()=>{
+        const months=[...new Set(yl.map(r=>r.date.slice(0,7)))];
+        return months.map(m=>{const ml=yl.filter(r=>r.date.startsWith(m));
+          return grp('m'+fundId+m,'　'+parseInt(m.slice(5))+' 月',ml,false,()=>ml.map(line).join(''),false);}).join('');
+      },y===yr);
+    }).join('')||'<div style="padding:8px;text-align:center;color:#94a3b8;font-size:11px">尚無紀錄</div>';
+  }
+  return`<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 10px;border-bottom:1px solid #f1f5f9"><span style="font-size:10px;font-weight:700;color:#374151">扣款紀錄 <span style="color:#94a3b8;font-weight:400">共 ${logs.length} 筆</span></span><span style="display:flex;gap:4px">${tab('m','本月')}${tab('a','全部')}</span></div>${body}`;
+}
+function setFundLogView(fundId,v){_fundLogView[fundId]=v;const el=document.getElementById('flog-'+fundId+'-box');if(el)el.innerHTML=fundLogBoxHTML(fundId);}
+function toggleFundLogGroup(key,defOpen){
+  const open=_fundLogOpen.has(key)||(defOpen&&!_fundLogOpen.has('x'+key));
+  if(open){_fundLogOpen.delete(key);if(defOpen)_fundLogOpen.add('x'+key);}
+  else{_fundLogOpen.add(key);_fundLogOpen.delete('x'+key);}
+  const fundId=Object.keys(_fundLogView).concat((db.settings?.fundDeductions||[]).map(f=>f.id)).find(id=>key.includes(id));
+  if(fundId)setFundLogView(fundId,_fundLogView[fundId]||'a');
+}
+
 function toggleFundLog(id){
   const el=document.getElementById(id);
   const arr=document.getElementById(id+'-arr');
@@ -11588,6 +11660,7 @@ function renderAssetsPage(){
                 </div>
                 <div style="display:flex;align-items:center;gap:4px"><span class="fund-arr" style="font-size:10px;color:#94a3b8">▶</span><button onclick="event.stopPropagation();openFundSettings()" style="padding:2px 6px;background:#fff;border:0.5px solid #fde68a;border-radius:5px;font-size:10px;cursor:pointer;color:#92400e">⚙️</button></div>
               </div>
+              ${fundStatusLine(false)}
               <div class="fund-l2-detail" style="display:none">
                 ${fds.map((f,fi)=>{
                   const logs2=(db.fundDeductionLogs||[]).filter(r=>r.fundId===f.id);
@@ -11595,7 +11668,6 @@ function renderAssetsPage(){
                   const daysStr=(f.days||[]).map(d=>'週'+dayNames[d]).join('、');
                   const isOn=f.enabled!==false;
                   const fid='flog-'+f.id;
-                  const logRows=logs2.sort((a,b)=>b.date.localeCompare(a.date)).slice(0,20).map(r=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 10px;border-bottom:1px solid #f8f8f8;font-size:11px"><span style="color:#94a3b8">${r.date}</span><span style="font-weight:700;color:#dc2626;font-family:'JetBrains Mono',monospace">-$${(r.amount||0).toLocaleString()}</span></div>`).join('');
                   return`<div>
                     <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-top:1px solid #f8f8f8;cursor:pointer;${!isOn?'opacity:0.55':''}" onclick="toggleFundLog('${fid}')">
                       <div style="display:flex;align-items:center;gap:6px">
@@ -11611,11 +11683,7 @@ function renderAssetsPage(){
                       </div>
                     </div>
                     <div id="${fid}" style="display:none;background:#fff;border-radius:8px;border:1px solid #f1f5f9;margin-top:4px;margin-bottom:4px;overflow:hidden">
-                      <div style="display:flex;justify-content:space-between;padding:5px 10px;background:#f8fafc;border-bottom:1px solid #f1f5f9">
-                        <span style="font-size:10px;font-weight:700;color:#374151">扣款紀錄</span>
-                        <span style="font-size:10px;color:#94a3b8">共 ${logs2.length} 筆</span>
-                      </div>
-                      ${logRows||'<div style="padding:10px;text-align:center;color:#94a3b8;font-size:11px">尚無紀錄</div>'}
+                      <div id="${fid}-box">${fundLogBoxHTML(f.id)}</div>
                     </div>
                   </div>`;
                 }).join('')}
