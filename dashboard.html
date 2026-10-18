@@ -353,6 +353,8 @@ body:not(.privacy) .privacy-mask{filter:none;}
     if(journalModal&&journalModal.classList.contains('open'))return true;
     const openModals=document.querySelectorAll('.mo.open');
     if(openModals.length>0)return true;
+    // 日誌改成右側抽屜後，原本只檢查 Modal 看不到它 → 寫到一半被登出
+    if(document.querySelector('.side-drawer.open'))return true;
     return false;
   }
   function resetTimer(){
@@ -369,7 +371,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
       window.location.href='index.html';
     },TIMEOUT);
   }
-  ['click','keydown','touchstart'].forEach(ev=>{
+  ['click','keydown','touchstart','input','paste','wheel'].forEach(ev=>{
     document.addEventListener(ev,resetTimer,{passive:true});
   });
   resetTimer();
@@ -7888,7 +7890,7 @@ const _LOAD_DAY=new Date(Date.now()+8*3600000).toISOString().slice(0,10);
 document.addEventListener('visibilitychange',async function(){
   if(document.visibilityState==='visible'){
     // 分頁開著過了一天：重新載入，確保跑的是最新程式、並重新執行開啟流程
-    if(new Date(Date.now()+8*3600000).toISOString().slice(0,10)!==_LOAD_DAY&&!isDirty()){location.reload();return;}
+    if(new Date(Date.now()+8*3600000).toISOString().slice(0,10)!==_LOAD_DAY&&!isDirty()&&!document.querySelector('.side-drawer.open,.mo.open')){location.reload();return;}
     if(!_syncEnabled)return;
     _syncEnabled=false;
     try{
@@ -14129,6 +14131,7 @@ function backToFamilyCards(){
 }
 
 function selectFamilyMember(member){
+  renderFamilyMemberSel(); // 先建好成員選項，否則第一次選不進去（要輸入兩次密碼的原因）
   const sel=document.getElementById('family-member-sel');
   if(sel)sel.value=member;
   const backBtn=document.getElementById('family-back-btn');
