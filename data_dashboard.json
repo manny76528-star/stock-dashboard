@@ -3048,7 +3048,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1792342521632,
+  "_ts": 1792342526370,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -3327,7 +3327,8 @@
         "stocks": {},
         "retDate": "2026-10-15",
         "note": ""
-      }
+      },
+      "jMood": 2
     },
     {
       "id": "mtebxxiyapd",
