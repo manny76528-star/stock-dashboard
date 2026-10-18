@@ -4272,25 +4272,82 @@ async function ghPull(){
     const remoteTs=remote._ts||0;
     console.log(`Pull: 本地ts=${new Date(localTs).toLocaleTimeString()} / 遠端ts=${new Date(remoteTs).toLocaleTimeString()}`);
 
-    if(remoteTs>=localTs){
+    if(preferRemote(db,remote)){
       // journals/watchlist 取筆數較多的那份
       if((db.journals||[]).length>(remote.journals||[]).length)remote.journals=db.journals;
       if((db.watchlist||[]).length>(remote.watchlist||[]).length)remote.watchlist=db.watchlist;
       // prices 保留本地（每次自動抓，不需同步）
       remote.prices=db.prices||{};
+      const addBack=mergeAppendOnly(remote,db);
       db=remote;
       localStorage.setItem(STORE,JSON.stringify(db));
+      if(addBack)save(); else localStorage.removeItem(DIRTY_KEY);
       showSyncStatus('☁️ 已從雲端同步');
       return true;
     } else {
-      console.log('本地資料較新，保留本地');
+      console.log('本地有未同步修改，保留本地並併入雲端紀錄');
+      if(mergeAppendOnly(db,remote))save();
       return false;
     }
   }catch(e){console.warn('Pull失敗:',e.message);return false;}
 }
 
+// ── 本地是否有「尚未推上雲端」的修改 ──
+const DIRTY_KEY='assetDB_dirty';
+function isDirty(){return localStorage.getItem(DIRTY_KEY)==='1';}
+function _decodeGh(content){
+  const bin=atob((content||'').replace(/\n/g,''));const u=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);
+  return JSON.parse(new TextDecoder().decode(u));
+}
+// 決定要不要採用雲端：本地沒有未推送的修改、或本地是空的、或雲端較新 → 用雲端
+function preferRemote(localDb,remote){
+  if(!(localDb.investments||[]).length)return true;
+  if(!isDirty())return true;
+  return (remote._ts||0)>=(localDb._ts||0);
+}
+// ── 基金扣款紀錄合併：同一檔基金同一天只算一次；補進來的紀錄同步扣 Line Bank ──
+function mergeFundLogs(target,other){
+  if(!target||!other)return 0;
+  if(!target.fundDeductionLogs)target.fundDeductionLogs=[];
+  const have=new Set(target.fundDeductionLogs.map(l=>l.fundId+'|'+l.date));
+  const lb=(target.cashAccounts||[]).find(a=>a.bank&&a.bank.toLowerCase().includes('line'));
+  let added=0;
+  (other.fundDeductionLogs||[]).forEach(l=>{
+    const k=l.fundId+'|'+l.date;
+    if(have.has(k))return;
+    target.fundDeductionLogs.push(l);have.add(k);added++;
+    if(lb)lb.cash=(lb.cash||0)-(l.amount||0);
+  });
+  if(added)console.log('🔗 基金扣款合併：補回 '+added+' 筆');
+  return added;
+}
+function mergeAppendOnly(target,other){return mergeSnapHistory(target,other)+mergeFundLogs(target,other);}
+
+// ── 快照合併：雲端與本地的快照/家族市值歷史取聯集，任何一邊有的都不會被蓋掉 ──
+function mergeSnapHistory(target,other){
+  if(!target||!other)return 0;
+  let added=0;
+  if(!target.snapshots)target.snapshots=[];
+  const have=new Set(target.snapshots.map(s=>s.ym));
+  (other.snapshots||[]).forEach(s=>{if(s&&s.ym&&!have.has(s.ym)){target.snapshots.push(s);have.add(s.ym);added++;}});
+  target.snapshots.sort((a,b)=>(a.ym||'').localeCompare(b.ym||''));
+  const tAcc=target.family?.accounts||{}, oAcc=other.family?.accounts||{};
+  Object.keys(oAcc).forEach(m=>{
+    const ta=tAcc[m]; if(!ta)return;
+    if(!ta.mktHistory)ta.mktHistory=[];
+    const hd=new Set(ta.mktHistory.map(r=>r.date));
+    (oAcc[m].mktHistory||[]).forEach(r=>{if(r&&r.date&&!hd.has(r.date)){ta.mktHistory.push(r);hd.add(r.date);added++;}});
+    ta.mktHistory.sort((a,b)=>a.date.localeCompare(b.date));
+  });
+  if(added)console.log('🔗 快照合併：補回 '+added+' 筆');
+  return added;
+}
+
+let _pushRetrying=false;
 async function ghPush(){
   if(!_syncEnabled)return;
+  if(!(db.investments||[]).length){console.warn('本地資料是空的，不推送（避免蓋掉雲端）');return;}
   try{
     db._ts=Date.now();
     localStorage.setItem(STORE,JSON.stringify(db));
@@ -4421,8 +4478,8 @@ async function ghPush(){
     // 若沒有 sha，先嘗試取得
     if(!_ghSha){
       try{
-        const chk=await fetch(GH_API);
-        if(chk.ok){const cj=await chk.json();_ghSha=cj.sha;}
+        const chk=await fetch(GH_API+'?t='+Date.now());
+        if(chk.ok){const cj=await chk.json();_ghSha=cj.sha;try{if(mergeAppendOnly(db,_decodeGh(cj.content))&&!_pushRetrying){_pushRetrying=true;try{await ghPush();}finally{_pushRetrying=false;}return;}}catch(_){}}
       }catch(e){}
     }
     const body={message:'sync:'+Date.now(),content:encoded};
@@ -4439,14 +4496,11 @@ async function ghPush(){
         console.warn('SHA 衝突，重新取得 SHA 重試...');
         try{
           const chk2=await fetch(GH_API+'?t='+Date.now());
-          if(chk2.ok){const cj2=await chk2.json();_ghSha=cj2.sha;}
-          const body2={message:'sync-retry:'+Date.now(),content:encoded,sha:_ghSha};
-          const r2=await fetch(GH_API,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body2)});
-          if(r2.ok){
-            const j2=await r2.json();
-            _ghSha=j2.content.sha;
-            showSyncStatus('✅ 已同步至雲端');
-            return;
+          if(chk2.ok){
+            const cj2=await chk2.json();_ghSha=cj2.sha;
+            // 別台裝置剛推過：先把雲端的快照/基金紀錄併進來，再重推（不直接覆蓋）
+            try{mergeAppendOnly(db,_decodeGh(cj2.content));}catch(_){}
+            if(!_pushRetrying){_pushRetrying=true;try{await ghPush();}finally{_pushRetrying=false;}return;}
           }
         }catch(e2){console.warn('重試也失敗:',e2.message);}
       }
@@ -4454,6 +4508,7 @@ async function ghPush(){
     }
     const j=await r.json();
     _ghSha=j.content.sha;
+    localStorage.removeItem(DIRTY_KEY);
     showSyncStatus('✅ 已同步至雲端');
   }catch(e){
     showSyncStatus('⚠️ 同步失敗！');
@@ -4513,29 +4568,10 @@ window.addEventListener('pagehide',function(){
 });
 
 function _pushWithKeepalive(){
-  try{
-    db._ts=Date.now();
-    localStorage.setItem(STORE,JSON.stringify(db));
-    const jsonStr=JSON.stringify(db,null,2);
-    const encoder=new TextEncoder();
-    const bytes=encoder.encode(jsonStr);
-    const binStr=Array.from(bytes,b=>String.fromCharCode(b)).join('');
-    const encoded=btoa(binStr);
-    const body=JSON.stringify({
-      message:'dash-sync:'+Date.now(),
-      content:encoded,
-      ..._ghSha?{sha:_ghSha}:{}
-    });
-    // keepalive:true 確保頁面關閉後請求仍繼續
-    fetch(GH_API,{
-      method:'PUT',
-      headers:{'Content-Type':'application/json'},
-      body,
-      keepalive:true
-    }).then(r=>{
-      if(r.ok)r.json().then(j=>{if(j.content?.sha)_ghSha=j.content.sha;});
-    }).catch(e=>console.warn('keepalive push失敗:',e.message));
-  }catch(e){console.warn('_pushWithKeepalive失敗:',e.message);}
+  // 只有真的有未推送的修改才推；不再每次切換分頁就把時間戳改成「現在」
+  // （舊版會讓本地看起來永遠比雲端新，導致雲端的扣款/快照被忽略）
+  if(!_syncEnabled||!isDirty())return;
+  ghPush();
 }
 
 function showSyncStatus(msg){
@@ -4565,6 +4601,7 @@ function save(){
   undoStack.push(JSON.stringify(db));
   if(undoStack.length>15)undoStack.shift();
   localStorage.setItem(STORE,JSON.stringify(db));
+  localStorage.setItem(DIRTY_KEY,'1');
   const _ub=document.getElementById('undoBtn');if(_ub)_ub.disabled=undoStack.length<=1;
   const _rb=document.getElementById('redoBtn');if(_rb)_rb.disabled=true;
   checkBkWarn();
@@ -7781,11 +7818,14 @@ setTimeout(async()=>{
       const remoteTs=remote._ts||0;
       const localTs=db._ts||0;
       console.log('啟動Pull: 本地ts='+localTs+' 遠端ts='+remoteTs);
-      if(remoteTs>=localTs){
+      if(preferRemote(db,remote)){
         if((db.journals||[]).length>(remote.journals||[]).length)remote.journals=db.journals;
         if((db.watchlist||[]).length>(remote.watchlist||[]).length)remote.watchlist=db.watchlist;
+        remote.prices=db.prices||{};
+        const addBack=mergeAppendOnly(remote,db);
         db=remote;
         localStorage.setItem(STORE,JSON.stringify(db));
+        if(addBack)localStorage.setItem(DIRTY_KEY,'1'); else localStorage.removeItem(DIRTY_KEY);
         render();
         runDailyProcess(false);
         showSyncStatus('☁️ 已從雲端同步');
@@ -7793,7 +7833,8 @@ setTimeout(async()=>{
         renderInvestL1();
         renderInvestL1();
       } else {
-        // 本地資料較新，直接執行（不覆蓋本地）
+        // 本地資料較新，直接執行（不覆蓋本地），但把雲端有、本地沒有的快照補回來
+        if(mergeAppendOnly(db,remote))save();
         runDailyProcess(false);
       }
       // Pull 完成後直接嘗試拍照（繞過 autoSnapshot 的 setTimeout，更可靠）
@@ -7830,8 +7871,11 @@ setInterval(async()=>{
 },5*60*1000);
 
 // 頁面重新顯示時（從背景切回來）強制 Pull
+const _LOAD_DAY=new Date(Date.now()+8*3600000).toISOString().slice(0,10);
 document.addEventListener('visibilitychange',async function(){
   if(document.visibilityState==='visible'){
+    // 分頁開著過了一天：重新載入，確保跑的是最新程式、並重新執行開啟流程
+    if(new Date(Date.now()+8*3600000).toISOString().slice(0,10)!==_LOAD_DAY&&!isDirty()){location.reload();return;}
     if(!_syncEnabled)return;
     _syncEnabled=false;
     try{
@@ -7846,16 +7890,20 @@ document.addEventListener('visibilitychange',async function(){
         const remote=JSON.parse(new TextDecoder().decode(bytes));
         const remoteTs=remote._ts||0;
         const localTs=db._ts||0;
-        if(remoteTs>=localTs){
+        if(preferRemote(db,remote)){
           if((db.journals||[]).length>(remote.journals||[]).length)remote.journals=db.journals;
           if((db.watchlist||[]).length>(remote.watchlist||[]).length)remote.watchlist=db.watchlist;
           remote.prices=db.prices||{};
+          const addBack=mergeAppendOnly(remote,db);
           db=remote;
           localStorage.setItem(STORE,JSON.stringify(db));
+          if(addBack)localStorage.setItem(DIRTY_KEY,'1'); else localStorage.removeItem(DIRTY_KEY);
           render();
-          runDailyProcess(false);
           showSyncStatus('☁️ 已從雲端同步');
+        } else {
+          mergeAppendOnly(db,remote);
         }
+        runDailyProcess(false);
       }
     }catch(e){console.warn('visibilitychange Pull失敗:',e.message);}
     _syncEnabled=true;
@@ -7988,7 +8036,6 @@ function runDailyProcess(force){
       const lsKey=localStorage.getItem(FUND_KEY);
       const alreadyDone=db.fundDeductionLogs.find(l=>l.fundId===f.id&&l.date===todayStr);
       console.log('[基金扣款]',f.name,'lsKey:'+lsKey,'alreadyDone:'+!!alreadyDone);
-      if(!force&&lsKey)return;
       if(alreadyDone){localStorage.setItem(FUND_KEY,'1');return;}
       db.fundDeductionLogs.push({id:uid(),fundId:f.id,fundName:f.name,date:todayStr,amount:f.amount||0});
       const lb=db.cashAccounts?.find(a=>a.bank&&a.bank.toLowerCase().includes('line'));
