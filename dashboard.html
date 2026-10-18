@@ -4930,7 +4930,12 @@ function fmtF(n,d=2){return isNaN(n)?'—':n.toFixed(d);}
 // ═══════ RENDER ═══════
 let showDivRoi=false;
 
-function render(){renderInv();renderInvTop3();renderLoans();renderFlex();renderCash();renderDivs();renderSum();updateWatchNavBadge();if(typeof renderFamilyMemberCards==="function")renderFamilyMemberCards();}
+function render(){
+  // 每一塊各自保護：任何一塊畫面出錯，都不能中斷後面的同步／扣款／快照流程
+  [renderInv,renderInvTop3,renderLoans,renderFlex,renderCash,renderDivs,renderSum,updateWatchNavBadge,
+   ()=>{if(typeof renderFamilyMemberCards==="function")renderFamilyMemberCards();}]
+  .forEach(fn=>{try{fn();}catch(e){console.warn('render 區塊錯誤（已略過）:',fn.name||'family',e.message);}});
+}
 
 window._marketColors={1:'',2:'',3:''};
 function setMarketColor(n,color){
@@ -5177,6 +5182,7 @@ function renderInvTop3(){
 
 function renderInv(){
   const grid=document.getElementById('inv-body');
+  if(!grid)return; // 新版介面已無此區塊，略過（舊版這裡會報錯，導致開頁後的同步、扣款、快照全部沒執行）
   const openIds=new Set();
   grid.querySelectorAll('.irow[data-open="1"]').forEach(r=>openIds.add(r.dataset.id));
   grid.innerHTML='';
