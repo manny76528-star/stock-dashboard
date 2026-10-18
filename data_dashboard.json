@@ -3048,7 +3048,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1792342570404,
+  "_ts": 1792342575492,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -4047,7 +4047,8 @@
         "009805": 17.05
       },
       "aiAnalysis": null,
-      "images": []
+      "images": [],
+      "jMood": 3
     },
     {
       "id": "mqxl8mv5yxx",
