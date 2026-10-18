@@ -254,6 +254,17 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 
 /* SECTION CARD EXTRA POLISH */
 .sec{animation:fadeInUp .3s ease both;}
+/* 日誌：四欄位選取按鈕 */
+.jp-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:7px}
+.jp-need{animation:jpNeed 1.2s ease 2;border-radius:10px}
+@keyframes jpNeed{0%,100%{background:transparent}50%{background:#fee2e2}}
+.jp-lab{font-size:12px;font-weight:700;color:#64748b;width:30px;flex-shrink:0;padding-top:5px}
+.jp-btns{display:flex;flex-wrap:wrap;gap:5px}
+.jp-btn{padding:4px 10px;border-radius:999px;border:1.5px solid #e2e8f0;background:#fff;color:#475569;font-size:12px;cursor:pointer;font-family:'Noto Sans TC',sans-serif;line-height:1.4}
+.jp-btn small{font-size:10px;margin-left:2px}
+.jp-btn.on{background:#eff6ff;border-color:#3b82f6;color:#1d4ed8;font-weight:700}
+.jp-btn[data-k="mood"].on{background:#fef3c7;border-color:#f59e0b;color:#92400e}
+#jp-star.on{background:#fef3c7;border-color:#f59e0b;color:#92400e}
 /* 基金扣款按鈕動畫 */
 @keyframes fundPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.85;transform:scale(1.03)}}
 /* ═══ PRIVACY MODE ═══ */
@@ -2095,7 +2106,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
       <div class="ov-mid-grid">
         <!-- 左：資產趨勢折線圖 -->
         <div class="ov-chart-card">
-          <div class="ov-chart-title">📈 資產趨勢 <span style="font-size:10px;color:#9ca3af;font-weight:500">（每週五快照）</span></div>
+          <div class="ov-chart-title" style="display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap"><span>📈 資產趨勢 <span style="font-size:10px;color:#9ca3af;font-weight:500">（每週五快照）</span></span><span id="crslot-ov"></span></div>
           <div style="flex:1;position:relative;min-height:220px">
             <canvas id="ov-trend-canvas"></canvas>
           </div>
@@ -2364,6 +2375,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
         <div class="trend-page-card" style="padding:0;overflow:hidden">
           <div class="trend-page-hdr" style="padding:12px 16px;border-bottom:1px solid #f0f2f5">
             <span>📈 市值趨勢</span>
+            <span id="crslot-fam" style="margin-left:auto;margin-right:10px"></span>
             <div style="display:flex;gap:8px;align-items:center" class="family-chart-radio-area">
               <label style="font-size:11px;color:#64748b;display:flex;align-items:center;gap:3px;cursor:pointer">
                 <input type="radio" name="family-chart-mode" id="family-chart-all" value="all" checked onchange="renderFamilyTrendChart(window._curFamilyAcc)">
@@ -2476,34 +2488,11 @@ body:not(.privacy) .privacy-mask{filter:none;}
         <div id="journal-page-chart-body" style="display:none;padding:12px 16px;border-top:1px solid #f0f2f5">
           <!-- 篩選器 -->
           <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;align-items:center">
-            <select id="journal-tag-sel" onchange="setJournalTagSel(this)" class="drawer-select" style="width:auto">
-              <option value="">全部標籤</option>
-              <option value="看多">📈 看多</option>
-              <option value="看空">📉 看空</option>
-              <option value="買入">💰 買入</option>
-              <option value="賣出">💸 賣出</option>
-              <option value="重大事項">🚨 重大事項</option>
-              <option value="極度恐慌">😱 極度恐慌</option>
-              <option value="YouTube">🔴▶ YouTube</option>
-            </select>
-            <select id="journal-event-sel" onchange="onJournalFilterChange()" class="drawer-select" style="width:auto">
-              <option value="">全部事件</option>
-              <option value="總經面">🌐 總經面</option>
-              <option value="消息面">📰 消息面</option>
-              <option value="政治面">🏛 政治面</option>
-              <option value="技術面">📊 技術面</option>
-              <option value="個股操作">💹 個股操作</option>
-            </select>
-            <select id="journal-behavior-sel" onchange="onJournalFilterChange()" class="drawer-select" style="width:auto">
-              <option value="">全部行為</option>
-              <option value="阿豪の強心針">😊 阿豪の強心針</option>
-              <option value="跌到有點煩躁">😤 跌到有點煩躁</option>
-              <option value="觸發PTSD">😱 觸發PTSD</option>
-              <option value="信心滿滿的買進">💪 信心滿滿的買進</option>
-              <option value="賣出降低水位">📉 賣出降低水位</option>
-            </select>
+            <select id="journal-tag-sel" onchange="setJournalTagSel(this)" class="drawer-select" style="width:auto"><option value="">全部判斷／操作</option><option value="star">⭐ 重大事項</option><option value="v:看多">📈 看多</option><option value="v:中性">➖ 中性</option><option value="v:看空">📉 看空</option><option value="a:沒動作">⏸ 沒動作</option><option value="a:買入">💰 買入</option><option value="a:加碼">➕ 加碼</option><option value="a:減碼">➖ 減碼</option><option value="a:賣出">💸 賣出</option><option value="YouTube">🔴▶ YouTube</option></select>
+            <select id="journal-event-sel" onchange="onJournalFilterChange()" class="drawer-select" style="width:auto"><option value="">全部事件</option><option value="總經面">🌐 總經面</option><option value="消息面">📰 消息面</option><option value="政治面">🏛 政治面</option><option value="技術面">📊 技術面</option><option value="個股操作">💹 個股操作</option><option value="無特定事件">○ 無特定事件</option></select>
+            <select id="journal-behavior-sel" onchange="onJournalFilterChange()" class="drawer-select" style="width:auto"><option value="">全部心情</option><option value="mg:neg">😱😤 恐慌或煩躁</option><option value="mg:pos">😊💪 安心或信心</option><option value="m:1">😱 恐慌</option><option value="m:2">😤 煩躁</option><option value="m:3">😐 平靜</option><option value="m:4">😊 安心</option><option value="m:5">💪 信心</option></select>
           </div>
-          <div id="journal-chart-checks" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;font-size:12px;align-items:center"></div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap"><div id="journal-chart-checks" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;font-size:12px;align-items:center"></div><span id="crslot-journal" style="margin-bottom:10px"></span></div>
           <label style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:700;color:#7c3aed;margin-bottom:10px;cursor:pointer">
             <input type="checkbox" id="jchart-backtest-toggle" onchange="renderJournalChart()">
             📊 回測 Hover
@@ -2515,21 +2504,14 @@ body:not(.privacy) .privacy-mask{filter:none;}
 
       <!-- 日誌列表 -->
       <div class="journal-page-card">
+        <div id="journal-review"></div>
         <div class="journal-page-toolbar">
           <input id="journal-search-page" type="text" placeholder="搜尋日誌..." class="drawer-input" style="flex:1;min-width:120px" oninput="renderJournalPage()">
           <select id="journal-year-page" onchange="renderJournalPage()" class="drawer-select" style="width:auto">
             <option value="all">全部年份</option>
           </select>
-          <select id="journal-tag-page" onchange="renderJournalPage()" class="drawer-select" style="width:auto">
-            <option value="">全部標籤</option>
-            <option value="看多">📈 看多</option>
-            <option value="看空">📉 看空</option>
-            <option value="買入">💰 買入</option>
-            <option value="賣出">💸 賣出</option>
-            <option value="重大事項">🚨 重大事項</option>
-            <option value="極度恐慌">😱 極度恐慌</option>
-          <option value="YouTube">🔴▶ YouTube</option>
-          </select>
+          <select id="journal-tag-page" onchange="renderJournalPage()" class="drawer-select" style="width:auto"><option value="">全部判斷／操作</option><option value="star">⭐ 重大事項</option><option value="v:看多">📈 看多</option><option value="v:中性">➖ 中性</option><option value="v:看空">📉 看空</option><option value="a:沒動作">⏸ 沒動作</option><option value="a:買入">💰 買入</option><option value="a:加碼">➕ 加碼</option><option value="a:減碼">➖ 減碼</option><option value="a:賣出">💸 賣出</option><option value="YouTube">🔴▶ YouTube</option></select>
+          <select id="journal-mood-page" onchange="renderJournalPage()" class="drawer-select" style="width:auto"><option value="">全部心情</option><option value="nomood">⚠️ 尚未標心情</option><option value="mg:neg">😱😤 恐慌或煩躁</option><option value="mg:pos">😊💪 安心或信心</option><option value="m:1">😱 恐慌</option><option value="m:2">😤 煩躁</option><option value="m:3">😐 平靜</option><option value="m:4">😊 安心</option><option value="m:5">💪 信心</option></select>
           <button onclick="openJournalDrawer()" style="padding:8px 16px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">＋ 新增日誌</button>
           <button onclick="batchUpdateBacktest()" style="padding:8px 14px;background:#f8f9fa;border:1px solid #e2e8f0;color:#374151;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">🔄 更新回測</button>
         </div>
@@ -2544,7 +2526,8 @@ body:not(.privacy) .privacy-mask{filter:none;}
       <div class="trend-page-card">
         <div class="trend-page-hdr">
           <span>📈 淨資產趨勢（每週五快照）</span>
-          <div style="display:flex;gap:6px">
+          <div style="display:flex;gap:6px;align-items:center">
+            <span id="crslot-trend"></span>
             <button onclick="recordSnapshot(true)" style="padding:5px 12px;background:#eff6ff;border:1px solid #bfdbfe;color:#2563eb;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer">📷 手動記錄</button>
             <button onclick="clearAndReRecord()" style="padding:5px 12px;background:#fff3e0;border:1px solid #ffb74d;color:#e67e22;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer">🔄 重算本次</button>
           </div>
@@ -2573,6 +2556,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
       <div class="trend-page-card" style="padding:0;overflow:hidden;margin-bottom:12px">
         <div class="trend-page-hdr" style="padding:12px 18px;border-bottom:1px solid #f0f2f5">
           <span>📈 累積股息走勢</span>
+          <span id="crslot-div"></span>
         </div>
         <div style="padding:16px;position:relative;height:200px">
           <canvas id="div-trend-canvas"></canvas>
@@ -3090,33 +3074,9 @@ body:not(.privacy) .privacy-mask{filter:none;}
           <option value="all">全部年份</option>
         </select>
         <!-- 標籤下拉 -->
-        <select id="journal-tag-sel" onchange="setJournalTagSel(this)" style="padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:700;color:#475569;background:#fff;cursor:pointer;outline:none;min-width:110px">
-          <option value="">全部標籤</option>
-          <option value="看多">📈 看多</option>
-          <option value="看空">📉 看空</option>
-          <option value="買入">💰 買入</option>
-          <option value="賣出">💸 賣出</option>
-          <option value="重大事項">🚨 重大事項</option>
-          <option value="極度恐慌">😱 極度恐慌(PTSD)</option>
-          <option value="YouTube">🔴▶ YouTube</option>
-        </select>
-        <select id="journal-event-sel" onchange="onJournalFilterChange()" style="padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:700;color:#475569;background:#fff;cursor:pointer;outline:none;min-width:110px">
-          <option value="">全部事件</option>
-          <option value="總經面">🌐 總經面</option>
-          <option value="消息面">📰 消息面</option>
-          <option value="政治面">🏛 政治面</option>
-          <option value="技術面">📊 技術面</option>
-          <option value="個股操作">💹 個股操作</option>
-        </select>
-        <select id="journal-behavior-sel" onchange="onJournalFilterChange()" style="padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:700;color:#475569;background:#fff;cursor:pointer;outline:none;min-width:110px">
-          <option value="">全部行為</option>
-          <option value="阿豪の強心針">😊 阿豪の強心針</option>
-          <option value="跌到有點煩躁">😤 跌到有點煩躁</option>
-          <option value="觸發PTSD">😱 觸發PTSD</option>
-          <option value="信心滿滿的買進">💪 信心滿滿的買進</option>
-          <option value="賣出降低水位">📉 賣出降低水位</option>
-          
-        </select>
+        <select id="journal-tag-sel" onchange="setJournalTagSel(this)" style="padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:700;color:#475569;background:#fff;cursor:pointer;outline:none;min-width:110px"><option value="">全部判斷／操作</option><option value="star">⭐ 重大事項</option><option value="v:看多">📈 看多</option><option value="v:中性">➖ 中性</option><option value="v:看空">📉 看空</option><option value="a:沒動作">⏸ 沒動作</option><option value="a:買入">💰 買入</option><option value="a:加碼">➕ 加碼</option><option value="a:減碼">➖ 減碼</option><option value="a:賣出">💸 賣出</option><option value="YouTube">🔴▶ YouTube</option></select>
+        <select id="journal-event-sel" onchange="onJournalFilterChange()" style="padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:700;color:#475569;background:#fff;cursor:pointer;outline:none;min-width:110px"><option value="">全部事件</option><option value="總經面">🌐 總經面</option><option value="消息面">📰 消息面</option><option value="政治面">🏛 政治面</option><option value="技術面">📊 技術面</option><option value="個股操作">💹 個股操作</option><option value="無特定事件">○ 無特定事件</option></select>
+        <select id="journal-behavior-sel" onchange="onJournalFilterChange()" style="padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:700;color:#475569;background:#fff;cursor:pointer;outline:none;min-width:110px"><option value="">全部心情</option><option value="mg:neg">😱😤 恐慌或煩躁</option><option value="mg:pos">😊💪 安心或信心</option><option value="m:1">😱 恐慌</option><option value="m:2">😤 煩躁</option><option value="m:3">😐 平靜</option><option value="m:4">😊 安心</option><option value="m:5">💪 信心</option></select>
       </div>
       <!-- 走勢圖折疊區 -->
       <div id="journal-chart-section" style="border-bottom:1px solid var(--border)">
@@ -3308,6 +3268,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
         <span id="jdr-date" style="font-size:12px;font-weight:700;color:#9ca3af;font-family:'JetBrains Mono',monospace"></span>
         <div id="jdr-tags" style="display:flex;gap:6px;flex-wrap:wrap"></div>
       </div>
+      <div id="jdr-moodfill" style="display:none;margin:-6px 0 16px"></div>
 
       <!-- 大盤環境標題（大） -->
       <div id="jdr-market" style="font-size:16px;font-weight:700;color:#1e293b;line-height:1.6;margin-bottom:16px;white-space:pre-wrap"></div>
@@ -3321,6 +3282,8 @@ body:not(.privacy) .privacy-mask{filter:none;}
       <!-- 事件/行為標籤 -->
       <div id="jdr-meta" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px"></div>
 
+      <!-- 事後大盤 + 相似案例 -->
+      <div id="jdr-after" style="margin-bottom:12px"></div>
       <!-- 回測 -->
       <div id="jdr-backtest" style="margin-bottom:20px"></div>
 
@@ -3377,50 +3340,18 @@ body:not(.privacy) .privacy-mask{filter:none;}
         </div>
       </div>
 
-      <!-- 標籤 -->
+      <!-- 事件／判斷／心情／操作 -->
       <div class="drawer-section">
-        <div class="drawer-section-title">標籤</div>
-        <div class="drawer-tag-row" style="margin-bottom:10px">
-          <label class="drawer-tag-label" id="dtag-bull"><input type="checkbox" id="jtag-bull" value="看多">📈 看多</label>
-          <label class="drawer-tag-label" id="dtag-bear"><input type="checkbox" id="jtag-bear" value="看空">📉 看空</label>
-          <label class="drawer-tag-label" id="dtag-buy"><input type="checkbox" id="jtag-buy" value="買入">💰 買入</label>
-          <label class="drawer-tag-label" id="dtag-sell"><input type="checkbox" id="jtag-sell" value="賣出">💸 賣出</label>
-          <label class="drawer-tag-label" id="dtag-alert"><input type="checkbox" id="jtag-alert" value="重大事項">🚨 重大事項</label>
-          <label class="drawer-tag-label" id="dtag-panic"><input type="checkbox" id="jtag-panic" value="極度恐慌">😱 極度恐慌</label>
-          <label class="drawer-tag-label" id="dtag-youtube"><input type="checkbox" id="jtag-youtube" value="YouTube" onchange="toggleYoutubeUrl(this)">🔴▶ YouTube</label>
-        </div>
-        <!-- YouTube 網址輸入框（勾選才顯示） -->
-        <div id="youtube-url-wrap" style="display:none;margin-top:8px">
-          <input class="drawer-input" type="url" id="j-youtube-url" placeholder="🔴▶ 貼上 YouTube 網址..." style="width:100%">
-        </div>
-        <div class="drawer-grid-2">
-          <div>
-            <span class="drawer-label">📂 事件分類</span>
-            <select class="drawer-select" id="j-event-cat">
-              <option value="">— 選擇事件分類 —</option>
-              <option value="總經面">🌐 總經面</option>
-              <option value="消息面">📰 消息面</option>
-              <option value="政治面">🏛 政治面</option>
-              <option value="技術面">📊 技術面</option>
-              <option value="個股操作">💹 個股操作</option>
-
-            </select>
-          </div>
-          <div>
-            <span class="drawer-label">🎯 個人行為</span>
-            <select class="drawer-select" id="j-behavior">
-              <option value="">— 選擇個人行為 —</option>
-              <option value="阿豪の強心針">😊 阿豪の強心針</option>
-              <option value="跌到有點煩躁">😤 跌到有點煩躁</option>
-              <option value="觸發PTSD">😱 觸發PTSD</option>
-              <option value="信心滿滿的買進">💪 信心滿滿的買進</option>
-              <option value="賣出降低水位">📉 賣出降低水位</option>
-              
-            </select>
-          </div>
+        <div class="drawer-section-title" style="display:flex;justify-content:space-between;align-items:center">當下狀態 <button type="button" id="jp-star" class="jp-btn" onclick="(function(){const s=document.getElementById('j-star');s.value=s.value==='1'?'':'1';jPaintPicks();autoSaveJournalDraft();})()">☆ 重大事項</button></div>
+        <input type="hidden" id="j-cat"><input type="hidden" id="j-view"><input type="hidden" id="j-mood"><input type="hidden" id="j-action"><input type="hidden" id="j-star">
+          <div class="jp-row"><span class="jp-lab">事件</span><div class="jp-btns"><button type="button" class="jp-btn" data-k="cat" data-v="總經面" onclick="jPick('cat','總經面')">🌐 總經面</button><button type="button" class="jp-btn" data-k="cat" data-v="消息面" onclick="jPick('cat','消息面')">📰 消息面</button><button type="button" class="jp-btn" data-k="cat" data-v="政治面" onclick="jPick('cat','政治面')">🏛 政治面</button><button type="button" class="jp-btn" data-k="cat" data-v="技術面" onclick="jPick('cat','技術面')">📊 技術面</button><button type="button" class="jp-btn" data-k="cat" data-v="個股操作" onclick="jPick('cat','個股操作')">💹 個股操作</button><button type="button" class="jp-btn" data-k="cat" data-v="無特定事件" onclick="jPick('cat','無特定事件')">○ 無特定事件</button></div></div>
+          <div class="jp-row"><span class="jp-lab">判斷</span><div class="jp-btns"><button type="button" class="jp-btn" data-k="view" data-v="看多" onclick="jPick('view','看多')">📈 看多</button><button type="button" class="jp-btn" data-k="view" data-v="中性" onclick="jPick('view','中性')">➖ 中性</button><button type="button" class="jp-btn" data-k="view" data-v="看空" onclick="jPick('view','看空')">📉 看空</button></div></div>
+          <div class="jp-row" id="jp-mood-row"><span class="jp-lab">心情<b style="color:#dc2626">*</b></span><div class="jp-btns"><button type="button" class="jp-btn" data-k="mood" data-v="1" onclick="jPick('mood','1')">😱<small>恐慌</small></button><button type="button" class="jp-btn" data-k="mood" data-v="2" onclick="jPick('mood','2')">😤<small>煩躁</small></button><button type="button" class="jp-btn" data-k="mood" data-v="3" onclick="jPick('mood','3')">😐<small>平靜</small></button><button type="button" class="jp-btn" data-k="mood" data-v="4" onclick="jPick('mood','4')">😊<small>安心</small></button><button type="button" class="jp-btn" data-k="mood" data-v="5" onclick="jPick('mood','5')">💪<small>信心</small></button></div></div>
+          <div class="jp-row"><span class="jp-lab">操作</span><div class="jp-btns"><button type="button" class="jp-btn" data-k="action" data-v="沒動作" onclick="jPick('action','沒動作')">⏸ 沒動作</button><button type="button" class="jp-btn" data-k="action" data-v="買入" onclick="jPick('action','買入')">💰 買入</button><button type="button" class="jp-btn" data-k="action" data-v="加碼" onclick="jPick('action','加碼')">➕ 加碼</button><button type="button" class="jp-btn" data-k="action" data-v="減碼" onclick="jPick('action','減碼')">➖ 減碼</button><button type="button" class="jp-btn" data-k="action" data-v="賣出" onclick="jPick('action','賣出')">💸 賣出</button></div></div>
+        <div style="margin-top:8px">
+          <input class="drawer-input" type="url" id="j-youtube-url" placeholder="🔴▶ YouTube 網址（選填）" oninput="autoSaveJournalDraft()" style="font-size:12px;padding:6px 10px;margin-bottom:0">
         </div>
       </div>
-
       <!-- 個股追蹤 -->
       <div class="drawer-section">
         <div class="drawer-section-title">個股追蹤（選填）</div>
@@ -6840,7 +6771,9 @@ function renderDivChart(){
   if(divs.length===0)return;
   const monthMap={};
   divs.forEach(d=>{const m=d.date.slice(0,7);monthMap[m]=(monthMap[m]||0)+(d.amount||0);});
-  const months=Object.keys(monthMap).sort();
+  crEnsurePlugin();
+  const _divYearOnly=crGet('div')==='y';
+  const months=Object.keys(monthMap).sort().filter(m=>crIn(m,'div'));
   let cum=0;
   const cumData=months.map(m=>{cum+=monthMap[m];return Math.round(cum);});
   const ctx=canvas.getContext('2d');
@@ -6862,7 +6795,7 @@ function renderDivChart(){
       plugins:{
         legend:{display:false},
         tooltip:{backgroundColor:'rgba(255,255,255,0.95)',titleColor:'#1e293b',bodyColor:'#64748b',borderColor:'#e2e8f0',borderWidth:1,padding:10,cornerRadius:10,
-          callbacks:{label:ctx=>'累積：$'+Math.round(ctx.raw||0).toLocaleString()}}
+          callbacks:{label:ctx=>(_divYearOnly?'今年累積：$':'累積：$')+Math.round(ctx.raw||0).toLocaleString()}}
       },
       scales:{
         x:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{font:{size:10},color:'#94a3b8',maxTicksLimit:12},border:{dash:[4,4]}},
@@ -6870,6 +6803,7 @@ function renderDivChart(){
       }
     }
   });
+  crDecorate(_divTrendChart,months,'div');
 }
 
 function openDivModal(preCode=null){
@@ -7591,7 +7525,8 @@ function buildIndexSegments(dataArr, yAxisID='yIndex'){
   }];
 }
 
-function renderTrendChart(){
+function renderTrendChart(){ if(typeof renderTrendPage==='function')return renderTrendPage(); }
+function _renderTrendChartOld(){
   if(!db.snapshots||db.snapshots.length===0){
     document.getElementById('trend-table').innerHTML='<div style="color:var(--muted);text-align:center;padding:20px">尚無記錄，請按「📷 記錄本月」開始</div>';
     return;
@@ -9742,7 +9677,8 @@ function renderJournalChart(){
     });
   }
 
-  const sorted=[...journals].sort((a,b)=>a.date.localeCompare(b.date));
+  crEnsurePlugin();
+  const sorted=[...journals].sort((a,b)=>a.date.localeCompare(b.date)).filter(j=>crIn(j.date,'journal'));
   const labels=sorted.map(j=>j.date);
   const colors=['#3b82f6','#dc2626','#16a34a','#f59e0b','#8b5cf6','#0891b2','#db2777'];
   let ci=0;
@@ -9782,17 +9718,15 @@ function renderJournalChart(){
         if(!point||point.x===undefined)return;
         const emojis=[];
         // 標籤篩選
-        if(activeLabelFilter){
-          const tags=(j.tags||[]).filter(t=>t===activeLabelFilter&&tagEmojiMap[t]);
-          tags.forEach(t=>emojis.push(tagEmojiMap[t]));
+        const _m=jMeta(j);
+        if(activeLabelFilter&&jMatch(j,activeLabelFilter)){
+          emojis.push(activeLabelFilter==='star'?'⭐':activeLabelFilter==='YouTube'?'🔴':activeLabelFilter.startsWith('v:')?(J_VIEWS.find(v=>v[0]===_m.view)||['','•'])[1]:(J_ACTIONS.find(a=>a[0]===_m.action)||['','•'])[1]);
         }
-        // 事件分類篩選
-        if(activeEventFilter&&j.eventCat===activeEventFilter&&eventEmojiMap[j.eventCat]){
-          emojis.push(eventEmojiMap[j.eventCat]);
+        if(activeEventFilter&&_m.cat===activeEventFilter){
+          emojis.push((J_EVENTS.find(e=>e[0]===_m.cat)||['','📂'])[1]);
         }
-        // 個人行為篩選
-        if(activeBehaviorFilter&&j.behavior===activeBehaviorFilter&&behaviorEmojiMap[j.behavior]){
-          emojis.push(behaviorEmojiMap[j.behavior]);
+        if(activeBehaviorFilter&&jMatch(j,activeBehaviorFilter)&&_m.mood){
+          emojis.push(J_MOODS[_m.mood].e);
         }
         if(!emojis.length)return;
         ctx.save();
@@ -9941,6 +9875,7 @@ function renderJournalChart(){
       }
     }]
   });
+  crDecorate(_journalChart,labels,'journal',true);
 }
 
 function toggleJournalStockDropdown(e){
@@ -9977,7 +9912,7 @@ function showJournalChartPopup(j,evt){
     popup.style.cssText='position:fixed;z-index:9999;background:#1e293b;color:#e2e8f0;border-radius:10px;padding:12px 16px;max-width:240px;width:240px;font-size:12px;line-height:1.6;box-shadow:0 8px 32px rgba(0,0,0,.4);word-break:break-word;white-space:normal';
     document.body.appendChild(popup);
   }
-  const tags=(j.tags||[]).map(t=>`<span style="background:rgba(255,255,255,.15);padding:1px 6px;border-radius:10px;font-size:10px">${t}</span>`).join(' ');
+  const tags=jChipsHTML(j,true);
   popup.innerHTML=`
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
       <span style="font-weight:800;color:#93c5fd">${j.date}</span>
@@ -10159,6 +10094,74 @@ function jTitleText(x,text){
   return `<a href="${x.u}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="開啟原文：${x.u}" style="color:inherit;text-decoration:none;border-bottom:1px dashed currentColor">${text}</a> <span title="含外部網址" style="font-size:.85em;opacity:.85">🌐</span>`;
 }
 
+// ══ 交易日誌：四個欄位（事件／判斷／心情／操作）+ ⭐ ══
+const J_MOODS=[null,{e:'😱',t:'恐慌'},{e:'😤',t:'煩躁'},{e:'😐',t:'平靜'},{e:'😊',t:'安心'},{e:'💪',t:'信心'}];
+const J_VIEWS=[['看多','📈'],['中性','➖'],['看空','📉']];
+const J_ACTIONS=[['沒動作','⏸'],['買入','💰'],['加碼','➕'],['減碼','➖'],['賣出','💸']];
+const J_EVENTS=[['總經面','🌐'],['消息面','📰'],['政治面','🏛'],['技術面','📊'],['個股操作','💹'],['無特定事件','○']];
+// 讀取一篇日誌的四欄位：新格式直接讀；舊格式（標籤／個人行為）自動換算，原始資料不刪
+function jMeta(j){
+  if(!j)return{cat:'',view:'',mood:0,action:'',star:false};
+  if(j.jv2)return{cat:j.eventCat||'',view:j.jView||'',mood:j.jMood||0,action:j.jAction||'',star:!!j.star};
+  const t=j.tags||[], b=j.behavior||'';
+  const view=t.includes('看多')?'看多':t.includes('看空')?'看空':'';
+  const mood=(t.includes('極度恐慌')||b==='觸發PTSD')?1:b==='跌到有點煩躁'?2:b==='信心滿滿的買進'?5:b==='阿豪の強心針'?4:0;
+  const action=b==='逆向加碼'?'加碼':b==='賣出降低水位'?'減碼':(t.includes('買入')||b==='信心滿滿的買進')?'買入':t.includes('賣出')?'賣出':'';
+  return{cat:j.eventCat||'',view,mood:(+j.jMood||mood),action,star:t.includes('重大事項')};
+}
+function jMoodGroup(m){return m===1||m===2?'neg':m===4||m===5?'pos':m===3?'neu':'';}
+// 篩選代碼：star / v:看多 / m:1 / mg:neg / a:買入（也相容舊的標籤值）
+function jMatch(j,tok){
+  if(!tok)return true;
+  const m=jMeta(j);
+  const legacy={'重大事項':'star','極度恐慌':'m:1','看多':'v:看多','看空':'v:看空','買入':'a:買入','賣出':'a:賣出'};
+  if(tok==='YouTube')return !!j.youtubeUrl;
+  tok=legacy[tok]||tok;
+  if(tok==='star')return m.star;
+  if(tok==='nomood')return !m.mood;
+  const [k,v]=tok.split(':');
+  if(k==='v')return m.view===v;
+  if(k==='a')return m.action===v;
+  if(k==='m')return m.mood===+v;
+  if(k==='mg')return jMoodGroup(m.mood)===v;
+  if(k==='e')return m.cat===v;
+  return true;
+}
+function jChipsHTML(j,dark){
+  const m=jMeta(j), out=[];
+  const chip=(txt,bg,fg,dbg,dfg)=>`<span style="display:inline-block;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700;margin:0 4px 2px 0;background:${dark?dbg:bg};color:${dark?dfg:fg}">${txt}</span>`;
+  if(m.star)out.push(chip('⭐ 重大','#fef3c7','#92400e','rgba(251,191,36,.18)','#fbbf24'));
+  if(m.cat)out.push(chip((J_EVENTS.find(e=>e[0]===m.cat)||['','📂'])[1]+' '+m.cat,'#fef3c7','#92400e','rgba(251,191,36,.12)','#fcd34d'));
+  if(m.view)out.push(chip((J_VIEWS.find(v=>v[0]===m.view)||['',''])[1]+' '+m.view,m.view==='看多'?'#fee2e2':m.view==='看空'?'#dcfce7':'#f1f5f9',m.view==='看多'?'#b91c1c':m.view==='看空'?'#15803d':'#475569','rgba(255,255,255,.12)',m.view==='看多'?'#fca5a5':m.view==='看空'?'#86efac':'#cbd5e1'));
+  if(m.mood)out.push(chip(J_MOODS[m.mood].e+' '+J_MOODS[m.mood].t,m.mood<=2?'#f3e8ff':'#ecfccb',m.mood<=2?'#7e22ce':'#3f6212','rgba(167,139,250,.18)',m.mood<=2?'#c4b5fd':'#bef264'));
+  if(m.action)out.push(chip((J_ACTIONS.find(a=>a[0]===m.action)||['',''])[1]+' '+m.action,'#e0f2fe','#0369a1','rgba(56,189,248,.15)','#7dd3fc'));
+  if(j.youtubeUrl)out.push(`<a href="${_safeUrl(j.youtubeUrl)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="text-decoration:none">${chip('🔴▶ YouTube','#fee2e2','#b91c1c','rgba(239,68,68,.15)','#fca5a5')}</a>`);
+  return out.join('');
+}
+// 表單：選取按鈕（再按一次取消）
+function jPick(kind,val){
+  const el=document.getElementById('j-'+kind); if(!el)return;
+  el.value=(String(el.value)===String(val))?'':String(val);
+  jPaintPicks(); if(typeof autoSaveJournalDraft==='function')autoSaveJournalDraft();
+}
+function jPaintPicks(){
+  ['view','mood','action','cat'].forEach(k=>{
+    const v=document.getElementById('j-'+k)?.value||'';
+    document.querySelectorAll('#journal-drawer .jp-btn[data-k="'+k+'"]').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
+  });
+  const st=document.getElementById('j-star'); const sb=document.getElementById('jp-star');
+  if(sb)sb.classList.toggle('on',st?.value==='1');
+}
+function jSetPicks(m){
+  const sv=(id,v)=>{const e=document.getElementById(id);if(e)e.value=v;};
+  sv('j-view',m.view||'');sv('j-mood',m.mood?String(m.mood):'');sv('j-action',m.action||'');sv('j-cat',m.cat||'');sv('j-star',m.star?'1':'');
+  jPaintPicks();
+}
+function jReadPicks(){
+  const g=id=>document.getElementById(id)?.value||'';
+  return{view:g('j-view'),mood:parseInt(g('j-mood'))||0,action:g('j-action'),cat:g('j-cat'),star:g('j-star')==='1'};
+}
+
 function autoSaveJournalDraft(){
   const draft={
     market:document.getElementById('j-market')?.value.trim()||'',
@@ -10170,6 +10173,7 @@ function autoSaveJournalDraft(){
     marketUrl:document.getElementById('j-market-url')?.value.trim()||'',
     marketUrl2:document.getElementById('j-market-url2')?.value.trim()||'',
     marketUrl3:document.getElementById('j-market-url3')?.value.trim()||'',
+    picks:typeof jReadPicks==='function'?jReadPicks():null,
     content:document.getElementById('j-content')?.value||'',
     date:document.getElementById('j-date')?.value||'',
     savedAt:new Date().toISOString()
@@ -10372,15 +10376,25 @@ function saveJournal(){
   if(drawerEditId)editJournalId=drawerEditId||null;
   const date=document.getElementById('j-date').value;
   if(!date){toast('請填寫日期');return;}
+  const _pk=jReadPicks();
+  if(!_pk.mood){
+    toast('⚠️ 請先選「心情」才能存檔（之後回顧要用）');
+    const row=document.getElementById('jp-mood-row');
+    if(row){row.scrollIntoView({behavior:'smooth',block:'center'});row.classList.remove('jp-need');void row.offsetWidth;row.classList.add('jp-need');}
+    return;
+  }
+  // 舊版相容：同步產生舊標籤（其他舊畫面仍可辨識），以四欄位為準
   const tags=[];
-  ['jtag-bull','jtag-bear','jtag-buy','jtag-sell','jtag-alert','jtag-panic','jtag-youtube'].forEach(id2=>{
-    const el=document.getElementById(id2);
-    if(el&&el.checked)tags.push(el.value);
-  });
+  if(_pk.view==='看多'||_pk.view==='看空')tags.push(_pk.view);
+  if(_pk.action==='買入'||_pk.action==='賣出')tags.push(_pk.action);
+  if(_pk.star)tags.push('重大事項');
+  if(_pk.mood===1)tags.push('極度恐慌');
+  const _prevJ=editJournalId?(db.journals||[]).find(x=>x.id===editJournalId):null;
   const j={
     id:editJournalId||uid(),
     date,
     tags,
+    jv2:true,jView:_pk.view,jMood:_pk.mood,jAction:_pk.action,star:_pk.star,
     market:document.getElementById('j-market').value.trim(),
     market2:document.getElementById('j-market2')?.value.trim()||'',
     market3:document.getElementById('j-market3')?.value.trim()||'',
@@ -10393,8 +10407,8 @@ function saveJournal(){
     youtubeUrl:document.getElementById('j-youtube-url')?.value.trim()||'',
     content:document.getElementById('j-content').value.trim(),
     stockTags:document.getElementById('j-stock-tags').value.trim().split(/[\s,，]+/).filter(Boolean),
-    eventCat:document.getElementById('j-event-cat')?.value||'',
-    behavior:document.getElementById('j-behavior')?.value||'',
+    eventCat:_pk.cat,
+    behavior:_prevJ?.behavior||'',
     indexVal:parseFloat(document.getElementById('j-index')?.value)||null,
     stockPrices:(()=>{
       const prices={};
@@ -10527,14 +10541,14 @@ function renderJournal(){
     moodSel.value=moods.includes(curMood)?curMood:'';
   }
 
-  if(journalTagFilter)list=list.filter(j=>(j.tags||[]).includes(journalTagFilter));
+  if(journalTagFilter)list=list.filter(j=>jMatch(j,journalTagFilter));
   if(selYear&&selYear!=='all')list=list.filter(j=>(j.date||'').startsWith(selYear));
   if(selMood)list=list.filter(j=>(j.mood||'')==selMood);
   // 雙層標籤篩選
   const selEvent=document.getElementById('journal-event-sel')?.value||'';
   const selBehavior=document.getElementById('journal-behavior-sel')?.value||'';
-  if(selEvent)list=list.filter(j=>j.eventCat===selEvent);
-  if(selBehavior)list=list.filter(j=>j.behavior===selBehavior);
+  if(selEvent)list=list.filter(j=>jMeta(j).cat===selEvent);
+  if(selBehavior)list=list.filter(j=>jMatch(j,selBehavior));
   if(q)list=list.filter(j=>
     (j.content||'').toLowerCase().includes(q)||
     (j.market||'').toLowerCase().includes(q)||
@@ -10548,7 +10562,7 @@ function renderJournal(){
   const tagTextColors={'看多':'#16a34a','看空':'#dc2626','買入':'#2563eb','賣出':'#db2777','重大事項':'#d97706'};
 
   container.innerHTML=list.map(j=>{
-    const tags=(j.tags||[]).map(t=>`<span style="display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;background:${tagColors[t]||'#f1f5f9'};color:${tagTextColors[t]||'#475569'};margin-right:4px">${t}</span>`).join('');
+    const tags=jChipsHTML(j,true);
 
     const hasBody = j.market || j.content;
 
@@ -10563,8 +10577,6 @@ function renderJournal(){
             <span style="font-size:13px;font-weight:700;color:#e2e8f0;font-family:'JetBrains Mono',monospace;white-space:nowrap">${j.date}</span>
             ${tags}
             ${j.mood?`<span style="font-size:12px;color:rgba(255,255,255,.65)"></span>`:''}
-            ${j.eventCat?`<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;background:rgba(251,191,36,.15);color:#fbbf24;border:1px solid rgba(251,191,36,.3)">${j.eventCat}</span>`:''}
-            ${j.behavior?`<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;background:rgba(167,139,250,.15);color:#a78bfa;border:1px solid rgba(167,139,250,.3)">${j.behavior}</span>`:''}
             ${(j.stockTags||[]).map(t=>`<span onclick="event.stopPropagation();openStockTracker('${t}')" style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;background:rgba(56,189,248,.15);color:#38bdf8;border:1px solid rgba(56,189,248,.3);cursor:pointer;font-family:'JetBrains Mono',monospace" title="點擊查看 ${t} 所有記錄">${t}</span>`).join('')}
             ${(j.images||[]).length>0?`<span style="display:inline-flex;align-items:center;font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;background:rgba(251,146,60,.15);color:#fb923c;border:1px solid rgba(251,146,60,.3)">🖼️ ${j.images.length}張圖</span>`:''}
           </div>
@@ -10678,7 +10690,7 @@ async function batchUpdateBacktest(){
       if(updated){
         j.backtest.retDate=today;
         // 打臉文字
-        const hasPanic=(j.tags||[]).includes('極度恐慌')||(j.tags||[]).includes('看空');
+        const hasPanic=jMoodGroup(jMeta(j).mood)==='neg'||jMeta(j).view==='看空';
         const ret=j.backtest.ret;
         if(ret!=null){
           if(hasPanic&&ret>5)j.backtest.note=`事後證明：當時恐慌，但後來漲了 +${ret.toFixed(1)}%，恐慌是過度的！`;
@@ -10791,7 +10803,7 @@ async function openBacktestInput(journalId){
         <div style="font-size:15px;font-weight:800;color:#1e293b">📊 事後回測更新</div>
         <button onclick="document.getElementById('backtest-modal').style.display='none'" style="background:none;border:none;font-size:18px;cursor:pointer;color:#94a3b8">✕</button>
       </div>
-      <div style="font-size:12px;color:#64748b;margin-bottom:12px">📅 ${j.date}（${daysSince}天前）・${(j.tags||[]).join('、')||'無標籤'}</div>
+      <div style="font-size:12px;color:#64748b;margin-bottom:12px">📅 ${j.date}（${daysSince}天前）・${jChipsHTML(j)||'未標記'}</div>
       ${rows.length===0?'<div style="color:#94a3b8;font-size:12px;padding:10px 0">此篇日誌未記錄大盤或個股股價，無法自動計算</div>':
         rows.map(row=>`
         <div style="background:#f8fafc;border-radius:8px;padding:8px 10px;margin-bottom:8px">
@@ -10838,7 +10850,7 @@ function saveBacktestAll(journalId){
     }
   });
   // 打臉文字（以大盤為主）
-  const hasPanic=(j.tags||[]).includes('極度恐慌')||(j.tags||[]).includes('看空');
+  const hasPanic=jMoodGroup(jMeta(j).mood)==='neg'||jMeta(j).view==='看空';
   const ret=j.backtest.ret;
   if(ret!=null){
     if(hasPanic&&ret>5)j.backtest.note=`事後證明：當時恐慌，但後來漲了 +${ret.toFixed(1)}%，恐慌是過度的！`;
@@ -11047,46 +11059,53 @@ function _initCfDebtChart(){
 function toggleFundL3As(btn){
   const l3=btn.closest('.fund-l2-detail').querySelector('.fund-l3-as');
   const canvas=btn.closest('.fund-l2-detail').querySelector('.fund-as-canvas');
-  const legend=btn.closest('.fund-l2-detail').querySelector('.fund-as-legend');
   if(!l3)return;
   const open=l3.style.display==='none';
   l3.style.display=open?'block':'none';
   btn.textContent=open?'📈 趨勢 ▼':'📈 趨勢 ▶';
   if(open&&canvas&&!canvas.dataset.inited){
     canvas.dataset.inited='1';
-    const funds=db.settings?.fundDeductions||[];
-    const logs=db.fundDeductionLogs||[];
-    if(logs.length===0){canvas.parentElement.innerHTML='<div style="text-align:center;color:#94a3b8;padding:16px;font-size:11px">尚無扣款紀錄</div>';return;}
-    const allDates=[...new Set(logs.map(l=>l.date))].sort();
-    const colors=['#2563eb','#f97316','#16a34a','#8b5cf6'];
-    const datasets=[];
-    funds.forEach((f,i)=>{
-      const data=allDates.map(d=>logs.filter(l=>l.fundId===f.id&&l.date<=d).reduce((s,l)=>s+(l.amount||0),0));
-      datasets.push({label:f.name,data,borderColor:colors[i%colors.length],borderWidth:2,pointRadius:2,tension:0.3,fill:false});
-      if(legend)legend.innerHTML+='<span><span style="display:inline-block;width:10px;height:3px;background:'+colors[i%colors.length]+';vertical-align:middle;margin-right:4px"></span>'+f.name+'</span>';
-    });
-    const totalData=allDates.map(d=>logs.filter(l=>l.date<=d).reduce((s,l)=>s+(l.amount||0),0));
-    datasets.push({label:'總計',data:totalData,borderColor:'#64748b',borderWidth:2,pointRadius:2,tension:0.3,borderDash:[4,4],fill:false});
-    if(legend)legend.innerHTML+='<span style="color:#64748b">-- 總計</span>';
-    const labels=allDates.map(d=>d.slice(5).replace('-','/'));
-    if(window.Chart){
-      new window.Chart(canvas,{
-        type:'line',data:{labels,datasets},
-        options:{responsive:true,maintainAspectRatio:false,
-          interaction:{mode:'index',intersect:false},
-          plugins:{legend:{display:false},tooltip:{
-            backgroundColor:'rgba(255,255,255,0.97)',titleColor:'#0b0b0b',bodyColor:'#52514e',
-            borderColor:'rgba(11,11,11,0.1)',borderWidth:1,padding:8,cornerRadius:8,
-            callbacks:{label:ctx=>ctx.dataset.label+'：$'+ctx.raw.toLocaleString()}
-          }},
-          scales:{
-            x:{grid:{display:false},ticks:{font:{size:9},color:'#898781',maxRotation:0,maxTicksLimit:8}},
-            y:{position:'right',min:0,grid:{color:'rgba(0,0,0,0.04)'},ticks:{font:{size:9},color:'#898781',callback:v=>'$'+(v/10000).toFixed(0)+'萬'},border:{display:false}}
-          }
-        }
-      });
-    }
+    drawFundAsChart(canvas);
   }
+}
+function drawFundAsChart(canvas){
+  const legend=canvas.closest('.fund-l3-as')?.querySelector('.fund-as-legend');
+  const funds=db.settings?.fundDeductions||[];
+  const logs=db.fundDeductionLogs||[];
+  if(logs.length===0){canvas.parentElement.innerHTML='<div style="text-align:center;color:#94a3b8;padding:16px;font-size:11px">尚無扣款紀錄</div>';return;}
+  crEnsurePlugin();
+  // 累積金額一律從第一筆開始算，只是切出要顯示的日期區段
+  const allDates=[...new Set(logs.map(l=>l.date))].sort().filter(d=>crIn(d,'fund'));
+  const colors=['#2563eb','#f97316','#16a34a','#8b5cf6'];
+  const datasets=[];
+  if(legend)legend.innerHTML='';
+  funds.forEach((f,i)=>{
+    const data=allDates.map(d=>logs.filter(l=>l.fundId===f.id&&l.date<=d).reduce((s,l)=>s+(l.amount||0),0));
+    datasets.push({label:f.name,data,borderColor:colors[i%colors.length],borderWidth:2,pointRadius:2,tension:0.3,fill:false});
+    if(legend)legend.innerHTML+='<span><span style="display:inline-block;width:10px;height:3px;background:'+colors[i%colors.length]+';vertical-align:middle;margin-right:4px"></span>'+f.name+'</span>';
+  });
+  const totalData=allDates.map(d=>logs.filter(l=>l.date<=d).reduce((s,l)=>s+(l.amount||0),0));
+  datasets.push({label:'總計',data:totalData,borderColor:'#64748b',borderWidth:2,pointRadius:2,tension:0.3,borderDash:[4,4],fill:false});
+  if(legend)legend.innerHTML+='<span style="color:#64748b">-- 總計</span>';
+  const labels=allDates;
+  if(!window.Chart)return;
+  if(canvas._ch){canvas._ch.destroy();canvas._ch=null;}
+  canvas._ch=new window.Chart(canvas,{
+    type:'line',data:{labels,datasets},
+    options:{responsive:true,maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{legend:{display:false},tooltip:{
+        backgroundColor:'rgba(255,255,255,0.97)',titleColor:'#0b0b0b',bodyColor:'#52514e',
+        borderColor:'rgba(11,11,11,0.1)',borderWidth:1,padding:8,cornerRadius:8,
+        callbacks:{label:ctx=>ctx.dataset.label+'：$'+ctx.raw.toLocaleString()}
+      }},
+      scales:{
+        x:{grid:{display:false},ticks:{font:{size:9},color:'#898781',maxRotation:0,maxTicksLimit:8}},
+        y:{position:'right',min:0,grid:{color:'rgba(0,0,0,0.04)'},ticks:{font:{size:9},color:'#898781',callback:v=>'$'+(v/10000).toFixed(0)+'萬'},border:{display:false}}
+      }
+    }
+  });
+  crDecorate(canvas._ch,labels,'fund');
 }
 
 function delLineBankProtected(id){
@@ -11721,7 +11740,7 @@ function renderAssetsPage(){
                   <button onclick="toggleFundL3As(this)" style="padding:2px 8px;background:#fff;border:0.5px solid #fde68a;border-radius:5px;font-size:10px;cursor:pointer;color:#374151;font-weight:600">📈 趨勢 ▶</button>
                 </div>
                 <div class="fund-l3-as" style="display:none;margin-top:8px">
-                  <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:6px">📈 累積投入走勢</div>
+                  <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px"><span style="font-size:11px;font-weight:700;color:#64748b">📈 累積投入走勢</span>${crBarHTML('fund','mqya')}</div>
                   <div class="fund-as-legend" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px;font-size:10px;color:#64748b"></div>
                   <div style="position:relative;height:160px"><canvas class="fund-as-canvas"></canvas></div>
                 </div>
@@ -12035,15 +12054,72 @@ function renderTrendPage(){
   renderTrendPageTable();
 }
 
+// ══ 趨勢圖時間範圍（所有趨勢圖共用同一套）══
+const CR_NAMES={m:'當月',q:'近3月',y:'當年',a:'全部'};
+let _chartRange={};
+try{_chartRange=JSON.parse(localStorage.getItem('chartRange_v1')||'{}')||{};}catch(e){_chartRange={};}
+const CR_RENDER={
+  trend:()=>renderTrendPageChart(),
+  ov:()=>renderOvTrend(),
+  fam:()=>renderFamilyTrendChart(window._curFamilyAcc),
+  journal:()=>renderJournalChart(),
+  div:()=>renderDivChart(),
+  fund:()=>document.querySelectorAll('.fund-as-canvas').forEach(cv=>{if(cv.dataset.inited)drawFundAsChart(cv);})
+};
+function crGet(key){return CR_NAMES[_chartRange[key]]?_chartRange[key]:'a';}
+function crSet(key,v){
+  _chartRange[key]=v;
+  try{localStorage.setItem('chartRange_v1',JSON.stringify(_chartRange));}catch(e){}
+  document.querySelectorAll('.crbar[data-k="'+key+'"]').forEach(el=>el.outerHTML=crBarHTML(key,el.dataset.o));
+  try{CR_RENDER[key]&&CR_RENDER[key]();}catch(e){console.warn('chart range',e);}
+}
+function crBarHTML(key,opts){
+  opts=opts||'mqya'; const cur=crGet(key);
+  return `<span class="crbar" data-k="${key}" data-o="${opts}" style="display:inline-flex;gap:4px;align-items:center">${opts.split('').map(v=>`<button type="button" onclick="event.stopPropagation();crSet('${key}','${v}')" style="padding:2px 10px;border-radius:999px;font-size:10px;font-weight:700;cursor:pointer;border:1px solid ${cur===v?'#93c5fd':'#e2e8f0'};background:${cur===v?'#eff6ff':'#fff'};color:${cur===v?'#1d4ed8':'#64748b'}">${CR_NAMES[v]}</button>`).join('')}</span>`;
+}
+// 日期是否落在目前選的範圍內（日期格式 YYYY-MM-DD 或 YYYY-MM）
+function crIn(dateStr,key){
+  const r=crGet(key), d=(dateStr||'').slice(0,10), t=_twToday();
+  if(r==='m')return d.slice(0,7)===t.slice(0,7);
+  if(r==='y')return d.slice(0,4)===t.slice(0,4);
+  if(r==='q')return d>=_addDays(t,-91).slice(0,d.length);
+  return true;
+}
+// 畫完圖後統一調整：日期標籤自動拉開、資料多時隱藏小圓點、沒資料時顯示提示
+function crEnsurePlugin(){
+  if(window._crPluginOk||!window.Chart)return;
+  window.Chart.register({id:'crEmpty',afterDraw(ch){
+    if(!ch.$crEmpty)return;const a=ch.chartArea;if(!a)return;const x=ch.ctx;
+    x.save();x.font='600 12px sans-serif';x.fillStyle='#94a3b8';x.textAlign='center';
+    x.fillText(ch.$crEmpty,(a.left+a.right)/2,(a.top+a.bottom)/2);x.restore();
+  }});
+  window._crPluginOk=true;
+}
+function crDecorate(chart,dates,key,keepPoints){
+  if(!chart)return;
+  const n=dates.length;
+  const span=n>1?_dayDiff(dates[n-1].slice(0,10).padEnd(10,'-01').slice(0,10),dates[0].slice(0,10).padEnd(10,'-01').slice(0,10)):0;
+  const fmt=d=>{d=d||'';if(d.length<=7)return d.slice(2,4)+'/'+d.slice(5,7);return span>400?d.slice(2,4)+'/'+d.slice(5,7):d.slice(5,7)+'/'+d.slice(8,10);};
+  const x=chart.options.scales&&chart.options.scales.x;
+  if(x){x.ticks=Object.assign({},x.ticks||{},{autoSkip:true,maxTicksLimit:8,maxRotation:0,minRotation:0,
+    callback:function(v,i){const l=this.getLabelForValue?this.getLabelForValue(v):dates[i];return fmt(l);}});}
+  if(n>60&&!keepPoints)chart.data.datasets.forEach(ds=>{if(typeof ds.pointRadius!=='function'){ds.pointRadius=0;ds.pointHoverRadius=5;}});
+  const slot=document.getElementById('crslot-'+key);
+  if(slot&&!slot.firstChild)slot.innerHTML=crBarHTML(key,key==='div'?'ya':'mqya');
+  chart.$crEmpty=n===0?`這段期間（${CR_NAMES[crGet(key)]}）還沒有資料`:'';
+  chart.update();
+}
+
 function renderTrendPageChart(){
   const canvas=document.getElementById('trend-page-canvas');
   if(!canvas)return;
-  const snaps=(db.snapshots||[]).slice().sort((a,b)=>(a.ym||'').slice(0,10).localeCompare((b.ym||'').slice(0,10)));
-  if(snaps.length===0)return;
+  crEnsurePlugin();
+  const snaps=(db.snapshots||[]).slice().sort((a,b)=>(a.ym||'').slice(0,10).localeCompare((b.ym||'').slice(0,10))).filter(s=>crIn(s.ym,'trend'));
+  if((db.snapshots||[]).length===0)return;
   const showNet=document.getElementById('tp-tc-net')?.checked;
   const showIndex=document.getElementById('tp-tc-index')?.checked;
   const showDiv=document.getElementById('tp-tc-div')?.checked;
-  const labels=snaps.map(s=>s.ym.length>7?s.ym.slice(5):s.ym);
+  const labels=snaps.map(s=>s.ym.slice(0,10));
   const parent=canvas.parentElement;
   canvas.width=parent.offsetWidth||600;canvas.height=280;
   const ctx=canvas.getContext('2d');
@@ -12064,11 +12140,12 @@ function renderTrendPageChart(){
         tooltip:{backgroundColor:'rgba(17,24,39,.88)',padding:10,cornerRadius:8,bodyFont:{family:"'JetBrains Mono',monospace",size:11}}},
       scales:{
         x:{grid:{color:'rgba(0,0,0,.04)'},ticks:{font:{size:10},color:'#9ca3af'}},
-        yL:{position:'left',grid:{color:'rgba(0,0,0,.04)'},ticks:{font:{size:10},color:'#9ca3af',callback:v=>v>=1000000?'$'+(v/1000000).toFixed(1)+'M':'$'+(v/1000).toFixed(0)+'K'}},
-        yR:{position:'right',display:!!showIndex,grid:{drawOnChartArea:false},ticks:{font:{size:10},color:'#a8c5a0',callback:v=>Math.round(v/1000)+'K'}}
+        yL:{position:'left',grid:{color:'rgba(0,0,0,.04)'},ticks:{font:{size:10},color:'#9ca3af',callback:v=>v>=1000000?'$'+(v/1000000).toFixed(crGet('trend')==='a'||crGet('trend')==='y'?1:2)+'M':'$'+(v/1000).toFixed(0)+'K'}},
+        yR:{position:'right',display:!!showIndex,grid:{drawOnChartArea:false},ticks:{font:{size:10},color:'#a8c5a0',callback:v=>(crGet('trend')==='m'||crGet('trend')==='q'?(v/1000).toFixed(1):Math.round(v/1000))+'K'}}
       }
     }
   });
+  crDecorate(_trendPageChart,labels,'trend');
   // 強制套用高度
   setTimeout(()=>{
     canvas.style.height='240px';
@@ -12267,15 +12344,16 @@ function renderOvKpi(){
 function renderOvTrend(){
   const canvas=document.getElementById('ov-trend-canvas');
   if(!canvas)return;
-  const snaps=(db.snapshots||[]).slice().sort((a,b)=>(a.ym||'').slice(0,10).localeCompare((b.ym||'').slice(0,10)));
-  if(snaps.length===0){canvas.style.display='none';return;}
+  crEnsurePlugin();
+  if((db.snapshots||[]).length===0){canvas.style.display='none';return;}
+  const snaps=(db.snapshots||[]).slice().sort((a,b)=>(a.ym||'').slice(0,10).localeCompare((b.ym||'').slice(0,10))).filter(s=>crIn(s.ym,'ov'));
 
   // 設定 canvas 大小
   const parent=canvas.parentElement;
   canvas.width=parent.offsetWidth||400;
   canvas.height=220;
 
-  const labels=snaps.map(s=>s.ym.length>7?s.ym.slice(5):s.ym);
+  const labels=snaps.map(s=>s.ym.slice(0,10));
   const data=snaps.map(s=>s.net);
 
   const ctx2=canvas.getContext('2d');
@@ -12344,6 +12422,7 @@ function renderOvTrend(){
       }
     }
   });
+  crDecorate(_ovTrendChart,labels,'ov');
 }
 
 // ── 資產分佈甜甜圈（總覽版）──
@@ -12523,10 +12602,7 @@ function renderOvJournal(){
     '極度恐慌':'background:#f3e8ff;color:#7e22ce'
   };
   el.innerHTML=journals.map(j=>{
-    const tags=(j.tags||[]).slice(0,3).map(t=>{
-      const style=tagColors[t]||'background:#f1f5f9;color:#374151';
-      return`<span style="${style};padding:1px 6px;border-radius:4px;font-size:10px;font-weight:600">${t}</span>`;
-    }).join('');
+    const tags=jChipsHTML(j);
     const markets=[j.market,j.market2,j.market3].filter(Boolean);
     return`<div class="ov-j-item" onclick="openSP('journal');setTimeout(()=>openJournalModal('${j.id}'),300)">
       <div class="ov-j-date">${j.date}</div>
@@ -12626,8 +12702,18 @@ function renderJournalReadMode(id){
   set('jdr-date',j.date||'');
 
   // 標籤
-  const tags=(j.tags||[]).map(t=>`<span style="${tagColors[t]||'background:#f1f5f9;color:#374151'};padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700">${t}</span>`).join('');
-  set('jdr-tags',tags);
+  set('jdr-tags',jChipsHTML(j));
+  const mf=document.getElementById('jdr-moodfill');
+  if(mf){
+    if(jMeta(j).mood){mf.style.display='none';mf.innerHTML='';}
+    else{
+      mf.style.display='';
+      mf.innerHTML=`<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:10px 12px">
+        <div style="font-size:12px;font-weight:700;color:#92400e;margin-bottom:8px">⚠️ 這篇還沒標心情，寫下這篇時你的心情是？（點一下就存）</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">${[1,2,3,4,5].map(v=>`<button type="button" class="jp-btn" onclick="jQuickMood('${j.id}',${v})">${J_MOODS[v].e} ${J_MOODS[v].t}</button>`).join('')}</div>
+      </div>`;
+    }
+  }
 
   // 大盤環境（大標題）
   const marketEl=document.getElementById('jdr-market');
@@ -12665,12 +12751,14 @@ function renderJournalReadMode(id){
   const metaEl=document.getElementById('jdr-meta');
   if(metaEl){
     let html='';
-    if(j.eventCat)html+=`<span style="background:#fef3c7;color:#92400e;padding:4px 12px;border-radius:6px;font-size:12px;font-weight:700">📂 ${j.eventCat}</span>`;
-    if(j.behavior)html+=`<span style="background:#f3e8ff;color:#7e22ce;padding:4px 12px;border-radius:6px;font-size:12px;font-weight:700">🎯 ${j.behavior}</span>`;
     (j.stockTags||[]).forEach(t=>html+=`<span style="background:#eff6ff;color:#2563eb;padding:4px 12px;border-radius:6px;font-size:12px;font-weight:700">${t}</span>`);
     metaEl.innerHTML=html;
     metaEl.style.display=html?'flex':'none';
   }
+
+  // 事後大盤 + 相似案例
+  const afEl=document.getElementById('jdr-after');
+  if(afEl){const h=jAfterBlockHTML(j);afEl.innerHTML=h;afEl.style.display=h?'':'none';}
 
   // 回測
   const btEl=document.getElementById('jdr-backtest');
@@ -12723,24 +12811,8 @@ function fillJournalEditForm(id){
   sv('j-event-cat',j?.eventCat||'');
   sv('j-behavior',j?.behavior||'');
 
-  ['bull','bear','buy','sell','alert','panic','youtube'].forEach(t=>{
-    const tagMap={bull:'看多',bear:'看空',buy:'買入',sell:'賣出',alert:'重大事項',panic:'極度恐慌',youtube:'YouTube'};
-    const cb=document.getElementById('jtag-'+t);
-    const lb=document.getElementById('dtag-'+t);
-    if(cb){cb.checked=(j?.tags||[]).includes(tagMap[t]);}
-    if(lb){
-      lb.classList.toggle('checked',cb?.checked||false);
-      // youtube 的 onchange 由 HTML 的 toggleYoutubeUrl 處理，不覆蓋
-      if(t!=='youtube'){cb.onchange=()=>lb.classList.toggle('checked',cb.checked);}
-      else if(cb){cb.onchange=function(){toggleYoutubeUrl(this);};}
-    }
-  });
-
-  // YouTube 網址還原
-  const ytChecked=(j?.tags||[]).includes('YouTube');
-  const ytWrap=document.getElementById('youtube-url-wrap');
+  jSetPicks(jMeta(j||{}));
   const ytUrl=document.getElementById('j-youtube-url');
-  if(ytWrap)ytWrap.style.display=ytChecked?'block':'none';
   if(ytUrl)ytUrl.value=j?.youtubeUrl||'';
 
   // 圖片：同步到 _jImgs 暫存（儲存時需要）
@@ -12764,6 +12836,7 @@ function fillJournalEditForm(id){
         if(draft.marketUrl)sv('j-market-url',draft.marketUrl);
         if(draft.marketUrl2)sv('j-market-url2',draft.marketUrl2);
         if(draft.marketUrl3)sv('j-market-url3',draft.marketUrl3);
+        if(draft.picks)jSetPicks(draft.picks);
         if(draft.content)sv('j-content',draft.content);
         if(draft.date)sv('j-date',draft.date);
       } else clearJournalDraft();
@@ -12806,9 +12879,133 @@ function toggleJournalPageChart(){
   if(!isOpen)renderJournalChart();
 }
 
+// ══ 日誌回顧：事後大盤走勢（用日誌當天大盤 + 每週快照大盤，取最接近的日期）══
+function jIndexSeries(){
+  const map={};
+  (db.snapshots||[]).forEach(s=>{if(s.ym&&s.indexVal)map[s.ym]=s.indexVal;});
+  (db.journals||[]).forEach(j=>{if(j.date&&j.indexVal)map[j.date]=j.indexVal;});
+  return Object.keys(map).sort().map(d=>({d,v:map[d]}));
+}
+function _dayDiff(a,b){return Math.round((new Date(a+'T00:00:00Z')-new Date(b+'T00:00:00Z'))/86400000);}
+// 回傳 {ret, date} 或 {pending:true}（還沒到期）或 null（附近沒有資料）
+function jAfter(j,days,series){
+  if(!j||!j.indexVal||!j.date)return null;
+  series=series||jIndexSeries();
+  const target=_addDays(j.date,days);
+  const last=series.length?series[series.length-1].d:'';
+  const tol=days<=7?3:days<=30?6:10;
+  if(_dayDiff(target,last)>tol)return{pending:true};
+  let best=null;
+  series.forEach(p=>{if(p.d<=j.date)return;const dd=Math.abs(_dayDiff(p.d,target));if(dd<=tol&&(!best||dd<best.dd))best={...p,dd};});
+  if(!best)return null;
+  return{ret:(best.v/j.indexVal-1)*100,date:best.d};
+}
+function jFmtRet(r){
+  if(!r)return'<span style="color:#cbd5e1">—</span>';
+  if(r.pending)return'<span style="color:#94a3b8;font-size:.85em">未到期</span>';
+  return`<span style="color:${r.ret>=0?'#dc2626':'#16a34a'}">${r.ret>=0?'+':''}${r.ret.toFixed(1)}%</span>`;
+}
+function jSimilar(j,series){
+  const m=jMeta(j); const g=jMoodGroup(m.mood);
+  const useCat=m.cat&&m.cat!=='無特定事件';
+  if(!useCat&&!g)return{list:[],label:''};
+  const list=(db.journals||[]).filter(x=>{
+    if(x.id===j.id)return false;
+    const mx=jMeta(x);
+    if(useCat&&mx.cat!==m.cat)return false;
+    if(g&&jMoodGroup(mx.mood)!==g)return false;
+    return true;
+  }).sort((a,b)=>b.date.localeCompare(a.date));
+  const grpTxt={neg:'😱😤 恐慌／煩躁',pos:'😊💪 安心／信心',neu:'😐 平靜'}[g]||'';
+  return{list,label:[useCat?m.cat:'',grpTxt].filter(Boolean).join(' × ')};
+}
+function jInsight(j,r1m){
+  if(!r1m||r1m.pending||r1m.ret==null)return'';
+  const m=jMeta(j), up=r1m.ret>=0, pct=(up?'+':'')+r1m.ret.toFixed(1)+'%';
+  const act=m.action;
+  if(jMoodGroup(m.mood)==='neg'){
+    if(up)return`當時${J_MOODS[m.mood].t}，但 1 個月後大盤 ${pct}`+(act==='賣出'||act==='減碼'?'，事後看是賣早了':act==='買入'||act==='加碼'?'，逆勢布局是對的':act==='沒動作'?'，抱住不動是對的':'');
+    return`當時${J_MOODS[m.mood].t}，1 個月後大盤確實 ${pct}`+(act==='賣出'||act==='減碼'?'，降低部位是對的':'');
+  }
+  if(jMoodGroup(m.mood)==='pos'){
+    if(!up)return`當時${J_MOODS[m.mood].t}，但 1 個月後大盤 ${pct}，要留意過度樂觀`;
+    return`當時${J_MOODS[m.mood].t}，1 個月後大盤 ${pct}，判斷正確`;
+  }
+  return'';
+}
+function jAfterBlockHTML(j){
+  const series=jIndexSeries();
+  const r=[7,30,90].map(d=>jAfter(j,d,series));
+  if(!j.indexVal)return'';
+  const cell=(t,x)=>`<div style="flex:1;background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:6px 8px"><div style="font-size:10px;color:#94a3b8">${t}</div><div style="font-size:16px;font-weight:800;font-family:'JetBrains Mono',monospace">${jFmtRet(x)}</div></div>`;
+  const ins=jInsight(j,r[1]);
+  const sim=jSimilar(j,series);
+  let simHtml='';
+  if(sim.list.length){
+    const rows=sim.list.slice(0,5).map(x=>{const rr=jAfter(x,30,series);const t=(jTitles(x)[0]?.t||x.content||'').slice(0,26);
+      return`<div onclick="openJournalDrawer('${x.id}')" style="display:flex;justify-content:space-between;gap:8px;padding:3px 0;cursor:pointer;font-size:12px"><span style="color:#475569;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${x.date.slice(5)} ${t}</span><span style="font-family:'JetBrains Mono',monospace;flex-shrink:0">${jFmtRet(rr)}</span></div>`;}).join('');
+    const vals=sim.list.map(x=>jAfter(x,30,series)).filter(x=>x&&!x.pending&&x.ret!=null).map(x=>x.ret);
+    const avg=vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:null;
+    const ups=vals.filter(v=>v>=0).length;
+    simHtml=`<div style="border-top:1px dashed #e2e8f0;margin-top:10px;padding-top:8px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:#1e293b;margin-bottom:4px"><span>🔁 相似案例：${sim.label}（${sim.list.length} 次）</span>${avg!=null?`<span style="font-weight:600;color:#64748b">1個月後 ${ups}/${vals.length} 次上漲 · 平均 ${jFmtRet({ret:avg})}</span>`:''}</div>${rows}</div>`;
+  }
+  return`<div style="background:#f8fafc;border-radius:10px;padding:12px 14px">
+    <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:8px">⏳ 事後大盤走勢 <span style="font-weight:400;color:#94a3b8">（當天 ${Math.round(j.indexVal).toLocaleString()} 點）</span></div>
+    <div style="display:flex;gap:6px">${cell('1 週後',r[0])}${cell('1 個月後',r[1])}${cell('3 個月後',r[2])}</div>
+    ${ins?`<div style="font-size:12px;color:#334155;margin-top:8px">💡 ${ins}</div>`:''}
+    ${simHtml}
+  </div>`;
+}
+// 日誌頁上方的回顧儀表
+// 舊日誌補心情：在閱讀畫面點一下就存，並可跳到下一篇待補
+function jNoMoodList(){return (db.journals||[]).filter(x=>!jMeta(x).mood).sort((a,b)=>b.date.localeCompare(a.date));}
+function jQuickMood(id,v){
+  const j=(db.journals||[]).find(x=>x.id===id); if(!j)return;
+  j.jMood=v;
+  save();
+  renderJournalReadMode(id);
+  try{renderJournalPage();}catch(e){}
+  try{renderOvJournal();}catch(e){}
+  try{renderJournal();}catch(e){}
+  const left=jNoMoodList();
+  const mf=document.getElementById('jdr-moodfill');
+  if(mf){
+    mf.style.display='';
+    mf.innerHTML=`<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+      <span style="font-size:12px;font-weight:700;color:#166534">✅ 已補上 ${J_MOODS[v].e} ${J_MOODS[v].t}${left.length?`，還有 ${left.length} 篇待補`:'，全部補完了 🎉'}</span>
+      ${left.length?`<button type="button" onclick="openJournalDrawer('${left[0].id}')" style="padding:4px 12px;border-radius:999px;border:1px solid #86efac;background:#fff;color:#166534;font-size:12px;font-weight:700;cursor:pointer">下一篇待補 →</button>`:''}
+    </div>`;
+  }
+}
+function renderJournalReview(){
+  const el=document.getElementById('journal-review'); if(!el)return;
+  const series=jIndexSeries(); const J=db.journals||[];
+  const stat=fn=>{const L=J.filter(fn);const v=L.map(x=>jAfter(x,30,series)).filter(x=>x&&!x.pending&&x.ret!=null);return{n:L.length,done:v.length,up:v.filter(x=>x.ret>=0).length,avg:v.length?v.reduce((a,b)=>a+b.ret,0)/v.length:null};};
+  const neg=stat(x=>jMoodGroup(jMeta(x).mood)==='neg'), pos=stat(x=>jMoodGroup(jMeta(x).mood)==='pos'), st=stat(x=>jMeta(x).star);
+  const card=(title,s,onc)=>`<div onclick="${onc}" style="flex:1;min-width:150px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:10px 12px;cursor:pointer">
+    <div style="font-size:12px;color:#64748b">${title}（${s.n} 次）</div>
+    <div style="font-size:15px;font-weight:800;color:#1e293b;margin-top:2px">${s.done?`1個月後 ${s.up}/${s.done} 次上漲`:'資料累積中'}</div>
+    <div style="font-size:11px;color:#94a3b8">${s.avg!=null?'平均 '+(s.avg>=0?'+':'')+s.avg.toFixed(1)+'%':'點擊查看清單'}</div></div>`;
+  el.innerHTML=`<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+    ${card('😱😤 恐慌／煩躁的日子',neg,"jReviewFilter('journal-mood-page','mg:neg')")}
+    ${card('😊💪 安心／信心的日子',pos,"jReviewFilter('journal-mood-page','mg:pos')")}
+    ${card('⭐ 重大事項',st,"jReviewFilter('journal-tag-page','star')")}
+  </div>${(()=>{const L=jNoMoodList();return L.length?`<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:8px 12px;margin-bottom:10px">
+    <span style="font-size:12px;font-weight:700;color:#92400e">⚠️ 還有 ${L.length} 篇日誌沒標心情，補上後上面的統計會更準</span>
+    <span style="display:flex;gap:6px"><button type="button" onclick="jReviewFilter('journal-mood-page','nomood')" style="padding:4px 12px;border-radius:999px;border:1px solid #fcd34d;background:#fff;color:#92400e;font-size:12px;font-weight:700;cursor:pointer">只看這些</button><button type="button" onclick="openJournalDrawer('${L[0].id}')" style="padding:4px 12px;border-radius:999px;border:none;background:#f59e0b;color:#fff;font-size:12px;font-weight:700;cursor:pointer">開始逐篇補 →</button></span>
+  </div>`:'';})()}`;
+}
+function jReviewFilter(id,val){
+  const s=document.getElementById(id); if(!s)return;
+  s.value=(s.value===val)?'':val; renderJournalPage();
+}
+
 function renderJournalPage(){
   const container=document.getElementById('journal-page-list');
   if(!container)return;
+  renderJournalReview();
+  const _series=jIndexSeries();
 
   const q=(document.getElementById('journal-search-page')?.value||'').toLowerCase();
   const selYear=document.getElementById('journal-year-page')?.value||'all';
@@ -12823,7 +13020,9 @@ function renderJournalPage(){
 
   let list=[...(db.journals||[])].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
   if(selYear!=='all')list=list.filter(j=>(j.date||'').startsWith(selYear));
-  if(selTag)list=list.filter(j=>(j.tags||[]).includes(selTag));
+  if(selTag)list=list.filter(j=>jMatch(j,selTag));
+  const selPageMood=document.getElementById('journal-mood-page')?.value||'';
+  if(selPageMood)list=list.filter(j=>jMatch(j,selPageMood));
   if(q)list=list.filter(j=>(j.market||'').toLowerCase().includes(q)||(j.market2||'').toLowerCase().includes(q)||(j.market3||'').toLowerCase().includes(q)||(j.content||'').toLowerCase().includes(q));
 
   const tagColors={'看多':'background:#dbeafe;color:#1d4ed8','看空':'background:#dcfce7;color:#15803d',
@@ -12836,7 +13035,7 @@ function renderJournalPage(){
   }
 
   container.innerHTML=list.map(j=>{
-    const tags=(j.tags||[]).map(t=>`<span style="${tagColors[t]||'background:#f1f5f9;color:#374151'};padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600">${t}</span>`).join('');
+    const tags=jChipsHTML(j)+(jMeta(j).mood?'':'<span style="display:inline-block;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700;margin:0 4px 2px 0;background:#fffbeb;color:#b45309;border:1px dashed #fcd34d">⚠️ 待補心情</span>');
     const markets=[j.market,j.market2,j.market3].filter(Boolean);
     const hasBt=j.backtest?.ret!=null;
     const btColor=hasBt?(j.backtest.ret>=0?'#dc2626':'#16a34a'):'#9ca3af';
@@ -12852,7 +13051,8 @@ function renderJournalPage(){
             : `<div style="font-size:13px;font-weight:600;color:#1e293b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${(j.content||'（無標題）').slice(0,80)}</div>`
           }
         </div>
-        <div style="display:flex;gap:4px;flex-wrap:wrap">${tags}${j.eventCat?`<span style="background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600">${j.eventCat}</span>`:''}${j.behavior?`<span style="background:#f3e8ff;color:#7e22ce;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600">${j.behavior}</span>`:''}</div>
+        <div style="display:flex;gap:0;flex-wrap:wrap">${tags}</div>
+        ${j.indexVal?`<div style="font-size:11px;color:#94a3b8;margin-top:3px;font-family:'JetBrains Mono',monospace">事後大盤 1週 ${jFmtRet(jAfter(j,7,_series))} · 1月 ${jFmtRet(jAfter(j,30,_series))} · 3月 ${jFmtRet(jAfter(j,90,_series))}</div>`:''}
 
       </div>
       ${hasBt?`<div style="font-size:12px;font-weight:800;color:${btColor};white-space:nowrap;font-family:'JetBrains Mono',monospace">${j.backtest.ret>=0?'+':''}${j.backtest.ret.toFixed(1)}%</div>`:''}
@@ -14607,6 +14807,12 @@ function renderFamilyTrendChart(acc){
     curMktFinal=Math.round(curMkt*pct);
     mktDataFinal=allDates.map(d=>mktMap[d]!=null?Math.round(mktMap[d]*pct):null);
   }
+  // 時間範圍：先用全部資料算好累積成本，再切出要顯示的區段
+  crEnsurePlugin();
+  const _keep=allDates.map((d,i)=>crIn(d,'fam')?i:-1).filter(i=>i>=0);
+  const datesShown=_keep.map(i=>allDates[i]);
+  costDataFinal=_keep.map(i=>costDataFinal[i]);
+  mktDataFinal=_keep.map(i=>mktDataFinal[i]);
 
   // 方案C 漸層風格
   const ctx2=canvas.getContext('2d');
@@ -14625,7 +14831,7 @@ function renderFamilyTrendChart(acc){
     borderColor:'rgba(37,99,235,0.3)',borderWidth:1.5,
     backgroundColor:gradCost,
     tension:0.45,fill:true,spanGaps:true,
-    pointRadius:ctx=>ctx.raw!=null&&costByDate[allDates[ctx.dataIndex]]!==undefined?5:0,
+    pointRadius:ctx=>ctx.raw!=null&&costByDate[datesShown[ctx.dataIndex]]!==undefined?(datesShown.length>60?3:5):0,
     pointHoverRadius:8,
     pointBackgroundColor:'#2563eb',pointBorderColor:'#fff',pointBorderWidth:2
   });
@@ -14634,7 +14840,7 @@ function renderFamilyTrendChart(acc){
     borderColor:curMktFinal>=lastCostFinal?'rgba(220,38,38,0.3)':'rgba(22,163,74,0.3)',borderWidth:1.5,
     backgroundColor:gradMkt,
     tension:0.45,fill:true,spanGaps:true,
-    pointRadius:ctx=>ctx.raw!=null?5:0,
+    pointRadius:ctx=>ctx.raw!=null?(datesShown.length>60?0:5):0,
     pointHoverRadius:8,
     pointBackgroundColor:mktColor,pointBorderColor:'#fff',pointBorderWidth:2
   });
@@ -14642,7 +14848,7 @@ function renderFamilyTrendChart(acc){
   if(_familyTrendChart)_familyTrendChart.destroy();
   _familyTrendChart=new Chart(canvas,{
     type:'line',
-    data:{labels:allDates,datasets},
+    data:{labels:datesShown,datasets},
     options:{
       responsive:true,maintainAspectRatio:false,
       plugins:{
@@ -14662,7 +14868,7 @@ function renderFamilyTrendChart(acc){
           border:{dash:[4,4]}
         },
         y:{
-          type:'logarithmic',
+          type:crGet('fam')==='a'?'logarithmic':'linear',
           grid:{color:'rgba(0,0,0,0.04)',lineWidth:1},
           ticks:{callback:v=>'$'+(v>=10000?(v/10000).toFixed(0)+'萬':v>=1000?(v/1000).toFixed(0)+'K':v),font:{size:10},color:'#94a3b8'},
           border:{dash:[4,4]}
@@ -14670,6 +14876,7 @@ function renderFamilyTrendChart(acc){
       }
     }
   });
+  crDecorate(_familyTrendChart,datesShown,'fam');
 }
 
 function _renderInvestL1Body(){
