@@ -1572,7 +1572,7 @@
     {
       "id": "mncull1439i",
       "bank": "Line Bank",
-      "cash": 49500,
+      "cash": 49501,
       "d1Date": "",
       "d1": 0,
       "d2": 0
@@ -3038,7 +3038,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1792146911223,
+  "_ts": 1792321687862,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -8291,7 +8291,7 @@
     }
   ],
   "mobile_cache": {
-    "updatedAt": "2026-10-16",
+    "updatedAt": "2026-10-18",
     "invest": {
       "activeCount": 2,
       "nearAmt": 0,
@@ -8433,49 +8433,49 @@
         "bank": "line Bank-1",
         "monthly": 17807,
         "deductDay": "13號",
-        "days": 28,
+        "days": 26,
         "pct": 60,
         "paid": 27,
         "remain": 18,
         "ok": true,
-        "diff": 9798
+        "diff": 9799
       },
       {
         "bank": "line Bank-2",
         "monthly": 6319,
         "deductDay": "14號",
-        "days": 29,
+        "days": 27,
         "pct": 40,
         "paid": 22,
         "remain": 33,
         "ok": true,
-        "diff": 3479
+        "diff": 3480
       },
       {
         "bank": "line Bank-4",
         "monthly": 12400,
         "deductDay": "1號",
-        "days": 16,
+        "days": 14,
         "pct": 41,
         "paid": 14,
         "remain": 20,
         "ok": true,
-        "diff": 37100
+        "diff": 37101
       },
       {
         "bank": "line Bank-5",
         "monthly": 9495,
         "deductDay": "12號",
-        "days": 27,
+        "days": 25,
         "pct": 29,
         "paid": 10,
         "remain": 25,
         "ok": true,
-        "diff": 27605
+        "diff": 27606
       }
     ],
     "loanTotal": 1025458,
     "monthLoan": 46021,
-    "cashTotal": 49509
+    "cashTotal": 49510
   }
 }
