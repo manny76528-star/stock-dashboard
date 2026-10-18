@@ -3048,7 +3048,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1792342487610,
+  "_ts": 1792342497251,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -3150,7 +3150,8 @@
       "indexVal": 47111,
       "stockPrices": null,
       "aiAnalysis": null,
-      "images": []
+      "images": [],
+      "jMood": 2
     },
     {
       "id": "mv9ec8yktrn",
