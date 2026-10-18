@@ -310,6 +310,13 @@ body:not(.privacy) .privacy-mask{filter:none;}
 (function(){
   if(window.innerWidth < 768 && !window.location.search.includes('force=pc')){
     window.location.href = 'mobile.html';
+    return;
+  }
+  // 手機強制看電腦版：用電腦寬度 1280px 排版（可縮放），避免版面被擠成一條
+  if(Math.min(screen.width, window.innerWidth) < 1024 && window.location.search.includes('force=pc')){
+    let vp=document.querySelector('meta[name="viewport"]');
+    if(!vp){vp=document.createElement('meta');vp.name='viewport';document.head.appendChild(vp);}
+    vp.setAttribute('content','width=1280, initial-scale='+(Math.min(screen.width,window.innerWidth)/1280).toFixed(3)+', user-scalable=yes');
   }
 })();
 </script>
