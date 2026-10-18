@@ -1782,6 +1782,16 @@
       "perShare": 0.082,
       "amount": 106600,
       "pending": false
+    },
+    {
+      "id": "mvdsffqo4cv",
+      "code": "00981T",
+      "exDate": "2026-10-19",
+      "date": "2026-11-13",
+      "lots": 1300,
+      "perShare": 0.082,
+      "amount": 106600,
+      "pending": true
     }
   ],
   "snapshots": [
@@ -3038,7 +3048,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1792325610165,
+  "_ts": 1792325673307,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -8295,10 +8305,10 @@
     "updatedAt": "2026-10-18",
     "invest": {
       "activeCount": 2,
-      "nearAmt": 0,
-      "nearDate": "",
-      "nearDays": 0,
-      "surplus": -81897,
+      "nearAmt": 106600,
+      "nearDate": "2026-11-13",
+      "nearDays": 26,
+      "surplus": 24703,
       "totalMonthly": 81897,
       "totalPaidDiv": 811675,
       "targetDiv": 1500000,
