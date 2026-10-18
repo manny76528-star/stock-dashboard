@@ -4767,6 +4767,24 @@ async function refreshPricesBtn(){
   toast('✅ 價格已更新');
 }
 
+// 股價更新後：目前畫面上「所有」用到股價的地方一起重畫（不切頁、不捲動、不關掉家族詳細）
+function refreshAllPriceViews(){
+  const act=id=>document.getElementById('dbpage-'+id)?.classList.contains('active');
+  const run=(fn)=>{try{fn();}catch(e){console.warn('股價重畫略過:',e.message);}};
+  if(act('invest-l1')){
+    run(()=>{if(typeof _renderInvestL1Body==='function')_renderInvestL1Body();});
+    run(()=>{if(typeof curFamilyMember==='function'&&curFamilyMember())renderFamilyPage();
+             else if(typeof renderFamilyMemberCards==='function')renderFamilyMemberCards();});
+  }
+  if(act('overview'))run(()=>{if(typeof renderOvDashboard==='function')renderOvDashboard();});
+  if(act('assets'))run(()=>{renderAssetsPage();renderAssetsDeduct();});
+  if(act('invest'))run(()=>{if(typeof renderInvestPage==='function')renderInvestPage();});
+  if(act('watch'))run(()=>{if(typeof renderWatchPage==='function')renderWatchPage();});
+  if(act('pledge'))run(()=>{if(typeof renderPledgePage==='function')renderPledgePage();});
+  if(act('analytics'))run(()=>{if(typeof renderAnalytics==='function')renderAnalytics();});
+  if(act('dividend'))run(()=>{if(typeof renderDivs==='function')renderDivs();});
+}
+
 async function refreshPrices(){
   document.getElementById('pstat').innerHTML='<span class="spin"></span> 即時更新中...';
   const activeCodes=[...new Set(db.investments.filter(inv=>calcInv(inv).tLots>0).map(i=>i.code))];
@@ -4791,6 +4809,7 @@ async function refreshPrices(){
   if(watchOpen)renderWatchlist();
   if(typeof renderPledgeOvOnly==='function')renderPledgeOvOnly();
   updateWatchNavBadge();
+  refreshAllPriceViews();
   const n=new Date();
   const isAfterMarket=found.length===0&&notFound.length>0;
   let msg=isAfterMarket?'盤後 - 使用收盤價':'即時股價已更新 '+found.length+'檔';
