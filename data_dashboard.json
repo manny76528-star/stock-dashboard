@@ -3048,7 +3048,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1792338092296,
+  "_ts": 1792338100225,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -3136,8 +3136,8 @@
       "market": "美9月CPI高於預期！AI債務與油價風險 費半連跌8天",
       "market2": "韓股今年第10次熔斷 記憶體雙雄遭血洗、5大利空引爆賣壓",
       "market3": "",
-      "marketColor": "",
-      "market2Color": "",
+      "marketColor": "green",
+      "market2Color": "green",
       "market3Color": "",
       "marketUrl": "https://www.chinatimes.com/newspapers/20261018000353-260120?chdtv",
       "marketUrl2": "https://www.chinatimes.com/newspapers/20261018000353-260120?chdtv",
