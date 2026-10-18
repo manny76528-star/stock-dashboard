@@ -4789,7 +4789,8 @@ async function refreshPrices(){
   const pledgeCodes=(db.pledgeAssets||[]).map(a=>a.code).filter(Boolean);
   // 家族帳戶的股票也一起抓
   const familyCodes=Object.values(db.family?.accounts||{}).flatMap(acc=>(acc.holdings||[]).map(h=>h.code)).filter(Boolean);
-  const allCodes=[...new Set([...activeCodes,...watchCodes,...pledgeCodes,...familyCodes])];
+  const fpCodes=[...(db.finPlan?.bStocks||[]),...(db.finPlan?.cStocks||[])].map(s=>s.code).filter(Boolean);
+  const allCodes=[...new Set([...activeCodes,...watchCodes,...pledgeCodes,...familyCodes,...fpCodes])];
   if(allCodes.length===0){document.getElementById('pstat').innerHTML='無持股';return;}
 
   const found=[], notFound=[];
@@ -4852,6 +4853,23 @@ function buildLots(inv){
   return lots;
 }
 
+// ══ 台股交易成本：全系統唯一一套（主帳戶、家族、賣出試算都用這裡）══
+const TW_FEE_RATE=0.001425*0.28; // 手續費 2.8 折
+function twSellTaxRate(code,dateStr){
+  const c=String(code||'').toUpperCase();
+  const d=dateStr||new Date().toISOString().slice(0,10);
+  if(!/^00/.test(c))return 0.003;                 // 個股 0.3%
+  if(/B$/.test(c))return 0;                       // 被動式債券ETF 免徵
+  if(/D$/.test(c)&&d>='2027-01-01')return 0;      // 主動式債券ETF 2027 起免徵
+  return 0.001;                                   // 其餘 ETF 0.1%
+}
+function defaultBuyFee(gross){return gross>0?Math.max(1,Math.round(gross*TW_FEE_RATE)):0;}
+function defaultSellFee(code,gross,dateStr){return gross>0?Math.round(gross*TW_FEE_RATE)+Math.round(gross*twSellTaxRate(code,dateStr)):0;}
+function estSellCost(code,value,dateStr){
+  if(!value||value<=0)return 0;
+  return Math.round(value*TW_FEE_RATE)+Math.round(value*twSellTaxRate(code,dateStr));
+}
+
 function calcInv(inv){
   const lots=buildLots(inv);
   const active=lots.filter(l=>l.remaining>0);
@@ -4907,8 +4925,7 @@ function calcInv(inv){
   const curPrice=cp?cp.price:null;
   const mktVal=curPrice?tLots*1000*curPrice:null;
   // 未實現損益 = 市值 - 成本 - 預估賣出費用（手續費+證交稅）
-  const sellFeeRate=0.001425*0.28+0.003; // 手續費2.8折 + 證交稅0.3%
-  const estSellFee=mktVal!==null?Math.round(mktVal*sellFeeRate):0;
+  const estSellFee=mktVal!==null?estSellCost(inv.code,mktVal):0; // 預估賣出：手續費 + 依標的證交稅
   const pnl=mktVal!==null?mktVal-tCost-estSellFee:null;
   const pnlPct=tCost>0&&pnl!==null?pnl/tCost*100:null;
   const _td=new Date().toISOString().split('T')[0];
@@ -5215,8 +5232,7 @@ function renderInv(){
   const calcs=sortedInvs.map(inv=>({inv,c:calcInv(inv)}));
   calcs.forEach(({c})=>{tC+=c.tCost;if(c.mktVal)tM+=c.mktVal;tD+=c.moDivAmt;tDivTot+=c.divTot;});
   // 總損益也扣預估賣出費用，與各標的一致
-  const sellFeeRate=0.001425*0.28+0.003;
-  const tEstSellFee=tM>0?Math.round(tM*sellFeeRate):0;
+  const tEstSellFee=calcs.reduce((s,{inv,c})=>s+(c.mktVal?estSellCost(inv.code,c.mktVal):0),0);
   const chk=document.getElementById('roi-chk');if(chk)chk.checked=showDivRoi;
 
   calcs.forEach(({inv,c})=>{
@@ -6154,8 +6170,7 @@ function renderSum(){
   // 淨資產 = 股票市值（有報價）或成本（無報價）+ 現金 - 負債
   const invVal=tM>0?tM:tC;
   const tot=invVal+cT;
-  const sellFeeRate=0.001425*0.28+0.003;
-  const estSellFee=tM>0?Math.round(tM*sellFeeRate):0;
+  const estSellFee=db.investments.reduce((s,inv)=>{const cc=calcInv(inv);return s+(cc.mktVal?estSellCost(inv.code,cc.mktVal):0);},0);
   const pnl=tM-tC-estSellFee,roi=tC>0?pnl/tC*100:0;
   const roiInc=tC>0?(pnl+tDivTot)/tC*100:0;
   const dR=tot>0?lR/tot*100:0;
@@ -6461,7 +6476,8 @@ function updateSellSum(){
   const el=document.getElementById('sell-sum');
   if(!sLots){el.style.display='none';return;}
   const fee=Math.max(1,Math.round(sLots*1000*sp*0.001425*0.28));
-  const tax=Math.round(sLots*1000*sp*0.003);
+  const _sinv=db.investments.find(i=>i.id===sellInvId);
+  const tax=Math.round(sLots*1000*sp*twSellTaxRate(_sinv?.code));
   const rev=sLots*1000*sp-fee-tax;
   const pnl=rev-sCost,pct=sCost>0?pnl/sCost*100:0;
   el.style.display='block';
@@ -6488,8 +6504,8 @@ function saveSell(){
   });
   if(!ok)return;
   const fee=Math.max(1,Math.round(tLots*1000*price*0.001425*0.28));
-  const tax=Math.round(tLots*1000*price*0.003);
   const inv=db.investments.find(i=>i.id===sellInvId);
+  const tax=Math.round(tLots*1000*price*twSellTaxRate(inv?.code,date));
   if(hasVirtual){
     // Selling from virtual lot: first create a buy record for initial lots, then sell
     if(!inv.transactions)inv.transactions=[];
@@ -7515,7 +7531,7 @@ async function recordSnapshot(manual=false){
         name:inv.name||'',
         lots:c.tLots,
         price:price,
-        pnl:c.mktVal!=null?Math.round(c.mktVal-c.tCost):null
+        pnl:c.mktVal!=null?Math.round(c.mktVal-c.tCost-estSellCost(inv.code,c.mktVal)):null
       };
     }).filter(h=>h.lots>0)
   };
@@ -7736,7 +7752,7 @@ function openSnapDetail(ym){
       const c=calcInv(inv);
       if(c.tLots<=0)return null;
       const price=db.prices[inv.code]?.price||null;
-      const pnl=price!=null?Math.round(c.tLots*1000*price-c.tCost):null;
+      const pnl=price!=null?Math.round(c.tLots*1000*price-c.tCost-estSellCost(inv.code,c.tLots*1000*price)):null;
       return{code:inv.code,name:inv.name||'',lots:c.tLots,price,pnl};
     }).filter(Boolean);
   }
@@ -8315,6 +8331,7 @@ function toggleFpStocks(acct){
   if(arrow)arrow.textContent=isOpen?'▼':'▲';
 }
 
+function fpPrice(s){return (s&&db.prices?.[s.code]?.price)||s?.price||0;}
 function renderFpStocks(acct){
   const wrap=document.getElementById('fp-'+acct+'-stocks');
   if(!wrap)return;
@@ -8334,7 +8351,7 @@ function renderFpStocks(acct){
     // 彙整
     const totalShares=purchases.reduce((s,p)=>(p.lots||0)*1000+(p.oddShares||0)+s,0);
     const totalCost=purchases.reduce((s,p)=>s+(p.buyPrice||0)*((p.lots||0)*1000+(p.oddShares||0)),0);
-    const mktVal=(s.price||0)*totalShares;
+    const mktVal=fpPrice(s)*totalShares;
     const pnl=mktVal-totalCost;
     const roi=totalCost>0?(pnl/totalCost*100):null;
     const pnlColor=pnl>=0?'#dc2626':'#16a34a';
@@ -8345,7 +8362,7 @@ function renderFpStocks(acct){
     const purchaseRows=purchases.map((p,pi)=>{
       const ps=(p.lots||0)*1000+(p.oddShares||0);
       const pCost=(p.buyPrice||0)*ps;
-      const pPnl=(s.price||0)*ps-pCost;
+      const pPnl=fpPrice(s)*ps-pCost;
       const pColor=pPnl>=0?'#dc2626':'#16a34a';
       const editId=`fp-${acct}-edit-${i}-${pi}`;
       const viewId=`fp-${acct}-view-${i}-${pi}`;
@@ -8399,7 +8416,7 @@ function renderFpStocks(acct){
         <div style="flex:1;display:grid;grid-template-columns:repeat(4,1fr);gap:4px">
           <div style="background:#f8fafc;border-radius:5px;padding:3px 5px;text-align:center">
             <div style="font-size:9px;color:#94a3b8">現價</div>
-            <div style="font-size:11px;font-weight:700;color:#dc2626">${s.price?'$'+s.price:'—'}</div>
+            <div style="font-size:11px;font-weight:700;color:#dc2626">${fpPrice(s)?'$'+fpPrice(s):'—'}</div>
           </div>
           <div style="background:#f8fafc;border-radius:5px;padding:3px 5px;text-align:center">
             <div style="font-size:9px;color:#94a3b8">市值</div>
@@ -8478,7 +8495,7 @@ function openFpBuyModal(acct, stockIdx=null, prefillCode=''){
   // 如果有現價，預填
   if(stockIdx!==null){
     const s=db.finPlan?.[acct+'Stocks']?.[stockIdx];
-    if(s?.price) document.getElementById('fp-buy-price').value=s.price;
+    if(fpPrice(s)) document.getElementById('fp-buy-price').value=fpPrice(s);
   }
   document.getElementById('fp-buy-modal').style.display='flex';
 }
@@ -8561,7 +8578,7 @@ function renderFpStocksModal(acct){
   stocks.forEach(s=>{
     const purchases=s.purchases||[{lots:s.lots||0,oddShares:s.oddShares||0,buyPrice:s.buyPrice||0}];
     const sh=purchases.reduce((a,p)=>(p.lots||0)*1000+(p.oddShares||0)+a,0);
-    totalMkt+=(s.price||0)*sh;
+    totalMkt+=fpPrice(s)*sh;
     totalCost+=purchases.reduce((a,p)=>(p.buyPrice||0)*((p.lots||0)*1000+(p.oddShares||0))+a,0);
   });
   const loan=(db.finPlan||{})[acct+'Loan']||0;
@@ -8597,7 +8614,7 @@ function renderFpStocksModal(acct){
     const purchases=s.purchases||[{lots:s.lots||0,oddShares:s.oddShares||0,buyDate:s.buyDate||'',buyPrice:s.buyPrice||0}];
     const totalShares=purchases.reduce((a,p)=>(p.lots||0)*1000+(p.oddShares||0)+a,0);
     const totalCostS=purchases.reduce((a,p)=>(p.buyPrice||0)*((p.lots||0)*1000+(p.oddShares||0))+a,0);
-    const mktVal=(s.price||0)*totalShares;
+    const mktVal=fpPrice(s)*totalShares;
     const pnlS=mktVal-totalCostS;
     const roiS=totalCostS>0?(pnlS/totalCostS*100):null;
     const pnlColorS=pnlS>=0?'#dc2626':'#16a34a';
@@ -8606,7 +8623,7 @@ function renderFpStocksModal(acct){
 
     const purchaseRows=purchases.map((p,pi)=>{
       const ps=(p.lots||0)*1000+(p.oddShares||0);
-      const pPnl=(s.price||0)*ps-(p.buyPrice||0)*ps;
+      const pPnl=fpPrice(s)*ps-(p.buyPrice||0)*ps;
       const pColor=pPnl>=0?'#dc2626':'#16a34a';
       const editId=`fpm-${acct}-edit-${i}-${pi}`;
       const viewId=`fpm-${acct}-view-${i}-${pi}`;
@@ -8658,7 +8675,7 @@ function renderFpStocksModal(acct){
         <div style="flex:1;display:grid;grid-template-columns:repeat(4,1fr);gap:6px">
           <div style="background:#f8fafc;border-radius:6px;padding:5px 8px;text-align:center">
             <div style="font-size:9px;color:#94a3b8">現價</div>
-            <div style="font-size:13px;font-weight:700;color:#dc2626">${s.price?'$'+s.price:'—'}</div>
+            <div style="font-size:13px;font-weight:700;color:#dc2626">${fpPrice(s)?'$'+fpPrice(s):'—'}</div>
           </div>
           <div style="background:#f8fafc;border-radius:6px;padding:5px 8px;text-align:center">
             <div style="font-size:9px;color:#94a3b8">市值</div>
@@ -8916,7 +8933,7 @@ function updateFpMktVal(acct){
   const mktVal=stocks.reduce((sum,st)=>{
     const purchases=st.purchases||[{lots:st.lots||0,oddShares:st.oddShares||0}];
     const totalShares=purchases.reduce((s,p)=>(p.lots||0)*1000+(p.oddShares||0)+s,0);
-    return sum+(st.price||0)*totalShares;
+    return sum+fpPrice(st)*totalShares;
   },0);
   const loan=parseFloat(document.getElementById('fp-'+acct+'-loan')?.value)||(db.finPlan?.[acct+'Loan']||0);
   const netVal=mktVal-loan;
@@ -9038,7 +9055,7 @@ function calcFinPlan(){
     const mktVal=stocks.reduce((sum,st)=>{
       const purchases=st.purchases||[{lots:st.lots||0,oddShares:st.oddShares||0}];
       const totalShares=purchases.reduce((s,p)=>(p.lots||0)*1000+(p.oddShares||0)+s,0);
-      return sum+(st.price||0)*totalShares;
+      return sum+fpPrice(st)*totalShares;
     },0);
     const loan=(db.finPlan||{})[acct+'Loan']||gv('fp-'+acct+'-loan');
     return mktVal-loan;
@@ -13589,7 +13606,7 @@ function onSplitInput(){
   const a2=parseFloat(document.getElementById('fb-split-amt2').value)||0;
   const shares=parseFloat(document.getElementById('fb-shares').value)||0;
   const price=parseFloat(document.getElementById('fb-price').value)||0;
-  const fee=parseFloat(document.getElementById('fb-fee').value)||0;
+  const _fi=document.getElementById('fb-fee').value;const fee=_fi!==''?(parseFloat(_fi)||0):defaultBuyFee(shares*price);
   const total=Math.round(shares*price+fee);
   const hint=document.getElementById('fb-split-hint');
   if(hint)hint.textContent='總金額：$'+total.toLocaleString()+' | 已分配：$'+(a1+a2).toLocaleString()+(Math.abs(a1+a2-total)<=1?' ✅':' ⚠️ 差$'+Math.abs(a1+a2-total).toLocaleString());
@@ -13613,7 +13630,7 @@ function applySplitDefault(){
   const s=acc.defaultSplits;
   const shares=parseFloat(document.getElementById('fb-shares').value)||0;
   const price=parseFloat(document.getElementById('fb-price').value)||0;
-  const fee=parseFloat(document.getElementById('fb-fee').value)||0;
+  const _fi=document.getElementById('fb-fee').value;const fee=_fi!==''?(parseFloat(_fi)||0):defaultBuyFee(shares*price);
   const total=Math.round(shares*price+fee);
   if(total<=0)return;
   const el1=document.getElementById('fb-split-amt1');
@@ -13796,7 +13813,7 @@ function updateFsBatchTotal(){
 function updateFsTotal(){
   const lots=parseFloat(document.getElementById('fs-lots').value)||0;
   const price=parseFloat(document.getElementById('fs-price').value)||0;
-  const fee=parseFloat(document.getElementById('fs-fee').value)||0;
+  const _fi=document.getElementById('fs-fee').value;const fee=_fi!==''?(parseFloat(_fi)||0):defaultSellFee(document.getElementById('fs-code')?.value,lots*price);
   const total=Math.round(lots*price-fee);
   const disp=document.getElementById('fs-total-display');
   if(disp)disp.textContent='賣出金額：$'+total.toLocaleString();
@@ -13819,7 +13836,7 @@ function onFsSplitInput(){
   const a2=parseFloat(document.getElementById('fs-split-amt2').value)||0;
   const lots=parseFloat(document.getElementById('fs-lots').value)||0;
   const price=parseFloat(document.getElementById('fs-price').value)||0;
-  const fee=parseFloat(document.getElementById('fs-fee').value)||0;
+  const _fi=document.getElementById('fs-fee').value;const fee=_fi!==''?(parseFloat(_fi)||0):defaultSellFee(document.getElementById('fs-code')?.value,lots*price);
   const total=Math.round(lots*price-fee);
   const hint=document.getElementById('fs-split-hint');
   const sum=a1+a2;
@@ -14029,7 +14046,7 @@ function saveFamilySell(){
   if(!date)return toast('請選擇日期');
   const feeIn=document.getElementById('fs-fee').value;
   const gross=shares*price;
-  const fee=feeIn!==''?parseFloat(feeIn):Math.round(gross*0.001425*0.28)+Math.round(gross*0.003);
+  const fee=feeIn!==''?parseFloat(feeIn):Math.round(gross*TW_FEE_RATE)+Math.round(gross*twSellTaxRate(code,date));
   const member=curFamilyMember();
   const acc=getFamilyAccount(member);
   const h=acc.holdings.find(x=>x.code===code);
@@ -14090,25 +14107,43 @@ function saveFamilyDiv(){
 }
 
 // ── 計算持股 ──
-function calcFamilyHolding(h){
-  let shares=0,cost=0,realized=0;
-  (h.transactions||[]).slice().sort((a,b)=>a.date.localeCompare(b.date)).forEach(t=>{
-    const s=t.shares||(t.lots||0)*1000; // 相容舊格式（lots×1000）
+// 家族持股：唯一一套先進先出（FIFO）計算。買入手續費按股數比例攤入成本，賣出淨收入扣手續費+稅。
+function familyFifo(h){
+  const txns=(h.transactions||[]).slice().sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  const lots=[]; const sellResult={}; let realized=0;
+  txns.forEach(t=>{
+    const sh=t.shares||(t.lots||0)*1000;
     if(t.type==='buy'){
-      shares+=s;
-      cost+=s*t.price+(t.fee||0);
+      lots.push({txnId:t.id,buyPrice:t.price,original:sh,remaining:sh,fee:t.fee||0,realizedShares:0,realizedPnl:0});
     } else if(t.type==='sell'){
-      const avgCost=shares>0?cost/shares:0;
-      const sellShares=t.shares||(t.lots||0)*1000;
-      realized+=(t.price-avgCost)*sellShares-(t.fee||0);
-      shares-=sellShares;
-      cost=shares>0?avgCost*shares:0;
+      let rem=sh,cost=0;
+      const net=sh*t.price-(t.fee||0);
+      const perShareNet=sh>0?net/sh:0;
+      for(const l of lots){
+        if(rem<=0)break;
+        const tk=Math.min(l.remaining,rem); if(tk<=0)continue;
+        const lc=tk*l.buyPrice+(l.original>0?l.fee*tk/l.original:0);
+        cost+=lc; l.realizedShares+=tk; l.realizedPnl+=Math.round(perShareNet*tk-lc);
+        l.remaining-=tk; rem-=tk;
+      }
+      sellResult[t.id]={net,cost,pnl:net-cost};
+      realized+=net-cost;
     }
   });
+  lots.forEach(l=>{l.costRemaining=l.remaining*l.buyPrice+(l.original>0?l.fee*l.remaining/l.original:0);});
+  return{lots,sellResult,realized};
+}
+
+function calcFamilyHolding(h){
+  const ff=familyFifo(h);
+  const shares=ff.lots.reduce((s,l)=>s+l.remaining,0);
+  const cost=ff.lots.reduce((s,l)=>s+l.costRemaining,0);
+  const realized=ff.realized;
   const avgCost=shares>0?cost/shares:0;
   const price=db.prices[h.code]?.price||0;
   const mktVal=price>0?shares*price:null;
-  const pnl=mktVal!=null?mktVal-cost:null;
+  const estSell=mktVal!=null?estSellCost(h.code,mktVal):0;
+  const pnl=mktVal!=null?mktVal-cost-estSell:null; // 與券商 APP 一致：扣預估賣出手續費+證交稅
   // 換算張數顯示
   const fullLots=Math.floor(shares/1000);
   const remShares=shares%1000;
@@ -14116,7 +14151,7 @@ function calcFamilyHolding(h){
   if(fullLots>0&&remShares>0)lotsDisplay=`${fullLots}張 ${remShares}股`;
   else if(fullLots>0)lotsDisplay=`${fullLots}張`;
   else lotsDisplay=`${shares}股`;
-  return{shares,cost,avgCost,mktVal,pnl,realized,lotsDisplay};
+  return{shares,cost,avgCost,mktVal,pnl,estSell,realized,lotsDisplay};
 }
 
 // ── 更新股價 ──
@@ -14363,21 +14398,12 @@ function renderFamilyPage(){
   acc.holdings.forEach(h=>{
     const code=h.code;
     const price=db.prices[code]?.price||0;
-    const buys=[...(h.transactions||[])].filter(t=>t.type==='buy').sort((a,b)=>a.date.localeCompare(b.date));
-    const sells=[...(h.transactions||[])].filter(t=>t.type==='sell').sort((a,b)=>a.date.localeCompare(b.date));
-    const queue=buys.map(b=>({txnId:b.id,remaining:b.shares||(b.lots||0)*1000,buyPrice:b.price,original:b.shares||(b.lots||0)*1000,realizedShares:0,realizedPnl:0}));
-    sells.forEach(s=>{
-      let rem=s.shares||(s.lots||0)*1000;
-      const sellNet=s.price-(s.fee||0)/rem;
-      for(const b of queue){
-        if(rem<=0)break;
-        const take=Math.min(b.remaining,rem);
-        b.realizedShares+=take;
-        b.realizedPnl+=Math.round((sellNet-b.buyPrice)*take);
-        b.remaining-=take;rem-=take;
-      }
+    const ff=familyFifo(h);
+    const queue=ff.lots;
+    queue.forEach(b=>{
+      const mv=price>0?price*b.remaining:0;
+      b.unRealizedPnl=price>0?Math.round(mv-b.costRemaining-estSellCost(code,mv)):null;
     });
-    queue.forEach(b=>{b.unRealizedPnl=price>0?Math.round((price-b.buyPrice)*b.remaining):null;});
     fifoMap[code]=queue;
   });
 
@@ -14416,14 +14442,10 @@ function renderFamilyPage(){
               const sellShares=sellTxn.shares||0;
               const sellPrice=sellTxn.price||0;
               const fee=sellTxn.fee||0;
-              // FIFO計算這筆賣出的成本
-              const buyQueue=[...(holding2.transactions||[])].filter(t=>t.type==='buy').sort((a,b)=>a.date.localeCompare(b.date)).map(b=>({...b,rem:b.shares}));
-              const prevSells=[...(holding2.transactions||[])].filter(t=>t.type==='sell'&&t.date<sellTxn.date).sort((a,b)=>a.date.localeCompare(b.date));
-              prevSells.forEach(s=>{let r=s.shares;for(const b of buyQueue){if(r<=0)break;const tk=Math.min(b.rem,r);b.rem-=tk;r-=tk;}});
-              let cost=0,rem=sellShares;
-              for(const b of buyQueue){if(rem<=0)break;const tk=Math.min(b.rem,rem);cost+=tk*b.price;rem-=tk;}
-              const net=sellShares*sellPrice-fee;
-              const realPnl=Math.round(net-cost);
+              // 與總計同一套 FIFO（含買入手續費攤提）
+              const _sr=familyFifo(holding2).sellResult[sellTxn.id]||{net:sellShares*sellPrice-fee,cost:0,pnl:0};
+              const net=_sr.net, cost=_sr.cost;
+              const realPnl=Math.round(_sr.pnl);
               const realRoi=cost>0?realPnl/cost*100:0;
               const c2=realPnl>=0?'#dc2626':'#16a34a';
               pnlHtml=`<div style="margin-top:3px;font-size:10px;display:flex;gap:8px">
