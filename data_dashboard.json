@@ -3048,7 +3048,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1792402094591,
+  "_ts": 1792402229524,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -3131,13 +3131,18 @@
   "journals": [
     {
       "id": "mvdz0qkuzlh",
-      "date": "2026-10-18",
+      "date": "2026-10-19",
       "tags": [],
+      "jv2": true,
+      "jView": "",
+      "jMood": 2,
+      "jAction": "",
+      "star": false,
       "market": "美9月CPI高於預期！AI債務與油價風險 費半連跌8天",
       "market2": "韓股今年第10次熔斷 記憶體雙雄遭血洗、5大利空引爆賣壓",
       "market3": "",
-      "marketColor": "green",
-      "market2Color": "green",
+      "marketColor": "",
+      "market2Color": "",
       "market3Color": "",
       "marketUrl": "https://www.chinatimes.com/newspapers/20261018000353-260120?chdtv",
       "marketUrl2": "https://www.chinatimes.com/newspapers/20261018000353-260120?chdtv",
@@ -3147,11 +3152,10 @@
       "stockTags": [],
       "eventCat": "",
       "behavior": "",
-      "indexVal": 47111,
+      "indexVal": 46822,
       "stockPrices": null,
       "aiAnalysis": null,
-      "images": [],
-      "jMood": 2
+      "images": []
     },
     {
       "id": "mv9ec8yktrn",
