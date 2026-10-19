@@ -2511,9 +2511,10 @@ body:not(.privacy) .privacy-mask{filter:none;}
             <option value="all">全部年份</option>
           </select>
           <select id="journal-tag-page" onchange="renderJournalPage()" class="drawer-select" style="width:auto"><option value="">全部判斷／操作</option><option value="star">⭐ 重大事項</option><option value="v:看多">📈 看多</option><option value="v:中性">➖ 中性</option><option value="v:看空">📉 看空</option><option value="a:沒動作">⏸ 沒動作</option><option value="a:買入">💰 買入</option><option value="a:加碼">➕ 加碼</option><option value="a:減碼">➖ 減碼</option><option value="a:賣出">💸 賣出</option><option value="YouTube">🔴▶ YouTube</option></select>
-          <select id="journal-mood-page" onchange="renderJournalPage()" class="drawer-select" style="width:auto"><option value="">全部心情</option><option value="nomood">⚠️ 尚未標心情</option><option value="mg:neg">😱😤 恐慌或煩躁</option><option value="mg:pos">😊💪 安心或信心</option><option value="m:1">😱 恐慌</option><option value="m:2">😤 煩躁</option><option value="m:3">😐 平靜</option><option value="m:4">😊 安心</option><option value="m:5">💪 信心</option></select>
+          <select id="journal-mood-page" onchange="renderJournalPage()" class="drawer-select" style="width:auto"><option value="">全部心情</option><option value="nomood">⚠️ 尚未標心情</option><option value="imp">📥 只看舊日誌</option><option value="mg:neg">😱😤 恐慌或煩躁</option><option value="mg:pos">😊💪 安心或信心</option><option value="m:1">😱 恐慌</option><option value="m:2">😤 煩躁</option><option value="m:3">😐 平靜</option><option value="m:4">😊 安心</option><option value="m:5">💪 信心</option></select>
           <button onclick="openJournalDrawer()" style="padding:8px 16px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">＋ 新增日誌</button>
           <button onclick="openQuarterReport()" style="padding:8px 14px;background:#fff7ed;border:1px solid #fed7aa;color:#c2410c;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">📊 季報</button>
+          <button id="arc-btn" onclick="arcOpen()" style="padding:8px 14px;background:#f8fafc;border:1px solid #e2e8f0;color:#475569;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">📥 匯入舊日誌</button>
           <button onclick="batchUpdateBacktest()" style="padding:8px 14px;background:#f8f9fa;border:1px solid #e2e8f0;color:#374151;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">🔄 更新回測</button>
         </div>
         <div id="journal-page-list" style="padding:8px 0"></div>
@@ -10149,7 +10150,8 @@ function jMatch(j,tok){
   if(tok==='YouTube')return !!j.youtubeUrl;
   tok=legacy[tok]||tok;
   if(tok==='star')return m.star;
-  if(tok==='nomood')return !m.mood;
+  if(tok==='nomood')return !j.imported&&!m.mood;
+  if(tok==='imp')return !!j.imported;
   const [k,v]=tok.split(':');
   if(k==='v')return m.view===v;
   if(k==='a')return m.action===v;
@@ -10161,6 +10163,7 @@ function jMatch(j,tok){
 function jChipsHTML(j,dark){
   const m=jMeta(j), out=[];
   const chip=(txt,bg,fg,dbg,dfg)=>`<span style="display:inline-block;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700;margin:0 4px 2px 0;background:${dark?dbg:bg};color:${dark?dfg:fg}">${txt}</span>`;
+  if(j.imported)out.push(chip(j.yearSummary?'📘 年度總結':'📥 舊日誌','#f1f5f9','#475569','rgba(255,255,255,.1)','#cbd5e1'));
   if(m.star)out.push(chip('⭐ 重大','#fef3c7','#92400e','rgba(251,191,36,.18)','#fbbf24'));
   if(m.cat)out.push(chip((J_EVENTS.find(e=>e[0]===m.cat)||['','📂'])[1]+' '+m.cat,'#fef3c7','#92400e','rgba(251,191,36,.12)','#fcd34d'));
   if(m.view)out.push(chip((J_VIEWS.find(v=>v[0]===m.view)||['',''])[1]+' '+m.view,m.view==='看多'?'#fee2e2':m.view==='看空'?'#dcfce7':'#f1f5f9',m.view==='看多'?'#b91c1c':m.view==='看空'?'#15803d':'#475569','rgba(255,255,255,.12)',m.view==='看多'?'#fca5a5':m.view==='看空'?'#86efac':'#cbd5e1'));
@@ -12684,7 +12687,7 @@ function _qPct(v,dp=1){return v==null||!isFinite(v)?'—':(v>=0?'+':'')+v.toFixe
 function _qClr(v){return v==null?'#64748b':v>=0?'#dc2626':'#16a34a';}
 function _qMD(d){return d?(+d.slice(5,7))+'/'+(+d.slice(8,10)):'';}
 function qrQuarters(){
-  const ds=[...(db.snapshots||[]).map(s=>(s.ym||'').slice(0,10)),...(db.journals||[]).map(j=>j.date||'')].filter(x=>x.length>=7).sort();
+  const ds=[...(db.snapshots||[]).map(s=>(s.ym||'').slice(0,10)),...jAll().map(j=>j.date||'')].filter(x=>x.length>=7).sort();
   if(!ds.length)return[];
   const t=_twToday();
   let y=+ds[0].slice(0,4), q=Math.floor((+ds[0].slice(5,7)-1)/3)+1;
@@ -12729,7 +12732,7 @@ function qrData(y,q){
     return{code,name:(b||a).name||'',lotsS:a?.lots??0,lotsF:b?.lots??0,priceS:a?.price??null,priceF:b?.price??null,pr,pnlS:a?.pnl??null,pnlF:b?.pnl??null,dp,
       mvF:b&&b.price?b.lots*1000*b.price:null,status:!a?'新買入':!b?'已出清':b.lots>a.lots?'加碼':b.lots<a.lots?'減碼':''};
   }).sort((x,y)=>Math.abs(y.dp??0)-Math.abs(x.dp??0));
-  const J=(db.journals||[]).filter(j=>j.date>=start&&j.date<=end).sort((a,b)=>a.date.localeCompare(b.date));
+  const J=jAll().filter(j=>j.date>=start&&j.date<=end).sort((a,b)=>a.date.localeCompare(b.date));
   const divs=(db.dividends||[]).filter(d=>!d.pending&&d.date>=start&&d.date<=end&&d.date<=today);
   const flogs=(db.fundDeductionLogs||[]).filter(l=>l.date>=start&&l.date<=end);
   const series=jIndexSeries();
@@ -12744,14 +12747,14 @@ function qrData(y,q){
   const quarters=q?[]:[1,2,3,4].map(qq=>{const r=qrRange(y,qq);if(r.start>today)return null;
     const ii=qrPick(jIndexSeries(),r.start,r.end), ss=qrPick(snaps,r.start,r.end);
     return{q:qq,idxRet:ii.s&&ii.f&&ii.s.d!==ii.f.d?(ii.f.v/ii.s.v-1)*100:null,netS:ss.s?.net??null,netF:ss.f?.net??null,rF:ss.f?.r??null,
-      nJ:(db.journals||[]).filter(j=>j.date>=r.start&&j.date<=r.end).length,has:!!(db.quarterReports||{})[y+'Q'+qq],ongoing:r.end>=today,noData:!ss.f&&!ii.f};}).filter(Boolean);
+      nJ:jAll().filter(j=>j.date>=r.start&&j.date<=r.end).length,has:!!((db.quarterReports||{})[y+'Q'+qq]||window._jArcYear[y+'Q'+qq]),ongoing:r.end>=today,noData:!ss.f&&!ii.f};}).filter(Boolean);
   return{y,q,key:q?y+'Q'+q:y+'Y',name:q?`${y} Q${q}`:`${y} 全年`,unit:q?'季':'年',start,end,ongoing,today,idx,sn,idxRet,debtExact,holdRows,quarters,
     netS,netF,netChg:netS!=null&&netF!=null?netF-netS:null,netPct:netS&&netF!=null?(netF/netS-1)*100:null,
     debtS:debtOf(sn.s),debtF:debtOf(sn.f),rS:sn.s?.r??null,rF:sn.f?.r??null,
     divSum:divs.reduce((s,d)=>s+(d.amount||0),0),divN:divs.length,
     fundSum:flogs.reduce((s,l)=>s+(l.amount||0),0),fundN:flogs.length,
     J,after,
-    moods:cnt(after,x=>x.m.mood||'none'),events:cnt(after,x=>x.m.cat),actions:cnt(after,x=>x.m.action),
+    moods:cnt(after,x=>x.m.mood||(x.j.imported?'':'none')),events:cnt(after,x=>x.m.cat),actions:cnt(after,x=>x.m.action),
     stars:after.filter(x=>x.m.star).length,
     neg:grp(x=>jMoodGroup(x.m.mood)==='neg'),pos:grp(x=>jMoodGroup(x.m.mood)==='pos'),
     bull:viewAcc('看多'),bear:viewAcc('看空')};
@@ -12769,10 +12772,13 @@ function renderQuarterReport(){
   const Q=qrPeriods(); const cur=Q.find(x=>x.key===_qrKey)||Q.find(x=>x.q)||Q[0]; if(!cur)return;
   _qrKey=cur.key;
   const D=qrData(cur.y,cur.q);
-  const saved=(db.quarterReports||{})[D.key];
+  const saved=(db.quarterReports||{})[D.key]||(window._jArcYear&&window._jArcYear[D.key]?{text:window._jArcYear[D.key],ts:null,arc:true}:null);
   const pm=privacyOn?'filter:blur(8px)':'';
-  const tabs=Q.map(x=>{const on=x.key===D.key;const og=qrPeriodRange(x).end>=_twToday();const has=(db.quarterReports||{})[x.key];const yr=!x.q;
-    return`${yr&&x!==Q[0]?'<span style="width:100%;height:0"></span>':''}<button onclick="_qrKey='${x.key}';renderQuarterReport()" style="padding:5px 12px;border-radius:999px;font-size:12px;font-weight:${yr?800:700};cursor:pointer;border:1px solid ${on?'#fb923c':yr?'#fdba74':'#e2e8f0'};background:${on?'#fff7ed':yr?'#fffbeb':'#fff'};color:${on?'#c2410c':yr?'#9a3412':'#475569'}">${yr?'📅 '+x.y+' 全年':x.y+' Q'+x.q}${og?' ⏳':has?' ✓':''}</button>`;}).join('');
+  const _chip=(x,on,yr)=>{const og=qrPeriodRange(x).end>=_twToday();const has=(db.quarterReports||{})[x.key]||(window._jArcYear||{})[x.key];
+    return`<button onclick="_qrKey='${x.key}';renderQuarterReport()" style="padding:5px 12px;border-radius:999px;font-size:12px;font-weight:${yr?800:700};cursor:pointer;border:1px solid ${on?'#fb923c':yr?'#fdba74':'#e2e8f0'};background:${on?'#fff7ed':yr?'#fffbeb':'#fff'};color:${on?'#c2410c':yr?'#9a3412':'#475569'}">${yr?'📅 '+x.y:x.y+' Q'+x.q}${og?' ⏳':has?' ✓':''}</button>`;};
+  const yearsRow=Q.filter(x=>!x.q).map(x=>_chip(x,x.y===D.y&&!D.q,true)).join('');
+  const qRow=Q.filter(x=>x.q&&x.y===D.y).sort((a,b)=>a.q-b.q).map(x=>_chip(x,x.key===D.key,false)).join('');
+  const tabs=`<div style="display:flex;gap:6px;flex-wrap:wrap;width:100%">${yearsRow}</div><div style="display:flex;gap:6px;flex-wrap:wrap;width:100%;padding-left:10px;border-left:3px solid #fed7aa">${qRow}</div>`;
   const dl=(p,late)=>p?`<div style="font-size:10px;color:${late?'#d97706':'#94a3b8'};font-weight:500">${_qMD(p.d)}${late?' 資料起始':''}</div>`:'';
   const row=(name,s,f,chg,chgClr,sp,fp,late,mask)=>`<tr>
     <td style="padding:10px 12px;font-weight:700;color:#374151;border-bottom:1px solid #f1f5f9">${name}</td>
@@ -12785,6 +12791,10 @@ function renderQuarterReport(){
     <div style="font-size:11px;color:#94a3b8;margin-top:2px">${sub||''}</div></div>`;
   const sec=(t,inner)=>`<div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;margin-bottom:12px"><div style="font-size:13px;font-weight:800;color:#1e293b;margin-bottom:10px">${t}</div>${inner}</div>`;
   const beat=D.netPct!=null&&D.idxRet!=null?D.netPct-D.idxRet:null;
+  const noSnap=!D.sn.s&&!D.sn.f;
+  // 網頁快照開始前的年度：用匯入檔附的大盤年底收盤
+  let arcIdx=null;
+  if(noSnap&&!D.q&&window._jArcIdx){const a=window._jArcIdx[String(D.y-1)],b=window._jArcIdx[String(D.y)];if(a&&b)arcIdx={a,b,ret:(b/a-1)*100};}
   // 心情分布
   const totalJ=D.J.length||1;
   const moodBars=[1,2,3,4,5,'none'].map(k=>{const n=D.moods[k]||0;if(!n)return'';const lab=k==='none'?'⚠️ 未標':J_MOODS[k].e+' '+J_MOODS[k].t;
@@ -12795,8 +12805,8 @@ function renderQuarterReport(){
   const jRows=D.after.map(x=>{const t=(jTitles(x.j)[0]?.t||x.j.content||'').slice(0,40);
     return`<div onclick="openJournalDrawer('${x.j.id}')" style="display:flex;gap:10px;padding:7px 0;border-bottom:1px solid #f8fafc;cursor:pointer;align-items:flex-start">
       <span style="font-size:11px;color:#94a3b8;font-family:'JetBrains Mono',monospace;width:40px;flex-shrink:0;padding-top:2px">${_qMD(x.j.date)}</span>
-      <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;color:#1e293b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${_qEsc(t)}</div><div>${jChipsHTML(x.j)}${x.m.mood?'':'<span style="font-size:10px;color:#b45309">⚠️ 待補心情</span>'}</div></div>
-      <span style="font-size:11px;font-family:'JetBrains Mono',monospace;flex-shrink:0;padding-top:2px">1月 ${jFmtRet(x.mo)}</span></div>`;}).join('')||'<div style="color:#94a3b8;font-size:12px">這段期間沒有日誌</div>';
+      <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;color:#1e293b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${_qEsc(t)}</div><div>${jChipsHTML(x.j)}${x.m.mood||x.j.imported?'':'<span style="font-size:10px;color:#b45309">⚠️ 待補心情</span>'}</div></div>
+      ${x.j.indexVal?`<span style="font-size:11px;font-family:'JetBrains Mono',monospace;flex-shrink:0;padding-top:2px">1月 ${jFmtRet(x.mo)}</span>`:''}</div>`;}).join('')||'<div style="color:#94a3b8;font-size:12px">這段期間沒有日誌</div>';
   // 持股明細
   const hr=D.holdRows.filter(h=>h.dp!=null||h.status);
   const win=hr.filter(h=>h.dp!=null&&h.dp>0).sort((a,b)=>b.dp-a.dp), lose=hr.filter(h=>h.dp!=null&&h.dp<0).sort((a,b)=>a.dp-b.dp);
@@ -12827,7 +12837,7 @@ function renderQuarterReport(){
   const aiBox=saved
     ?`<div id="qr-ai-view" style="font-size:13px;line-height:1.8;color:#1e293b">${qrRenderMD(saved.text)}</div>
       <div class="qr-noprint" style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;gap:8px;flex-wrap:wrap">
-        <span style="font-size:11px;color:#94a3b8">儲存於 ${new Date(saved.ts+8*3600000).toISOString().slice(0,16).replace('T',' ')}</span>
+        <span style="font-size:11px;color:#94a3b8">${saved.arc?'📥 來自舊日誌封存（從 Excel 整理）':'儲存於 '+new Date(saved.ts+8*3600000).toISOString().slice(0,16).replace('T',' ')}</span>
         <span style="display:flex;gap:6px"><button onclick="qrCopyPrompt()" style="padding:5px 12px;border-radius:8px;border:1px solid #e2e8f0;background:#fff;font-size:12px;font-weight:700;cursor:pointer;color:#475569">📋 重新複製給 AI</button><button onclick="qrEditAI()" style="padding:5px 12px;border-radius:8px;border:1px solid #e2e8f0;background:#fff;font-size:12px;font-weight:700;cursor:pointer;color:#475569">✏️ 修改</button></span>
       </div>`
     :qrAIEditorHTML('');
@@ -12838,7 +12848,7 @@ function renderQuarterReport(){
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span style="font-size:12px;color:${D.ongoing?'#d97706':'#64748b'};font-weight:600">${_qMD(D.start)} – ${_qMD(D.end)}${D.ongoing?'　⏳ 進行中，數字截至 '+_qMD(D.sn.f?.d||D.today):''}</span>
       <button class="qr-noprint" onclick="qrPrint()" style="padding:5px 12px;border-radius:8px;border:1px solid #e2e8f0;background:#fff;font-size:12px;font-weight:700;cursor:pointer;color:#475569">🖨️ 列印／存成 PDF</button></div>
     </div>
-    ${sec('📋 期初 vs 期末',`<table style="width:100%;border-collapse:collapse;font-size:13px">
+    ${noSnap?sec('📋 期初 vs 期末',`<div style="font-size:13px;color:#475569;line-height:1.8">這段期間還沒有網頁的每週快照（2026/4/17 才開始記錄），所以沒有淨資產、負債與負債比。${arcIdx?`<br>大盤：<b>${Math.round(arcIdx.a).toLocaleString()}</b>（${D.y-1} 年底）→ <b>${Math.round(arcIdx.b).toLocaleString()}</b>（${D.y} 年底），<b style="color:${_qClr(arcIdx.ret)}">${_qPct(arcIdx.ret)}</b>`:''}<br>下方是這段期間的日誌與回顧。</div>`):sec('📋 期初 vs 期末',`<table style="width:100%;border-collapse:collapse;font-size:13px">
       <thead><tr style="color:#94a3b8;font-size:11px"><th style="text-align:left;padding:4px 12px;font-weight:600">項目</th><th style="text-align:right;padding:4px 12px;font-weight:600">期初</th><th style="text-align:right;padding:4px 12px;font-weight:600">期末</th><th style="text-align:right;padding:4px 12px;font-weight:600">變化</th></tr></thead>
       <tbody>
       ${row('大盤點位',D.idx.s?Math.round(D.idx.s.v).toLocaleString():'—',D.idx.f?Math.round(D.idx.f.v).toLocaleString():'—',_qPct(D.idxRet),_qClr(D.idxRet),D.idx.s,D.idx.f,D.idx.late)}
@@ -12847,13 +12857,13 @@ function renderQuarterReport(){
       ${row('負債比',D.rS!=null?D.rS+'%':'—',D.rF!=null?D.rF+'%':'—',D.rS!=null&&D.rF!=null?((D.rF-D.rS)>=0?'+':'')+(D.rF-D.rS).toFixed(1)+' 點':'—',D.rS!=null&&D.rF!=null?(D.rF<=D.rS?'#16a34a':'#dc2626'):'#64748b',D.sn.s,D.sn.f,D.sn.late)}
       </tbody></table>
       <div style="font-size:10px;color:#94a3b8;margin-top:8px;line-height:1.6">期初＝季初前一週內最後一筆（上季收盤），沒有就用本季第一筆。${D.debtExact?'':'負債由快照的淨資產與負債比換算，誤差約數千元（新的快照已直接記錄負債金額）。'}淨資產變化包含薪水、還款等資金進出，不等於投資報酬率。</div>`)}
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+    ${noSnap?'':`<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
       ${card('大盤績效',_qPct(D.idxRet),D.idx.s&&D.idx.f?_qMD(D.idx.s.d)+' → '+_qMD(D.idx.f.d):'',_qClr(D.idxRet))}
       ${card('淨資產變化',_qPct(D.netPct),beat!=null?(beat>=0?'比大盤多 ':'比大盤少 ')+Math.abs(beat).toFixed(1)+' 個百分點':'',_qClr(D.netPct))}
       ${card('本'+D.unit+'股息入帳',_qMoney(D.divSum),D.divN+' 筆','#2563eb',true)}
       ${card('基金扣款',_qMoney(D.fundSum),D.fundN+' 次','#475569',true)}
-    </div>
-    ${sec('🧠 本'+D.unit+'日誌統計（'+D.J.length+' 篇'+(D.stars?'，⭐ 重大 '+D.stars+' 篇':'')+'）',`
+    </div>`}
+    ${noSnap&&!Object.keys(D.events).length&&!Object.keys(D.actions).length&&!D.neg.n&&!D.pos.n?'':sec('🧠 本'+D.unit+'日誌統計（'+D.J.length+' 篇'+(D.stars?'，⭐ 重大 '+D.stars+' 篇':'')+'）',`
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
         <div><div style="font-size:11px;color:#94a3b8;font-weight:700;margin-bottom:4px">心情分布</div>${moodBars||'<span style="color:#94a3b8;font-size:12px">—</span>'}</div>
         <div><div style="font-size:11px;color:#94a3b8;font-weight:700;margin-bottom:4px">事件類別</div>${pills(D.events)}<div style="font-size:11px;color:#94a3b8;font-weight:700;margin:6px 0 4px">操作</div>${pills(D.actions)}</div>
@@ -12861,7 +12871,7 @@ function renderQuarterReport(){
       <div style="border-top:1px dashed #e2e8f0;margin-top:10px;padding-top:8px">
         <div style="font-size:11px;color:#94a3b8;font-weight:700;margin-bottom:4px">事後驗證（以大盤 1 個月後漲跌為準）</div>
         ${grpLine('😱😤 恐慌／煩躁時',D.neg)}${grpLine('😊💪 安心／信心時',D.pos)}${accLine('📈 看多',D.bull)}${accLine('📉 看空',D.bear)}
-        ${!D.neg.n&&!D.pos.n&&!D.bull.n&&!D.bear.n?'<div style="font-size:12px;color:#94a3b8">本季日誌還沒有標心情或判斷</div>':''}
+        ${!D.neg.n&&!D.pos.n&&!D.bull.n&&!D.bear.n?'<div style="font-size:12px;color:#94a3b8">這段期間的日誌還沒有標心情或判斷</div>':''}
       </div>`)}
     ${holdHTML}
     ${D.q?'':yearHTML}
@@ -12886,7 +12896,7 @@ function qrAIEditorHTML(txt){
 }
 function qrEditAI(){
   const v=document.getElementById('qr-ai-view'); if(!v)return;
-  const box=v.parentElement; box.innerHTML=qrAIEditorHTML((db.quarterReports||{})[_qrKey]?.text||'');
+  const box=v.parentElement; box.innerHTML=qrAIEditorHTML((db.quarterReports||{})[_qrKey]?.text||(window._jArcYear||{})[_qrKey]||'');
 }
 function qrSaveAI(){
   const t=(document.getElementById('qr-ai-input')?.value||'').trim();
@@ -12955,7 +12965,7 @@ function qrPromptText(){
   const fr=r=>r?(r.pending?'未到期':_qPct(r.ret)):'—';
   D.after.forEach(x=>{
     const m=x.m;
-    const tags=[m.mood?J_MOODS[m.mood].t:'心情未標',m.view,m.action,m.cat,m.star?'⭐重大':''].filter(Boolean).join('｜');
+    const tags=[m.mood?J_MOODS[m.mood].t:(x.j.imported?'舊日誌':'心情未標'),m.view,m.action,m.cat,m.star?'⭐重大':''].filter(Boolean).join('｜');
     L.push(`--- ${x.j.date}｜${tags}`);
     jTitles(x.j).forEach((tt,i)=>L.push(`標題${i+1}：${tt.t}`));
     if(x.j.content)L.push('內容：'+String(x.j.content).replace(/\n{2,}/g,'\n').trim());
@@ -13007,6 +13017,8 @@ function openJournalDrawer(id=null){
     // 閱讀模式
     renderJournalReadMode(id);
     switchJournalDrawerMode('read');
+    const _ra=document.getElementById('jd-read-actions');
+    if(_ra)_ra.style.display=jFind(id)?.imported?'none':'flex';
   } else {
     // 新增模式直接進編輯
     fillJournalEditForm(null);
@@ -13045,7 +13057,7 @@ function switchJournalDrawerMode(mode){
 }
 
 function renderJournalReadMode(id){
-  const j=(db.journals||[]).find(x=>x.id===id);
+  const j=jFind(id);
   if(!j)return;
 
   const tagColors={'看多':'background:#dbeafe;color:#1d4ed8','看空':'background:#dcfce7;color:#15803d',
@@ -13061,7 +13073,8 @@ function renderJournalReadMode(id){
   set('jdr-tags',jChipsHTML(j));
   const mf=document.getElementById('jdr-moodfill');
   if(mf){
-    if(jMeta(j).mood){mf.style.display='none';mf.innerHTML='';}
+    if(j.imported){mf.style.display='';mf.innerHTML='<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:8px 12px;font-size:12px;color:#475569">📥 這是 2021–2026 Excel 匯入的舊日誌（加密封存、唯讀）</div>';}
+    else if(jMeta(j).mood){mf.style.display='none';mf.innerHTML='';}
     else{
       mf.style.display='';
       mf.innerHTML=`<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:10px 12px">
@@ -13118,6 +13131,7 @@ function renderJournalReadMode(id){
 
   // 回測
   const btEl=document.getElementById('jdr-backtest');
+  if(btEl)btEl.style.display=j.imported?'none':'';
   if(btEl&&j.backtest?.ret!=null){
     const color=j.backtest.ret>=0?'#dc2626':'#16a34a';
     btEl.innerHTML=`<div style="background:#f8f9fa;border-radius:10px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between">
@@ -13315,7 +13329,7 @@ function jAfterBlockHTML(j){
 }
 // 日誌頁上方的回顧儀表
 // 舊日誌補心情：在閱讀畫面點一下就存，並可跳到下一篇待補
-function jNoMoodList(){return (db.journals||[]).filter(x=>!jMeta(x).mood).sort((a,b)=>b.date.localeCompare(a.date));}
+function jNoMoodList(){return (db.journals||[]).filter(x=>!x.imported&&!jMeta(x).mood).sort((a,b)=>b.date.localeCompare(a.date));}
 function jQuickMood(id,v){
   const j=(db.journals||[]).find(x=>x.id===id); if(!j)return;
   j.jMood=v;
@@ -13334,6 +13348,172 @@ function jQuickMood(id,v){
     </div>`;
   }
 }
+// ══════════════════════════════════════
+// 舊日誌封存：加密存在雲端 journal_archive.enc.json（AES-GCM，PBKDF2 由你的密碼產生金鑰）
+// 每台裝置輸入一次密碼，只在這台裝置保存「金鑰」，密碼本身不保存、不上傳。舊日誌唯讀。
+// ══════════════════════════════════════
+const ARC_FILE='journal_archive.enc.json';
+const ARC_KEY_LS='jarc_key_v1';
+window._jArchive=null; window._jArcYear={}; window._jArcIdx={}; window._jArcState='unknown'; window._jArcEnv=null; window._jArcSha='';
+function jAll(){return (db.journals||[]).concat(window._jArchive||[]);}
+function jFind(id){return jAll().find(x=>x.id===id);}
+const _ab64e=buf=>{let s='';const b=new Uint8Array(buf);for(let i=0;i<b.length;i+=0x8000)s+=String.fromCharCode.apply(null,b.subarray(i,i+0x8000));return btoa(s);};
+const _ab64d=s=>{const bin=atob(s);const u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return u;};
+async function arcDeriveKey(pass,saltB64,iter){
+  const base=await crypto.subtle.importKey('raw',new TextEncoder().encode(pass),'PBKDF2',false,['deriveKey']);
+  return crypto.subtle.deriveKey({name:'PBKDF2',salt:_ab64d(saltB64),iterations:iter,hash:'SHA-256'},base,{name:'AES-GCM',length:256},true,['encrypt','decrypt']);
+}
+// 先 gzip 壓縮再加密（檔案小很多）；瀏覽器不支援壓縮時就直接加密
+async function _arcPipe(bytes,Stream){const s=new Blob([bytes]).stream().pipeThrough(new Stream('gzip'));return new Uint8Array(await new Response(s).arrayBuffer());}
+async function arcEncryptWith(obj,key,saltB64,iter){
+  const iv=crypto.getRandomValues(new Uint8Array(12));
+  let bytes=new TextEncoder().encode(JSON.stringify(obj)), z=0;
+  if(typeof CompressionStream!=='undefined'){try{bytes=await _arcPipe(bytes,CompressionStream);z=1;}catch(e){}}
+  const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,bytes);
+  return{v:1,alg:'AES-GCM/PBKDF2-SHA256',z,iter,salt:saltB64,iv:_ab64e(iv),ct:_ab64e(ct)};
+}
+async function arcDecrypt(env,key){
+  let pt=new Uint8Array(await crypto.subtle.decrypt({name:'AES-GCM',iv:_ab64d(env.iv)},key,_ab64d(env.ct)));
+  if(env.z){if(typeof DecompressionStream==='undefined')throw new Error('這個瀏覽器太舊，無法解壓縮舊日誌');pt=await _arcPipe(pt,DecompressionStream);}
+  return JSON.parse(new TextDecoder().decode(pt));
+}
+async function arcRememberKey(key,saltB64){
+  try{const raw=await crypto.subtle.exportKey('raw',key);localStorage.setItem(ARC_KEY_LS,JSON.stringify({salt:saltB64,k:_ab64e(raw)}));}catch(e){}
+}
+async function arcStoredKey(env){
+  try{const s=JSON.parse(localStorage.getItem(ARC_KEY_LS)||'null');if(!s||!env||s.salt!==env.salt)return null;
+    return await crypto.subtle.importKey('raw',_ab64d(s.k),'AES-GCM',true,['encrypt','decrypt']);}catch(e){return null;}
+}
+async function arcFetch(){
+  const r=await fetch(CF_WORKER+'/'+ARC_FILE+'?t='+Date.now());
+  if(r.status===404)return null;
+  if(!r.ok)throw new Error('封存讀取失敗 '+r.status);
+  const j=await r.json();
+  window._jArcSha=j.sha||'';
+  return _decodeGh(j.content);
+}
+async function arcUpload(env){
+  const bytes=new TextEncoder().encode(JSON.stringify(env));
+  const body={message:'journal-archive:'+Date.now(),content:_ab64e(bytes)};
+  if(window._jArcSha)body.sha=window._jArcSha;
+  const r=await fetch(CF_WORKER+'/'+ARC_FILE,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  if(!r.ok)throw new Error('上傳失敗 '+r.status);
+  try{const j=await r.json();window._jArcSha=j?.content?.sha||window._jArcSha;}catch(e){}
+}
+function arcApply(data){
+  window._jArchive=(data.journals||[]).map(j=>({...j,imported:true}));
+  window._jArcYear=data.yearReports||{};
+  window._jArcIdx=data.indexYearEnd||{};
+  window._jArcState='open';
+  arcRefreshViews();
+}
+function arcRefreshViews(){
+  try{if(document.getElementById('dbpage-journal')?.classList.contains('active'))renderJournalPage();}catch(e){}
+  try{if(document.getElementById('qr-drawer')?.classList.contains('open'))renderQuarterReport();}catch(e){}
+  arcPaintBtn();
+}
+function arcPaintBtn(){
+  const b=document.getElementById('arc-btn'); if(!b)return;
+  const s=window._jArcState;
+  b.textContent=s==='open'?`📥 舊日誌 ${(window._jArchive||[]).length} 篇`:s==='locked'?'🔒 舊日誌（輸入密碼）':'📥 匯入舊日誌';
+}
+async function arcInit(){
+  try{
+    const env=await arcFetch();
+    window._jArcEnv=env;
+    if(!env){window._jArcState='none';arcPaintBtn();return;}
+    const key=await arcStoredKey(env);
+    if(key){try{arcApply(await arcDecrypt(env,key));return;}catch(e){console.warn('封存金鑰失效',e);}}
+    window._jArcState='locked';arcPaintBtn();
+  }catch(e){console.warn('arcInit',e);window._jArcState='error';arcPaintBtn();}
+}
+function arcModal(html){
+  arcCloseModal();
+  const ov=document.createElement('div');ov.id='arc-modal';ov.className='mo open';ov.style.zIndex='9500';ov.style.alignItems='center';
+  ov.innerHTML=`<div style="background:#fff;border-radius:14px;max-width:420px;width:100%;padding:20px 22px;box-shadow:0 20px 50px rgba(0,0,0,.25);font-size:13px;color:#334155;line-height:1.7">${html}</div>`;
+  ov.addEventListener('click',e=>{if(e.target===ov)arcCloseModal();});
+  document.body.appendChild(ov);
+  setTimeout(()=>ov.querySelector('input')?.focus(),50);
+}
+function arcCloseModal(){document.getElementById('arc-modal')?.remove();}
+const _arcIn='width:100%;box-sizing:border-box;border:1.5px solid #e2e8f0;border-radius:8px;padding:9px 11px;font-size:14px;margin:4px 0 10px';
+const _arcBtn=(c)=>`padding:8px 16px;border-radius:8px;border:${c?'none':'1px solid #e2e8f0'};background:${c||'#fff'};color:${c?'#fff':'#475569'};font-size:13px;font-weight:700;cursor:pointer`;
+function arcOpen(){
+  const s=window._jArcState;
+  if(s==='locked'){
+    arcModal(`<div style="font-size:16px;font-weight:800;color:#1e293b;margin-bottom:6px">🔒 開啟舊日誌</div>
+      <div>舊日誌已加密存在雲端。這台裝置第一次使用，請輸入當初設定的密碼（之後這台裝置不用再輸入）。</div>
+      <input id="arc-pass" type="password" placeholder="舊日誌密碼" style="${_arcIn}" onkeydown="if(event.key==='Enter')arcUnlock()">
+      <div id="arc-msg" style="color:#dc2626;min-height:18px;font-size:12px"></div>
+      <div style="display:flex;justify-content:flex-end;gap:8px"><button style="${_arcBtn()}" onclick="arcCloseModal()">取消</button><button style="${_arcBtn('#2563eb')}" onclick="arcUnlock()">開啟</button></div>`);
+    return;
+  }
+  const open=s==='open', n=(window._jArchive||[]).length;
+  const yrs=open?[...new Set(window._jArchive.map(j=>j.date.slice(0,4)))].sort():[];
+  arcModal(`<div style="font-size:16px;font-weight:800;color:#1e293b;margin-bottom:6px">📥 舊日誌（加密封存）</div>
+    ${open?`<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:8px 12px;margin-bottom:10px">✅ 已載入 <b>${n}</b> 篇（${yrs[0]}–${yrs[yrs.length-1]}），在「交易日誌」可用年份或搜尋查看，「📊 季報」可看每年回顧。</div>`:
+      `<div style="margin-bottom:10px">選擇我給你的 <b>舊日誌_2021-2026.json</b>，再設定一組密碼。舊日誌會<b>加密</b>後才上傳雲端，沒有密碼的人拿到檔案也看不到內容。</div>`}
+    <input id="arc-file" type="file" accept=".json,application/json" style="margin:4px 0 10px;font-size:12px">
+    ${open?'':`<div style="font-size:12px;color:#64748b">設定密碼（至少 6 碼，請記住；忘記就無法開啟舊日誌）</div>
+      <input id="arc-pass" type="password" placeholder="密碼" style="${_arcIn}">
+      <input id="arc-pass2" type="password" placeholder="再輸入一次" style="${_arcIn}">`}
+    <div id="arc-msg" style="color:#dc2626;min-height:18px;font-size:12px"></div>
+    <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap">
+      ${open?`<button style="${_arcBtn()}" onclick="arcLockDevice()">在這台裝置鎖上</button>`:'<span></span>'}
+      <span style="display:flex;gap:8px"><button style="${_arcBtn()}" onclick="arcCloseModal()">關閉</button><button style="${_arcBtn('#2563eb')}" onclick="arcImport()">${open?'追加匯入':'加密並匯入'}</button></span>
+    </div>`);
+}
+async function arcUnlock(){
+  const pass=document.getElementById('arc-pass')?.value||''; const msg=document.getElementById('arc-msg');
+  if(!pass){if(msg)msg.textContent='請輸入密碼';return;}
+  try{
+    const env=window._jArcEnv||await arcFetch();
+    const key=await arcDeriveKey(pass,env.salt,env.iter);
+    const data=await arcDecrypt(env,key);
+    await arcRememberKey(key,env.salt);
+    arcApply(data); arcCloseModal(); toast(`🔓 已開啟舊日誌 ${(window._jArchive||[]).length} 篇`);
+  }catch(e){if(msg)msg.textContent='密碼不對，請再試一次';}
+}
+function arcLockDevice(){
+  try{localStorage.removeItem(ARC_KEY_LS);}catch(e){}
+  window._jArchive=null;window._jArcYear={};window._jArcIdx={};window._jArcState=window._jArcEnv?'locked':'none';
+  arcCloseModal();arcRefreshViews();toast('🔒 這台裝置已鎖上舊日誌');
+}
+async function arcImport(){
+  const msg=document.getElementById('arc-msg'); const setMsg=t=>{if(msg)msg.textContent=t;};
+  const f=document.getElementById('arc-file')?.files?.[0];
+  if(!f){setMsg('請先選擇舊日誌檔案');return;}
+  let data;
+  try{data=JSON.parse(await f.text());}catch(e){setMsg('檔案不是正確的 JSON');return;}
+  if(data.type!=='stock-dashboard-journal-import'||!Array.isArray(data.journals)){setMsg('這不是舊日誌匯入檔');return;}
+  try{
+    let key,salt,iter,base={journals:[],yearReports:{},indexYearEnd:{}};
+    if(window._jArcState==='open'){
+      const env=window._jArcEnv; salt=env.salt; iter=env.iter; key=await arcStoredKey(env);
+      if(!key){setMsg('這台裝置的金鑰遺失，請先鎖上再用密碼開啟');return;}
+      base={journals:window._jArchive||[],yearReports:window._jArcYear||{},indexYearEnd:window._jArcIdx||{}};
+    }else{
+      const p1=document.getElementById('arc-pass')?.value||'', p2=document.getElementById('arc-pass2')?.value||'';
+      if(p1.length<6){setMsg('密碼至少 6 碼');return;}
+      if(p1!==p2){setMsg('兩次密碼不一樣');return;}
+      if(window._jArcEnv&&!confirm('雲端已經有一份舊日誌封存，用新密碼匯入會取代它，確定嗎？'))return;
+      salt=_ab64e(crypto.getRandomValues(new Uint8Array(16))); iter=250000; key=await arcDeriveKey(p1,salt,iter);
+    }
+    setMsg(''); toast('🔐 加密中…');
+    const have=new Set(base.journals.map(j=>j.id)); let added=0;
+    const merged=base.journals.slice();
+    data.journals.forEach(j=>{if(j&&j.id&&j.date&&!have.has(j.id)){merged.push({...j,imported:true});have.add(j.id);added++;}});
+    merged.sort((a,b)=>a.date.localeCompare(b.date));
+    const plain={journals:merged,yearReports:{...data.yearReports,...base.yearReports},indexYearEnd:{...(data.indexYearEnd||{}),...base.indexYearEnd},updated:Date.now()};
+    const env=await arcEncryptWith(plain,key,salt,iter);
+    await arcUpload(env);
+    window._jArcEnv=env; await arcRememberKey(key,salt);
+    arcApply(plain); arcCloseModal();
+    toast(`✅ 已加密匯入 ${added} 篇舊日誌（略過重複 ${data.journals.length-added} 篇）`);
+  }catch(e){setMsg('匯入失敗：'+e.message);}
+}
+setTimeout(arcInit,3500);
+
 function renderJournalReview(){
   const el=document.getElementById('journal-review'); if(!el)return;
   const series=jIndexSeries(); const J=db.journals||[];
@@ -13369,12 +13549,16 @@ function renderJournalPage(){
 
   // 更新年份選單
   const yrSel=document.getElementById('journal-year-page');
-  if(yrSel&&yrSel.options.length<=1){
-    const years=[...new Set((db.journals||[]).map(j=>(j.date||'').slice(0,4)).filter(Boolean))].sort().reverse();
-    years.forEach(y=>{const o=document.createElement('option');o.value=y;o.textContent=y+'年';yrSel.appendChild(o);});
+  if(yrSel){
+    const years=[...new Set(jAll().map(j=>(j.date||'').slice(0,4)).filter(Boolean))].sort().reverse();
+    if(yrSel.options.length-1!==years.length){
+      const keep=yrSel.value;
+      yrSel.innerHTML='<option value="all">全部年份</option>'+years.map(y=>`<option value="${y}">${y}年</option>`).join('');
+      yrSel.value=years.includes(keep)?keep:'all';
+    }
   }
 
-  let list=[...(db.journals||[])].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  let list=[...jAll()].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
   if(selYear!=='all')list=list.filter(j=>(j.date||'').startsWith(selYear));
   if(selTag)list=list.filter(j=>jMatch(j,selTag));
   const selPageMood=document.getElementById('journal-mood-page')?.value||'';
@@ -13391,7 +13575,7 @@ function renderJournalPage(){
   }
 
   container.innerHTML=list.map(j=>{
-    const tags=jChipsHTML(j)+(jMeta(j).mood?'':'<span style="display:inline-block;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700;margin:0 4px 2px 0;background:#fffbeb;color:#b45309;border:1px dashed #fcd34d">⚠️ 待補心情</span>');
+    const tags=jChipsHTML(j)+(jMeta(j).mood||j.imported?'':'<span style="display:inline-block;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700;margin:0 4px 2px 0;background:#fffbeb;color:#b45309;border:1px dashed #fcd34d">⚠️ 待補心情</span>');
     const markets=[j.market,j.market2,j.market3].filter(Boolean);
     const hasBt=j.backtest?.ret!=null;
     const btColor=hasBt?(j.backtest.ret>=0?'#dc2626':'#16a34a'):'#9ca3af';
@@ -13412,7 +13596,7 @@ function renderJournalPage(){
 
       </div>
       ${hasBt?`<div style="font-size:12px;font-weight:800;color:${btColor};white-space:nowrap;font-family:'JetBrains Mono',monospace">${j.backtest.ret>=0?'+':''}${j.backtest.ret.toFixed(1)}%</div>`:''}
-      <button onclick="event.stopPropagation();deleteJournal('${j.id}')" style="padding:4px 8px;background:#fff;border:1px solid #fca5a5;color:#dc2626;border-radius:6px;font-size:11px;cursor:pointer;opacity:.6;transition:opacity .15s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.6'">刪</button>
+      ${j.imported?'':`<button onclick="event.stopPropagation();deleteJournal('${j.id}')" style="padding:4px 8px;background:#fff;border:1px solid #fca5a5;color:#dc2626;border-radius:6px;font-size:11px;cursor:pointer;opacity:.6;transition:opacity .15s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.6'">刪</button>`}
     </div>`;
   }).join('');
 }
