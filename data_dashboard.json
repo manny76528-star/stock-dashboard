@@ -3048,7 +3048,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1792342754822,
+  "_ts": 1792401869580,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -8359,12 +8359,12 @@
     }
   ],
   "mobile_cache": {
-    "updatedAt": "2026-10-18",
+    "updatedAt": "2026-10-19",
     "invest": {
       "activeCount": 2,
       "nearAmt": 106600,
       "nearDate": "2026-11-13",
-      "nearDays": 26,
+      "nearDays": 25,
       "surplus": 24703,
       "totalMonthly": 81897,
       "totalPaidDiv": 811675,
@@ -8373,7 +8373,7 @@
       "lR": 1025458,
       "lOrig": 1900000,
       "lPct": 46,
-      "pledgeRatio": 171.3,
+      "pledgeRatio": 169.8,
       "pledgeLoan": 10006000,
       "showPledge": true
     },
@@ -8389,11 +8389,11 @@
         "阿豪凱基": {
           "pct": 75,
           "totalCost": 750111.0800000001,
-          "totalMkt": 621572,
+          "totalMkt": 611487,
           "caps": [
             {
               "code": "00997A",
-              "wt": 55
+              "wt": 54
             },
             {
               "code": "009805",
@@ -8405,15 +8405,15 @@
         "阿豪富邦": {
           "pct": 38.7,
           "totalCost": 386719.16000000003,
-          "totalMkt": 420480.62,
+          "totalMkt": 416616.04000000004,
           "caps": [
             {
               "code": "00405A",
-              "wt": 45
+              "wt": 44
             },
             {
               "code": "00986A",
-              "wt": 43
+              "wt": 42
             },
             {
               "code": "00981A",
@@ -8433,11 +8433,11 @@
         "媽媽": {
           "pct": 31.4,
           "totalCost": 25132.78,
-          "totalMkt": 25730.879999999997,
+          "totalMkt": 25495.68,
           "caps": [
             {
               "code": "00999A",
-              "wt": 102
+              "wt": 101
             }
           ],
           "activeCount": 1
@@ -8445,11 +8445,11 @@
         "琁 & 軒": {
           "pct": 47.9,
           "totalCost": 287656.60000000003,
-          "totalMkt": 295677.74,
+          "totalMkt": 293220.52999999997,
           "caps": [
             {
               "code": "00403A",
-              "wt": 85
+              "wt": 84
             },
             {
               "code": "00981A",
@@ -8469,7 +8469,7 @@
             },
             {
               "code": "00983A",
-              "wt": 2
+              "wt": 1
             }
           ],
           "activeCount": 6
@@ -8477,11 +8477,11 @@
         "老婆": {
           "pct": 43.3,
           "totalCost": 259557.86,
-          "totalMkt": 253002.18,
+          "totalMkt": 251352.82,
           "caps": [
             {
               "code": "00403A",
-              "wt": 91
+              "wt": 90
             },
             {
               "code": "2330",
