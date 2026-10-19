@@ -1972,6 +1972,9 @@ body:not(.privacy) .privacy-mask{filter:none;}
       <span class="nav-icon">📓</span>交易日誌
       <span class="db-nav-badge" id="nav-journal-badge" style="background:#dbeafe;color:#1d4ed8"></span>
     </div>
+    <div class="db-nav-item" id="nav-advisor" onclick="openAdvisor('cards')">
+      <span class="nav-icon">🧭</span>投資顧問
+    </div>
     <div class="db-nav-item" id="nav-dividend" onclick="dbShowPage('dividend')">
       <span class="nav-icon">💰</span>股息管理
       <span class="db-nav-badge" id="nav-div-badge" style="background:#dcfce7;color:#15803d"></span>
@@ -2029,6 +2032,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
 
   <!-- 內容區域 -->
   <div class="db-content">
+    <div id="adv-banner"></div>
 
     <!-- ══ 頁面：數據總覽 ══ -->
     <div class="db-page" id="dbpage-overview">
@@ -2513,7 +2517,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
           <select id="journal-tag-page" onchange="renderJournalPage()" class="drawer-select" style="width:auto"><option value="">全部判斷／操作</option><option value="star">⭐ 重大事項</option><option value="v:看多">📈 看多</option><option value="v:中性">➖ 中性</option><option value="v:看空">📉 看空</option><option value="a:沒動作">⏸ 沒動作</option><option value="a:買入">💰 買入</option><option value="a:加碼">➕ 加碼</option><option value="a:減碼">➖ 減碼</option><option value="a:賣出">💸 賣出</option><option value="YouTube">🔴▶ YouTube</option></select>
           <select id="journal-mood-page" onchange="renderJournalPage()" class="drawer-select" style="width:auto"><option value="">全部心情</option><option value="nomood">⚠️ 尚未標心情</option><option value="imp">📥 只看舊日誌</option><option value="mg:neg">😱😤 恐慌或煩躁</option><option value="mg:pos">😊💪 安心或信心</option><option value="m:1">😱 恐慌</option><option value="m:2">😤 煩躁</option><option value="m:3">😐 平靜</option><option value="m:4">😊 安心</option><option value="m:5">💪 信心</option></select>
           <button onclick="openJournalDrawer()" style="padding:8px 16px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">＋ 新增日誌</button>
-          <button onclick="openQuarterReport()" style="padding:8px 14px;background:#fff7ed;border:1px solid #fed7aa;color:#c2410c;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">📊 季報</button>
+          <button onclick="openQuarterReport()" style="padding:8px 14px;background:#fff7ed;border:1px solid #fed7aa;color:#c2410c;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">📊 季報</button><button onclick="openAdvisor('cards')" style="padding:8px 14px;background:#f0f9ff;border:1px solid #bae6fd;color:#0369a1;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">🧭 顧問</button>
           <button id="arc-btn" onclick="arcOpen()" style="padding:8px 14px;background:#f8fafc;border:1px solid #e2e8f0;color:#475569;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">📥 匯入舊日誌</button>
           <button onclick="batchUpdateBacktest()" style="padding:8px 14px;background:#f8f9fa;border:1px solid #e2e8f0;color:#374151;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">🔄 更新回測</button>
         </div>
@@ -3229,9 +3233,16 @@ body:not(.privacy) .privacy-mask{filter:none;}
 <div id="qr-drawer" class="side-drawer" style="width:780px">
   <div class="side-drawer-hdr">
     <div class="side-drawer-title"><span>📊</span><span>投資季報</span></div>
-    <div class="side-drawer-actions"><button class="side-drawer-close" onclick="closeDrawer()">✕</button></div>
+    <div class="side-drawer-actions"><button id="privacy-btn-qr" onclick="qrTogglePrivacy()" style="font-size:12px;font-weight:700;padding:5px 10px;border-radius:8px;border:1px solid #fed7aa;background:#fff7ed;color:#c2410c;cursor:pointer;margin-right:6px">👁 顯示金額</button><button class="side-drawer-close" onclick="closeDrawer()">✕</button></div>
   </div>
   <div class="side-drawer-body" id="qr-body" style="background:#f8fafc"></div>
+</div>
+<div id="adv-drawer" class="side-drawer" style="width:780px">
+  <div class="side-drawer-hdr">
+    <div class="side-drawer-title"><span>🧭</span><span>我的投資顧問</span><span style="font-size:11px;color:#94a3b8;font-weight:500;margin-left:6px">不是 AI，是「過去冷靜的你」寫給現在的你</span></div>
+    <div class="side-drawer-actions"><button class="side-drawer-close" onclick="closeDrawer()">✕</button></div>
+  </div>
+  <div class="side-drawer-body" id="adv-body" style="background:#f8fafc"></div>
 </div>
 <div id="journal-drawer" class="side-drawer">
   <!-- Header -->
@@ -10924,6 +10935,7 @@ function applyPrivacy(){
     document.querySelectorAll('.privacy-mask').forEach(el=>el.style.filter='blur(8px)');
     if(btn)btn.textContent='👁 顯示金額';
     if(btnSide)btnSide.textContent='👁 顯示金額';
+    {const q=document.getElementById('privacy-btn-qr');if(q)q.textContent='👁 顯示金額';}
     // 趨勢圖白色遮罩
     const tc=document.getElementById('trend-page-canvas');
     if(tc){tc.style.opacity='0';document.getElementById('trend-privacy-overlay')?.remove();const ov=document.createElement('div');ov.id='trend-privacy-overlay';ov.style.cssText='position:absolute;inset:0;background:#f8fafc;display:flex;align-items:center;justify-content:center;border-radius:8px;z-index:1';ov.innerHTML='<span style="font-size:13px;color:#94a3b8;font-weight:600">🔒 顯示金額後可見</span>';tc.parentElement.appendChild(ov);}
@@ -10934,6 +10946,7 @@ function applyPrivacy(){
     document.querySelectorAll('.privacy-mask').forEach(el=>el.style.filter='none');
     if(btn)btn.textContent='🙈 隱藏金額';
     if(btnSide)btnSide.textContent='🙈 隱藏金額';
+    {const q=document.getElementById('privacy-btn-qr');if(q)q.textContent='🙈 隱藏金額';}
     const tc=document.getElementById('trend-page-canvas');
     if(tc)tc.style.opacity='1';
     document.getElementById('trend-privacy-overlay')?.remove();
@@ -12663,9 +12676,10 @@ function _drawerSnapshot(id){
     return{id,kind:'journal',jid:d.dataset.editId,scroll:sc};
   }
   if(id==='qr-drawer')return{id,kind:'qr',key:_qrKey,scroll:sc};
+  if(id==='adv-drawer')return{id,kind:'adv',tab:_advTab,card:_advCard,scroll:sc};
   return null;
 }
-function _drawerBackLabel(s){return s.kind==='qr'?'← 返回季報':'← 返回上一篇';}
+function _drawerBackLabel(s){return s.kind==='qr'?'← 返回季報':s.kind==='adv'?'← 返回顧問':'← 返回上一篇';}
 function paintDrawerBack(){
   document.querySelectorAll('.drawer-back-btn').forEach(b=>b.remove());
   if(!_currentDrawer||!_drawerStack.length)return;
@@ -12681,6 +12695,7 @@ function drawerBack(){
   _drawerBackNav=true;
   try{
     if(s.kind==='qr')openQuarterReport(s.key);
+    else if(s.kind==='adv')openAdvisor(s.tab,s.card);
     else if(s.kind==='journal')openJournalDrawer(s.jid);
   }finally{_drawerBackNav=false;}
   setTimeout(()=>{const b=document.getElementById(s.id)?.querySelector('.side-drawer-body');if(b)b.scrollTop=s.scroll;},60);
@@ -13024,6 +13039,12 @@ function qrPromptText(){
   return L.join('\n');
 }
 // 列印／存成 PDF：直接用畫面上已算好的季報內容，放進隱藏框列印
+function qrTogglePrivacy(){
+  const body=document.getElementById('qr-body'); const st=body?body.scrollTop:0;
+  togglePrivacy();
+  try{renderQuarterReport();}catch(e){}
+  if(body)requestAnimationFrame(()=>{body.scrollTop=st;});
+}
 function qrPrintHTML(showMoney){
   const src=document.getElementById('qr-body'); if(!src)return'';
   const clone=src.cloneNode(true);
@@ -15842,6 +15863,670 @@ function toggleAnalytics(){}
 function toggleFinPlan(){}
 function toggleJournal(){}
 renderInvestL1(); // 啟動時渲染第一層
+
+// ══════════════════════════════════════════════════════════════
+// 🧭 投資顧問：定位卡／冷靜卡／大跌提醒（資料存在 db.advisor，跟著雲端同步）
+// ══════════════════════════════════════════════════════════════
+const ADV_ROLES={
+  def:{n:'🛡️ 防禦核心',bg:'#dbeafe',c:'#1d4ed8',bar:'#3b82f6'},
+  core:{n:'🌏 長期核心',bg:'#dcfce7',c:'#15803d',bar:'#22c55e'},
+  sat:{n:'🚀 衛星',bg:'#fef3c7',c:'#b45309',bar:'#f59e0b'},
+  theme:{n:'🔌 主題',bg:'#ffedd5',c:'#c2410c',bar:'#fb923c'},
+  cash:{n:'💵 類現金／短債',bg:'#f1f5f9',c:'#475569',bar:'#94a3b8'},
+  other:{n:'✍️ 其他',bg:'#f1f5f9',c:'#64748b',bar:'#94a3b8'}
+};
+const ADV_DEF_CALM={on:true,buyAmt:200000,buyPct:5,rebuyDays:7};
+const ADV_DEF_ALERT={on:true,day:2,dd:5,pledge:155,mood:true};
+function _ae(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function _advLines(a){return (a||[]).filter(x=>String(x).trim());}
+
+function advSeed(){
+  const card=(o)=>Object.assign({confirmed:false,ts:Date.now(),quotes:[],role_t:[],keep:[],review:[],note:'',reviewWhen:'每季季報時'},o);
+  return{
+    v:1, seededAt:_twToday(), ownMembers:null,
+    calm:{...ADV_DEF_CALM}, alert:{...ADV_DEF_ALERT},
+    patterns:[
+      {t:'跌了就賣，基本面沒變',c:'2022Q4「恐慌時賣掉好公司」→ 2023Q2「個股還是賣太快」→ 2026Q2「一個利空就急著賣」→ 2026Q3「嘴上看好、手上賣出」'},
+      {t:'對防禦資產沒耐心',c:'2026Q1「債券一跌就焦慮」→ 2026Q2「對防禦資產沒耐心，說到沒做到」→ 2026Q3「防禦資產又被嫌棄後出清」'},
+      {t:'槓桿說一套做一套',c:'2021Q4「準備用質借放大部位」→ 2022Q4「融資賭營收」→ 2026Q3「寫的和做的不一致：槓桿」'}
+    ],
+    lev:{rules:'',note:'趁現在冷靜，寫下：維持率到多少要降槓桿、降多少、賣哪一檔。不要在浴室裡做決定（07/31）。',src:'2026Q3 AI 回顧・提醒①',example:'例：維持率 < 150% → 還款 50 萬；< 140% → 賣 00981T 200 張還款（數字由你決定）'},
+    cards:[
+      card({id:'c_981t',role:'def',title:'00981T 平衡凱基雙核收息',codes:['00981T'],target:70,lo:60,hi:80,
+        role_t:['防禦核心：取代原本的短債（00985B、00864B），7 成債 + 3 成股、月配息。','期待：大盤大跌時跌得比 0050 少；長期報酬接近 0050 的 8 成。'],
+        keep:['美國長債殖利率上升 → 債券那 7 成下跌（買進時就存在的風險，不是新消息）','大盤創新高、它卻沒跟上（它本來就不是用來追漲的）','一兩個月沒照預期走'],
+        review:['連續 2 季，大盤下跌時它跌得比大盤還多 → 防禦功能失效','每股配息連續 3 個月下降','質押維持率跌破 145% → 先降槓桿，不是換標的'],
+        note:'00985B、00864B 我都在「持有半年不如預期」時換掉。換之前先問：這次跟那兩次有什麼不同？',
+        quotes:[{d:'2026-07-08',t:'以長抱00981T當防禦型資產',s:'日誌'},{d:'2026-07-31',t:'今天與AI討論後 更篤定他是 安全版的0050 … 與0050的帳跌幅約是 1 : 1.25',s:'日誌'},{d:'2026-10-02',t:'30年公債盡然能漲到5.7% … 只能說如果不是00981T持有30%台股 , 這波跌幅不知道還會多深',s:'日誌'}]}),
+      card({id:'c_core',role:'core',title:'美股／全球指數',codes:['00924','009823','009826'],target:20,lo:15,hi:25,
+        role_t:['長期核心：3～5 年不換的指數部位，跟著美國／全球長期成長。','目前用 00924（S&P500 成長，排除傳產、保留前 200 大）。'],
+        keep:['美股回檔 10～20%（指數本來就會這樣）','另一檔 ETF 的回測比較好看'],
+        review:['費用率或追蹤誤差明顯變差','要用錢的時間點提前（人生計畫改變）'],
+        note:'兩個月內換了 3 檔同類（009826 → 009823 → 00924）。長期核心的意義，就是不換。',
+        quotes:[{d:'2026-10-06',t:'排除傳產 保留前200大的SP500',s:'交易備註'},{d:'2026-08-13',t:'VT轉移到S&P500 _ 主要是我看長期回測 S&P500贏VT很多',s:'交易備註'},{d:'2026-07-15',t:'追求睡得著覺、分散全球風險的投資：除了美股 VT，利用 009826 建立全球核心部位，才是實踐真正的指數化投資',s:'日誌'}]}),
+      card({id:'c_sat',role:'sat',title:'主動式 ETF',codes:['00988A','00981A','00403A','00996A','00997A','00405A','00986A','00990A','00982A','00980A','00983A','009815'],target:7,lo:0,hi:10,
+        role_t:['衛星：用小部位參與 AI 成長，可以操作，但有上限。'],
+        keep:['單一新聞造成的下跌（先等 48 小時）'],
+        review:['溢價超過 5% → 照紀律出場','觸發事先設好的移動停損','合計超過上限 → 停利拉回'],
+        note:'7/18～7/20 在焦慮下清空全部主動式 ETF；家人的 00403A 跌 30% 後又翻正。停損停利要事先設，不在盤中決定。',
+        quotes:[{d:'2026-05-14',t:'淨值10.2 市價10.8 溢價已達5% 照紀律出場',s:'00403A 交易備註'},{d:'2026-04-09',t:'設定移動停損並觸發！！',s:'00996A 交易備註'},{d:'2026-10-02',t:'00403A不僅收復5萬多的虧損 , 目前還翻正 5-6千的損益獲利',s:'日誌'}]}),
+      card({id:'c_theme',role:'theme',title:'電力基建',codes:['009805','009819'],target:3,lo:0,hi:5,
+        role_t:['主題：AI 用電缺口帶來的電力基建需求（你備註過：2028 年美國資料中心供給短缺約 49 GW）。'],
+        keep:['成分股短期因 AI 情緒連動下跌','跟漲幅度比大盤小'],
+        review:['訂單能見度（到 2030 年）下修','溢價超過 5%（009819 首日溢價 25% 時出場是對的）'],
+        note:'7/06 賣出 009805 的理由是「與AI連動太深」，但 5/11 你寫「回頭看這5%一定只是小小波動」。想回補時先看論點還在不在。',
+        quotes:[{d:'2026-04-29',t:'依然看好009805 未來五年的訂單確定性',s:'日誌'},{d:'2026-05-11',t:'我相信回頭看這5%一定只是小小波動',s:'日誌'},{d:'2026-04-23',t:'淨值只有10.12 溢價盡然高達25% , 停利轉單',s:'009819 交易備註'}]}),
+      card({id:'c_cash',role:'cash',title:'類現金／短債',codes:['00985B','00864B','00950B','00981D','00953B','00958B'],target:null,lo:null,hi:null,
+        role_t:['需要「類現金」時才用：經濟衰退時 00864B（美國國庫券）最能防禦，不溫不火時 00985B 較有優勢。'],
+        keep:['台幣升值造成的帳面下跌（領息部位本來就會受匯率影響）'],
+        review:['先定好考核期，期間殖利率怎麼動都不換標的'],
+        note:'2026Q2 季報：04/21 寫「不要吃碗內看碗外」、05/25 說「再給一年」，06/22 卻全數出清 00985B。',
+        quotes:[{d:'2026-03-25',t:'經濟衰退下 864B才是最強的防禦 , 不溫不火下 985B則較有優勢',s:'日誌'},{d:'2026-04-21',t:'所以不要再吃碗內看碗外了',s:'日誌'}]})
+    ],
+    evidence:[
+      {id:'ev1',card:'c_981t',d:'2026-10-02',t:'30年債殖利率 5.7%，981T 債的部分下殺，但 3 成台股撐住',st:'con',idx:48476},
+      {id:'ev2',card:'c_981t',d:'2026-07-31',t:'上市一年和 0050 漲跌約 1 : 1.25 → 安全版 0050',st:'pro',idx:43120},
+      {id:'ev3',card:'c_981t',d:'2026-06-29',t:'「好在持有的00981T 微幅上漲0.3%」',st:'pro',idx:45000}
+    ],
+    wants:[], decisions:[]
+  };
+}
+function advEnsure(){if(!db.advisor){db.advisor=advSeed();save();}return db.advisor;}
+function advCfg(){const a=db.advisor||{};return{calm:{...ADV_DEF_CALM,...(a.calm||{})},alert:{...ADV_DEF_ALERT,...(a.alert||{})}};}
+function advCards(){return (db.advisor?.cards)||advSeed().cards;}
+function advCardOf(code){const C=String(code||'').toUpperCase();return advCards().find(c=>(c.codes||[]).some(x=>String(x).toUpperCase()===C))||null;}
+function advOwnMembers(){
+  const a=db.advisor; if(a&&Array.isArray(a.ownMembers))return a.ownMembers;
+  return (db.family?.members||Object.keys(db.family?.accounts||{})).filter(m=>String(m).includes('阿豪'));
+}
+// 部位：主帳戶 + 自己的家族帳戶
+function advPositions(){
+  const out=[];
+  (db.investments||[]).forEach(inv=>{
+    const c=calcInv(inv); if(!(c.tLots>0))return;
+    out.push({code:inv.code,name:inv.name||'',src:'主帳戶',lots:c.tLots,mkt:c.mktVal??c.tCost,cost:c.tCost,pnl:c.mktVal!=null?c.pnl:0,avg:c.avgCost,price:c.curPrice});
+  });
+  advOwnMembers().forEach(m=>{
+    const acc=db.family?.accounts?.[m];
+    (acc?.holdings||[]).forEach(h=>{
+      const c=calcFamilyHolding(h); if(!(c.shares>0))return;
+      out.push({code:h.code,name:h.name||'',src:m,lots:c.shares/1000,mkt:c.mktVal??c.cost,cost:c.cost,pnl:c.mktVal!=null?c.pnl:0,avg:c.avgCost});
+    });
+  });
+  return out;
+}
+function advExposure(){
+  const pos=advPositions(); const total=pos.reduce((s,p)=>s+(p.mkt||0),0);
+  const cards=advCards().map(c=>{
+    const set=new Set((c.codes||[]).map(x=>String(x).toUpperCase()));
+    const ps=pos.filter(p=>set.has(String(p.code).toUpperCase()));
+    const mkt=ps.reduce((s,p)=>s+(p.mkt||0),0), pnl=ps.reduce((s,p)=>s+(p.pnl||0),0);
+    return{card:c,ps,mkt,pnl,pct:total>0?mkt/total*100:0};
+  });
+  const used=new Set(); advCards().forEach(c=>(c.codes||[]).forEach(x=>used.add(String(x).toUpperCase())));
+  const un=pos.filter(p=>!used.has(String(p.code).toUpperCase()));
+  return{pos,total,cards,un};
+}
+// 質押維持率（與質押頁同一套算法）
+function advPledge(){
+  const loan=(db.flexLoans||[]).filter(f=>f.calcPledge).reduce((s,f)=>s+(f.used||f.remain||0),0);
+  if(!loan||!(db.pledgeAssets||[]).length)return null;
+  let mkt=0; const lots={},price={};
+  db.pledgeAssets.forEach(a=>{const p=db.prices?.[a.code]?.price||0;mkt+=p*(a.lots||0)*1000;lots[a.code]=(lots[a.code]||0)+(a.lots||0);price[a.code]=p;});
+  if(!mkt||Object.values(price).some(v=>!v))return null; // 有擔保品還沒抓到股價就不算，避免誤報
+  return{loan,mkt,ratio:mkt/loan*100,lots,price};
+}
+function advPledgeAfterSell(code,sellLots){
+  const P=advPledge(); if(!P)return null;
+  const pl=Math.min(sellLots,P.lots[code]||0), p=P.price[code]||0;
+  return{before:P.ratio,after:(P.mkt-pl*1000*p)/P.loan*100,pledged:pl};
+}
+function advPriceAtRatio(code,R){
+  const P=advPledge(); if(!P||!P.lots[code])return null;
+  const other=P.mkt-P.price[code]*P.lots[code]*1000;
+  return (R/100*P.loan-other)/(P.lots[code]*1000);
+}
+function advLatestDebtRatio(){const s=[...(db.snapshots||[])].filter(x=>x.debtRatio!=null).sort((a,b)=>String(a.ym).localeCompare(String(b.ym))).pop();return s?{r:s.debtRatio,d:String(s.ym).slice(0,10)}:null;}
+function advIdxAt(date){
+  const ser=jIndexSeries(); let best=null;
+  ser.forEach(p=>{const dd=Math.abs(_dayDiff(p.d,date));if(dd<=4&&(!best||dd<best.dd))best={...p,dd};});
+  return best?best.v:null;
+}
+async function advIndexNow(force){
+  const c=window._advIdx; if(!force&&c&&Date.now()-c.ts<10*60000)return c;
+  const today=_twToday(); const ser=jIndexSeries();
+  let price=null,pct=null,date=today;
+  try{const r=await fetch(CF_WORKER+'/index?t='+Date.now());if(r.ok){const d=await r.json();if(d.price){price=+d.price;if(typeof d.changePct==='number'&&d.changePct!==0)pct=+d.changePct;}}}catch(e){}
+  if(price&&pct==null){const prev=[...ser].reverse().find(p=>p.d<today);if(prev&&_dayDiff(today,prev.d)<=4)pct=(price/prev.v-1)*100;}
+  if(!price){const last=ser[ser.length-1];if(last){price=last.v;date=last.d;}}
+  let hi=null; const since=_addDays(today,-28);
+  ser.filter(p=>p.d>=since).forEach(p=>{if(!hi||p.v>hi.v)hi=p;});
+  if(price&&(!hi||price>hi.v))hi={d:date,v:price};
+  return(window._advIdx={ts:Date.now(),price,pct,date,hi,dd:(hi&&price)?(price/hi.v-1)*100:null});
+}
+function advTodayMood(){
+  const t=_twToday(); const j=(db.journals||[]).filter(x=>x.date===t).map(x=>({j:x,m:jMeta(x).mood})).find(x=>x.m);
+  return j?{mood:j.m,e:J_MOODS[j.m]?.e,t:J_MOODS[j.m]?.t,title:j.j.market||''}:null;
+}
+// 最新一份季報 AI 回顧裡「給自己的提醒」
+function advReminders(){
+  const Q=db.quarterReports||{}; const keys=Object.keys(Q).filter(k=>/Q\d$/.test(k)).sort().reverse();
+  for(const k of keys){
+    const t=Q[k]?.text||''; const i=t.search(/給自己的.{0,8}提醒/); if(i<0)continue;
+    const sec=t.slice(i).split('\n').slice(1);
+    const heads=[]; let body=[];
+    for(const raw of sec){
+      const l=raw.replace(/　/g,' ').trim();
+      if(/^(═|───|📅)/.test(l)&&heads.length)break;
+      const m=l.match(/^(?:[1-5]️?⃣|[1-5][\.．、]|[•\-])\s*(.+)/);
+      if(m){heads.push({h:m[1].trim(),b:[]});continue;}
+      if(l&&heads.length&&!/^(═|━)/.test(l))heads[heads.length-1].b.push(l.replace(/^[\s　]+/,''));
+    }
+    if(heads.length)return{key:k,items:heads.slice(0,5)};
+  }
+  return null;
+}
+function adv48Source(){
+  const Q=db.quarterReports||{};
+  return Object.keys(Q).sort().find(k=>/48\s*小時/.test(Q[k]?.text||''))||null;
+}
+// 情緒交易紀錄：依心情分組，看 1 個月後大盤
+function advMoodTrades(){
+  const ser=jIndexSeries(); const g={};
+  (db.investments||[]).forEach(inv=>(inv.transactions||[]).forEach(t=>{
+    if(t.type!=='buy'&&t.type!=='sell')return;
+    const mood=(t.mood||'').trim()||'（沒標）';
+    const iv=advIdxAt(t.date); const r=iv?jAfter({date:t.date,indexVal:iv},30,ser):null;
+    const k=t.type+'|'+mood; (g[k]=g[k]||{type:t.type,mood,list:[]}).list.push({d:t.date,code:inv.code,lots:t.lots,price:t.price,r});
+  }));
+  return Object.values(g).map(x=>{const rs=x.list.filter(y=>y.r&&!y.r.pending).map(y=>y.r.ret);return{...x,n:x.list.length,avg:rs.length?rs.reduce((a,b)=>a+b,0)/rs.length:null,nr:rs.length};})
+    .sort((a,b)=>a.type.localeCompare(b.type)||b.n-a.n);
+}
+function advLastPanicSell(){
+  const L=[];
+  (db.investments||[]).forEach(inv=>(inv.transactions||[]).forEach(t=>{if(t.type==='sell'&&/焦慮|恐慌|PTSD/.test(t.mood||''))L.push({d:t.date,code:inv.code,mood:t.mood});}));
+  if(!L.length)return null;
+  L.sort((a,b)=>b.d.localeCompare(a.d));
+  const last=L[0].d; const grp=L.filter(x=>_dayDiff(last,x.d)<=7);
+  const from=grp[grp.length-1].d; const iv=advIdxAt(last); const ser=jIndexSeries();
+  const after=ser.filter(p=>p.d>last); const low=after.filter(p=>_dayDiff(p.d,last)<=30).reduce((m,p)=>(!m||p.v<m.v)?p:m,null);
+  const m1=iv?jAfter({date:last,indexVal:iv},30,ser):null; const now=ser[ser.length-1];
+  return{from,to:last,codes:[...new Set(grp.map(x=>x.code))],mood:L[0].mood,iv,low,m1,now};
+}
+const _advPct=v=>v==null?'—':(v>=0?'+':'')+v.toFixed(1)+'%';
+const _advCol=v=>v==null?'#64748b':v>=0?'#dc2626':'#16a34a';
+const _advW=n=>{const a=Math.abs(n);return (n<0?'−':'')+(a>=10000?(a/10000).toFixed(1)+' 萬':Math.round(a).toLocaleString());};
+
+// ── 抽屜 ──
+let _advTab='cards', _advCard=null, _advEdit=false;
+function openAdvisor(tab,cardId){
+  advEnsure();
+  _drawerPushCurrent();
+  if(tab)_advTab=tab; _advCard=cardId||null; _advEdit=false;
+  renderAdvisor(); openDrawer('adv-drawer');
+  const b=document.getElementById('adv-body'); if(b)b.scrollTop=0;
+}
+function advGo(tab,cardId){_advTab=tab;_advCard=cardId||null;_advEdit=false;renderAdvisor();const b=document.getElementById('adv-body');if(b)b.scrollTop=0;}
+const _advBtn=(c)=>`padding:7px 13px;border-radius:9px;border:${c?'1px solid '+c:'1px solid #e2e8f0'};background:${c||'#fff'};color:${c?'#fff':'#334155'};font-size:13px;font-weight:700;cursor:pointer`;
+const _advBox='background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:12px 14px;margin-bottom:10px';
+const _advQ='font-size:12.5px;color:#334155;background:#f8fafc;border-left:3px solid #cbd5e1;padding:5px 9px;margin:5px 0;border-radius:0 6px 6px 0';
+function _advRole(r){const R=ADV_ROLES[r]||ADV_ROLES.other;return`<span style="display:inline-block;font-size:11px;font-weight:700;border-radius:6px;padding:2px 8px;background:${R.bg};color:${R.c};white-space:nowrap">${R.n}</span>`;}
+function _advQuote(q){return`<div style="${_advQ}">「${_ae(q.t)}」<span style="color:#94a3b8;font-size:11px;margin-left:6px">${_ae(q.d)} ${_ae(q.s||'')}</span></div>`;}
+
+function renderAdvisor(){
+  const body=document.getElementById('adv-body'); if(!body)return;
+  const A=advEnsure();
+  const tabs=[['cards','定位卡'],['ev','證據筆記'],['mood','我的情緒交易紀錄'],['rem','季報提醒'],['set','設定']];
+  const tabHTML=`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">${tabs.map(([k,n])=>`<button onclick="advGo('${k}')" style="padding:5px 12px;border-radius:99px;font-size:12px;cursor:pointer;border:1px solid ${_advTab===k&&!_advCard?'#ea580c':'#e2e8f0'};background:${_advTab===k&&!_advCard?'#ea580c':'#fff'};color:${_advTab===k&&!_advCard?'#fff':'#475569'}">${n}</button>`).join('')}</div>`;
+  let h='';
+  if(_advCard){h=_advCard==='lev'?advLevHTML():advCardHTML(_advCard);}
+  else if(_advTab==='ev')h=advEvTabHTML();
+  else if(_advTab==='mood')h=advMoodHTML();
+  else if(_advTab==='rem')h=advRemHTML();
+  else if(_advTab==='set')h=advSetHTML();
+  else h=advOverviewHTML();
+  body.innerHTML=`<div style="padding:14px 16px">${_advCard?'':tabHTML}${h}</div>`;
+  if(typeof applyPrivacy==='function')applyPrivacy();
+}
+
+function advOverviewHTML(){
+  const A=db.advisor; const E=advExposure(); const P=advPledge(); const DR=advLatestDebtRatio();
+  const drafts=A.cards.filter(c=>!c.confirmed).length;
+  let h='';
+  if(drafts)h+=`<div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:9px 11px;font-size:12.5px;color:#9a3412;margin-bottom:10px">📝 有 <b>${drafts}</b> 張定位卡還是<b>草稿</b>（從你的日誌、舊日誌、交易備註和季報 AI 回顧擬的）。點開每張，看完按「✅ 確認」。冷靜卡在草稿狀態也會提醒，但會標示「草稿」。</div>`;
+  // 想賣／想買清單
+  const W=(A.wants||[]);
+  if(W.length){
+    h+=`<div style="${_advBox};border-color:#bfdbfe;background:#eff6ff"><b style="font-size:13px">📌 48 小時清單</b><span style="font-size:11px;color:#64748b">（到期後再看一次，訊號還在才動作）</span>`+
+      W.map(w=>{const left=w.ts+48*3600000-Date.now();const due=left<=0;
+        return`<div style="display:flex;align-items:center;gap:8px;font-size:12.5px;padding:6px 0;border-bottom:1px dashed #cbd5e1">
+          <span style="flex:1">${w.type==='sell'?'賣出':'買進'} <b>${_ae(w.code)}</b> ${w.lots} 張 @${w.price}　<span style="color:#64748b">${_ae(w.d)}｜${_ae(w.reason||'')}</span></span>
+          <span style="font-size:11px;font-weight:700;color:${due?'#c2410c':'#64748b'}">${due?'⏰ 已到期，可以再看一次':'還有 '+Math.ceil(left/3600000)+' 小時'}</span>
+          <button onclick="advWantDel('${w.id}')" style="${_advBtn()};padding:3px 8px;font-size:11px">移除</button></div>`;}).join('')+`</div>`;
+  }
+  // 反覆模式
+  h+=`<div style="${_advBox};border-color:#fecaca;background:#fff5f5"><b style="font-size:13px">🔁 你季報裡反覆出現的模式</b><span style="font-size:11px;color:#94a3b8">（從你存的 ${Object.keys(db.quarterReports||{}).length} 份 AI 回顧整理）</span>
+    <ul style="margin:4px 0 0;padding-left:18px;font-size:12.5px;line-height:1.7">${(A.patterns||[]).map(p=>`<li><b>${_ae(p.t)}</b>：${_ae(p.c)}</li>`).join('')}</ul></div>`;
+  // 槓桿應變計畫
+  const lev=A.lev||{};
+  h+=`<div style="${_advBox};border-style:dashed;cursor:pointer" onclick="advGo('cards','lev')"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">${'<span style="display:inline-block;font-size:11px;font-weight:700;border-radius:6px;padding:2px 8px;background:#fee2e2;color:#b91c1c">⚖️ 槓桿應變計畫</span>'}
+    <b style="font-size:13px">維持率 <span class="privacy-mask">${P?P.ratio.toFixed(1)+'%':'—'}</span>｜負債比 ${DR?DR.r+'%':'—'}</b>
+    <span style="margin-left:auto;font-size:12px;color:${lev.rules?'#15803d':'#c2410c'};font-weight:700">${lev.rules?'✅ 已寫好':'待你填'}</span></div>
+    ${lev.rules?`<div style="${_advQ};white-space:pre-wrap">${_ae(lev.rules)}</div>`:`<div style="${_advQ}">「${_ae(lev.note)}」<span style="color:#94a3b8;font-size:11px;margin-left:6px">${_ae(lev.src||'')}</span></div>`}</div>`;
+  // 定位卡
+  E.cards.forEach(x=>{
+    const c=x.card, R=ADV_ROLES[c.role]||ADV_ROLES.other;
+    const hasBand=c.target!=null&&c.hi!=null;
+    const st=!hasBand?'':x.pct>c.hi?`<span style="color:#c2410c;font-weight:700">超出範圍 ${(x.pct-c.hi).toFixed(0)}%</span>`:x.pct<c.lo?`<span style="color:#2563eb;font-weight:700">低於範圍 ${(c.lo-x.pct).toFixed(0)}%</span>`:'<span style="color:#15803d;font-weight:700">在範圍內</span>';
+    const lots=x.ps.reduce((s,p)=>s+p.lots,0);
+    const srcs=[...new Set(x.ps.map(p=>p.src))].join('・');
+    const held=[...new Set(x.ps.map(p=>p.code))].join('・');
+    h+=`<div style="${_advBox};cursor:pointer" onclick="advGo('cards','${c.id}')">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">${_advRole(c.role)}<b style="font-size:14px">${_ae(c.title)}</b>
+        ${c.confirmed?'<span style="font-size:11px;color:#15803d">✅</span>':'<span style="font-size:11px;background:#fef9c3;color:#854d0e;border-radius:6px;padding:1px 7px">草稿</span>'}
+        <div style="margin-left:auto;text-align:right;font-size:12px;color:#64748b">${lots?`${held} ${lots>=1?Math.round(lots*100)/100+' 張':''}｜占 ${x.pct.toFixed(0)}%<br><span class="privacy-mask" style="color:${_advCol(x.pnl)}">未實現 ${_advW(x.pnl)}</span>`:'目前 0 張'}</div></div>
+      ${hasBand?`<div style="height:7px;background:#f1f5f9;border-radius:9px;margin:9px 0 4px;position:relative">
+        <i style="position:absolute;left:${c.lo}%;width:${c.hi-c.lo}%;top:0;bottom:0;background:${R.bg};border-radius:9px"></i>
+        <i style="position:absolute;left:0;width:${Math.min(100,x.pct)}%;top:1px;bottom:1px;background:${R.bar};border-radius:9px"></i>
+        <s style="position:absolute;left:${c.target}%;top:-3px;bottom:-3px;width:2px;background:#1e293b"></s></div>
+        <div style="font-size:11px;color:#94a3b8">目標 ${c.target}%（範圍 ${c.lo}～${c.hi}%）｜目前 ${x.pct.toFixed(1)}% ・ ${st}${srcs?' ・ '+_ae(srcs):''}</div>`:`<div style="font-size:11px;color:#94a3b8;margin-top:4px">不設比重範圍${srcs?' ・ '+_ae(srcs):''}</div>`}
+      ${c.quotes?.[0]?_advQuote(c.quotes[0]):''}</div>`;
+  });
+  if(E.un.length){
+    const codes=[...new Set(E.un.map(p=>p.code))];
+    h+=`<div style="${_advBox};opacity:.9">${_advRole('other')} <b style="font-size:13px">還沒有定位卡的持股</b>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">${codes.map(c=>{const p=E.un.find(x=>x.code===c);return`<button onclick="advNewCard('${_ae(c)}')" style="${_advBtn()};font-size:12px;padding:4px 10px">＋ ${_ae(c)} ${_ae(p.name||'')}<span style="color:#94a3b8;font-weight:400">（${_ae(p.src)}）</span></button>`;}).join('')}</div>
+      <div style="font-size:11px;color:#94a3b8;margin-top:6px">點一下建立卡片，或在現有卡片「修改」裡把代號加進去。</div></div>`;
+  }
+  h+=`<div style="font-size:11px;color:#94a3b8;margin:4px 2px">比重以「主帳戶 + ${_ae(advOwnMembers().join('、')||'—')}」的市值計算（共 <span class="privacy-mask">${_advW(E.total)}</span>）。可在「設定」調整。</div>`;
+  return h;
+}
+
+function advNewCard(code){
+  const A=advEnsure(); const id='c_'+uid();
+  const p=advPositions().find(x=>x.code===code);
+  A.cards.push({id,role:'other',title:code+' '+(p?.name||''),codes:[code],target:null,lo:null,hi:null,role_t:[],keep:[],review:[],note:'',quotes:[],confirmed:false,ts:Date.now(),reviewWhen:'每季季報時'});
+  save(); _advCard=id; _advEdit=true; renderAdvisor();
+}
+
+function advCardHTML(id){
+  const A=db.advisor; const c=A.cards.find(x=>x.id===id); if(!c)return'找不到這張卡';
+  const back=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><button onclick="advGo('cards')" style="${_advBtn()};padding:4px 10px;font-size:12px;color:#ea580c;border-color:#fed7aa;background:#fff7ed">← 返回總覽</button>${_advRole(c.role)}<b style="font-size:16px">${_ae(c.title)}</b>${c.confirmed?'<span style="font-size:12px;color:#15803d">✅ 已確認</span>':'<span style="font-size:11px;background:#fef9c3;color:#854d0e;border-radius:6px;padding:1px 7px">草稿・待你確認</span>'}</div>`;
+  if(_advEdit)return back+advCardEditHTML(c);
+  const x=advExposure().cards.find(y=>y.card.id===id);
+  const ul=a=>_advLines(a).length?`<ul style="margin:2px 0 0;padding-left:18px;font-size:12.5px;line-height:1.7">${_advLines(a).map(l=>`<li>${_ae(l)}</li>`).join('')}</ul>`:'<div style="font-size:12px;color:#94a3b8">（還沒寫）</div>';
+  const H=t=>`<h4 style="margin:14px 0 4px;font-size:13px;color:#0f172a">${t}</h4>`;
+  let pledgeLine='';
+  if(c.codes?.length){const pr=advPriceAtRatio(c.codes[0],145);if(pr&&pr>0)pledgeLine=`<div style="font-size:12px;color:#64748b;margin-top:4px">📎 維持率 145% 大約對應 ${_ae(c.codes[0])} <b class="privacy-mask">${pr.toFixed(2)} 元</b>（用目前擔保品與借款試算）</div>`;}
+  const evs=(A.evidence||[]).filter(e=>e.card===id).sort((a,b)=>b.d.localeCompare(a.d));
+  const nPro=evs.filter(e=>e.st==='pro').length,nCon=evs.filter(e=>e.st==='con').length;
+  return back+`
+    ${x&&x.ps.length?`<div style="font-size:12px;color:#64748b;margin-bottom:6px">目前持有：${x.ps.map(p=>`${_ae(p.code)} ${Math.round(p.lots*1000)/1000} 張（${_ae(p.src)}）`).join('、')}｜占 ${x.pct.toFixed(1)}%</div>`:''}
+    ${H('① 它在我組合裡的角色')}${ul(c.role_t)}${(c.quotes||[]).slice(0,1).map(_advQuote).join('')}
+    ${H('② 我「不會」因為這些事賣它（已知風險）')}${ul(c.keep)}${(c.quotes||[]).slice(2,3).map(_advQuote).join('')}
+    ${H('③ 我「會」重新檢討的條件')}${ul(c.review)}${pledgeLine}
+    ${H('④ 給未來的我的一句話')}${c.note?`<div style="${_advQ};border-left-color:#ea580c">「${_ae(c.note)}」</div>`:'<div style="font-size:12px;color:#94a3b8">（還沒寫）</div>'}
+    ${H('⑤ 目標比重')}<div style="font-size:12.5px">${c.target!=null?`目標 ${c.target}%（範圍 ${c.lo}～${c.hi}%）`:'不設比重範圍'}　｜　下次檢討：${_ae(c.reviewWhen||'—')}</div>
+    ${(c.quotes||[]).length>1?H('📎 出處（你自己的話）')+(c.quotes||[]).slice(1).map(_advQuote).join(''):''}
+    ${H(`🗒️ 證據筆記　<span style="font-weight:400;font-size:12px;color:#64748b">支持 ${nPro} ・ 反方 ${nCon}</span>`)}
+    <div style="display:flex;gap:6px;margin:4px 0 6px;flex-wrap:wrap"><input id="adv-ev-t" placeholder="今天看到什麼？例：大盤跌 2%，981T 只跌 0.3%" style="flex:1;min-width:200px;border:1.5px solid #e2e8f0;border-radius:8px;padding:7px 10px;font-size:13px">
+      <select id="adv-ev-st" style="border:1.5px solid #e2e8f0;border-radius:8px;padding:6px;font-size:13px"><option value="pro">✅ 支持論點</option><option value="con">⚠️ 反方</option></select>
+      <button onclick="advEvAdd('${id}')" style="${_advBtn('#2563eb')}">⊕ 記一筆</button></div>
+    <div style="font-size:11px;color:#94a3b8;margin-bottom:4px">會自動附上當天大盤，以及這張卡持股的當日漲跌%</div>
+    ${evs.map(advEvRow).join('')||'<div style="font-size:12px;color:#94a3b8">還沒有筆記</div>'}
+    <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+      ${c.confirmed?'':`<button onclick="advConfirm('${id}')" style="${_advBtn('#ea580c')}">✅ 確認這張卡</button>`}
+      <button onclick="_advEdit=true;renderAdvisor()" style="${_advBtn()}">✏️ 修改</button>
+      <button onclick="advCopy(advCardPrompt('${id}'),'定位卡')" style="${_advBtn()}">📋 複製給 Claude 幫我挑毛病</button>
+      ${c.id.startsWith('c_')&&!['c_981t','c_core','c_sat','c_theme','c_cash'].includes(c.id)?`<button onclick="advCardDel('${id}')" style="${_advBtn()};color:#dc2626">刪除</button>`:''}
+    </div>`;
+}
+function advEvRow(e){
+  const pr=e.prices?Object.entries(e.prices).map(([k,v])=>`${_ae(k)} <span style="color:${_advCol(v)}">${_advPct(v)}</span>`).join('｜'):'';
+  return`<div style="display:flex;gap:8px;font-size:12.5px;padding:6px 0;border-bottom:1px dashed #e2e8f0;align-items:flex-start">
+    <span style="color:#94a3b8;width:78px;flex:none">${_ae(e.d)}</span><span style="flex:1">${_ae(e.t)}</span>
+    <span style="font-size:11px;color:#64748b;text-align:right">${e.idx?'大盤 '+Math.round(e.idx).toLocaleString():''}${e.idxPct!=null?` <span style="color:${_advCol(e.idxPct)}">${_advPct(e.idxPct)}</span>`:''}${pr?'<br>'+pr:''}<br><b>${e.st==='con'?'⚠️ 反方':'✅ 支持'}</b>
+    <button onclick="advEvDel('${e.id}')" style="border:none;background:none;color:#cbd5e1;cursor:pointer;font-size:11px">✕</button></span></div>`;
+}
+function advCardEditHTML(c){
+  const ta=(id,v,rows)=>`<textarea id="${id}" rows="${rows||3}" style="width:100%;box-sizing:border-box;border:1.5px solid #e2e8f0;border-radius:8px;padding:8px 10px;font-size:13px;font-family:inherit;line-height:1.6">${_ae((v||[]).join?v.join('\n'):v||'')}</textarea>`;
+  const inp=(id,v,w)=>`<input id="${id}" value="${_ae(v??'')}" style="width:${w||'100%'};box-sizing:border-box;border:1.5px solid #e2e8f0;border-radius:8px;padding:7px 10px;font-size:13px">`;
+  const L=t=>`<div style="font-size:12px;font-weight:700;color:#334155;margin:10px 0 3px">${t}</div>`;
+  return`<div style="${_advBox}">
+    ${L('名稱')}${inp('adv-e-title',c.title)}
+    ${L('類別')}<select id="adv-e-role" style="border:1.5px solid #e2e8f0;border-radius:8px;padding:6px;font-size:13px">${Object.entries(ADV_ROLES).map(([k,v])=>`<option value="${k}" ${c.role===k?'selected':''}>${v.n}</option>`).join('')}</select>
+    ${L('包含的代號（用逗號分開）')}${inp('adv-e-codes',(c.codes||[]).join(', '))}
+    ${L('目標比重 %（範圍下限～上限；三格都空白＝不設）')}<div style="display:flex;gap:6px;align-items:center">${inp('adv-e-target',c.target,'80px')} 範圍 ${inp('adv-e-lo',c.lo,'70px')} ～ ${inp('adv-e-hi',c.hi,'70px')}</div>
+    ${L('① 角色（一行一條）')}${ta('adv-e-role_t',c.role_t)}
+    ${L('② 不會因為這些事賣（一行一條）')}${ta('adv-e-keep',c.keep)}
+    ${L('③ 會重新檢討的條件（一行一條）')}${ta('adv-e-review',c.review)}
+    ${L('④ 給未來的我的一句話')}${ta('adv-e-note',c.note,2)}
+    ${L('下次檢討')}${inp('adv-e-when',c.reviewWhen)}
+    <div style="margin-top:12px;display:flex;gap:8px"><button onclick="advCardSave('${c.id}')" style="${_advBtn('#ea580c')}">💾 儲存</button><button onclick="_advEdit=false;renderAdvisor()" style="${_advBtn()}">取消</button></div></div>`;
+}
+function advCardSave(id){
+  const c=db.advisor.cards.find(x=>x.id===id); if(!c)return;
+  const v=k=>document.getElementById('adv-e-'+k)?.value??'';
+  const n=k=>{const s=v(k).trim();return s===''?null:+s;};
+  const lines=k=>v(k).split('\n').map(s=>s.trim()).filter(Boolean);
+  const t=n('target'),lo=n('lo'),hi=n('hi');
+  if(t!=null&&(lo==null||hi==null||lo>t||hi<t))return toast('範圍要包含目標，例如 目標 70、範圍 60～80');
+  Object.assign(c,{title:v('title').trim()||c.title,role:v('role'),codes:v('codes').split(/[,，\s]+/).map(s=>s.trim().toUpperCase()).filter(Boolean),target:t,lo,hi,
+    role_t:lines('role_t'),keep:lines('keep'),review:lines('review'),note:v('note').trim(),reviewWhen:v('when').trim(),ts:Date.now()});
+  save(); _advEdit=false; renderAdvisor(); toast('✅ 定位卡已儲存');
+}
+function advConfirm(id){const c=db.advisor.cards.find(x=>x.id===id);if(!c)return;c.confirmed=true;c.ts=Date.now();save();renderAdvisor();toast('✅ 已確認，買賣時會用這張卡提醒你');}
+function advCardDel(id){if(!confirm('刪除這張定位卡？'))return;db.advisor.cards=db.advisor.cards.filter(x=>x.id!==id);save();advGo('cards');}
+
+function advLevHTML(){
+  const lev=db.advisor.lev||{}; const P=advPledge(); const DR=advLatestDebtRatio();
+  const p145=advPriceAtRatio('00981T',145), p130=advPriceAtRatio('00981T',130);
+  return`<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><button onclick="advGo('cards')" style="${_advBtn()};padding:4px 10px;font-size:12px;color:#ea580c;border-color:#fed7aa;background:#fff7ed">← 返回總覽</button><b style="font-size:16px">⚖️ 槓桿應變計畫</b></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+      <div style="background:#f8fafc;border-radius:9px;padding:8px 10px"><span style="font-size:11px;color:#64748b">質押維持率</span><b style="display:block;font-size:17px" class="privacy-mask">${P?P.ratio.toFixed(1)+'%':'—'}</b><span style="font-size:11px;color:#64748b">借款 <span class="privacy-mask">${P?_advW(P.loan):'—'}</span></span></div>
+      <div style="background:#f8fafc;border-radius:9px;padding:8px 10px"><span style="font-size:11px;color:#64748b">負債比</span><b style="display:block;font-size:17px">${DR?DR.r+'%':'—'}</b><span style="font-size:11px;color:#64748b">${DR?DR.d+' 快照':''}</span></div></div>
+    ${p145?`<div style="font-size:12.5px;color:#334155;margin-bottom:8px">試算：00981T 跌到 <b class="privacy-mask">${p145.toFixed(2)}</b> 元 → 維持率約 145%；跌到 <b class="privacy-mask">${p130?.toFixed(2)}</b> 元 → 約 130%</div>`:''}
+    <div style="${_advQ}">「${_ae(lev.note)}」<span style="color:#94a3b8;font-size:11px;margin-left:6px">${_ae(lev.src||'')}</span></div>
+    <div style="font-size:12px;font-weight:700;margin:10px 0 3px">我的應變計畫（平靜時寫好，冷靜卡會顯示這段）</div>
+    <textarea id="adv-lev" rows="5" placeholder="${_ae(lev.example||'')}" style="width:100%;box-sizing:border-box;border:1.5px solid #e2e8f0;border-radius:8px;padding:8px 10px;font-size:13px;font-family:inherit;line-height:1.6">${_ae(lev.rules||'')}</textarea>
+    <div style="margin-top:8px"><button onclick="advLevSave()" style="${_advBtn('#ea580c')}">💾 儲存</button></div>`;
+}
+function advLevSave(){db.advisor.lev=db.advisor.lev||{};db.advisor.lev.rules=(document.getElementById('adv-lev')?.value||'').trim();save();toast('✅ 槓桿應變計畫已儲存');advGo('cards');}
+
+async function advEvAdd(cardId){
+  const t=(document.getElementById('adv-ev-t')?.value||'').trim(); if(!t)return toast('先寫一句你看到什麼');
+  const st=document.getElementById('adv-ev-st')?.value||'pro';
+  const c=db.advisor.cards.find(x=>x.id===cardId);
+  toast('⏳ 抓今天大盤與股價…');
+  const I=await advIndexNow(true);
+  const held=new Set(advPositions().map(p=>String(p.code).toUpperCase()));
+  const codes=(c?.codes||[]).filter(x=>held.has(String(x).toUpperCase())).slice(0,4);
+  const prices={};
+  await Promise.all(codes.map(async k=>{try{const p=await fetchPrice(k);if(p&&p.price&&typeof p.changePct==='number')prices[k]=+p.changePct;}catch(e){}}));
+  db.advisor.evidence=db.advisor.evidence||[];
+  db.advisor.evidence.push({id:uid(),card:cardId,d:_twToday(),t,st,idx:I.date===_twToday()?I.price:null,idxPct:I.date===_twToday()?I.pct:null,prices:Object.keys(prices).length?prices:null,ts:Date.now()});
+  save(); renderAdvisor(); toast('✅ 已記下');
+}
+function advEvDel(id){if(!confirm('刪除這筆筆記？'))return;db.advisor.evidence=(db.advisor.evidence||[]).filter(e=>e.id!==id);save();renderAdvisor();}
+function advEvTabHTML(){
+  const A=db.advisor; let h='';
+  A.cards.forEach(c=>{
+    const evs=(A.evidence||[]).filter(e=>e.card===c.id).sort((a,b)=>b.d.localeCompare(a.d)); if(!evs.length)return;
+    h+=`<div style="${_advBox}"><div style="display:flex;align-items:center;gap:8px">${_advRole(c.role)}<b style="font-size:13px;cursor:pointer" onclick="advGo('cards','${c.id}')">${_ae(c.title)}</b><span style="margin-left:auto;font-size:12px;color:#64748b">支持 ${evs.filter(e=>e.st==='pro').length} ・ 反方 ${evs.filter(e=>e.st==='con').length}</span></div>${evs.map(advEvRow).join('')}</div>`;
+  });
+  return (h||`<div style="font-size:13px;color:#94a3b8">還沒有證據筆記。打開任一張定位卡，按「⊕ 記一筆」。</div>`)+`<div style="font-size:11px;color:#94a3b8;margin-top:6px">每季看一次：論點的支持多、還是反方多？反方開始變多，才是檢討的時機，而不是價格。</div>`;
+}
+function advMoodHTML(){
+  const G=advMoodTrades();
+  const rows=G.map(g=>`<tr><td style="padding:7px 8px;border-bottom:1px solid #f1f5f9">${g.type==='sell'?'賣出':'買進'}</td><td style="padding:7px 8px;border-bottom:1px solid #f1f5f9">${_ae(g.mood)}</td><td style="padding:7px 8px;text-align:right;border-bottom:1px solid #f1f5f9">${g.n}</td>
+    <td style="padding:7px 8px;text-align:right;border-bottom:1px solid #f1f5f9;color:${_advCol(g.avg)};font-weight:700">${g.avg==null?'—':_advPct(g.avg)}${g.nr&&g.nr<g.n?`<span style="color:#94a3b8;font-weight:400;font-size:11px">（${g.nr} 筆）</span>`:''}</td>
+    <td style="padding:7px 8px;border-bottom:1px solid #f1f5f9;font-size:11px;color:#64748b">${g.list.slice(-3).reverse().map(x=>`${x.d.slice(5)} ${_ae(x.code)}`).join('、')}</td></tr>`).join('');
+  const L=advLastPanicSell();
+  return`${L?`<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:9px 11px;font-size:12.5px;margin-bottom:10px">🕰️ <b>最近一次焦慮／恐慌下賣出</b>：${L.from===L.to?L.to:L.from+'～'+L.to.slice(5)}（${L.codes.join('、')}，大盤 ${L.iv?Math.round(L.iv).toLocaleString():'—'}）<br>
+    ${L.low&&L.iv?`之後 30 天內最低 ${Math.round(L.low.v).toLocaleString()}（${_advPct((L.low.v/L.iv-1)*100)}）、`:''}1 個月後 ${L.m1&&!L.m1.pending?_advPct(L.m1.ret):'未到期'}${L.now&&L.iv?`、最新 ${Math.round(L.now.v).toLocaleString()}（${_advPct((L.now.v/L.iv-1)*100)}）`:''}</div>`:''}
+    <div style="${_advBox};padding:0;overflow:auto"><table style="width:100%;border-collapse:collapse;font-size:12.5px"><thead><tr style="background:#f8fafc;color:#64748b;font-size:11px"><th style="padding:7px 8px;text-align:left">動作</th><th style="padding:7px 8px;text-align:left">當時心情</th><th style="padding:7px 8px;text-align:right">筆數</th><th style="padding:7px 8px;text-align:right">1 個月後大盤（平均）</th><th style="padding:7px 8px;text-align:left">最近幾筆</th></tr></thead><tbody>${rows||'<tr><td colspan="5" style="padding:10px;color:#94a3b8">還沒有交易紀錄</td></tr>'}</tbody></table></div>
+    <div style="font-size:11px;color:#94a3b8">「1 個月後大盤」用日誌與每週快照的大盤點位估算；賣出後大盤平均上漲，代表當時賣得早。筆數少時只能參考。</div>`;
+}
+function advRemHTML(){
+  const R=advReminders(); const s48=adv48Source();
+  if(!R)return`<div style="font-size:13px;color:#94a3b8">季報的 AI 回顧裡還沒有「給自己的提醒」。</div>`;
+  return`<div style="${_advBox};border-color:#bfdbfe;background:#eff6ff"><b style="font-size:13px">📊 ${R.key} 季報給自己的提醒</b><span style="font-size:11px;color:#64748b">（冷靜卡會顯示這幾條；存了新一季的回顧就自動換成新的）</span>
+    ${R.items.map((x,i)=>`<div style="margin-top:8px;font-size:13px"><b>${i+1}. ${_ae(x.h)}</b>${x.b.length?`<div style="font-size:12px;color:#475569;line-height:1.6;margin-top:2px">${x.b.map(_ae).join('<br>')}</div>`:''}</div>`).join('')}</div>
+    ${s48?`<div style="font-size:12px;color:#64748b">⏳ 冷靜卡的「48 小時後再決定」來自你 ${s48} 季報的提醒。</div>`:''}
+    <div style="margin-top:8px"><button onclick="openQuarterReport('${R.key}')" style="${_advBtn()}">📊 打開 ${R.key} 季報</button></div>`;
+}
+function advSetHTML(){
+  const {calm,alert}=advCfg(); const own=advOwnMembers(); const mem=db.family?.members||Object.keys(db.family?.accounts||{});
+  const n=(id,v,w)=>`<input id="${id}" type="number" value="${v}" style="width:${w||'80px'};border:1.5px solid #e2e8f0;border-radius:8px;padding:5px 8px;font-size:13px">`;
+  const ck=(id,v,t)=>`<label style="display:flex;gap:7px;align-items:center;font-size:13px;margin:6px 0"><input type="checkbox" id="${id}" ${v?'checked':''}>${t}</label>`;
+  return`<div style="${_advBox}"><b style="font-size:13px">🧊 冷靜卡</b>
+    ${ck('adv-s-calm',calm.on,'開啟（賣出每次都跳）')}
+    <div style="font-size:13px;line-height:2.2">買進在這些情況才跳：金額 ≥ ${n('adv-s-amt',calm.buyAmt,'110px')} 元，或 ≥ 投資總額 ${n('adv-s-pct',calm.buyPct,'60px')}%；
+      ${n('adv-s-rebuy',calm.rebuyDays,'60px')} 天內才賣過同一檔；還沒有定位卡；買完會超出範圍。</div></div>
+    <div style="${_advBox}"><b style="font-size:13px">🧊 大漲／大跌提醒（一天最多跳一次）</b>
+    ${ck('adv-s-alert',alert.on,'開啟')}
+    <div style="font-size:13px;line-height:2.2">大盤單日 ±${n('adv-s-day',alert.day,'60px')}%　｜　距近 20 日高點 −${n('adv-s-dd',alert.dd,'60px')}%　｜　維持率 &lt; ${n('adv-s-pl',alert.pledge,'70px')}%</div>
+    ${ck('adv-s-mood',alert.mood,'當天日誌心情是 😱 恐慌 或 😤 煩躁 時也提醒')}
+    <div style="font-size:11px;color:#94a3b8">這台裝置過去 30 天跳了 <b>${advAlertCount30()}</b> 次（太常跳就把門檻調高）。</div></div>
+    <div style="${_advBox}"><b style="font-size:13px">👤 哪些家族帳戶算我自己的部位</b>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:6px">${mem.map(m=>`<label style="font-size:13px;display:flex;gap:5px;align-items:center"><input type="checkbox" class="adv-s-mem" value="${_ae(m)}" ${own.includes(m)?'checked':''}>${_ae(m)}</label>`).join('')||'<span style="font-size:12px;color:#94a3b8">沒有家族帳戶</span>'}</div></div>
+    <button onclick="advSetSave()" style="${_advBtn('#ea580c')}">💾 儲存設定</button>`;
+}
+function advSetSave(){
+  const A=advEnsure(); const g=id=>document.getElementById(id); const num=(id,d)=>{const v=parseFloat(g(id)?.value);return isNaN(v)?d:v;};
+  A.calm={on:!!g('adv-s-calm')?.checked,buyAmt:num('adv-s-amt',200000),buyPct:num('adv-s-pct',5),rebuyDays:num('adv-s-rebuy',7)};
+  A.alert={on:!!g('adv-s-alert')?.checked,day:num('adv-s-day',2),dd:num('adv-s-dd',5),pledge:num('adv-s-pl',155),mood:!!g('adv-s-mood')?.checked};
+  A.ownMembers=[...document.querySelectorAll('.adv-s-mem:checked')].map(x=>x.value);
+  save(); toast('✅ 設定已儲存'); advGo('set'); advCheckAlert(true);
+}
+function advWantDel(id){db.advisor.wants=(db.advisor.wants||[]).filter(w=>w.id!==id);save();renderAdvisor();}
+
+// ── 複製給 Claude ──
+async function advCopy(txt,label){
+  let ok=false;
+  try{await navigator.clipboard.writeText(txt);ok=true;}catch(e){}
+  if(!ok){try{const ta=document.createElement('textarea');ta.value=txt;ta.style.cssText='position:fixed;left:-9999px';document.body.appendChild(ta);ta.select();ok=document.execCommand('copy');ta.remove();}catch(e){}}
+  window._advLastPrompt=txt;
+  toast(ok?`📋 已複製${label?'（'+label+'）':''}，貼到 Claude 對話即可`:'複製失敗，請再按一次');
+  return ok;
+}
+function _advCardText(c){
+  if(!c)return'（這檔還沒有定位卡）';
+  const L=[`名稱：${c.title}（${(ADV_ROLES[c.role]||ADV_ROLES.other).n.replace(/^\S+\s/,'')}）${c.confirmed?'':'［草稿］'}`];
+  if(c.target!=null)L.push(`目標比重 ${c.target}%（範圍 ${c.lo}～${c.hi}%）`);
+  if(_advLines(c.role_t).length)L.push('角色：'+_advLines(c.role_t).join('；'));
+  if(_advLines(c.keep).length)L.push('不會賣的理由：'+_advLines(c.keep).join('；'));
+  if(_advLines(c.review).length)L.push('會檢討的條件：'+_advLines(c.review).map((x,i)=>`${'①②③④⑤⑥'[i]||'・'}${x}`).join(' '));
+  if(c.note)L.push('給自己的話：'+c.note);
+  return L.join('\n');
+}
+function advPromptText(ctx){
+  ctx=ctx||{}; const I=window._advIdx; const P=advPledge(); const DR=advLatestDebtRatio(); const M=advTodayMood(); const R=advReminders();
+  const E=advExposure();
+  const c=ctx.code?advCardOf(ctx.code):null; const ex=c?E.cards.find(x=>x.card.id===c.id):null;
+  const act=ctx.code?`${ctx.type==='sell'?'賣出':'買進'} ${ctx.code} ${ctx.lots} 張（價格 ${ctx.price}）`:'調整我的投資部位';
+  const L=[`我是長期投資人，現在想【${act}】。請你當冷靜的投資顧問：先問我問題、指出盲點，不要直接叫我買或賣。`,''];
+  L.push('【我當初寫的定位卡】',_advCardText(c));
+  if(ex)L.push(`目前占投資 ${ex.pct.toFixed(1)}%，未實現 ${_advW(ex.pnl)} 元`);
+  L.push('',`【現況】大盤 ${I?.price?Math.round(I.price).toLocaleString():'—'}${I?.pct!=null?'（今日 '+_advPct(I.pct)+'）':''}${I?.dd!=null?'，距近 20 日高點 '+_advPct(I.dd):''}｜維持率 ${P?P.ratio.toFixed(1)+'%':'—'}｜負債比 ${DR?DR.r+'%':'—'}`);
+  if(ctx.code&&ctx.type==='sell'){const pa=advPledgeAfterSell(ctx.code,ctx.lots);if(pa&&pa.pledged)L.push(`若賣出後不還款，維持率約 ${pa.before.toFixed(0)}% → ${pa.after.toFixed(0)}%`);}
+  if(db.advisor?.lev?.rules)L.push('我的槓桿應變計畫：'+db.advisor.lev.rules.replace(/\n/g,'；'));
+  if(M)L.push(`【我今天的心情】${M.e} ${M.t}${M.title?'｜日誌：'+M.title:''}`);
+  const LP=advLastPanicSell();
+  const pats=(db.advisor?.patterns||[]).map(p=>p.t);
+  L.push('【我過去的模式】'+(pats.length?pats.join('；'):'—'));
+  if(LP&&LP.iv)L.push(`  上次焦慮下賣出：${LP.to}（大盤 ${Math.round(LP.iv)}），1 個月後 ${LP.m1&&!LP.m1.pending?_advPct(LP.m1.ret):'未到期'}`);
+  if(R)L.push(`【我 ${R.key} 季報給自己的提醒】`+R.items.map((x,i)=>`${i+1}. ${x.h}`).join('；'));
+  if(ctx.reason)L.push('【我勾選的理由】'+ctx.reason);
+  L.push('','請問：這次是觸發了我自己寫的條件，還是情緒？如果是情緒，我該怎麼做？');
+  return L.join('\n');
+}
+function advCardPrompt(id){
+  const c=db.advisor.cards.find(x=>x.id===id);
+  return`下面是我替自己的一個投資部位寫的「定位卡」，請幫我挑毛病：哪些理由太模糊、哪些檢討條件無法客觀判斷、有沒有漏掉的重大風險？請具體建議怎麼改寫，不要叫我買或賣。\n\n${_advCardText(c)}\n\n我的出處（當初自己寫的話）：\n${(c.quotes||[]).map(q=>`- ${q.d}：「${q.t}」`).join('\n')}`;
+}
+
+// ── 冷靜卡 ──
+function advCalmClose(){document.getElementById('adv-calm')?.remove();clearInterval(window._advCalmTimer);}
+function advCalmOpen(ctx,proceed){
+  advCalmClose();
+  const c=advCardOf(ctx.code); const E=advExposure(); const ex=c?E.cards.find(x=>x.card.id===c.id):null;
+  const M=advTodayMood(); const R=advReminders(); const LP=ctx.type==='sell'?advLastPanicSell():null; const s48=adv48Source();
+  const isSell=ctx.type==='sell';
+  const reasons=isSell?[
+      ['review','觸發了定位卡上的檢討條件'],['rebal',`要調整比重${ex&&c.target!=null?`（目前 ${ex.pct.toFixed(0)}%，目標 ${c.target}%）`:''}`],['cash','需要用錢／降槓桿'],['fear','說不上來，就是怕再跌']]
+    :[['plan','照定位卡的計畫加碼／把比重補回範圍'],['regular','領息再投入／定期定額'],['new','新標的，我寫得出為什麼買'],['fomo','怕錯過，再不買就來不及']];
+  const kpi=(t,v,s,id)=>`<div style="background:#f8fafc;border-radius:9px;padding:8px 10px"><span style="font-size:11px;color:#64748b">${t}</span><b ${id?`id="${id}"`:''} style="display:block;font-size:15px">${v}</b><span style="font-size:11px;color:#64748b" ${id?`id="${id}-s"`:''}>${s||''}</span></div>`;
+  let k2='',k3='';
+  if(isSell){
+    k2=kpi('這筆賣出會實現',`<span class="privacy-mask" style="color:${_advCol(ctx.pnl)}">約 ${_advW(ctx.pnl)}</span>`,ctx.avg?`成本約 ${ctx.avg.toFixed(2)} → 賣 ${ctx.price}`:'');
+    const pa=advPledgeAfterSell(ctx.code,ctx.lots);
+    k3=pa&&pa.pledged?kpi('質押維持率',`<span class="privacy-mask">${pa.before.toFixed(0)}% → <span style="color:${pa.after<145?'#dc2626':'#334155'}">約 ${pa.after.toFixed(0)}%${pa.after<145?' ⚠️':''}</span></span>`,'若賣出後不還款'):kpi('質押維持率',(()=>{const P=advPledge();return P?`<span class="privacy-mask">${P.ratio.toFixed(1)}%</span>`:'—';})(),'這檔沒有質押');
+  }else{
+    k2=kpi('這筆買進金額',`<span class="privacy-mask">${_advW(ctx.amt)}</span>`,E.total?`占投資總額 ${(ctx.amt/E.total*100).toFixed(1)}%`:'');
+    k3=kpi('買完後這一類',ex&&c.hi!=null?`${((ex.mkt+ctx.amt)/(E.total+ctx.amt)*100).toFixed(1)}%`:'—',ex&&c.hi!=null?`範圍 ${c.lo}～${c.hi}%`:'沒有設比重');
+  }
+  let cardBox='';
+  if(c){
+    cardBox=isSell
+      ?`<div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:9px 11px;font-size:12.5px;color:#9a3412;margin:8px 0">🛡️ <b>你的定位卡${c.confirmed?'':'（草稿）'}說，不會因為這些事賣：</b><br>${_advLines(c.keep).map(x=>'・'+_ae(x)).join('<br>')||'（還沒寫）'}
+         ${_advLines(c.review).length?`<div style="margin-top:6px"><b>會檢討的條件，已經發生了哪一條？</b>${_advLines(c.review).map((x,i)=>`<label style="display:flex;gap:6px;align-items:flex-start;margin-top:3px;color:#7c2d12"><input type="checkbox" class="adv-c-rv" value="${i}" style="margin-top:3px">${_ae(x)}</label>`).join('')}</div>`:''}</div>`
+      :`<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:9px 11px;font-size:12.5px;color:#166534;margin:8px 0">🧭 <b>${_ae(c.title)}</b>${c.confirmed?'':'（草稿）'}：${_advLines(c.role_t).map(_ae).join(' ')||'（還沒寫角色）'}</div>`;
+  }else{
+    cardBox=`<div style="background:#fef9c3;border:1px solid #fde68a;border-radius:10px;padding:9px 11px;font-size:12.5px;color:#854d0e;margin:8px 0">✍️ <b>${_ae(ctx.code)} 還沒有定位卡。</b>${isSell?'':'先用一句話寫下為什麼買（會自動建立草稿卡）：'}
+      ${isSell?'':`<textarea id="adv-c-why" rows="2" style="width:100%;box-sizing:border-box;border:1.5px solid #fde68a;border-radius:8px;padding:6px 9px;font-size:13px;margin-top:5px;font-family:inherit" placeholder="例：AI 用電缺口，訂單到 2030；溢價超過 5% 就出場"></textarea>`}</div>`;
+  }
+  if(ctx.flags&&ctx.flags.length)cardBox=`<div style="font-size:12px;color:#64748b;margin:6px 0 0">這次會跳出來是因為：${ctx.flags.map(_ae).join('、')}</div>`+cardBox;
+  const lev=db.advisor?.lev?.rules;
+  const levBox=isSell&&lev?`<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:9px 11px;font-size:12.5px;color:#7f1d1d;margin:8px 0;white-space:pre-wrap">⚖️ <b>你的槓桿應變計畫</b>\n${_ae(lev)}</div>`:'';
+  const remBox=R?`<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:9px 11px;font-size:12.5px;color:#1e3a8a;margin:8px 0">📊 <b>你在 ${R.key} 季報給自己的提醒</b><br>${R.items.slice(0,3).map((x,i)=>`${i+1}. ${_ae(x.h)}`).join('<br>')}</div>`:'';
+  const lpBox=LP&&LP.iv?`<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:9px 11px;font-size:12.5px;color:#334155;margin:8px 0">🕰️ <b>上次類似情況：</b>${LP.from===LP.to?LP.to:LP.from+'～'+LP.to.slice(5)} 你在 ${_ae(LP.mood)} 下賣出 ${LP.codes.map(_ae).join('、')}（大盤 ${Math.round(LP.iv).toLocaleString()}）。<br>${LP.low?`之後先到 ${Math.round(LP.low.v).toLocaleString()}（${_advPct((LP.low.v/LP.iv-1)*100)}），`:''}1 個月後 ${LP.m1&&!LP.m1.pending?_advPct(LP.m1.ret):'未到期'}${LP.now?`，最新 ${Math.round(LP.now.v).toLocaleString()}（${_advPct((LP.now.v/LP.iv-1)*100)}）`:''}。</div>`:'';
+  const ov=document.createElement('div'); ov.id='adv-calm'; ov.className='mo open'; ov.style.zIndex='9600'; ov.style.alignItems='flex-start';
+  ov.innerHTML=`<div style="background:#fff;border-radius:14px;max-width:540px;width:100%;box-shadow:0 20px 50px rgba(0,0,0,.3);overflow:hidden;margin:auto 0;font-size:13px;color:#334155;line-height:1.6">
+    <div style="background:#1e293b;color:#fff;padding:11px 15px;font-weight:700;font-size:15px">🧊 先停 30 秒：你要${isSell?'賣出':'買進'} ${_ae(ctx.code)} ${ctx.lots} 張</div>
+    <div style="padding:12px 15px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        ${kpi('今日大盤','讀取中…','','adv-c-idx')}
+        ${kpi('今天日誌心情',M?`${M.e} ${M.t}`:'還沒寫',M?_ae(M.title.slice(0,22)):'寫了日誌，冷靜卡會更準')}
+        ${k2}${k3}
+      </div>
+      ${cardBox}${levBox}${remBox}${lpBox}
+      <div style="font-size:12.5px;margin:8px 0 4px"><b>這次${isSell?'賣出':'買進'}的理由屬於：</b></div>
+      ${reasons.map(([v,t])=>`<label style="display:flex;gap:7px;align-items:flex-start;margin:5px 0;cursor:pointer"><input type="radio" name="adv-c-r" value="${v}" data-t="${_ae(t)}" style="margin-top:4px" onchange="advCalmReason()">${_ae(t)}</label>`).join('')}
+      <div id="adv-c-hint" style="display:none;background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:8px 10px;font-size:12.5px;color:#9a3412;margin-top:6px"></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap">
+        <button onclick="advCalmClose()" style="${_advBtn()}">取消</button>
+        <button onclick="advCalmAsk()" style="${_advBtn()}">📋 先問 Claude</button>
+        <button onclick="advCalmWant()" style="${_advBtn()}">⏳ 48 小時後再決定</button>
+        <button id="adv-c-go" disabled onclick="advCalmGo()" style="${_advBtn()};background:#f1f5f9;color:#94a3b8;cursor:not-allowed">仍要${isSell?'賣出':'買進'}（<span id="adv-c-sec">3</span> 秒）</button>
+      </div>
+      ${s48?`<div style="font-size:11px;color:#94a3b8;text-align:right;margin-top:4px">「48 小時」是你 ${s48} 季報寫的：訊號真的改變的話，兩天後依然成立</div>`:''}
+    </div></div>`;
+  document.body.appendChild(ov);
+  window._advCalm={ctx,proceed,t0:Date.now()};
+  if(typeof applyPrivacy==='function')applyPrivacy();
+  window._advCalmTimer=setInterval(()=>{const s=Math.max(0,3-Math.floor((Date.now()-window._advCalm.t0)/1000));const el=document.getElementById('adv-c-sec');if(el)el.textContent=s;if(!s){clearInterval(window._advCalmTimer);advCalmReason();}},250);
+  advIndexNow().then(I=>{const el=document.getElementById('adv-c-idx'),s=document.getElementById('adv-c-idx-s');if(!el)return;
+    if(!I.price){el.textContent='—';return;}
+    el.innerHTML=`<span style="color:${_advCol(I.pct)}">${Math.round(I.price).toLocaleString()}${I.pct!=null?'（'+_advPct(I.pct)+'）':''}</span>`;
+    if(s)s.textContent=(I.date!==_twToday()?I.date+' 的紀錄・':'')+(I.dd!=null&&I.hi?`距 ${I.hi.d.slice(5)} 高點 ${_advPct(I.dd)}`:'');});
+}
+function advCalmReason(){
+  const r=document.querySelector('input[name="adv-c-r"]:checked'); const C=window._advCalm; if(!C)return;
+  const hint=document.getElementById('adv-c-hint'); const go=document.getElementById('adv-c-go');
+  const msg={fear:'選「說不上來」時，建議先按 <b>⏳ 48 小時後再決定</b>，或先問 Claude。你季報裡反覆出現「跌了就賣，基本面沒變」。',
+    fomo:'「怕錯過」是你 2026Q1 季報寫的 FOMO 追價：追進的那一部分幾乎每次都是短線虧損。建議分 3 批以上，間隔至少一週。',
+    review:'很好。請在上面勾選是哪一條條件，冷靜卡會記在這筆交易的備註裡。',
+    rebal:'調整比重時，先想想能不能用新進來的錢（配息、薪水）去補不足的類別，不一定要賣出。'}[r?.value];
+  if(hint){hint.style.display=msg?'block':'none';hint.innerHTML=msg||'';}
+  const ready=Date.now()-C.t0>=3000&&!!r;
+  if(go){go.disabled=!ready;go.style.background=ready?(C.ctx.type==='sell'?'#dc2626':'#2563eb'):'#f1f5f9';go.style.color=ready?'#fff':'#94a3b8';go.style.cursor=ready?'pointer':'not-allowed';go.style.borderColor=ready?'transparent':'#e2e8f0';}
+}
+function _advCalmReasonText(){
+  const r=document.querySelector('input[name="adv-c-r"]:checked'); if(!r)return'';
+  let t=r.dataset.t||'';
+  const C=window._advCalm; const c=C?advCardOf(C.ctx.code):null;
+  const rv=[...document.querySelectorAll('.adv-c-rv:checked')].map(x=>_advLines(c?.review)[+x.value]).filter(Boolean);
+  if(rv.length)t+='：'+rv.join('、');
+  return t;
+}
+function advCalmAsk(){const C=window._advCalm;if(!C)return;advCopy(advPromptText({...C.ctx,reason:_advCalmReasonText()}),'冷靜卡');}
+function advCalmWant(){
+  const C=window._advCalm; if(!C)return; const A=advEnsure();
+  A.wants=A.wants||[]; A.wants.push({id:uid(),type:C.ctx.type,code:C.ctx.code,lots:C.ctx.lots,price:C.ctx.price,d:_twToday(),ts:Date.now(),reason:_advCalmReasonText()||'還沒想清楚'});
+  save(); advCalmClose(); closeModal(C.ctx.type==='sell'?'sellModal':'buyModal');
+  toast('📌 已放進 48 小時清單（投資顧問最上面），這筆交易沒有存');
+}
+function advCalmGo(){
+  const C=window._advCalm; if(!C)return;
+  const go=document.getElementById('adv-c-go'); if(go&&go.disabled)return;
+  const reasonT=_advCalmReasonText(); const why=(document.getElementById('adv-c-why')?.value||'').trim();
+  const r=document.querySelector('input[name="adv-c-r"]:checked')?.value;
+  if(C.ctx.type==='buy'&&!advCardOf(C.ctx.code)&&!why)return toast('先寫一句「為什麼買」，會變成這檔的定位卡草稿');
+  const A=advEnsure();
+  if(why&&!advCardOf(C.ctx.code)){
+    A.cards.push({id:'c_'+uid(),role:'other',title:C.ctx.code+' '+(C.ctx.name||''),codes:[C.ctx.code],target:null,lo:null,hi:null,role_t:[why],keep:[],review:[],note:'',quotes:[{d:_twToday(),t:why,s:'買進時寫的'}],confirmed:false,ts:Date.now(),reviewWhen:'每季季報時'});
+  }
+  A.decisions=A.decisions||[]; A.decisions.push({d:_twToday(),type:C.ctx.type,code:C.ctx.code,lots:C.ctx.lots,price:C.ctx.price,reason:reasonT,key:r,ts:Date.now()});
+  if(A.decisions.length>300)A.decisions=A.decisions.slice(-300);
+  // 理由寫進這筆交易的備註，季報複製給 AI 時看得到
+  const rm=document.getElementById(C.ctx.type==='sell'?'s-remark':'b-remark');
+  if(rm&&reasonT&&!rm.value.includes('〔冷靜卡'))rm.value=(rm.value.trim()?rm.value.trim()+' ':'')+`〔冷靜卡：${reasonT}〕`;
+  advCalmClose();
+  window._advCalmPass=true;
+  try{C.proceed();}finally{window._advCalmPass=false;}
+}
+function _advSellCtx(){
+  const inv=db.investments.find(i=>i.id===sellInvId); if(!inv)return null;
+  const price=parseFloat(document.getElementById('s-price')?.value); const date=document.getElementById('s-date')?.value;
+  const checked=document.querySelectorAll('#lot-picker input[type=checkbox]:checked');
+  if(!date||!price||price<=0||!checked.length)return null;
+  let lots=0,cost=0,bad=false;
+  checked.forEach(cb=>{const q=parseFloat(document.getElementById('qty-'+cb.dataset.txn)?.value);const mx=parseFloat(cb.dataset.max);if(!q||q<=0||q>mx)bad=true;lots+=q||0;cost+=(q||0)*1000*parseFloat(cb.dataset.price||0);});
+  if(bad||!lots)return null;
+  return{type:'sell',code:inv.code,name:inv.name||'',lots:Math.round(lots*1000)/1000,price,date,avg:cost/(lots*1000),pnl:lots*1000*price-cost};
+}
+function _advBuyCtx(){
+  const inv=db.investments.find(i=>i.id===buyInvId); if(!inv)return null;
+  const lots=parseFloat(document.getElementById('b-lots')?.value); const price=parseFloat(document.getElementById('b-price')?.value); const date=document.getElementById('b-date')?.value;
+  if(!lots||lots<=0||!price||price<=0||!date)return null;
+  const {calm}=advCfg(); const amt=lots*1000*price; const E=advExposure(); const c=advCardOf(inv.code); const flags=[];
+  if(amt>=calm.buyAmt)flags.push(`金額 ≥ ${(calm.buyAmt/10000).toFixed(0)} 萬`);
+  else if(E.total>0&&amt/E.total*100>=calm.buyPct)flags.push(`≥ 投資總額 ${calm.buyPct}%`);
+  if(!c)flags.push('還沒有定位卡');
+  const sold=(inv.transactions||[]).filter(t=>t.type==='sell'&&t.date<=date&&_dayDiff(date,t.date)<=calm.rebuyDays).pop();
+  if(sold){const dd=_dayDiff(date,sold.date);flags.push(dd===0?'今天才賣過這檔':`${dd} 天前（${sold.date.slice(5)}）才賣過這檔`);}
+  if(c&&c.hi!=null){const ex=E.cards.find(x=>x.card.id===c.id);const after=(ex.mkt+amt)/(E.total+amt)*100;if(after>c.hi)flags.push(`買完 ${after.toFixed(0)}%，超出上限 ${c.hi}%`);}
+  return{type:'buy',code:inv.code,name:inv.name||'',lots,price,date,amt,flags};
+}
+// 包住原本的 saveBuy／saveSell（原本邏輯不動，只在前面多一道確認）
+(function(){
+  const _origSaveSell=saveSell, _origSaveBuy=saveBuy;
+  saveSell=function(){
+    const {calm}=advCfg();
+    if(window._advCalmPass||!calm.on)return _origSaveSell.apply(this,arguments);
+    const ctx=_advSellCtx(); if(!ctx)return _origSaveSell.apply(this,arguments); // 欄位不完整 → 交給原本的檢查顯示提示
+    advCalmOpen(ctx,()=>_origSaveSell());
+  };
+  saveBuy=function(){
+    const {calm}=advCfg(); const modal=document.getElementById('buyModal');
+    if(window._advCalmPass||!calm.on||modal?.dataset.editTxnId)return _origSaveBuy.apply(this,arguments);
+    const ctx=_advBuyCtx(); if(!ctx||!ctx.flags.length)return _origSaveBuy.apply(this,arguments);
+    advCalmOpen(ctx,()=>_origSaveBuy());
+  };
+})();
+
+// ── 大漲／大跌提醒 ──
+function advAlertLog(){try{return JSON.parse(localStorage.getItem('adv_alert_log')||'[]');}catch(e){return[];}}
+function advAlertCount30(){const since=_addDays(_twToday(),-30);return advAlertLog().filter(d=>d>=since).length;}
+async function advCheckAlert(force){
+  const box=document.getElementById('adv-banner'); if(!box)return;
+  const {alert}=advCfg(); const today=_twToday();
+  if(!alert.on){box.innerHTML='';return;}
+  let dismissed=false; try{dismissed=localStorage.getItem('adv_bn_'+today)==='1';}catch(e){}
+  if(dismissed&&!force){box.innerHTML='';return;}
+  const I=await advIndexNow(force); const P=advPledge(); const M=advTodayMood();
+  const why=[];
+  if(I.date===today&&I.pct!=null&&Math.abs(I.pct)>=alert.day)why.push(`大盤今日 ${_advPct(I.pct)}`);
+  if(I.dd!=null&&I.dd<=-alert.dd&&I.hi)why.push(`大盤 ${I.hi.d.slice(5)} 高點 ${Math.round(I.hi.v).toLocaleString()} → ${Math.round(I.price).toLocaleString()}（${_advPct(I.dd)}）`);
+  if(P&&P.ratio<alert.pledge)why.push(`維持率 ${P.ratio.toFixed(1)}%（低於 ${alert.pledge}%）`);
+  if(alert.mood&&M&&M.mood<=2)why.push(`今天日誌心情 ${M.e} ${M.t}`);
+  if(!why.length||dismissed){box.innerHTML='';return;}
+  try{const L=advAlertLog();if(!L.includes(today)){L.push(today);localStorage.setItem('adv_alert_log',JSON.stringify(L.slice(-120)));}}catch(e){}
+  const W=(db.advisor?.wants||[]).filter(w=>w.ts+48*3600000<=Date.now()).length;
+  box.innerHTML=`<div style="background:linear-gradient(90deg,#f0fdf4,#fff);border:1px solid #bbf7d0;border-radius:12px;padding:10px 14px;display:flex;gap:12px;align-items:center;margin:0 0 12px;flex-wrap:wrap">
+    <div style="font-size:24px">🧊</div>
+    <div style="flex:1;min-width:220px;font-size:13px;color:#14532d"><b>${why.map(_ae).join('　｜　')}</b><br>今天適合寫日誌、不適合臨時下單。要買賣前，冷靜卡會先跳出來。${W?`<br>📌 48 小時清單有 ${W} 筆已到期，可以再看一次。`:''}</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      <button onclick="openJournalDrawer()" style="${_advBtn('#16a34a')};padding:6px 11px;font-size:12px">📝 寫今天日誌</button>
+      <button onclick="advIndexNow().then(()=>advCopy(advPromptText(),'先問 Claude'))" style="${_advBtn()};padding:6px 11px;font-size:12px">📋 先問 Claude</button>
+      <button onclick="openAdvisor('cards')" style="${_advBtn()};padding:6px 11px;font-size:12px">🧭 看定位卡</button>
+      <button onclick="try{localStorage.setItem('adv_bn_${today}','1')}catch(e){};document.getElementById('adv-banner').innerHTML=''" title="今天不再顯示" style="border:none;background:none;color:#94a3b8;cursor:pointer;font-size:16px">✕</button>
+    </div></div>`;
+}
+setTimeout(()=>{try{advCheckAlert();}catch(e){console.warn('advisor alert',e);}},6000);
+setTimeout(()=>{try{advCheckAlert();}catch(e){}},25000);
+
 </script>
 
 </div><!-- /main-content -->
