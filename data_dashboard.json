@@ -1572,7 +1572,7 @@
     {
       "id": "mncull1439i",
       "bank": "Line Bank",
-      "cash": 53000,
+      "cash": 50500,
       "d1Date": "",
       "d1": 0,
       "d2": 0
@@ -3048,7 +3048,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1792422583371,
+  "_ts": 1792425693176,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -8360,6 +8360,20 @@
       "fundName": "安聯台灣科技基金",
       "date": "2026-10-15",
       "amount": 1250
+    },
+    {
+      "id": "mvffz79ae8d",
+      "fundId": "mu737brxc3e",
+      "fundName": "統一奔騰基金",
+      "date": "2026-10-20",
+      "amount": 1250
+    },
+    {
+      "id": "mvffz79a9pe",
+      "fundId": "mu73ajshs13",
+      "fundName": "安聯台灣科技基金",
+      "date": "2026-10-20",
+      "amount": 1250
     }
   ],
   "mobile_cache": {
@@ -8505,50 +8519,50 @@
         "bank": "line Bank-1",
         "monthly": 17807,
         "deductDay": "13號",
-        "days": 25,
+        "days": 24,
         "pct": 60,
         "paid": 27,
         "remain": 18,
         "ok": true,
-        "diff": 13298
+        "diff": 10798
       },
       {
         "bank": "line Bank-2",
         "monthly": 6319,
         "deductDay": "14號",
-        "days": 26,
+        "days": 25,
         "pct": 40,
         "paid": 22,
         "remain": 33,
         "ok": true,
-        "diff": 6979
+        "diff": 4479
       },
       {
         "bank": "line Bank-4",
         "monthly": 12400,
         "deductDay": "1號",
-        "days": 13,
+        "days": 12,
         "pct": 41,
         "paid": 14,
         "remain": 20,
         "ok": true,
-        "diff": 40600
+        "diff": 38100
       },
       {
         "bank": "line Bank-5",
         "monthly": 9495,
         "deductDay": "12號",
-        "days": 24,
+        "days": 23,
         "pct": 29,
         "paid": 10,
         "remain": 25,
         "ok": true,
-        "diff": 31105
+        "diff": 28605
       }
     ],
     "loanTotal": 1025458,
     "monthLoan": 46021,
-    "cashTotal": 53009
+    "cashTotal": 50509
   },
   "quarterReports": {
     "2026Q1": {
