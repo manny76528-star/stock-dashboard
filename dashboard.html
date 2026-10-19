@@ -12652,8 +12652,52 @@ function renderOvJournal(){
 // ══════════════════════════════════════
 let _currentDrawer=null;
 
+// ── 抽屜「返回上一頁」：從季報點進日誌、從日誌點相似案例，都能一層層退回 ──
+let _drawerStack=[], _drawerBackNav=false;
+function _drawerSnapshot(id){
+  const d=document.getElementById(id); if(!d)return null;
+  const sc=d.querySelector('.side-drawer-body')?.scrollTop||0;
+  if(id==='journal-drawer'){
+    const editing=document.getElementById('jd-edit-mode')?.style.display!=='none';
+    if(editing||!d.dataset.editId)return null; // 編輯中／新增中不記錄
+    return{id,kind:'journal',jid:d.dataset.editId,scroll:sc};
+  }
+  if(id==='qr-drawer')return{id,kind:'qr',key:_qrKey,scroll:sc};
+  return null;
+}
+function _drawerBackLabel(s){return s.kind==='qr'?'← 返回季報':'← 返回上一篇';}
+function paintDrawerBack(){
+  document.querySelectorAll('.drawer-back-btn').forEach(b=>b.remove());
+  if(!_currentDrawer||!_drawerStack.length)return;
+  const title=document.getElementById(_currentDrawer)?.querySelector('.side-drawer-title'); if(!title)return;
+  const b=document.createElement('button');
+  b.className='drawer-back-btn'; b.type='button'; b.textContent=_drawerBackLabel(_drawerStack[_drawerStack.length-1]);
+  b.style.cssText='padding:5px 10px;margin-right:6px;border-radius:8px;border:1px solid #e2e8f0;background:#f8fafc;color:#334155;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap';
+  b.onclick=e=>{e.stopPropagation();drawerBack();};
+  title.prepend(b);
+}
+function drawerBack(){
+  const s=_drawerStack.pop(); if(!s){closeDrawer();return;}
+  _drawerBackNav=true;
+  try{
+    if(s.kind==='qr')openQuarterReport(s.key);
+    else if(s.kind==='journal')openJournalDrawer(s.jid);
+  }finally{_drawerBackNav=false;}
+  setTimeout(()=>{const b=document.getElementById(s.id)?.querySelector('.side-drawer-body');if(b)b.scrollTop=s.scroll;},60);
+  paintDrawerBack();
+}
+
+// 在畫面內容換掉「之前」先記下目前這頁（日誌、季報會先畫內容才開抽屜）
+function _drawerPushCurrent(){
+  if(_currentDrawer&&!_drawerBackNav){const s=_drawerSnapshot(_currentDrawer);if(s)_drawerStack.push(s);}
+  window._drawerPushed=true;
+}
 function openDrawer(id){
-  if(_currentDrawer)closeDrawer();
+  if(_currentDrawer){
+    if(!_drawerBackNav&&!window._drawerPushed){const s=_drawerSnapshot(_currentDrawer);if(s)_drawerStack.push(s);}
+    _closeDrawerInner();
+  }
+  window._drawerPushed=false;
   const drawer=document.getElementById(id);
   const overlay=document.getElementById('drawer-overlay');
   if(!drawer)return;
@@ -12661,9 +12705,14 @@ function openDrawer(id){
   if(overlay)overlay.classList.add('open');
   _currentDrawer=id;
   document.body.style.overflow='hidden';
+  paintDrawerBack();
 }
 
 function closeDrawer(){
+  _drawerStack=[]; document.querySelectorAll('.drawer-back-btn').forEach(b=>b.remove());
+  _closeDrawerInner();
+}
+function _closeDrawerInner(){
   if(!_currentDrawer)return;
   const drawer=document.getElementById(_currentDrawer);
   const overlay=document.getElementById('drawer-overlay');
@@ -12761,6 +12810,7 @@ function qrData(y,q){
 }
 function openQuarterReport(key){
   const Q=qrQuarters(); if(!Q.length){toast('還沒有快照或日誌資料');return;}
+  _drawerPushCurrent();
   // 預設：最近一個「已結束」的季度；都沒有就用進行中那季
   const t=_twToday();
   _qrKey=key||_qrKey||(Q.find(x=>qrRange(x.y,x.q).end<t)||Q[0]).key;
@@ -12875,8 +12925,8 @@ function renderQuarterReport(){
       </div>`)}
     ${holdHTML}
     ${D.q?'':yearHTML}
-    ${sec('📓 本'+D.unit+'日誌（點開可看全文）',jRows)}
     ${sec('🤖 AI 本'+D.unit+'回顧',aiBox)}
+    ${sec('📓 本'+D.unit+'日誌（點開可看全文）',jRows)}
   `;
 }
 function qrAIEditorHTML(txt){
@@ -13010,6 +13060,7 @@ async function qrCopyPrompt(){
 }
 
 function openJournalDrawer(id=null){
+  _drawerPushCurrent();
   const drawer=document.getElementById('journal-drawer');
   drawer.dataset.editId=id||'';
 
@@ -13038,6 +13089,7 @@ function switchJournalDrawerMode(mode){
   const editActions=document.getElementById('jd-edit-actions');
   const title=document.getElementById('journal-drawer-title');
 
+  document.querySelectorAll('.drawer-back-btn').forEach(b=>b.style.display=mode==='edit'?'none':'');
   if(mode==='read'){
     if(readMode)readMode.style.display='';
     if(editMode)editMode.style.display='none';
