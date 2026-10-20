@@ -3048,7 +3048,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1792498450547,
+  "_ts": 1792498455565,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -7164,7 +7164,8 @@
                     "name": "琁",
                     "amt": 146
                   }
-                ]
+                ],
+                "src": "save"
               },
               {
                 "id": "mryrniqzryt",
@@ -7251,7 +7252,8 @@
                     "name": "琁",
                     "amt": 778
                   }
-                ]
+                ],
+                "src": "save"
               },
               {
                 "id": "mryrra6po4x",
@@ -8065,7 +8067,8 @@
             "amount": 324.40000000000003,
             "fee": 1,
             "remark": "",
-            "txnId": "mryrmon69ff"
+            "txnId": "mryrmon69ff",
+            "src": "save"
           },
           {
             "id": "mryrqbdwm2d",
@@ -8078,7 +8081,8 @@
             "amount": 1729,
             "fee": 1,
             "remark": "",
-            "txnId": "mryrqbdwrc8"
+            "txnId": "mryrqbdwrc8",
+            "src": "save"
           }
         ],
         "mktHistory": [
