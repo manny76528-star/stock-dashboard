@@ -17121,9 +17121,20 @@ const STYLE_A={
       const tw=x.measureText(t).width; let tx=Math.max(a.left+tw/2,Math.min(a.right-tw/2,p.x)); x.fillText(t,tx,ty);};
     const _nv=vals.filter(v=>v!=null); const _mono=_nv.every((v,k)=>k===0||v>=_nv[k-1])||_nv.every((v,k)=>k===0||v<=_nv[k-1]);
     if(!_mono&&!chart.$saNoHiLo&&hi!==lo&&_nv.length>=5){const near=k=>last-k<=Math.max(2,Math.round(vals.length*0.08));if(!near(hi))mark(hi,'最高','#dc2626',-10);if(!near(lo))mark(lo,'最低','#16a34a',18);}
+    if(chart.$saAllLast){
+      const boxes=[];x.font="700 11px 'JetBrains Mono',monospace";
+      chart.data.datasets.forEach((d,di)=>{if(!chart.isDatasetVisible(di))return;const m=chart.getDatasetMeta(di);let k=-1;(d.data||[]).forEach((v,j)=>{if(typeof v==='number'&&isFinite(v))k=j;});
+        const pt=k>=0?m.data[k]:null;if(!pt||pt.skip)return;const t=(d.label==='總計'?'累計 ':'')+'$'+Math.round(d.data[k]).toLocaleString();
+        boxes.push({t,w:x.measureText(t).width+10,px:pt.x,y:pt.y-9,c:typeof d.borderColor==='string'?d.borderColor:'#64748b'});});
+      boxes.sort((p,q)=>p.y-q.y);for(let j=1;j<boxes.length;j++)if(boxes[j].y-boxes[j-1].y<20)boxes[j].y=boxes[j-1].y+20;
+      const ov=boxes.length?boxes[boxes.length-1].y-(a.bottom-18):0;if(ov>0)boxes.forEach(b=>b.y-=ov);
+      boxes.forEach(b=>{const bx=chart.$saRight?Math.max(a.left,b.px-b.w-8):Math.min(a.right+4,chart.width-b.w-1),by=Math.max(a.top,b.y);
+        x.fillStyle=b.c;x.beginPath();if(x.roundRect)x.roundRect(bx,by,b.w,18,4);else x.rect(bx,by,b.w,18);x.fill();x.fillStyle='#fff';x.textAlign='left';x.fillText(b.t,bx+5,by+13);});
+      x.restore();return;
+    }
     const p=meta.data[last];
-    if(p&&!p.skip){const t=_saFmt(chart,ds,vals[last]);x.font="700 11px 'JetBrains Mono',monospace";const w=x.measureText(t).width+10;
-      const bx=chart.$saRight?Math.max(a.left,p.x-w-8):Math.min(a.right+4,chart.width-w-1),by=chart.$saRight?Math.max(a.top,Math.min(a.bottom-18,p.y-24)):Math.max(a.top,Math.min(a.bottom-18,p.y-9));
+    if(p&&!p.skip){const t=(chart.$saLastPre||'')+_saFmt(chart,ds,vals[last]);x.font="700 11px 'JetBrains Mono',monospace";const w=x.measureText(t).width+10;
+      const bx=chart.$saLastPre?Math.min(p.x+8,chart.width-w-1):chart.$saRight?Math.max(a.left,p.x-w-8):Math.min(a.right+4,chart.width-w-1),by=chart.$saLastPre?Math.max(a.top,p.y-26):chart.$saRight?Math.max(a.top,Math.min(a.bottom-18,p.y-24)):Math.max(a.top,Math.min(a.bottom-18,p.y-9));
       x.fillStyle=col;x.beginPath();if(x.roundRect)x.roundRect(bx,by,w,18,4);else x.rect(bx,by,w,18);x.fill();
       x.fillStyle='#fff';x.textAlign='left';x.fillText(t,bx+5,by+13);}
     x.restore();
@@ -17715,13 +17726,20 @@ function _b6Runway(R){
   const noAcc=R.noAcc.length?`<div style="background:#fff7ed;border:1px solid #fed7aa;color:#c2410c;border-radius:10px;padding:7px 10px;margin-bottom:8px;font-size:12px">⚠️ ${R.noAcc.map(e=>_ae(e.label)).join('、')} 找不到扣款帳戶，沒辦法檢查餘額；請在信貸的「扣款帳戶」選一個現金帳戶。</div>`:'';
   return`<div id="b6-runway" class="trend-page-card" style="padding:14px 16px;margin-bottom:16px;${R.loanShort.length?'border:2px solid #dc2626':''}">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap"><b style="font-size:13.5px">🛫 現金跑道</b><span style="font-size:11.5px;color:#94a3b8">到下一次股息入帳前，${_ae(lbName)} 的錢夠不夠付每一筆扣款</span>
-      <span style="margin-left:auto;font-size:12px;font-weight:800;background:${chip[1]};color:${chip[2]};border-radius:8px;padding:3px 10px">${chip[0]}</span></div>
+      <span style="margin-left:auto;font-size:12px;font-weight:800;background:${chip[1]};color:${chip[2]};border-radius:8px;padding:3px 10px">${chip[0]}</span>
+      <button id="b6-run-btn" onclick="b6RunToggle()" style="${_b6Btn}">📈 走勢圖 ${_b6Open('run')?'▼':'▶'}</button></div>
     ${alert}${noAcc}
-    <div style="position:relative;height:170px"><canvas id="b6-run-canvas"></canvas></div>
+    <div id="b6-run-chart" style="display:${_b6Open('run')?'block':'none'};margin-bottom:4px"><div style="position:relative;height:190px"><canvas id="b6-run-canvas"></canvas></div></div>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;margin-top:8px">${tiles.join('')||'<span style="font-size:12px;color:#94a3b8">這段期間沒有扣款</span>'}</div>
     <div style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:11.5px;color:#64748b;flex-wrap:wrap">安全水位 <input id="b6-safe" type="number" min="0" step="1000" value="${R.safe||''}" placeholder="0" onchange="b6SetSafe(this.value)" style="width:90px;padding:3px 6px;border:1px solid #e2e8f0;border-radius:6px;font-size:12px;font-weight:700;text-align:right"> 元<span style="color:#94a3b8">｜餘額低於這條線會黃色提醒；信貸扣款不夠付（10 天內）會全站紅色警示</span></div>
   </div>`;
 }
+// 收合狀態（只記在這台裝置）
+function _b6OpenSet(){try{return new Set(JSON.parse(localStorage.getItem('b6Open')||'[]'));}catch(e){return new Set();}}
+function _b6Open(k){return _b6OpenSet().has(k);}
+function _b6SetOpen(k,on){const S=_b6OpenSet();on?S.add(k):S.delete(k);try{localStorage.setItem('b6Open',JSON.stringify([...S]));}catch(e){}}
+function b6RunToggle(){const on=!_b6Open('run');_b6SetOpen('run',on);const el=document.getElementById('b6-run-chart'),bt=document.getElementById('b6-run-btn');
+  if(el)el.style.display=on?'block':'none';if(bt)bt.textContent='📈 走勢圖 '+(on?'▼':'▶');if(on){try{_b6DrawRunway(cashRunway());}catch(e){console.warn(e);}}}
 function b6SetSafe(v){if(!db.settings)db.settings={};db.settings.cashSafeLine=Math.max(0,parseInt(v)||0);save();renderAssetsPage();}
 function _b6DrawRunway(R){
   const cv=document.getElementById('b6-run-canvas'); if(!cv||!window.Chart)return;
@@ -17789,6 +17807,7 @@ function _b6DebtData(){
   }
   sim.forEach(x=>{if(x.end){const j=x.end-s0;(ev[j]=ev[j]||[]).push('✅ '+(x.l.bank||'信貸')+' 還清');}});
   [...act,...clr].forEach(l=>{const j=ymOf(l.start)-s0;if(j>=0&&j<labels.length)(ev[j]=ev[j]||[]).push('📍 '+(l.bank||'信貸')+' 借入 '+_b6w(l.amount||0));});
+  clr.forEach(l=>{const j=ymOf(l.clearedDate)-s0;if(j>=0&&j<labels.length)(ev[j]=ev[j]||[]).push('✅ '+(l.bank||'信貸')+' 已還清');});
   return{labels,hist,fc,ev,s0,now,endLab:lab(e0),cur:proj[now],clr};
 }
 function _b6Debt(){
@@ -17798,22 +17817,24 @@ function _b6Debt(){
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap"><b style="font-size:14px">📉 信貸餘額走勢</b><span style="font-size:12px;color:#94a3b8">實線＝過去餘額・虛線＝照目前月付推算</span><span style="margin-left:auto;font-size:12px">現在 <b style="font-family:'JetBrains Mono',monospace">${_b6m(D.cur)}</b> → <b style="color:#16a34a">${D.endLab} 歸零</b></span></div>
     <div style="position:relative;height:220px"><canvas id="b6-debt-canvas"></canvas></div>
     ${clr.length?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;align-items:center"><span style="font-size:12px;font-weight:700">已結清：</span>${clr.map(l=>`<span style="font-size:11px;background:#f1f5f9;border-radius:6px;padding:2px 8px;color:#64748b">${_ae(l.bank)} ✅ ${l.clearedDate.slice(0,7).replace('-','/')}</span>`).join('')}</div>`:''}
-    <div style="font-size:11px;color:#94a3b8;margin-top:6px">◆ 綠色＝預計還清　○ 白點＝借入新信貸。滑鼠移上去看那個月的餘額。</div></div>`;
+    <div style="font-size:11px;color:#94a3b8;margin-top:6px">◆ 綠色＝已還清／預計還清　○ 白點＝借入新信貸。滑鼠移上去看那個月的餘額。</div></div>`;
 }
 function _b6DrawDebt(){
   const cv=document.getElementById('b6-debt-canvas'); if(!cv||!window.Chart)return;
   if(_b6DebtCh){try{_b6DebtCh.destroy();}catch(e){}_b6DebtCh=null;}
   const D=_b6DebtData(); const n=D.labels.length;
-  const isEnd=j=>(D.ev[j]||[]).some(x=>x.startsWith('✅')), isNew=j=>(D.ev[j]||[]).some(x=>x.startsWith('📍'));
+  const nowJ=D.now-D.s0;
+  const isEnd=j=>j>nowJ&&(D.ev[j]||[]).some(x=>x.startsWith('✅')), isClr=j=>j<=nowJ&&(D.ev[j]||[]).some(x=>x.startsWith('✅')), isNew=j=>(D.ev[j]||[]).some(x=>x.startsWith('📍'));
   _b6DebtCh=new Chart(cv,{type:'line',data:{labels:D.labels,datasets:[
     {label:'實際',data:D.hist,borderColor:'#7c3aed',borderWidth:2.5,tension:.3,fill:true,backgroundColor:'rgba(124,58,237,.10)',
-      pointRadius:D.labels.map((_,j)=>isNew(j)&&D.hist[j]!=null?5:0),pointBackgroundColor:'#fff',pointBorderColor:'#7c3aed',pointBorderWidth:2},
+      pointRadius:D.labels.map((_,j)=>D.hist[j]==null?0:isClr(j)?6:isNew(j)?5:0),pointStyle:D.labels.map((_,j)=>isClr(j)?'rectRot':'circle'),
+      pointBackgroundColor:D.labels.map((_,j)=>isClr(j)?'#16a34a':'#fff'),pointBorderColor:D.labels.map((_,j)=>isClr(j)?'#16a34a':'#7c3aed'),pointBorderWidth:2},
     {label:'預測',data:D.fc,borderColor:'#7c3aed',borderDash:[6,5],borderWidth:2,tension:.2,fill:false,
       pointRadius:D.labels.map((_,j)=>isEnd(j)?6:0),pointStyle:'rectRot',pointBackgroundColor:'#16a34a',pointBorderColor:'#16a34a'}]},
     options:{responsive:true,maintainAspectRatio:false,animation:false,interaction:{mode:'index',intersect:false},
-      plugins:{styleA:false,legend:{display:false},tooltip:{backgroundColor:'#0f172a',padding:10,cornerRadius:10,filter:(x)=>x.raw!=null&&!(x.datasetIndex===1&&D.hist[x.dataIndex]!=null),callbacks:{label:x=>(x.datasetIndex?'預測 ':'餘額 ')+_b6m(x.raw),afterBody:it=>(D.ev[it[0]?.dataIndex]||[])}}},
-      scales:{x:{grid:{display:false},ticks:{color:'#94a3b8',maxTicksLimit:10,autoSkip:true,maxRotation:0}},y:{min:0,grid:{color:'#eef2f7'},border:{display:false},ticks:{color:'#94a3b8',callback:v=>(v/10000)+'萬'}}}}});
-  _b6DebtCh.$saNoHiLo=true;
+      plugins:{legend:{display:false},tooltip:{filter:(x)=>x.raw!=null&&!(x.datasetIndex===1&&D.hist[x.dataIndex]!=null),callbacks:{label:x=>(x.datasetIndex?'預測 ':'餘額 ')+_b6m(x.raw),afterBody:it=>(D.ev[it[0]?.dataIndex]||[])}}},
+      scales:{x:{grid:{display:false},ticks:{color:'#94a3b8',maxTicksLimit:10,autoSkip:true,maxRotation:0}},y:{min:0,grid:{color:'#eef2f7'},border:{display:false},ticks:{color:'#94a3b8',callback:v=>(Math.round(v/1000)/10)+'萬'}}}},
+    plugins:[{id:'b6DebtPre',beforeInit(c){c.$saLastPre='目前 ';}}]});
 }
 
 // ══ ④ 現金帳戶 ══
@@ -17857,7 +17878,7 @@ function _b6FundVis(){let v={};try{v=JSON.parse(localStorage.getItem('b6FundVis'
 function b6FundToggle(key,on){const v=_b6FundVis();v[key]=!!on;try{localStorage.setItem('b6FundVis',JSON.stringify(v));}catch(e){}
   const cv=document.getElementById('b6-fund-canvas');if(cv&&cv._ch){_b6ApplyFundVis(cv);}}
 function _b6ApplyFundVis(cv){const v=_b6FundVis();cv._ch.data.datasets.forEach(ds=>{const k=ds.label==='總計'?'__total':ds.label;ds.hidden=k==='__total'?!(v[k]===true):(v[k]===false);});cv._ch.update('none');}
-(function(){const _d=drawFundAsChart;drawFundAsChart=function(canvas){const r=_d.apply(this,arguments);try{if(canvas&&canvas.dataset.pro&&canvas._ch)_b6ApplyFundVis(canvas);}catch(e){}return r;};})();
+(function(){const _d=drawFundAsChart;drawFundAsChart=function(canvas){const r=_d.apply(this,arguments);try{if(canvas&&canvas.dataset.pro&&canvas._ch){canvas._ch.$saAllLast=true;_b6ApplyFundVis(canvas);}}catch(e){}return r;};})();
 function _b6Fund(R){
   const fds=db.settings?.fundDeductions||[]; const logs=db.fundDeductionLogs||[];
   if(!fds.length)return _b6Card(`<div style="display:flex;align-items:center;gap:8px"><b style="font-size:15px">📈 定期定額基金</b><span style="font-size:12px;color:#94a3b8">還沒設定</span><button onclick="openFundSettings()" style="${_b6Btn};margin-left:auto">＋ 設定</button></div>`,'').replace('class="trend-page-card"','id="b6-fund" class="trend-page-card"');
@@ -17878,9 +17899,11 @@ function _b6Fund(R){
   const vis=_b6FundVis(); const colors=['#2563eb','#f97316','#16a34a','#8b5cf6'];
   const maxCum=Math.max(1,...fds.map(f=>logs.filter(x=>x.fundId===f.id).reduce((s,x)=>s+(x.amount||0),0)));
   const fundRows=fds.map((f,i)=>{const cum=logs.filter(x=>x.fundId===f.id).reduce((s,x)=>s+(x.amount||0),0);const isOn=f.enabled!==false;
-    return`<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:#f8fafc;${i?'border-top:1px solid #e2e8f0':''};${isOn?'':'opacity:.6'}"><span style="width:9px;height:9px;border-radius:50%;background:${isOn?'#22c55e':'#cbd5e1'};flex-shrink:0"></span><b>${_ae(f.name)}</b><span style="font-size:11px;color:#94a3b8">${(f.days||[]).map(d=>'週'+_WK[d]).join('、')}・每次 ${_b6m(f.amount||0)}${isOn?'':'・<b style="color:#f59e0b">暫停中</b>'}</span>
-      <div style="flex:1;max-width:240px;margin-left:auto">${_b6Bar(cum/maxCum*100*0.98,colors[i%colors.length])}</div><b style="font-family:'JetBrains Mono',monospace;color:#2563eb;width:84px;text-align:right">${_b6m(cum)}</b></div>
-      <div id="flog-${f.id}-box" style="background:#fff">${fundLogBoxHTML(f.id)}</div>`;}).join('');
+    const lo=_b6Open('flog:'+f.id);
+    return`<div onclick="b6FundLog('${f.id}')" style="cursor:pointer;display:flex;align-items:center;gap:10px;padding:9px 12px;background:#f8fafc;${i?'border-top:1px solid #e2e8f0':''};${isOn?'':'opacity:.6'}"><span style="width:9px;height:9px;border-radius:50%;background:${isOn?'#22c55e':'#cbd5e1'};flex-shrink:0"></span><b>${_ae(f.name)}</b><span style="font-size:11px;color:#94a3b8">${(f.days||[]).map(d=>'週'+_WK[d]).join('、')}・每次 ${_b6m(f.amount||0)}${isOn?'':'・<b style="color:#f59e0b">暫停中</b>'}</span>
+      <div style="flex:1;max-width:240px;margin-left:auto">${_b6Bar(cum/maxCum*100*0.98,colors[i%colors.length])}</div><b style="font-family:'JetBrains Mono',monospace;color:#2563eb;width:84px;text-align:right">${_b6m(cum)}</b><span id="b6-flog-arr-${f.id}" style="font-size:10px;color:#94a3b8;width:12px">${lo?'▼':'▶'}</span></div>
+      <div id="b6-flog-${f.id}" style="display:${lo?'block':'none'};background:#fff;border-top:1px solid #f1f5f9"><div id="flog-${f.id}-box">${fundLogBoxHTML(f.id)}</div></div>`;}).join('');
+  const l2=_b6Open('fund2'), fc=_b6Open('fundc');
   const ck=(key,label,col,checked,dash)=>`<label style="display:inline-flex;align-items:center;gap:4px;font-size:11.5px;cursor:pointer;border:1px solid #e2e8f0;border-radius:8px;padding:2px 8px;background:#fff"><input type="checkbox" ${checked?'checked':''} onchange="b6FundToggle('${key}',this.checked)" style="margin:0"> <span style="color:${col};font-weight:700">${dash?'┅':'●'} ${_ae(label)}</span></label>`;
   return`<div id="b6-fund" class="trend-page-card" style="padding:14px 16px;margin-bottom:16px">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><b style="font-size:15px">📈 定期定額基金</b><span style="font-size:12px;color:#94a3b8">${fds.length} 檔・從 Line Bank 扣款</span><button onclick="openFundSettings()" style="${_b6Btn};margin-left:auto">⚙️ 設定</button></div>
@@ -17891,12 +17914,22 @@ function _b6Fund(R){
       ${_b6K('每週扣款',_b6m(wk),dayTxt?(same?`${dayTxt} 各 ${_b6m(Object.values(perDay)[0])}`:dayTxt):'全部暫停')}
       ${_b6K('本月已扣',_b6m(mon),parseInt(ym.slice(5))+' 月')}
       ${nextBox}</div>
-    <div style="border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;margin-top:12px">${fundRows}</div>
-    <div style="display:flex;align-items:center;gap:6px;margin:12px 0 6px;flex-wrap:wrap"><b style="font-size:12px">📈 累積投入走勢</b>
+    <div onclick="b6FundL2()" style="cursor:pointer;margin-top:12px;display:flex;align-items:center;justify-content:space-between;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:8px 12px"><span style="font-size:12.5px;font-weight:700">📅 各檔基金扣款明細 <span style="font-weight:400;color:#94a3b8;font-size:11px">點一檔看扣款紀錄</span></span><span id="b6-fund-l2arr" style="font-size:11px;color:#94a3b8">${l2?'▼ 收起':'▶ 展開'}</span></div>
+    <div id="b6-fund-l2" style="display:${l2?'block':'none'}">
+    <div style="border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;margin-top:8px">${fundRows}</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 2px 0"><span style="font-size:12px;font-weight:700;color:#64748b">📊 總累積投入 <b style="font-size:14px;color:#2563eb;font-family:'JetBrains Mono',monospace">${_b6m(total)}</b></span><button id="b6-fund-cbtn" onclick="b6FundChart()" style="${_b6Btn}">📈 趨勢 ${fc?'▼':'▶'}</button></div>
+    <div id="b6-fund-chart" style="display:${fc?'block':'none'}">
+    <div style="display:flex;align-items:center;gap:6px;margin:10px 0 6px;flex-wrap:wrap"><b style="font-size:12px">📈 累積投入走勢</b>
       ${fds.map((f,i)=>ck(f.name,f.name.replace(/基金$/,''),colors[i%colors.length],vis[f.name]!==false)).join('')}${ck('__total','全部累計','#334155',vis.__total===true,true)}
       <span style="margin-left:auto">${crBarHTML('fund','mqya')}</span></div>
-    <div style="position:relative;height:150px"><canvas id="b6-fund-canvas" class="fund-as-canvas" data-inited="1" data-pro="1"></canvas></div></div>`;
+    <div style="position:relative;height:250px"><canvas id="b6-fund-canvas" class="fund-as-canvas" data-inited="1" data-pro="1"></canvas></div></div></div></div>`;
 }
+function _b6Tog(boxId,on){const el=document.getElementById(boxId);if(el)el.style.display=on?'block':'none';}
+function b6FundL2(){const on=!_b6Open('fund2');_b6SetOpen('fund2',on);_b6Tog('b6-fund-l2',on);const a=document.getElementById('b6-fund-l2arr');if(a)a.textContent=on?'▼ 收起':'▶ 展開';
+  if(on&&_b6Open('fundc')){const cv=document.getElementById('b6-fund-canvas');if(cv)drawFundAsChart(cv);}}
+function b6FundLog(id){const k='flog:'+id,on=!_b6Open(k);_b6SetOpen(k,on);_b6Tog('b6-flog-'+id,on);const a=document.getElementById('b6-flog-arr-'+id);if(a)a.textContent=on?'▼':'▶';}
+function b6FundChart(){const on=!_b6Open('fundc');_b6SetOpen('fundc',on);_b6Tog('b6-fund-chart',on);const b=document.getElementById('b6-fund-cbtn');if(b)b.textContent='📈 趨勢 '+(on?'▼':'▶');
+  if(on){const cv=document.getElementById('b6-fund-canvas');if(cv)drawFundAsChart(cv);}}
 
 // ══ 組合資產頁 ══
 function renderAssetsPro(){
@@ -17904,9 +17937,9 @@ function renderAssetsPro(){
   const R=cashRunway();
   box.innerHTML=_b6Overview(R)+_b6Runway(R)+_b6Loans(R)+_b6Debt()+
     `<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start"><div>${_b6Cash(R)}</div><div>${_b6Flex()}</div></div>`+_b6Fund(R);
-  try{_b6DrawRunway(R);}catch(e){console.warn('runway chart',e);}
+  try{if(_b6Open('run'))_b6DrawRunway(R);}catch(e){console.warn('runway chart',e);}
   try{_b6DrawDebt();}catch(e){console.warn('debt chart',e);}
-  try{const cv=document.getElementById('b6-fund-canvas');if(cv)drawFundAsChart(cv);}catch(e){console.warn('fund chart',e);}
+  try{const cv=document.getElementById('b6-fund-canvas');if(cv&&_b6Open('fund2')&&_b6Open('fundc'))drawFundAsChart(cv);}catch(e){console.warn('fund chart',e);}
   // 舊版 Line Bank 卡片（隱藏中）清掉，避免扣款紀錄 id 重複
   const old=document.getElementById('as-cash-body'); if(old)old.innerHTML='';
   if(typeof applyPrivacy==='function')applyPrivacy();
@@ -18128,6 +18161,51 @@ function renderAnalyticsPro(){
 setTimeout(()=>{try{renderAssetsDeduct();}catch(e){}},1500);
 setTimeout(()=>{try{renderAssetsDeduct();}catch(e){}},6000);
 
+
+// ══ 已還清信貸：新版畫面（資料、編輯、刪除沿用原本）══
+openLoanHist=function(){
+  const C=(db.clearedLoans||[]).slice().filter(l=>l);
+  C.forEach(l=>{if(!l.id)l.id=uid();});
+  const box=document.getElementById('loan-hist-results'); if(!box)return;
+  const md=document.querySelector('#loanHistModal .modal'); if(md)md.style.maxWidth='780px';
+  box.style.maxHeight='70vh';
+  const ymOf=s=>{if(!s)return null;const[y,m]=s.slice(0,7).split('-').map(Number);return y*12+m-1;};
+  const fmtYm=s=>s?s.slice(0,7).replace('-','/'):'—';
+  const dur=n=>n==null?'':(n>=12?Math.floor(n/12)+' 年':'')+(n%12?' '+(n%12)+' 個月':'');
+  if(!C.length){box.innerHTML='<div style="padding:30px;text-align:center;color:#94a3b8">尚無已結清的信貸記錄</div>';openModal('loanHistModal');return;}
+  const tot=C.reduce((s,l)=>s+(l.amount||0),0);
+  const wr=tot?C.reduce((s,l)=>s+(l.rate||0)*(l.amount||0),0)/tot:0;
+  const st=C.map(l=>ymOf(l.start)).filter(v=>v!=null), en=C.map(l=>ymOf(l.clearedDate||l.due)).filter(v=>v!=null);
+  const a0=Math.min(...st,...en), a1=Math.max(...st,...en)+1, span=Math.max(1,a1-a0);
+  const yrs=[];for(let y=Math.ceil(a0/12);y*12<=a1;y++)yrs.push(y);
+  const list=C.sort((a,b)=>(b.clearedDate||'').localeCompare(a.clearedDate||''));
+  const cols=['#16a34a','#0ea5e9','#8b5cf6','#f59e0b','#ec4899','#14b8a6'];
+  const rows=list.map((l,i)=>{
+    const s0=ymOf(l.start), e0=ymOf(l.clearedDate||l.due); const n=(s0!=null&&e0!=null)?e0-s0:null;
+    const left=s0!=null?(s0-a0)/span*100:0, w=(s0!=null&&e0!=null)?Math.max(1.5,(e0-s0)/span*100):0;
+    const c=cols[i%cols.length];
+    const paid=(l.monthly>=100&&n)?l.monthly*n:null; const intr=paid!=null&&l.amount?paid-l.amount:null;
+    return`<div style="border:1px solid #e2e8f0;border-radius:12px;padding:10px 12px;margin-bottom:8px;background:#fff">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="width:10px;height:10px;border-radius:3px;background:${c}"></span><b style="font-size:14px">${_ae(l.bank||'信貸')}</b>
+        <span style="font-size:11px;font-weight:700;border-radius:6px;padding:1px 8px;background:#dcfce7;color:#15803d">✅ ${fmtYm(l.clearedDate||l.due)} 還清</span>
+        ${l.note?`<span style="font-size:11.5px;color:#94a3b8">${_ae(l.note)}</span>`:''}
+        <span style="margin-left:auto;white-space:nowrap"><button title="編輯" data-id="${l.id}" onclick="editClearedLoan(this.dataset.id)" style="${_b6Ico}">✏️</button> <button title="刪除" data-id="${l.id}" onclick="deleteClearedLoan(this.dataset.id)" style="${_b6Ico};border-color:#fca5a5;background:#fff">🗑</button></span></div>
+      <div style="position:relative;height:10px;background:#f1f5f9;border-radius:9px;margin:9px 0 6px"><i style="position:absolute;left:${left.toFixed(2)}%;width:${w.toFixed(2)}%;top:0;bottom:0;border-radius:9px;background:${c}"></i></div>
+      <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;font-size:11.5px">
+        <div><div style="color:#94a3b8">借款</div><b style="font-family:'JetBrains Mono',monospace">${_b6m(l.amount||0)}</b></div>
+        <div><div style="color:#94a3b8">利率</div><b>${(+l.rate||0).toFixed(2)}%</b></div>
+        <div><div style="color:#94a3b8">月付</div><b style="font-family:'JetBrains Mono',monospace">${l.monthly>=100?_b6m(l.monthly):'—'}</b></div>
+        <div><div style="color:#94a3b8">期間</div><b>${fmtYm(l.start)} → ${fmtYm(l.clearedDate||l.due)}</b><div style="color:#94a3b8">${dur(n)}</div></div>
+        <div><div style="color:#94a3b8">約付利息</div><b style="font-family:'JetBrains Mono',monospace">${intr!=null&&intr>0?_b6m(intr):'—'}</b></div></div></div>`;}).join('');
+  box.innerHTML=`<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:10px">
+      ${_b6K('🎉 已還清',C.length+' 筆','','background:#f0fdf4;border-color:#bbf7d0')}
+      ${_b6K('累積清償本金',`<span style="color:#15803d">${_b6m(tot)}</span>`,'')}
+      ${_b6K('平均利率',wr.toFixed(2)+'%','依借款金額加權')}</div>
+    <div style="font-size:12px;font-weight:800;margin:4px 0 4px">📅 還款時間軸 <span style="font-weight:400;color:#94a3b8;font-size:11px">每條代表從借款到還清的期間（最新還清的在最上面）</span></div>
+    <div style="position:relative;height:16px;margin:0 0 4px;font-size:10px;color:#94a3b8">${yrs.map(y=>`<span style="position:absolute;left:${((y*12-a0)/span*100).toFixed(2)}%;transform:translateX(-50%)">${y}</span>`).join('')}</div>
+    ${rows}`;
+  openModal('loanHistModal');
+};
 </script>
 
 </div><!-- /main-content -->
