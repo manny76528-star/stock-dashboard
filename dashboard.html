@@ -275,6 +275,8 @@ select.fi{cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
   transition:filter .3s;
 }
 body.privacy .privacy-mask{filter:blur(8px);}
+body.privacy .pl-needle{display:none}
+body:not(.privacy) .pl-needle-off{display:none}
 body:not(.privacy) .privacy-mask{filter:none;}
 
 @keyframes fadeInUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
@@ -2161,6 +2163,8 @@ body:not(.privacy) .privacy-mask{filter:none;}
     </div><!-- /dbpage-overview -->
     <!-- ══ 頁面：資產與負債 ══ -->
     <div class="db-page" id="dbpage-assets">
+      <div id="assets-pro"></div>
+      <div id="assets-legacy" style="display:none">
       <!-- 上方 KPI 摘要 -->
       <div class="ov-kpi-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px">
         <div class="ov-kpi-card">
@@ -2284,6 +2288,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
           <div class="as-add-btn" onclick="openFlexModal()">＋ 新增不限用途</div>
         </div>
       </div>
+      </div><!-- /assets-legacy -->
     </div>
 
     <!-- ══ 頁面：投資與觀察 ══ -->
@@ -17114,7 +17119,8 @@ const STYLE_A={
     const mark=(k,label,c,dy)=>{const p=meta.data[k];if(!p||p.skip)return;x.fillStyle=c;x.beginPath();x.arc(p.x,p.y,4,0,Math.PI*2);x.fill();
       x.strokeStyle='#fff';x.lineWidth=1.5;x.stroke();const t=label+' '+_saFmt(chart,ds,vals[k]);let ty=p.y+dy;ty=Math.max(a.top+9,Math.min(a.bottom-3,ty));
       const tw=x.measureText(t).width; let tx=Math.max(a.left+tw/2,Math.min(a.right-tw/2,p.x)); x.fillText(t,tx,ty);};
-    if(hi!==lo&&vals.filter(v=>v!=null).length>=5){const near=k=>last-k<=Math.max(2,Math.round(vals.length*0.08));if(!near(hi))mark(hi,'最高','#dc2626',-10);if(!near(lo))mark(lo,'最低','#16a34a',18);}
+    const _nv=vals.filter(v=>v!=null); const _mono=_nv.every((v,k)=>k===0||v>=_nv[k-1])||_nv.every((v,k)=>k===0||v<=_nv[k-1]);
+    if(!_mono&&!chart.$saNoHiLo&&hi!==lo&&_nv.length>=5){const near=k=>last-k<=Math.max(2,Math.round(vals.length*0.08));if(!near(hi))mark(hi,'最高','#dc2626',-10);if(!near(lo))mark(lo,'最低','#16a34a',18);}
     const p=meta.data[last];
     if(p&&!p.skip){const t=_saFmt(chart,ds,vals[last]);x.font="700 11px 'JetBrains Mono',monospace";const w=x.measureText(t).width+10;
       const bx=chart.$saRight?Math.max(a.left,p.x-w-8):Math.min(a.right+4,chart.width-w-1),by=chart.$saRight?Math.max(a.top,Math.min(a.bottom-18,p.y-24)):Math.max(a.top,Math.min(a.bottom-18,p.y-9));
@@ -17443,7 +17449,7 @@ function renderPledgePro(){
     ${th>145?`<path d="${_plArc(cx,cy,r,ang(145),ang(th))}" fill="none" stroke="${A}" stroke-width="22"/>`:''}
     <path d="${_plArc(cx,cy,r,ang(Math.max(145,th)),ang(MAX))}" fill="none" stroke="${S}" stroke-width="22"/>
     ${[[130,'130'],[145,'145'],...(th>145?[[th,String(th)]]:[]),[200,'200']].map(([v,t])=>{const a=ang(v);const tx=cx+(r+20)*Math.cos(a),ty=cy-(r+20)*Math.sin(a);return`<text x="${tx.toFixed(1)}" y="${(ty+4).toFixed(1)}" font-size="10.5" fill="#64748b" text-anchor="middle">${t}</text>`;}).join('')}
-    <line x1="${cx}" y1="${cy}" x2="${nx.toFixed(1)}" y2="${ny.toFixed(1)}" stroke="#0f172a" stroke-width="4" stroke-linecap="round"/><circle cx="${cx}" cy="${cy}" r="8" fill="#0f172a"/></svg>`;
+    <g class="pl-needle"><line x1="${cx}" y1="${cy}" x2="${nx.toFixed(1)}" y2="${ny.toFixed(1)}" stroke="#0f172a" stroke-width="4" stroke-linecap="round"/><circle cx="${cx}" cy="${cy}" r="8" fill="#0f172a"/></g><g class="pl-needle-off"><circle cx="${cx}" cy="${cy}" r="8" fill="#cbd5e1"/><text x="${cx}" y="${cy-26}" font-size="11" fill="#94a3b8" text-anchor="middle">🔒 顯示金額後可見</text></g></svg>`;
   const top=Object.values(by).sort((a,b)=>b.mkt-a.mkt); const big=top[0];
   const pAt=(X,g)=>{if(!g||!g.lots)return null;const other=mkt-g.mkt;return (X/100*loan-other)/(g.lots*1000);};
   const drop=X=>R>0?Math.max(0,(1-X/R)*100):0;
@@ -17534,6 +17540,593 @@ function renderCashflowPro(){
   if(typeof applyPrivacy==='function')applyPrivacy();
 }
 (function(){const _r=renderAssetsPage;renderAssetsPage=function(){const r=_r.apply(this,arguments);try{renderCashflowPro();}catch(e){console.warn('cfPro',e);}return r;};})();
+
+
+// ══════════════════════════════════════════════════════════════
+// batch6：資金總覽／資產與負債改版／信貸扣款不足警示／定期定額基金卡
+//         我的持股第一層（不看股價）／家族帳戶第一層／投資分析
+//   原則：沿用原本資料與計算，只換畫面；原本的 DOM 仍保留（隱藏）給舊邏輯用
+// ══════════════════════════════════════════════════════════════
+const _b6m=v=>'$'+Math.round(Math.abs(v||0)).toLocaleString();
+const _b6s=v=>(v>=0?'+':'−')+_b6m(v);
+const _b6w=v=>{const x=Math.abs(v)/10000;return (x>=100?Math.round(x):Math.round(x*10)/10)+' 萬';};
+const _b6md=ds=>ds.slice(5).replace('-','/');
+function _b6Acc(name){const n=String(name||'Line Bank').toLowerCase().trim();return (db.cashAccounts||[]).find(c=>{const b=String(c.bank||'').toLowerCase().trim();return b&&(b===n||b.includes(n)||n.includes(b));})||null;}
+function _b6Bal(a){return a?(a.cash||0)+(a.d1||0)+(a.d2||0):0;}
+function _b6Dim(y,m){return new Date(Date.UTC(y,m,0)).getUTCDate();}
+function _b6ActiveLoans(){return (db.loans||[]).filter(l=>!l.settled&&calcLoanRemain(l)>0);}
+function _b6Card(inner,extra){return`<div class="trend-page-card" style="padding:14px 16px;margin-bottom:16px;${extra||''}">${inner}</div>`;}
+const _b6K=(t,v,s,st)=>`<div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:10px 12px;${st||''}"><div style="font-size:11px;color:#64748b">${t}</div><div style="font-size:19px;font-weight:800;margin-top:2px;font-family:'JetBrains Mono',monospace">${v}</div>${s?`<div style="font-size:11px;color:#94a3b8;margin-top:1px">${s}</div>`:''}</div>`;
+const _b6Bar=(pct,col,h)=>`<div style="height:${h||8}px;background:#f1f5f9;border-radius:9px;overflow:hidden"><i style="display:block;height:100%;border-radius:9px;width:${Math.max(0,Math.min(100,pct)).toFixed(1)}%;background:${col}"></i></div>`;
+const _b6Pill=(t,bg,c,st)=>`<span style="display:inline-block;font-size:10.5px;font-weight:700;border-radius:6px;padding:1px 7px;white-space:nowrap;background:${bg};color:${c};${st||''}">${t}</span>`;
+const _b6Btn='padding:4px 10px;border:1px solid #e2e8f0;border-radius:8px;background:#fff;color:#334155;font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit';
+const _b6Ico='width:26px;height:26px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:7px;cursor:pointer;font-size:12px;display:inline-flex;align-items:center;justify-content:center;padding:0';
+function _b6Scroll(id){setTimeout(()=>{const el=document.getElementById(id);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});},120);}
+function b6GoAssets(id){dbShowPage('assets');_b6Scroll(id||'b6-runway');}
+
+// ── 每月股息（近 3 個月平均，跟原本每月現金流同一套）──
+function _b6Income(){
+  const today=_twToday(), ym=today.slice(0,7);
+  const byM={};(db.dividends||[]).filter(d=>d.date&&d.date<=today&&!d.pending).forEach(d=>{const k=d.date.slice(0,7);byM[k]=(byM[k]||0)+(d.amount||0);});
+  const months=Object.keys(byM).sort().filter(k=>k<=ym).slice(-3);
+  const avg3=months.length?months.reduce((s,k)=>s+byM[k],0)/months.length:0;
+  const next=(db.dividends||[]).filter(d=>d.date&&(d.date>today||(d.date===today&&d.pending))).sort((a,b)=>a.date.localeCompare(b.date));
+  const nextDate=next[0]?.date||null;
+  const nextAmt=nextDate?next.filter(d=>d.date===nextDate).reduce((s,d)=>s+(d.amount||0),0):0;
+  const loans=_b6ActiveLoans();
+  const loanM=loans.reduce((s,l)=>s+(l.monthly||0),0);
+  const flex=(db.flexLoans||[]).filter(f=>!f.settled);
+  const flexM=flex.reduce((s,f)=>s+(f.monthly||0),0);
+  const inc=avg3||nextAmt, out=loanM+flexM;
+  return{inc,avg3,months,nextDate,nextAmt,loans,loanM,flex,flexM,out,net:inc-out,cov:out>0?inc/out*100:0};
+}
+
+// ══ 現金跑道：模擬每個帳戶未來每天的餘額（股息入帳、信貸扣款、基金扣款）══
+function cashRunway(minDays){
+  const today=_twToday();
+  const I=_b6Income();
+  let end=I.nextDate?_addDays(I.nextDate,2):_addDays(today,30);
+  const span=_dayDiff(end,today); if(span<(minDays||14))end=_addDays(today,minDays||14); if(span>62)end=_addDays(today,62);
+  const lb=_b6Acc('Line Bank');
+  const bal={}; (db.cashAccounts||[]).forEach(a=>bal[a.id]=_b6Bal(a));
+  const evs=[];
+  // 股息 → Line Bank（原本自動入帳就是加到 Line Bank）
+  (db.dividends||[]).forEach(d=>{if(!d.date||d.date>end)return;if(d.date>today||(d.date===today&&d.pending))evs.push({date:d.date,amt:+(d.amount||0),kind:'div',label:'💰 '+(d.code||'股息')+' 股息',acc:lb?.id});});
+  // 信貸
+  _b6ActiveLoans().forEach(l=>{const dd=parseInt(l.deductDay)||0;if(!dd)return;const acc=_b6Acc(l.deductBank);
+    for(let k=0;k<=3;k++){const t=new Date(today+'T00:00:00Z');t.setUTCDate(1);t.setUTCMonth(t.getUTCMonth()+k);
+      const y=t.getUTCFullYear(),m=t.getUTCMonth()+1;const ds=`${y}-${String(m).padStart(2,'0')}-${String(Math.min(dd,_b6Dim(y,m))).padStart(2,'0')}`;
+      if(ds<today||ds>end)continue;
+      if(ds===today){try{if(localStorage.getItem('loan_deducted_'+l.id+'_'+ds.slice(0,7)))continue;}catch(e){}}
+      evs.push({date:ds,amt:-(l.monthly||0),kind:'loan',label:l.bank||'信貸',loan:l,acc:acc?.id});}
+  });
+  // 定期基金 → Line Bank
+  const funds=(db.settings?.fundDeductions||[]).filter(f=>f.enabled!==false);
+  const logs=db.fundDeductionLogs||[];
+  for(let d=today;d<=end;d=_addDays(d,1)){const w=_dowOf(d);if(w<1||w>5)continue;
+    funds.forEach(f=>{if(!(f.days||[]).includes(w))return;if(d===today&&logs.some(x=>x.fundId===f.id&&x.date===d))return;
+      evs.push({date:d,amt:-(f.amount||0),kind:'fund',label:f.name,fund:f,acc:lb?.id});});}
+  const ord={div:0,loan:1,fund:2};
+  evs.sort((a,b)=>a.date.localeCompare(b.date)||ord[a.kind]-ord[b.kind]);
+  // 逐日
+  const series=[]; let i=0; const start=lb?bal[lb.id]:0;
+  for(let d=today;d<=end;d=_addDays(d,1)){
+    while(i<evs.length&&evs[i].date===d){const e=evs[i++];if(e.acc&&bal[e.acc]!=null){bal[e.acc]+=e.amt;e.after=bal[e.acc];}else e.after=null;}
+    series.push({date:d,bal:lb?bal[lb.id]:0});
+  }
+  let min=null; series.forEach(p=>{if(!min||p.bal<min.bal)min=p;});
+  const safe=+(db.settings?.cashSafeLine)||0;
+  const in10=_addDays(today,10), in3=_addDays(today,3);
+  const loanShort=evs.filter(e=>e.kind==='loan'&&e.date<=in10&&e.after!=null&&e.after<0);
+  const noAcc=evs.filter(e=>e.kind==='loan'&&e.date<=in10&&!e.acc);
+  const fundWarn=evs.filter(e=>e.kind==='fund'&&e.date<=in3&&e.after!=null&&e.after<safe);
+  const anyLow=series.some(p=>p.bal<safe);
+  return{today,end,lb,start,evs,series,min,safe,loanShort,noAcc,fundWarn,anyLow,I};
+}
+function _b6AccName(id){return (db.cashAccounts||[]).find(a=>a.id===id)?.bank||'扣款帳戶';}
+
+// ── 全站紅色警示 ──
+function renderLoanAlert(){
+  let R; try{R=cashRunway();}catch(e){console.warn('runway',e);return null;}
+  const host=document.querySelector('.db-content'); if(!host)return R;
+  let el=document.getElementById('b6-alert');
+  if(!R.loanShort.length){if(el)el.remove();return R;}
+  if(!el){el=document.createElement('div');el.id='b6-alert';host.insertBefore(el,host.firstChild);}
+  const f=R.loanShort[0]; const days=_dayDiff(f.date,R.today);
+  const more=R.loanShort.length>1?`（10 天內共 ${R.loanShort.length} 筆不足）`:'';
+  el.innerHTML=`<div onclick="b6GoAssets('b6-runway')" style="cursor:pointer;margin:0 0 14px;background:#dc2626;color:#fff;border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 6px 18px rgba(220,38,38,.35);animation:b6pulse 1.6s ease-in-out infinite">
+    <span style="font-size:26px">🚨</span>
+    <div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:900">信貸扣款餘額不足！${days===0?'今天':days+' 天後'}（${_b6md(f.date)}）</div>
+      <div style="font-size:12.5px;opacity:.95;margin-top:2px">${_ae(f.label)} 要扣 <b>${_b6m(f.amt)}</b>，${_ae(_b6AccName(f.acc))} 扣款前預計只剩 <b>${(f.after-f.amt)<0?'−':''}${_b6m(f.after-f.amt)}</b>，還差 <b style="background:#fff;color:#b91c1c;border-radius:5px;padding:0 6px">${_b6m(f.after)}</b>${more}。請在 ${_b6md(f.date)} 前把錢轉進去。</div></div>
+    <span style="font-size:12px;font-weight:800;background:#fff;color:#b91c1c;border-radius:8px;padding:5px 10px;white-space:nowrap">看現金跑道 ›</span></div>`;
+  return R;
+}
+(function(){const st=document.createElement('style');st.textContent='@keyframes b6pulse{0%,100%{box-shadow:0 6px 18px rgba(220,38,38,.35)}50%{box-shadow:0 6px 26px rgba(220,38,38,.75)}}';document.head.appendChild(st);})();
+
+// 左側選單：扣款不足時紅色、基金將不足時黃色
+(function(){const _r=renderAssetsDeduct;renderAssetsDeduct=function(){const r=_r.apply(this,arguments);
+  try{const R=renderLoanAlert();const nav=document.getElementById('nav-assets-deduct');
+    if(R&&nav){
+      if(R.loanShort.length){const f=R.loanShort[0];nav.innerHTML=`<span style="background:#dc2626;color:#fff;border-radius:5px;padding:0 5px;font-size:9.5px;font-weight:800">🚨 ${_b6md(f.date)} 扣款不足 差${_b6m(f.after)}</span>`;}
+      else if(R.fundWarn.length){const f=R.fundWarn[0];nav.innerHTML=`<span style="background:#fef3c7;color:#b45309;border-radius:5px;padding:0 5px;font-size:9.5px;font-weight:800">⚠️ ${_b6md(f.date)} 基金扣款後低於安全水位</span>`;}
+    }}catch(e){console.warn('b6 nav',e);}
+  return r;};})();
+
+// ══ ① 資金總覽 ══
+function _b6Overview(R){
+  const I=R.I;
+  const cT=(db.cashAccounts||[]).reduce((s,c)=>s+_b6Bal(c),0);
+  const loans=I.loans; const lR=loans.reduce((s,l)=>s+calcLoanRemain(l),0); const lO=loans.reduce((s,l)=>s+(l.amount||0),0);
+  const lPct=lO>0?(1-lR/lO)*100:0;
+  const ends=loans.map(l=>({l,e:_cfLoanEnd(l)})).filter(x=>x.e).sort((a,b)=>a.e.ym.localeCompare(b.e.ym));
+  const lastYm=ends.length?ends[ends.length-1].e.ym:null;
+  const fU=(db.flexLoans||[]).reduce((s,f)=>s+(f.used||f.remain||0),0), fL=(db.flexLoans||[]).reduce((s,f)=>s+(f.limit||0),0);
+  const inc=I.inc, net=I.net, cov=I.cov;
+  const st=cov>=120?['安全','#dcfce7','#15803d']:cov>=100?['剛好打平','#fef3c7','#b45309']:['入不敷出','#fee2e2','#b91c1c'];
+  const pc=v=>inc>0?Math.round(v/inc*100)+'% 的股息':'';
+  let cur=I.out; const steps=ends.map(x=>{cur-=x.l.monthly||0;return{ym:x.e.ym,name:x.l.bank,net:inc-Math.max(0,cur)};});
+  const chip=(t,last)=>`<span onclick="_b6Scroll('b6-debt')" style="cursor:pointer;display:inline-block;font-size:11.5px;font-weight:700;border-radius:6px;padding:3px 9px;background:${last?'#fee2e2':'#f5f3ff'};color:${last?'#b91c1c':'#6d28d9'}">${t}</span>`;
+  const wan=v=>(v>=0?'+':'−')+(Math.abs(v)/10000).toFixed(1)+' 萬';
+  const row=(v,t,s,bg,col)=>`<div style="display:flex;align-items:center;gap:8px;background:${bg};border-radius:10px;padding:8px 10px"><b style="font-family:'JetBrains Mono',monospace;width:78px;${col?'color:'+col:''}">${v}</b><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700">${t}</div><div style="font-size:11px;color:#94a3b8">${s}</div></div></div>`;
+  const flexTxt=I.flex.filter(f=>f.monthly).map(f=>`${_ae(f.name||f.bank||'')} ${Math.round(f.monthly).toLocaleString()}`).join('＋');
+  return _b6Card(`
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap"><b style="font-size:15px">💧 資金總覽</b><span style="font-size:12px;color:#94a3b8">現金、負債、每月流向一次看完</span>
+      <span style="margin-left:auto;background:${st[1]};color:${st[2]};border-radius:8px;padding:3px 10px;font-size:12px;font-weight:800">覆蓋率 ${cov.toFixed(0)}% ・ ${st[0]}</span></div>
+    <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px">
+      ${_b6K('💵 現金帳戶',_b6m(cT),I.nextAmt?`+待入帳 ${_b6m(I.nextAmt)}（${_b6md(I.nextDate)}）`:'','border-top:3px solid #0ea5e9')}
+      ${_b6K('🏦 信貸剩餘',_b6m(lR),`<div style="margin:5px 0 2px">${_b6Bar(lPct,'#7c3aed',6)}</div>已還 ${Math.round(lPct)}%${lastYm?'・'+lastYm+' 全部還清':''}`,'border-top:3px solid #7c3aed')}
+      ${_b6K('💳 不限用途已用',_b6m(fU),`<div style="margin:5px 0 2px">${_b6Bar(fL?fU/fL*100:0,'#a78bfa',6)}</div>額度 ${_b6w(fL)}（${fL?Math.round(fU/fL*100):0}%）`,'border-top:3px solid #a78bfa')}
+      ${_b6K('📈 每月淨現金流',`<span style="color:${net>=0?'#dc2626':'#16a34a'}">${_b6s(net)}</span>`,net>=0?(inc>0?`股息少 ${Math.round((1-I.out/inc)*100)}% 才會入不敷出`:''):'要靠薪水或現金補','border-top:3px solid #dc2626')}
+    </div>
+    <div style="font-size:12.5px;font-weight:800;margin-bottom:6px">🔀 每月資金流向</div>
+    <div style="display:grid;grid-template-columns:170px 30px minmax(0,1fr) 30px 190px;gap:0">
+      <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:12px;display:flex;flex-direction:column;justify-content:center"><div style="font-size:11px;color:#94a3b8">💰 每月股息進來</div><div style="font-size:22px;font-weight:900;font-family:'JetBrains Mono',monospace;color:#dc2626">${_b6m(inc)}</div><div style="font-size:11px;color:#94a3b8">${I.months.length?`近 ${I.months.length} 個月平均`:'下一筆入帳'}</div></div>
+      <div style="display:flex;align-items:center;justify-content:center;font-size:18px;color:#cbd5e1">➜</div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        ${row(Math.round(I.loanM).toLocaleString(),`🏦 信貸月繳（${loans.length} 筆）`,pc(I.loanM),'#f5f3ff')}
+        ${I.flexM?row(Math.round(I.flexM).toLocaleString(),'💳 不限用途利息',(flexTxt?flexTxt+'・':'')+pc(I.flexM),'#faf5ff'):''}
+        ${row((net>=0?'+':'−')+Math.round(Math.abs(net)).toLocaleString(),net>=0?'✨ 每月多出':'⚠️ 每月不足',net>=0?pc(net):'股息不夠付，要從現金補','#fff1f2',net>=0?'#dc2626':'#16a34a')}
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;font-size:18px;color:#cbd5e1">➜</div>
+      <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:12px;padding:12px;display:flex;flex-direction:column;justify-content:center"><div style="font-size:11px;color:#94a3b8">💵 ${net>=0?'留在現金帳戶':'現金帳戶要補'}</div><div style="font-size:22px;font-weight:900;font-family:'JetBrains Mono',monospace;color:${net>=0?'#0369a1':'#16a34a'}">${_b6s(net)}</div><div style="font-size:11px;color:#94a3b8">一年約 ${_b6s(net*12)}</div></div>
+    </div>
+    ${steps.length?`<div style="margin-top:12px;border-top:1px dashed #e2e8f0;padding-top:8px;display:flex;gap:6px;flex-wrap:wrap;align-items:center"><span style="font-size:12px;font-weight:800">📅 信貸還清後，每月多出：</span>${chip('現在 '+wan(net))}${steps.map((s,k)=>'→'+chip(s.ym+' '+wan(s.net),k===steps.length-1)).join('')}<span style="font-size:11px;color:#94a3b8">點一下看還款走勢</span></div>`:''}`);
+}
+
+// ══ ② 現金跑道 ══
+let _b6RunCh=null;
+function _b6Runway(R){
+  const lbName=R.lb?.bank||'Line Bank';
+  let chip;
+  if(R.loanShort.length) chip=['🚨 信貸扣款不足','#dc2626','#fff'];
+  else if(R.min&&R.min.bal<0) chip=[`⚠️ ${_b6md(R.min.date)} 會變負數`,'#fee2e2','#b91c1c'];
+  else if(R.anyLow) chip=[`⚠️ ${_b6md(R.min.date)} 低於安全水位`,'#fef3c7','#b45309'];
+  else chip=[`夠用・最低剩 ${_b6m(R.min?.bal||0)}（${R.min?_b6md(R.min.date):'—'}）`,'#dcfce7','#15803d'];
+  // 事件格：依日期分組（基金合併成一格）
+  const non=R.evs.filter(e=>e.kind!=='fund'&&e.acc===R.lb?.id);
+  const fund=R.evs.filter(e=>e.kind==='fund');
+  const byD={}; non.forEach(e=>{(byD[e.date]=byD[e.date]||[]).push(e);});
+  const short=new Set(R.loanShort.map(e=>e.date));
+  const tiles=Object.keys(byD).sort().map(d=>{const list=byD[d];const hasDiv=list.some(e=>e.kind==='div');const bad=short.has(d);
+    return`<div style="background:${bad?'#fee2e2':hasDiv?'#fef2f2':'#fff'};border:1px solid ${bad?'#f87171':hasDiv?'#fecaca':'#e2e8f0'};border-radius:10px;padding:7px 9px;font-size:11.5px"><b style="font-family:'JetBrains Mono',monospace">${_b6md(d)}</b> <span style="color:#94a3b8">${_WK[_dowOf(d)]}</span>${list.map(e=>`<br>${_ae(e.label)} <b style="font-family:'JetBrains Mono',monospace;color:${e.amt>0?'#dc2626':'#334155'}">${e.amt>0?'+':'−'}${Math.round(Math.abs(e.amt)).toLocaleString()}</b>`).join('')}${bad?'<br><b style="color:#b91c1c">🚨 餘額不足</b>':''}</div>`;});
+  if(fund.length){const perDay={};fund.forEach(e=>perDay[e.date]=(perDay[e.date]||0)+(-e.amt));const ds=Object.keys(perDay);const wk=[...new Set(ds.map(d=>_dowOf(d)))].sort().map(w=>_WK[w]).join('、');const per=Math.round(Object.values(perDay)[0]);
+    tiles.splice(Math.min(1,tiles.length),0,`<div style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:7px 9px;font-size:11.5px;cursor:pointer" onclick="_b6Scroll('b6-fund')"><b>每週${wk}</b><br>基金扣款 <b style="font-family:'JetBrains Mono',monospace">−${per.toLocaleString()}</b> ×${ds.length}${R.fundWarn.length?'<br><b style="color:#b45309">⚠️ 扣款後低於安全水位</b>':''}</div>`);}
+  const alert=R.loanShort.length?`<div style="background:#dc2626;color:#fff;border-radius:10px;padding:9px 12px;margin-bottom:10px;font-size:12.5px;font-weight:700">🚨 10 天內有 ${R.loanShort.length} 筆信貸扣款時餘額不夠：${R.loanShort.map(e=>`${_b6md(e.date)} ${_ae(e.label)} 差 ${_b6m(e.after)}`).join('、')}。請提前轉帳到 ${_ae(_b6AccName(R.loanShort[0].acc))}。</div>`:'';
+  const noAcc=R.noAcc.length?`<div style="background:#fff7ed;border:1px solid #fed7aa;color:#c2410c;border-radius:10px;padding:7px 10px;margin-bottom:8px;font-size:12px">⚠️ ${R.noAcc.map(e=>_ae(e.label)).join('、')} 找不到扣款帳戶，沒辦法檢查餘額；請在信貸的「扣款帳戶」選一個現金帳戶。</div>`:'';
+  return`<div id="b6-runway" class="trend-page-card" style="padding:14px 16px;margin-bottom:16px;${R.loanShort.length?'border:2px solid #dc2626':''}">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap"><b style="font-size:13.5px">🛫 現金跑道</b><span style="font-size:11.5px;color:#94a3b8">到下一次股息入帳前，${_ae(lbName)} 的錢夠不夠付每一筆扣款</span>
+      <span style="margin-left:auto;font-size:12px;font-weight:800;background:${chip[1]};color:${chip[2]};border-radius:8px;padding:3px 10px">${chip[0]}</span></div>
+    ${alert}${noAcc}
+    <div style="position:relative;height:170px"><canvas id="b6-run-canvas"></canvas></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;margin-top:8px">${tiles.join('')||'<span style="font-size:12px;color:#94a3b8">這段期間沒有扣款</span>'}</div>
+    <div style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:11.5px;color:#64748b;flex-wrap:wrap">安全水位 <input id="b6-safe" type="number" min="0" step="1000" value="${R.safe||''}" placeholder="0" onchange="b6SetSafe(this.value)" style="width:90px;padding:3px 6px;border:1px solid #e2e8f0;border-radius:6px;font-size:12px;font-weight:700;text-align:right"> 元<span style="color:#94a3b8">｜餘額低於這條線會黃色提醒；信貸扣款不夠付（10 天內）會全站紅色警示</span></div>
+  </div>`;
+}
+function b6SetSafe(v){if(!db.settings)db.settings={};db.settings.cashSafeLine=Math.max(0,parseInt(v)||0);save();renderAssetsPage();}
+function _b6DrawRunway(R){
+  const cv=document.getElementById('b6-run-canvas'); if(!cv||!window.Chart)return;
+  if(_b6RunCh){try{_b6RunCh.destroy();}catch(e){}_b6RunCh=null;}
+  const labels=R.series.map(p=>_b6md(p.date)), data=R.series.map(p=>p.bal);
+  const ds=[{label:'餘額',data,stepped:true,borderColor:'#0284c7',borderWidth:2.5,pointRadius:0,fill:true,backgroundColor:'rgba(2,132,199,.12)'}];
+  if(R.safe>0)ds.push({label:'安全水位',data:labels.map(()=>R.safe),borderColor:'#f59e0b',borderDash:[5,4],borderWidth:1.5,pointRadius:0,fill:false});
+  if(R.min&&R.min.bal<0)ds.push({label:'0',data:labels.map(()=>0),borderColor:'#dc2626',borderWidth:1.2,pointRadius:0,fill:false});
+  _b6RunCh=new Chart(cv,{type:'line',data:{labels,datasets:ds},options:{responsive:true,maintainAspectRatio:false,animation:false,interaction:{mode:'index',intersect:false},
+    plugins:{legend:{display:false},tooltip:{filter:x=>x.datasetIndex===0,callbacks:{label:x=>'餘額 '+(x.raw<0?'−':'')+'$'+Math.round(Math.abs(x.raw)).toLocaleString()}}},
+    scales:{x:{grid:{display:false},ticks:{maxTicksLimit:10,color:'#94a3b8',font:{size:10.5}}},y:{grid:{color:'#eef2f7'},border:{display:false},ticks:{color:'#94a3b8',font:{size:10.5},callback:v=>(v/10000).toFixed(v%10000?1:0)+'萬'}}}}});
+}
+
+// ══ ③ 信貸表＋餘額走勢 ══
+function _b6Loans(R){
+  const loans=R.I.loans.slice().sort((a,b)=>(parseInt(a.deductDay)||0)-(parseInt(b.deductDay)||0));
+  const lR=loans.reduce((s,l)=>s+calcLoanRemain(l),0), lO=loans.reduce((s,l)=>s+(l.amount||0),0);
+  const ends=loans.map(l=>_cfLoanEnd(l)).filter(Boolean).map(e=>e.ym).sort();
+  const nextOf=l=>R.evs.find(e=>e.kind==='loan'&&e.loan===l)||null;
+  const nextDate=l=>{const e=nextOf(l);if(e)return e.date;const dd=parseInt(l.deductDay)||0;if(!dd)return null;const t=new Date(R.today+'T00:00:00Z');let y=t.getUTCFullYear(),m=t.getUTCMonth()+1;if(t.getUTCDate()>=dd){m++;if(m>12){m=1;y++;}}return`${y}-${String(m).padStart(2,'0')}-${String(Math.min(dd,_b6Dim(y,m))).padStart(2,'0')}`;};
+  const short=new Map(R.loanShort.map(e=>[e.loan,e]));
+  const cleared=(db.clearedLoans||[]).length;
+  const rows=loans.map(l=>{const rem=calcLoanRemain(l);const pct=l.amount?(1-rem/l.amount)*100:0;const e=_cfLoanEnd(l);const nd=nextDate(l);const days=nd?_dayDiff(nd,R.today):null;const bad=short.get(l);
+    return`<tr style="border-bottom:1px solid #f1f5f9;${bad?'background:#fef2f2':''}"><td style="padding:8px"><b>${_ae(l.bank||'信貸')}</b><div style="font-size:11px;color:#94a3b8">${l.rate||0}%・剩 ${_b6m(rem)}</div></td>
+      <td style="padding:8px;min-width:120px">${_b6Bar(pct,'#7c3aed')}<div style="font-size:11px;color:#94a3b8;margin-top:2px">${Math.round(pct)}%${e?`・剩 ${e.n} 期`:''}</div></td>
+      <td style="padding:8px;text-align:right;font-family:'JetBrains Mono',monospace">${Math.round(l.monthly||0).toLocaleString()}</td>
+      <td style="padding:8px;text-align:right"><b>${nd?_b6md(nd):'—'}</b><div style="font-size:11px;color:${bad?'#b91c1c':days!=null&&days<=3?'#c2410c':'#94a3b8'};font-weight:${bad?800:400}">${bad?'🚨 差 '+_b6m(bad.after):days==null?'':days===0?'今天':days+' 天後'}</div><div style="font-size:10px;color:#94a3b8">${_ae(l.deductBank||'')}</div></td>
+      <td style="padding:8px;text-align:right;font-family:'JetBrains Mono',monospace">${e?e.ym:'—'}</td>
+      <td style="padding:8px;text-align:right;white-space:nowrap"><button title="編輯" onclick="editLoan('${l.id}')" style="${_b6Ico}">✏️</button> <button title="結清" onclick="clearLoan('${l.id}')" style="${_b6Ico}">✅</button> <button title="刪除" onclick="delLoan('${l.id}')" style="${_b6Ico};border-color:#fca5a5;background:#fff">🗑</button></td></tr>`;}).join('');
+  return`<div id="b6-loans" class="trend-page-card" style="padding:14px 16px;margin-bottom:16px;${R.loanShort.length?'border:2px solid #dc2626':''}">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap"><b style="font-size:13.5px">🏦 信貸</b><span style="font-size:11.5px;color:#94a3b8">剩 ${_b6m(lR)}・已還 ${lO?Math.round((1-lR/lO)*100):0}%${ends.length?'・全部還清 '+ends[ends.length-1]:''}</span>
+      <span style="margin-left:auto;display:flex;gap:6px"><button onclick="openLoanHist()" style="${_b6Btn};background:#f1f5f9;color:#475569">✅ 已還清 ${cleared} 筆 ▸</button><button onclick="openLoanModal()" style="${_b6Btn}">＋ 新增信貸</button></span></div>
+    ${R.loanShort.length?`<div style="background:#dc2626;color:#fff;border-radius:10px;padding:8px 12px;margin-bottom:8px;font-size:12.5px;font-weight:700">🚨 ${R.loanShort.map(e=>`${_b6md(e.date)} ${_ae(e.label)} 扣款時 ${_ae(_b6AccName(e.acc))} 還差 ${_b6m(e.after)}`).join('；')}</div>`:''}
+    <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12.5px"><tr style="font-size:11px;color:#64748b"><th style="text-align:left;padding:7px 8px;border-bottom:1px solid #e2e8f0;font-weight:600">信貸</th><th style="text-align:left;padding:7px 8px;border-bottom:1px solid #e2e8f0;font-weight:600">還款進度</th><th style="text-align:right;padding:7px 8px;border-bottom:1px solid #e2e8f0;font-weight:600">月繳</th><th style="text-align:right;padding:7px 8px;border-bottom:1px solid #e2e8f0;font-weight:600">下次扣款</th><th style="text-align:right;padding:7px 8px;border-bottom:1px solid #e2e8f0;font-weight:600">還清</th><th style="border-bottom:1px solid #e2e8f0"></th></tr>${rows||'<tr><td colspan="6" style="padding:16px;text-align:center;color:#94a3b8">沒有還款中的信貸 🎉</td></tr>'}</table></div>
+    <div style="font-size:11px;color:#94a3b8;margin-top:4px">還清日用含利息的攤還計算（依金額、利率、月付金推算）。</div></div>`;
+}
+// 某筆信貸在某月底的餘額（攤還）
+function _b6LoanBalAt(l,ymIdx){
+  const ymOf=s=>{const[y,m]=s.slice(0,7).split('-').map(Number);return y*12+m;};
+  if(!l.start||!l.amount)return 0; const s0=ymOf(l.start); if(ymIdx<s0)return 0;
+  if(l.clearedDate&&ymIdx>=ymOf(l.clearedDate))return 0;
+  const k=ymIdx-s0, r=(l.rate||0)/100/12, M=l.monthly||0;
+  let b=r>0?l.amount*Math.pow(1+r,k)-M*(Math.pow(1+r,k)-1)/r:l.amount-M*k;
+  return Math.max(0,Math.round(b));
+}
+let _b6DebtCh=null;
+function _b6DebtData(){
+  const ymOf=s=>{const[y,m]=s.slice(0,7).split('-').map(Number);return y*12+m;};
+  const lab=i=>{const y=Math.floor((i-1)/12),m=((i-1)%12)+1;return`${y}/${String(m).padStart(2,'0')}`;};
+  const t=_twToday(); const now=ymOf(t);
+  const act=_b6ActiveLoans(); const clr=(db.clearedLoans||[]).filter(l=>l.start&&l.clearedDate);
+  const starts=act.map(l=>ymOf(l.start)).filter(Boolean);
+  let s0=starts.length?Math.min(...starts):now-12; s0=Math.min(s0,now-6);
+  // 預測：逐月攤還
+  const sim=act.map(l=>({l,B:calcLoanRemain(l),r:(l.rate||0)/100/12,M:l.monthly||0,end:null}));
+  const proj={}; proj[now]=sim.reduce((s,x)=>s+x.B,0);
+  let i=now; while(sim.some(x=>x.B>0)&&i<now+240){i++;sim.forEach(x=>{if(x.B<=0)return;x.B=x.B*(1+x.r)-x.M;if(x.B<=0.5){x.B=0;x.end=i;}});proj[i]=Math.max(0,Math.round(sim.reduce((s,x)=>s+x.B,0)));}
+  const e0=i;
+  const labels=[],hist=[],fc=[],ev={};
+  for(let k=s0;k<=e0;k++){
+    labels.push(lab(k));
+    if(k<now){hist.push([...act,...clr].reduce((s,l)=>s+_b6LoanBalAt(l,k),0));fc.push(null);}
+    else if(k===now){hist.push(proj[now]);fc.push(proj[now]);}
+    else{hist.push(null);fc.push(proj[k]??0);}
+  }
+  sim.forEach(x=>{if(x.end){const j=x.end-s0;(ev[j]=ev[j]||[]).push('✅ '+(x.l.bank||'信貸')+' 還清');}});
+  [...act,...clr].forEach(l=>{const j=ymOf(l.start)-s0;if(j>=0&&j<labels.length)(ev[j]=ev[j]||[]).push('📍 '+(l.bank||'信貸')+' 借入 '+_b6w(l.amount||0));});
+  return{labels,hist,fc,ev,s0,now,endLab:lab(e0),cur:proj[now],clr};
+}
+function _b6Debt(){
+  const D=_b6DebtData();
+  const clr=D.clr.slice().sort((a,b)=>a.clearedDate.localeCompare(b.clearedDate));
+  return`<div id="b6-debt" class="trend-page-card" style="padding:14px 16px;margin-bottom:16px">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap"><b style="font-size:14px">📉 信貸餘額走勢</b><span style="font-size:12px;color:#94a3b8">實線＝過去餘額・虛線＝照目前月付推算</span><span style="margin-left:auto;font-size:12px">現在 <b style="font-family:'JetBrains Mono',monospace">${_b6m(D.cur)}</b> → <b style="color:#16a34a">${D.endLab} 歸零</b></span></div>
+    <div style="position:relative;height:220px"><canvas id="b6-debt-canvas"></canvas></div>
+    ${clr.length?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;align-items:center"><span style="font-size:12px;font-weight:700">已結清：</span>${clr.map(l=>`<span style="font-size:11px;background:#f1f5f9;border-radius:6px;padding:2px 8px;color:#64748b">${_ae(l.bank)} ✅ ${l.clearedDate.slice(0,7).replace('-','/')}</span>`).join('')}</div>`:''}
+    <div style="font-size:11px;color:#94a3b8;margin-top:6px">◆ 綠色＝預計還清　○ 白點＝借入新信貸。滑鼠移上去看那個月的餘額。</div></div>`;
+}
+function _b6DrawDebt(){
+  const cv=document.getElementById('b6-debt-canvas'); if(!cv||!window.Chart)return;
+  if(_b6DebtCh){try{_b6DebtCh.destroy();}catch(e){}_b6DebtCh=null;}
+  const D=_b6DebtData(); const n=D.labels.length;
+  const isEnd=j=>(D.ev[j]||[]).some(x=>x.startsWith('✅')), isNew=j=>(D.ev[j]||[]).some(x=>x.startsWith('📍'));
+  _b6DebtCh=new Chart(cv,{type:'line',data:{labels:D.labels,datasets:[
+    {label:'實際',data:D.hist,borderColor:'#7c3aed',borderWidth:2.5,tension:.3,fill:true,backgroundColor:'rgba(124,58,237,.10)',
+      pointRadius:D.labels.map((_,j)=>isNew(j)&&D.hist[j]!=null?5:0),pointBackgroundColor:'#fff',pointBorderColor:'#7c3aed',pointBorderWidth:2},
+    {label:'預測',data:D.fc,borderColor:'#7c3aed',borderDash:[6,5],borderWidth:2,tension:.2,fill:false,
+      pointRadius:D.labels.map((_,j)=>isEnd(j)?6:0),pointStyle:'rectRot',pointBackgroundColor:'#16a34a',pointBorderColor:'#16a34a'}]},
+    options:{responsive:true,maintainAspectRatio:false,animation:false,interaction:{mode:'index',intersect:false},
+      plugins:{styleA:false,legend:{display:false},tooltip:{backgroundColor:'#0f172a',padding:10,cornerRadius:10,filter:(x)=>x.raw!=null&&!(x.datasetIndex===1&&D.hist[x.dataIndex]!=null),callbacks:{label:x=>(x.datasetIndex?'預測 ':'餘額 ')+_b6m(x.raw),afterBody:it=>(D.ev[it[0]?.dataIndex]||[])}}},
+      scales:{x:{grid:{display:false},ticks:{color:'#94a3b8',maxTicksLimit:10,autoSkip:true,maxRotation:0}},y:{min:0,grid:{color:'#eef2f7'},border:{display:false},ticks:{color:'#94a3b8',callback:v=>(v/10000)+'萬'}}}}});
+  _b6DebtCh.$saNoHiLo=true;
+}
+
+// ══ ④ 現金帳戶 ══
+function _b6Cash(R){
+  const accs=db.cashAccounts||[]; const tot=accs.reduce((s,c)=>s+_b6Bal(c),0);
+  const fds=(db.settings?.fundDeductions||[]).filter(f=>f.enabled!==false);
+  const wk=fds.reduce((s,f)=>s+(f.amount||0)*(f.days||[]).length,0);
+  const I=R.I;
+  const rows=accs.map(a=>{const lb=a.bank==='Line Bank';const b=_b6Bal(a);
+    const sub=[a.d1?`D+1 ${a.d1>0?'+':''}${Math.round(a.d1).toLocaleString()}`:'',a.d2?`D+2 ${a.d2>0?'+':''}${Math.round(a.d2).toLocaleString()}`:''].filter(Boolean).join('・');
+    return`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f1f5f9"><div style="flex:1;min-width:0"><b>${_ae(a.bank||a.name||'帳戶')}</b> ${lb?_b6Pill('主帳戶・扣款用','#dcfce7','#15803d'):''}
+      ${sub?`<div style="font-size:11px;color:#94a3b8">現金 ${Math.round(a.cash||0).toLocaleString()}・${sub}</div>`:''}
+      ${lb&&I.nextAmt?`<div style="font-size:11px;color:#2563eb">⏳ 待入帳 ${_b6m(I.nextAmt)}（${_b6md(I.nextDate)}，${_dayDiff(I.nextDate,R.today)} 天後）</div>`:''}</div>
+      <b style="font-family:'JetBrains Mono',monospace;font-size:${lb?17:14}px;color:${b<0?'#16a34a':'#1e293b'}">${b<0?'−':''}${_b6m(b)}</b>
+      <span style="white-space:nowrap"><button onclick="editCash('${a.id}')" style="${_b6Ico}">✏️</button> <button onclick="${lb?'delLineBankProtected':'delCash'}('${a.id}')" style="${_b6Ico};border-color:#fca5a5;background:#fff">🗑</button></span></div>`;}).join('');
+  return`<div id="b6-cash" class="trend-page-card" style="padding:14px 16px;margin-bottom:16px">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><b style="font-size:13.5px">💵 現金帳戶</b><span style="font-size:11.5px;color:#94a3b8">合計 ${_b6m(tot)}</span><button onclick="openCashModal()" style="${_b6Btn};margin-left:auto">＋ 新增帳戶</button></div>
+    ${rows||'<div style="padding:16px;text-align:center;color:#94a3b8;font-size:12px">尚無現金帳戶</div>'}
+    ${fds.length?`<div onclick="_b6Scroll('b6-fund')" style="cursor:pointer;background:#f8fafc;border-radius:10px;padding:8px 10px;margin-top:8px;font-size:12px">📅 每週基金扣款 <b>${_b6m(wk)}</b>（從 Line Bank）<span style="color:#2563eb;font-weight:700;margin-left:6px">看基金 ›</span></div>`:''}</div>`;
+}
+
+// ══ ⑤ 不限用途 ══
+function _b6Flex(){
+  const fl=db.flexLoans||[]; const avail=fl.reduce((s,f)=>s+Math.max(0,(f.limit||0)-(f.used||0)),0);
+  let ratio=null; try{const P=advPledge();if(P)ratio=P.ratio;}catch(e){}
+  const rows=fl.map(f=>{const used=f.used||0,lim=f.limit||0,p=lim?used/lim*100:0;
+    const c=p>=90?['#fee2e2','#b91c1c','#ef4444']:p>=75?['#ffedd5','#c2410c','#f59e0b']:['#dbeafe','#1d4ed8','#3b82f6'];
+    return`<div style="padding:8px 0;border-bottom:1px solid #f1f5f9"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><b>${_ae(f.name||f.bank||'不限用途')}</b><span style="font-size:11px;color:#94a3b8">${f.rate||0}%・每月 ${_b6m(f.monthly||0)}</span>
+      <span style="margin-left:auto">${_b6Pill('已用 '+Math.round(p)+'%',c[0],c[1])}</span><button onclick="editFlex('${f.id}')" style="${_b6Ico}">✏️</button><button onclick="delFlex('${f.id}')" style="${_b6Ico};border-color:#fca5a5;background:#fff">🗑</button></div>
+      <div style="margin:5px 0 3px">${_b6Bar(p,c[2])}</div>
+      <div style="font-size:11px;color:#94a3b8">${_b6m(used)} ／ ${_b6m(lim)}・${p>=90?`只剩 <b style="color:#b91c1c">${_b6m(lim-used)}</b>`:`可用 ${_b6m(lim-used)}`}${f.calcPledge?`・計入質押 <a href="javascript:void 0" onclick="dbShowPage('pledge')" style="color:#2563eb">→ 維持率 <span class="privacy-mask">${ratio!=null?ratio.toFixed(1)+'%':'看質押'}</span></a>`:''}</div>
+      ${f.note?`<div style="font-size:11px;color:#64748b;margin-top:2px">📝 ${_ae(f.note)}</div>`:''}</div>`;}).join('');
+  return`<div id="b6-flex" class="trend-page-card" style="padding:14px 16px;margin-bottom:16px">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><b style="font-size:13.5px">💳 不限用途</b><span style="font-size:11.5px;color:#94a3b8">可用 ${_b6m(avail)}</span><button onclick="openFlexModal()" style="${_b6Btn};margin-left:auto">＋ 新增不限用途</button></div>
+    ${rows||'<div style="padding:16px;text-align:center;color:#94a3b8;font-size:12px">尚無不限用途</div>'}</div>`;
+}
+
+// ══ ⑥ 定期定額基金卡（全部展開）══
+let _b6FundInit=false;
+function _b6FundVis(){let v={};try{v=JSON.parse(localStorage.getItem('b6FundVis')||'{}');}catch(e){}return v;}
+function b6FundToggle(key,on){const v=_b6FundVis();v[key]=!!on;try{localStorage.setItem('b6FundVis',JSON.stringify(v));}catch(e){}
+  const cv=document.getElementById('b6-fund-canvas');if(cv&&cv._ch){_b6ApplyFundVis(cv);}}
+function _b6ApplyFundVis(cv){const v=_b6FundVis();cv._ch.data.datasets.forEach(ds=>{const k=ds.label==='總計'?'__total':ds.label;ds.hidden=k==='__total'?!(v[k]===true):(v[k]===false);});cv._ch.update('none');}
+(function(){const _d=drawFundAsChart;drawFundAsChart=function(canvas){const r=_d.apply(this,arguments);try{if(canvas&&canvas.dataset.pro&&canvas._ch)_b6ApplyFundVis(canvas);}catch(e){}return r;};})();
+function _b6Fund(R){
+  const fds=db.settings?.fundDeductions||[]; const logs=db.fundDeductionLogs||[];
+  if(!fds.length)return _b6Card(`<div style="display:flex;align-items:center;gap:8px"><b style="font-size:15px">📈 定期定額基金</b><span style="font-size:12px;color:#94a3b8">還沒設定</span><button onclick="openFundSettings()" style="${_b6Btn};margin-left:auto">＋ 設定</button></div>`,'').replace('class="trend-page-card"','id="b6-fund" class="trend-page-card"');
+  const today=R.today, ym=today.slice(0,7);
+  if(!_b6FundInit){_b6FundInit=true;fds.forEach(f=>{if(!_fundLogView[f.id])_fundLogView[f.id]='a';const mine=logs.filter(x=>x.fundId===f.id).map(x=>x.date).sort();const lm=mine.length?mine[mine.length-1].slice(0,7):ym;const key='m'+f.id+lm;if(!_fundLogOpen.has('x'+key))_fundLogOpen.add(key);});}
+  const on=fds.filter(f=>f.enabled!==false);
+  const total=logs.reduce((s,x)=>s+(x.amount||0),0);
+  const first=logs.length?logs.map(x=>x.date).sort()[0]:null;
+  const wk=on.reduce((s,f)=>s+(f.amount||0)*(f.days||[]).length,0);
+  const perDay={}; on.forEach(f=>(f.days||[]).forEach(d=>perDay[d]=(perDay[d]||0)+(f.amount||0)));
+  const dayTxt=Object.keys(perDay).sort().map(d=>'週'+_WK[d]).join('、');
+  const same=new Set(Object.values(perDay)).size===1;
+  const mon=logs.filter(x=>x.date.startsWith(ym)).reduce((s,x)=>s+(x.amount||0),0);
+  const S=fundDeductStatus()||{};
+  const warn=R.fundWarn[0];
+  const lbOk=!R.evs.some(e=>e.kind==='fund'&&e.date===S.next&&e.after!=null&&e.after<R.safe);
+  const nextBox=S.next?_b6K('下次扣款',`<span style="color:${lbOk?'#15803d':'#b45309'}">${_b6md(S.next)}（${_WK[_dowOf(S.next)]}）</span>`,`${S.last?`前次 ${_b6md(S.last)} ${S.missed?.length?'⚠️':'✓'}・`:''}Line Bank 餘額${lbOk?'足夠':'不夠'}`,lbOk?'background:#f0fdf4;border-color:#bbf7d0':'background:#fffbeb;border-color:#fde68a'):_b6K('下次扣款','—','');
+  const vis=_b6FundVis(); const colors=['#2563eb','#f97316','#16a34a','#8b5cf6'];
+  const maxCum=Math.max(1,...fds.map(f=>logs.filter(x=>x.fundId===f.id).reduce((s,x)=>s+(x.amount||0),0)));
+  const fundRows=fds.map((f,i)=>{const cum=logs.filter(x=>x.fundId===f.id).reduce((s,x)=>s+(x.amount||0),0);const isOn=f.enabled!==false;
+    return`<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:#f8fafc;${i?'border-top:1px solid #e2e8f0':''};${isOn?'':'opacity:.6'}"><span style="width:9px;height:9px;border-radius:50%;background:${isOn?'#22c55e':'#cbd5e1'};flex-shrink:0"></span><b>${_ae(f.name)}</b><span style="font-size:11px;color:#94a3b8">${(f.days||[]).map(d=>'週'+_WK[d]).join('、')}・每次 ${_b6m(f.amount||0)}${isOn?'':'・<b style="color:#f59e0b">暫停中</b>'}</span>
+      <div style="flex:1;max-width:240px;margin-left:auto">${_b6Bar(cum/maxCum*100*0.98,colors[i%colors.length])}</div><b style="font-family:'JetBrains Mono',monospace;color:#2563eb;width:84px;text-align:right">${_b6m(cum)}</b></div>
+      <div id="flog-${f.id}-box" style="background:#fff">${fundLogBoxHTML(f.id)}</div>`;}).join('');
+  const ck=(key,label,col,checked,dash)=>`<label style="display:inline-flex;align-items:center;gap:4px;font-size:11.5px;cursor:pointer;border:1px solid #e2e8f0;border-radius:8px;padding:2px 8px;background:#fff"><input type="checkbox" ${checked?'checked':''} onchange="b6FundToggle('${key}',this.checked)" style="margin:0"> <span style="color:${col};font-weight:700">${dash?'┅':'●'} ${_ae(label)}</span></label>`;
+  return`<div id="b6-fund" class="trend-page-card" style="padding:14px 16px;margin-bottom:16px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><b style="font-size:15px">📈 定期定額基金</b><span style="font-size:12px;color:#94a3b8">${fds.length} 檔・從 Line Bank 扣款</span><button onclick="openFundSettings()" style="${_b6Btn};margin-left:auto">⚙️ 設定</button></div>
+    ${warn?`<div style="background:#fef3c7;border:1px solid #fde68a;color:#b45309;border-radius:10px;padding:8px 12px;margin-bottom:10px;font-size:12.5px;font-weight:700">⚠️ ${_b6md(warn.date)}（${_WK[_dowOf(warn.date)]}）基金扣款後 Line Bank 預計剩 ${warn.after<0?'−':''}${_b6m(warn.after)}，${R.safe>0?`低於安全水位 ${_b6m(R.safe)}`:'不夠扣'}，記得先補錢。</div>`:''}
+    ${S.missed?.length?`<div style="background:#fef3c7;border:1px solid #fde68a;color:#b45309;border-radius:10px;padding:6px 12px;margin-bottom:10px;font-size:12px">⚠️ ${S.missed.map(_b6md).join('、')} 沒有扣款紀錄（可能漏扣）</div>`:''}
+    <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px">
+      ${_b6K('總累積投入',`<span style="color:#2563eb">${_b6m(total)}</span>`,first?_b6md(first)+(first.slice(0,4)!==today.slice(0,4)?' '+first.slice(0,4):'')+' 開始':'')}
+      ${_b6K('每週扣款',_b6m(wk),dayTxt?(same?`${dayTxt} 各 ${_b6m(Object.values(perDay)[0])}`:dayTxt):'全部暫停')}
+      ${_b6K('本月已扣',_b6m(mon),parseInt(ym.slice(5))+' 月')}
+      ${nextBox}</div>
+    <div style="border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;margin-top:12px">${fundRows}</div>
+    <div style="display:flex;align-items:center;gap:6px;margin:12px 0 6px;flex-wrap:wrap"><b style="font-size:12px">📈 累積投入走勢</b>
+      ${fds.map((f,i)=>ck(f.name,f.name.replace(/基金$/,''),colors[i%colors.length],vis[f.name]!==false)).join('')}${ck('__total','全部累計','#334155',vis.__total===true,true)}
+      <span style="margin-left:auto">${crBarHTML('fund','mqya')}</span></div>
+    <div style="position:relative;height:150px"><canvas id="b6-fund-canvas" class="fund-as-canvas" data-inited="1" data-pro="1"></canvas></div></div>`;
+}
+
+// ══ 組合資產頁 ══
+function renderAssetsPro(){
+  const box=document.getElementById('assets-pro'); if(!box)return;
+  const R=cashRunway();
+  box.innerHTML=_b6Overview(R)+_b6Runway(R)+_b6Loans(R)+_b6Debt()+
+    `<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start"><div>${_b6Cash(R)}</div><div>${_b6Flex()}</div></div>`+_b6Fund(R);
+  try{_b6DrawRunway(R);}catch(e){console.warn('runway chart',e);}
+  try{_b6DrawDebt();}catch(e){console.warn('debt chart',e);}
+  try{const cv=document.getElementById('b6-fund-canvas');if(cv)drawFundAsChart(cv);}catch(e){console.warn('fund chart',e);}
+  // 舊版 Line Bank 卡片（隱藏中）清掉，避免扣款紀錄 id 重複
+  const old=document.getElementById('as-cash-body'); if(old)old.innerHTML='';
+  if(typeof applyPrivacy==='function')applyPrivacy();
+}
+(function(){const _r=renderAssetsPage;renderAssetsPage=function(){const r=_r.apply(this,arguments);try{renderAssetsPro();}catch(e){console.warn('assetsPro',e);}try{renderLoanAlert();}catch(e){}return r;};})();
+// 基金紀錄切換時，舊函式只更新第一個 id，現在只剩新卡這一份，不用額外處理
+
+// ══════════════════════════════════════════════════════════════
+// 💼 我的持股：第一層（不看股價）
+// ══════════════════════════════════════════════════════════════
+let _b6DivCh=null;
+function _b6PledgeZone(){
+  const flex=(db.flexLoans||[]).filter(f=>f.calcPledge); const loan=flex.reduce((s,f)=>s+(f.used||f.remain||0),0);
+  if(!loan||!(db.pledgeAssets||[]).length)return null;
+  let mkt=0,miss=false;(db.pledgeAssets||[]).forEach(a=>{const p=db.prices?.[a.code]?.price||0;if(!p)miss=true;mkt+=p*(a.lots||0)*1000;});
+  const R=mkt/loan*100, th=+db.pledgeThreshold||130;
+  if(miss&&!mkt)return['🔒 質押 待更新','#f1f5f9','#64748b'];
+  return R<130?['🔒 質押 斷頭區','#dc2626','#fff']:R<145?['🔒 質押 警示','#fee2e2','#b91c1c']:R<th?['🔒 質押 低於警戒','#fef3c7','#b45309']:['🔒 質押 安全','#dbeafe','#1d4ed8'];
+}
+// 每月配息：用最近一次配息的每股金額 × 現在張數（沒有才用持股設定的每股配息）
+function _b6MoDiv(inv,c){
+  const today=_twToday(); const ld=(db.dividends||[]).filter(d=>d.code===inv.code&&d.perShare&&d.date).sort((a,b)=>b.date.localeCompare(a.date))[0];
+  if(ld&&_dayDiff(today,ld.exDate||ld.date)<=75)return{amt:Math.round(ld.perShare*c.tLots*1000),ps:ld.perShare};
+  return{amt:c.moDivAmt||0,ps:inv.divPerShare||0};
+}
+function _b6DivYear(){
+  const today=_twToday(), yr=today.slice(0,4), curM=parseInt(today.slice(5,7));
+  const recv=Array(12).fill(0), pend=Array(12).fill(0);
+  (db.dividends||[]).forEach(d=>{if(!d.date||!d.date.startsWith(yr))return;const m=parseInt(d.date.slice(5,7))-1;if(!d.pending&&d.date<=today)recv[m]+=d.amount||0;else pend[m]+=d.amount||0;});
+  // 目前每月配息（各檔 張數×每股配息；沒有的話用最近一個月實領）
+  let rr=0,top=null;(db.investments||[]).forEach(inv=>{const c=calcInv(inv);if(!(c.tLots>0))return;const D=_b6MoDiv(inv,c);if(D.amt>0){rr+=D.amt;if(!top||D.amt>top.amt)top={code:inv.code,amt:D.amt,ps:D.ps};}});
+  if(!rr){const last=recv.map((v,i)=>[v,i]).filter(x=>x[0]>0).pop();rr=last?last[0]:0;}
+  if(!top||!top.ps){const ld=(db.dividends||[]).filter(d=>d.perShare).sort((a,b)=>b.date.localeCompare(a.date))[0];if(ld)top={code:ld.code,ps:ld.perShare};}
+  const proj=Array(12).fill(0); for(let m=0;m<12;m++){if(m+1<curM)continue;if(m+1===curM){proj[m]=recv[m]>0?0:Math.max(pend[m],0);continue;}proj[m]=pend[m]>0?pend[m]:rr;}
+  const ytd=recv.reduce((s,v)=>s+v,0); const yEnd=ytd+proj.reduce((s,v)=>s+v,0);
+  return{yr,recv,proj,ytd,yEnd,rr,top};
+}
+_renderInvestL1Body=function(){
+  const body=document.getElementById('invest-l1-body'); if(!body)return;
+  if(!db.settings)db.settings={};
+  const today=_twToday(); const I=_b6Income();
+  const target=db.settings.targetDividend||800000;
+  const Y=_b6DivYear(); const tPct=target>0?Y.ytd/target*100:0;
+  const active=(db.investments||[]).filter(inv=>calcInv(inv).tLots>0).sort((a,b)=>(a.order||0)-(b.order||0));
+  const lots=active.reduce((s,inv)=>s+calcInv(inv).tLots,0);
+  const pz=_b6PledgeZone();
+  const loans=I.loans; const lR=loans.reduce((s,l)=>s+calcLoanRemain(l),0), lO=loans.reduce((s,l)=>s+(l.amount||0),0);
+  const lPct=lO>0?Math.round((1-lR/lO)*100):0;
+  const pledged=new Set((db.pledgeAssets||[]).map(a=>String(a.code).toUpperCase()));
+  const nd=I.nextDate?_dayDiff(I.nextDate,today):null;
+  const rows=active.map((inv,i)=>{const c=calcInv(inv);const card=advCardOf(inv.code);
+    const mo=_b6MoDiv(inv,c).amt;
+    return`<div style="display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:8px;padding:10px 12px;align-items:center;${i?'border-top:1px solid #f1f5f9':''}">
+      <div><b style="font-size:15px">${_ae(inv.code)}</b> <span style="font-size:12px;color:#94a3b8">${_ae(inv.name||'')}</span><div style="margin-top:2px">${card?_advRole(card.role):''} ${pledged.has(String(inv.code).toUpperCase())?'<span style="font-size:11px;color:#94a3b8">質押中</span>':''}</div></div>
+      <div style="text-align:right"><div style="font-size:11px;color:#94a3b8">張數</div><b style="font-family:'JetBrains Mono',monospace">${Math.round(c.tLots*1000)/1000}</b></div>
+      <div style="text-align:right"><div style="font-size:11px;color:#94a3b8">每月股息</div>${mo>0?`<b style="font-family:'JetBrains Mono',monospace;color:#dc2626">${_b6m(mo)}</b>`:'<span style="font-size:12px;color:#94a3b8">不配息</span>'}</div>
+      <div style="text-align:right"><div style="font-size:11px;color:#94a3b8">累積領息</div><b style="font-family:'JetBrains Mono',monospace;${c.divTot>0?'':'color:#94a3b8'}">${c.divTot>0?_b6m(c.divTot):'—'}</b></div></div>`;}).join('');
+  const yr12=Y.rr*12, gap=target-yr12;
+  let tip='';
+  if(Y.rr>0){
+    if(gap>0&&Y.top?.ps){const need=Math.ceil(gap/(Y.top.ps*1000*12));tip=`💡 照現在每月 ${_b6m(Y.rr)}，一年約 ${_b6m(yr12)}，離目標還差 <b>${_b6m(gap)}</b>，大約再 <b>${need.toLocaleString()} 張</b> ${_ae(Y.top.code)}。`;}
+    else if(gap>0)tip=`💡 照現在每月 ${_b6m(Y.rr)}，一年約 ${_b6m(yr12)}，離目標還差 <b>${_b6m(gap)}</b>。`;
+    else tip=`🎉 照現在每月 ${_b6m(Y.rr)}，一年約 ${_b6m(yr12)}，已經超過目標 ${_b6m(target)}！`;
+  }
+  const chip=(t,bg,c,fn)=>`<button onclick="event.stopPropagation();${fn}" style="border:none;cursor:pointer;font-size:11.5px;font-weight:700;border-radius:6px;padding:4px 9px;background:${bg};color:${c};font-family:inherit">${t} ›</button>`;
+  body.innerHTML=`<div onclick="openInvFaithModal()" style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:16px 18px;cursor:pointer;box-shadow:0 4px 6px -1px rgba(0,0,0,.05);margin-bottom:14px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap"><b style="font-size:15px">💼 我的持股</b><span style="font-size:12px;color:#94a3b8">${active.length} 檔・${(Math.round(lots*1000)/1000).toLocaleString()} 張</span>
+      <span style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap">${pz?chip(pz[0],pz[1],pz[2],"dbShowPage('pledge')"):''}${lO>0?chip('🏦 信貸已還 '+lPct+'%','#f5f3ff','#6d28d9',"b6GoAssets('b6-loans')"):''}
+        <button onclick="event.stopPropagation();openDivTargetModal()" style="${_b6Btn}">✏️ 股息目標</button><button onclick="event.stopPropagation();openInvModal()" style="${_b6Btn}">＋ 買入</button></span></div>
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:12px">
+      ${_b6K('📅 下次股息',`<span style="color:#dc2626">${I.nextAmt?_b6m(I.nextAmt):'—'}</span>`,I.nextDate?`${_b6md(I.nextDate)} 入帳・${nd===0?'今天':nd+' 天後'}`:'暫無預告','background:#fef2f2;border-color:#fecaca')}
+      ${_b6K('🏆 今年已領',_b6m(Y.ytd),`<div style="margin:5px 0 2px">${_b6Bar(tPct,'#dc2626',6)}</div>目標 ${_b6m(target)}（${Math.round(tPct)}%）`)}
+      ${_b6K('⚔️ 股息付完信貸後',`<span style="color:${I.net>=0?'#dc2626':'#16a34a'}">${_b6s(I.net)}</span>`,I.net>=0?'每月可以無腦再加碼':'股息還不夠付每月支出')}</div>
+    <div style="border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;margin-bottom:12px">${rows||'<div style="padding:16px;text-align:center;color:#94a3b8;font-size:12px">尚無持股</div>'}</div>
+    <div style="font-size:13.5px;font-weight:800;margin-bottom:6px">🎯 ${Y.yr} 股息目標 <span style="font-weight:400;font-size:11.5px;color:#94a3b8">年底預估 ${_b6m(Y.yEnd)}（${target?Math.round(Y.yEnd/target*100):0}%）・深色＝已領、淺色＝預估</span></div>
+    <div style="position:relative;height:130px"><canvas id="b6-divbar"></canvas></div>
+    ${tip?`<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:8px 10px;font-size:12.5px;margin-top:6px">${tip}</div>`:''}
+    <div style="text-align:center;margin-top:12px"><button onclick="event.stopPropagation();openInvFaithModal()" style="${_b6Btn};background:#0f172a;color:#fff;border-color:#0f172a;padding:7px 14px">🔒 看股價與損益（輸入密碼進第二層）</button></div></div>`;
+  try{const cv=document.getElementById('b6-divbar');if(cv&&window.Chart){if(_b6DivCh){_b6DivCh.destroy();_b6DivCh=null;}
+    const M=Array.from({length:12},(_,i)=>(i+1)+'月');
+    _b6DivCh=new Chart(cv,{type:'bar',data:{labels:M,datasets:[{label:'已領',data:Y.recv,backgroundColor:'#dc2626',borderRadius:6,borderSkipped:false,stack:'s'},{label:'預估',data:Y.proj,backgroundColor:'rgba(220,38,38,.25)',borderRadius:6,borderSkipped:false,stack:'s'}]},
+      options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{display:false},tooltip:{filter:x=>x.raw>0,callbacks:{label:x=>x.dataset.label+' '+_b6m(x.raw)}}},scales:{x:{stacked:true,grid:{display:false},ticks:{color:'#94a3b8'}},y:{stacked:true,grid:{color:'#eef2f7'},border:{display:false},ticks:{color:'#94a3b8',callback:v=>(v/10000)+'萬'}}}}});}}catch(e){console.warn('divbar',e);}
+};
+
+// ── 第二層：每檔加上「角色」與「占比／目標」（資料來自投資顧問）──
+(function(){const _r=renderInvestPage;renderInvestPage=function(){const r=_r.apply(this,arguments);try{_b6InvL2Tags();}catch(e){console.warn('invL2',e);}return r;};})();
+function _b6InvL2Tags(){
+  const body=document.getElementById('invest-page-body'); if(!body)return;
+  const active=(db.investments||[]).filter(inv=>calcInv(inv).tLots>0).sort((a,b)=>(a.order||0)-(b.order||0));
+  if(body.children.length!==active.length)return;
+  let X=null; try{X=advExposure();}catch(e){}
+  active.forEach((inv,i)=>{const row=body.children[i]; if(!row||row.querySelector('.b6-role'))return;
+    const card=advCardOf(inv.code); if(!card)return;
+    const ex=X?.cards.find(c=>c.card.id===card.id); const pct=ex?ex.pct:null;
+    const head=row.querySelector('div > div'); if(head){const s=document.createElement('span');s.className='b6-role';s.innerHTML=_advRole(card.role);head.appendChild(s);}
+    if(pct!=null&&card.target!=null){const R=ADV_ROLES[card.role]||ADV_ROLES.other;const over=card.hi!=null&&pct>card.hi, under=card.lo!=null&&pct<card.lo;
+      const w=document.createElement('div');w.className='b6-weight';w.title='占比＝這一類在你所有部位（主帳戶＋阿豪的家族帳戶）的比重；目標來自投資顧問';
+      w.style.cssText='display:flex;align-items:center;gap:8px;margin-top:6px;font-size:11px;color:#64748b';
+      w.innerHTML=`<span>${_ae(card.title.length>14?card.title.slice(0,14)+'…':card.title)} 占比</span><b style="color:#1e293b">${pct.toFixed(0)}%</b><span style="color:${over?'#c2410c':under?'#2563eb':'#94a3b8'}">／目標 ${card.target}%${over?' 偏高':under?' 偏低':''}</span><div style="flex:1;max-width:160px">${_b6Bar(pct,R.bar,6)}</div>`;
+      row.appendChild(w);}
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// 👨‍👩‍👧 家族帳戶第一層：進度環＋計畫標題＋持股比例＋快速買入（明細仍要密碼）
+// ══════════════════════════════════════════════════════════════
+const _b6FamOpen=new Set();
+function b6FamMore(m){_b6FamOpen.has(m)?_b6FamOpen.delete(m):_b6FamOpen.add(m);renderFamilyMemberCards();}
+renderFamilyMemberCards=function(){
+  const f=getFamilyDB();
+  const grid=document.getElementById('family-member-cards');
+  const cardsWrap=document.getElementById('family-cards-grid');
+  const empty=document.getElementById('family-empty');
+  const content=document.getElementById('family-content');
+  if(!grid)return;
+  if(f.members.length===0){if(cardsWrap)cardsWrap.style.display='none';if(empty)empty.style.display='';if(content)content.style.display='none';return;}
+  if(empty)empty.style.display='none'; if(cardsWrap)cardsWrap.style.display='';
+  grid.style.gridTemplateColumns='repeat(auto-fill,minmax(280px,1fr))';
+  const ringC=['#a855f7','#3b82f6','#14b8a6','#ec4899','#f59e0b','#6366f1'];
+  const chipC=[['#dbeafe','#1d4ed8','#3b82f6'],['#dcfce7','#15803d','#22c55e'],['#fef3c7','#b45309','#f59e0b'],['#f3e8ff','#7e22ce','#a855f7'],['#fce7f3','#be185d','#ec4899'],['#ccfbf1','#0f766e','#14b8a6']];
+  const esc=s=>String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+  if(!db.family.targets)db.family.targets={};
+  grid.innerHTML=f.members.map((member,mi)=>{
+    const acc=getFamilyAccount(member); const holdings=acc.holdings||[];
+    const active=holdings.filter(h=>calcFamilyHolding(h).shares>0);
+    let totalCost=0; const hd=active.map(h=>{const c=calcFamilyHolding(h);totalCost+=c.cost;return{code:h.code,cost:c.cost,mktVal:c.mktVal};});
+    const target=db.family.targets[member]||1000000;
+    const pct=target>0?Math.round(totalCost/target*1000)/10:0;
+    const sorted=hd.sort((a,b)=>(b.mktVal||b.cost)-(a.mktVal||a.cost)).map(h=>({...h,p:totalCost>0?Math.round((h.mktVal||h.cost)/totalCost*100):0}));
+    let last=''; holdings.forEach(h=>(h.transactions||[]).forEach(t=>{if(t.type==='buy'&&t.date>last)last=t.date;}));
+    const title=((db.settings?.faithTexts||{})[member]||{}).title||'大盤長線必創歷史新高！';
+    const col=ringC[mi%ringC.length]; const C=2*Math.PI*31; const dash=Math.min(100,pct)/100*C;
+    const open=_b6FamOpen.has(member); const show=open?sorted:sorted.slice(0,3);
+    const chips=show.map((h,i)=>{const cc=chipC[i%chipC.length];return`<span onclick="event.stopPropagation();openFamilyBuyForHolding('${esc(member)}','${esc(h.code)}')" title="點擊快速買入 ${_ae(h.code)}" style="cursor:pointer;display:inline-block;font-size:10.5px;font-weight:700;border-radius:6px;padding:2px 8px;background:${cc[0]};color:${cc[1]}">${_ae(h.code)} ${h.p}%</span>`;}).join('')+
+      (sorted.length>3?`<span onclick="event.stopPropagation();b6FamMore('${esc(member)}')" style="cursor:pointer;display:inline-block;font-size:10.5px;font-weight:700;border-radius:6px;padding:2px 8px;background:#f1f5f9;color:#64748b">${open?'收起':'+'+(sorted.length-3)+' 檔'}</span>`:'');
+    const sumP=sorted.reduce((s,h)=>s+h.p,0)||1;
+    const stack=sorted.length?`<div style="display:flex;height:8px;border-radius:9px;overflow:hidden;background:#f1f5f9">${sorted.map((h,i)=>`<i style="width:${(h.p/Math.max(100,sumP)*100).toFixed(1)}%;background:${i<3?chipC[i%chipC.length][2]:'#cbd5e1'}"></i>`).join('')}</div>`:'';
+    // 出資比例（有預設分配的帳戶，例如琁 & 軒）
+    let split='';
+    const sp=acc.defaultSplits;
+    if(sp&&sp.length>=2){const tot={};sp.forEach(s=>tot[s.name]=0);holdings.forEach(h=>(h.transactions||[]).filter(t=>t.type==='buy'&&t.splits).forEach(t=>t.splits.forEach(x=>{if(tot[x.name]!==undefined)tot[x.name]+=x.amt||0;})));
+      const g=Object.values(tot).reduce((s,v)=>s+v,0); const sc=['#3b82f6','#ec4899','#14b8a6','#f59e0b'];
+      const ps=sp.map((s,i)=>({n:s.name,p:g>0?Math.round(tot[s.name]/g*100):s.pct,c:sc[i%sc.length]}));
+      split=`<div style="margin-top:8px;background:#fdf2f8;border-radius:9px;padding:6px 8px"><div style="font-size:11px;font-weight:700;color:#be185d;margin-bottom:3px">👫 出資比例</div><div style="display:flex;height:10px;border-radius:9px;overflow:hidden">${ps.map(x=>`<i style="width:${x.p}%;background:${x.c}"></i>`).join('')}</div><div style="display:flex;justify-content:space-between;font-size:11px">${ps.map(x=>`<span style="color:${x.c};font-weight:700">${_ae(x.n)} ${x.p}%</span>`).join('')}</div></div>`;}
+    return`<div onclick="openFamilyFaithModal('${esc(member)}')" style="background:#fff;border:1px solid ${split?'#fbcfe8':'#e2e8f0'};border-radius:14px;padding:14px 16px;cursor:pointer;box-shadow:0 4px 6px -1px rgba(0,0,0,.05);transition:all .2s" onmouseover="this.style.transform='translateY(-3px)';this.style.borderColor='#93c5fd'" onmouseout="this.style.transform='';this.style.borderColor='${split?'#fbcfe8':'#e2e8f0'}'">
+      <div style="display:flex;gap:12px;align-items:center">
+        <svg width="70" height="70" viewBox="0 0 74 74" style="flex-shrink:0"><circle cx="37" cy="37" r="31" fill="none" stroke="#f1f5f9" stroke-width="8"/><circle cx="37" cy="37" r="31" fill="none" stroke="${col}" stroke-width="8" stroke-linecap="round" stroke-dasharray="${dash.toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 37 37)"/><text x="37" y="42" text-anchor="middle" font-size="${pct>=100?13:15}" font-weight="800" fill="#0f172a">${pct>=100?Math.round(pct):pct}%</text></svg>
+        <div style="flex:1;min-width:0"><b style="font-size:15px">${_ae(member)}</b><div style="font-size:11px;color:#94a3b8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${_ae(title)}">🎯 ${_ae(title)}</div><div style="font-size:11px;color:#94a3b8;margin-top:2px">${active.length} 檔持股${last?'・最近投入 '+_b6md(last):''}</div></div></div>
+      ${split}
+      <div style="margin-top:10px">${stack}<div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:6px">${chips||'<span style="font-size:11px;color:#94a3b8;font-style:italic">尚無持股</span>'}</div></div>
+      <div style="display:flex;gap:6px;margin-top:10px"><button onclick="event.stopPropagation();openFamilyQuickBuy('${esc(member)}')" style="${_b6Btn};flex:1">＋ 買入</button><button onclick="event.stopPropagation();openFamilyTargetModal('${esc(member)}')" style="${_b6Btn}" title="修改目標">🎯</button><button onclick="event.stopPropagation();openFamilyFaithModal('${esc(member)}')" style="${_b6Btn}">🔒 明細</button></div></div>`;
+  }).join('')+
+  `<div onclick="openFamilyMemberModal()" style="background:#f8fafc;border:2px dashed #cbd5e1;border-radius:14px;padding:20px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:140px;gap:10px" onmouseover="this.style.borderColor='#93c5fd';this.style.background='#eff6ff'" onmouseout="this.style.borderColor='#cbd5e1';this.style.background='#f8fafc'">
+    <div style="width:40px;height:40px;border-radius:50%;background:#e2e8f0;display:flex;align-items:center;justify-content:center;font-size:20px;color:#64748b">＋</div><div style="font-size:12px;font-weight:700;color:#94a3b8">新增成員</div></div>`;
+};
+
+// ══════════════════════════════════════════════════════════════
+// 📊 投資分析：告訴你賺在哪、虧在哪（沿用原本每筆賣出損益的算法）
+// ══════════════════════════════════════════════════════════════
+let _b6SellFn=null, _b6MpCh=null, _b6AnYear=null; const _b6AnSrc=renderAnalytics.toString();
+function _b6Sells(){
+  if(!_b6SellFn){const src=_b6AnSrc;const cut=src.indexOf('// ── KPI 計算 ──');if(cut<0)return[];_b6SellFn=eval('('+src.slice(0,cut)+'return sellResults;})');}
+  return _b6SellFn()||[];
+}
+function b6AnYear(v){_b6AnYear=v;renderAnalyticsPro();}
+function b6AnLoss(k){const el=document.getElementById('b6-loss-'+k);if(el)el.style.display=el.style.display==='none'?'':'none';}
+function renderAnalyticsPro(){
+  const host=document.getElementById('analytics-body'); if(!host)return;
+  let box=document.getElementById('analytics-pro');
+  if(!box){box=document.createElement('div');box.id='analytics-pro';host.insertBefore(box,host.firstChild);}
+  const kpi=document.getElementById('analytics-kpi'); if(kpi){kpi.style.display='none';const g=kpi.nextElementSibling;if(g&&g.querySelector('#mood-chart'))g.style.display='none';}
+  const all=_b6Sells().filter(s=>s.date);
+  const years=[...new Set(all.map(s=>s.date.slice(0,4)))].sort().reverse();
+  const yr=_b6AnYear||(years.includes(_twToday().slice(0,4))?_twToday().slice(0,4):'all');
+  const S=yr==='all'?all:all.filter(s=>s.date.startsWith(yr));
+  const m=v=>(v>=0?'+':'−')+Math.round(Math.abs(v)).toLocaleString();
+  const col=v=>v>=0?'#dc2626':'#16a34a';
+  const sel=`<select onchange="b6AnYear(this.value)" style="padding:4px 8px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;font-weight:700">${years.map(y=>`<option value="${y}" ${y===yr?'selected':''}>${y} 年</option>`).join('')}<option value="all" ${yr==='all'?'selected':''}>全部</option></select>`;
+  if(!S.length){box.innerHTML=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><b>📊 已實現交易</b>${sel}</div><div style="padding:20px;text-align:center;color:#94a3b8;font-size:13px">這段期間沒有賣出紀錄</div>`;return;}
+  const wins=S.filter(s=>s.pnl>0), losses=S.filter(s=>s.pnl<=0);
+  const tot=S.reduce((a,s)=>a+s.pnl,0), sw=wins.reduce((a,s)=>a+s.pnl,0), sl=losses.reduce((a,s)=>a+s.pnl,0);
+  const aw=wins.length?sw/wins.length:0, al=losses.length?sl/losses.length:0;
+  const pf=sl<0?sw/Math.abs(sl):0, rr=al<0?aw/Math.abs(al):0;
+  const cost=S.reduce((a,s)=>a+(s.cost||0),0), hold=S.reduce((a,s)=>a+s.holdDays,0)/S.length;
+  const ann=cost>0?(tot/cost)*(365/hold)*100:0;
+  const tla=(db.loans||[]).reduce((a,l)=>a+(l.amount||0),0); const wr=tla>0?(db.loans||[]).reduce((a,l)=>a+(l.rate||0)*(l.amount||0),0)/tla:0;
+  const B=[['≤ 7 天',0,7],['8～30 天',8,30],['31～90 天',31,90],['> 90 天',91,1e9]].map(([n,a,b])=>{const L=S.filter(s=>s.holdDays>=a&&s.holdDays<=b);return{n,L,w:L.filter(s=>s.pnl>0).length,p:L.reduce((x,s)=>x+s.pnl,0)};}).filter(b=>b.L.length);
+  const best=B.slice().sort((a,b)=>b.p-a.p)[0], worst=B.slice().sort((a,b)=>a.p-b.p)[0];
+  const ex=(L,dir)=>L.slice().sort((a,b)=>dir*(b.pnl-a.pnl)).slice(0,2).map(s=>`${_b6md(s.date)} ${_ae(s.code)}${s.remark?'「'+_ae(String(s.remark).slice(0,18))+(String(s.remark).length>18?'…':'')+'」':''} <b style="color:${col(s.pnl)}">${m(s.pnl)}</b>`).join('、');
+  const ins=(b,good)=>`<div style="background:${good?'#fef2f2':'#f0fdf4'};border:1px solid ${good?'#fecaca':'#bbf7d0'};border-radius:12px;padding:10px 12px;font-size:12.5px;line-height:1.6">${good?'🎯':'⚠️'} <b>${good?'你的錢主要賺在':'虧在'}：持有 ${b.n}${good?'的交易':'後賣出'}</b><br>${b.L.length} 筆${b.w===b.L.length?'全勝':'贏 '+b.w+' 筆'}，合計 <b style="color:${col(b.p)}">${m(b.p)}</b>。例如 ${ex(b.L,good?1:-1)}。</div>`;
+  const moods={};S.forEach(s=>{const k=s.mood||'未記錄';const o=moods[k]=moods[k]||{n:0,w:0,p:0};o.n++;if(s.pnl>0)o.w++;o.p+=s.pnl;});
+  const top=S.slice().sort((a,b)=>b.pnl-a.pnl);
+  const tline=s=>`<div style="display:flex;gap:8px;font-size:12px;padding:2px 0"><b style="font-family:'JetBrains Mono',monospace;color:${col(s.pnl)};width:84px;flex-shrink:0">${m(s.pnl)}</b><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${_ae(s.code)} ${_b6md(s.date)} <span style="color:#94a3b8">${_ae(String(s.remark||s.mood||'').slice(0,20))}</span></span></div>`;
+  const lr={};losses.forEach(s=>{const k=s.lossReason||'未分類';(lr[k]=lr[k]||[]).push(s);});
+  const th='style="text-align:left;padding:6px 6px;border-bottom:1px solid #e2e8f0;font-size:11px;color:#64748b;font-weight:600"', td='style="padding:6px 6px;border-bottom:1px solid #f1f5f9"';
+  const card=(h,inner)=>`<div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:12px 14px"><div style="font-size:13px;font-weight:800;margin-bottom:8px">${h}</div>${inner}</div>`;
+  box.innerHTML=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><b style="font-size:14px">📊 已實現交易</b>${sel}<span style="font-size:11.5px;color:#94a3b8">${S.length} 筆賣出</span></div>
+  <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:12px">
+    ${_b6K('已實現損益',`<span style="color:${col(tot)}">${m(tot)}</span>`,S.length+' 筆賣出')}
+    ${_b6K('勝率',(wins.length/S.length*100).toFixed(0)+'%',`${wins.length} 勝 ${losses.length} 負`)}
+    ${_b6K('平均賺 vs 平均賠',`<span style="color:#dc2626">${m(aw)}</span> <span style="font-size:12px;color:#94a3b8">/</span> <span style="color:#16a34a;font-size:15px">${m(al)}</span>`,`賺賠比 ${rr.toFixed(1)}・獲利因子 ${pf.toFixed(2)}`)}
+    ${_b6K('資金年化報酬',`<span style="color:${ann>=wr?'#dc2626':'#b45309'}">${ann>=0?'+':''}${ann.toFixed(1)}%</span>`,ann>=wr?`✅ 高於信貸加權利率 ${wr.toFixed(2)}%`:`⚠️ 低於信貸加權利率 ${wr.toFixed(2)}%`,ann>=wr?'':'background:#fffbeb;border-color:#fde68a')}</div>
+  ${best&&worst&&best!==worst?`<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;margin-bottom:12px">${best.p>0?ins(best,true):'<div></div>'}${worst.p<0?ins(worst,false):'<div></div>'}</div>`:''}
+  <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;margin-bottom:12px">
+    ${card('📊 每月已實現損益','<div style="position:relative;height:180px"><canvas id="b6-mpnl"></canvas></div>')}
+    ${card('⏱️ 持有多久 vs 成績 <span style="font-weight:400;font-size:11px;color:#94a3b8">最能看出你的強項</span>',`<table style="width:100%;border-collapse:collapse;font-size:12.5px"><tr><th ${th}>持有天數</th><th ${th} style="text-align:right">筆數</th><th ${th}>勝率</th><th ${th} style="text-align:right">損益</th></tr>${B.map(b=>{const w=b.w/b.L.length*100;return`<tr><td ${td}>${b.n}</td><td ${td} style="text-align:right">${b.L.length}</td><td ${td}><div style="display:flex;align-items:center;gap:6px"><div style="flex:1">${_b6Bar(w,w>=50?'#dc2626':w>=30?'#f59e0b':'#16a34a')}</div><span style="font-size:11px">${w.toFixed(0)}%</span></div></td><td ${td} style="text-align:right;font-family:'JetBrains Mono',monospace;color:${col(b.p)}">${m(b.p)}</td></tr>`;}).join('')}</table>`)}</div>
+  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:16px">
+    ${card('🧠 情緒 vs 成績',`<table style="width:100%;border-collapse:collapse;font-size:12.5px"><tr><th ${th}>心情</th><th ${th} style="text-align:right">筆</th><th ${th} style="text-align:right">勝率</th><th ${th} style="text-align:right">損益</th></tr>${Object.entries(moods).sort((a,b)=>(a[0]==='未記錄')-(b[0]==='未記錄')||b[1].n-a[1].n).map(([k,o])=>`<tr><td ${td}${k==='未記錄'?' style="color:#94a3b8"':''}>${_ae(k)}</td><td ${td} style="text-align:right">${o.n}</td><td ${td} style="text-align:right">${Math.round(o.w/o.n*100)}%</td><td ${td} style="text-align:right;font-family:'JetBrains Mono',monospace;color:${col(o.p)}">${m(o.p)}</td></tr>`).join('')}</table>`)}
+    ${card('🏆 賺最多／虧最多',top.slice(0,3).filter(s=>s.pnl>0).map(tline).join('')+'<div style="border-top:1px dashed #e2e8f0;margin:4px 0"></div>'+top.slice(-3).reverse().filter(s=>s.pnl<=0).map(tline).join(''))}
+    ${card('❌ 虧損原因 <span style="font-weight:400;font-size:11px;color:#94a3b8">點一類看是哪幾筆</span>',Object.keys(lr).length?Object.entries(lr).sort((a,b)=>(a[0]==='未分類')-(b[0]==='未分類')||b[1].length-a[1].length).map(([k,L],i)=>`<div onclick="b6AnLoss(${i})" style="cursor:pointer;display:flex;justify-content:space-between;padding:6px 4px;border-bottom:1px solid #f1f5f9;font-size:12.5px"><span${k==='未分類'?' style="color:#94a3b8"':''}>${_ae(k)}</span><span>${L.length} 筆 <span style="font-family:'JetBrains Mono',monospace;color:#16a34a">${m(L.reduce((a,s)=>a+s.pnl,0))}</span></span></div><div id="b6-loss-${i}" style="display:none;background:#f8fafc;padding:4px 8px">${L.sort((a,b)=>a.pnl-b.pnl).map(tline).join('')}</div>`).join(''):'<div style="font-size:12px;color:#94a3b8">沒有虧損交易 🎉</div>')}</div>`;
+  try{const cv=document.getElementById('b6-mpnl');if(cv&&window.Chart){if(_b6MpCh){_b6MpCh.destroy();_b6MpCh=null;}
+    const byM={};S.forEach(s=>{const k=s.date.slice(0,7);byM[k]=(byM[k]||0)+s.pnl;});
+    const ks=Object.keys(byM).sort(); const lab=ks.map(k=>yr==='all'?k.replace('-','/'):parseInt(k.slice(5))+'月'); const v=ks.map(k=>Math.round(byM[k]));
+    _b6MpCh=new Chart(cv,{type:'bar',data:{labels:lab,datasets:[{data:v,backgroundColor:v.map(x=>x>=0?'#dc2626':'#16a34a'),borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:x=>m(x.raw)}}},scales:{x:{grid:{display:false},ticks:{color:'#94a3b8'}},y:{grid:{color:'#eef2f7'},border:{display:false},ticks:{color:'#94a3b8',callback:x=>(x/10000)+'萬'}}}}});}}catch(e){console.warn('mpnl',e);}
+}
+(function(){const _r=renderAnalytics;renderAnalytics=function(){const r=_r.apply(this,arguments);try{renderAnalyticsPro();}catch(e){console.warn('analyticsPro',e);}return r;};})();
+
+// 開頁時就檢查一次扣款不足（不用等打開資產頁）
+setTimeout(()=>{try{renderAssetsDeduct();}catch(e){}},1500);
+setTimeout(()=>{try{renderAssetsDeduct();}catch(e){}},6000);
 
 </script>
 
