@@ -3048,7 +3048,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1792490853253,
+  "_ts": 1792490912458,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -8649,7 +8649,7 @@
   "advisor": {
     "v": 1,
     "seededAt": "2026-10-20",
-    "ownMembers": null,
+    "ownMembers": [],
     "calm": {
       "on": true,
       "buyAmt": 200000,
