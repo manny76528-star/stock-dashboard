@@ -2970,7 +2970,8 @@
         "amount": 1250,
         "enabled": true
       }
-    ]
+    ],
+    "cashSafeLine": 100000
   },
   "archivedTxns": [
     {
@@ -3056,7 +3057,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1792513922895,
+  "_ts": 1792514375716,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -8623,7 +8624,7 @@
         "阿豪富邦": {
           "pct": 48.1,
           "totalCost": 481241.84,
-          "totalMkt": 505710.55,
+          "totalMkt": 505361.82999999996,
           "caps": [
             {
               "code": "00405A",
@@ -8667,7 +8668,7 @@
         "琁 & 軒": {
           "pct": 47.9,
           "totalCost": 287656.60000000003,
-          "totalMkt": 288847.37,
+          "totalMkt": 288812.97,
           "caps": [
             {
               "code": "00403A",
