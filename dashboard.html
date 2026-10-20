@@ -2883,6 +2883,10 @@ body:not(.privacy) .privacy-mask{filter:none;}
     </div>
     <div class="fg"><label class="fl">📝 關注原因</label><textarea class="fi" id="w-reason" rows="3" placeholder="例：殖利率高、技術面突破..." style="resize:vertical"></textarea></div>
     <div class="fr">
+      <div class="fg"><label class="fl">📅 加入日期</label><input class="fi" id="w-added-date" type="date"></div>
+      <div class="fg"><label class="fl">💲 加入時股價 <span style="font-weight:400;color:#94a3b8;font-size:11px">（算「加入後漲跌」用）</span></label><input class="fi" id="w-add-price" type="number" step="0.01" placeholder="新增時自動帶目前股價"></div>
+    </div>
+    <div class="fr">
       <div class="fg"><label class="fl">🎯 目標買入價</label><input class="fi" id="w-target" type="number" step="0.01" placeholder="達到此價提醒"></div>
       <div class="fg"><label class="fl">🔔 提醒方向</label>
         <select class="fi" id="w-alert-dir">
@@ -16639,7 +16643,9 @@ function abSeed(){
   };
 }
 function abEnsure(){if(!db.aboutMe){db.aboutMe=abSeed();save();}return db.aboutMe;}
-let _abFilter='', _abOpen=null, _abEdit=false;
+let _abFilter='', _abOpen=null, _abEdit=false, _abOpenSet=null, _abPrevOpen=null;
+function abToggleEra(k){if(!_abOpenSet)_abOpenSet=new Set();if(_abOpenSet.has(k))_abOpenSet.delete(k);else{_abOpenSet.add(k);_abOpen=k;_abPrevOpen=k;}renderAboutPage();}
+function abExpandAll(on){const A=db.aboutMe;_abOpenSet=new Set(on&&A?A.eras.map(e=>e.key):[]);renderAboutPage();}
 function _abFmtD(d,multi){if(!d)return'';const p=String(d).split('-');if(multi)return p.length>=2?`${p[0]}/${p[1]}`:p[0];return p.length===3?`${p[1]}/${p[2]}`:p.length===2?`${+p[1]} 月`:'';}
 function _abMask(s){return _ae(s).replace(/(\d[\d,\.]*\s*(?:萬|億|元))/g,'<span class="privacy-mask">$1</span>');}
 function _abW(n){const f=(v,d)=>v.toFixed(d).replace(/\.0+$/,'');return n>=1e8?f(n/1e8,2)+' 億':f(n/1e4,n>=1e6?0:1)+' 萬';}
@@ -16682,7 +16688,10 @@ function renderAboutPage(){
   const typeChips=Object.entries(AB_TYPES).filter(([k])=>k!=='note').map(([k,v])=>`<button onclick="_abFilter=_abFilter==='${k}'?'':'${k}';renderAboutPage()" style="padding:4px 10px;border-radius:99px;font-size:12px;cursor:pointer;border:1px solid ${_abFilter===k?v.c:'#e2e8f0'};background:${_abFilter===k?v.c:'#fff'};color:${_abFilter===k?'#fff':'#475569'}">${v.e} ${v.n}</button>`).join('');
   const eras=[...A.eras].sort((a,b)=>b.from-a.from);
   if(_abOpen==null)_abOpen=eras[0]?.key;
-  const yearNav=[...A.eras].sort((a,b)=>a.from-b.from).map(e=>`<a href="javascript:void 0" onclick="_abOpen='${e.key}';renderAboutPage();setTimeout(()=>document.getElementById('ab-era-${e.key}')?.scrollIntoView({behavior:'smooth',block:'start'}),50)" style="flex:1;text-align:center;padding:6px 4px;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;color:${_abOpen===e.key?'#fff':'#334155'};background:${_abOpen===e.key?'#ea580c':'transparent'};white-space:nowrap">${e.from===e.to?e.from:e.from+'–'+String(e.to).slice(2)}</a>`).join('');
+  if(!_abOpenSet)_abOpenSet=new Set(_abOpen?[_abOpen]:[]);
+  if(_abOpen&&_abOpen!==_abPrevOpen){_abOpenSet.add(_abOpen);_abPrevOpen=_abOpen;}
+  const _abAllOpen=A.eras.every(e=>_abOpenSet.has(e.key));
+  const yearNav=[...A.eras].sort((a,b)=>a.from-b.from).map(e=>`<a href="javascript:void 0" onclick="_abOpen='${e.key}';_abPrevOpen=null;renderAboutPage();setTimeout(()=>document.getElementById('ab-era-${e.key}')?.scrollIntoView({behavior:'smooth',block:'start'}),50)" style="flex:1;text-align:center;padding:6px 4px;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;color:${_abOpen===e.key?'#fff':'#334155'};background:${_abOpen===e.key?'#ea580c':'transparent'};white-space:nowrap">${e.from===e.to?e.from:e.from+'–'+String(e.to).slice(2)}</a>`).join('');
   const itemRow=(x,ek,multi)=>{const T=AB_TYPES[x.k]||AB_TYPES.note;
     return`<div style="display:flex;gap:10px;align-items:flex-start;padding:7px 0;${x.k==='quote'?'':''}">
       <div style="width:54px;flex:none;text-align:right;font-size:11.5px;color:#94a3b8;padding-top:2px;font-family:'JetBrains Mono',monospace">${_abFmtD(x.d,multi||_abFilter)}</div>
@@ -16695,14 +16704,14 @@ function renderAboutPage(){
   const eraHTML=eras.map(e=>{
     let L=by[e.key]||[]; const n=L.length; if(_abFilter)L=L.filter(x=>x.k===_abFilter);
     if(_abFilter&&!L.length)return'';
-    const open=_abFilter||_abOpen===e.key;
+    const open=_abFilter||_abOpenSet.has(e.key);
     const counts={};(by[e.key]||[]).forEach(x=>counts[x.k]=(counts[x.k]||0)+1);
     const badge=['gain','loss','lesson','debt','clear'].filter(k=>counts[k]).map(k=>`<span style="font-size:11px;color:#64748b;white-space:nowrap">${AB_TYPES[k].e}${counts[k]}</span>`).join(' ');
     return`<div id="ab-era-${e.key}" style="display:flex;gap:0;scroll-margin-top:70px">
       <div style="width:64px;flex:none;position:relative"><div style="position:absolute;left:31px;top:0;bottom:0;width:2px;background:#e2e8f0"></div>
         <div style="position:relative;margin-top:14px;width:62px;text-align:center;background:${open?'#ea580c':'#fff'};color:${open?'#fff':'#ea580c'};border:2px solid #ea580c;border-radius:10px;font-weight:800;font-size:${e.from===e.to?15:11.5}px;padding:3px 0">${e.from===e.to?e.from:e.from+'<br>–'+e.to}</div></div>
       <div style="flex:1;min-width:0;background:#fff;border:1px solid #e2e8f0;border-radius:14px;margin:6px 0 12px 8px;overflow:hidden">
-        <div onclick="_abOpen=_abOpen==='${e.key}'?'':'${e.key}';renderAboutPage()" style="padding:12px 16px;cursor:pointer;display:flex;gap:10px;align-items:flex-start">
+        <div onclick="abToggleEra('${e.key}')" style="padding:12px 16px;cursor:pointer;display:flex;gap:10px;align-items:flex-start">
           <div style="flex:1;min-width:0"><div style="font-size:16px;font-weight:800;color:#0f172a">${_ae(e.title||'（還沒有標題）')}</div>
             ${e.sum?`<div style="font-size:12.5px;color:#475569;margin-top:3px;line-height:1.6">${_abMask(e.sum)}</div>`:''}
             <div style="margin-top:5px;display:flex;gap:8px;flex-wrap:wrap">${badge}<span style="font-size:11px;color:#94a3b8">共 ${n} 件</span></div></div>
@@ -16743,7 +16752,8 @@ function renderAboutPage(){
       ${inbox.slice(0,8).map(j=>`<div style="display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px dashed #bfdbfe;font-size:12.5px"><span style="color:#64748b;width:80px;flex:none">${j.date}</span><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${_ae(_abJTitle(j))}</span>
         <button onclick="abInboxAdd('${j.id}')" style="${_advBtn('#2563eb')};padding:3px 9px;font-size:11px">＋ 收錄</button><button onclick="abInboxSkip('${j.id}')" style="${_advBtn()};padding:3px 9px;font-size:11px">略過</button></div>`).join('')}</div>`:''}
     <div style="position:sticky;top:0;z-index:5;background:#f8fafc;padding:6px 0 8px">
-      <div style="display:flex;gap:2px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:3px;overflow-x:auto">${yearNav}</div>
+      <div style="display:flex;gap:6px;align-items:stretch"><div style="flex:1;min-width:0;display:flex;gap:2px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:3px;overflow-x:auto">${yearNav}</div>
+        <button onclick="abExpandAll(${_abAllOpen?'false':'true'})" style="flex:none;padding:0 12px;border-radius:10px;border:1px solid #e2e8f0;background:#fff;color:#334155;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">${_abAllOpen?'⊖ 全部收合':'⊕ 全部展開'}</button></div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">${typeChips}${_abFilter?`<span style="font-size:12px;color:#64748b;align-self:center">只看「${AB_TYPES[_abFilter].n}」，跨年度列出</span>`:''}</div></div>
     ${eraHTML}
     ${card('🎯 我立下的目標',goalHTML||'<div style="font-size:12px;color:#94a3b8">還沒有目標</div>',_abEdit?`<button onclick="abGoalModal()" style="${_advBtn()};font-size:12px;padding:3px 9px">＋ 目標</button>`:'<span style="font-size:11px;color:#94a3b8">點狀態可切換</span>')}
@@ -16919,6 +16929,22 @@ const FAM_SRC={
   thrift:{e:'♻️',n:'變賣／省下',c:'#0d9488',bg:'#ccfbf1',fg:'#0f766e'},
   other:{e:'✍️',n:'其他',c:'#94a3b8',bg:'#f1f5f9',fg:'#475569'}
 };
+const FAM_SRC_DEF=JSON.parse(JSON.stringify(FAM_SRC));
+function famSrcApplyNames(){const o=db.family?.srcNames||{};Object.keys(FAM_SRC).forEach(k=>{FAM_SRC[k].n=(o[k]?.n||'').trim()||FAM_SRC_DEF[k].n;FAM_SRC[k].e=(o[k]?.e||'').trim()||FAM_SRC_DEF[k].e;});}
+function famSrcRename(){
+  famSrcApplyNames();
+  arcModal(`<div style="font-size:15px;font-weight:800;color:#1e293b;margin-bottom:4px">✏️ 修改資金來源的名稱</div>
+    <div style="font-size:12px;color:#64748b;margin-bottom:10px">只改顯示的名稱和圖示，已經分好的紀錄不會變。所有家族成員共用同一套名稱。</div>
+    ${Object.entries(FAM_SRC).map(([k,S])=>`<div style="display:flex;gap:6px;align-items:center;margin-bottom:6px"><input id="fsn-e-${k}" value="${_ae(S.e)}" style="width:46px;text-align:center;border:1.5px solid #e2e8f0;border-radius:8px;padding:6px;font-size:15px"><input id="fsn-n-${k}" value="${_ae(S.n)}" placeholder="${_ae(FAM_SRC_DEF[k].n)}" style="flex:1;border:1.5px solid #e2e8f0;border-radius:8px;padding:7px 10px;font-size:13px"><span style="font-size:11px;color:#94a3b8;width:70px">原：${_ae(FAM_SRC_DEF[k].n)}</span></div>`).join('')}
+    <div style="display:flex;justify-content:space-between;margin-top:10px"><button style="${_arcBtn()};font-size:12px" onclick="famSrcRenameSave(true)">全部恢復預設</button><span><button style="${_arcBtn()}" onclick="arcCloseModal()">取消</button> <button style="${_arcBtn('#ea580c')}" onclick="famSrcRenameSave()">儲存</button></span></div>`);
+}
+function famSrcRenameSave(reset){
+  const f=getFamilyDB(); const o={};
+  if(!reset)Object.keys(FAM_SRC).forEach(k=>{const n=(document.getElementById('fsn-n-'+k)?.value||'').trim(),e=(document.getElementById('fsn-e-'+k)?.value||'').trim();
+    if((n&&n!==FAM_SRC_DEF[k].n)||(e&&e!==FAM_SRC_DEF[k].e))o[k]={n:n&&n!==FAM_SRC_DEF[k].n?n:'',e:e&&e!==FAM_SRC_DEF[k].e?e:''};});
+  if(Object.keys(o).length)f.srcNames=o;else delete f.srcNames;
+  save(); arcCloseModal(); famSrcApplyNames(); renderFamilyPage(); toast(reset?'已恢復預設名稱':'✅ 名稱已更新');
+}
 const FAM_SRC_RULES=[
   ['regular',/定期定額|定額|每月.{0,6}(投入|扣款|扣)/],
   ['div',/配息|股息|領息|息.{0,3}(再|投|買)/],
@@ -16964,6 +16990,7 @@ var _famSrcFilter='';
 function famSrcFilterSet(k){_famSrcFilter=_famSrcFilter===k?'':k;renderFamilyPage();}
 function renderFamilySrcCard(acc,fy,fm){
   const box=document.getElementById('family-src-card'); if(!box)return;
+  famSrcApplyNames();
   const buys=(acc.log||[]).filter(l=>l.type==='buy'&&(!fy||l.date?.startsWith(fy))&&(!fm||l.date?.slice(5,7)===fm));
   if(!buys.length){box.style.display='none';box.innerHTML='';return;}
   const g={}; let tot=0;
@@ -16973,7 +17000,7 @@ function renderFamilySrcCard(acc,fy,fm){
   const per=(fy?fy+' 年':'')+(fm?+fm+' 月':'')||'累計';
   box.style.display='';
   box.innerHTML=`<div style="padding:12px 14px">
-    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px"><b style="font-size:13px;color:#1e293b">💧 錢從哪裡來</b><span style="font-size:11px;color:#94a3b8">${_ae(per)}投入 <span class="privacy-mask">$${tot.toLocaleString()}</span>・${buys.length} 筆・點分類只看那一類（跟著上面的年份／月份篩選）</span></div>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px"><b style="font-size:13px;color:#1e293b">💧 錢從哪裡來</b><button onclick="famSrcRename()" style="margin-left:auto;order:2;border:1px solid #e2e8f0;background:#fff;border-radius:7px;font-size:11px;padding:2px 8px;cursor:pointer;color:#475569">✏️ 改名稱</button><span style="font-size:11px;color:#94a3b8">${_ae(per)}投入 <span class="privacy-mask">$${tot.toLocaleString()}</span>・${buys.length} 筆・點分類只看那一類（跟著上面的年份／月份篩選）</span></div>
     <div style="display:flex;height:14px;border-radius:9px;overflow:hidden;margin-bottom:10px;background:#f1f5f9">${order.map(k=>`<i title="${S(k).n} ${Math.round(g[k].a/tot*100)}%" style="width:${(g[k].a/tot*100).toFixed(2)}%;background:${S(k).c}"></i>`).join('')}</div>
     <div style="display:flex;flex-wrap:wrap;gap:6px">
       <button onclick="famSrcFilterSet('')" style="padding:4px 10px;border-radius:99px;font-size:12px;cursor:pointer;border:1px solid ${!_famSrcFilter?'#ea580c':'#e2e8f0'};background:${!_famSrcFilter?'#ea580c':'#fff'};color:${!_famSrcFilter?'#fff':'#475569'}">全部 <b>${buys.length}</b></button>
@@ -16984,6 +17011,7 @@ function renderFamilySrcCard(acc,fy,fm){
 // 買入視窗的來源選擇
 function famSrcChips(){
   const box=document.getElementById('fb-src-chips'); if(!box)return;
+  famSrcApplyNames();
   const v=document.getElementById('fb-src')?.value||'';
   box.innerHTML=Object.entries(FAM_SRC).map(([k,S])=>`<button type="button" onclick="famSrcChoose('${k}')" style="padding:4px 9px;border-radius:99px;font-size:12px;cursor:pointer;border:1.5px solid ${v===k?S.c:'#e2e8f0'};background:${v===k?S.bg:'#fff'};color:${v===k?S.fg:'#475569'};font-weight:${v===k?700:400}">${S.e} ${S.n}</button>`).join('');
 }
@@ -17126,7 +17154,10 @@ var _wFilter='', _wSort='dist', _wOpen=null;
 function _wAddPrice(w){
   if(w.addPrice)return{p:+w.addPrice,src:'加入時'};
   const m=String(w.reason||'').match(/(?:股價|收盤|現價|價位|目前)[^\d\n]{0,6}(\d+(?:\.\d+)?)\s*元?/);
-  return m?{p:+m[1],src:'理由裡的股價'}:null;
+  if(m)return{p:+m[1],src:'理由裡的股價'};
+  if(w.addedDate){let best=null;(db.journals||[]).forEach(j=>{const v=(j.stockPrices||{})[w.code];if(!v||!j.date)return;const dd=Math.abs(_dayDiff(j.date,w.addedDate));if(dd<=7&&(!best||dd<best.dd))best={p:+v,dd,d:j.date};});
+    if(best)return{p:best.p,src:'日誌 '+best.d.slice(5)+' 的股價'};}
+  return null;
 }
 function _wHist(code){
   const H={};
@@ -17185,7 +17216,7 @@ renderWatchPage=function(){
       <td style="padding:9px 10px;text-align:right;font-family:'JetBrains Mono',monospace;color:${_wCol(c.day)}">${_wPct(c.day,2)}</td>
       <td style="padding:6px 10px">${_wSpark(w.code)}</td>
       <td style="padding:9px 10px">${bar}${tgt}</td>
-      <td style="padding:9px 10px;text-align:right;font-family:'JetBrains Mono',monospace;color:${_wCol(c.since)}">${_wPct(c.since)}${c.ap?`<div style="font-size:10px;color:#94a3b8">自 ${c.ap.p}</div>`:''}</td>
+      <td style="padding:9px 10px;text-align:right;font-family:'JetBrains Mono',monospace;color:${_wCol(c.since)}">${c.ap?_wPct(c.since)+`<div style="font-size:10px;color:#94a3b8">自 ${c.ap.p}</div>`:`<span onclick="event.stopPropagation();openWatchModal('${w.id}');setTimeout(()=>document.getElementById('w-add-price')?.focus(),200)" title="沒有加入時的股價，點這裡補上" style="font-family:inherit;font-size:11px;color:#2563eb;cursor:pointer;white-space:nowrap">＋ 補股價</span>`}</td>
       <td style="padding:9px 10px;font-size:12px;color:#475569;max-width:220px"><div style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${_ae(String(w.reason||'').replace(/\n/g,' '))}</div><div style="font-size:10.5px;color:#cbd5e1">${days!=null?'觀察 '+days+' 天':''}</div></td>
       <td style="padding:9px 6px;color:#94a3b8;font-size:12px">${open?'▲':'▼'}</td></tr>`;
     if(open){
@@ -17234,18 +17265,29 @@ function watchToHolding(id){
     const w=(db.watchlist||[]).find(x=>x.id===(oldCopy?.id))||(!oldCopy?(db.watchlist||[])[db.watchlist.length-1]:null);
     if(w){
       let ch=false;
+      const _ad=(document.getElementById('w-added-date')?.value||'').trim(), _ap=parseFloat(document.getElementById('w-add-price')?.value);
       if(oldCopy){
         if(oldCopy.addedDate&&w.addedDate!==oldCopy.addedDate){w.addedDate=oldCopy.addedDate;ch=true;}
         if(oldCopy.addPrice!=null){w.addPrice=oldCopy.addPrice;ch=true;}
+        if(_ad&&_ad!==w.addedDate){w.addedDate=_ad;ch=true;}
+        if(!isNaN(_ap)&&_ap>0){if(w.addPrice!==_ap){w.addPrice=_ap;ch=true;}}else if(document.getElementById('w-add-price')?.value===''&&oldCopy.addPrice!=null){delete w.addPrice;ch=true;}
         w.targetLog=oldCopy.targetLog||[];
         if((oldCopy.target||null)!==(w.target||null)){w.targetLog.push({d:_twToday(),from:oldCopy.target||null,to:w.target||null});}
         ch=true;
-      }else{const p=db.prices?.[w.code]?.price;if(p){w.addPrice=p;ch=true;}}
+      }else{
+        if(_ad){w.addedDate=_ad;ch=true;}
+        if(!isNaN(_ap)&&_ap>0){w.addPrice=_ap;ch=true;}else{const p=db.prices?.[w.code]?.price;if(p){w.addPrice=p;ch=true;}}
+      }
       if(ch)save();
     }
     try{renderWatchPage();}catch(e){}
     return r;
   };
+  const _o=openWatchModal; openWatchModal=function(id){const r=_o.apply(this,arguments);
+    const w=id?(db.watchlist||[]).find(x=>x.id===id):null;
+    const d=document.getElementById('w-added-date'); if(d)d.value=w?.addedDate||_twToday();
+    const p=document.getElementById('w-add-price'); if(p){p.value=w?.addPrice??'';p.placeholder=w?(_wAddPrice(w)?.p?('理由裡寫的 '+_wAddPrice(w).p+'（可直接用或改）'):'可填當初加入時的股價'):'新增時自動帶目前股價';}
+    return r;};
   const _d=deleteWatch; deleteWatch=function(){const r=_d.apply(this,arguments);try{renderWatchPage();}catch(e){}return r;};
 })();
 // 每天記一次觀察股價格（刷新價格後）
