@@ -3048,7 +3048,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1792498497809,
+  "_ts": 1792498504415,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -6855,7 +6855,8 @@
                 "shares": 83,
                 "price": 35.29,
                 "fee": 1,
-                "remark": ""
+                "remark": "",
+                "src": "save"
               }
             ]
           }
@@ -6952,7 +6953,8 @@
             "price": 35.29,
             "amount": 2930.0699999999997,
             "fee": 1,
-            "remark": ""
+            "remark": "",
+            "src": "save"
           }
         ],
         "mktHistory": [
