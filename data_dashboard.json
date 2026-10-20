@@ -3048,7 +3048,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1792498504415,
+  "_ts": 1792498840624,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -5647,11 +5647,33 @@
                 "price": 10.74,
                 "fee": 4,
                 "remark": "媽媽 8月存一萬"
+              },
+              {
+                "id": "mvgnj0hsqtl",
+                "type": "sell",
+                "date": "2026-10-16",
+                "shares": 1882,
+                "price": 10.65,
+                "fee": 28,
+                "remark": "贖回兩萬 _ 勞保/健檢費用"
               }
             ]
           }
         ],
         "log": [
+          {
+            "id": "mvgnj0hs9yg",
+            "txnId": "mvgnj0hsqtl",
+            "date": "2026-10-16",
+            "type": "sell",
+            "code": "00999A",
+            "name": "野村台灣高息",
+            "shares": 1882,
+            "price": 10.65,
+            "amount": 20015.3,
+            "fee": 28,
+            "remark": "贖回兩萬 _ 勞保/健檢費用"
+          },
           {
             "id": "msgv8amujtg",
             "date": "2026-08-06",
@@ -8513,13 +8535,13 @@
           "activeCount": 5
         },
         "媽媽": {
-          "pct": 31.4,
-          "totalCost": 25132.78,
-          "totalMkt": 25048.8,
+          "pct": 6.3,
+          "totalCost": 5049.817167381974,
+          "totalMkt": 5005.5,
           "caps": [
             {
               "code": "00999A",
-              "wt": 100
+              "wt": 99
             }
           ],
           "activeCount": 1
