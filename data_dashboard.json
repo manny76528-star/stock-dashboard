@@ -3048,7 +3048,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1792498974545,
+  "_ts": 1792499354360,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -6007,6 +6007,16 @@
                 "price": 10.45,
                 "fee": 5,
                 "remark": ""
+              },
+              {
+                "id": "mvgnu0w6qmw",
+                "type": "buy",
+                "date": "2026-06-10",
+                "shares": 7040,
+                "price": 10.55,
+                "fee": 30,
+                "remark": "目前庫存在元大帳戶",
+                "src": "move"
               }
             ]
           },
@@ -6339,6 +6349,20 @@
             "fee": 6,
             "remark": "每月富邦薪水定期定額",
             "txnId": "mryicj7blb3"
+          },
+          {
+            "id": "mvgnu0w68wa",
+            "txnId": "mvgnu0w6qmw",
+            "date": "2026-06-10",
+            "type": "buy",
+            "code": "00997A",
+            "name": "主動群益美國增長",
+            "shares": 7040,
+            "price": 10.55,
+            "amount": 74302,
+            "fee": 30,
+            "remark": "目前庫存在元大帳戶",
+            "src": "move"
           },
           {
             "id": "mryi5qx2141",
@@ -8539,33 +8563,33 @@
           "activeCount": 2
         },
         "阿豪富邦": {
-          "pct": 40.7,
-          "totalCost": 406939.84,
-          "totalMkt": 431297.75,
+          "pct": 48.1,
+          "totalCost": 481241.84,
+          "totalMkt": 505710.55,
           "caps": [
             {
               "code": "00405A",
-              "wt": 41
+              "wt": 35
             },
             {
               "code": "00986A",
-              "wt": 40
-            },
-            {
-              "code": "00981A",
-              "wt": 10
-            },
-            {
-              "code": "009811",
-              "wt": 7
-            },
-            {
-              "code": "00999A",
-              "wt": 5
+              "wt": 34
             },
             {
               "code": "00997A",
-              "wt": 3
+              "wt": 18
+            },
+            {
+              "code": "00981A",
+              "wt": 8
+            },
+            {
+              "code": "009811",
+              "wt": 6
+            },
+            {
+              "code": "00999A",
+              "wt": 4
             }
           ],
           "activeCount": 6
