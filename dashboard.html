@@ -2196,7 +2196,8 @@ body:not(.privacy) .privacy-mask{filter:none;}
       </div>
 
       <!-- 現金流月報 -->
-      <div class="as-card" id="cashflow-card" style="margin-bottom:16px;padding:12px 16px;position:relative;background:#eff6ff;border:1px solid #bfdbfe">
+      <div id="cashflow-pro"></div>
+      <div class="as-card" id="cashflow-card" style="margin-bottom:16px;padding:12px 16px;position:relative;background:#eff6ff;border:1px solid #bfdbfe;display:none">
         <div style="display:grid;grid-template-columns:minmax(0,1fr) 36px minmax(0,1fr);gap:0;align-items:end">
           <div style="padding-right:12px">
             <div style="font-size:11px;color:#3b82f6;font-weight:600;margin-bottom:4px">現金流入 🏦</div>
@@ -2333,8 +2334,8 @@ body:not(.privacy) .privacy-mask{filter:none;}
           <div class="ov-kpi-card"><div class="ov-kpi-accent" style="background:#b5adc4"></div><div class="ov-kpi-label" style="padding-left:8px">累積股息</div><div class="ov-kpi-val" id="fm-div" style="padding-left:8px">—</div></div>
         </div>
 
-        <!-- 持股 + 歷史紀錄 -->
-        <div style="display:grid;grid-template-columns:1fr 340px;gap:16px;margin-bottom:16px">
+        <!-- 持股（一整排）＋ 錢從哪裡來｜歷史紀錄（並排）-->
+        <div style="display:flex;flex-direction:column;gap:16px;margin-bottom:16px">
           <!-- 持股清單 -->
           <div class="trend-page-card" style="padding:0;overflow:hidden">
             <div class="trend-page-hdr" style="padding:12px 16px;border-bottom:1px solid #f0f2f5">
@@ -2348,7 +2349,8 @@ body:not(.privacy) .privacy-mask{filter:none;}
             <div id="family-holdings-body"></div>
           </div>
 
-          <div id="family-src-card" class="trend-page-card" style="display:none"></div>
+          <div id="family-src-wrap" style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:16px;align-items:start">
+          <div id="family-src-card" class="trend-page-card" style="display:none;position:sticky;top:8px"></div>
           <!-- 歷史紀錄 -->
           <div class="trend-page-card" style="padding:0;overflow:hidden">
             <div class="trend-page-hdr" style="padding:10px 14px;border-bottom:1px solid #f0f2f5;flex-direction:column;align-items:flex-start;gap:8px">
@@ -2368,7 +2370,8 @@ body:not(.privacy) .privacy-mask{filter:none;}
                 </select>
               </div>
             </div>
-            <div id="family-log-body" style="max-height:460px;overflow-y:auto"></div>
+            <div id="family-log-body" style="max-height:560px;overflow-y:auto"></div>
+          </div>
           </div>
         </div>
 
@@ -2666,8 +2669,9 @@ body:not(.privacy) .privacy-mask{filter:none;}
     </div>
 
     <div class="db-page" id="dbpage-pledge">
-      <!-- 整體維持率大卡 -->
-      <div class="trend-page-card" style="padding:20px;margin-bottom:16px">
+      <div id="pledge-pro"></div>
+      <!-- 整體維持率大卡（舊版，保留給原本的計算使用，畫面改用上面的新版）-->
+      <div class="trend-page-card" id="pledge-old-card" style="padding:20px;margin-bottom:16px;display:none">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
           <div style="font-size:15px;font-weight:800;color:#1e293b">🔒 質押維持率</div>
           <button onclick="renderPledgePage()" style="padding:5px 12px;background:#f8fafc;border:1px solid #eaecf0;color:#374151;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">🔄 更新</button>
@@ -16992,7 +16996,9 @@ function renderFamilySrcCard(acc,fy,fm){
   const box=document.getElementById('family-src-card'); if(!box)return;
   famSrcApplyNames();
   const buys=(acc.log||[]).filter(l=>l.type==='buy'&&(!fy||l.date?.startsWith(fy))&&(!fm||l.date?.slice(5,7)===fm));
-  if(!buys.length){box.style.display='none';box.innerHTML='';return;}
+  const _wrap=document.getElementById('family-src-wrap');
+  if(!buys.length){box.style.display='none';box.innerHTML='';if(_wrap)_wrap.style.gridTemplateColumns='minmax(0,1fr)';return;}
+  if(_wrap)_wrap.style.gridTemplateColumns=window.innerWidth<900?'minmax(0,1fr)':'minmax(0,1fr) minmax(0,1.25fr)';
   const g={}; let tot=0;
   buys.forEach(l=>{const k=famSrcOfLog(acc,l);const a=Math.round(l.amount||0);(g[k]=g[k]||{n:0,a:0});g[k].n++;g[k].a+=a;tot+=a;});
   const order=[...Object.keys(FAM_SRC),'none'].filter(k=>g[k]).sort((a,b)=>a==='none'?1:b==='none'?-1:g[b].a-g[a].a);
@@ -17307,6 +17313,227 @@ function watchRecordPx(){
   if(isNew)save();
 }
 (function(){const _r=refreshPrices;refreshPrices=async function(){const r=await _r.apply(this,arguments);try{watchRecordPx();if(document.getElementById('dbpage-watch')?.classList.contains('active'))renderWatchPage();}catch(e){console.warn('watchPx',e);}return r;};})();
+
+
+// ══════════════════════════════════════════════════════════════
+// 📋 家族持股明細 B 版：價位地圖＋精簡表（同一套 familyFifo 計算）
+// ══════════════════════════════════════════════════════════════
+var _fdHid=null, _fdSort='date';
+function _fdSrcOfTxn(acc,t){
+  const l=(acc.log||[]).find(x=>x.txnId===t.id);
+  const k=l?famSrcOfLog(acc,l):(t.src||famSrcGuess(t.remark)||'none');
+  const auto=l?famSrcIsAuto(acc,l):!t.src;
+  return{k,auto,logId:l?.id||''};
+}
+openFamilyDetail=function(hId){
+  const member=curFamilyMember(); const acc=getFamilyAccount(member);
+  const h=acc.holdings.find(x=>x.id===hId); if(!h)return;
+  _fdHid=hId; famSrcApplyNames();
+  const c=calcFamilyHolding(h); const price=db.prices[h.code]?.price||0;
+  const ff=familyFifo(h); const lotBy={}; ff.lots.forEach(l=>lotBy[l.txnId]=l);
+  const pnlC=v=>v==null?'#94a3b8':v>=0?'#dc2626':'#16a34a';
+  const roi=c.cost>0?c.pnl/c.cost*100:0;
+  document.getElementById('family-detail-title').textContent=h.code+' '+(h.name||'');
+  const btn=(bg,bd,col)=>`padding:6px 13px;background:${bg};border:1px solid ${bd};color:${col};border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;text-decoration:none`;
+  let html=`<div style="display:flex;gap:18px;align-items:flex-end;flex-wrap:wrap;padding:14px 20px;border-bottom:1px solid #f0f2f5">
+    <div><div style="font-size:11px;color:#94a3b8">持股</div><div style="font-size:20px;font-weight:900">${c.lotsDisplay}</div></div>
+    <div><div style="font-size:11px;color:#94a3b8">均成本</div><div style="font-size:17px;font-weight:800;font-family:'JetBrains Mono',monospace">${c.avgCost?c.avgCost.toFixed(2):'—'}</div></div>
+    <div><div style="font-size:11px;color:#94a3b8">現價</div><div style="font-size:17px;font-weight:800;font-family:'JetBrains Mono',monospace">${price?price.toFixed(2):'—'}</div></div>
+    <div><div style="font-size:11px;color:#94a3b8">市值</div><div class="privacy-mask" style="font-size:17px;font-weight:800;font-family:'JetBrains Mono',monospace">${c.mktVal!=null?'$'+Math.round(c.mktVal).toLocaleString():'—'}</div></div>
+    <div><div style="font-size:11px;color:#94a3b8">未實現</div><div class="privacy-mask" style="font-size:17px;font-weight:800;font-family:'JetBrains Mono',monospace;color:${pnlC(c.pnl)}">${c.pnl!=null?(c.pnl>=0?'+':'−')+'$'+Math.abs(Math.round(c.pnl)).toLocaleString()+'（'+(roi>=0?'+':'')+roi.toFixed(1)+'%）':'—'}</div></div>
+    ${c.realized?`<div><div style="font-size:11px;color:#94a3b8">已實現</div><div class="privacy-mask" style="font-size:15px;font-weight:800;font-family:'JetBrains Mono',monospace;color:${pnlC(c.realized)}">${c.realized>=0?'+':'−'}$${Math.abs(Math.round(c.realized)).toLocaleString()}</div></div>`:''}
+  </div>
+  <div style="display:flex;gap:8px;padding:10px 20px;border-bottom:1px solid #f0f2f5;flex-wrap:wrap">
+    <button onclick="closeModal('familyDetailModal');openFamilyBuyModal('${hId}')" style="${btn('#fee2e2','#fca5a5','#dc2626')}">💰 買入</button>
+    <button onclick="closeModal('familyDetailModal');openFamilySellModal('${hId}')" style="${btn('#dcfce7','#86efac','#15803d')}">💸 賣出</button>
+    <button onclick="closeModal('familyDetailModal');openFamilyDivModal('${hId}')" style="${btn('#fef3c7','#fcd34d','#92400e')}">🎁 股息</button>
+    ${h.url?`<a href="${h.url}" target="_blank" style="${btn('#eff6ff','#bfdbfe','#2563eb')}">🔗 相關連結</a>`:''}
+    <button onclick="delFamilyHolding('${hId}')" style="${btn('#fff','#fca5a5','#ef4444')};margin-left:auto">🗑 刪除</button></div>`;
+  // ── 價位地圖（只畫還有庫存的買入批次）──
+  const buys=(h.transactions||[]).filter(t=>t.type==='buy');
+  const open=buys.map(t=>({t,l:lotBy[t.id]})).filter(x=>x.l&&x.l.remaining>0);
+  if(open.length){
+    const ps=open.map(x=>x.t.price).concat([c.avgCost||0,price||0]).filter(v=>v>0);
+    let lo=Math.min(...ps),hi=Math.max(...ps); const pad=(hi-lo)*0.08||lo*0.05||1; lo-=pad; hi+=pad;
+    const X=v=>((v-lo)/(hi-lo)*100).toFixed(2);
+    const maxS=Math.max(...open.map(x=>x.l.remaining));
+    const win=open.filter(x=>price&&price>=x.t.price).length, lose=open.length-win;
+    const cheap=open.reduce((m,x)=>!m||x.t.price<m.t.price?x:m,null), dear=open.reduce((m,x)=>!m||x.t.price>m.t.price?x:m,null);
+    const ticks=[]; const raw=(hi-lo)/4, mag=Math.pow(10,Math.floor(Math.log10(raw))); const step=[1,2,2.5,5,10].map(k=>k*mag).find(v=>v>=raw)||raw;
+    for(let v=Math.ceil(lo/step)*step;v<=hi+1e-9;v+=step)ticks.push(+v.toFixed(6));
+    html+=`<div style="padding:12px 20px 6px"><div style="font-size:12px;font-weight:700;color:#334155">📍 買進價位分佈 <span style="font-weight:400;color:#94a3b8">圓點大小＝還持有的股數・滑過看細節</span></div>
+      <div style="position:relative;height:82px;margin:6px 14px 0">
+        <div style="position:absolute;left:0;right:0;top:44px;height:2px;background:#e2e8f0"></div>
+        ${c.avgCost?`<div style="position:absolute;left:${X(c.avgCost)}%;top:14px;bottom:16px;border-left:2px dashed #64748b"></div><div style="position:absolute;left:${X(c.avgCost)}%;top:0;font-size:10.5px;color:#64748b;transform:translateX(-50%);white-space:nowrap">均成本 ${c.avgCost.toFixed(2)}</div>`:''}
+        ${price?`<div style="position:absolute;left:${X(price)}%;top:14px;bottom:16px;border-left:2px solid #ea580c"></div><div style="position:absolute;left:${X(price)}%;top:0;font-size:10.5px;color:#ea580c;font-weight:700;transform:translateX(-50%);white-space:nowrap">現價 ${price.toFixed(2)}</div>`:''}
+        ${open.map(x=>{const d=Math.max(8,Math.round(26*Math.sqrt(x.l.remaining/maxS)));const up=price&&price>=x.t.price;
+          return`<i title="${x.t.date}｜${x.l.remaining} 股 @ ${x.t.price}${x.t.remark?'｜'+_ae(x.t.remark):''}" style="position:absolute;left:${X(x.t.price)}%;top:${45-d/2}px;width:${d}px;height:${d}px;margin-left:-${d/2}px;border-radius:50%;background:${price?(up?'#dc262699':'#16a34a99'):'#64748b88'};border:1.5px solid #fff;cursor:default"></i>`;}).join('')}
+        ${ticks.map(v=>`<div style="position:absolute;left:${X(v)}%;top:62px;font-size:10px;color:#94a3b8;transform:translateX(-50%)">${step<1?v.toFixed(step<0.1?2:1):Math.round(v)}</div>`).join('')}
+      </div>
+      <div style="font-size:11.5px;color:#475569;margin:2px 0 6px">${price?`紅點＝目前賺錢的批次（${win} 筆）、綠點＝賠錢（${lose} 筆）。`:'還沒抓到現價。'}最便宜買在 ${cheap.t.price}（${cheap.t.date.slice(5).replace('-','/')}），最貴 ${dear.t.price}（${dear.t.date.slice(5).replace('-','/')}）。</div></div>`;
+  }
+  // ── 精簡表 ──
+  const today=_twToday();
+  const rows=(h.transactions||[]).map(t=>{
+    const sh=t.shares||(t.lots||0)*1000; const isB=t.type==='buy';
+    let pnl=null,pct=null,remain=null;
+    if(isB){const l=lotBy[t.id];remain=l?l.remaining:sh;
+      if(price&&remain>0){const cr=l?l.costRemaining:sh*t.price+(t.fee||0);pnl=remain*price-cr;pct=cr>0?pnl/cr*100:0;}
+      else if(l&&l.realizedShares>0){pnl=l.realizedPnl;pct=null;}}
+    else if(t.type==='sell'){const r=ff.sellResult[t.id];if(r){pnl=r.pnl;pct=r.cost>0?r.pnl/r.cost*100:0;}}
+    return{t,sh,isB,pnl,pct,remain,days:isB?Math.max(0,_dayDiff(today,t.date)):null};
+  });
+  const key={date:r=>r.t.date,pnl:r=>r.pnl==null?-1e15:r.pnl,shares:r=>r.sh}[_fdSort]||(r=>r.t.date);
+  rows.sort((a,b)=>{const ka=key(a),kb=key(b);return ka<kb?1:ka>kb?-1:0;});
+  const sb=(k,t)=>`<a href="javascript:void 0" onclick="_fdSort='${k}';openFamilyDetail('${hId}')" style="text-decoration:none;color:${_fdSort===k?'#0f172a':'#64748b'};font-weight:${_fdSort===k?800:400}">${t}</a>`;
+  html+=`<div style="padding:4px 20px 6px;display:flex;align-items:center;gap:8px;border-top:1px solid #f0f2f5"><span style="font-size:12px;font-weight:700;color:#334155">📋 交易紀錄（${rows.length} 筆）</span><span style="margin-left:auto;font-size:11.5px;color:#64748b">排序：${sb('date','日期')}｜${sb('pnl','損益')}｜${sb('shares','股數')}</span></div>
+  <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:720px">
+    <tr style="background:#f8fafc;color:#64748b;font-size:11px"><th style="padding:7px 10px 7px 20px;text-align:left;font-weight:600">日期</th><th style="padding:7px 8px;text-align:left;font-weight:600">資金來源／備註</th><th style="padding:7px 8px;text-align:right;font-weight:600">股數</th><th style="padding:7px 8px;text-align:right;font-weight:600">價格</th><th style="padding:7px 8px;text-align:right;font-weight:600">金額</th><th style="padding:7px 8px;text-align:right;font-weight:600">損益</th><th style="padding:7px 8px;text-align:right;font-weight:600">持有</th><th style="padding:7px 16px 7px 8px"></th></tr>
+    ${rows.map(r=>{const t=r.t;let tag;
+      if(r.isB){const s=_fdSrcOfTxn(acc,t);const S=s.k==='none'?null:FAM_SRC[s.k]||FAM_SRC.other;
+        tag=S?`<span ${s.logId?`onclick="famSrcPick('${s.logId}')"`:''} title="${s.auto?'依備註自動判斷，點一下可以改':'點一下可以改'}" style="font-size:10.5px;font-weight:700;border-radius:6px;padding:1px 7px;background:${S.bg};color:${S.fg};border:${s.auto?'1px dashed '+S.c+'88':'1px solid transparent'};cursor:pointer;white-space:nowrap">${S.e} ${S.n}</span>`
+          :`<span ${s.logId?`onclick="famSrcPick('${s.logId}')"`:''} style="font-size:10.5px;border-radius:6px;padding:1px 7px;border:1px dashed #cbd5e1;color:#94a3b8;cursor:pointer;white-space:nowrap">⬜ 點我分類</span>`;}
+      else tag=`<span style="font-size:10.5px;font-weight:700;border-radius:6px;padding:1px 7px;background:${t.type==='sell'?'#dcfce7':'#ede9fe'};color:${t.type==='sell'?'#15803d':'#6d28d9'}">${t.type==='sell'?'💸 賣出':'🎁 '+(t.type==='div'?'股息':t.type)}</span>`;
+      const amt=r.sh*(t.price||0);
+      const partial=r.isB&&r.remain!=null&&r.remain<r.sh?`<div style="font-size:10px;color:#94a3b8">剩 ${r.remain} 股</div>`:'';
+      return`<tr style="border-bottom:1px solid #f1f5f9">
+        <td style="padding:8px 10px 8px 20px;font-family:'JetBrains Mono',monospace;white-space:nowrap">${t.date.slice(2).replace(/-/g,'/')}</td>
+        <td style="padding:8px">${tag} <span style="color:#475569">${_ae(t.remark||'')||'<span style="color:#cbd5e1">—</span>'}</span></td>
+        <td style="padding:8px;text-align:right;font-family:'JetBrains Mono',monospace">${r.sh.toLocaleString()}${partial}</td>
+        <td style="padding:8px;text-align:right;font-family:'JetBrains Mono',monospace">${t.price!=null?(+t.price).toFixed(2):'—'}</td>
+        <td class="privacy-mask" style="padding:8px;text-align:right;font-family:'JetBrains Mono',monospace">$${Math.round(amt+(r.isB?(t.fee||0):0)).toLocaleString()}</td>
+        <td class="privacy-mask" style="padding:8px;text-align:right;font-family:'JetBrains Mono',monospace;color:${pnlC(r.pnl)};white-space:nowrap">${r.pnl!=null?(r.pnl>=0?'+':'−')+Math.abs(Math.round(r.pnl)).toLocaleString():'—'}${r.pct!=null?` <span style="font-size:10.5px">${r.pct>=0?'+':''}${r.pct.toFixed(1)}%</span>`:''}${!r.isB&&t.type==='sell'?'<div style="font-size:10px;color:#94a3b8">已實現</div>':''}</td>
+        <td style="padding:8px;text-align:right;color:#94a3b8;white-space:nowrap">${r.days!=null&&r.remain>0?r.days+' 天':''}</td>
+        <td style="padding:8px 16px 8px 8px;white-space:nowrap;text-align:right"><button onclick="editFamilyTxn('${hId}','${t.id}')" title="編輯" style="border:1px solid #e2e8f0;background:#fff;border-radius:6px;cursor:pointer;font-size:12px;padding:2px 6px">✏️</button> <button onclick="delFamilyTxn('${hId}','${t.id}')" title="刪除" style="border:none;background:none;color:#ef4444;cursor:pointer;font-size:12px;padding:2px 4px">🗑</button></td></tr>`;}).join('')}
+  </table></div>`;
+  document.getElementById('family-detail-body').innerHTML=html;
+  openModal('familyDetailModal');
+  if(typeof applyPrivacy==='function')applyPrivacy();
+};
+(function(){const _s=famSrcSet;famSrcSet=function(){const r=_s.apply(this,arguments);try{if(_fdHid&&document.getElementById('familyDetailModal')?.classList.contains('open'))openFamilyDetail(_fdHid);}catch(e){}return r;};})();
+
+// ══════════════════════════════════════════════════════════════
+// 🔒 質押管理：直覺版（儀表、離危險多遠、壓力測試、組成、額度）
+//   資料與計算跟原本質押頁同一套；下方借款／擔保品清單沿用原本的
+// ══════════════════════════════════════════════════════════════
+function _plArc(cx,cy,r,a0,a1){const p=a=>[cx+r*Math.cos(a),cy-r*Math.sin(a)];const [x0,y0]=p(a0),[x1,y1]=p(a1);return`M${x0.toFixed(1)} ${y0.toFixed(1)} A${r} ${r} 0 0 1 ${x1.toFixed(1)} ${y1.toFixed(1)}`;}
+function renderPledgePro(){
+  const box=document.getElementById('pledge-pro'); if(!box)return;
+  const flex=(db.flexLoans||[]).filter(f=>f.calcPledge);
+  const loan=flex.reduce((s,f)=>s+(f.used||f.remain||0),0);
+  const limit=flex.reduce((s,f)=>s+(f.limit||0),0);
+  const by={}; let mkt=0, missing=[];
+  (db.pledgeAssets||[]).forEach(a=>{const p=db.prices?.[a.code]?.price||0;if(!p)missing.push(a.code);const v=p*(a.lots||0)*1000;mkt+=v;
+    const g=by[a.code]=by[a.code]||{code:a.code,lots:0,mkt:0,price:p,notes:new Set()};g.lots+=a.lots||0;g.mkt+=v;if(a.note)g.notes.add(a.note);});
+  const th=+db.pledgeThreshold||130; const R=loan>0?mkt/loan*100:0;
+  const W='#ef4444',A='#f59e0b',S='#bfdbfe';
+  if(!loan){box.innerHTML=`<div class="trend-page-card" style="padding:20px;margin-bottom:16px;color:#94a3b8;font-size:13px">還沒有「計入質押維持率」的借款。請到「資產與負債 → 不限用途」勾選。</div>`;return;}
+  const lv=[{v:130,n:'斷頭',c:'#b91c1c',bg:'#fef2f2',bd:'#fecaca'},{v:145,n:'券商警示',c:'#c2410c',bg:'#fff7ed',bd:'#fed7aa'}];
+  if(th!==130&&th!==145)lv.push({v:th,n:'你的警戒',c:'#b45309',bg:'#fffbeb',bd:'#fde68a'});
+  lv.sort((a,b)=>b.v-a.v);
+  const zone=R<130?['斷頭區','#dc2626','#fee2e2']:R<145?['警示區','#c2410c','#ffedd5']:R<th?['低於你的警戒','#b45309','#fef3c7']:['安全區','#1d4ed8','#dbeafe'];
+  // 儀表：120%～220%
+  const MIN=120,MAX=220,ang=v=>Math.PI*(1-(Math.min(MAX,Math.max(MIN,v))-MIN)/(MAX-MIN));
+  const cx=140,cy=140,r=108;
+  const needle=ang(R); const nx=cx+(r-14)*Math.cos(needle), ny=cy-(r-14)*Math.sin(needle);
+  const svg=`<svg width="280" height="168" viewBox="0 0 280 168">
+    <path d="${_plArc(cx,cy,r,Math.PI,0)}" fill="none" stroke="#f1f5f9" stroke-width="22"/>
+    <path d="${_plArc(cx,cy,r,ang(MIN),ang(130))}" fill="none" stroke="#991b1b" stroke-width="22"/>
+    <path d="${_plArc(cx,cy,r,ang(130),ang(145))}" fill="none" stroke="${W}" stroke-width="22"/>
+    ${th>145?`<path d="${_plArc(cx,cy,r,ang(145),ang(th))}" fill="none" stroke="${A}" stroke-width="22"/>`:''}
+    <path d="${_plArc(cx,cy,r,ang(Math.max(145,th)),ang(MAX))}" fill="none" stroke="${S}" stroke-width="22"/>
+    ${[[130,'130'],[145,'145'],...(th>145?[[th,String(th)]]:[]),[200,'200']].map(([v,t])=>{const a=ang(v);const tx=cx+(r+20)*Math.cos(a),ty=cy-(r+20)*Math.sin(a);return`<text x="${tx.toFixed(1)}" y="${(ty+4).toFixed(1)}" font-size="10.5" fill="#64748b" text-anchor="middle">${t}</text>`;}).join('')}
+    <line x1="${cx}" y1="${cy}" x2="${nx.toFixed(1)}" y2="${ny.toFixed(1)}" stroke="#0f172a" stroke-width="4" stroke-linecap="round"/><circle cx="${cx}" cy="${cy}" r="8" fill="#0f172a"/></svg>`;
+  const top=Object.values(by).sort((a,b)=>b.mkt-a.mkt); const big=top[0];
+  const pAt=(X,g)=>{if(!g||!g.lots)return null;const other=mkt-g.mkt;return (X/100*loan-other)/(g.lots*1000);};
+  const drop=X=>R>0?Math.max(0,(1-X/R)*100):0;
+  const col=['#3b82f6','#22c55e','#f59e0b','#a855f7','#ec4899','#14b8a6','#64748b'];
+  const stress=[5,10,15,20,25].map(d=>{const v=R*(1-d/100);const s=v<130?['斷頭','#dc2626','#fff']:v<145?['低於 145% 警示','#fee2e2','#b91c1c']:v<th?[`低於你的 ${th}%`,'#fef3c7','#b45309']:['安全','#dcfce7','#15803d'];return{d,v,s};});
+  const hitBy=stress.find(x=>x.v<th);
+  const lev=db.advisor?.lev?.rules;
+  const add=Math.min(1000000,Math.max(0,limit-loan));
+  const m=v=>'$'+Math.round(v).toLocaleString();
+  box.innerHTML=`<div class="trend-page-card" style="padding:16px 18px;margin-bottom:16px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><b style="font-size:15px">🔒 質押維持率</b>
+      <span style="font-size:12px;color:#64748b">你的警戒線 <input type="number" value="${th}" min="100" max="250" step="1" onchange="plSetTh(this.value)" style="width:56px;padding:2px 6px;border:1px solid #e2e8f0;border-radius:6px;font-size:12px;font-weight:700;text-align:center"> %</span>
+      <button onclick="renderPledgePage()" style="margin-left:auto;padding:5px 12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">🔄 更新</button></div>
+    ${missing.length?`<div style="font-size:12px;color:#b45309;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:6px 10px;margin-bottom:8px">⚠️ ${[...new Set(missing)].join('、')} 還沒抓到股價，維持率可能偏低。請按右上角「💹 刷新價格」。</div>`:''}
+    <div style="display:grid;grid-template-columns:290px minmax(0,1fr);gap:18px;align-items:center">
+      <div style="text-align:center">${svg}<div class="privacy-mask" style="font-size:32px;font-weight:900;font-family:'JetBrains Mono',monospace;color:#0f172a;margin-top:-6px">${R.toFixed(1)}%</div>
+        <div style="font-size:12px;color:#64748b">整體維持率 <span style="font-size:11px;font-weight:700;border-radius:6px;padding:1px 8px;background:${zone[2]};color:${zone[1]}">${zone[0]}</span></div>
+        <div style="font-size:11.5px;color:#64748b;margin-top:4px">擔保品 <b class="privacy-mask">${m(mkt)}</b> ÷ 借款 <b class="privacy-mask">${m(loan)}</b></div></div>
+      <div><div style="font-size:13px;font-weight:800;margin-bottom:6px">🧯 離危險還有多遠</div>
+        <div style="display:grid;grid-template-columns:repeat(${lv.length},minmax(0,1fr));gap:8px">${lv.map(x=>`<div style="background:${x.bg};border:1px solid ${x.bd};border-radius:12px;padding:10px 12px"><div style="font-size:11px;color:#64748b">擔保品再跌</div><div style="font-size:22px;font-weight:900;color:${x.c}">${R>x.v?drop(x.v).toFixed(1)+'%':'已低於'}</div><div style="font-size:11px;color:#94a3b8">到${x.n} ${x.v}%</div></div>`).join('')}</div>
+        ${big?`<div style="font-size:12px;color:#475569;margin-top:8px">換算成 <b>${_ae(big.code)}</b> 股價（其他擔保品不動時）：${lv.map(x=>{const p=pAt(x.v,big);return p&&p>0?`跌到 <b class="privacy-mask" style="font-family:'JetBrains Mono',monospace">${p.toFixed(2)}</b> → ${x.v}%`:'';}).filter(Boolean).join('｜')}${big.price?`　<span style="color:#94a3b8">（現價 ${big.price}）</span>`:''}</div>`:''}</div></div></div>
+  <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-bottom:16px">
+    <div class="trend-page-card" style="padding:14px 16px"><div style="font-size:13px;font-weight:800;margin-bottom:6px">🧪 壓力測試：擔保品一起跌</div>
+      <table style="width:100%;border-collapse:collapse;font-size:12.5px">${stress.map(x=>`<tr style="border-bottom:1px solid #f1f5f9"><td style="padding:7px 4px">−${x.d}%</td><td class="privacy-mask" style="padding:7px 4px;text-align:right;font-family:'JetBrains Mono',monospace">${x.v.toFixed(1)}%</td><td style="padding:7px 4px;text-align:right"><span style="font-size:11px;font-weight:700;border-radius:6px;padding:1px 8px;background:${x.s[1]};color:${x.s[2]}">${x.s[0]}</span></td></tr>`).join('')}</table>
+      <div style="font-size:11px;color:#94a3b8;margin-top:6px">${hitBy?`擔保品跌 ${hitBy.d}% 左右就會低於你的警戒線。`:''}參考：2026/07 那波，大盤一個月跌了約 15%。</div></div>
+    <div class="trend-page-card" style="padding:14px 16px"><div style="font-size:13px;font-weight:800;margin-bottom:6px">📦 擔保品組成 <span style="font-weight:400;font-size:11px;color:#94a3b8">合計 <span class="privacy-mask">${m(mkt)}</span></span></div>
+      <div style="display:flex;height:14px;border-radius:9px;overflow:hidden;margin-bottom:8px;background:#f1f5f9">${top.map((g,i)=>`<i title="${g.code}" style="width:${mkt?(g.mkt/mkt*100).toFixed(2):0}%;background:${col[i%col.length]}"></i>`).join('')}</div>
+      <table style="width:100%;border-collapse:collapse;font-size:12.5px">${top.map((g,i)=>`<tr style="border-bottom:1px solid #f1f5f9"><td style="padding:6px 4px"><span style="color:${col[i%col.length]}">●</span> <b>${_ae(g.code)}</b> ${g.lots} 張 <span style="font-size:11px;color:#94a3b8">${_ae([...g.notes].join('、'))}</span></td><td class="privacy-mask" style="padding:6px 4px;text-align:right;font-family:'JetBrains Mono',monospace">${m(g.mkt)}</td><td style="padding:6px 4px;text-align:right">${mkt?(g.mkt/mkt*100).toFixed(1):0}%</td></tr>`).join('')}</table>
+      ${big&&mkt&&big.mkt/mkt>0.6?`<div style="font-size:11.5px;color:#c2410c;margin-top:6px">⚠️ ${Math.round(big.mkt/mkt*100)}% 集中在 ${_ae(big.code)}，維持率幾乎就是看它一檔</div>`:''}</div></div>
+  <div class="trend-page-card" style="padding:14px 16px;margin-bottom:16px"><div style="font-size:13px;font-weight:800;margin-bottom:8px">💳 借款與額度</div>
+    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap"><div style="flex:1;min-width:260px">
+      <div style="display:flex;height:14px;border-radius:9px;overflow:hidden;background:#f1f5f9"><i style="width:${limit?Math.min(100,loan/limit*100).toFixed(1):0}%;background:#ea580c"></i></div>
+      <div style="font-size:12px;color:#475569;margin-top:4px">${flex.map(f=>_ae(f.name||'')).join('、')} 已用 <b class="privacy-mask" style="font-family:'JetBrains Mono',monospace">${m(loan)}</b>${limit?` ／ 額度 <span class="privacy-mask">${m(limit)}</span>（${Math.round(loan/limit*100)}%）・還可借 <b class="privacy-mask" style="font-family:'JetBrains Mono',monospace">${m(limit-loan)}</b>`:''}</div></div>
+      ${add>0?`<div style="border:1px solid #e2e8f0;border-radius:12px;padding:8px 12px;min-width:220px"><div style="font-size:11px;color:#64748b">試算：再借 ${Math.round(add/10000)} 萬（不買股票）</div><div class="privacy-mask" style="font-size:16px;font-weight:800;font-family:'JetBrains Mono',monospace">${R.toFixed(1)}% → ${(mkt/(loan+add)*100).toFixed(1)}%</div></div>`:''}</div>
+    ${lev?`<div style="font-size:12px;color:#7f1d1d;background:#fef2f2;border:1px solid #fecaca;border-radius:9px;padding:7px 10px;margin-top:10px;white-space:pre-wrap">⚖️ 你的槓桿應變計畫：${_ae(lev)}　<a href="javascript:void 0" onclick="openAdvisor('cards','lev')" style="color:#94a3b8;font-size:11px">修改</a></div>`
+      :`<div style="font-size:12px;color:#64748b;margin-top:10px">⚖️ 還沒寫槓桿應變計畫 → <a href="javascript:void 0" onclick="openAdvisor('cards','lev')" style="color:#2563eb">到投資顧問寫一份</a></div>`}</div>`;
+  if(typeof applyPrivacy==='function')applyPrivacy();
+}
+function plSetTh(v){const n=parseInt(v)||130;db.pledgeThreshold=n;const el=document.getElementById('pledge-threshold');if(el)el.value=n;save();renderPledgePage();}
+(function(){const _r=renderPledgePage;renderPledgePage=function(){const r=_r.apply(this,arguments);try{renderPledgePro();}catch(e){console.warn('pledgePro',e);}return r;};})();
+
+// ══════════════════════════════════════════════════════════════
+// 💧 每月現金流＋信貸還清時間軸（取代原本的戰場儀表板）
+// ══════════════════════════════════════════════════════════════
+function _cfLoanEnd(l){
+  const B=calcLoanRemain(l); if(!(B>0)||!l.monthly)return null;
+  const r=(l.rate||0)/100/12; let n;
+  if(r>0){const x=1-r*B/l.monthly; if(x<=0)return null; n=Math.ceil(-Math.log(x)/Math.log(1+r));} else n=Math.ceil(B/l.monthly);
+  const t=new Date(Date.now()+8*3600000); let y=t.getUTCFullYear(), mo=t.getUTCMonth()+1;
+  const dd=parseInt(l.deductDay)||1; let k=n-(t.getUTCDate()<dd?1:0); mo+=k; y+=Math.floor((mo-1)/12); mo=((mo-1)%12)+1;
+  return{ym:`${y}/${String(mo).padStart(2,'0')}`,n,B};
+}
+function renderCashflowPro(){
+  const box=document.getElementById('cashflow-pro'); if(!box)return;
+  const today=_twToday(); const ym=today.slice(0,7);
+  const loans=(db.loans||[]).filter(l=>!l.settled&&calcLoanRemain(l)>0);
+  const loanM=loans.reduce((s,l)=>s+(l.monthly||0),0);
+  const flexM=(db.flexLoans||[]).filter(f=>!f.settled).reduce((s,f)=>s+(f.monthly||0),0);
+  const out=loanM+flexM;
+  const byM={}; (db.dividends||[]).filter(d=>d.date&&d.date<=today&&!d.pending).forEach(d=>{const k=d.date.slice(0,7);byM[k]=(byM[k]||0)+(d.amount||0);});
+  const months=Object.keys(byM).sort().filter(k=>k<=ym).slice(-3);
+  const avg3=months.length?months.reduce((s,k)=>s+byM[k],0)/months.length:0;
+  const next=(db.dividends||[]).filter(d=>d.date&&d.date>today).sort((a,b)=>a.date.localeCompare(b.date));
+  const nextAmt=next.length?next.filter(d=>d.date===next[0].date).reduce((s,d)=>s+(d.amount||0),0):0;
+  const inc=avg3||nextAmt; const net=inc-out; const cov=out>0?inc/out*100:0; const safe=inc>0?(1-out/inc)*100:0;
+  const m=v=>'$'+Math.round(Math.abs(v)).toLocaleString();
+  const st=cov>=120?['安全','#dcfce7','#15803d']:cov>=100?['剛好打平','#fef3c7','#b45309']:['入不敷出','#fee2e2','#b91c1c'];
+  const tot=Math.max(inc,out)||1;
+  const ends=loans.map(l=>({l,e:_cfLoanEnd(l)})).filter(x=>x.e).sort((a,b)=>a.e.ym.localeCompare(b.e.ym));
+  let cur=out; const steps=ends.map(x=>{cur-=x.l.monthly||0;return{ym:x.e.ym,name:x.l.bank||x.l.name||'信貸',m:x.l.monthly||0,out:Math.max(0,cur)};});
+  box.innerHTML=`<div class="as-card" style="margin-bottom:16px;padding:14px 16px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap"><b style="font-size:14px">💧 每月現金流</b><span style="font-size:11.5px;color:#94a3b8">股息能不能付掉每月的固定支出</span>
+      <span style="margin-left:auto;font-size:12px;font-weight:800;background:${st[1]};color:${st[2]};border-radius:8px;padding:3px 10px">覆蓋率 ${cov.toFixed(0)}% ・ ${st[0]}</span></div>
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px">
+      <div><div style="font-size:11px;color:#94a3b8">每月股息</div><div class="privacy-mask" style="font-size:22px;font-weight:900;font-family:'JetBrains Mono',monospace;color:#dc2626">${m(inc)}</div><div style="font-size:11px;color:#94a3b8">${months.length?`近 ${months.length} 個月平均`:'下一筆入帳'}${nextAmt?`・下一筆 ${next[0].date.slice(5).replace('-','/')} <span class="privacy-mask">${m(nextAmt)}</span>`:''}</div></div>
+      <div><div style="font-size:11px;color:#94a3b8">每月固定支出</div><div class="privacy-mask" style="font-size:22px;font-weight:900;font-family:'JetBrains Mono',monospace">${m(out)}</div><div style="font-size:11px;color:#94a3b8">信貸 <span class="privacy-mask">${m(loanM)}</span>＋不限用途 <span class="privacy-mask">${m(flexM)}</span></div></div>
+      <div><div style="font-size:11px;color:#94a3b8">${net>=0?'每月多出':'每月不足'}</div><div class="privacy-mask" style="font-size:22px;font-weight:900;font-family:'JetBrains Mono',monospace;color:${net>=0?'#dc2626':'#16a34a'}">${net>=0?'+':'−'}${m(net)}</div><div style="font-size:11px;color:#94a3b8">${net>=0?`股息少 ${safe.toFixed(0)}% 才會入不敷出`:'要靠薪水或現金補'}</div></div></div>
+    <div style="margin-top:12px"><div style="display:flex;height:22px;border-radius:7px;overflow:hidden;font-size:11px;color:#fff;font-weight:700;background:#f1f5f9">
+      <div style="width:${(loanM/tot*100).toFixed(1)}%;background:#7c3aed;display:flex;align-items:center;padding-left:6px;white-space:nowrap;overflow:hidden">信貸</div>
+      <div style="width:${(flexM/tot*100).toFixed(1)}%;background:#a78bfa;display:flex;align-items:center;padding-left:6px;white-space:nowrap;overflow:hidden">不限用途</div>
+      ${net>0?`<div style="width:${(net/tot*100).toFixed(1)}%;background:#dc2626;display:flex;align-items:center;padding-left:6px;white-space:nowrap;overflow:hidden">多出</div>`:''}</div>
+      <div style="font-size:10.5px;color:#94a3b8;margin-top:2px">${net>=0?'整條＝每月股息；之後每還清一筆信貸，紫色變短、紅色變長':'整條＝每月支出；灰色是股息不夠付的部分'}</div></div>
+    ${steps.length?`<div style="margin-top:12px;border-top:1px dashed #e2e8f0;padding-top:10px"><div style="font-size:12.5px;font-weight:800;margin-bottom:6px">📅 信貸還清時間軸 <span style="font-weight:400;font-size:11px;color:#94a3b8">依金額、利率、月付金推算；股息假設不變</span></div>
+      <table style="width:100%;border-collapse:collapse;font-size:12.5px"><tr style="color:#64748b;font-size:11px"><td style="padding:4px">時間</td><td style="padding:4px">事件</td><td style="padding:4px;text-align:right">每月支出</td><td style="padding:4px;text-align:right">每月多出</td></tr>
+      <tr style="border-top:1px solid #f1f5f9"><td style="padding:6px 4px;font-family:'JetBrains Mono',monospace">現在</td><td style="padding:6px 4px;color:#475569">${loans.length} 筆信貸${flexM?'＋不限用途':''}</td><td class="privacy-mask" style="padding:6px 4px;text-align:right;font-family:'JetBrains Mono',monospace">${m(out)}</td><td class="privacy-mask" style="padding:6px 4px;text-align:right;font-family:'JetBrains Mono',monospace;color:${net>=0?'#dc2626':'#16a34a'}">${net>=0?'+':'−'}${m(net)}</td></tr>
+      ${steps.map(s=>`<tr style="border-top:1px solid #f1f5f9"><td style="padding:6px 4px;font-family:'JetBrains Mono',monospace">${s.ym}</td><td style="padding:6px 4px">✅ ${_ae(s.name)} 還清 <span style="color:#94a3b8" class="privacy-mask">（−${m(s.m)}）</span></td><td class="privacy-mask" style="padding:6px 4px;text-align:right;font-family:'JetBrains Mono',monospace">${m(s.out)}</td><td class="privacy-mask" style="padding:6px 4px;text-align:right;font-family:'JetBrains Mono',monospace;color:${inc-s.out>=0?'#dc2626':'#16a34a'}">${inc-s.out>=0?'+':'−'}${m(inc-s.out)}</td></tr>`).join('')}</table></div>`:''}
+  </div>`;
+  if(typeof applyPrivacy==='function')applyPrivacy();
+}
+(function(){const _r=renderAssetsPage;renderAssetsPage=function(){const r=_r.apply(this,arguments);try{renderCashflowPro();}catch(e){console.warn('cfPro',e);}return r;};})();
 
 </script>
 
