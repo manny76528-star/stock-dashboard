@@ -1572,7 +1572,7 @@
     {
       "id": "mncull1439i",
       "bank": "Line Bank",
-      "cash": 50500,
+      "cash": 38000,
       "d1Date": "",
       "d1": 0,
       "d2": 0
@@ -3056,7 +3056,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1792511684051,
+  "_ts": 1792511806064,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -8691,8 +8691,8 @@
         "pct": 60,
         "paid": 27,
         "remain": 18,
-        "ok": true,
-        "diff": 10798
+        "ok": false,
+        "diff": 1702
       },
       {
         "bank": "line Bank-2",
@@ -8702,8 +8702,8 @@
         "pct": 40,
         "paid": 22,
         "remain": 33,
-        "ok": true,
-        "diff": 4479
+        "ok": false,
+        "diff": 8021
       },
       {
         "bank": "line Bank-4",
@@ -8714,7 +8714,7 @@
         "paid": 14,
         "remain": 20,
         "ok": true,
-        "diff": 38100
+        "diff": 25600
       },
       {
         "bank": "line Bank-5",
@@ -8725,12 +8725,12 @@
         "paid": 10,
         "remain": 25,
         "ok": true,
-        "diff": 28605
+        "diff": 16105
       }
     ],
     "loanTotal": 1025458,
     "monthLoan": 46021,
-    "cashTotal": 50509
+    "cashTotal": 38009
   },
   "quarterReports": {
     "2026Q1": {
