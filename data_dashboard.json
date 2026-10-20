@@ -3048,7 +3048,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1792498484985,
+  "_ts": 1792498497809,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -6783,7 +6783,8 @@
                 "shares": 22000,
                 "price": 10.83,
                 "fee": 99,
-                "remark": ""
+                "remark": "",
+                "src": "move"
               },
               {
                 "id": "mtcrn6etzx1",
@@ -6937,7 +6938,8 @@
             "amount": 238359,
             "fee": 99,
             "remark": "",
-            "txnId": "mrz3k4t5931"
+            "txnId": "mrz3k4t5931",
+            "src": "move"
           },
           {
             "id": "mtwjtphe28u",
