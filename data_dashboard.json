@@ -3048,7 +3048,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1792498840624,
+  "_ts": 1792498974545,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -6044,6 +6044,24 @@
                 "remark": "註冊費伙食費減免_加碼股市"
               }
             ]
+          },
+          {
+            "id": "mvgnlvttxth",
+            "code": "00999A",
+            "name": "主動野村臺灣高息",
+            "url": "https://www.wantgoo.com/stock/etf/00999a/dividend-policy/ex-dividend",
+            "transactions": [
+              {
+                "id": "mvgnlvtttrz",
+                "type": "buy",
+                "date": "2026-10-15",
+                "shares": 1882,
+                "price": 10.74,
+                "fee": 8,
+                "remark": "",
+                "src": "save"
+              }
+            ]
           }
         ],
         "log": [
@@ -6058,6 +6076,20 @@
             "price": 8.95,
             "amount": 1128.6999999999998,
             "fee": 1,
+            "remark": "",
+            "src": "save"
+          },
+          {
+            "id": "mvgnlvttkpx",
+            "txnId": "mvgnlvtttrz",
+            "date": "2026-10-15",
+            "type": "buy",
+            "code": "00999A",
+            "name": "主動野村臺灣高息",
+            "shares": 1882,
+            "price": 10.74,
+            "amount": 20220.68,
+            "fee": 8,
             "remark": "",
             "src": "save"
           },
@@ -8507,17 +8539,17 @@
           "activeCount": 2
         },
         "阿豪富邦": {
-          "pct": 38.7,
-          "totalCost": 386719.16000000003,
-          "totalMkt": 411254.45,
+          "pct": 40.7,
+          "totalCost": 406939.84,
+          "totalMkt": 431297.75,
           "caps": [
             {
               "code": "00405A",
-              "wt": 43
+              "wt": 41
             },
             {
               "code": "00986A",
-              "wt": 42
+              "wt": 40
             },
             {
               "code": "00981A",
@@ -8528,11 +8560,15 @@
               "wt": 7
             },
             {
+              "code": "00999A",
+              "wt": 5
+            },
+            {
               "code": "00997A",
               "wt": 3
             }
           ],
-          "activeCount": 5
+          "activeCount": 6
         },
         "媽媽": {
           "pct": 6.3,
