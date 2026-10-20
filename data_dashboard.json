@@ -3048,7 +3048,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1792498254498,
+  "_ts": 1792498258599,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -5758,7 +5758,8 @@
                 "shares": 60,
                 "price": 31.54,
                 "fee": 1,
-                "remark": ""
+                "remark": "",
+                "src": "save"
               },
               {
                 "id": "mryilexi87y",
@@ -5767,7 +5768,8 @@
                 "shares": 104,
                 "price": 22,
                 "fee": 1,
-                "remark": ""
+                "remark": "",
+                "src": "save"
               },
               {
                 "id": "mryiy3wp8t2",
@@ -6295,7 +6297,8 @@
             "amount": 1893.3999999999999,
             "fee": 1,
             "remark": "",
-            "txnId": "mryi5qx2m1b"
+            "txnId": "mryi5qx2m1b",
+            "src": "save"
           },
           {
             "id": "mryikajmk27",
@@ -6334,7 +6337,8 @@
             "amount": 2289,
             "fee": 1,
             "remark": "",
-            "txnId": "mryilexi87y"
+            "txnId": "mryilexi87y",
+            "src": "save"
           },
           {
             "id": "mryibflqhh7",
