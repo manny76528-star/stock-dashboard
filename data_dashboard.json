@@ -3048,7 +3048,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1792500230795,
+  "_ts": 1792500261262,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -3103,7 +3103,9 @@
       "alertDir": "below",
       "priority": "中",
       "url": "",
-      "addedDate": "2026-07-31"
+      "addedDate": "2026-07-31",
+      "addPrice": 98,
+      "targetLog": []
     },
     {
       "id": "ms1oi4vmllq",
