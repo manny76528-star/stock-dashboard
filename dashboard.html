@@ -1968,6 +1968,9 @@ body:not(.privacy) .privacy-mask{filter:none;}
 
 
     <div class="db-nav-section">記錄</div>
+    <div class="db-nav-item" id="nav-about" onclick="dbShowPage('about')">
+      <span class="nav-icon">👤</span>關於我
+    </div>
     <div class="db-nav-item" id="nav-journal" onclick="dbShowPage('journal')" style="position:relative">
       <span class="nav-icon">📓</span>交易日誌
       <span class="db-nav-badge" id="nav-journal-badge" style="background:#dbeafe;color:#1d4ed8"></span>
@@ -2480,6 +2483,9 @@ body:not(.privacy) .privacy-mask{filter:none;}
     
     </div>
 
+
+    <!-- ══ 頁面：關於我 ══ -->
+    <div class="db-page" id="dbpage-about"><div id="about-body"></div></div>
 
     <!-- ══ 頁面：交易日誌 ══ -->
     <div class="db-page" id="dbpage-journal">
@@ -10966,7 +10972,7 @@ setTimeout(()=>applyPrivacy(),500); // 確保元素都渲染完
 const DB_PAGE_NAMES={
   overview:'數據總覽',assets:'資產與負債',invest:'投資與觀察',
   watch:'觀察股',pledge:'質押管理',family:'家族帳戶',
-  journal:'交易日誌',dividend:'股息管理',analytics:'投資分析',finplan:'財務規劃',trend:'資產趨勢'
+  journal:'交易日誌',about:'關於我',dividend:'股息管理',analytics:'投資分析',finplan:'財務規劃',trend:'資產趨勢'
 };
 // ══════════════════════════════════════
 // 三段式總覽 Dashboard
@@ -15772,6 +15778,7 @@ function dbShowPage(id){
   if(id==='invest'){renderInvestL1();if(typeof renderFamilyMemberCards==='function')renderFamilyMemberCards();return;}
   if(id==='invest-detail'){renderInvestPage();return;}
   if(id==='trend')renderTrendPage();
+  if(id==='about'){renderAboutPage();}
   if(id==='journal'){renderJournalPage();setTimeout(()=>{if(typeof renderJournal==='function')renderJournal();},150);}
   if(id==='dividend'){if(typeof renderDivs==='function')renderDivs();setTimeout(renderDivChart,100);}
   if(id==='analytics'){if(typeof renderAnalytics==='function')renderAnalytics();}
@@ -16526,6 +16533,370 @@ async function advCheckAlert(force){
 }
 setTimeout(()=>{try{advCheckAlert();}catch(e){console.warn('advisor alert',e);}},6000);
 setTimeout(()=>{try{advCheckAlert();}catch(e){}},25000);
+
+
+// ══════════════════════════════════════════════════════════════
+// 👤 關於我：投資旅程大事記（資料存在 db.aboutMe，跟著雲端同步）
+//   ・信貸新增／還清、淨資產高低點、股息 → 從系統資料自動算
+//   ・⭐ 重大事項日誌 → 進「待收錄」，一鍵收進大事記
+//   ・其他 → 手動新增，或「複製給 Claude」整理後貼回
+// ══════════════════════════════════════════════════════════════
+const AB_TYPES={
+  start:{e:'🌱',n:'起點',c:'#16a34a'}, debt:{e:'💳',n:'借款',c:'#7c3aed'}, clear:{e:'✅',n:'還清',c:'#15803d'},
+  gain:{e:'📈',n:'獲利',c:'#dc2626'}, loss:{e:'📉',n:'虧損',c:'#16a34a'}, lesson:{e:'⚠️',n:'教訓',c:'#c2410c'},
+  goal:{e:'🎯',n:'目標',c:'#2563eb'}, family:{e:'👨‍👩‍👧',n:'家庭',c:'#db2777'}, milestone:{e:'🏁',n:'里程碑',c:'#0f766e'},
+  strategy:{e:'🧭',n:'策略',c:'#0369a1'}, quote:{e:'💬',n:'心聲',c:'#64748b'}, system:{e:'🔧',n:'系統',c:'#475569'}, note:{e:'•',n:'其他',c:'#64748b'}
+};
+function abSeed(){
+  const I=(d,k,t)=>({id:'s'+Math.random().toString(36).slice(2,9),d,k,t});
+  return{v:1, seededAt:_twToday(), updatedAt:_twToday(),
+    title:'阿豪的投資旅程', motto:'在可控的風險下勇敢冒險',
+    eras:[
+      {key:'2017',from:2017,to:2020,title:'起點',sum:'兒子出生前決定勇敢一次，靠信貸踏出第一步。',items:[
+        I('2017','start','兒子快出生，決定「勇敢一次」開始投資'),
+        I('2017','quote','2023 年回頭寫：「現在還是很感謝 2017 的我在兒子即將出生時，勇敢了這麼一次」')]},
+      {key:'2021',from:2021,to:2021,title:'找到自己的方法',sum:'全年獲利 75 萬、股息 11.2 萬；從單純配息股轉成成長型配息股。',items:[
+        I('2021','milestone','開始每年寫交易日誌'),
+        I('2021','gain','累積獲利從年初 43 萬到年底 107 萬：全年獲利 75 萬、股息 11.2 萬'),
+        I('2021-03','gain','燦星網 25 → 30 停利（之後最高 35）、4 月東和鋼'),
+        I('2021-11','gain','聯強、神達財報後發動，合計約 40 萬，全年最大功臣'),
+        I('2021','strategy','策略從「單純配息股」轉成「成長型配息股」，寫下 7 條選股標準'),
+        I('2021','debt','開始用聯邦質借放大部位（第一次股票質押）'),
+        I('2021-12','goal','年底寫下四個目標：2025 年前還完信貸、2025 年淨現金 500 萬、150 萬頭期款買 500 萬的房子、一台油電車')]},
+      {key:'2022',from:2022,to:2022,title:'第一次真正的熊市',sum:'大盤 −22.4%；看清自己「能忍受下跌，卻無法忍受獲利回吐」。',items:[
+        I('2022','loss','俄烏戰爭、暴力升息，大盤全年 −22.4%'),
+        I('2022-03-07','quote','「每次大跌都會動搖持股的信心」'),
+        I('2022-04-25','loss','帳上一度虧損 36 萬'),
+        I('2022-07','strategy','轉向防禦股，邦特持有兩年終於轉正'),
+        I('2022-09-13','lesson','看清最大的問題：「能忍受下跌，卻無法忍受獲利回吐」'),
+        I('2022-10','lesson','恐慌中賣掉台汽電、京城銀，賣完一個月就漲回'),
+        I('2022-12','strategy','開始買債券，寫好 2023 年操作計畫')]},
+      {key:'2023',from:2023,to:2023,title:'轉向債券，負債開始放大',sum:'開辦 300 萬理財型房貸；第一次盤點淨資產約 300 萬；決定建立自己的 SOP。',items:[
+        I('2023-03-10','loss','燦星配息不如預期，融資 18 張跌停，認賠 5.3 萬'),
+        I('2023-06','strategy','資金從個股轉往美債；保險股「疫情受害股」策略成功（中再保、第一保）'),
+        I('2023-07-21','debt','永豐 300 萬理財型房貸核准（2.66%）'),
+        I('2023-09-12','milestone','第一次盤點：淨資產約 300 萬'),
+        I('2023-09-12','quote','「對一個領 3 萬薪水、要養兩個小孩一個老婆的我，是多麼遙不可及的夢想」'),
+        I('2023-10','loss','美債殖利率衝破 5%，債券帳面一度虧損約 40 萬'),
+        I('2023-10-19','strategy','決定建立自己的 SOP（價格影響心情時就不看盤）'),
+        I('2023-12','gain','營建股（國建、長虹）把全年績效拉上來，已實現約 +34 萬')]},
+      {key:'2024',from:2024,to:2024,title:'槓桿最大的一年',sum:'九成資產在債券、質押額度提高到 1300 萬；投等債獲利破百萬，也第一次體會資金鏈快斷掉。',items:[
+        I('2024-06','strategy','九成資產放在債券，00937 從 280 張加碼到 700 張以上'),
+        I('2024-05-20','debt','統一證券質借額度從 700 萬提高到 1300 萬'),
+        I('2024-07','family','用質押資金買車'),
+        I('2024-08-29','quote','當年的座右銘：「在可控的風險下勇敢冒險」'),
+        I('2024-09-18','gain','投等債資本利得＋股利突破 100 萬，投資以來最大單筆獲利'),
+        I('2024-09-29','lesson','家裡裝潢加上質押進度延誤，第一次體會「資金鏈快斷掉」的壓力'),
+        I('2024-10-02','debt','永豐房貸增貸被拒'),
+        I('2024-10-22','loss','美債期貨停損 30 萬'),
+        I('2024-11-13','strategy','大幅出清投等債、改以非投等債為主，躲過約 50 萬跌幅')]},
+      {key:'2025',from:2025,to:2025,title:'最痛的一年，也是轉型的一年',sum:'股災加台幣急升，帳上百萬級虧損；年底結論：重現金流、輕股價；重 ETF、輕個股。',items:[
+        I('2025-01-01','family','替琁 & 軒開存股帳戶，寫下〈致十年後的你〉'),
+        I('2025-02-26','quote','聯邦信貸還清：「感謝七年前自己的勇敢」'),
+        I('2025-03','family','家中長輩病重，生活和投資的低谷疊在一起'),
+        I('2025-04-07','loss','對等關稅股災（單日跌 2,086 點）'),
+        I('2025-04-11','strategy','質押全部清空；槓桿讓帳上一度虧掉近三分之一資產'),
+        I('2025-05','loss','台幣兩天急升，美債雙重打擊，帳上百萬級虧損'),
+        I('2025-09-08','gain','中鼎二可轉債波段，從帳虧約 5 萬到累計獲利 17 萬'),
+        I('2025-10-01','goal','啟動兩個 3 年計畫：富邦每月 2 萬定期定額；凱基 60 萬滾到 110 萬'),
+        I('2025-12-14','debt','重新建倉 00985B 800 張、00981D 100 張並質押'),
+        I('2025-12-31','strategy','年度結論：「重現金流、輕股價；重 ETF、輕個股」')]},
+      {key:'2026',from:2026,to:2026,title:'系統化記錄，也經歷了最驚險的一天',sum:'淨資產從 369.6 萬高點跌到 239.3 萬；10/08 差點違約交割，寫下三條鋼鐵紀律。',items:[
+        I('2026-01-02','goal','3 年計畫：主帳戶約 150 萬信貸 2029 年前還清；三帳戶 3 年後資產 700 萬，再 3–4 年達千萬'),
+        I('2026-03','gain','主動式 AI ETF 波段，合計獲利約 13.5 萬'),
+        I('2026-03-18','strategy','出清 00950B 750 張（中東戰爭會推升通膨）'),
+        I('2026-04-17','system','開始每週快照：淨資產 326.5 萬、負債比 80.7%'),
+        I('2026-04-23','gain','009819 掛牌首日溢價 25%，出場獲利 10.8 萬'),
+        I('2026-05-14','strategy','00403A 溢價 5% 照紀律出場'),
+        I('2026-06','strategy','00985B、00864B 全數轉進 00981T'),
+        I('2026-06-08','family','媽媽開始存 00999A'),
+        I('2026-07-01','milestone','淨資產高點 369.6 萬'),
+        I('2026-07-18','lesson','台股史上最大跌點（−2,953 點），焦慮下清空所有主動式 ETF'),
+        I('2026-07-30','loss','淨資產低點 239.3 萬，一個月縮水約 130 萬'),
+        I('2026-07-31','quote','浴室 PTSD 發作：「擔心會一路歸零」'),
+        I('2026-08-14','strategy','VT → S&P500；00981T 湊成 1,300 張'),
+        I('2026-10-06','strategy','換成 00924（S&P500 成長）'),
+        I('2026-10-08','lesson','差點違約交割：忘了股票已質押就換股，約 50 萬交割缺口，靠哥哥湊 40 萬化解；寫下三條鋼鐵紀律'),
+        I('2026-10','system','建立季報回顧、舊日誌封存、投資顧問與冷靜卡')]}
+    ],
+    goals:[
+      {id:'g1',y:'2021',t:'2025 年前還完信貸',st:'part',note:'舊的 4 筆都還清；期間又新增 LINE Bank 5 筆與房貸'},
+      {id:'g2',y:'2021',t:'一台車',st:'done',note:'2024/07 完成'},
+      {id:'g3',y:'2021',t:'淨現金 500 萬',st:'todo',note:''},
+      {id:'g4',y:'2021',t:'150 萬頭期款買 500 萬的房子',st:'todo',note:''},
+      {id:'g5',y:'2026',t:'2029 年前還清主帳戶信貸（約 150 萬）',st:'todo',note:''},
+      {id:'g6',y:'2026',t:'三個帳戶合計資產 700 萬（約 2029）',st:'todo',note:''}
+    ],
+    reflect:'最常出現的轉折點都在大跌的時候：2022 恐慌賣出、2025 股災清空債券、2026/07 清空主動式 ETF，三次之後都是大盤反彈。\n最驚險的一天（2026/10/08）不是市場造成的，而是自己對槓桿的操作疏忽。',
+    reviewedJ:(db.journals||[]).filter(j=>jMeta(j).star).map(j=>j.id),
+    seenJ:(db.journals||[]).map(j=>j.id)
+  };
+}
+function abEnsure(){if(!db.aboutMe){db.aboutMe=abSeed();save();}return db.aboutMe;}
+let _abFilter='', _abOpen=null, _abEdit=false;
+function _abFmtD(d,multi){if(!d)return'';const p=String(d).split('-');if(multi)return p.length>=2?`${p[0]}/${p[1]}`:p[0];return p.length===3?`${p[1]}/${p[2]}`:p.length===2?`${+p[1]} 月`:'';}
+function _abMask(s){return _ae(s).replace(/(\d[\d,\.]*\s*(?:萬|億|元))/g,'<span class="privacy-mask">$1</span>');}
+function _abW(n){const f=(v,d)=>v.toFixed(d).replace(/\.0+$/,'');return n>=1e8?f(n/1e8,2)+' 億':f(n/1e4,n>=1e6?0:1)+' 萬';}
+// 自動事件：信貸紀錄
+function abAutoItems(){
+  const out=[];
+  (db.loans||[]).forEach(l=>{if(l.start)out.push({id:'L'+(l.id||l.bank),d:l.start,k:'debt',t:`${l.bank} 借款 ${_abW(l.amount||0)}（${l.rate}%）`,auto:'信貸紀錄'});});
+  (db.clearedLoans||[]).forEach(l=>{
+    const nt=l.note&&!String(l.note).includes(String(l.bank).replace(/-\d+$/,''))?'・'+l.note:'';
+    if(l.start)out.push({id:'L'+l.id,d:l.start,k:'debt',t:`${l.bank} 借款 ${_abW(l.amount||0)}（${l.rate}%）${nt}`,auto:'信貸紀錄'});
+    if(l.clearedDate)out.push({id:'C'+l.id,d:l.clearedDate,k:'clear',t:`${l.bank} 還清（${_abW(l.amount||0)}，${String(l.start||'').slice(0,4)} 年借）`,auto:'信貸紀錄'});
+  });
+  return out;
+}
+function abEraOf(A,d){const y=+String(d).slice(0,4);return A.eras.find(e=>y>=e.from&&y<=e.to);}
+function abAllItems(A){
+  const by={}; A.eras.forEach(e=>by[e.key]=e.items.map(x=>({...x})));
+  abAutoItems().forEach(x=>{let e=abEraOf(A,x.d);if(!e){const y=+x.d.slice(0,4);e={key:String(y),from:y,to:y,title:'',sum:'',items:[]};A.eras.push(e);A.eras.sort((a,b)=>a.from-b.from);by[e.key]=[];}by[e.key].push(x);});
+  Object.values(by).forEach(L=>L.sort((a,b)=>String(a.d).localeCompare(String(b.d))));
+  return by;
+}
+function abInbox(){
+  const A=db.aboutMe; if(!A)return[];
+  const seen=new Set(A.reviewedJ||[]); const dates=new Set(A.eras.flatMap(e=>e.items.map(i=>i.d)));
+  return (db.journals||[]).filter(j=>jMeta(j).star&&!seen.has(j.id)&&!dates.has(j.date)).sort((a,b)=>b.date.localeCompare(a.date));
+}
+function abNewJournals(){const A=db.aboutMe;if(!A)return[];if(!Array.isArray(A.seenJ)){const since=A.updatedAt||'';return (db.journals||[]).filter(j=>j.date>since);}const S=new Set(A.seenJ);return (db.journals||[]).filter(j=>!S.has(j.id));}
+function _abJTitle(j){const t=(j.market||'').trim()||String(j.content||'').replace(/<[^>]+>/g,' ').trim();return t.split('\n')[0].slice(0,80);}
+
+function renderAboutPage(){
+  const box=document.getElementById('about-body'); if(!box)return;
+  const A=abEnsure(); const by=abAllItems(A);
+  const snaps=[...(db.snapshots||[])].filter(s=>s.net).sort((a,b)=>String(a.ym).localeCompare(String(b.ym)));
+  const last=snaps[snaps.length-1], hi=snaps.reduce((m,s)=>!m||s.net>m.net?s:m,null), lo=snaps.reduce((m,s)=>!m||s.net<m.net?s:m,null);
+  const yr=_twToday().slice(0,4); const divY=(db.dividends||[]).filter(x=>String(x.date).startsWith(yr)&&x.date<=_twToday()).reduce((s,x)=>s+(x.amount||0),0);
+  const nCleared=(db.clearedLoans||[]).length, nOpen=(db.loans||[]).filter(l=>!l.settled).length;
+  const first=A.eras[0]?.from||2017; const yrs=(+yr)-first;
+  const inbox=abInbox(); const newJ=abNewJournals();
+  const kpi=(t,v,s)=>`<div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:10px 12px;min-width:0"><div style="font-size:11px;color:#64748b">${t}</div><div style="font-size:19px;font-weight:800;color:#0f172a;margin-top:2px">${v}</div><div style="font-size:11px;color:#94a3b8;margin-top:1px">${s||''}</div></div>`;
+  const typeChips=Object.entries(AB_TYPES).filter(([k])=>k!=='note').map(([k,v])=>`<button onclick="_abFilter=_abFilter==='${k}'?'':'${k}';renderAboutPage()" style="padding:4px 10px;border-radius:99px;font-size:12px;cursor:pointer;border:1px solid ${_abFilter===k?v.c:'#e2e8f0'};background:${_abFilter===k?v.c:'#fff'};color:${_abFilter===k?'#fff':'#475569'}">${v.e} ${v.n}</button>`).join('');
+  const eras=[...A.eras].sort((a,b)=>b.from-a.from);
+  if(_abOpen==null)_abOpen=eras[0]?.key;
+  const yearNav=[...A.eras].sort((a,b)=>a.from-b.from).map(e=>`<a href="javascript:void 0" onclick="_abOpen='${e.key}';renderAboutPage();setTimeout(()=>document.getElementById('ab-era-${e.key}')?.scrollIntoView({behavior:'smooth',block:'start'}),50)" style="flex:1;text-align:center;padding:6px 4px;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;color:${_abOpen===e.key?'#fff':'#334155'};background:${_abOpen===e.key?'#ea580c':'transparent'};white-space:nowrap">${e.from===e.to?e.from:e.from+'–'+String(e.to).slice(2)}</a>`).join('');
+  const itemRow=(x,ek,multi)=>{const T=AB_TYPES[x.k]||AB_TYPES.note;
+    return`<div style="display:flex;gap:10px;align-items:flex-start;padding:7px 0;${x.k==='quote'?'':''}">
+      <div style="width:54px;flex:none;text-align:right;font-size:11.5px;color:#94a3b8;padding-top:2px;font-family:'JetBrains Mono',monospace">${_abFmtD(x.d,multi||_abFilter)}</div>
+      <div style="width:24px;height:24px;flex:none;border-radius:50%;background:${T.c}1a;display:flex;align-items:center;justify-content:center;font-size:13px">${T.e}</div>
+      <div style="flex:1;font-size:13.5px;line-height:1.6;color:${x.k==='quote'?'#475569':'#1e293b'};${x.k==='quote'?'font-style:italic':''};${x.k==='lesson'?'font-weight:700':''}">${_abMask(x.t)}
+        ${x.auto?`<span style="font-size:10px;color:#94a3b8;border:1px solid #e2e8f0;border-radius:5px;padding:0 5px;margin-left:4px;font-style:normal;font-weight:400">自動・${x.auto}</span>`:''}
+        ${x.jid?`<a href="javascript:void 0" onclick="openJournalDrawer('${x.jid}')" style="font-size:11px;color:#2563eb;margin-left:4px;font-style:normal;font-weight:400">📓 看日誌</a>`:''}</div>
+      ${_abEdit&&!x.auto?`<div style="flex:none;display:flex;gap:2px"><button onclick="abItemModal('${ek}','${x.id}')" style="border:none;background:none;cursor:pointer;font-size:13px">✏️</button><button onclick="abItemDel('${ek}','${x.id}')" style="border:none;background:none;cursor:pointer;font-size:13px">🗑</button></div>`:''}
+    </div>`;};
+  const eraHTML=eras.map(e=>{
+    let L=by[e.key]||[]; const n=L.length; if(_abFilter)L=L.filter(x=>x.k===_abFilter);
+    if(_abFilter&&!L.length)return'';
+    const open=_abFilter||_abOpen===e.key;
+    const counts={};(by[e.key]||[]).forEach(x=>counts[x.k]=(counts[x.k]||0)+1);
+    const badge=['gain','loss','lesson','debt','clear'].filter(k=>counts[k]).map(k=>`<span style="font-size:11px;color:#64748b;white-space:nowrap">${AB_TYPES[k].e}${counts[k]}</span>`).join(' ');
+    return`<div id="ab-era-${e.key}" style="display:flex;gap:0;scroll-margin-top:70px">
+      <div style="width:64px;flex:none;position:relative"><div style="position:absolute;left:31px;top:0;bottom:0;width:2px;background:#e2e8f0"></div>
+        <div style="position:relative;margin-top:14px;width:62px;text-align:center;background:${open?'#ea580c':'#fff'};color:${open?'#fff':'#ea580c'};border:2px solid #ea580c;border-radius:10px;font-weight:800;font-size:${e.from===e.to?15:11.5}px;padding:3px 0">${e.from===e.to?e.from:e.from+'<br>–'+e.to}</div></div>
+      <div style="flex:1;min-width:0;background:#fff;border:1px solid #e2e8f0;border-radius:14px;margin:6px 0 12px 8px;overflow:hidden">
+        <div onclick="_abOpen=_abOpen==='${e.key}'?'':'${e.key}';renderAboutPage()" style="padding:12px 16px;cursor:pointer;display:flex;gap:10px;align-items:flex-start">
+          <div style="flex:1;min-width:0"><div style="font-size:16px;font-weight:800;color:#0f172a">${_ae(e.title||'（還沒有標題）')}</div>
+            ${e.sum?`<div style="font-size:12.5px;color:#475569;margin-top:3px;line-height:1.6">${_abMask(e.sum)}</div>`:''}
+            <div style="margin-top:5px;display:flex;gap:8px;flex-wrap:wrap">${badge}<span style="font-size:11px;color:#94a3b8">共 ${n} 件</span></div></div>
+          <div style="flex:none;display:flex;gap:4px;align-items:center">${_abEdit?`<button onclick="event.stopPropagation();abEraModal('${e.key}')" style="border:1px solid #e2e8f0;background:#fff;border-radius:7px;cursor:pointer;font-size:11px;padding:3px 7px">✏️ 標題</button>`:''}<span style="color:#94a3b8;font-size:12px">${open?'▲':'▼'}</span></div></div>
+        ${open?`<div style="border-top:1px solid #f1f5f9;padding:6px 16px 10px 6px">${L.map(x=>itemRow(x,e.key,e.from!==e.to)).join('')||'<div style="font-size:12px;color:#94a3b8;padding:8px 60px">沒有這類事件</div>'}
+          ${_abEdit?`<div style="padding:6px 0 0 88px"><button onclick="abItemModal('${e.key}')" style="${_advBtn()};font-size:12px;padding:4px 10px">＋ 在這一年新增</button></div>`:''}</div>`:''}
+      </div></div>`;}).join('');
+  // 信貸一覽（自動）
+  const loanRows=[...(db.clearedLoans||[]).map(l=>({b:l.note&&/信貸/.test(l.note)?l.bank:l.bank,a:l.amount,r:l.rate,s:l.start,st:'✅ '+String(l.clearedDate||'').slice(0,7).replace('-','/')+' 還清',done:1})),
+    ...(db.loans||[]).map(l=>{let rem=null;try{rem=calcLoanRemain(l);}catch(e){}return{b:l.bank,a:l.amount,r:l.rate,s:l.start,st:l.settled?'✅ 已結清':'還款中'+(rem!=null?`｜剩 <span class="privacy-mask">${_abW(rem)}</span>`:''),done:l.settled?1:0};}),
+    ...(db.flexLoans||[]).map(f=>({b:f.name,a:f.limit,r:f.rate,s:'',st:`使用中｜已用 <span class="privacy-mask">${_abW(f.used||0)}</span>`,done:0,lim:1}))]
+    .sort((a,b)=>String(a.s||'9').localeCompare(String(b.s||'9')));
+  const loanHTML=`<table style="width:100%;border-collapse:collapse;font-size:12.5px">${loanRows.map(r=>`<tr style="border-bottom:1px solid #f1f5f9;${r.done?'color:#94a3b8':''}"><td style="padding:7px 6px;font-weight:700;color:${r.done?'#94a3b8':'#1e293b'}">${_ae(r.b)}</td><td style="padding:7px 6px;text-align:right" class="privacy-mask">${r.a?_abW(r.a):'—'}${r.lim?' 額度':''}</td><td style="padding:7px 6px;text-align:right">${r.r??'—'}%</td><td style="padding:7px 6px">${r.s?String(r.s).slice(0,7).replace('-','/'):''}</td><td style="padding:7px 6px;text-align:right;color:${r.done?'#15803d':'#334155'};font-weight:700">${r.st}</td></tr>`).join('')}</table>`;
+  const stMap={done:['✅','#15803d','完成'],part:['🟡','#b45309','部分'],todo:['⏳','#64748b','進行中']};
+  const goalHTML=(A.goals||[]).map(g=>{const s=stMap[g.st]||stMap.todo;return`<div style="display:flex;gap:8px;align-items:flex-start;padding:7px 0;border-bottom:1px dashed #f1f5f9">
+    <button onclick="abGoalCycle('${g.id}')" title="點一下切換狀態" style="border:1px solid ${s[1]}55;background:${s[1]}12;color:${s[1]};border-radius:7px;font-size:11px;font-weight:700;padding:2px 7px;cursor:pointer;white-space:nowrap">${s[0]} ${s[2]}</button>
+    <div style="flex:1;font-size:13px"><b>${_abMask(g.t)}</b><span style="font-size:11px;color:#94a3b8;margin-left:6px">${_ae(g.y)} 年立下</span>${g.note?`<div style="font-size:12px;color:#64748b">${_abMask(g.note)}</div>`:''}</div>
+    ${_abEdit?`<button onclick="abGoalModal('${g.id}')" style="border:none;background:none;cursor:pointer">✏️</button>`:''}</div>`;}).join('');
+  const card=(t,body,extra)=>`<div style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:14px 16px;margin-bottom:14px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><b style="font-size:14px">${t}</b><span style="margin-left:auto">${extra||''}</span></div>${body}</div>`;
+  box.innerHTML=`
+  <div style="max-width:920px;margin:0 auto">
+    <div style="background:linear-gradient(135deg,#fff7ed,#fff 60%);border:1px solid #fed7aa;border-radius:16px;padding:18px 20px;margin-bottom:14px">
+      <div style="display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap">
+        <div style="flex:1;min-width:220px"><div style="font-size:12px;color:#c2410c;font-weight:700">👤 關於我</div>
+          <div style="font-size:24px;font-weight:900;color:#0f172a;margin-top:2px">${_ae(A.title)}</div>
+          <div style="font-size:13px;color:#475569;margin-top:4px">從 ${first} 年出發的第 <b>${yrs}</b> 年 ・ 座右銘「${_ae(A.motto)}」</div></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button onclick="abUpdateModal()" style="${_advBtn('#ea580c')};position:relative">🔄 更新關於我${newJ.length?`<span style="position:absolute;top:-7px;right:-7px;background:#dc2626;color:#fff;border-radius:99px;font-size:10px;padding:1px 6px">${newJ.length}</span>`:''}</button>
+          <button onclick="_abEdit=!_abEdit;renderAboutPage()" style="${_advBtn(_abEdit?'#334155':'')}">${_abEdit?'✔ 完成編輯':'✏️ 編輯'}</button>
+          <button onclick="abPrint()" style="${_advBtn()}">🖨️ 列印</button></div></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:14px">
+        ${kpi('目前淨資產',last?`<span class="privacy-mask">${_abW(last.net)}</span>`:'—',last?String(last.ym).slice(0,10)+' 快照':'')}
+        ${kpi('負債比',last?.debtRatio!=null?last.debtRatio+'%':'—',hi&&lo?`高點 <span class="privacy-mask">${_abW(hi.net)}</span>・低點 <span class="privacy-mask">${_abW(lo.net)}</span>`:'')}
+        ${kpi('信貸',`✅ ${nCleared} 筆還清`,`還款中 ${nOpen} 筆`)}
+        ${kpi(yr+' 年股息',`<span class="privacy-mask">${_abW(divY)}</span>`,db.settings?.targetDividend?`目標 <span class="privacy-mask">${_abW(db.settings.targetDividend)}</span>（${Math.round(divY/db.settings.targetDividend*100)}%）`:'')}
+      </div></div>
+    ${inbox.length?`<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:14px;padding:12px 16px;margin-bottom:14px"><b style="font-size:13px;color:#1e3a8a">📥 有 ${inbox.length} 篇 ⭐ 重大事項日誌還沒收進大事記</b>
+      ${inbox.slice(0,8).map(j=>`<div style="display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px dashed #bfdbfe;font-size:12.5px"><span style="color:#64748b;width:80px;flex:none">${j.date}</span><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${_ae(_abJTitle(j))}</span>
+        <button onclick="abInboxAdd('${j.id}')" style="${_advBtn('#2563eb')};padding:3px 9px;font-size:11px">＋ 收錄</button><button onclick="abInboxSkip('${j.id}')" style="${_advBtn()};padding:3px 9px;font-size:11px">略過</button></div>`).join('')}</div>`:''}
+    <div style="position:sticky;top:0;z-index:5;background:#f8fafc;padding:6px 0 8px">
+      <div style="display:flex;gap:2px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:3px;overflow-x:auto">${yearNav}</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">${typeChips}${_abFilter?`<span style="font-size:12px;color:#64748b;align-self:center">只看「${AB_TYPES[_abFilter].n}」，跨年度列出</span>`:''}</div></div>
+    ${eraHTML}
+    ${card('🎯 我立下的目標',goalHTML||'<div style="font-size:12px;color:#94a3b8">還沒有目標</div>',_abEdit?`<button onclick="abGoalModal()" style="${_advBtn()};font-size:12px;padding:3px 9px">＋ 目標</button>`:'<span style="font-size:11px;color:#94a3b8">點狀態可切換</span>')}
+    ${card('💳 信貸一覽',loanHTML,'<span style="font-size:11px;color:#94a3b8">自動・跟「資產與負債」同步</span>')}
+    ${card('🧭 回頭看',_abEdit?`<textarea id="ab-reflect" rows="5" style="width:100%;box-sizing:border-box;border:1.5px solid #e2e8f0;border-radius:8px;padding:8px 10px;font-size:13px;font-family:inherit;line-height:1.7">${_ae(A.reflect||'')}</textarea><button onclick="db.aboutMe.reflect=document.getElementById('ab-reflect').value.trim();save();toast('✅ 已儲存');" style="${_advBtn('#ea580c')};margin-top:6px">💾 儲存</button>`:`<div style="font-size:13.5px;line-height:1.9;color:#334155">${(A.reflect||'').split('\n').filter(Boolean).map(l=>'・'+_abMask(l)).join('<br>')}</div>`)}
+    <div style="font-size:11px;color:#94a3b8;text-align:center;margin:4px 0 20px">上次更新：${_ae(A.updatedAt||'—')}${newJ.length?` ・ 之後新增了 ${newJ.length} 篇日誌，按「🔄 更新關於我」整理進來`:''}</div>
+  </div>`;
+  if(typeof applyPrivacy==='function')applyPrivacy();
+}
+// ── 收錄／編輯 ──
+function abInboxAdd(jid){const j=(db.journals||[]).find(x=>x.id===jid);if(!j)return;abItemModal(null,null,{d:j.date,t:_abJTitle(j),k:'note',jid});}
+function abInboxSkip(jid){const A=abEnsure();A.reviewedJ=[...new Set([...(A.reviewedJ||[]),jid])];save();renderAboutPage();}
+function abItemModal(eraKey,id,pre){
+  const A=abEnsure(); const e=eraKey?A.eras.find(x=>x.key===eraKey):null; const it=e&&id?e.items.find(x=>x.id===id):null;
+  const v=it||pre||{d:e?String(e.from):_twToday(),t:'',k:'note'};
+  arcModal(`<div style="font-size:16px;font-weight:800;color:#1e293b;margin-bottom:8px">${it?'✏️ 修改大事':'＋ 新增大事'}</div>
+    <div style="font-size:12px;color:#64748b">日期（可以只寫年，或年-月）</div><input id="ab-i-d" value="${_ae(v.d)}" placeholder="2026-10-08 或 2026-10 或 2026" style="${_arcIn}">
+    <div style="font-size:12px;color:#64748b">類型</div><div style="display:flex;flex-wrap:wrap;gap:5px;margin:4px 0 10px">${Object.entries(AB_TYPES).map(([k,t])=>`<label style="font-size:12px;border:1px solid #e2e8f0;border-radius:8px;padding:3px 8px;cursor:pointer"><input type="radio" name="ab-i-k" value="${k}" ${v.k===k?'checked':''} style="margin:0 3px 0 0">${t.e} ${t.n}</label>`).join('')}</div>
+    <div style="font-size:12px;color:#64748b">內容</div><textarea id="ab-i-t" rows="3" style="${_arcIn};font-family:inherit">${_ae(v.t)}</textarea>
+    <div style="display:flex;justify-content:flex-end;gap:8px"><button style="${_arcBtn()}" onclick="arcCloseModal()">取消</button><button style="${_arcBtn('#ea580c')}" onclick="abItemSave('${eraKey||''}','${id||''}','${pre?.jid||''}')">儲存</button></div>`);
+}
+function abItemSave(eraKey,id,jid){
+  const A=abEnsure(); const d=(document.getElementById('ab-i-d').value||'').trim().replace(/\//g,'-'); const t=(document.getElementById('ab-i-t').value||'').trim();
+  const k=document.querySelector('input[name="ab-i-k"]:checked')?.value||'note';
+  if(!/^\d{4}(-\d{1,2}(-\d{1,2})?)?$/.test(d))return toast('日期格式：2026-10-08、2026-10 或 2026');
+  if(!t)return toast('請寫內容');
+  const dd=d.split('-').map((x,i)=>i?x.padStart(2,'0'):x).join('-');
+  if(eraKey&&id){const e=A.eras.find(x=>x.key===eraKey);const i=e?.items.findIndex(x=>x.id===id);if(e&&i>=0)e.items.splice(i,1);}
+  let e=abEraOf(A,dd); if(!e){const y=+dd.slice(0,4);e={key:String(y),from:y,to:y,title:'',sum:'',items:[]};A.eras.push(e);A.eras.sort((a,b)=>a.from-b.from);}
+  const item={id:id||'m'+uid(),d:dd,k,t}; if(jid){item.jid=jid;A.reviewedJ=[...new Set([...(A.reviewedJ||[]),jid])];}
+  e.items.push(item); save(); arcCloseModal(); _abOpen=e.key; renderAboutPage(); toast('✅ 已收進大事記');
+}
+function abItemDel(eraKey,id){if(!confirm('刪除這件大事？'))return;const e=db.aboutMe.eras.find(x=>x.key===eraKey);if(!e)return;e.items=e.items.filter(x=>x.id!==id);save();renderAboutPage();}
+function abEraModal(key){
+  const e=db.aboutMe.eras.find(x=>x.key===key); if(!e)return;
+  arcModal(`<div style="font-size:16px;font-weight:800;margin-bottom:8px">✏️ ${e.from===e.to?e.from:e.from+'–'+e.to} 年的標題</div>
+    <div style="font-size:12px;color:#64748b">一句話標題</div><input id="ab-e-t" value="${_ae(e.title)}" style="${_arcIn}">
+    <div style="font-size:12px;color:#64748b">摘要</div><textarea id="ab-e-s" rows="3" style="${_arcIn};font-family:inherit">${_ae(e.sum)}</textarea>
+    <div style="display:flex;justify-content:flex-end;gap:8px"><button style="${_arcBtn()}" onclick="arcCloseModal()">取消</button><button style="${_arcBtn('#ea580c')}" onclick="(function(){const e=db.aboutMe.eras.find(x=>x.key==='${key}');e.title=document.getElementById('ab-e-t').value.trim();e.sum=document.getElementById('ab-e-s').value.trim();save();arcCloseModal();renderAboutPage();})()">儲存</button></div>`);
+}
+function abGoalCycle(id){const g=db.aboutMe.goals.find(x=>x.id===id);if(!g)return;g.st={todo:'part',part:'done',done:'todo'}[g.st]||'todo';save();renderAboutPage();}
+function abGoalModal(id){
+  const g=id?db.aboutMe.goals.find(x=>x.id===id):{y:_twToday().slice(0,4),t:'',note:'',st:'todo'};
+  arcModal(`<div style="font-size:16px;font-weight:800;margin-bottom:8px">🎯 ${id?'修改':'新增'}目標</div>
+    <div style="font-size:12px;color:#64748b">目標</div><input id="ab-g-t" value="${_ae(g.t)}" style="${_arcIn}">
+    <div style="font-size:12px;color:#64748b">哪一年立下的</div><input id="ab-g-y" value="${_ae(g.y)}" style="${_arcIn}">
+    <div style="font-size:12px;color:#64748b">備註（進度）</div><input id="ab-g-n" value="${_ae(g.note)}" style="${_arcIn}">
+    <div style="display:flex;justify-content:space-between;gap:8px">${id?`<button style="${_arcBtn()};color:#dc2626" onclick="if(confirm('刪除這個目標？')){db.aboutMe.goals=db.aboutMe.goals.filter(x=>x.id!=='${id}');save();arcCloseModal();renderAboutPage();}">刪除</button>`:'<span></span>'}<span><button style="${_arcBtn()}" onclick="arcCloseModal()">取消</button> <button style="${_arcBtn('#ea580c')}" onclick="abGoalSave('${id||''}')">儲存</button></span></div>`);
+}
+function abGoalSave(id){
+  const A=abEnsure(); const t=document.getElementById('ab-g-t').value.trim(); if(!t)return toast('請寫目標');
+  const o={t,y:document.getElementById('ab-g-y').value.trim(),note:document.getElementById('ab-g-n').value.trim()};
+  if(id)Object.assign(A.goals.find(x=>x.id===id),o);else A.goals.push({id:'g'+uid(),st:'todo',...o});
+  save();arcCloseModal();renderAboutPage();
+}
+// ── 複製給 Claude → 貼回（跟季報同一套流程）──
+function abExportText(withAuto){
+  const A=abEnsure(); const by=abAllItems(A);
+  return [...A.eras].sort((a,b)=>a.from-b.from).map(e=>{
+    const h=`## ${e.from===e.to?e.from:e.from+'–'+e.to}｜${e.title||''}`+(e.sum?`\n> ${e.sum}`:'');
+    const L=(by[e.key]||[]).filter(x=>withAuto||!x.auto).map(x=>`- ${String(x.d).replace(/-/g,'/')} ${(AB_TYPES[x.k]||AB_TYPES.note).e} ${x.t}${x.auto?' 〔自動〕':''}`);
+    return h+'\n'+L.join('\n');
+  }).join('\n\n');
+}
+function abPromptText(){
+  const A=abEnsure(); const nj=abNewJournals().sort((a,b)=>a.date.localeCompare(b.date));
+  const jtxt=nj.map(j=>{const m=jMeta(j);const c=String(j.content||'').replace(/<[^>]+>/g,' ').replace(/\s+\n/g,'\n').trim();
+    return `【${j.date}】${m.star?'⭐重大事項 ':''}${m.mood&&J_MOODS[m.mood]?J_MOODS[m.mood].e+J_MOODS[m.mood].t+' ':''}${j.market||''}${j.market2?'｜'+j.market2:''}\n${c.slice(0,700)}`;}).join('\n\n');
+  const snaps=[...(db.snapshots||[])].filter(s=>s.ym>(A.updatedAt||'')).sort((a,b)=>String(a.ym).localeCompare(String(b.ym)));
+  const sn=snaps.length?`\n\n【這段期間的淨資產快照】\n`+snaps.map(s=>`${String(s.ym).slice(0,10)} 淨資產 ${s.net}、負債比 ${s.debtRatio}%`).join('\n'):'';
+  const qk=Object.keys(db.quarterReports||{}).filter(k=>(db.quarterReports[k].ts||0)>Date.parse(A.updatedAt||'2000-01-01')).sort();
+  const qr=qk.length?`\n\n【這段期間新存的季報 AI 回顧】\n`+qk.map(k=>`### ${k}\n`+db.quarterReports[k].text.slice(0,1500)).join('\n\n'):'';
+  return `你是我的投資旅程編輯。下面是我「關於我」頁面目前的大事記，以及上次更新（${A.updatedAt}）之後新寫的日誌。
+請幫我把新的重要事件整理進大事記：
+
+規則：
+1. 只輸出「有變動的年份」，每個年份要輸出「完整」內容（包含原本保留的事件），我會整段取代。
+2. 格式一定要照這樣（不要加其他說明、不要用表格）：
+## 2026｜一句話標題
+> 一句話摘要
+- 2026/10/08 ⚠️ 事件內容
+3. 日期寫 YYYY/MM/DD，不確定日期可以寫 YYYY/MM 或 YYYY。
+4. 每行開頭用一個圖示代表類型：🌱起點 💳借款 ✅還清 📈獲利 📉虧損 ⚠️教訓 🎯目標 👨‍👩‍👧家庭 🏁里程碑 🧭策略 💬心聲（引用我自己的原話） 🔧系統
+5. 標了〔自動〕的是系統自動產生的（信貸紀錄），不要輸出它們。
+6. 只收「回頭看會覺得重要」的事：大額獲利或虧損、借款與還款、策略轉變、情緒最強烈的時刻、學到的教訓、家庭大事。日常盤勢不要收。
+7. 年份標題和摘要如果因為新事件而需要改寫，請一起改。
+
+【目前的大事記】
+${abExportText(true)}
+
+【上次更新後的新日誌（${nj.length} 篇）】
+${jtxt||'（沒有）'}${sn}${qr}`;
+}
+function abParse(txt){
+  const out=[]; let cur=null;
+  String(txt||'').replace(/\r/g,'').split('\n').forEach(raw=>{
+    const l=raw.trim(); if(!l)return;
+    let m=l.match(/^#{2,3}\s*(\d{4})\s*(?:[–\-~～]\s*(\d{4}))?\s*[｜|:：]?\s*(.*)$/);
+    if(m){cur={from:+m[1],to:+(m[2]||m[1]),title:m[3].trim(),sum:'',items:[]};out.push(cur);return;}
+    if(!cur)return;
+    if(/^>/.test(l)){cur.sum=(cur.sum?cur.sum+' ':'')+l.replace(/^>\s*/,'');return;}
+    m=l.match(/^[-*•]\s*(\d{4})(?:[\/\-.](\d{1,2}))?(?:[\/\-.](\d{1,2}))?\s*(.*)$/);
+    if(m){
+      if(/〔自動〕/.test(m[4]))return;
+      let rest=m[4].trim(); let k='note';
+      for(const [kk,t] of Object.entries(AB_TYPES)){if(kk!=='note'&&rest.startsWith(t.e)){k=kk;rest=rest.slice(t.e.length).trim();break;}}
+      if(k==='note'&&/^\p{Extended_Pictographic}/u.test(rest)){rest=rest.replace(/^\p{Extended_Pictographic}️?\s*/u,'');}
+      const d=[m[1],m[2]&&m[2].padStart(2,'0'),m[3]&&m[3].padStart(2,'0')].filter(Boolean).join('-');
+      if(rest)cur.items.push({id:'c'+uid(),d,k,t:rest});
+    }
+  });
+  return out.filter(e=>e.items.length||e.title);
+}
+function abUpdateModal(){
+  const A=abEnsure(); const nj=abNewJournals();
+  arcModal(`<div style="font-size:16px;font-weight:800;color:#1e293b;margin-bottom:4px">🔄 更新關於我</div>
+    <div style="font-size:12.5px;color:#475569;line-height:1.7">上次更新：<b>${_ae(A.updatedAt)}</b>，之後新寫了 <b>${nj.length}</b> 篇日誌。</div>
+    <div style="margin:10px 0 4px;font-weight:700">① 複製資料給 Claude</div>
+    <button style="${_arcBtn('#2563eb')}" onclick="advCopy(abPromptText(),'關於我')">📋 複製（大事記＋新日誌）</button>
+    <div style="margin:12px 0 4px;font-weight:700">② 把 Claude 的回覆整段貼在這裡</div>
+    <textarea id="ab-paste" rows="7" placeholder="## 2026｜…&#10;> …&#10;- 2026/10/08 ⚠️ …" style="${_arcIn};font-family:inherit;font-size:12.5px" oninput="abPreview()"></textarea>
+    <div id="ab-prev" style="font-size:12px;color:#64748b;min-height:18px"></div>
+    <div style="display:flex;justify-content:space-between;gap:8px;margin-top:6px"><button style="${_arcBtn()};font-size:12px" onclick="abMarkDone()" title="不用 Claude，直接把「上次更新」改成今天">只標記為已更新</button><span><button style="${_arcBtn()}" onclick="arcCloseModal()">取消</button> <button id="ab-apply" style="${_arcBtn('#ea580c')}" onclick="abApply()">③ 套用</button></span></div>`);
+  const box=document.querySelector('#arc-modal > div'); if(box)box.style.maxWidth='560px';
+}
+function abPreview(){
+  const P=abParse(document.getElementById('ab-paste')?.value); const el=document.getElementById('ab-prev'); if(!el)return;
+  el.innerHTML=P.length?`會更新 <b>${P.length}</b> 個年份：`+P.map(e=>`${e.from===e.to?e.from:e.from+'–'+e.to}（${e.items.length} 件）`).join('、'):'還沒讀到內容（每個年份要用「## 年份｜標題」開頭）';
+}
+function abApply(){
+  const P=abParse(document.getElementById('ab-paste')?.value); if(!P.length)return toast('讀不到內容，請確認格式');
+  const A=abEnsure();
+  P.forEach(p=>{
+    let e=A.eras.find(x=>x.from===p.from&&x.to===p.to)||A.eras.find(x=>p.from>=x.from&&p.from<=x.to);
+    const keepJ=e?e.items.filter(x=>x.jid&&!p.items.some(y=>y.d===x.d)):[];
+    if(!e){e={key:String(p.from),from:p.from,to:p.to,title:'',sum:'',items:[]};A.eras.push(e);}
+    if(p.title)e.title=p.title; if(p.sum)e.sum=p.sum;
+    e.items=[...p.items,...keepJ];
+  });
+  A.eras.sort((a,b)=>a.from-b.from);
+  A.updatedAt=_twToday(); A.seenJ=(db.journals||[]).map(j=>j.id); A.reviewedJ=[...new Set([...(A.reviewedJ||[]),...(db.journals||[]).filter(j=>jMeta(j).star).map(j=>j.id)])];
+  save(); arcCloseModal(); _abOpen=String(P[P.length-1].from); renderAboutPage(); toast(`✅ 已更新 ${P.length} 個年份`);
+}
+function abMarkDone(){const A=abEnsure();A.updatedAt=_twToday();A.seenJ=(db.journals||[]).map(j=>j.id);save();arcCloseModal();renderAboutPage();toast('✅ 已標記為今天更新');}
+function abPrint(){
+  const A=abEnsure(); const by=abAllItems(A);
+  const show=privacyOn?confirm('目前是「隱藏金額」模式。\n列印時要顯示金額嗎？\n（按「取消」金額會以＊＊＊代替）'):true;
+  const m=s=>show?_ae(s):_ae(s).replace(/(\d[\d,\.]*\s*(?:萬|億|元))/g,'＊＊＊');
+  const html=`<!doctype html><html><head><meta charset="utf-8"><title>${_ae(A.title)}</title><style>@page{size:A4;margin:14mm}body{font-family:'Noto Sans TC','PingFang TC','Microsoft JhengHei',sans-serif;color:#1e293b;font-size:12.5px}h1{font-size:20px;margin:0 0 4px}h2{font-size:15px;margin:16px 0 2px;color:#c2410c;break-after:avoid}.s{color:#475569;margin:0 0 6px}.i{display:flex;gap:8px;padding:2px 0;break-inside:avoid}.d{width:48px;color:#94a3b8;text-align:right;flex:none}</style></head><body>
+    <h1>👤 ${_ae(A.title)}</h1><div class="s">座右銘「${_ae(A.motto)}」・列印日期 ${_twToday()}</div>
+    ${[...A.eras].sort((a,b)=>a.from-b.from).map(e=>`<h2>${e.from===e.to?e.from:e.from+'–'+e.to}｜${_ae(e.title)}</h2>${e.sum?`<div class="s">${m(e.sum)}</div>`:''}${(by[e.key]||[]).map(x=>`<div class="i"><span class="d">${_abFmtD(x.d)}</span><span>${(AB_TYPES[x.k]||AB_TYPES.note).e}</span><span>${m(x.t)}</span></div>`).join('')}`).join('')}
+    <h2>🎯 我立下的目標</h2>${(A.goals||[]).map(g=>`<div class="i"><span>${g.st==='done'?'✅':g.st==='part'?'🟡':'⏳'}</span><span>${m(g.t)}（${_ae(g.y)}）${g.note?'－'+m(g.note):''}</span></div>`).join('')}
+    <h2>🧭 回頭看</h2>${(A.reflect||'').split('\n').filter(Boolean).map(l=>`<div class="i"><span>・</span><span>${m(l)}</span></div>`).join('')}</body></html>`;
+  document.getElementById('qr-print-frame')?.remove();
+  const f=document.createElement('iframe'); f.id='qr-print-frame'; f.style.cssText='position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden';
+  document.body.appendChild(f); const d=f.contentWindow.document; d.open(); d.write(html); d.close();
+  setTimeout(()=>{try{f.contentWindow.focus();f.contentWindow.print();}catch(e){toast('列印失敗，請改用電腦版瀏覽器');}},400);
+  toast('🖨️ 印表機選「另存為 PDF」就能存成 PDF');
+}
 
 </script>
 
