@@ -11241,10 +11241,10 @@ function fundLogBoxHTML(fundId){
   const money=v=>'-$'+(v||0).toLocaleString();
   const sum=a=>a.reduce((s,r)=>s+(r.amount||0),0);
   const tab=(v,t)=>`<button onclick="event.stopPropagation();setFundLogView('${fundId}','${v}')" style="padding:2px 10px;border-radius:999px;font-size:10px;font-weight:700;cursor:pointer;border:1px solid ${view===v?'#93c5fd':'#e2e8f0'};background:${view===v?'#eff6ff':'#fff'};color:${view===v?'#1d4ed8':'#64748b'}">${t}</button>`;
-  const line=r=>`<div style="display:flex;justify-content:space-between;padding:3px 10px 3px 26px;font-size:11px"><span style="color:#64748b">${_md(r.date)} 週${_WK[_dowOf(r.date)]}</span><span style="font-weight:700;color:#dc2626;font-family:'JetBrains Mono',monospace">${money(r.amount)}</span></div>`;
+  const line=r=>`<div style="display:flex;justify-content:space-between;padding:3px 10px 3px 26px;font-size:11px"><span style="color:#64748b">${_md(r.date)} 週${_WK[_dowOf(r.date)]}</span><span style="font-weight:700;color:#16a34a;font-family:'JetBrains Mono',monospace">${money(r.amount)}</span></div>`;
   const grp=(key,label,list,bold,inner,defOpen)=>{
     const open=_fundLogOpen.has(key)||(defOpen&&!_fundLogOpen.has('x'+key));
-    return`<div onclick="event.stopPropagation();toggleFundLogGroup('${key}',${defOpen?1:0})" style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;border-top:1px solid #f1f5f9;cursor:pointer;font-size:11px;${bold?'background:#f8fafc;font-weight:800;color:#1e293b':'color:#374151;font-weight:600'}"><span><span style="display:inline-block;width:12px;color:#94a3b8">${open?'▾':'▸'}</span>${label} · ${list.length} 次</span><span style="font-family:'JetBrains Mono',monospace;color:${bold?'#1e293b':'#dc2626'}">${money(sum(list))}</span></div>${open?inner():''}`;
+    return`<div onclick="event.stopPropagation();toggleFundLogGroup('${key}',${defOpen?1:0})" style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;border-top:1px solid #f1f5f9;cursor:pointer;font-size:11px;${bold?'background:#f8fafc;font-weight:800;color:#1e293b':'color:#374151;font-weight:600'}"><span><span style="display:inline-block;width:12px;color:#94a3b8">${open?'▾':'▸'}</span>${label} · ${list.length} 次</span><span style="font-family:'JetBrains Mono',monospace;color:${bold?'#1e293b':'#16a34a'}">${money(sum(list))}</span></div>${open?inner():''}`;
   };
   let body='';
   if(view==='m'){
@@ -17116,9 +17116,14 @@ const STYLE_A={
     if(last<0)return;
     const x=chart.ctx; const col=typeof ds.borderColor==='string'?ds.borderColor:'#ea580c';
     x.save(); x.font="700 11px 'Noto Sans TC',sans-serif"; x.textAlign='center';
-    const mark=(k,label,c,dy)=>{const p=meta.data[k];if(!p||p.skip)return;x.fillStyle=c;x.beginPath();x.arc(p.x,p.y,4,0,Math.PI*2);x.fill();
-      x.strokeStyle='#fff';x.lineWidth=1.5;x.stroke();const t=label+' '+_saFmt(chart,ds,vals[k]);let ty=p.y+dy;ty=Math.max(a.top+9,Math.min(a.bottom-3,ty));
-      const tw=x.measureText(t).width; let tx=Math.max(a.left+tw/2,Math.min(a.right-tw/2,p.x)); x.fillText(t,tx,ty);};
+    const _pr=k=>{const r=Array.isArray(ds.pointRadius)?ds.pointRadius[k]:(typeof ds.pointRadius==='number'?ds.pointRadius:0);return +r||0;};
+    const mark=(k,label,c,dy)=>{const p=meta.data[k];if(!p||p.skip)return;const pr=_pr(k);
+      if(!pr){x.fillStyle=c;x.beginPath();x.arc(p.x,p.y,4,0,Math.PI*2);x.fill();x.strokeStyle='#fff';x.lineWidth=1.5;x.stroke();}
+      const r=Math.max(pr,4)+4, t=label+' '+_saFmt(chart,ds,vals[k]); x.font="700 11.5px 'Noto Sans TC',sans-serif";
+      const w=x.measureText(t).width+12, h=20; let by=dy<0?p.y-r-h:p.y+r, bx=Math.max(a.left,Math.min(a.right-w,p.x-w/2));
+      if(by<a.top||by+h>a.bottom){by=Math.max(a.top,Math.min(a.bottom-h,p.y-h/2));bx=p.x+r+w<=a.right?p.x+r:p.x-r-w;}
+      x.fillStyle='#fff';x.strokeStyle=c;x.lineWidth=1.2;x.beginPath();if(x.roundRect)x.roundRect(bx,by,w,h,6);else x.rect(bx,by,w,h);x.fill();x.stroke();
+      x.fillStyle=c;x.textAlign='center';x.fillText(t,bx+w/2,by+14);};
     const _nv=vals.filter(v=>v!=null); const _mono=_nv.every((v,k)=>k===0||v>=_nv[k-1])||_nv.every((v,k)=>k===0||v<=_nv[k-1]);
     if(!_mono&&!chart.$saNoHiLo&&hi!==lo&&_nv.length>=5){const near=k=>last-k<=Math.max(2,Math.round(vals.length*0.08));if(!near(hi))mark(hi,'最高','#dc2626',-10);if(!near(lo))mark(lo,'最低','#16a34a',18);}
     if(chart.$saAllLast){
@@ -17134,7 +17139,8 @@ const STYLE_A={
     }
     const p=meta.data[last];
     if(p&&!p.skip){const t=(chart.$saLastPre||'')+_saFmt(chart,ds,vals[last]);x.font="700 11px 'JetBrains Mono',monospace";const w=x.measureText(t).width+10;
-      const bx=chart.$saLastPre?Math.min(p.x+8,chart.width-w-1):chart.$saRight?Math.max(a.left,p.x-w-8):Math.min(a.right+4,chart.width-w-1),by=chart.$saLastPre?Math.max(a.top,p.y-26):chart.$saRight?Math.max(a.top,Math.min(a.bottom-18,p.y-24)):Math.max(a.top,Math.min(a.bottom-18,p.y-9));
+      const _r=Math.max(_pr(last),4)+6;
+      const bx=chart.$saLastPre?Math.max(a.left,Math.min(chart.width-w-1,p.x-w/2)):chart.$saRight?Math.max(a.left,p.x-w-8):Math.min(a.right+4,chart.width-w-1),by=chart.$saLastPre?(p.y-_r-18<a.top?p.y+_r:p.y-_r-18):chart.$saRight?Math.max(a.top,Math.min(a.bottom-18,p.y-24)):Math.max(a.top,Math.min(a.bottom-18,p.y-9));
       x.fillStyle=col;x.beginPath();if(x.roundRect)x.roundRect(bx,by,w,18,4);else x.rect(bx,by,w,18);x.fill();
       x.fillStyle='#fff';x.textAlign='left';x.fillText(t,bx+5,by+13);}
     x.restore();
@@ -17567,7 +17573,8 @@ function _b6Bal(a){return a?(a.cash||0)+(a.d1||0)+(a.d2||0):0;}
 function _b6Dim(y,m){return new Date(Date.UTC(y,m,0)).getUTCDate();}
 function _b6ActiveLoans(){return (db.loans||[]).filter(l=>!l.settled&&calcLoanRemain(l)>0);}
 function _b6Card(inner,extra){return`<div class="trend-page-card" style="padding:14px 16px;margin-bottom:16px;${extra||''}">${inner}</div>`;}
-const _b6K=(t,v,s,st)=>`<div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:10px 12px;${st||''}"><div style="font-size:11px;color:#64748b">${t}</div><div style="font-size:19px;font-weight:800;margin-top:2px;font-family:'JetBrains Mono',monospace">${v}</div>${s?`<div style="font-size:11px;color:#94a3b8;margin-top:1px">${s}</div>`:''}</div>`;
+const _b6K=(t,v,s,st)=>`<div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:10px 12px;${st||''}"><div style="font-size:12.5px;font-weight:700;color:#334155">${t}</div><div style="font-size:20px;font-weight:800;margin-top:2px;font-family:'JetBrains Mono',monospace">${v}</div>${s?`<div class="b6-sub" style="font-size:12.5px;color:#475569;margin-top:3px;line-height:1.5">${s}</div>`:''}</div>`;
+const _b6Tag=(t,bg,c,bd)=>`<span style="display:inline-block;font-size:12px;font-weight:700;border-radius:6px;padding:1px 8px;background:${bg};color:${c};border:1px solid ${bd||bg};white-space:nowrap">${t}</span>`;
 const _b6Bar=(pct,col,h)=>`<div style="height:${h||8}px;background:#f1f5f9;border-radius:9px;overflow:hidden"><i style="display:block;height:100%;border-radius:9px;width:${Math.max(0,Math.min(100,pct)).toFixed(1)}%;background:${col}"></i></div>`;
 const _b6Pill=(t,bg,c,st)=>`<span style="display:inline-block;font-size:10.5px;font-weight:700;border-radius:6px;padding:1px 7px;white-space:nowrap;background:${bg};color:${c};${st||''}">${t}</span>`;
 const _b6Btn='padding:4px 10px;border:1px solid #e2e8f0;border-radius:8px;background:#fff;color:#334155;font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit';
@@ -17676,32 +17683,32 @@ function _b6Overview(R){
   const st=cov>=120?['安全','#dcfce7','#15803d']:cov>=100?['剛好打平','#fef3c7','#b45309']:['入不敷出','#fee2e2','#b91c1c'];
   const pc=v=>inc>0?Math.round(v/inc*100)+'% 的股息':'';
   let cur=I.out; const steps=ends.map(x=>{cur-=x.l.monthly||0;return{ym:x.e.ym,name:x.l.bank,net:inc-Math.max(0,cur)};});
-  const chip=(t,last)=>`<span onclick="_b6Scroll('b6-debt')" style="cursor:pointer;display:inline-block;font-size:11.5px;font-weight:700;border-radius:6px;padding:3px 9px;background:${last?'#fee2e2':'#f5f3ff'};color:${last?'#b91c1c':'#6d28d9'}">${t}</span>`;
+  const chip=(t,last)=>`<span onclick="_b6Scroll('b6-debt')" style="cursor:pointer;display:inline-block;font-size:12.5px;font-weight:800;border-radius:7px;padding:3px 10px;background:${last?'#fee2e2':'#f5f3ff'};color:${last?'#b91c1c':'#6d28d9'};border:1px solid ${last?'#fecaca':'#ddd6fe'}">${t}</span>`;
   const wan=v=>(v>=0?'+':'−')+(Math.abs(v)/10000).toFixed(1)+' 萬';
-  const row=(v,t,s,bg,col)=>`<div style="display:flex;align-items:center;gap:8px;background:${bg};border-radius:10px;padding:8px 10px"><b style="font-family:'JetBrains Mono',monospace;width:78px;${col?'color:'+col:''}">${v}</b><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700">${t}</div><div style="font-size:11px;color:#94a3b8">${s}</div></div></div>`;
+  const row=(v,t,s,bg,col)=>`<div style="display:flex;align-items:center;gap:8px;background:${bg};border-radius:10px;padding:8px 10px"><b style="font-family:'JetBrains Mono',monospace;width:78px;${col?'color:'+col:''}">${v}</b><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700">${t}</div><div style="font-size:12px;color:#475569">${s}</div></div></div>`;
   const flexTxt=I.flex.filter(f=>f.monthly).map(f=>`${_ae(f.name||f.bank||'')} ${Math.round(f.monthly).toLocaleString()}`).join('＋');
   return _b6Card(`
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap"><b style="font-size:15px">💧 資金總覽</b><span style="font-size:12px;color:#94a3b8">現金、負債、每月流向一次看完</span>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap"><b style="font-size:16px">💧 資金總覽</b><span style="font-size:13px;color:#475569">現金、負債、每月流向一次看完</span>
       <span style="margin-left:auto;background:${st[1]};color:${st[2]};border-radius:8px;padding:3px 10px;font-size:12px;font-weight:800">覆蓋率 ${cov.toFixed(0)}% ・ ${st[0]}</span></div>
     <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px">
-      ${_b6K('💵 現金帳戶',_b6m(cT),I.nextAmt?`+待入帳 ${_b6m(I.nextAmt)}（${_b6md(I.nextDate)}）`:'','border-top:3px solid #0ea5e9')}
-      ${_b6K('🏦 信貸剩餘',_b6m(lR),`<div style="margin:5px 0 2px">${_b6Bar(lPct,'#7c3aed',6)}</div>已還 ${Math.round(lPct)}%${lastYm?'・'+lastYm+' 全部還清':''}`,'border-top:3px solid #7c3aed')}
-      ${_b6K('💳 不限用途已用',_b6m(fU),`<div style="margin:5px 0 2px">${_b6Bar(fL?fU/fL*100:0,'#a78bfa',6)}</div>額度 ${_b6w(fL)}（${fL?Math.round(fU/fL*100):0}%）`,'border-top:3px solid #a78bfa')}
-      ${_b6K('📈 每月淨現金流',`<span style="color:${net>=0?'#dc2626':'#16a34a'}">${_b6s(net)}</span>`,net>=0?(inc>0?`股息少 ${Math.round((1-I.out/inc)*100)}% 才會入不敷出`:''):'要靠薪水或現金補','border-top:3px solid #dc2626')}
+      ${_b6K('💵 現金帳戶',_b6m(cT),I.nextAmt?_b6Tag(`⏳ 待入帳 +${_b6m(I.nextAmt)}・${_b6md(I.nextDate)}`,'#eff6ff','#1d4ed8','#bfdbfe'):'','border-top:3px solid #0ea5e9')}
+      ${_b6K('🏦 信貸剩餘',_b6m(lR),`<div style="margin:5px 0 4px">${_b6Bar(lPct,'#7c3aed',7)}</div>已還 <b style="color:#6d28d9">${Math.round(lPct)}%</b>${lastYm?`・<b style="color:#15803d">${lastYm}</b> 全部還清`:''}`,'border-top:3px solid #7c3aed')}
+      ${_b6K('💳 不限用途已用',_b6m(fU),`<div style="margin:5px 0 4px">${_b6Bar(fL?fU/fL*100:0,'#a78bfa',7)}</div>額度 ${_b6w(fL)}・已用 <b style="color:#6d28d9">${fL?Math.round(fU/fL*100):0}%</b>`,'border-top:3px solid #a78bfa')}
+      ${_b6K('📈 每月淨現金流',`<span style="color:${net>=0?'#dc2626':'#16a34a'}">${_b6s(net)}</span>`,net>=0?(inc>0?`股息少 <b style="color:#b45309">${Math.round((1-I.out/inc)*100)}%</b> 才會入不敷出`:''):'要靠薪水或現金補','border-top:3px solid #dc2626')}
     </div>
-    <div style="font-size:12.5px;font-weight:800;margin-bottom:6px">🔀 每月資金流向</div>
+    <div style="font-size:14px;font-weight:800;margin-bottom:6px">🔀 每月資金流向</div>
     <div style="display:grid;grid-template-columns:170px 30px minmax(0,1fr) 30px 190px;gap:0">
-      <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:12px;display:flex;flex-direction:column;justify-content:center"><div style="font-size:11px;color:#94a3b8">💰 每月股息進來</div><div style="font-size:22px;font-weight:900;font-family:'JetBrains Mono',monospace;color:#dc2626">${_b6m(inc)}</div><div style="font-size:11px;color:#94a3b8">${I.months.length?`近 ${I.months.length} 個月平均`:'下一筆入帳'}</div></div>
+      <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:12px;display:flex;flex-direction:column;justify-content:center"><div style="font-size:12.5px;font-weight:700;color:#334155">💰 每月股息進來</div><div style="font-size:24px;font-weight:900;font-family:'JetBrains Mono',monospace;color:#dc2626">${_b6m(inc)}</div><div style="font-size:12px;color:#475569">${I.months.length?`近 ${I.months.length} 個月平均`:'下一筆入帳'}</div></div>
       <div style="display:flex;align-items:center;justify-content:center;font-size:18px;color:#cbd5e1">➜</div>
       <div style="display:flex;flex-direction:column;gap:6px">
-        ${row(Math.round(I.loanM).toLocaleString(),`🏦 信貸月繳（${loans.length} 筆）`,pc(I.loanM),'#f5f3ff')}
-        ${I.flexM?row(Math.round(I.flexM).toLocaleString(),'💳 不限用途利息',(flexTxt?flexTxt+'・':'')+pc(I.flexM),'#faf5ff'):''}
+        ${row('−'+Math.round(I.loanM).toLocaleString(),`🏦 信貸月繳（${loans.length} 筆）`,pc(I.loanM),'#f5f3ff','#16a34a')}
+        ${I.flexM?row('−'+Math.round(I.flexM).toLocaleString(),'💳 不限用途利息',(flexTxt?flexTxt+'・':'')+pc(I.flexM),'#faf5ff','#16a34a'):''}
         ${row((net>=0?'+':'−')+Math.round(Math.abs(net)).toLocaleString(),net>=0?'✨ 每月多出':'⚠️ 每月不足',net>=0?pc(net):'股息不夠付，要從現金補','#fff1f2',net>=0?'#dc2626':'#16a34a')}
       </div>
       <div style="display:flex;align-items:center;justify-content:center;font-size:18px;color:#cbd5e1">➜</div>
-      <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:12px;padding:12px;display:flex;flex-direction:column;justify-content:center"><div style="font-size:11px;color:#94a3b8">💵 ${net>=0?'留在現金帳戶':'現金帳戶要補'}</div><div style="font-size:22px;font-weight:900;font-family:'JetBrains Mono',monospace;color:${net>=0?'#0369a1':'#16a34a'}">${_b6s(net)}</div><div style="font-size:11px;color:#94a3b8">一年約 ${_b6s(net*12)}</div></div>
+      <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:12px;padding:12px;display:flex;flex-direction:column;justify-content:center"><div style="font-size:12.5px;font-weight:700;color:#334155">💵 ${net>=0?'留在現金帳戶':'現金帳戶要補'}</div><div style="font-size:24px;font-weight:900;font-family:'JetBrains Mono',monospace;color:${net>=0?'#dc2626':'#16a34a'}">${_b6s(net)}</div><div style="font-size:12px;color:#475569">一年約 <b>${_b6s(net*12)}</b></div></div>
     </div>
-    ${steps.length?`<div style="margin-top:12px;border-top:1px dashed #e2e8f0;padding-top:8px;display:flex;gap:6px;flex-wrap:wrap;align-items:center"><span style="font-size:12px;font-weight:800">📅 信貸還清後，每月多出：</span>${chip('現在 '+wan(net))}${steps.map((s,k)=>'→'+chip(s.ym+' '+wan(s.net),k===steps.length-1)).join('')}<span style="font-size:11px;color:#94a3b8">點一下看還款走勢</span></div>`:''}`);
+    ${steps.length?`<div style="margin-top:12px;border-top:1px dashed #e2e8f0;padding-top:8px;display:flex;gap:6px;flex-wrap:wrap;align-items:center"><span style="font-size:13px;font-weight:800">📅 信貸還清後，每月多出：</span>${chip('現在 '+wan(net))}${steps.map((s,k)=>'→'+chip(s.ym+' '+wan(s.net),k===steps.length-1)).join('')}<span style="font-size:12px;color:#64748b">👆 點一下看還款走勢</span></div>`:''}`);
 }
 
 // ══ ② 現金跑道 ══
@@ -17719,9 +17726,9 @@ function _b6Runway(R){
   const byD={}; non.forEach(e=>{(byD[e.date]=byD[e.date]||[]).push(e);});
   const short=new Set(R.loanShort.map(e=>e.date));
   const tiles=Object.keys(byD).sort().map(d=>{const list=byD[d];const hasDiv=list.some(e=>e.kind==='div');const bad=short.has(d);
-    return`<div style="background:${bad?'#fee2e2':hasDiv?'#fef2f2':'#fff'};border:1px solid ${bad?'#f87171':hasDiv?'#fecaca':'#e2e8f0'};border-radius:10px;padding:7px 9px;font-size:11.5px"><b style="font-family:'JetBrains Mono',monospace">${_b6md(d)}</b> <span style="color:#94a3b8">${_WK[_dowOf(d)]}</span>${list.map(e=>`<br>${_ae(e.label)} <b style="font-family:'JetBrains Mono',monospace;color:${e.amt>0?'#dc2626':'#334155'}">${e.amt>0?'+':'−'}${Math.round(Math.abs(e.amt)).toLocaleString()}</b>`).join('')}${bad?'<br><b style="color:#b91c1c">🚨 餘額不足</b>':''}</div>`;});
+    return`<div style="background:${bad?'#fee2e2':hasDiv?'#fef2f2':'#fff'};border:1px solid ${bad?'#f87171':hasDiv?'#fecaca':'#e2e8f0'};border-radius:10px;padding:7px 9px;font-size:11.5px"><b style="font-family:'JetBrains Mono',monospace">${_b6md(d)}</b> <span style="color:#94a3b8">${_WK[_dowOf(d)]}</span>${list.map(e=>`<br>${_ae(e.label)} <b style="font-family:'JetBrains Mono',monospace;color:${e.amt>0?'#dc2626':'#16a34a'}">${e.amt>0?'+':'−'}${Math.round(Math.abs(e.amt)).toLocaleString()}</b>`).join('')}${bad?'<br><b style="color:#b91c1c">🚨 餘額不足</b>':''}</div>`;});
   if(fund.length){const perDay={};fund.forEach(e=>perDay[e.date]=(perDay[e.date]||0)+(-e.amt));const ds=Object.keys(perDay);const wk=[...new Set(ds.map(d=>_dowOf(d)))].sort().map(w=>_WK[w]).join('、');const per=Math.round(Object.values(perDay)[0]);
-    tiles.splice(Math.min(1,tiles.length),0,`<div style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:7px 9px;font-size:11.5px;cursor:pointer" onclick="_b6Scroll('b6-fund')"><b>每週${wk}</b><br>基金扣款 <b style="font-family:'JetBrains Mono',monospace">−${per.toLocaleString()}</b> ×${ds.length}${R.fundWarn.length?'<br><b style="color:#b45309">⚠️ 扣款後低於安全水位</b>':''}</div>`);}
+    tiles.splice(Math.min(1,tiles.length),0,`<div style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:7px 9px;font-size:11.5px;cursor:pointer" onclick="_b6Scroll('b6-fund')"><b>每週${wk}</b><br>基金扣款 <b style="font-family:'JetBrains Mono',monospace;color:#16a34a">−${per.toLocaleString()}</b> ×${ds.length}${R.fundWarn.length?'<br><b style="color:#b45309">⚠️ 扣款後低於安全水位</b>':''}</div>`);}
   const alert=R.loanShort.length?`<div style="background:#dc2626;color:#fff;border-radius:10px;padding:9px 12px;margin-bottom:10px;font-size:12.5px;font-weight:700">🚨 10 天內有 ${R.loanShort.length} 筆信貸扣款時餘額不夠：${R.loanShort.map(e=>`${_b6md(e.date)} ${_ae(e.label)} 差 ${_b6m(e.after)}`).join('、')}。請提前轉帳到 ${_ae(_b6AccName(R.loanShort[0].acc))}。</div>`:'';
   const noAcc=R.noAcc.length?`<div style="background:#fff7ed;border:1px solid #fed7aa;color:#c2410c;border-radius:10px;padding:7px 10px;margin-bottom:8px;font-size:12px">⚠️ ${R.noAcc.map(e=>_ae(e.label)).join('、')} 找不到扣款帳戶，沒辦法檢查餘額；請在信貸的「扣款帳戶」選一個現金帳戶。</div>`:'';
   return`<div id="b6-runway" class="trend-page-card" style="padding:14px 16px;margin-bottom:16px;${R.loanShort.length?'border:2px solid #dc2626':''}">
@@ -17765,7 +17772,7 @@ function _b6Loans(R){
   const rows=loans.map(l=>{const rem=calcLoanRemain(l);const pct=l.amount?(1-rem/l.amount)*100:0;const e=_cfLoanEnd(l);const nd=nextDate(l);const days=nd?_dayDiff(nd,R.today):null;const bad=short.get(l);
     return`<tr style="border-bottom:1px solid #f1f5f9;${bad?'background:#fef2f2':''}"><td style="padding:8px"><b>${_ae(l.bank||'信貸')}</b><div style="font-size:11px;color:#94a3b8">${l.rate||0}%・剩 ${_b6m(rem)}</div></td>
       <td style="padding:8px;min-width:120px">${_b6Bar(pct,'#7c3aed')}<div style="font-size:11px;color:#94a3b8;margin-top:2px">${Math.round(pct)}%${e?`・剩 ${e.n} 期`:''}</div></td>
-      <td style="padding:8px;text-align:right;font-family:'JetBrains Mono',monospace">${Math.round(l.monthly||0).toLocaleString()}</td>
+      <td style="padding:8px;text-align:right;font-family:'JetBrains Mono',monospace;color:#16a34a">−${Math.round(l.monthly||0).toLocaleString()}</td>
       <td style="padding:8px;text-align:right"><b>${nd?_b6md(nd):'—'}</b><div style="font-size:11px;color:${bad?'#b91c1c':days!=null&&days<=3?'#c2410c':'#94a3b8'};font-weight:${bad?800:400}">${bad?'🚨 差 '+_b6m(bad.after):days==null?'':days===0?'今天':days+' 天後'}</div><div style="font-size:10px;color:#94a3b8">${_ae(l.deductBank||'')}</div></td>
       <td style="padding:8px;text-align:right;font-family:'JetBrains Mono',monospace">${e?e.ym:'—'}</td>
       <td style="padding:8px;text-align:right;white-space:nowrap"><button title="編輯" onclick="editLoan('${l.id}')" style="${_b6Ico}">✏️</button> <button title="結清" onclick="clearLoan('${l.id}')" style="${_b6Ico}">✅</button> <button title="刪除" onclick="delLoan('${l.id}')" style="${_b6Ico};border-color:#fca5a5;background:#fff">🗑</button></td></tr>`;}).join('');
@@ -17993,10 +18000,10 @@ _renderInvestL1Body=function(){
   const rows=active.map((inv,i)=>{const c=calcInv(inv);const card=advCardOf(inv.code);
     const mo=_b6MoDiv(inv,c).amt;
     return`<div style="display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:8px;padding:10px 12px;align-items:center;${i?'border-top:1px solid #f1f5f9':''}">
-      <div><b style="font-size:15px">${_ae(inv.code)}</b> <span style="font-size:12px;color:#94a3b8">${_ae(inv.name||'')}</span><div style="margin-top:2px">${card?_advRole(card.role):''} ${pledged.has(String(inv.code).toUpperCase())?'<span style="font-size:11px;color:#94a3b8">質押中</span>':''}</div></div>
-      <div style="text-align:right"><div style="font-size:11px;color:#94a3b8">張數</div><b style="font-family:'JetBrains Mono',monospace">${Math.round(c.tLots*1000)/1000}</b></div>
-      <div style="text-align:right"><div style="font-size:11px;color:#94a3b8">每月股息</div>${mo>0?`<b style="font-family:'JetBrains Mono',monospace;color:#dc2626">${_b6m(mo)}</b>`:'<span style="font-size:12px;color:#94a3b8">不配息</span>'}</div>
-      <div style="text-align:right"><div style="font-size:11px;color:#94a3b8">累積領息</div><b style="font-family:'JetBrains Mono',monospace;${c.divTot>0?'':'color:#94a3b8'}">${c.divTot>0?_b6m(c.divTot):'—'}</b></div></div>`;}).join('');
+      <div><b style="font-size:16px">${_ae(inv.code)}</b> <span style="font-size:13px;color:#475569">${_ae(inv.name||'')}</span><div style="margin-top:4px;display:flex;gap:5px;align-items:center">${card?_advRole(card.role):''} ${pledged.has(String(inv.code).toUpperCase())?_b6Tag('🔒 質押中','#f1f5f9','#334155','#cbd5e1'):''}</div></div>
+      <div style="text-align:right"><div style="font-size:12px;color:#64748b;font-weight:600">張數</div><b style="font-family:'JetBrains Mono',monospace;font-size:16px">${(Math.round(c.tLots*1000)/1000).toLocaleString()}</b></div>
+      <div style="text-align:right"><div style="font-size:12px;color:#64748b;font-weight:600">每月股息</div>${mo>0?`<b style="font-family:'JetBrains Mono',monospace;font-size:16px;color:#dc2626">${_b6m(mo)}</b>`:'<span style="font-size:13px;color:#475569">不配息</span>'}</div>
+      <div style="text-align:right"><div style="font-size:12px;color:#64748b;font-weight:600">累積領息</div><b style="font-family:'JetBrains Mono',monospace;font-size:16px;${c.divTot>0?'':'color:#64748b'}">${c.divTot>0?_b6m(c.divTot):'—'}</b></div></div>`;}).join('');
   const yr12=Y.rr*12, gap=target-yr12;
   let tip='';
   if(Y.rr>0){
@@ -18006,17 +18013,17 @@ _renderInvestL1Body=function(){
   }
   const chip=(t,bg,c,fn)=>`<button onclick="event.stopPropagation();${fn}" style="border:none;cursor:pointer;font-size:11.5px;font-weight:700;border-radius:6px;padding:4px 9px;background:${bg};color:${c};font-family:inherit">${t} ›</button>`;
   body.innerHTML=`<div onclick="openInvFaithModal()" style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:16px 18px;cursor:pointer;box-shadow:0 4px 6px -1px rgba(0,0,0,.05);margin-bottom:14px">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap"><b style="font-size:15px">💼 我的持股</b><span style="font-size:12px;color:#94a3b8">${active.length} 檔・${(Math.round(lots*1000)/1000).toLocaleString()} 張</span>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap"><b style="font-size:16px">💼 我的持股</b><span style="font-size:13px;color:#475569;font-weight:600">${active.length} 檔・${(Math.round(lots*1000)/1000).toLocaleString()} 張</span>
       <span style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap">${pz?chip(pz[0],pz[1],pz[2],"dbShowPage('pledge')"):''}${lO>0?chip('🏦 信貸已還 '+lPct+'%','#f5f3ff','#6d28d9',"b6GoAssets('b6-loans')"):''}
         <button onclick="event.stopPropagation();openDivTargetModal()" style="${_b6Btn}">✏️ 股息目標</button><button onclick="event.stopPropagation();openInvModal()" style="${_b6Btn}">＋ 買入</button></span></div>
     <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:12px">
-      ${_b6K('📅 下次股息',`<span style="color:#dc2626">${I.nextAmt?_b6m(I.nextAmt):'—'}</span>`,I.nextDate?`${_b6md(I.nextDate)} 入帳・${nd===0?'今天':nd+' 天後'}`:'暫無預告','background:#fef2f2;border-color:#fecaca')}
-      ${_b6K('🏆 今年已領',_b6m(Y.ytd),`<div style="margin:5px 0 2px">${_b6Bar(tPct,'#dc2626',6)}</div>目標 ${_b6m(target)}（${Math.round(tPct)}%）`)}
-      ${_b6K('⚔️ 股息付完信貸後',`<span style="color:${I.net>=0?'#dc2626':'#16a34a'}">${_b6s(I.net)}</span>`,I.net>=0?'每月可以無腦再加碼':'股息還不夠付每月支出')}</div>
+      ${_b6K('📅 下次股息',`<span style="color:#dc2626">${I.nextAmt?_b6m(I.nextAmt):'—'}</span>`,I.nextDate?`<b style="color:#b91c1c">${_b6md(I.nextDate)}</b> 入帳・${nd===0?'<b>今天</b>':'還有 <b style="color:#b91c1c">'+nd+'</b> 天'}`:'暫無預告','background:#fef2f2;border-color:#fecaca')}
+      ${_b6K('🏆 今年已領',_b6m(Y.ytd),`<div style="margin:5px 0 2px">${_b6Bar(tPct,'#dc2626',6)}</div>目標 ${_b6m(target)}・已達 <b style="color:#b91c1c">${Math.round(tPct)}%</b>`)}
+      ${_b6K('⚔️ 股息付完信貸後',`<span style="color:${I.net>=0?'#dc2626':'#16a34a'}">${_b6s(I.net)}</span>`,I.net>=0?'💪 每月可以無腦再加碼':'股息還不夠付每月支出')}</div>
     <div style="border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;margin-bottom:12px">${rows||'<div style="padding:16px;text-align:center;color:#94a3b8;font-size:12px">尚無持股</div>'}</div>
-    <div style="font-size:13.5px;font-weight:800;margin-bottom:6px">🎯 ${Y.yr} 股息目標 <span style="font-weight:400;font-size:11.5px;color:#94a3b8">年底預估 ${_b6m(Y.yEnd)}（${target?Math.round(Y.yEnd/target*100):0}%）・深色＝已領、淺色＝預估</span></div>
+    <div style="font-size:14px;font-weight:800;margin-bottom:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">🎯 ${Y.yr} 股息目標 ${_b6Tag(`年底預估 ${_b6m(Y.yEnd)}（${target?Math.round(Y.yEnd/target*100):0}%）`,'#fef2f2','#b91c1c','#fecaca')}<span style="font-weight:500;font-size:12px;color:#475569"><span style="color:#dc2626">■</span> 已領　<span style="color:rgba(220,38,38,.35)">■</span> 預估</span></div>
     <div style="position:relative;height:130px"><canvas id="b6-divbar"></canvas></div>
-    ${tip?`<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:8px 10px;font-size:12.5px;margin-top:6px">${tip}</div>`:''}
+    ${tip?`<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:9px 12px;font-size:13.5px;color:#1e293b;margin-top:6px">${tip}</div>`:''}
     <div style="text-align:center;margin-top:12px"><button onclick="event.stopPropagation();openInvFaithModal()" style="${_b6Btn};background:#0f172a;color:#fff;border-color:#0f172a;padding:7px 14px">🔒 看股價與損益（輸入密碼進第二層）</button></div></div>`;
   try{const cv=document.getElementById('b6-divbar');if(cv&&window.Chart){if(_b6DivCh){_b6DivCh.destroy();_b6DivCh=null;}
     const M=Array.from({length:12},(_,i)=>(i+1)+'月');
@@ -18073,8 +18080,8 @@ renderFamilyMemberCards=function(){
     const title=((db.settings?.faithTexts||{})[member]||{}).title||'大盤長線必創歷史新高！';
     const col=ringC[mi%ringC.length]; const C=2*Math.PI*31; const dash=Math.min(100,pct)/100*C;
     const open=_b6FamOpen.has(member); const show=open?sorted:sorted.slice(0,3);
-    const chips=show.map((h,i)=>{const cc=chipC[i%chipC.length];return`<span onclick="event.stopPropagation();openFamilyBuyForHolding('${esc(member)}','${esc(h.code)}')" title="點擊快速買入 ${_ae(h.code)}" style="cursor:pointer;display:inline-block;font-size:10.5px;font-weight:700;border-radius:6px;padding:2px 8px;background:${cc[0]};color:${cc[1]}">${_ae(h.code)} ${h.p}%</span>`;}).join('')+
-      (sorted.length>3?`<span onclick="event.stopPropagation();b6FamMore('${esc(member)}')" style="cursor:pointer;display:inline-block;font-size:10.5px;font-weight:700;border-radius:6px;padding:2px 8px;background:#f1f5f9;color:#64748b">${open?'收起':'+'+(sorted.length-3)+' 檔'}</span>`:'');
+    const chips=show.map((h,i)=>{const cc=chipC[i%chipC.length];return`<span onclick="event.stopPropagation();openFamilyBuyForHolding('${esc(member)}','${esc(h.code)}')" title="點擊快速買入 ${_ae(h.code)}" style="cursor:pointer;display:inline-block;font-size:12px;font-weight:700;border-radius:6px;padding:2px 8px;background:${cc[0]};color:${cc[1]}">${_ae(h.code)} ${h.p}%</span>`;}).join('')+
+      (sorted.length>3?`<span onclick="event.stopPropagation();b6FamMore('${esc(member)}')" style="cursor:pointer;display:inline-block;font-size:12px;font-weight:700;border-radius:6px;padding:2px 8px;background:#f1f5f9;color:#334155">${open?'收起':'+'+(sorted.length-3)+' 檔'}</span>`:'');
     const sumP=sorted.reduce((s,h)=>s+h.p,0)||1;
     const stack=sorted.length?`<div style="display:flex;height:8px;border-radius:9px;overflow:hidden;background:#f1f5f9">${sorted.map((h,i)=>`<i style="width:${(h.p/Math.max(100,sumP)*100).toFixed(1)}%;background:${i<3?chipC[i%chipC.length][2]:'#cbd5e1'}"></i>`).join('')}</div>`:'';
     // 出資比例（有預設分配的帳戶，例如琁 & 軒）
@@ -18083,11 +18090,11 @@ renderFamilyMemberCards=function(){
     if(sp&&sp.length>=2){const tot={};sp.forEach(s=>tot[s.name]=0);holdings.forEach(h=>(h.transactions||[]).filter(t=>t.type==='buy'&&t.splits).forEach(t=>t.splits.forEach(x=>{if(tot[x.name]!==undefined)tot[x.name]+=x.amt||0;})));
       const g=Object.values(tot).reduce((s,v)=>s+v,0); const sc=['#3b82f6','#ec4899','#14b8a6','#f59e0b'];
       const ps=sp.map((s,i)=>({n:s.name,p:g>0?Math.round(tot[s.name]/g*100):s.pct,c:sc[i%sc.length]}));
-      split=`<div style="margin-top:8px;background:#fdf2f8;border-radius:9px;padding:6px 8px"><div style="font-size:11px;font-weight:700;color:#be185d;margin-bottom:3px">👫 出資比例</div><div style="display:flex;height:10px;border-radius:9px;overflow:hidden">${ps.map(x=>`<i style="width:${x.p}%;background:${x.c}"></i>`).join('')}</div><div style="display:flex;justify-content:space-between;font-size:11px">${ps.map(x=>`<span style="color:${x.c};font-weight:700">${_ae(x.n)} ${x.p}%</span>`).join('')}</div></div>`;}
+      split=`<div style="margin-top:8px;background:#fdf2f8;border-radius:9px;padding:6px 8px"><div style="font-size:12.5px;font-weight:700;color:#be185d;margin-bottom:3px">👫 出資比例</div><div style="display:flex;height:10px;border-radius:9px;overflow:hidden">${ps.map(x=>`<i style="width:${x.p}%;background:${x.c}"></i>`).join('')}</div><div style="display:flex;justify-content:space-between;font-size:13px;margin-top:2px">${ps.map(x=>`<span style="color:${x.c};font-weight:800">${_ae(x.n)} ${x.p}%</span>`).join('')}</div></div>`;}
     return`<div onclick="openFamilyFaithModal('${esc(member)}')" style="background:#fff;border:1px solid ${split?'#fbcfe8':'#e2e8f0'};border-radius:14px;padding:14px 16px;cursor:pointer;box-shadow:0 4px 6px -1px rgba(0,0,0,.05);transition:all .2s" onmouseover="this.style.transform='translateY(-3px)';this.style.borderColor='#93c5fd'" onmouseout="this.style.transform='';this.style.borderColor='${split?'#fbcfe8':'#e2e8f0'}'">
       <div style="display:flex;gap:12px;align-items:center">
         <svg width="70" height="70" viewBox="0 0 74 74" style="flex-shrink:0"><circle cx="37" cy="37" r="31" fill="none" stroke="#f1f5f9" stroke-width="8"/><circle cx="37" cy="37" r="31" fill="none" stroke="${col}" stroke-width="8" stroke-linecap="round" stroke-dasharray="${dash.toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 37 37)"/><text x="37" y="42" text-anchor="middle" font-size="${pct>=100?13:15}" font-weight="800" fill="#0f172a">${pct>=100?Math.round(pct):pct}%</text></svg>
-        <div style="flex:1;min-width:0"><b style="font-size:15px">${_ae(member)}</b><div style="font-size:11px;color:#94a3b8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${_ae(title)}">🎯 ${_ae(title)}</div><div style="font-size:11px;color:#94a3b8;margin-top:2px">${active.length} 檔持股${last?'・最近投入 '+_b6md(last):''}</div></div></div>
+        <div style="flex:1;min-width:0"><b style="font-size:16px">${_ae(member)}</b><div style="font-size:12.5px;color:#334155;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${_ae(title)}">🎯 ${_ae(title)}</div><div style="font-size:12px;color:#475569;margin-top:3px">${active.length} 檔持股${last?`・最近投入 <b>${_b6md(last)}</b>`:''}</div></div></div>
       ${split}
       <div style="margin-top:10px">${stack}<div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:6px">${chips||'<span style="font-size:11px;color:#94a3b8;font-style:italic">尚無持股</span>'}</div></div>
       <div style="display:flex;gap:6px;margin-top:10px"><button onclick="event.stopPropagation();openFamilyQuickBuy('${esc(member)}')" style="${_b6Btn};flex:1">＋ 買入</button><button onclick="event.stopPropagation();openFamilyTargetModal('${esc(member)}')" style="${_b6Btn}" title="修改目標">🎯</button><button onclick="event.stopPropagation();openFamilyFaithModal('${esc(member)}')" style="${_b6Btn}">🔒 明細</button></div></div>`;
