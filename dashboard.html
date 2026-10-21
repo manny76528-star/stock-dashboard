@@ -17501,7 +17501,7 @@ function renderPledgePro(){
       <div style="display:flex;height:14px;border-radius:9px;overflow:hidden;background:#f1f5f9"><i style="width:${limit?Math.min(100,loan/limit*100).toFixed(1):0}%;background:#ea580c"></i></div>
       <div style="font-size:12px;color:#475569;margin-top:4px">${flex.map(f=>_ae(f.name||'')).join('、')} 已用 <b class="privacy-mask" style="font-family:'JetBrains Mono',monospace">${m(loan)}</b>${limit?` ／ 額度 <span class="privacy-mask">${m(limit)}</span>（${Math.round(loan/limit*100)}%）・還可借 <b class="privacy-mask" style="font-family:'JetBrains Mono',monospace">${m(limit-loan)}</b>`:''}</div></div>
       ${add>0?`<div style="border:1px solid #e2e8f0;border-radius:12px;padding:8px 12px;min-width:220px"><div style="font-size:11px;color:#64748b">試算：再借 ${Math.round(add/10000)} 萬（不買股票）</div><div class="privacy-mask" style="font-size:16px;font-weight:800;font-family:'JetBrains Mono',monospace">${R.toFixed(1)}% → ${(mkt/(loan+add)*100).toFixed(1)}%</div></div>`:''}</div>
-    ${lev?`<div style="font-size:12px;color:#7f1d1d;background:#fef2f2;border:1px solid #fecaca;border-radius:9px;padding:7px 10px;margin-top:10px;white-space:pre-wrap">⚖️ 你的槓桿應變計畫：${_ae(lev)}　<a href="javascript:void 0" onclick="openAdvisor('cards','lev')" style="color:#94a3b8;font-size:11px">修改</a></div>`
+    ${window.ADV_OFF?'':lev?`<div style="font-size:12px;color:#7f1d1d;background:#fef2f2;border:1px solid #fecaca;border-radius:9px;padding:7px 10px;margin-top:10px;white-space:pre-wrap">⚖️ 你的槓桿應變計畫：${_ae(lev)}　<a href="javascript:void 0" onclick="openAdvisor('cards','lev')" style="color:#94a3b8;font-size:11px">修改</a></div>`
       :`<div style="font-size:12px;color:#64748b;margin-top:10px">⚖️ 還沒寫槓桿應變計畫 → <a href="javascript:void 0" onclick="openAdvisor('cards','lev')" style="color:#2563eb">到投資顧問寫一份</a></div>`}</div>`;
   if(typeof applyPrivacy==='function')applyPrivacy();
 }
@@ -18042,7 +18042,7 @@ function _b6InvL2Tags(){
     const card=advCardOf(inv.code); if(!card)return;
     const ex=X?.cards.find(c=>c.card.id===card.id); const pct=ex?ex.pct:null;
     const head=row.querySelector('div > div'); if(head){const s=document.createElement('span');s.className='b6-role';s.innerHTML=_advRole(card.role);head.appendChild(s);}
-    if(pct!=null&&card.target!=null){const R=ADV_ROLES[card.role]||ADV_ROLES.other;const over=card.hi!=null&&pct>card.hi, under=card.lo!=null&&pct<card.lo;
+    if(pct!=null&&card.target!=null&&!window.ADV_OFF){const R=ADV_ROLES[card.role]||ADV_ROLES.other;const over=card.hi!=null&&pct>card.hi, under=card.lo!=null&&pct<card.lo;
       const w=document.createElement('div');w.className='b6-weight';w.title='占比＝這一類在你所有部位（主帳戶＋阿豪的家族帳戶）的比重；目標來自投資顧問';
       w.style.cssText='display:flex;align-items:center;gap:8px;margin-top:6px;font-size:11px;color:#64748b';
       w.innerHTML=`<span>${_ae(card.title.length>14?card.title.slice(0,14)+'…':card.title)} 占比</span><b style="color:#1e293b">${pct.toFixed(0)}%</b><span style="color:${over?'#c2410c':under?'#2563eb':'#94a3b8'}">／目標 ${card.target}%${over?' 偏高':under?' 偏低':''}</span><div style="flex:1;max-width:160px">${_b6Bar(pct,R.bar,6)}</div>`;
@@ -18216,6 +18216,15 @@ openLoanHist=function(){
 
 // 啟動時第一層是在新版畫面載入之前就畫好的（會先看到舊版約 1 秒），這裡用新版馬上重畫一次
 try{if(document.getElementById('dbpage-invest-l1')?.classList.contains('active')){_renderInvestL1Body();renderFamilyMemberCards();}}catch(e){console.warn('首屏重畫',e);}
+
+// ══ 投資顧問：先關閉（資料保留在 db.advisor，之後要用把 ADV_OFF 改成 false 即可）══
+window.ADV_OFF=true;
+if(window.ADV_OFF){
+  (function(){const n=document.getElementById('nav-advisor');if(n)n.style.display='none';})();
+  // 買進／賣出不再跳冷靜卡、不再顯示大漲大跌提醒
+  (function(){const _c=advCfg;advCfg=function(){const c=_c.apply(this,arguments);c.calm.on=false;c.alert.on=false;return c;};})();
+  advCheckAlert=async function(){const b=document.getElementById('adv-banner');if(b)b.innerHTML='';};
+}
 </script>
 
 </div><!-- /main-content -->
