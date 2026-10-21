@@ -6747,6 +6747,41 @@
     "bankCode": "013",
     "bankAccount": "061506186489"
   },
-  "_ts": 1791534621151,
-  "_vendorPaidBackfilled": true
+  "_ts": 1792578631375,
+  "_vendorPaidBackfilled": true,
+  "crm": {
+    "mnmofk0wpc0i": {
+      "log": [
+        {
+          "id": "mvhz121eyv58",
+          "d": "2026-10-21",
+          "t": "延後提醒",
+          "remind": "2026-11-20"
+        }
+      ],
+      "snooze": "2026-11-20"
+    },
+    "mnmofk0wvucy": {
+      "log": [
+        {
+          "id": "mvhz13qp4ghm",
+          "d": "2026-10-21",
+          "t": "延後提醒",
+          "remind": "2026-11-20"
+        }
+      ],
+      "snooze": "2026-11-20"
+    },
+    "mnmofk0wcsf4": {
+      "log": [
+        {
+          "id": "mvhz15vyctft",
+          "d": "2026-10-21",
+          "t": "延後提醒",
+          "remind": "2026-11-20"
+        }
+      ],
+      "snooze": "2026-11-20"
+    }
+  }
 }
