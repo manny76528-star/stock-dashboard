@@ -162,6 +162,83 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
   .tbl th:nth-child(n+5),.tbl td:nth-child(n+5){display:none;}
 }
 #main-content{display:none;}
+
+/* ══ v7 改版：今天／客戶追蹤／客戶詳情／萬用搜尋 ══ */
+.v7-old{display:none!important}
+.stat-strip{display:grid;gap:12px;margin-bottom:16px}
+.stat-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px 14px}
+.stat-label{font-size:12.5px;font-weight:700;color:#334155;margin-bottom:4px}
+.stat-val{font-size:20px;font-weight:800;font-family:var(--mono);color:#0f172a}
+.stat-val.blue{color:#2563eb}.stat-val.gain,.gain{color:#dc2626}.stat-val.loss,.loss{color:#16a34a}
+.v7-nb{margin-left:auto;font-size:11.5px;font-weight:800;border-radius:999px;padding:0 8px;line-height:19px}
+.v7-nb:empty{display:none}
+.v7-nb.red{background:#fee2e2;color:#b91c1c}.v7-nb.amber{background:#ffedd5;color:#c2410c}
+.v7-top{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.v7-h1{font-size:22px;font-weight:900;color:#0f172a}
+.v7-sbox{flex:1;max-width:520px;margin-left:auto;display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--border);border-radius:12px;padding:9px 12px;color:#64748b;font-size:14px;cursor:text}
+.v7-sbox:hover{border-color:#a5b4fc}
+.v7-kbd{margin-left:auto;font-size:11.5px;border:1px solid var(--border);border-radius:6px;padding:0 6px;color:#64748b}
+.v7-btn{border:1px solid var(--border);background:#fff;border-radius:10px;padding:7px 12px;font-size:13.5px;font-weight:700;color:#1e293b;white-space:nowrap;cursor:pointer;font-family:'Noto Sans TC',sans-serif;text-decoration:none;display:inline-flex;align-items:center;gap:4px}
+.v7-btn:hover{background:#f8fafc;border-color:#cbd5e1}
+.v7-btn.p{background:#4f46e5;border-color:#4f46e5;color:#fff}.v7-btn.p:hover{background:#4338ca}
+.v7-btn.sm{padding:4px 9px;font-size:12.5px;border-radius:8px}
+.v7-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px 16px}
+.v7-g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.v7-k .t{font-size:13px;font-weight:700;color:#334155}.v7-k .v{font-size:25px;font-weight:900;font-family:var(--mono);margin:4px 0 2px;color:#0f172a}.v7-k .s{font-size:13px;color:#475569}
+.v7-pill{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;font-weight:800;border-radius:999px;padding:2px 10px;white-space:nowrap}
+.v7-ok{background:#dcfce7;color:#15803d}.v7-soon{background:#dbeafe;color:#1d4ed8}.v7-call{background:#ffedd5;color:#c2410c}.v7-lost{background:#fee2e2;color:#b91c1c}.v7-sleep{background:#e2e8f0;color:#334155}.v7-once{background:#f3e8ff;color:#7e22ce}.v7-new{background:#f1f5f9;color:#475569}.v7-snz{background:#fef9c3;color:#854d0e}
+.v7-ht{font-size:16px;font-weight:900;display:flex;align-items:center;gap:8px;margin-bottom:10px;color:#0f172a;flex-wrap:wrap}.v7-ht span.s{font-size:13px;font-weight:500;color:#475569}
+.v7-small{font-size:13px;color:#475569}
+.v7-todo{display:flex;align-items:center;gap:12px;padding:11px 12px;border:1px solid var(--border);border-radius:12px;background:#fff;margin-bottom:8px;cursor:pointer}
+.v7-todo:hover{border-color:#a5b4fc;background:#fafaff}
+.v7-ico{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.v7-chip{font-size:13px;font-weight:700;border:1px solid var(--border);border-radius:999px;padding:5px 12px;background:#fff;color:#334155;cursor:pointer;font-family:'Noto Sans TC',sans-serif}
+.v7-chip.on{background:#0f172a;color:#fff;border-color:#0f172a}
+.v7-bar{height:7px;background:#eef2f7;border-radius:9px;overflow:hidden}.v7-bar i{display:block;height:100%;border-radius:9px}
+.v7-tbl{width:100%;border-collapse:collapse;font-size:14px}
+.v7-tbl th{font-size:12.5px;color:#475569;font-weight:700;text-align:left;padding:9px 10px;border-bottom:1px solid var(--border);background:#f8fafc;white-space:nowrap}
+.v7-tbl td{padding:10px;border-bottom:1px solid #eef2f7;vertical-align:middle}
+.v7-tbl tr.cl{cursor:pointer}.v7-tbl tr.cl:hover td{background:#fafaff}
+.v7-r{text-align:right}
+.v7-health{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.v7-health div{border:1px solid var(--border);border-radius:12px;padding:9px 11px;cursor:pointer}.v7-health div:hover{border-color:#a5b4fc}
+/* 抽屜 */
+#v7-drawer-bg{position:fixed;inset:0;background:rgba(15,23,42,.35);z-index:300;display:none}
+#v7-drawer{position:fixed;top:0;right:0;bottom:0;width:min(680px,100vw);background:#fff;z-index:301;box-shadow:-20px 0 40px rgba(15,23,42,.18);transform:translateX(105%);transition:transform .22s ease;overflow-y:auto;padding:20px 22px 40px}
+#v7-drawer.open{transform:none}
+.v7-tl{border-left:2px solid #e2e8f0;margin-left:7px;padding-left:16px}.v7-tl .it{position:relative;padding-bottom:12px;cursor:pointer}.v7-tl .it:before{content:'';position:absolute;left:-22px;top:5px;width:10px;height:10px;border-radius:50%;background:#4f46e5;border:2px solid #fff;box-shadow:0 0 0 1px #c7d2fe}
+.v7-note{font-size:13.5px;color:#1e293b;background:#f8fafc;border-radius:10px;padding:9px 12px;line-height:1.6;margin-bottom:6px;position:relative}
+.v7-menu{position:absolute;z-index:400;background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:0 12px 30px rgba(15,23,42,.18);padding:6px;min-width:150px}
+.v7-menu button{display:block;width:100%;text-align:left;border:none;background:none;padding:8px 10px;border-radius:8px;font-size:13.5px;font-weight:600;cursor:pointer;font-family:'Noto Sans TC',sans-serif;color:#1e293b}
+.v7-menu button:hover{background:#f1f5f9}
+/* 萬用搜尋 */
+#v7-search-bg{position:fixed;inset:0;background:rgba(15,23,42,.4);z-index:500;display:none;align-items:flex-start;justify-content:center;padding-top:8vh}
+#v7-search{width:min(760px,94vw);background:#fff;border-radius:16px;box-shadow:0 30px 60px rgba(15,23,42,.3);overflow:hidden}
+#v7-sq{flex:1;border:none;outline:none;font-size:18px;font-weight:700;font-family:'Noto Sans TC',sans-serif}
+#v7-sres{max-height:62vh;overflow-y:auto;padding:6px 10px 10px}
+.v7-sg{font-size:12px;font-weight:800;color:#64748b;margin:10px 8px 4px}
+.v7-si{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;cursor:pointer;font-size:14px}
+.v7-si.on,.v7-si:hover{background:#eef2ff}
+@media(max-width:1000px){.v7-g4{grid-template-columns:1fr 1fr}.v7-2col{grid-template-columns:1fr!important}}
+@media(max-width:700px){
+  .app-layout{flex-direction:column}
+  .sidebar{width:auto;height:auto;position:sticky;top:0;z-index:50;display:flex;overflow-x:auto;padding:4px 6px;border-right:none;border-bottom:1px solid var(--border)}
+  .sidebar-section{display:none}
+  .sidebar-item{white-space:nowrap;border-left:none;border-bottom:3px solid transparent;padding:8px 10px;gap:6px}
+  .sidebar-item.active{border-bottom-color:#2563eb}
+  .hdr{position:static;flex-wrap:wrap;gap:8px;padding:10px 12px}
+  .hdr-actions{flex-wrap:wrap;gap:6px}
+  .hdr-btn{padding:5px 9px;white-space:nowrap}
+  .main{padding:12px}
+  .v7-h1{font-size:19px;width:100%}
+  .v7-sbox{max-width:none;margin-left:0}
+  .v7-k .v{font-size:19px}
+  .v7-todo{flex-wrap:wrap}
+  .v7-todo>div:nth-child(2){flex:1 1 calc(100% - 52px)!important}
+  .v7-todo>.v7-btn,.v7-todo>a.v7-btn{margin-left:auto}
+  .v7-health{grid-template-columns:1fr 1fr}
+  #v7-drawer{padding:16px 14px 40px}
+}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 </head>
@@ -245,12 +322,12 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
 <!-- Sidebar -->
 <div class="sidebar">
   <div class="sidebar-section">主要功能</div>
-  <div class="sidebar-item active" onclick="showTab('overview')" id="nav-overview">📊 總覽</div>
+  <div class="sidebar-item active" onclick="showTab('overview')" id="nav-overview">🏠 今天 <span class="v7-nb" id="v7-nb-today"></span></div>
   <div class="sidebar-item" onclick="showTab('orders')" id="nav-orders">📋 訂單記錄</div>
   <div class="sidebar-item" onclick="showTab('reports')" id="nav-reports">📊 報表</div>
   <div class="sidebar-section">管理</div>
-  <div class="sidebar-item" onclick="showTab('customers')" id="nav-customers">👥 客戶管理</div>
-  <div class="sidebar-item" onclick="showTab('receivable')" id="nav-receivable">💰 應收帳款</div>
+  <div class="sidebar-item" onclick="showTab('customers')" id="nav-customers">👥 客戶追蹤 <span class="v7-nb" id="v7-nb-cust"></span></div>
+  <div class="sidebar-item" onclick="showTab('receivable')" id="nav-receivable">💰 應收帳款 <span class="v7-nb" id="v7-nb-recv"></span></div>
   <div class="sidebar-item" onclick="showTab('products')" id="nav-products">📦 商品管理</div>
   <div class="sidebar-item" onclick="showTab('warranty')" id="nav-warranty">🔍 序號查詢</div>
 </div>
@@ -259,7 +336,8 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
 
   <!-- ══ 總覽 ══ -->
   <div id="tab-overview">
-    <div class="page-hdr">
+    <div id="v7-today"></div>
+    <div class="page-hdr v7-old">
       <div class="page-title">📊 總覽</div>
       <div class="page-actions">
         <span id="ov-month-label" style="font-size:13px;color:#64748b;font-weight:600"></span>
@@ -268,7 +346,7 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
     </div>
 
     <!-- KPI 卡片 -->
-    <div class="kpi-grid" style="grid-template-columns:repeat(5,1fr)">
+    <div class="kpi-grid v7-old" style="grid-template-columns:repeat(5,1fr)">
       <div class="kpi-card" onclick="showTab('reports')" style="cursor:pointer" title="查看報表">
         <div class="kpi-icon blue">💵</div>
         <div class="kpi-info">
@@ -311,7 +389,7 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
     </div>
 
     <!-- 累積統計 -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
+    <div class="v7-old" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
       <div style="background:linear-gradient(135deg,#1e3a5f,#2563eb);border-radius:12px;padding:16px 20px;display:flex;justify-content:space-between;align-items:center">
         <div>
           <div style="font-size:11px;color:rgba(255,255,255,.7);font-weight:600;margin-bottom:4px">📈 累積總營收</div>
@@ -329,7 +407,7 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
     </div>
 
     <!-- 客戶追蹤提醒（全寬） -->
-    <div class="sec" style="margin-bottom:16px">
+    <div class="sec v7-old" style="margin-bottom:16px">
       <div class="sec-hdr"><span class="sec-title">📡 客戶追蹤提醒</span></div>
       <div class="sec-body" style="padding:10px">
         <div id="cust-track-list" style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px">
@@ -452,11 +530,12 @@ body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#1e293b;mi
 
   <!-- ══ 客戶管理 ══ -->
   <div id="tab-customers" style="display:none">
-    <div class="search-bar">
+    <div id="v7-cust"></div>
+    <div class="search-bar v7-old">
       <input class="search-input" id="cust-search" placeholder="搜尋客戶名稱、聯絡人、電話..." oninput="renderCustomers()">
       <button class="search-btn" onclick="openCustModal()">＋ 新增客戶</button>
     </div>
-    <div class="sec">
+    <div class="sec v7-old">
       <div class="sec-body">
         <table class="tbl">
           <thead><tr><th>客戶名稱</th><th>聯絡人</th><th>電話</th><th>累積訂單</th><th>累積利潤</th><th>最後往來</th><th>操作</th></tr></thead>
@@ -2997,6 +3076,312 @@ function showImgOverlay(imgs,startIdx){
   overlay.appendChild(imgEl);overlay.appendChild(nav);
   document.body.appendChild(overlay);
 }
+
+// ══════════════════════════════════════════════════════════════
+// v7 改版：🏠 今天／👥 客戶追蹤（自動算回購週期）／客戶詳情抽屜／🔍 萬用搜尋
+//   原則：資料結構、同步、原本的功能都不動；只新增 db.crm（追蹤紀錄、延後提醒）
+// ══════════════════════════════════════════════════════════════
+const v7Today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
+const v7Diff=(a,b)=>Math.round((new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/864e5); // b − a（天）
+const v7Add=(ds,n)=>{const d=new Date(ds+'T00:00:00');d.setDate(d.getDate()+n);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
+const v7E=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const v7M=v=>'$'+Math.round(v||0).toLocaleString();
+const v7Ymd=s=>s?s.replace(/-/g,'/'):'—';
+const v7Md=s=>s?s.slice(5).replace('-','/'):'—';
+const v7Med=a=>{const b=a.slice().sort((x,y)=>x-y);const n=b.length;return n?(n%2?b[(n-1)/2]:(b[n/2-1]+b[n/2])/2):null;};
+const v7Digits=s=>String(s||'').replace(/\D/g,'');
+const V7S={ok:['正常','v7-ok'],soon:['快叫貨了','v7-soon'],call:['該聯絡','v7-call'],lost:['久未交易','v7-lost'],sleep:['沉睡 2 年+','v7-sleep'],once:['單次客戶','v7-once'],new:['尚無訂單','v7-new']};
+const V7RANK={lost:0,call:0,soon:1,ok:2,once:3,new:4,sleep:5};
+function v7Pill(c){
+  if(c.snoozed)return`<span class="v7-pill v7-snz">⏰ 延後到 ${v7Md(c.snooze)}</span>`;
+  const S=V7S[c.s];return`<span class="v7-pill ${S[1]}">${S[0]}</span>`;
+}
+function v7Crm(key){if(!db.crm)db.crm={};if(!db.crm[key])db.crm[key]={log:[],snooze:''};return db.crm[key];}
+
+// ── 分析每位客戶 ──
+let _v7C=[];
+function v7Analyze(){
+  const T=v7Today();
+  const byId={},byName={};(db.customers||[]).forEach(c=>{byId[c.id]=c;if(c.name)byName[c.name]=c;});
+  const G={};
+  (db.orders||[]).forEach(o=>{
+    if(o.status==='cancelled'||!o.date)return;
+    const cust=(o.custId&&byId[o.custId])||byName[o.custName]||null;
+    const key=cust?cust.id:'n:'+(o.custName||'未知');
+    (G[key]=G[key]||{key,cust,name:cust?cust.name:(o.custName||'未知'),orders:[]}).orders.push(o);
+  });
+  (db.customers||[]).forEach(c=>{if(!G[c.id])G[c.id]={key:c.id,cust:c,name:c.name,orders:[]};});
+  const out=Object.values(G).map(g=>{
+    const os=g.orders.sort((a,b)=>b.date.localeCompare(a.date));
+    const ds=[...new Set(os.map(o=>o.date))].sort();
+    const gaps=[];for(let i=1;i<ds.length;i++)gaps.push(v7Diff(ds[i-1],ds[i]));
+    const cyc=gaps.length>=2?Math.max(1,Math.round(v7Med(gaps))):null;
+    const last=ds[ds.length-1]||null, since=last?v7Diff(last,T):null;
+    const ratio=cyc&&since!=null?since/cyc:null;
+    let s;
+    if(!last)s='new';
+    else if(since>730)s='sleep';
+    else if(!cyc)s=since>180?'lost':'once';
+    else if(since>365||ratio>2.5)s='lost';
+    else if(ratio>1.3)s='call';
+    else if(ratio>=0.8)s='soon';
+    else s='ok';
+    let rev=0,pf=0,r12=0,p12=0,unpaid=0;const m12=Array(12).fill(0);
+    const ty=+T.slice(0,4),tm=+T.slice(5,7);
+    os.forEach(o=>{const c=calcOrder(o);rev+=c.revenue;pf+=c.profit;const d=v7Diff(o.date,T);
+      if(d<=365)r12+=c.revenue;else if(d<=730)p12+=c.revenue;
+      const mi=(ty-+o.date.slice(0,4))*12+(tm-+o.date.slice(5,7));if(mi>=0&&mi<12)m12[11-mi]+=c.revenue;
+      if(!o.paid)unpaid+=c.revenue+c.tax;});
+    // 品項回購週期（買過 3 次以上、名稱沒有「停用」）
+    const im={};os.forEach(o=>(o.items||[]).forEach(it=>{const n=it.name||it.spec||it.subtype;if(!n||/停用/.test(n))return;(im[n]=im[n]||[]).push({date:o.date,it,o});}));
+    const items=Object.entries(im).map(([n,l])=>{const dd=[...new Set(l.map(x=>x.date))].sort();if(dd.length<3)return null;
+      const g=[];for(let i=1;i<dd.length;i++)g.push(v7Diff(dd[i-1],dd[i]));const c=Math.max(1,Math.round(v7Med(g)));
+      const lastX=l.filter(x=>x.date===dd[dd.length-1]);const qty=lastX.reduce((s,x)=>s+(parseFloat(x.it.qty)||1),0);
+      const nxt=v7Add(dd[dd.length-1],c);return{n,times:dd.length,cyc:c,last:dd[dd.length-1],next:nxt,late:v7Diff(nxt,T),qty,src:lastX[0]};}).filter(Boolean).sort((a,b)=>b.late-a.late);
+    const crm=(db.crm||{})[g.key]||{log:[],snooze:''};
+    const snoozed=!!(crm.snooze&&crm.snooze>T);
+    return{...g,orders:os,n:ds.length,cnt:os.length,first:ds[0]||null,last,since,cyc,ratio,s,rev,pf,r12,p12,m12,unpaid,items,crm,snooze:crm.snooze,snoozed};
+  });
+  _v7C=out;return out;
+}
+// 保固 30 天內到期
+function v7Warranty(){const T=v7Today();const war=[];(db.orders||[]).forEach(o=>{if(!o.date||o.status==='cancelled')return;(o.items||[]).forEach(it=>{const sns=it.sns&&it.sns.length?it.sns:[it.sn].filter(Boolean);if(!sns.length)return;
+    const e=new Date(o.date+'T00:00:00');e.setMonth(e.getMonth()+(it.warranty||12));const es=e.getFullYear()+'-'+String(e.getMonth()+1).padStart(2,'0')+'-'+String(e.getDate()).padStart(2,'0');
+    const left=v7Diff(T,es);if(left>=0&&left<=30)war.push({o,it,sns,es,left});});});return war;}
+const v7Need=c=>!c.snoozed&&(c.s==='call'||c.s==='lost'||c.s==='soon')&&(c.r12+c.p12)>0;
+function v7Badges(){
+  try{const C=v7Analyze();const call=C.filter(c=>!c.snoozed&&(c.s==='call'||c.s==='lost')).length;
+    const unp=(db.orders||[]).filter(o=>!o.paid&&o.status!=='cancelled').length;
+    const todo=C.filter(v7Need).length+unp+(db.orders||[]).filter(o=>o.vendorPaid===false&&o.status!=='cancelled').length+v7Warranty().length;
+    const set=(id,v,cls)=>{const el=document.getElementById(id);if(el){el.textContent=v||'';el.className='v7-nb '+cls;}};
+    set('v7-nb-today',todo,'red');set('v7-nb-cust',call,'red');set('v7-nb-recv',unp,'amber');}catch(e){console.warn('v7 badges',e);}
+}
+function v7Spark(a){const mx=Math.max(1,...a);return`<svg width="120" height="28" viewBox="0 0 120 28">${a.map((v,i)=>{const h=v?Math.max(3,v/mx*26):1;return`<rect x="${i*10+1}" y="${28-h}" width="7" height="${h}" rx="2" fill="${v?'#4f46e5':'#e2e8f0'}"/>`;}).join('')}</svg>`;}
+function v7Tel(c,label){const p=c.cust?.phone;if(!p)return'';return`<a class="v7-btn sm" href="tel:${v7Digits(p)}" onclick="event.stopPropagation()">📞 ${v7E(label||'')}</a>`;}
+function v7Top(title){return`<div class="v7-top"><div class="v7-h1">${title}</div><div class="v7-sbox" onclick="v7SearchOpen()">🔍 搜尋客戶、電話、品項、序號、訂單…<span class="v7-kbd">/</span></div><button class="v7-btn p" onclick="openOrderModal()">＋ 新增訂單</button></div>`;}
+const v7Idx=c=>_v7C.indexOf(c);
+
+// ══ 🏠 今天 ══
+let _v7Chart=null;
+function v7RenderToday(){
+  const box=document.getElementById('v7-today'); if(!box)return;
+  const C=v7Analyze(), T=v7Today(), y=T.slice(0,4), ly=String(+y-1), md=T.slice(5);
+  let rev=0,pf=0,lrev=0,lpf=0;
+  (db.orders||[]).forEach(o=>{if(!o.date||o.status==='cancelled')return;const c=calcOrder(o);
+    if(o.date.startsWith(y)){rev+=c.revenue;pf+=c.profit;}else if(o.date.startsWith(ly)&&o.date.slice(5)<=md){lrev+=c.revenue;lpf+=c.profit;}});
+  const unpaid=(db.orders||[]).filter(o=>!o.paid&&o.status!=='cancelled').map(o=>{const c=calcOrder(o);return{o,amt:c.revenue+c.tax,days:v7Diff(o.date,T)};}).sort((a,b)=>b.days-a.days);
+  const vend=(db.orders||[]).filter(o=>o.vendorPaid===false&&o.status!=='cancelled');
+  const war=v7Warranty();
+  const need=C.filter(v7Need).sort((a,b)=>V7RANK[a.s]-V7RANK[b.s]||(b.r12+b.p12)-(a.r12+a.p12));
+  const callN=C.filter(c=>!c.snoozed&&(c.s==='call'||c.s==='lost'));
+  const quiet=callN.reduce((s,c)=>s+c.p12+c.r12,0);
+  const total=need.length+unpaid.length+vend.length+war.length;
+  const yoy=lrev?Math.round((rev-lrev)/lrev*100):null;
+  const hr=new Date().getHours(); const hi=hr<11?'早安':hr<18?'午安':'晚安';
+  const todo=need.slice(0,6).map(c=>{const it=c.items[0];return`<div class="v7-todo" onclick="v7Open(${v7Idx(c)})"><div class="v7-ico" style="background:${c.s==='lost'?'#fee2e2':c.s==='call'?'#ffedd5':'#dbeafe'}">${c.s==='soon'?'📦':'📞'}</div>
+    <div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:800">${v7E(c.name)} ${v7Pill(c)}</div>
+    <div class="v7-small">平常每 <b>${c.cyc}</b> 天叫一次貨，已經 <b style="color:#b91c1c">${c.since}</b> 天沒下單${it?`・常買 ${v7E(it.n)}（上次 ${it.qty}）`:''}</div></div>
+    ${v7Tel(c,(c.cust?.contact||'').replace(/先生|小姐/,''))}<button class="v7-btn sm" onclick="event.stopPropagation();v7SnoozeMenu(this,${v7Idx(c)})">⏰ 延後</button></div>`;}).join('');
+  const more=need.length>6?`<div onclick="v7GoCust('need')" style="text-align:center;margin:0 0 8px;color:#4f46e5;font-weight:700;font-size:13px;cursor:pointer">還有 ${need.length-6} 家要追蹤 ›</div>`:'';
+  const upd=unpaid.map(u=>`<div class="v7-todo" onclick="showOrderDetail('${u.o.id}')"><div class="v7-ico" style="background:#fef3c7">💰</div><div style="flex:1"><div style="font-size:15px;font-weight:800">${v7E(u.o.custName||'—')} 尚未收款 <span class="v7-pill ${u.days>30?'v7-lost':'v7-call'}">${u.days} 天</span></div><div class="v7-small">${v7Ymd(u.o.date)} 出貨・<b>${v7M(u.amt)}</b></div></div><button class="v7-btn sm" onclick="event.stopPropagation();markPaid('${u.o.id}');toast('✅ 已標記收款')">✓ 已收款</button></div>`).join('');
+  const vd=vend.map(o=>`<div class="v7-todo" onclick="showOrderDetail('${o.id}')"><div class="v7-ico" style="background:#f1f5f9">🏭</div><div style="flex:1"><div style="font-size:15px;font-weight:800">${v7E(o.custName||'—')} 的貨，還沒付廠商</div><div class="v7-small">${v7Ymd(o.date)} 出貨・成本 <b>${v7M((o.items||[]).reduce((s,i)=>s+(parseFloat(i.cost)||0)*(parseFloat(i.qty)||1),0))}</b></div></div></div>`).join('');
+  const wr=war.map(w=>`<div class="v7-todo" onclick="showOrderDetail('${w.o.id}')"><div class="v7-ico" style="background:#ecfeff">🛡️</div><div style="flex:1"><div style="font-size:15px;font-weight:800">${v7E(w.o.custName||'—')} 的保固快到期</div><div class="v7-small">${v7E(w.it.name||'')}・序號 ${v7E(w.sns.join('、'))}・${v7Ymd(w.es)} 到期（剩 ${w.left} 天），可以問要不要續保或換新</div></div></div>`).join('');
+  const hs=['ok','soon','call','lost','sleep'].map(s=>{const n=C.filter(c=>c.s===s).length;return`<div onclick="v7GoCust('${s}')"><span class="v7-pill ${V7S[s][1]}">${V7S[s][0]}</span><div style="font-size:24px;font-weight:900;margin-top:4px">${n} <span style="font-size:13px;color:#475569;font-weight:600">家</span></div></div>`;}).join('')+
+    (C.some(c=>c.snoozed)?`<div onclick="v7GoCust('snz')"><span class="v7-pill v7-snz">⏰ 延後中</span><div style="font-size:24px;font-weight:900;margin-top:4px">${C.filter(c=>c.snoozed).length} <span style="font-size:13px;color:#475569;font-weight:600">家</span></div></div>`:'');
+  box.innerHTML=v7Top(total?`${hi}，今天有 ${total} 件事`:`${hi}，今天沒有待辦 🎉`)+`
+  <div class="v7-g4" style="margin-bottom:14px">
+    <div class="v7-card v7-k" onclick="showTab('reports')" style="cursor:pointer"><div class="t">💵 今年營收</div><div class="v">${v7M(rev)}</div><div class="s">去年同期 ${v7M(lrev)}${yoy!=null?`・<b style="color:${yoy>=0?'#dc2626':'#16a34a'}">${yoy>=0?'+':''}${yoy}%</b>`:''}</div></div>
+    <div class="v7-card v7-k" onclick="showTab('reports')" style="cursor:pointer"><div class="t">💰 今年利潤</div><div class="v" style="color:#dc2626">${v7M(pf)}</div><div class="s">毛利率 <b>${rev?Math.round(pf/rev*100):0}%</b>・去年同期 ${v7M(lpf)}</div></div>
+    <div class="v7-card v7-k" onclick="showTab('receivable')" style="cursor:pointer"><div class="t">📬 待收款</div><div class="v" style="color:${unpaid.length?'#c2410c':'#0f172a'}">${v7M(unpaid.reduce((s,x)=>s+x.amt,0))}</div><div class="s">${unpaid.length?`${unpaid.length} 張・最久 <b>${unpaid[0].days}</b> 天`:'全部收齊了'}</div></div>
+    <div class="v7-card v7-k" onclick="v7GoCust('need')" style="cursor:pointer"><div class="t">👥 該聯絡的客戶</div><div class="v" style="color:${callN.length?'#b91c1c':'#0f172a'}">${callN.length} 家</div><div class="s">${callN.length?`前一年＋近一年營收 <b>${v7M(quiet)}</b> 的客戶變安靜了`:'客戶都在正常週期內'}</div></div></div>
+  <div class="v7-2col" style="display:grid;grid-template-columns:1.25fr 1fr;gap:14px;margin-bottom:16px">
+    <div class="v7-card"><div class="v7-ht">✅ 今天待辦 <span class="s">點一列看詳情；聯絡過可以「延後」，到時候再提醒</span></div>${todo}${more}${upd}${vd}${wr}${total?'':'<div class="v7-small" style="text-align:center;padding:20px">🎉 沒有要處理的事</div>'}</div>
+    <div><div class="v7-card" style="margin-bottom:14px"><div class="v7-ht">📈 每月營收 <span class="s">近 24 個月，深色是近 12 個月</span></div><div style="position:relative;height:180px"><canvas id="v7-chart"></canvas></div></div>
+      <div class="v7-card"><div class="v7-ht">🩺 客戶健康度 <span class="s">點一格就篩選</span></div><div class="v7-health">${hs}</div></div></div></div>`;
+  try{const cv=document.getElementById('v7-chart');if(cv&&window.Chart){if(_v7Chart)_v7Chart.destroy();
+    const L=[],V=[];const t=new Date();for(let i=23;i>=0;i--){const d=new Date(t.getFullYear(),t.getMonth()-i,1);const k=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');L.push(d.getMonth()===0?d.getFullYear()+'/1月':(d.getMonth()+1)+'月');
+      V.push((db.orders||[]).filter(o=>o.status!=='cancelled'&&o.date&&o.date.startsWith(k)).reduce((s,o)=>s+calcOrder(o).revenue,0));}
+    _v7Chart=new Chart(cv,{type:'bar',data:{labels:L,datasets:[{data:V,backgroundColor:V.map((_,i)=>i>=12?'#4f46e5':'#c7d2fe'),borderRadius:5}]},
+      options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:x=>v7M(x.raw)}}},
+        scales:{x:{grid:{display:false},ticks:{color:'#475569',maxTicksLimit:12,font:{size:11}}},y:{grid:{color:'#eef2f7'},border:{display:false},ticks:{color:'#475569',callback:v=>(v/10000)+'萬'}}}}});}}catch(e){console.warn('v7 chart',e);}
+  v7Badges();
+}
+(function(){const _r=renderOverview;renderOverview=function(){const r=_r.apply(this,arguments);try{v7RenderToday();}catch(e){console.warn('v7 today',e);}return r;};})();
+
+// ══ 👥 客戶追蹤 ══
+let _v7F='all',_v7Q='',_v7Sort='need';
+function v7GoCust(f){_v7F=f||'all';showTab('customers');}
+function v7SetF(f){_v7F=f;v7RenderCust();}
+function v7RenderCust(){
+  const box=document.getElementById('v7-cust'); if(!box)return;
+  const C=v7Analyze();
+  const cnt=f=>C.filter(c=>v7FMatch(c,f)).length;
+  const chips=[['all','全部'],['need','需要聯絡'],['soon','快叫貨了'],['ok','正常'],['lost','久未交易'],['sleep','沉睡'],['once','單次客戶'],['snz','⏰ 延後中']].filter(([f])=>f==='all'||cnt(f))
+    .map(([f,n])=>`<button class="v7-chip ${_v7F===f?'on':''}" onclick="v7SetF('${f}')">${n} ${cnt(f)}</button>`).join('');
+  const q=_v7Q.trim().toLowerCase(), qd=v7Digits(q);
+  let L=C.filter(c=>v7FMatch(c,_v7F)).filter(c=>!q||[c.name,c.cust?.contact,c.cust?.note,c.cust?.addr].some(x=>String(x||'').toLowerCase().includes(q))||(qd.length>=3&&v7Digits(c.cust?.phone).includes(qd)));
+  const S={need:(a,b)=>V7RANK[a.s]-V7RANK[b.s]||(a.snoozed-b.snoozed)||(b.r12+b.p12)-(a.r12+a.p12),rev:(a,b)=>b.r12-a.r12||b.rev-a.rev,since:(a,b)=>(b.since??-1)-(a.since??-1),name:(a,b)=>a.name.localeCompare(b.name,'zh-Hant')};
+  L.sort(S[_v7Sort]||S.need);
+  const rows=L.map(c=>{const pct=c.p12?Math.round((c.r12-c.p12)/c.p12*100):null;const bad=c.s==='call'||c.s==='lost';
+    const col={ok:'#22c55e',soon:'#3b82f6',call:'#f97316',lost:'#ef4444',sleep:'#94a3b8',once:'#a855f7'}[c.s]||'#cbd5e1';
+    return`<tr class="cl" onclick="v7Open(${v7Idx(c)})"><td><div style="font-weight:800;font-size:15px">${v7E(c.name)}</div><div class="v7-small">${v7E(c.cust?.contact||'—')}・${v7E(c.cust?.phone||'沒有電話')}</div></td>
+      <td>${v7Pill(c)}</td><td>${c.cyc?`每 <b>${c.cyc}</b> 天`:`<span class="v7-small">${c.n?'只買過 1 次':'—'}</span>`}</td>
+      <td>${c.since!=null?`<b style="font-size:15px;color:${bad&&!c.snoozed?'#b91c1c':'#0f172a'}">${c.since} 天</b>`:'<span class="v7-small">—</span>'}${c.cyc?`<div class="v7-bar" style="width:110px;margin-top:4px"><i style="width:${Math.min(100,c.ratio/3*100).toFixed(0)}%;background:${col}"></i></div>`:''}</td>
+      <td>${v7Spark(c.m12)}</td><td class="v7-r" style="font-family:var(--mono);font-weight:800">${v7M(c.r12)}</td>
+      <td class="v7-r">${pct==null?'<span class="v7-small">—</span>':`<b style="color:${pct>=0?'#dc2626':'#16a34a'}">${pct>=0?'+':''}${pct}%</b>`}</td>
+      <td class="v7-r" style="white-space:nowrap">${v7Tel(c,'')}</td></tr>`;}).join('');
+  const sel=document.activeElement&&document.activeElement.id==='v7-cq';
+  box.innerHTML=v7Top('客戶追蹤')+`
+  <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap">${chips}
+    <span style="margin-left:auto;display:flex;gap:8px;align-items:center"><input id="v7-cq" value="${v7E(_v7Q)}" oninput="_v7Q=this.value;v7RenderCust()" placeholder="篩選名稱、聯絡人、電話…" style="padding:7px 10px;border:1px solid var(--border);border-radius:10px;font-size:13.5px;width:200px;font-family:inherit">
+    <select onchange="_v7Sort=this.value;v7RenderCust()" style="padding:7px 10px;border:1px solid var(--border);border-radius:10px;font-size:13.5px;font-weight:700;font-family:inherit">${[['need','最該聯絡優先'],['rev','近一年營收'],['since','最久沒下單'],['name','名稱']].map(([v,n])=>`<option value="${v}" ${_v7Sort===v?'selected':''}>${n}</option>`).join('')}</select>
+    <button class="v7-btn" onclick="openCustModal()">＋ 新增客戶</button></span></div>
+  <div class="v7-card" style="padding:0;overflow-x:auto"><table class="v7-tbl"><tr><th>客戶</th><th>狀態</th><th>平常多久叫貨</th><th>距上次</th><th>近 12 個月</th><th class="v7-r">近一年營收</th><th class="v7-r">比前一年</th><th></th></tr>
+  ${rows||'<tr><td colspan="8" style="text-align:center;padding:30px;color:#475569">沒有符合的客戶</td></tr>'}</table></div>
+  <div class="v7-small" style="margin-top:8px">「平常多久叫貨」是過去每兩次下單間隔的中位數（至少下單 3 次才算）。距上次 ÷ 平常週期：0.8 倍以下＝正常、0.8～1.3＝快叫貨了、1.3～2.5＝該聯絡、超過 2.5 倍或一年沒下單＝久未交易、兩年以上＝沉睡。</div>`;
+  if(sel){const i=document.getElementById('v7-cq');if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length);}}
+  v7Badges();
+}
+function v7FMatch(c,f){if(f==='all')return true;if(f==='snz')return c.snoozed;if(f==='need')return !c.snoozed&&(c.s==='call'||c.s==='lost');if(f==='lost')return c.s==='lost';return c.s===f;}
+(function(){const _r=renderCustomers;renderCustomers=function(){const r=_r.apply(this,arguments);try{v7RenderCust();}catch(e){console.warn('v7 cust',e);}return r;};})();
+
+// ══ 客戶詳情抽屜 ══
+let _v7Cur=null;
+function v7Open(i){
+  const c=_v7C[i]; if(!c)return; _v7Cur=c.key;
+  let bg=document.getElementById('v7-drawer-bg'),dr=document.getElementById('v7-drawer');
+  if(!dr){bg=document.createElement('div');bg.id='v7-drawer-bg';bg.onclick=v7Close;document.body.appendChild(bg);dr=document.createElement('div');dr.id='v7-drawer';document.body.appendChild(dr);}
+  const T=v7Today(), cu=c.cust||{};
+  const last=c.orders[0];
+  const items=c.items.map((it,k)=>`<tr><td style="font-weight:700">${v7E(it.n)}<div class="v7-small">買過 ${it.times} 次</div></td><td>每 ${it.cyc} 天</td><td>${v7Ymd(it.last)}<div class="v7-small">數量 ${it.qty}</div></td>
+    <td><b style="color:${it.late>0?'#b91c1c':'#15803d'}">${v7Ymd(it.next)}</b><div class="v7-small">${it.late>0?'已晚 '+it.late+' 天':it.late===0?'就是今天':'還有 '+(-it.late)+' 天'}</div></td>
+    <td class="v7-r"><button class="v7-btn sm" onclick="v7Reorder(${i},${k})">＋ 照上次下單</button></td></tr>`).join('');
+  const log=(c.crm.log||[]).slice().sort((a,b)=>(b.d||'').localeCompare(a.d||'')).map(l=>`<div class="v7-note">💬 <b>${v7Md(l.d)}</b> ${v7E(l.t)}${l.remind?`<div style="color:#64748b;font-size:12.5px">⏰ ${v7Md(l.remind)} 再提醒</div>`:''}<span onclick="v7DelLog('${l.id}')" title="刪除" style="position:absolute;right:8px;top:6px;cursor:pointer;color:#94a3b8">✕</span></div>`).join('');
+  const kpi=(t,v,s,col)=>`<div class="v7-card v7-k" style="padding:10px 12px"><div class="t">${t}</div><div class="v" style="font-size:21px;${col?'color:'+col:''}">${v}</div><div class="s">${s}</div></div>`;
+  dr.innerHTML=`<div style="display:flex;align-items:flex-start;gap:10px"><div style="min-width:0"><div style="font-size:22px;font-weight:900">${v7E(c.name)}</div>
+      <div class="v7-small" style="margin-top:2px">${[cu.note,c.first?'往來 '+c.first.slice(0,4)+' 年起':'',c.cnt?'共 '+c.cnt+' 張訂單':''].filter(Boolean).map(v7E).join('・')}</div></div>
+      <span style="margin-left:auto;display:flex;gap:6px;align-items:center">${v7Pill(c)}<button class="v7-btn sm" onclick="v7Close()">✕</button></span></div>
+    <div style="display:flex;gap:8px;margin:12px 0;flex-wrap:wrap">
+      ${cu.phone?`<a class="v7-btn p" href="tel:${v7Digits(cu.phone)}">📞 ${v7E(cu.contact||'')}${cu.contact?'・':''}${v7E(cu.phone)}</a>`:`<span class="v7-btn" style="color:#64748b">📞 沒有電話</span>`}
+      ${cu.addr?`<a class="v7-btn" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cu.addr.trim())}">📍 地圖</a>`:''}
+      <button class="v7-btn" onclick="v7Reorder(${i},-1)">＋ 幫他下單</button>
+      ${last?`<button class="v7-btn" onclick="v7Reorder(${i},-2)">↻ 照上一張訂單</button>`:''}
+      <button class="v7-btn" onclick="v7SnoozeMenu(this,${i})">⏰ ${c.snoozed?'延後到 '+v7Md(c.snooze):'延後提醒'}</button>
+      ${c.cust?`<button class="v7-btn" onclick="v7Close();openCustModal('${c.cust.id}')">✏️ 編輯資料</button>`:''}
+      ${c.cnt?`<button class="v7-btn" onclick="v7Close();showCustDetail('${(last.custId||last.custName||'').replace(/'/g,"\\'")}')">📊 完整報表</button>`:''}</div>
+    ${c.unpaid?`<div style="background:#fff7ed;border:1px solid #fed7aa;color:#c2410c;border-radius:10px;padding:8px 12px;margin-bottom:10px;font-size:13.5px;font-weight:700">💰 這家還有 ${v7M(c.unpaid)} 沒收款</div>`:''}
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:12px">
+      ${kpi('距上次下單',c.since!=null?c.since+' 天':'—',c.cyc?`平常每 ${c.cyc} 天（${c.ratio.toFixed(1)} 倍）`:(c.n?'只下單過 1 次':'還沒有訂單'),(c.s==='call'||c.s==='lost')?'#b91c1c':'')}
+      ${kpi('近一年營收',v7M(c.r12),'前一年 '+v7M(c.p12))}
+      ${kpi('累積利潤',v7M(c.pf),`營收 ${v7M(c.rev)}・毛利 ${c.rev?Math.round(c.pf/c.rev*100):0}%`,'#dc2626')}</div>
+    ${c.items.length?`<div class="v7-ht" style="font-size:15px">🔮 回購預測 <span class="s">依每個品項過去的購買週期</span></div>
+    <div style="overflow-x:auto;margin-bottom:12px"><table class="v7-tbl"><tr><th>品項</th><th>平常週期</th><th>上次</th><th>預計下次</th><th></th></tr>${items}</table></div>`:''}
+    <div class="v7-2col" style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div><div class="v7-ht" style="font-size:15px">📝 追蹤紀錄</div>${log||'<div class="v7-small" style="margin-bottom:6px">還沒有紀錄</div>'}
+        <textarea id="v7-log-t" rows="2" placeholder="例如：打給陳先生，說 11 月中會叫貨" style="width:100%;border:1px solid var(--border);border-radius:10px;padding:8px 10px;font-size:13.5px;font-family:inherit;resize:vertical"></textarea>
+        <div style="display:flex;gap:6px;align-items:center;margin-top:6px;flex-wrap:wrap"><span class="v7-small">到時候再提醒：</span><input id="v7-log-r" type="date" min="${v7Add(T,1)}" style="padding:5px 8px;border:1px solid var(--border);border-radius:8px;font-family:inherit">
+          <button class="v7-btn sm p" onclick="v7AddLog(${i})">＋ 記下來</button></div></div>
+      <div><div class="v7-ht" style="font-size:15px">🧾 最近訂單 <span class="s">點一筆看明細</span></div>
+        <div class="v7-tl">${c.orders.slice(0,8).map(o=>{const cc=calcOrder(o);return`<div class="it" onclick="v7Close();showOrderDetail('${o.id}')"><div style="font-size:13.5px;font-weight:800">${v7Ymd(o.date)} <span style="font-family:var(--mono);margin-left:6px">${v7M(cc.revenue)}</span>${o.paid?'':' <span class="v7-pill v7-call" style="font-size:11px">未收款</span>'}</div><div class="v7-small">${v7E((o.items||[]).map(x=>(x.name||'')+'×'+(x.qty||1)).join('、'))}</div></div>`;}).join('')||'<div class="v7-small">還沒有訂單</div>'}</div></div></div>`;
+  bg.style.display='block'; requestAnimationFrame(()=>dr.classList.add('open'));
+}
+function v7Close(){const dr=document.getElementById('v7-drawer'),bg=document.getElementById('v7-drawer-bg');if(dr)dr.classList.remove('open');if(bg)bg.style.display='none';_v7Cur=null;}
+function v7Refresh(){const key=_v7Cur;try{renderOverview();}catch(e){}try{if(document.getElementById('tab-customers')?.style.display!=='none')v7RenderCust();}catch(e){}
+  if(key){v7Analyze();const i=_v7C.findIndex(c=>c.key===key);if(i>=0)v7Open(i);}}
+function v7AddLog(i){const c=_v7C[i];if(!c)return;const t=(document.getElementById('v7-log-t')?.value||'').trim();const r=document.getElementById('v7-log-r')?.value||'';
+  if(!t&&!r){toast('請先寫內容');return;}
+  const m=v7Crm(c.key);m.log.push({id:uid(),d:v7Today(),t:t||'（設定提醒）',remind:r||''});if(r)m.snooze=r;save();toast('✅ 已記下'+(r?'，'+v7Md(r)+' 再提醒':''));v7Refresh();}
+function v7DelLog(id){if(!_v7Cur||!confirm('刪除這筆紀錄？'))return;const m=v7Crm(_v7Cur);m.log=m.log.filter(l=>l.id!==id);save();v7Refresh();}
+function v7SnoozeMenu(btn,i){
+  document.querySelectorAll('.v7-menu').forEach(x=>x.remove());
+  const c=_v7C[i];if(!c)return;const T=v7Today();
+  const m=document.createElement('div');m.className='v7-menu';
+  const opts=[[7,'一週後'],[14,'兩週後'],[30,'一個月後'],[60,'兩個月後']];
+  m.innerHTML=opts.map(([d,n])=>`<button data-d="${d}">⏰ ${n}（${v7Md(v7Add(T,d))}）</button>`).join('')+`<button data-d="pick">📅 選日期…</button>`+(c.snoozed?`<button data-d="0" style="color:#b91c1c">✕ 取消延後</button>`:'');
+  const r=btn.getBoundingClientRect();m.style.top=(window.scrollY+r.bottom+4)+'px';m.style.left=Math.max(8,window.scrollX+r.right-190)+'px';
+  m.onclick=e=>{e.stopPropagation();const b=e.target.closest('button');if(!b)return;let d=b.dataset.d;let ds='';
+    if(d==='pick'){const v=prompt('延後到哪一天？（例如 '+v7Add(T,21)+'）',v7Add(T,21));if(!v||!/^\d{4}-\d{2}-\d{2}$/.test(v.trim()))return;ds=v.trim();}
+    else if(d!=='0')ds=v7Add(T,+d);
+    const cm=v7Crm(c.key);cm.snooze=ds;if(ds)cm.log.push({id:uid(),d:T,t:'延後提醒',remind:ds});
+    save();m.remove();toast(ds?'⏰ '+v7Md(ds)+' 再提醒':'已取消延後');v7Refresh();};
+  document.body.appendChild(m);
+  setTimeout(()=>document.addEventListener('click',function h(){m.remove();document.removeEventListener('click',h);}),0);
+}
+// 照上次下單：開新訂單、帶入客戶與品項（序號不帶）
+function v7Reorder(i,k){
+  const c=_v7C[i];if(!c)return;v7Close();
+  openOrderModal(null);
+  const sel=document.getElementById('o-cust');
+  if(c.cust&&sel){sel.value=c.cust.id;try{fillCustInfo(c.cust.id);}catch(e){}}
+  let its=[];
+  if(k>=0){const it=c.items[k];if(it)its=[it.src.it];}
+  else if(k===-2&&c.orders[0])its=c.orders[0].items||[];
+  if(its.length){const box=document.getElementById('items-container');box.innerHTML='';
+    its.forEach(x=>addItemRow({type:x.type,subtype:x.subtype,spec:x.spec||(x.subtype?'':x.name),qty:x.qty||1,cost:x.cost,price:x.price,invoice:x.invoice}));calcTotal();}
+  if(!c.cust)toast('這位客戶還沒建檔，請在上方選客戶');
+}
+
+// ══ 🔍 萬用搜尋 ══
+let _v7SI=[],_v7SA=0;
+function v7SearchOpen(q){
+  let bg=document.getElementById('v7-search-bg');
+  if(!bg){bg=document.createElement('div');bg.id='v7-search-bg';bg.onclick=e=>{if(e.target===bg)v7SearchClose();};
+    bg.innerHTML=`<div id="v7-search"><div style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border)">🔍<input id="v7-sq" placeholder="客戶、聯絡人、電話、統編、品項、序號、訂單日期…" autocomplete="off"><span class="v7-kbd" style="cursor:pointer" onclick="v7SearchClose()">Esc</span></div><div id="v7-sres"></div></div>`;
+    document.body.appendChild(bg);
+    const inp=bg.querySelector('#v7-sq');
+    inp.oninput=()=>v7SearchRun(inp.value);
+    inp.onkeydown=e=>{if(e.key==='ArrowDown'){e.preventDefault();v7SMove(1);}else if(e.key==='ArrowUp'){e.preventDefault();v7SMove(-1);}else if(e.key==='Enter'){e.preventDefault();_v7SI[_v7SA]&&_v7SI[_v7SA].go();}else if(e.key==='Escape')v7SearchClose();};}
+  bg.style.display='flex';v7Analyze();const inp=document.getElementById('v7-sq');inp.value=q||'';v7SearchRun(inp.value);setTimeout(()=>inp.focus(),30);
+}
+function v7SearchClose(){const bg=document.getElementById('v7-search-bg');if(bg)bg.style.display='none';}
+function v7SMove(d){if(!_v7SI.length)return;_v7SA=(_v7SA+d+_v7SI.length)%_v7SI.length;document.querySelectorAll('#v7-sres .v7-si').forEach((el,i)=>el.classList.toggle('on',i===_v7SA));document.querySelector('#v7-sres .v7-si.on')?.scrollIntoView({block:'nearest'});}
+function v7SearchRun(raw){
+  const res=document.getElementById('v7-sres');const q=String(raw||'').trim().toLowerCase();const qd=v7Digits(q);_v7SI=[];_v7SA=0;
+  if(!q){res.innerHTML='<div class="v7-small" style="padding:14px 10px">輸入關鍵字開始搜尋。也可以輸入電話後幾碼、統編、序號（例如 C4060088）或日期（例如 2026/05）。<br>任何頁面按「/」就能叫出這個搜尋。</div>';return;}
+  const has=s=>String(s||'').toLowerCase().includes(q);
+  const qDate=q.replace(/\//g,'-');
+  const groups=[];
+  const cs=_v7C.filter(c=>has(c.name)||has(c.cust?.contact)||has(c.cust?.note)||has(c.cust?.addr)||has(c.cust?.email)||(qd.length>=3&&v7Digits(c.cust?.phone).includes(qd))).sort((a,b)=>b.rev-a.rev).slice(0,6);
+  if(cs.length)groups.push(['👥 客戶',cs.map(c=>({h:`<b style="font-size:15px">${v7E(c.name)}</b><span class="v7-small">${v7E(c.cust?.contact||'')}${c.cust?.phone?'・'+v7E(c.cust.phone):''}</span><span style="margin-left:auto">${v7Pill(c)}</span>`,go:()=>{v7SearchClose();v7Open(_v7C.indexOf(c));}}))]);
+  const os=(db.orders||[]).filter(o=>has(o.custName)||has(o.note)||(o.date||'').includes(qDate)||(o.items||[]).some(it=>has(it.name)||has(it.spec)||has(it.subtype))).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  if(os.length)groups.push([`🧾 訂單（${os.length} 筆${os.length>8?'，顯示最近 8 筆':''}）`,os.slice(0,8).map(o=>({h:`<b>${v7Ymd(o.date)}</b><span class="v7-small" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1">${v7E(o.custName||'')}・${v7E((o.items||[]).map(x=>(x.name||'')+'×'+(x.qty||1)).join('、'))}</span><b style="font-family:var(--mono)">${v7M(calcOrder(o).revenue)}</b>`,go:()=>{v7SearchClose();showOrderDetail(o.id);}}))]);
+  const sn=[];(db.orders||[]).forEach(o=>(o.items||[]).forEach(it=>{const l=it.sns&&it.sns.length?it.sns:[it.sn].filter(Boolean);l.forEach(s=>{if(String(s).toLowerCase().includes(q))sn.push({o,it,s});});}));
+  if(sn.length)groups.push(['🔢 序號',sn.slice(0,6).map(({o,it,s})=>{const e=new Date(o.date+'T00:00:00');e.setMonth(e.getMonth()+(it.warranty||12));const ok=new Date()<=e;
+    return{h:`<b style="font-family:var(--mono)">${v7E(s)}</b><span class="v7-small">${v7E(it.name||'')}・${v7E(o.custName||'')}・${v7Ymd(o.date)} 出貨</span><span class="v7-pill ${ok?'v7-ok':'v7-sleep'}" style="margin-left:auto">${ok?'保固中':'已過保'}</span>`,go:()=>{v7SearchClose();showOrderDetail(o.id);}};})]);
+  const ps=(db.products||[]).filter(p=>has(p.name)||has(p.sub)||has(p.spec)).slice(0,4);
+  if(ps.length)groups.push(['📦 商品',ps.map(p=>({h:`<b>${v7E((p.sub||'')+' '+(p.name||''))}</b><span class="v7-small">成本 ${v7M(p.cost)}</span>`,go:()=>{v7SearchClose();showTab('products');}}))]);
+  if(!groups.length){res.innerHTML=`<div class="v7-small" style="padding:14px 10px">找不到「${v7E(raw)}」</div>`;return;}
+  let n=0;res.innerHTML=groups.map(([t,l])=>`<div class="v7-sg">${t}</div>`+l.map(x=>{_v7SI.push(x);return`<div class="v7-si ${n===0?'on':''}" data-i="${n++}">${x.h}</div>`;}).join('')).join('')+
+    '<div class="v7-small" style="padding:8px 10px;border-top:1px solid var(--border);margin-top:6px">↑↓ 選擇・Enter 打開・Esc 關閉</div>';
+  res.querySelectorAll('.v7-si').forEach(el=>{el.onclick=()=>_v7SI[+el.dataset.i].go();el.onmouseenter=()=>{_v7SA=+el.dataset.i;res.querySelectorAll('.v7-si').forEach((x,i)=>x.classList.toggle('on',i===_v7SA));};});
+}
+document.addEventListener('keydown',e=>{
+  const t=e.target, typing=t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.tagName==='SELECT'||t.isContentEditable);
+  if((e.key==='/'&&!typing)||((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k')){e.preventDefault();v7SearchOpen();}
+  else if(e.key==='Escape'){const bg=document.getElementById('v7-search-bg');if(bg&&bg.style.display==='flex')v7SearchClose();else if(document.getElementById('v7-drawer')?.classList.contains('open'))v7Close();}
+});
+// 標題列加上搜尋按鈕
+(function(){const a=document.querySelector('.hdr-actions');if(a&&!document.getElementById('v7-hsearch')){const b=document.createElement('button');b.id='v7-hsearch';b.className='hdr-btn';b.textContent='🔍 搜尋';b.title='萬用搜尋（快捷鍵 /）';b.onclick=()=>v7SearchOpen();a.insertBefore(b,a.firstChild);}})();
+// 修正：上一步／下一步後重畫目前頁面（原本找的是舊版的分頁按鈕，找不到就不會重畫）
+refreshCurrentTab=function(){const a=document.querySelector('.sidebar-item.active');const t=a?.id?.replace('nav-','')||'overview';showTab(t);};
+// 修正「上一步」：原本存檔時記下的是「改完之後」的資料，所以第一次按上一步沒有反應。
+//   改成記下「改之前」的資料；刪除、上一步、下一步之後也會同步到雲端（原本只存在這台電腦）。
+let _v7Snap=null;
+(function(){
+  const _s=save;
+  save=function(){const prev=_v7Snap;const r=_s.apply(this,arguments);if(prev&&_history.length)_history[_history.length-1]=prev;_v7Snap=JSON.stringify(db);updateUndoRedo();setTimeout(v7Badges,0);return r;};
+  const after=()=>{_v7Snap=JSON.stringify(db);try{scheduleInvPush();}catch(e){}setTimeout(v7Badges,0);};
+  const _u=undo;undo=function(){const n=_history.length;const r=_u.apply(this,arguments);if(_history.length!==n)after();return r;};
+  const _rd=redo;redo=function(){const n=_future.length;const r=_rd.apply(this,arguments);if(_future.length!==n)after();return r;};
+  const _d=deleteOrderDirect;deleteOrderDirect=function(id){const n=db.orders.length;const r=_d.apply(this,arguments);if(db.orders.length!==n)after();return r;};
+  const _sd=showOrderDetail;showOrderDetail=function(id){const r=_sd.apply(this,arguments);const b=document.getElementById('detail-del-btn');
+    if(b&&b.onclick&&!b._v7){const h=b.onclick;b.onclick=function(){const n=db.orders.length;const x=h.apply(this,arguments);if(db.orders.length!==n)after();return x;};b._v7=1;}return r;};
+  const _p=ghPullInv;ghPullInv=async function(){const r=await _p.apply(this,arguments);if(r)_v7Snap=JSON.stringify(db);return r;};
+  const _ro=renderOverview;renderOverview=function(){if(_v7Snap==null)_v7Snap=JSON.stringify(db);return _ro.apply(this,arguments);};
+})();
+// 從舊版「客戶追蹤提醒」卡片點聯繫時，直接開新版抽屜
+showCustOrdersByName=function(name){v7Analyze();const i=_v7C.findIndex(c=>c.name===name);if(i>=0)v7Open(i);};
+
 </script>
 </div><!-- /main-content -->
 
