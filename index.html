@@ -7,90 +7,135 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-body{min-height:100vh;background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 60%,#0f2744 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Noto Sans TC',sans-serif;padding:24px;}
-.logo{font-size:13px;color:rgba(255,255,255,.4);letter-spacing:3px;text-transform:uppercase;margin-bottom:8px;}
-.title{font-size:32px;font-weight:900;color:#fff;margin-bottom:4px;letter-spacing:1px;}
-.sub{font-size:14px;color:rgba(255,255,255,.5);margin-bottom:48px;}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;width:100%;max-width:1100px;}
-.card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:32px 28px;cursor:pointer;transition:all .25s;text-decoration:none;display:flex;flex-direction:column;gap:16px;position:relative;overflow:hidden;}
-.card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.08),transparent);opacity:0;transition:opacity .25s;}
-.card:hover{border-color:rgba(255,255,255,.3);transform:translateY(-4px);box-shadow:0 20px 40px rgba(0,0,0,.3);}
-.card:hover::before{opacity:1;}
-.card-icon{font-size:36px;}
-.card-title{font-size:18px;font-weight:700;color:#fff;}
-.card-desc{font-size:13px;color:rgba(255,255,255,.55);line-height:1.6;}
-.card-arrow{position:absolute;bottom:24px;right:24px;font-size:18px;color:rgba(255,255,255,.3);transition:all .25s;}
-.card:hover .card-arrow{color:rgba(255,255,255,.8);transform:translateX(4px);}
-.card-badge{display:inline-block;background:rgba(96,165,250,.2);color:#93c5fd;border:1px solid rgba(96,165,250,.3);border-radius:20px;padding:2px 10px;font-size:11px;font-weight:600;margin-top:4px;align-self:flex-start;}
-.card-badge.new{background:rgba(34,197,94,.2);color:#86efac;border-color:rgba(34,197,94,.3);}
-.ver{margin-top:40px;font-size:11px;color:rgba(255,255,255,.2);}
+body{min-height:100vh;background:#f4f5f7;color:#0f172a;font-family:'Noto Sans TC','PingFang TC',sans-serif;}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1180px;margin:0 auto;padding:40px 28px 32px}
+.top{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.date{color:#475569;font-size:16px;margin-bottom:4px}
+h1{font-size:34px;font-weight:900;letter-spacing:.5px}
+.lock{margin-left:auto;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:8px 14px;font-size:14px;font-weight:700;color:#334155;cursor:pointer;font-family:inherit}
+.lock:hover{border-color:#a5b4fc;color:#4338ca}
+.grid{display:grid;grid-template-columns:1.35fr 1fr 1fr;grid-template-rows:minmax(260px,auto) minmax(190px,auto);gap:18px;margin-top:26px}
+.c{background:#fff;border:1px solid #e5e7eb;border-radius:24px;padding:24px;position:relative;overflow:hidden;display:block;transition:transform .18s,box-shadow .18s,border-color .18s;cursor:pointer}
+.c:hover{transform:translateY(-3px);box-shadow:0 18px 40px rgba(15,23,42,.10);border-color:#c7d2fe}
+.c.big{grid-row:span 2;background:linear-gradient(160deg,#1e3a8a,#4338ca);color:#fff;border:none}
+.c.big:hover{box-shadow:0 22px 50px rgba(67,56,202,.35)}
+.c.wide{grid-column:span 2}
+.ic{font-size:30px;line-height:1}
+.t{font-size:21px;font-weight:900;margin-top:10px}
+.d{font-size:14px;color:#475569;margin-top:4px;line-height:1.6}
+.big .d{color:#c7d2fe}
+.go{position:absolute;right:20px;top:20px;width:36px;height:36px;border-radius:50%;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-weight:900;color:#334155;transition:transform .18s}
+.c:hover .go{transform:translateX(3px)}
+.big .go{background:rgba(255,255,255,.18);color:#fff}
+.key{position:absolute;right:64px;top:27px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#94a3b8;border:1px solid #e2e8f0;border-radius:6px;padding:0 6px}
+.big .key{color:#c7d2fe;border-color:rgba(255,255,255,.3)}
+.live{margin-top:18px;display:flex;flex-direction:column;gap:10px}
+.row{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.16);border-radius:14px;padding:12px 14px;font-size:15px}
+.row b{margin-left:auto;font-size:15.5px;white-space:nowrap}
+.row.bad{background:#dc2626;border-color:#fca5a5}
+.row.warn{background:rgba(245,158,11,.25);border-color:rgba(253,230,138,.6)}
+.pills{display:flex;flex-direction:column;align-items:flex-start;gap:8px;margin-top:14px}
+.pill{display:inline-block;font-size:13.5px;font-weight:800;border-radius:999px;padding:4px 12px}
+.p-red{background:#fee2e2;color:#b91c1c}.p-amb{background:#ffedd5;color:#c2410c}.p-ok{background:#dcfce7;color:#15803d}.p-gray{background:#f1f5f9;color:#475569}.p-pink{background:#fce7f3;color:#be185d}.p-blue{background:#dbeafe;color:#1d4ed8}
+.bar{height:8px;background:#f1f5f9;border-radius:9px;overflow:hidden;margin-top:12px;max-width:260px}.bar i{display:block;height:100%;background:linear-gradient(90deg,#f472b6,#db2777);border-radius:9px}
+.foot{margin-top:24px;color:#64748b;font-size:13px;display:flex;gap:14px;flex-wrap:wrap}
+.note{font-size:12.5px;color:#94a3b8;margin-top:12px}
+.big .note{color:#a5b4fc}
+@media(max-width:900px){
+  .wrap{padding:24px 16px}
+  h1{font-size:28px}
+  .grid{grid-template-columns:1fr;grid-template-rows:none}
+  .c.big{grid-row:auto}.c.wide{grid-column:auto}
+  .key{display:none}.kb{display:none}
+}
+/* ══ 登入（左右分割）══ */
+#login-screen{position:fixed;inset:0;z-index:9999;display:flex;background:#fff}
+.lg-l{flex:1.1;background:linear-gradient(160deg,#4338ca,#7c3aed);color:#fff;padding:48px 44px;display:flex;flex-direction:column}
+.lg-k{font-size:14px;letter-spacing:3px;color:rgba(255,255,255,.65)}
+.lg-h{font-size:40px;font-weight:900;margin-top:auto}
+.lg-d{font-size:17px;color:#e0e7ff;margin-top:8px}
+.lg-q{margin-top:24px;background:rgba(255,255,255,.12);border-radius:16px;padding:16px 18px;font-size:15px;line-height:1.8;max-width:520px}
+.lg-r{flex:1;display:flex;align-items:center;justify-content:center;padding:40px}
+.lg-box{width:100%;max-width:360px}
+.lg-t{font-size:28px;font-weight:900}
+.lg-s{font-size:14.5px;color:#475569;margin-top:4px}
+.lg-in{display:flex;align-items:center;border:2px solid #c7d2fe;border-radius:14px;margin:22px 0 12px;transition:border-color .15s}
+.lg-in:focus-within{border-color:#6366f1;box-shadow:0 0 0 4px rgba(99,102,241,.12)}
+.lg-in input{flex:1;border:none;outline:none;background:none;padding:13px 14px;font-size:18px;letter-spacing:5px;font-family:inherit;min-width:0}
+.lg-eye{border:none;background:none;font-size:18px;padding:0 14px;cursor:pointer;color:#64748b}
+.lg-btn{width:100%;background:#4f46e5;color:#fff;border:none;border-radius:14px;padding:14px;font-weight:800;font-size:16px;cursor:pointer;font-family:inherit}
+.lg-btn:hover{background:#4338ca}
+#pw-err{color:#b91c1c;font-size:13.5px;margin-top:10px;display:none;font-weight:700}
+.lg-tip{font-size:12.5px;color:#94a3b8;margin-top:18px}
+.shake{animation:shake .35s}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+@media(max-width:760px){.lg-l{display:none}.lg-r{align-items:flex-start;padding:70px 26px}}
 </style>
 </head>
 <body>
-<div class="logo">Management System</div>
-<div class="title">📊 管理主目錄</div>
-<div class="sub">選擇要進入的系統</div>
 
-<div class="cards">
-  <a href="dashboard.html" class="card">
-    <div class="card-icon">📈</div>
-    <div>
-      <div class="card-title">資產損益表</div>
-      <div class="card-desc">投資標的、信貸管理、現金帳戶、股息記錄、資產總覽</div>
-    </div>
-    <div class="card-badge">個人財務</div>
-    <div class="card-arrow">→</div>
-  </a>
+<div class="wrap">
+  <div class="top">
+    <div><div class="date" id="h-date"></div><h1 id="h-hi">你好</h1></div>
+    <button class="lock" onclick="lockNow()">🔒 鎖定</button>
+  </div>
 
-  <a href="inventory.html" class="card">
-    <div class="card-icon">🗂️</div>
-    <div>
-      <div class="card-title">進銷存系統</div>
-      <div class="card-desc">客戶管理、開單記帳、序號查詢、應收帳款、業績分析</div>
-    </div>
-    <div class="card-badge new">業務記帳</div>
-    <div class="card-arrow">→</div>
-  </a>
-
-  <a href="vocab.html" class="card">
-    <div class="card-icon">🇯🇵</div>
-    <div>
-      <div class="card-title">日文單字複習</div>
-      <div class="card-desc">配對練習、常錯單字追蹤、進度統計、Excel 單字匯入</div>
-    </div>
-    <div class="card-badge new">語言學習</div>
-    <div class="card-arrow">→</div>
-  </a>
-
-  <a href="glove.html" class="card">
-    <div class="card-icon">🧤</div>
-    <div>
-      <div class="card-title">手套收藏記錄</div>
-      <div class="card-desc">品牌型號、買賣記錄、優缺點評比、圖片收藏、損益追蹤</div>
-    </div>
-    <div class="card-badge" style="background:rgba(232,160,32,.2);color:#e8a020;border-color:rgba(232,160,32,.3)">棒球收藏</div>
-    <div class="card-arrow">→</div>
-  </a>
+  <div class="grid">
+    <a href="dashboard.html" class="c big" id="card-1">
+      <span class="key">1</span><div class="go">→</div>
+      <div class="ic">📈</div>
+      <div class="t">資產損益表</div>
+      <div class="d">投資標的、信貸管理、現金帳戶、股息記錄、資產總覽</div>
+      <div class="live" id="live-asset"></div>
+      <div class="note" id="note-asset"></div>
+    </a>
+    <a href="inventory.html" class="c" id="card-2">
+      <span class="key">2</span><div class="go">→</div>
+      <div class="ic">🗂️</div>
+      <div class="t">進銷存系統</div>
+      <div class="d">客戶追蹤、開單記帳、序號查詢、應收帳款</div>
+      <div class="pills" id="live-inv"></div>
+    </a>
+    <a href="vocab.html" class="c" id="card-3">
+      <span class="key">3</span><div class="go">→</div>
+      <div class="ic">🇯🇵</div>
+      <div class="t">日文單字複習</div>
+      <div class="d">配對練習、常錯單字追蹤、進度統計、Excel 匯入</div>
+      <div id="live-vocab"></div>
+    </a>
+    <a href="glove.html" class="c wide" id="card-4">
+      <span class="key">4</span><div class="go">→</div>
+      <div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap">
+        <div class="ic" style="font-size:44px">🧤</div>
+        <div style="flex:1;min-width:200px"><div class="t" style="margin:0">手套收藏記錄</div><div class="d">品牌型號、買賣記錄、優缺點評比、圖片收藏、損益追蹤</div></div>
+        <div id="live-glove"></div>
+      </div>
+    </a>
+  </div>
+  <div class="foot"><span class="kb">⌨️ 按 1～4 直接進入</span><span>⏱ 閒置 3 分鐘自動上鎖</span><span>v2.0 · 2026</span></div>
 </div>
 
-<div class="ver">v1.0 · 2026</div>
-
-<!-- ══ 登入遮罩 ══ -->
-<div id="login-screen" style="position:fixed;inset:0;background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 100%);z-index:9999;display:flex;align-items:center;justify-content:center">
-  <div style="background:#fff;border-radius:20px;padding:40px 36px;width:320px;box-shadow:0 20px 60px rgba(0,0,0,.4);text-align:center">
-    <div style="font-size:40px;margin-bottom:12px">🔐</div>
-    <div style="font-size:20px;font-weight:800;color:#1e293b;margin-bottom:4px">管理系統</div>
-    <div style="font-size:12px;color:#94a3b8;margin-bottom:28px">請輸入密碼以繼續</div>
-    <input id="pw-input" type="password" placeholder="輸入密碼"
-      autocomplete="new-password"
-      style="width:100%;box-sizing:border-box;padding:12px 16px;border:2px solid #e2e8f0;border-radius:10px;font-size:16px;outline:none;text-align:center;letter-spacing:4px;margin-bottom:12px"
-      onkeydown="if(event.key==='Enter')checkPw()">
-    <button onclick="checkPw()"
-      style="width:100%;padding:12px;background:#1e3a5f;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer"
-      onmouseover="this.style.background='#2563eb'" onmouseout="this.style.background='#1e3a5f'">
-      進入
-    </button>
-    <div id="pw-err" style="color:#ef4444;font-size:12px;margin-top:10px;display:none">密碼錯誤，請再試一次</div>
+<!-- ══ 登入遮罩（左右分割）══ -->
+<div id="login-screen">
+  <div class="lg-l">
+    <div class="lg-k">MANAGEMENT SYSTEM</div>
+    <div class="lg-h">管理主目錄</div>
+    <div class="lg-d" id="lg-date"></div>
+    <div class="lg-q">「短線進出終將被市場淘汰，唯有長線配置才是發財大計。」</div>
+  </div>
+  <div class="lg-r">
+    <div class="lg-box" id="lg-box">
+      <div class="lg-t">登入</div>
+      <div class="lg-s">請輸入密碼</div>
+      <div class="lg-in">
+        <input id="pw-input" type="password" placeholder="輸入密碼" autocomplete="new-password" inputmode="numeric" onkeydown="if(event.key==='Enter')checkPw()">
+        <button class="lg-eye" type="button" onclick="togglePwEye(this)" title="顯示／隱藏">👁</button>
+      </div>
+      <button class="lg-btn" onclick="checkPw()">進入</button>
+      <div id="pw-err">密碼不對，請再試一次</div>
+      <div class="lg-tip">閒置 3 分鐘會自動上鎖</div>
+    </div>
   </div>
 </div>
 
@@ -99,19 +144,20 @@ body{min-height:100vh;background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 60%,#
   const PW='113067';
   const KEY='master_auth_v1';
   const TS_KEY='master_auth_ts';
-  const TIMEOUT=3*60*1000; // 3分鐘閒置登出 // 10分鐘閒置登出
+  const TIMEOUT=3*60*1000; // 3分鐘閒置登出
   const ls=document.getElementById('login-screen');
   const inp=document.getElementById('pw-input');
 
   function show(){
     ls.style.display='none';
     resetTimer();
+    try{renderHome();}catch(e){console.warn('首頁資訊',e);}
   }
   function showLogin(){
     ls.style.display='flex';
     localStorage.removeItem(KEY);
     localStorage.removeItem(TS_KEY);
-    inp.value='';
+    inp.value='';inp.type='password';
     setTimeout(()=>inp&&inp.focus(),100);
   }
 
@@ -141,10 +187,144 @@ body{min-height:100vh;background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 60%,#
     } else {
       inp.value='';
       document.getElementById('pw-err').style.display='block';
-      inp.style.borderColor='#ef4444';
-      setTimeout(()=>inp.style.borderColor='#e2e8f0',1500);
+      const box=document.getElementById('lg-box');box.classList.remove('shake');void box.offsetWidth;box.classList.add('shake');
+      inp.focus();
     }
   };
+  window.togglePwEye=function(btn){inp.type=inp.type==='password'?'text':'password';btn.textContent=inp.type==='password'?'👁':'🙈';inp.focus();};
+  window.lockNow=function(){clearTimeout(timer);showLogin();};
+  // 按 1～4 直接進入
+  document.addEventListener('keydown',e=>{
+    if(ls.style.display!=='none')return;
+    const t=e.target;if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'))return;
+    const a=document.getElementById('card-'+e.key);if(a&&!e.ctrlKey&&!e.metaKey&&!e.altKey)location.href=a.getAttribute('href');
+  });
 })();
+
+// ══ 日期與問候 ══
+const WK=['日','一','二','三','四','五','六'];
+function ymd(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function dayDiff(a,b){return Math.round((new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/864e5);} // b − a
+function addDays(s,n){const d=new Date(s+'T00:00:00');d.setDate(d.getDate()+n);return ymd(d);}
+const md=s=>s.slice(5).replace('-','/');
+const when=n=>n===0?'今天':n===1?'明天':n===2?'後天':n+' 天後';
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function renderDate(){
+  const d=new Date(),h=d.getHours();
+  const hi=h<5?'夜深了':h<11?'早安':h<14?'午安':h<18?'午安':'晚安';
+  const ap=h<12?'上午':h<18?'下午':'晚上';
+  const t=`${d.getMonth()+1} 月 ${d.getDate()} 日 星期${WK[d.getDay()]}`;
+  document.getElementById('h-date').textContent=`${t}・${ap} ${((h+11)%12)+1}:${String(d.getMinutes()).padStart(2,'0')}`;
+  document.getElementById('h-hi').textContent=hi+'，阿豪';
+  document.getElementById('lg-date').textContent=t;
+}
+renderDate();setInterval(renderDate,30000);
+
+function readLS(k){try{return JSON.parse(localStorage.getItem(k)||'null');}catch(e){return null;}}
+
+// ══ 首頁資訊（只讀這台電腦上已存的資料；只顯示日期和件數，不顯示金額）══
+function renderHome(){
+  renderDate();
+  const T=ymd(new Date());
+  // ── 資產損益表 ──
+  const box=document.getElementById('live-asset'), note=document.getElementById('note-asset');
+  const db=readLS('assetDB_v6');
+  if(!db){box.innerHTML='';note.textContent='打開一次資產損益表後，這裡就會顯示下次股息、扣款提醒。';}
+  else{
+    const rows=[];
+    const divs=(db.dividends||[]).filter(d=>d.date&&(d.date>T||(d.date===T&&d.pending))).sort((a,b)=>a.date.localeCompare(b.date));
+    if(divs.length){const n=dayDiff(T,divs[0].date);rows.push(['💰 下次股息入帳',`${md(divs[0].date)}・${when(n)}`]);}
+    // 下次信貸扣款
+    const loans=(db.loans||[]).filter(l=>!l.settled&&parseInt(l.deductDay));
+    let nl=null;
+    loans.forEach(l=>{const dd=parseInt(l.deductDay);for(let k=0;k<=1;k++){const b=new Date();b.setDate(1);b.setMonth(b.getMonth()+k);const dim=new Date(b.getFullYear(),b.getMonth()+1,0).getDate();
+      b.setDate(Math.min(dd,dim));const s=ymd(b);if(s<T)continue;if(s===T&&localStorage.getItem('loan_deducted_'+l.id+'_'+s.slice(0,7)))continue;if(!nl||s<nl.date)nl={date:s,l};break;}});
+    if(nl)rows.push(['🏦 下次信貸扣款',`${md(nl.date)}・${when(dayDiff(T,nl.date))}`]);
+    // 現金跑道（跟資產頁同一套：股息入帳、信貸扣款、基金扣款）
+    const R=runway(db,T);
+    if(R){
+      if(R.short)rows.push(['🚨 信貸扣款餘額不足',`${md(R.short.date)} 前要補錢`,'bad']);
+      else if(R.low)rows.push(['⚠️ 現金跑道',`${md(R.low)} 低於安全水位`,'warn']);
+      else rows.push(['✅ 現金跑道','夠用']);
+    }
+    // 週五快照
+    const snaps=new Set((db.snapshots||[]).map(s=>(s.ym||'').slice(0,10)));
+    const now=new Date(),dow=now.getDay();
+    let lastFri=new Date(now);lastFri.setDate(now.getDate()-((dow+2)%7||7));const lf=ymd(lastFri);
+    if(dow===5){rows.push(['📸 週五快照',snaps.has(T)?'✓ 今天已拍':(now.getHours()>=15?'打開資產損益表就會拍':'今天 15:00 後')]);}
+    else{const nf=addDays(T,(5-dow+7)%7);rows.push(['📸 週五快照',`${md(nf)}（${when(dayDiff(T,nf))}）`]);}
+    if(dow!==5&&!snaps.has(lf)&&(db.snapshots||[]).length)rows.push(['⚠️ 上週五沒拍到快照',md(lf),'warn']);
+    box.innerHTML=rows.map(r=>`<div class="row ${r[2]||''}">${r[0]}<b>${esc(r[1])}</b></div>`).join('');
+    note.textContent='';
+  }
+  // ── 進銷存 ──
+  const inv=readLS('inv_db_v1'), ib=document.getElementById('live-inv');
+  if(!inv){ib.innerHTML='<span class="pill p-gray">打開一次後會顯示待辦</span>';}
+  else{
+    const C=invStatus(inv,T);
+    const call=C.filter(c=>!c.snz&&(c.s==='call'||c.s==='lost')).length;
+    const soon=C.filter(c=>!c.snz&&c.s==='soon'&&c.val>0).length;
+    const unpaid=(inv.orders||[]).filter(o=>!o.paid&&o.status!=='cancelled').length;
+    const p=[];
+    if(call)p.push(`<span class="pill p-red">📞 ${call} 家客戶該聯絡</span>`);
+    if(soon)p.push(`<span class="pill p-blue">📦 ${soon} 家快叫貨了</span>`);
+    if(unpaid)p.push(`<span class="pill p-amb">💰 ${unpaid} 張待收款</span>`);
+    ib.innerHTML=p.join('')||'<span class="pill p-ok">✅ 今天沒有待辦</span>';
+  }
+  // ── 日文單字 ──
+  const v=readLS('vocab_db_v1'), vb=document.getElementById('live-vocab');
+  if(v&&(v.vocab||[]).length){const tot=v.vocab.length, done=(v.todayDone||[]).length, weak=Object.keys(v.weak||{}).filter(k=>v.weak[k]).length, pct=Math.round(done/tot*100);
+    vb.innerHTML=`<div class="pills"><span class="pill p-pink">已複習 ${done} / ${tot} 字（${pct}%）</span>${weak?`<span class="pill p-gray">⚠️ 不熟 ${weak} 個</span>`:''}</div><div class="bar"><i style="width:${pct}%"></i></div>`;}
+  else vb.innerHTML='<div class="pills"><span class="pill p-gray">打開一次後會顯示進度</span></div>';
+  // ── 手套 ──
+  const g=readLS('glove_vault_v1'), gb=document.getElementById('live-glove');
+  if(g&&(g.gloves||[]).length){gb.innerHTML=`<span class="pill" style="background:#fef3c7;color:#b45309">🧤 收藏 ${g.gloves.length} 個</span>`;}
+  else gb.innerHTML='';
+}
+
+// 現金跑道（簡化版，跟資產頁同一套規則）
+function runway(db,T){
+  const bal=a=>(a.cash||0)+(a.d1||0)+(a.d2||0);
+  const findAcc=n=>{n=String(n||'Line Bank').toLowerCase().trim();return (db.cashAccounts||[]).find(c=>{const b=String(c.bank||'').toLowerCase().trim();return b&&(b===n||b.includes(n)||n.includes(b));});};
+  const lb=findAcc('Line Bank'); if(!lb)return null;
+  const B={};(db.cashAccounts||[]).forEach(a=>B[a.id]=bal(a));
+  const divs=(db.dividends||[]).filter(d=>d.date&&(d.date>T||(d.date===T&&d.pending))).sort((a,b)=>a.date.localeCompare(b.date));
+  let end=divs.length?addDays(divs[0].date,2):addDays(T,30);
+  if(dayDiff(T,end)<14)end=addDays(T,14); if(dayDiff(T,end)>62)end=addDays(T,62);
+  const ev=[];
+  divs.forEach(d=>{if(d.date<=end)ev.push({date:d.date,amt:+(d.amount||0),k:0,acc:lb.id});});
+  (db.loans||[]).filter(l=>!l.settled&&parseInt(l.deductDay)).forEach(l=>{const dd=parseInt(l.deductDay);const acc=findAcc(l.deductBank);
+    for(let k=0;k<=3;k++){const b=new Date();b.setDate(1);b.setMonth(b.getMonth()+k);const dim=new Date(b.getFullYear(),b.getMonth()+1,0).getDate();b.setDate(Math.min(dd,dim));const s=ymd(b);
+      if(s<T||s>end)continue;if(s===T&&localStorage.getItem('loan_deducted_'+l.id+'_'+s.slice(0,7)))continue;ev.push({date:s,amt:-(l.monthly||0),k:1,acc:acc?.id,loan:1});}});
+  const funds=((db.settings||{}).fundDeductions||[]).filter(f=>f.enabled!==false);const logs=db.fundDeductionLogs||[];
+  for(let s=T;s<=end;s=addDays(s,1)){const w=new Date(s+'T00:00:00').getDay();if(w<1||w>5)continue;
+    funds.forEach(f=>{if(!(f.days||[]).includes(w))return;if(s===T&&logs.some(x=>x.fundId===f.id&&x.date===s))return;ev.push({date:s,amt:-(f.amount||0),k:2,acc:lb.id});});}
+  ev.sort((a,b)=>a.date.localeCompare(b.date)||a.k-b.k);
+  const safe=+((db.settings||{}).cashSafeLine)||0, in10=addDays(T,10);
+  let short=null,low=null;
+  ev.forEach(e=>{if(!e.acc||B[e.acc]==null)return;B[e.acc]+=e.amt;
+    if(e.loan&&e.date<=in10&&B[e.acc]<0&&!short)short=e;
+    if(e.acc===lb.id&&B[e.acc]<safe&&!low)low=e.date;});
+  return{short,low};
+}
+
+// 進銷存客戶狀態（跟進銷存「客戶追蹤」同一套規則）
+function invStatus(inv,T){
+  const calc=o=>(o.items||[]).reduce((s,it)=>s+(parseFloat(it.price)||0)*(parseFloat(it.qty)||1),0);
+  const byId={},byName={};(inv.customers||[]).forEach(c=>{byId[c.id]=c;if(c.name)byName[c.name]=c;});
+  const G={};
+  (inv.orders||[]).forEach(o=>{if(o.status==='cancelled'||!o.date)return;const c=(o.custId&&byId[o.custId])||byName[o.custName];const key=c?c.id:'n:'+(o.custName||'');(G[key]=G[key]||[]).push(o);});
+  const med=a=>{const b=a.slice().sort((x,y)=>x-y),n=b.length;return n%2?b[(n-1)/2]:(b[n/2-1]+b[n/2])/2;};
+  return Object.entries(G).map(([key,os])=>{
+    const ds=[...new Set(os.map(o=>o.date))].sort();const g=[];for(let i=1;i<ds.length;i++)g.push(dayDiff(ds[i-1],ds[i]));
+    const cyc=g.length>=2?Math.max(1,Math.round(med(g))):null;const since=dayDiff(ds[ds.length-1],T);const r=cyc?since/cyc:null;
+    let s;if(since>730)s='sleep';else if(!cyc)s=since>180?'lost':'once';else if(since>365||r>2.5)s='lost';else if(r>1.3)s='call';else if(r>=0.8)s='soon';else s='ok';
+    const val=os.filter(o=>dayDiff(o.date,T)<=730).reduce((a,o)=>a+calc(o),0);
+    const crm=(inv.crm||{})[key]||{};const snz=!!(crm.snooze&&crm.snooze>T);
+    return{s,snz,val};});
+}
+// 從其他頁返回時更新
+window.addEventListener('pageshow',()=>{if(localStorage.getItem('master_auth_v1')==='1'&&document.getElementById('login-screen').style.display==='none'){try{renderHome();}catch(e){}}});
 </script>
+</body>
 </html>

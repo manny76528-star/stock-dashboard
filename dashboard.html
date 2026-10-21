@@ -18213,6 +18213,9 @@ openLoanHist=function(){
     ${rows}`;
   openModal('loanHistModal');
 };
+
+// 啟動時第一層是在新版畫面載入之前就畫好的（會先看到舊版約 1 秒），這裡用新版馬上重畫一次
+try{if(document.getElementById('dbpage-invest-l1')?.classList.contains('active')){_renderInvestL1Body();renderFamilyMemberCards();}}catch(e){console.warn('首屏重畫',e);}
 </script>
 
 </div><!-- /main-content -->
