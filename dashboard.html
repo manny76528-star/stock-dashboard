@@ -17604,7 +17604,7 @@ function cashRunway(minDays){
   const today=_twToday();
   const I=_b6Income();
   let end=I.nextDate?_addDays(I.nextDate,2):_addDays(today,30);
-  const span=_dayDiff(end,today); if(span<(minDays||14))end=_addDays(today,minDays||14); if(span>62)end=_addDays(today,62);
+  const span=_dayDiff(end,today); if(span<(minDays||35))end=_addDays(today,minDays||35); if(span>62)end=_addDays(today,62);
   const lb=_b6Acc('Line Bank');
   const bal={}; (db.cashAccounts||[]).forEach(a=>bal[a.id]=_b6Bal(a));
   const evs=[];
@@ -17634,7 +17634,7 @@ function cashRunway(minDays){
   }
   let min=null; series.forEach(p=>{if(!min||p.bal<min.bal)min=p;});
   const safe=+(db.settings?.cashSafeLine)||0;
-  const in10=_addDays(today,10), in3=_addDays(today,3);
+  const in10=_addDays(today,35), in3=_addDays(today,3);
   const loanShort=evs.filter(e=>e.kind==='loan'&&e.date<=in10&&e.after!=null&&e.after<0);
   const noAcc=evs.filter(e=>e.kind==='loan'&&e.date<=in10&&!e.acc);
   const fundWarn=evs.filter(e=>e.kind==='fund'&&e.date<=in3&&e.after!=null&&e.after<safe);
@@ -17651,7 +17651,7 @@ function renderLoanAlert(){
   if(!R.loanShort.length){if(el)el.remove();return R;}
   if(!el){el=document.createElement('div');el.id='b6-alert';host.insertBefore(el,host.firstChild);}
   const f=R.loanShort[0]; const days=_dayDiff(f.date,R.today);
-  const more=R.loanShort.length>1?`（10 天內共 ${R.loanShort.length} 筆不足）`:'';
+  const more=R.loanShort.length>1?`（接下來共 ${R.loanShort.length} 筆不足）`:'';
   el.innerHTML=`<div onclick="b6GoAssets('b6-runway')" style="cursor:pointer;margin:0 0 14px;background:#dc2626;color:#fff;border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 6px 18px rgba(220,38,38,.35);animation:b6pulse 1.6s ease-in-out infinite">
     <span style="font-size:26px">🚨</span>
     <div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:900">信貸扣款餘額不足！${days===0?'今天':days+' 天後'}（${_b6md(f.date)}）</div>
@@ -17729,7 +17729,7 @@ function _b6Runway(R){
     return`<div style="background:${bad?'#fee2e2':hasDiv?'#fef2f2':'#fff'};border:1px solid ${bad?'#f87171':hasDiv?'#fecaca':'#e2e8f0'};border-radius:10px;padding:7px 9px;font-size:11.5px"><b style="font-family:'JetBrains Mono',monospace">${_b6md(d)}</b> <span style="color:#94a3b8">${_WK[_dowOf(d)]}</span>${list.map(e=>`<br>${_ae(e.label)} <b style="font-family:'JetBrains Mono',monospace;color:${e.amt>0?'#dc2626':'#16a34a'}">${e.amt>0?'+':'−'}${Math.round(Math.abs(e.amt)).toLocaleString()}</b>`).join('')}${bad?'<br><b style="color:#b91c1c">🚨 餘額不足</b>':''}</div>`;});
   if(fund.length){const perDay={};fund.forEach(e=>perDay[e.date]=(perDay[e.date]||0)+(-e.amt));const ds=Object.keys(perDay);const wk=[...new Set(ds.map(d=>_dowOf(d)))].sort().map(w=>_WK[w]).join('、');const per=Math.round(Object.values(perDay)[0]);
     tiles.splice(Math.min(1,tiles.length),0,`<div style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:7px 9px;font-size:11.5px;cursor:pointer" onclick="_b6Scroll('b6-fund')"><b>每週${wk}</b><br>基金扣款 <b style="font-family:'JetBrains Mono',monospace;color:#16a34a">−${per.toLocaleString()}</b> ×${ds.length}${R.fundWarn.length?'<br><b style="color:#b45309">⚠️ 扣款後低於安全水位</b>':''}</div>`);}
-  const alert=R.loanShort.length?`<div style="background:#dc2626;color:#fff;border-radius:10px;padding:9px 12px;margin-bottom:10px;font-size:12.5px;font-weight:700">🚨 10 天內有 ${R.loanShort.length} 筆信貸扣款時餘額不夠：${R.loanShort.map(e=>`${_b6md(e.date)} ${_ae(e.label)} 差 ${_b6m(e.after)}`).join('、')}。請提前轉帳到 ${_ae(_b6AccName(R.loanShort[0].acc))}。</div>`:'';
+  const alert=R.loanShort.length?`<div style="background:#dc2626;color:#fff;border-radius:10px;padding:9px 12px;margin-bottom:10px;font-size:12.5px;font-weight:700">🚨 接下來有 ${R.loanShort.length} 筆信貸扣款時餘額不夠：${R.loanShort.map(e=>`${_b6md(e.date)} ${_ae(e.label)} 差 ${_b6m(e.after)}`).join('、')}。請提前轉帳到 ${_ae(_b6AccName(R.loanShort[0].acc))}。</div>`:'';
   const noAcc=R.noAcc.length?`<div style="background:#fff7ed;border:1px solid #fed7aa;color:#c2410c;border-radius:10px;padding:7px 10px;margin-bottom:8px;font-size:12px">⚠️ ${R.noAcc.map(e=>_ae(e.label)).join('、')} 找不到扣款帳戶，沒辦法檢查餘額；請在信貸的「扣款帳戶」選一個現金帳戶。</div>`:'';
   return`<div id="b6-runway" class="trend-page-card" style="padding:14px 16px;margin-bottom:16px;${R.loanShort.length?'border:2px solid #dc2626':''}">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap"><b style="font-size:13.5px">🛫 現金跑道</b><span style="font-size:11.5px;color:#94a3b8">到下一次股息入帳前，${_ae(lbName)} 的錢夠不夠付每一筆扣款</span>
@@ -17738,7 +17738,7 @@ function _b6Runway(R){
     ${alert}${noAcc}
     <div id="b6-run-chart" style="display:${_b6Open('run')?'block':'none'};margin-bottom:4px"><div style="position:relative;height:190px"><canvas id="b6-run-canvas"></canvas></div></div>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;margin-top:8px">${tiles.join('')||'<span style="font-size:12px;color:#94a3b8">這段期間沒有扣款</span>'}</div>
-    <div style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:11.5px;color:#64748b;flex-wrap:wrap">安全水位 <input id="b6-safe" type="number" min="0" step="1000" value="${R.safe||''}" placeholder="0" onchange="b6SetSafe(this.value)" style="width:90px;padding:3px 6px;border:1px solid #e2e8f0;border-radius:6px;font-size:12px;font-weight:700;text-align:right"> 元<span style="color:#94a3b8">｜餘額低於這條線會黃色提醒；信貸扣款不夠付（10 天內）會全站紅色警示</span></div>
+    <div style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:11.5px;color:#64748b;flex-wrap:wrap">安全水位 <input id="b6-safe" type="number" min="0" step="1000" value="${R.safe||''}" placeholder="0" onchange="b6SetSafe(this.value)" style="width:90px;padding:3px 6px;border:1px solid #e2e8f0;border-radius:6px;font-size:12px;font-weight:700;text-align:right"> 元<span style="color:#94a3b8">｜餘額低於這條線會黃色提醒；信貸扣款不夠付會全站紅色警示，補足前每次登入都會跳提醒</span></div>
   </div>`;
 }
 // 收合狀態（只記在這台裝置）
@@ -18225,6 +18225,114 @@ if(window.ADV_OFF){
   (function(){const _c=advCfg;advCfg=function(){const c=_c.apply(this,arguments);c.calm.on=false;c.alert.on=false;return c;};})();
   advCheckAlert=async function(){const b=document.getElementById('adv-banner');if(b)b.innerHTML='';};
 }
+
+// ══════════════════════════════════════════════════════════════
+// 🔔 登入提醒：下次信貸扣款前錢夠不夠（含基金扣款、股息入帳）＋其他快到的事
+//   綠／黃：可以「今天不再顯示」，隔天再跳；紅：關不掉，補足餘額後才消失
+// ══════════════════════════════════════════════════════════════
+function b8Calc(){
+  const R=cashRunway(35); if(!R||!R.lb)return null;
+  const loans=R.evs.filter(e=>e.kind==='loan');
+  if(!loans.length)return{R,level:'none'};
+  const short=loans.find(e=>e.after!=null&&e.after<0);
+  const low=R.safe>0?R.evs.find(e=>e.kind!=='div'&&e.acc===R.lb.id&&e.after!=null&&e.after<R.safe):null;
+  const level=short?'red':low?'amber':'green';
+  const target=short||low||loans[0];
+  const acc=target.acc||R.lb.id;
+  const start=_b6Bal((db.cashAccounts||[]).find(a=>a.id===acc));
+  const before=R.evs.filter(e=>e.acc===acc&&(e.date<target.date||(e.date===target.date&&R.evs.indexOf(e)<R.evs.indexOf(target))));
+  const funds=before.filter(e=>e.kind==='fund'), divs=before.filter(e=>e.kind==='div'), prevLoans=before.filter(e=>e.kind==='loan');
+  const preBal=start+before.reduce((s,e)=>s+e.amt,0);
+  const nextDiv=R.evs.find(e=>e.kind==='div');
+  const later=loans.filter(e=>e!==target&&e.date>=target.date&&(!nextDiv||e.date<=nextDiv.date));
+  let minE=null;if(later.length>1)later.forEach(e=>{if(e.after!=null&&(!minE||e.after<minE.after))minE=e;});
+  return{R,level,target,acc,start,funds,divs,prevLoans,preBal,later,nextDiv,minE};
+}
+function b8Others(){
+  const out=[],T=_twToday(),now=new Date(),dow=now.getDay();
+  // 股息：3 天內才提醒
+  const dv=(db.dividends||[]).filter(d=>d.date&&(d.date>T||(d.date===T&&d.pending))).sort((a,b)=>a.date.localeCompare(b.date));
+  if(dv.length){const n=_dayDiff(dv[0].date,T);if(n<=3){const amt=dv.filter(d=>d.date===dv[0].date).reduce((s,d)=>s+(d.amount||0),0);
+    out.push(['#fef2f2','💰',`${[...new Set(dv.filter(d=>d.date===dv[0].date).map(d=>d.code))].join('、')} 股息 ${n===0?'今天入帳':n+' 天後入帳（'+_b6md(dv[0].date)+'）'}`,`<b style="color:#dc2626">+${_b6m(amt)}</b>`]);}}
+  // 週五快照
+  const snaps=new Set((db.snapshots||[]).map(x=>(x.ym||'').slice(0,10)));
+  if(dow===5)out.push(['#eff6ff','📸',snaps.has(T)?'今天的週五快照已經存好了':(now.getHours()>=15?'今天是週五，現在打開就會存快照':'今天是週五，下午 3 點後打開就會存快照'),'']);
+  else{const lf=new Date(now);lf.setDate(now.getDate()-((dow+2)%7||7));const k=lf.getFullYear()+'-'+String(lf.getMonth()+1).padStart(2,'0')+'-'+String(lf.getDate()).padStart(2,'0');
+    if((db.snapshots||[]).length&&!snaps.has(k))out.push(['#fffbeb','⚠️',`上週五（${_b6md(k)}）沒有存到快照`,'']);}
+  // 基金漏扣
+  try{const S=fundDeductStatus();if(S&&S.missed&&S.missed.length)out.push(['#fffbeb','⚠️',`${S.missed.map(_b6md).join('、')} 基金沒有扣款紀錄（可能漏扣）`,'']);}catch(e){}
+  // 信貸最後一期
+  _b6ActiveLoans().forEach(l=>{const e=_cfLoanEnd(l);if(e&&e.n===1)out.push(['#f5f3ff','🎉',`${_ae(l.bank||'信貸')} 下次扣款是最後一期，扣完就還清了！`,'']);});
+  // 日誌：一週沒寫
+  const lj=(db.journals||[]).map(j=>j.date||'').filter(Boolean).sort().pop();
+  if(lj&&_dayDiff(T,lj)>=7)out.push(['#f8fafc','📝',`已經 ${_dayDiff(T,lj)} 天沒寫日誌了`,'']);
+  // 季末：最後 7 天
+  const m=now.getMonth()+1;if([3,6,9,12].includes(m)){const end=new Date(now.getFullYear(),m,0).getDate();if(end-now.getDate()<=6)out.push(['#f8fafc','📊',`季末快到了（${m}/${end}），記得寫這一季的季報`,'']);}
+  return out;
+}
+function b8Show(force){
+  let C=null;try{C=b8Calc();}catch(e){console.warn('b8',e);return;}
+  const T=_twToday(); const others=b8Others();
+  if(!C||C.level==='none'){if(!others.length)return;}
+  const red=C&&C.level==='red';
+  if(!force&&!red){try{if(localStorage.getItem('b8pop_'+T))return;}catch(e){}}
+  if(!force&&!red&&C&&C.level==='green'&&!others.length){} // 綠色也照樣跳（使用者要看到）
+  let bg=document.getElementById('b8-bg');
+  if(!bg){bg=document.createElement('div');bg.id='b8-bg';document.body.appendChild(bg);}
+  bg.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:9000;display:flex;align-items:center;justify-content:center;padding:16px;overflow-y:auto';
+  const m=v=>(v<0?'−':'')+_b6m(v);
+  let head='',body='';
+  if(C&&C.level!=='none'){
+    const t=C.target, days=_dayDiff(t.date,T), accName=_ae(_b6AccName(C.acc));
+    const col=C.level==='red'?['#b91c1c','#dc2626']:C.level==='amber'?['#d97706','#f59e0b']:['#15803d','#16a34a'];
+    const after=t.after;
+    const ttl=C.level==='red'?`🚨 ${_b6md(t.date)} 信貸扣款錢不夠！還差 ${_b6m(after)}`
+      :C.level==='amber'?`⚠️ ${_b6md(t.date)} 扣完會低於安全水位`
+      :`✅ 下次扣款 ${_b6md(t.date)}（${days===0?'今天':days+' 天後'}）：錢夠`;
+    const sub=C.level==='amber'?`錢夠扣，但只剩 ${m(after)}，低於你設的 ${_b6m(C.R.safe)}`:`${_ae(t.label)} 要扣 ${_b6m(t.amt)}${t.kind==='loan'?'，從 '+accName+' 扣':''}${C.level==='red'?`（${days===0?'今天':days+' 天後'}），請在 ${_b6md(t.date)} 前補錢`:''}`;
+    head=`<div style="padding:18px 22px;color:#fff;background:linear-gradient(135deg,${col[0]},${col[1]})"><div style="font-size:20px;font-weight:900">${ttl}</div><div style="font-size:14px;opacity:.95;margin-top:2px">${sub}</div></div>`;
+    const row=(a,b,st)=>`<div style="display:flex;justify-content:space-between;gap:12px;${st||''}"><span>${a}</span><b style="font-family:'JetBrains Mono',monospace;white-space:nowrap">${b}</b></div>`;
+    const fd=C.funds.map(e=>_b6md(e.date)).filter((x,i,a)=>a.indexOf(x)===i);
+    let calc=row(`💵 ${accName} 目前餘額`,`<span style="color:${C.start<0?'#dc2626':'inherit'}">${m(C.start)}</span>`);
+    if(C.funds.length)calc+=row(`📅 到 ${_b6md(t.date)} 前基金會再扣 ${fd.length} 天${fd.length<=4?'（'+fd.join('、')+'）':''}`,`<span style="color:#16a34a">−${_b6m(C.funds.reduce((s,e)=>s+e.amt,0))}</span>`);
+    C.prevLoans.forEach(e=>{calc+=row(`🏦 ${_b6md(e.date)} ${_ae(e.label)}`,`<span style="color:#16a34a">−${_b6m(e.amt)}</span>`);});
+    calc+=row('💰 這段期間的股息入帳',C.divs.length?`<span style="color:#dc2626">+${_b6m(C.divs.reduce((s,e)=>s+e.amt,0))}</span>`:'$0');
+    calc+=row('扣款前預計餘額',m(C.preBal),'border-top:2px solid #0f172a;margin-top:4px;padding-top:4px;font-weight:900');
+    calc+=row(`${t.kind==='loan'?'🏦':'📅'} 扣 ${_ae(t.label)}`,`<span style="color:#16a34a">−${_b6m(t.amt)}</span>`);
+    calc+=row(after<0?'扣完會變成':'扣完還剩',`<span style="color:${after<0?'#dc2626':C.level==='amber'?'#b45309':'#0f172a'}">${m(after)} ${after<0?'✗':'✓'}</span>`,'font-weight:900');
+    body=`<div style="border:1px solid #e2e8f0;border-radius:14px;padding:10px 14px;font-size:14.5px;line-height:2">${calc}</div>`;
+    if(C.level==='red'){const need=-after, ev=C.R.evs, iD=C.nextDiv?ev.indexOf(C.nextDiv):ev.length; let mn=after; ev.forEach((x,k)=>{if(k<iD&&x.acc===C.acc&&x.after!=null&&x.after<mn)mn=x.after;}); const needAll=-mn, needSafe=needAll+(C.R.safe||0);
+      body+=`<div style="background:#fef2f2;border:2px solid #fecaca;border-radius:12px;padding:12px;margin-top:12px;font-size:14.5px;color:#7f1d1d;line-height:1.7">👉 <b>${_b6md(t.date)} 前至少再轉 ${_b6m(need)} 到 ${accName}</b>${needAll>need+0.5?`；要撐到 ${C.nextDiv?_b6md(C.nextDiv.date)+' 股息入帳':'之後的扣款'}，<b>總共要轉 ${_b6m(needAll)}</b>`:''}${C.R.safe>0?`（想保留安全水位 ${_b6m(C.R.safe)}，要轉 ${_b6m(needSafe)}）`:''}。<br>轉完在下面填入 ${accName} 現在的餘額，算出來夠了，這個提醒就會消失。</div>
+        <div style="display:flex;gap:8px;align-items:center;margin-top:10px"><span style="font-size:14px;font-weight:700">${accName} 現在餘額</span><input id="b8-bal" type="number" inputmode="numeric" value="${C.start}" style="flex:1;min-width:0;padding:9px 12px;border:2px solid #fca5a5;border-radius:10px;font-size:16px;font-weight:800;font-family:'JetBrains Mono',monospace"><button onclick="b8SetBal()" style="border:none;background:#dc2626;color:#fff;border-radius:10px;padding:10px 14px;font-weight:800;font-size:14px;cursor:pointer;white-space:nowrap">💵 我補好錢了，更新</button></div>`;}
+    else if(C.level==='amber'){const need=C.R.safe-after;body+=`<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:10px 12px;margin-top:12px;font-size:14px;color:#92400e">💡 建議在 ${_b6md(t.date)} 前多轉 <b>${_b6m(need)}</b> 到 ${accName}，才會回到安全水位。${C.nextDiv?_b6md(C.nextDiv.date)+' 股息入帳後就會恢復。':''}</div>`;}
+    if(C.later.length||C.nextDiv){body+=`<div style="margin-top:12px"><div style="font-size:13px;font-weight:800;color:#475569;margin-bottom:6px">接下來${C.nextDiv?'到股息入帳前（'+_b6md(C.nextDiv.date)+'）':''}</div>`+
+      C.later.map((e,i)=>{const dvH=(C.nextDiv&&C.R.evs.indexOf(C.nextDiv)<C.R.evs.indexOf(e)&&(!i||C.R.evs.indexOf(C.nextDiv)>C.R.evs.indexOf(C.later[i-1])))?b8DivRow(C,T):'';return dvH+(()=>{const ev=C.R.evs,i1=ev.indexOf(e);let i0=ev.indexOf(i?C.later[i-1]:t);if(dvH)i0=ev.indexOf(C.nextDiv);const fs=ev.filter((x,k)=>x.kind==='fund'&&x.acc===C.acc&&k>i0&&k<i1).reduce((a,x)=>a+x.amt,0);return `<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 10px;border-radius:10px;font-size:14px;margin-bottom:6px;background:${e.after<0?'#fee2e2':'#f8fafc'}">🏦 ${_b6md(e.date)} ${_ae(e.label)} <span style="color:#16a34a">−${_b6m(e.amt)}</span>${fs?`<span style="font-size:12.5px;color:#475569">（之前基金再扣 <span style="color:#16a34a">−${_b6m(-fs)}</span>）</span>`:''}<b style="margin-left:auto;font-family:'JetBrains Mono',monospace;color:${e.after<0?'#dc2626':'#0f172a'}">扣完剩 ${m(e.after)}${C.minE===e?'（最緊的一天）':''}</b></div>`;})();}).join('')+
+      ((C.nextDiv&&!C.later.some(e=>C.R.evs.indexOf(C.nextDiv)<C.R.evs.indexOf(e)))?b8DivRow(C,T):'')+`</div>`;}
+  } else head=`<div style="padding:18px 22px;color:#fff;background:linear-gradient(135deg,#1e3a8a,#4338ca)"><div style="font-size:20px;font-weight:900">🔔 今天的提醒</div></div>`;
+  if(others.length)body+=`<div style="margin-top:12px"><div style="font-size:13px;font-weight:800;color:#475569;margin-bottom:6px">今天的其他提醒</div>${others.map(o=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;font-size:14px;margin-bottom:6px;background:${o[0]}">${o[1]} <span>${o[2]}</span><span style="margin-left:auto">${o[3]}</span></div>`).join('')}</div>`;
+  const btn='border-radius:12px;padding:10px 16px;font-weight:800;font-size:14.5px;cursor:pointer;font-family:inherit';
+  const foot=red?`<div style="display:flex;gap:8px;padding:12px 22px 18px;align-items:center;flex-wrap:wrap"><button onclick="b8Hide();b6GoAssets('b6-runway')" style="${btn};border:1px solid #e2e8f0;background:#fff">看現金跑道 ›</button><span style="margin-left:auto;font-size:12.5px;color:#64748b;max-width:330px">補足前每次打開都會跳，頁面上方也會一直有紅條</span></div>`
+    :`<div style="display:flex;gap:8px;padding:12px 22px 18px;align-items:center;flex-wrap:wrap">${C&&C.level!=='none'?`<button onclick="b8Hide();b6GoAssets('b6-runway')" style="${btn};border:1px solid #e2e8f0;background:#fff">看現金跑道 ›</button>`:''}
+      <button onclick="b8Dismiss()" style="${btn};margin-left:auto;border:1px solid #e2e8f0;background:#fff">今天不再顯示</button><button onclick="b8Hide()" style="${btn};border:none;color:#fff;background:${C&&C.level==='amber'?'#d97706':'#16a34a'}">好，知道了</button></div>`;
+  bg.innerHTML=`<div id="b8-pop" style="width:min(640px,100%);background:#fff;border-radius:22px;overflow:hidden;box-shadow:0 30px 70px rgba(0,0,0,.35);${red?'border:3px solid #dc2626;':''}">${head}<div style="padding:16px 22px 0">${body}</div>${foot}</div>`;
+  if(!red)bg.onclick=e=>{if(e.target===bg)b8Hide();}; else bg.onclick=null;
+}
+function b8DivRow(C,T){const d=C.nextDiv,n=_dayDiff(d.date,T);return `<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;font-size:14px;margin-bottom:6px;background:#fef2f2">💰 ${_b6md(d.date)} ${_ae(String(d.label).replace(/^💰\s*/,''))} <span style="color:#dc2626">+${_b6m(d.amt)}</span><b style="margin-left:auto">${n===0?'今天':n+' 天後'}${d.after!=null?'，入帳後 '+(d.after<0?'−':'')+_b6m(d.after):''}</b></div>`;}
+function b8Hide(){const bg=document.getElementById('b8-bg');if(bg)bg.style.display='none';}
+function b8Dismiss(){try{localStorage.setItem('b8pop_'+_twToday(),'1');}catch(e){}b8Hide();}
+function b8SetBal(){
+  const C=b8Calc(); if(!C)return; const acc=(db.cashAccounts||[]).find(a=>a.id===C.acc); if(!acc)return;
+  const v=parseFloat(document.getElementById('b8-bal')?.value); if(!isFinite(v)){toast('請輸入金額');return;}
+  acc.cash=Math.round(v-(acc.d1||0)-(acc.d2||0)); save();
+  try{render();}catch(e){} try{renderAssetsPage();}catch(e){} try{renderAssetsDeduct();}catch(e){}
+  const N=b8Calc();
+  if(N&&N.level==='red'){toast('還不夠喔，還差 '+_b6m(N.target.after));b8Show(true);}
+  else{toast('✅ 已更新餘額，扣款的錢夠了');b8Show(true);}
+}
+// 打開頁面約 2 秒後跳（等雲端資料同步完）
+setTimeout(()=>{try{b8Show();}catch(e){console.warn('登入提醒',e);}},2200);
+// 資產頁的現金跑道加一個「🔔 今天的提醒」按鈕，隨時可以再打開
+(function(){const _r=renderAssetsPro;renderAssetsPro=function(){const r=_r.apply(this,arguments);try{const bt=document.getElementById('b6-run-btn');if(bt&&!document.getElementById('b8-open')){const b=document.createElement('button');b.id='b8-open';b.textContent='🔔 今天的提醒';b.style.cssText=bt.style.cssText;b.onclick=()=>b8Show(true);bt.parentNode.insertBefore(b,bt);}}catch(e){}return r;};})();
 </script>
 
 </div><!-- /main-content -->
