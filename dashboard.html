@@ -2588,7 +2588,8 @@ body:not(.privacy) .privacy-mask{filter:none;}
       <div class="trend-page-card" style="padding:0;overflow:hidden">
         <div class="trend-page-hdr" style="padding:14px 18px;border-bottom:1px solid #f0f2f5">
           <span>💰 股息管理</span>
-          <button onclick="openDivModal()" style="padding:6px 14px;background:#dcfce7;border:1px solid #86efac;color:#15803d;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">＋ 新增股息</button>
+          <span style="display:flex;gap:6px"><button id="b8-div-target" onclick="openDivTargetModal()" style="padding:6px 14px;background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">🎯 股息目標</button>
+          <button onclick="openDivModal()" style="padding:6px 14px;background:#dcfce7;border:1px solid #86efac;color:#15803d;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">＋ 新增股息</button></span>
         </div>
         <div class="div-cards" id="div-cards" style="padding:14px 16px;background:#f0fdfa;border-bottom:1px solid #99f6e4"><span style="color:var(--muted);font-size:11px">尚無領息記錄</span></div>
         <div id="div-pending-bar" style="display:none">
@@ -17914,7 +17915,7 @@ function _b6Fund(R){
   const l2=_b6Open('fund2'), fc=_b6Open('fundc');
   const ck=(key,label,col,checked,dash)=>`<label style="display:inline-flex;align-items:center;gap:4px;font-size:11.5px;cursor:pointer;border:1px solid #e2e8f0;border-radius:8px;padding:2px 8px;background:#fff"><input type="checkbox" ${checked?'checked':''} onchange="b6FundToggle('${key}',this.checked)" style="margin:0"> <span style="color:${col};font-weight:700">${dash?'┅':'●'} ${_ae(label)}</span></label>`;
   return`<div id="b6-fund" class="trend-page-card" style="padding:14px 16px;margin-bottom:16px">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><b style="font-size:15px">📈 定期定額基金</b><span style="font-size:12px;color:#94a3b8">${fds.length} 檔・從 Line Bank 扣款</span><button onclick="openFundSettings()" style="${_b6Btn};margin-left:auto">⚙️ 設定</button></div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><b style="font-size:15px">📈 定期定額基金</b><span style="font-size:12px;color:#94a3b8">${fds.length} 檔・從 Line Bank 扣款</span><button id="b8-fund-set" onclick="b8FundMenu()" style="${_b6Btn};margin-left:auto">⚙️ 設定</button></div>
     ${warn?`<div style="background:#fef3c7;border:1px solid #fde68a;color:#b45309;border-radius:10px;padding:8px 12px;margin-bottom:10px;font-size:12.5px;font-weight:700">⚠️ ${_b6md(warn.date)}（${_WK[_dowOf(warn.date)]}）基金扣款後 Line Bank 預計剩 ${warn.after<0?'−':''}${_b6m(warn.after)}，${R.safe>0?`低於安全水位 ${_b6m(R.safe)}`:'不夠扣'}，記得先補錢。</div>`:''}
     ${S.missed?.length?`<div style="background:#fef3c7;border:1px solid #fde68a;color:#b45309;border-radius:10px;padding:6px 12px;margin-bottom:10px;font-size:12px">⚠️ ${S.missed.map(_b6md).join('、')} 沒有扣款紀錄（可能漏扣）</div>`:''}
     <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px">
@@ -18016,7 +18017,7 @@ _renderInvestL1Body=function(){
   body.innerHTML=`<div onclick="openInvFaithModal()" style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:16px 18px;cursor:pointer;box-shadow:0 4px 6px -1px rgba(0,0,0,.05);margin-bottom:14px">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap"><b style="font-size:16px">💼 我的持股</b><span style="font-size:13px;color:#475569;font-weight:600">${active.length} 檔・${(Math.round(lots*1000)/1000).toLocaleString()} 張</span>
       <span style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap">${pz?chip(pz[0],pz[1],pz[2],"dbShowPage('pledge')"):''}${lO>0?chip('🏦 信貸已還 '+lPct+'%','#f5f3ff','#6d28d9',"b6GoAssets('b6-loans')"):''}
-        <button onclick="event.stopPropagation();openDivTargetModal()" style="${_b6Btn}">✏️ 股息目標</button><button onclick="event.stopPropagation();b8FundTarget()" style="${_b6Btn}">✏️ 基金目標</button><button onclick="event.stopPropagation();openInvModal()" style="${_b6Btn}">＋ 買入</button></span></div>
+        <button onclick="event.stopPropagation();openInvModal()" style="${_b6Btn}">＋ 買入</button></span></div>
     <div class="b8-k4" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:12px">
       ${_b6K('📅 下次股息',`<span style="color:#dc2626">${I.nextAmt?_b6m(I.nextAmt):'—'}</span>`,I.nextDate?`<b style="color:#b91c1c">${_b6md(I.nextDate)}</b> 入帳・${nd===0?'<b>今天</b>':'還有 <b style="color:#b91c1c">'+nd+'</b> 天'}`:'暫無預告','background:#fef2f2;border-color:#fecaca')}
       ${_b6K('⚔️ 股息付完信貸後',`<span style="color:${I.net>=0?'#dc2626':'#16a34a'}">${_b6s(I.net)}</span>`,I.net>=0?'💪 每月可以無腦再加碼':'股息還不夠付每月支出')}
@@ -18352,7 +18353,7 @@ function _b8FundTile(){
   const bar=p=>`<div style="height:8px;background:#dbeafe;border-radius:99px;overflow:hidden;margin:6px 0 3px"><i style="display:block;height:100%;width:${Math.max(0,Math.min(100,p))}%;border-radius:99px;background:linear-gradient(90deg,#3b82f6,#2563eb)"></i></div>`;
   const sub=`已扣 <b>${F.n}</b> 次${F.streak?`・持續 <b>${F.streak}</b> 週 🔥`:''}`;
   const v=F.pct==null?`<span style="font-size:15px;color:#2563eb">未設目標</span>`:`<span style="color:#2563eb">${Math.floor(F.pct)}%</span>${F.pct>=100?' 🎉':''}`;
-  return `<div onclick="event.stopPropagation();b6GoAssets('b6-fund')" title="打開資產與負債的基金區" style="cursor:pointer;position:relative;background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:10px 12px">${go}<div style="font-size:12.5px;font-weight:700;color:#334155">📈 基金累積</div><div style="font-size:20px;font-weight:800;margin-top:2px;font-family:'JetBrains Mono',monospace">${v}</div>${bar(F.pct||0)}<div class="b6-sub" style="font-size:12.5px;color:#475569;line-height:1.5">${F.pct==null?'按上面「✏️ 基金目標」設定・':''}${sub}</div></div>`;
+  return `<div onclick="event.stopPropagation();b6GoAssets('b6-fund')" title="打開資產與負債的基金區" style="cursor:pointer;position:relative;background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:10px 12px">${go}<div style="font-size:12.5px;font-weight:700;color:#334155">📈 基金累積</div><div style="font-size:20px;font-weight:800;margin-top:2px;font-family:'JetBrains Mono',monospace">${v}</div>${bar(F.pct||0)}<div class="b6-sub" style="font-size:12.5px;color:#475569;line-height:1.5">${F.pct==null?'到基金區「⚙️ 設定」設目標・':''}${sub}</div></div>`;
 }
 function b8FundTarget(){
   let bg=document.getElementById('b8-ft-bg'); if(!bg){bg=document.createElement('div');bg.id='b8-ft-bg';document.body.appendChild(bg);}
@@ -18372,8 +18373,24 @@ function b8FundTargetSave(v){
   if(v===undefined){v=parseFloat(document.getElementById('b8-ft-in')?.value);if(!(v>0)){toast('請輸入目標金額');return;}}
   if(!db.settings)db.settings={}; db.settings.fundTarget=Math.round(v); save();
   document.getElementById('b8-ft-bg').style.display='none';
-  try{_renderInvestL1Body();}catch(e){} toast(v?'✅ 基金目標已設定':'已清除基金目標');
+  try{_renderInvestL1Body();}catch(e){} try{if(document.getElementById('dbpage-assets')?.classList.contains('active'))renderAssetsPage();}catch(e){} toast(v?'✅ 基金目標已設定':'已清除基金目標');
 }
+
+// ══ 基金「⚙️ 設定」：選擇要設定基金目標或定期定額扣款 ══
+function b8FundMenu(){
+  let bg=document.getElementById('b8-ft-bg'); if(!bg){bg=document.createElement('div');bg.id='b8-ft-bg';document.body.appendChild(bg);}
+  bg.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:9000;display:flex;align-items:center;justify-content:center;padding:16px';
+  const F=_b8FundStat(); const fds=(db.settings?.fundDeductions||[]).filter(f=>f.enabled!==false);
+  const opt=(fn,ico,t,d)=>`<button onclick="${fn}" style="display:flex;align-items:center;gap:14px;width:100%;text-align:left;border:1px solid #e2e8f0;background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:10px;cursor:pointer;font-family:inherit"><span style="font-size:26px">${ico}</span><span style="flex:1"><b style="font-size:16px;color:#0f172a">${t}</b><div style="font-size:13px;color:#475569;margin-top:2px">${d}</div></span><span style="color:#94a3b8;font-size:18px">›</span></button>`;
+  bg.innerHTML=`<div style="background:#fff;border-radius:18px;width:min(420px,100%);padding:18px 20px 10px;box-shadow:0 30px 70px rgba(0,0,0,.35)">
+    <div style="display:flex;align-items:center;margin-bottom:12px"><b style="font-size:18px">⚙️ 基金設定</b><button onclick="document.getElementById('b8-ft-bg').style.display='none'" style="margin-left:auto;border:none;background:#f1f5f9;border-radius:50%;width:32px;height:32px;cursor:pointer;font-size:14px">✕</button></div>
+    ${opt('b8FundTarget()','🎯','基金累積目標',F.target?`目前達成 <b style="color:#2563eb">${Math.floor(F.pct)}%</b>`:'還沒設定・設了投資與觀察會顯示進度條')}
+    ${opt("document.getElementById('b8-ft-bg').style.display='none';openFundSettings()",'📅','定期定額扣款',fds.length?`${fds.length} 檔啟用中・扣款日與每次金額`:'還沒設定扣款')}</div>`;
+  bg.onclick=e=>{if(e.target===bg)bg.style.display='none';};
+}
+
+// 在股息管理頁設定股息目標後，留在原頁面（原本會跳回投資與觀察）
+(function(){const _s=saveDivTarget;saveDivTarget=function(){const pg=document.querySelector('.db-page.active')?.id||'';const r=_s.apply(this,arguments);try{if(pg&&pg!=='dbpage-invest-l1')dbShowPage(pg.replace('dbpage-',''));}catch(e){}return r;};})();
 </script>
 
 </div><!-- /main-content -->
