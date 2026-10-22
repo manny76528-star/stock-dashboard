@@ -297,6 +297,58 @@ body{
   .g-kpi-grid{grid-template-columns:repeat(2,1fr);}
   .g-mid-grid{grid-template-columns:1fr;}
 }
+
+/* ══ 改版：手套日記（C）＋ 本命展示（A）＋ 詳情頁（D）══ */
+.gv-old{display:none!important}
+#gpage-dashboard{margin:-24px -28px;padding:24px 28px 40px;background:#fffbf5;min-height:calc(100vh - 56px)}
+.gv-hi{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.gv-hi h1{font-size:26px;font-weight:900;color:#1c1917}.gv-hi span{color:#57534e;font-size:14px}
+.gv-sec{display:flex;align-items:baseline;gap:10px;margin:18px 0 10px}.gv-sec b{font-size:17px;font-weight:900;color:#1c1917}.gv-sec span{color:#57534e;font-size:13.5px}
+.gv-hero{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:18px}
+.gv-h{position:relative;border-radius:22px;overflow:hidden;height:340px;background:#1c1917;cursor:pointer;box-shadow:0 16px 40px rgba(28,25,23,.18);transition:transform .2s}
+.gv-h:hover{transform:translateY(-3px)}
+.gv-h img{width:100%;height:100%;object-fit:cover;display:block}
+.gv-h .ov{position:absolute;left:0;right:0;bottom:0;padding:20px 22px;background:linear-gradient(transparent,rgba(0,0,0,.85));color:#fff}
+.gv-h .b{font-size:13px;letter-spacing:2px;color:#e7e5e4;text-transform:uppercase}.gv-h .m{font-size:24px;font-weight:900;margin-top:2px}
+.gv-h .tags{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}.gv-h .tags span{font-size:12.5px;font-weight:700;background:rgba(255,255,255,.18);border-radius:999px;padding:2px 10px}
+.gv-h .badge{position:absolute;left:16px;top:16px;background:#facc15;color:#1c1917;font-size:12.5px;font-weight:900;border-radius:999px;padding:3px 10px}
+.gv-h .noimg{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:80px;background:#292524}
+.gv-wrap{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:24px;margin-top:6px}
+.gv-mo{font-size:13px;font-weight:800;color:#a16207;letter-spacing:2px;margin:16px 0 8px}
+.gv-e{display:grid;grid-template-columns:104px minmax(0,1fr) auto;gap:16px;background:#fff;border:1px solid #f5e9d7;border-radius:18px;padding:12px;margin-bottom:10px;align-items:center;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.gv-e:hover{border-color:#fcd34d;box-shadow:0 8px 20px rgba(161,98,7,.08)}
+.gv-e img,.gv-e .ni{width:104px;height:86px;border-radius:12px;object-fit:cover;display:block}
+.gv-e .ni{background:#f5f5f4;display:flex;align-items:center;justify-content:center;font-size:34px}
+.gv-e .br{font-size:12px;font-weight:800;color:#a16207}.gv-e .t{font-size:16px;font-weight:900;color:#1c1917}
+.gv-e .q{font-size:13.5px;color:#57534e;margin-top:4px;line-height:1.6;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.gv-e .side{text-align:right;font-size:13px;color:#57534e;white-space:nowrap;line-height:1.7}
+.gv-st{color:#f59e0b;letter-spacing:1px;white-space:nowrap}.gv-st i{color:#d6d3d1;font-style:normal}
+.gv-r{color:#dc2626}.gv-g{color:#16a34a}
+.gv-panel{background:#1c1917;color:#fafaf9;border-radius:22px;padding:20px;align-self:start;position:sticky;top:76px}
+.gv-panel h3{font-size:17px;font-weight:900}.gv-panel .row{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid #44403c;padding:9px 0;font-size:14px}.gv-panel .row b{font-size:15px;text-align:right}
+.gv-chip{display:inline-block;font-weight:900;border-radius:999px;padding:3px 10px;font-size:13px;margin:4px 4px 0 0}
+.gv-chip.ok{background:#facc15;color:#1c1917}.gv-chip.ng{background:#fca5a5;color:#450a0a}
+.gv-tools{display:flex;gap:8px;align-items:center;margin-left:auto;flex-wrap:wrap}
+.gv-tools input,.gv-tools select{padding:7px 10px;border:1px solid #e7e5e4;border-radius:10px;font-size:13.5px;font-family:inherit;background:#fff}
+/* 詳情 */
+#gv-detail-bg{position:fixed;inset:0;background:rgba(28,25,23,.55);z-index:3500;display:none;align-items:flex-start;justify-content:center;overflow-y:auto;padding:30px 16px}
+#gv-detail{background:#fff;border-radius:22px;width:min(1100px,100%);padding:26px 28px;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:30px;position:relative}
+#gv-detail .big{width:100%;aspect-ratio:4/3;border-radius:18px;object-fit:cover;cursor:zoom-in;display:block;background:#f5f5f4}
+#gv-detail .ths{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+#gv-detail .ths img{width:74px;height:60px;border-radius:10px;object-fit:cover;cursor:pointer;opacity:.7;border:2px solid transparent}
+#gv-detail .ths img.on{opacity:1;border-color:#1c1917}
+#gv-detail .b{font-size:13px;letter-spacing:2px;color:#78716c;text-transform:uppercase;font-weight:800}
+#gv-detail h2{font-size:28px;font-weight:900;color:#1c1917;margin:2px 0 6px}
+#gv-detail .spec{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:14px 0}
+#gv-detail .spec div{background:#fafaf9;border-radius:12px;padding:10px 12px}#gv-detail .spec span{font-size:12px;color:#78716c;display:block}#gv-detail .spec b{font-size:16px}
+#gv-detail .pc{display:grid;grid-template-columns:1fr 1fr;gap:10px}#gv-detail .pc div{border-radius:14px;padding:12px 14px;font-size:14px;line-height:1.8;white-space:pre-wrap;word-break:break-word}
+#gv-detail .tl{margin-top:14px;border-left:2px solid #e7e5e4;padding-left:16px}#gv-detail .tl div{position:relative;padding-bottom:10px;font-size:14px;line-height:1.6;white-space:pre-wrap}
+#gv-detail .tl div:before{content:'';position:absolute;left:-22px;top:6px;width:10px;height:10px;border-radius:50%;background:#1c1917}
+#gv-detail .btns{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+#gv-detail .btns button{border:1px solid #e7e5e4;background:#fff;border-radius:10px;padding:8px 14px;font-weight:800;font-size:13.5px;cursor:pointer;font-family:inherit}
+#gv-detail .btns button:hover{border-color:#a8a29e}
+#gv-detail .x{position:absolute;right:16px;top:14px;border:none;background:#f5f5f4;border-radius:50%;width:36px;height:36px;font-size:16px;cursor:pointer}
+@media(max-width:900px){.gv-wrap{grid-template-columns:1fr}.gv-panel{position:static}#gv-detail{grid-template-columns:1fr;padding:18px}#gv-detail .spec{grid-template-columns:1fr 1fr}.gv-e{grid-template-columns:84px minmax(0,1fr)}.gv-e img,.gv-e .ni{width:84px;height:72px}.gv-e .side{grid-column:2;text-align:left}.gv-h{height:260px}}
 </style>
 </head>
 <body>
@@ -313,7 +365,7 @@ body{
   <nav class="g-nav">
     <div class="g-nav-section">主要</div>
     <div class="g-nav-item active" id="gnav-dashboard" onclick="gShowPage('dashboard')">
-      <span class="g-nav-icon">📊</span>收藏總覽
+      <span class="g-nav-icon">📔</span>手套日記
     </div>
     <div class="g-nav-section">收藏</div>
     <div class="g-nav-item" id="gnav-hold" onclick="gShowPage('hold')">
@@ -340,7 +392,7 @@ body{
 <!-- ══ MAIN ══ -->
 <div class="g-main">
   <div class="g-topbar">
-    <div class="g-topbar-title" id="g-page-name">收藏總覽</div>
+    <div class="g-topbar-title" id="g-page-name">手套日記</div>
     <div class="g-topbar-actions">
       <div id="g-sync-status" style="font-size:12px;color:var(--muted)"></div>
       <button style="padding:7px 14px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer" onclick="openAddDrawer()">＋ 新增手套</button>
@@ -351,8 +403,9 @@ body{
 
     <!-- ══ PAGE: DASHBOARD ══ -->
     <div class="g-page active" id="gpage-dashboard">
+      <div id="gv-home"></div>
       <!-- KPI -->
-      <div class="g-kpi-grid">
+      <div class="g-kpi-grid gv-old">
         <div class="g-kpi-card">
           <div class="g-kpi-accent" style="background:#8fa8c8"></div>
           <div class="g-kpi-label">收藏總隻數</div>
@@ -380,7 +433,7 @@ body{
       </div>
 
       <!-- 圖表 + 最新動態 -->
-      <div class="g-mid-grid">
+      <div class="g-mid-grid gv-old">
         <div class="g-chart-card">
           <div class="g-chart-title">🥧 品牌分佈</div>
           <div style="position:relative;height:220px">
@@ -395,11 +448,11 @@ body{
       </div>
 
       <!-- 畫廊預覽 -->
-      <div class="g-section-hdr">
+      <div class="g-section-hdr gv-old">
         <div class="g-section-title">🖼 收藏畫廊</div>
         <button onclick="gShowPage('gallery')" style="font-size:12px;color:var(--accent);font-weight:700;background:none;border:none;cursor:pointer">查看全部 ↗</button>
       </div>
-      <div class="g-gallery" id="dash-gallery"></div>
+      <div class="g-gallery gv-old" id="dash-gallery"></div>
     </div>
 
     <!-- ══ PAGE: HOLD ══ -->
@@ -568,7 +621,7 @@ function gShowPage(id){
   document.querySelectorAll('.g-nav-item').forEach(el=>{
     el.classList.toggle('active', el.id==='gnav-'+id);
   });
-  const names={dashboard:'收藏總覽',hold:'持有中手套',sold:'已售出紀錄',wish:'觀察中清單',gallery:'手套畫廊'};
+  const names={dashboard:'手套日記',hold:'持有中手套',sold:'已售出紀錄',wish:'觀察中清單',gallery:'手套畫廊'};
   const titleEl=document.getElementById('g-page-name');
   if(titleEl)titleEl.textContent=names[id]||id;
   const mainEl=document.querySelector('.g-main');
@@ -1617,6 +1670,131 @@ async function manualSync(){
   _syncEnabled=true;
   renderAllPages();
 })();
+
+// ══════════════════════════════════════════════════════════════
+// 改版：📔 手套日記（範本 C）＋ 目前持有放大（範本 A）＋ 詳情頁（範本 D）
+//   資料、同步、新增／編輯／刪除、照片上傳都沿用原本的
+// ══════════════════════════════════════════════════════════════
+const gvE=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const gvM=v=>'$'+Math.round(Math.abs(+v||0)).toLocaleString();
+const gvYmd=s=>s?String(s).replace(/-/g,'/'):'—';
+const gvToday=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
+const gvDays=(a,b)=>Math.max(0,Math.round((new Date((b||gvToday())+'T00:00:00')-new Date(a+'T00:00:00'))/864e5));
+const gvSold=g=>!!(g.sellDate&&g.sellPrice);
+const gvStars=n=>{n=+n||0;return`<span class="gv-st">${'★'.repeat(n)}<i>${'★'.repeat(5-n)}</i></span>`;};
+const gvLine=g=>String(g.note||g.cons||g.pros||'').split('\n').map(x=>x.trim()).filter(Boolean)[0]||'';
+let _gvSort='date',_gvQ='',_gvShow='all';
+// 好評／踩雷關鍵字（從你寫的優點、缺點、備註裡找）
+const GV_OK=[['尺寸完美',/尺寸(非常)?(完美|滿意|合手|很合手|適合)|完美尺寸/],['接球聲音響亮',/聲音(響亮|不錯|清脆)/],['手感好',/手感(不錯|很好|好)|很合手|和手|合手/],['輕',/輕(量|巧)?|很輕/],['日本製',/日本製|日製/],['刀模喜歡',/喜歡的刀[膜模]|刀[膜模](很)?(滿意|喜歡)/],['全新／盒裝',/全新|盒裝|盒子/]];
+const GV_NG=[['皮革軟爛',/軟爛|軟塌/],['笨重',/笨重|偏重|重量重/],['太硬',/死硬|僵硬|偏硬|太硬/],['刀模不合',/刀[膜模](不適合|糟糕|不合)|不適合自己/],['塑膠感',/塑膠感/],['皮太薄',/皮太薄/],['容易掉球',/掉球/],['尺寸不合',/尺寸.*(偏大|偏小|不合)/]];
+function gvKeywords(){
+  const G=db.gloves||[];const ok={},ng={};
+  G.forEach(g=>{const good=(g.pros||'')+' '+((+g.stars||0)>=4?(g.note||''):'');const bad=(g.cons||'')+' '+((+g.stars||0)<=2?(g.note||''):'');
+    GV_OK.forEach(([k,re])=>{if(re.test(good))ok[k]=(ok[k]||0)+1;});GV_NG.forEach(([k,re])=>{if(re.test(bad))ng[k]=(ng[k]||0)+1;});});
+  const top=o=>Object.entries(o).sort((a,b)=>b[1]-a[1]).slice(0,4);
+  return{ok:top(ok),ng:top(ng)};
+}
+function gvTop(arr,f){const c={};arr.forEach(g=>{const k=f(g);if(k)c[k]=(c[k]||0)+1;});return Object.entries(c).sort((a,b)=>b[1]-a[1]);}
+function renderGvHome(){
+  const box=document.getElementById('gv-home'); if(!box)return;
+  const G=(db.gloves||[]).slice();
+  const hold=G.filter(g=>!gvSold(g)).sort((a,b)=>(+b.stars||0)-(+a.stars||0)||(b.buyDate||'').localeCompare(a.buyDate||''));
+  const sold=G.filter(gvSold);
+  const net=sold.reduce((s,g)=>s+(+g.sellPrice)-(+g.buyPrice),0);
+  const avgD=sold.length?Math.round(sold.reduce((s,g)=>s+gvDays(g.buyDate,g.sellDate),0)/sold.length):0;
+  const fav=G.filter(g=>(+g.stars||0)>=4);
+  const K=gvKeywords();
+  const first=G.map(g=>g.buyDate).filter(Boolean).sort()[0];
+  // 目前持有（放大）
+  const hero=hold.length?`<div class="gv-sec"><b>⭐ 目前持有</b><span>${hold.length} 隻・點一下看詳情</span></div><div class="gv-hero">${hold.map(g=>{const img=(g.images||[])[0];
+    return`<div class="gv-h" onclick="openGDetail('${g.id}')">${img?`<img src="${gvE(img)}" alt="" loading="lazy">`:'<div class="noimg">🧤</div>'}
+      <span class="badge">${(+g.stars||0)>=5?'★ 本命候選':'持有中'}・已持有 ${gvDays(g.buyDate)} 天</span>
+      <div class="ov"><div class="b">${gvE((g.brand||'').trim())}</div><div class="m">${gvE(g.model||'未命名')}</div>
+      <div class="tags">${g.position?`<span>${gvE(g.position)}</span>`:''}${g.size?`<span>${gvE(g.size)} 吋</span>`:''}${g.stars?`<span>${gvStars(g.stars)}</span>`:''}<span>買入 ${gvM(g.buyPrice)}</span></div></div></div>`;}).join('')}</div>`:'';
+  // 日記
+  const q=_gvQ.trim().toLowerCase();
+  let L=G.filter(g=>_gvShow==='all'||(_gvShow==='hold'?!gvSold(g):gvSold(g)));
+  if(q)L=L.filter(g=>[g.brand,g.model,g.position,g.size,g.pros,g.cons,g.note].some(x=>String(x||'').toLowerCase().includes(q)));
+  if(_gvSort==='star')L.sort((a,b)=>(+b.stars||0)-(+a.stars||0)||(b.buyDate||'').localeCompare(a.buyDate||''));
+  else L.sort((a,b)=>(b.buyDate||'').localeCompare(a.buyDate||''));
+  const entry=g=>{const img=(g.images||[])[0];const s=gvSold(g);const p=s?(+g.sellPrice)-(+g.buyPrice):null;const line=gvLine(g);
+    return`<div class="gv-e" onclick="openGDetail('${g.id}')">${img?`<img src="${gvE(img)}" alt="" loading="lazy">`:'<div class="ni">🧤</div>'}
+      <div style="min-width:0"><div class="br">${gvE((g.brand||'').trim())}</div><div class="t">${gvE(g.model||'未命名')} ${gvStars(g.stars)}</div>${line?`<div class="q">💬 ${gvE(line)}</div>`:''}</div>
+      <div class="side">${gvE(g.position||'—')}${g.size?'・'+gvE(g.size)+'"':''}<br>${s?`用了 <b>${gvDays(g.buyDate,g.sellDate)}</b> 天<br><b class="${p>=0?'gv-r':'gv-g'}">${p>=0?'+':'−'}${gvM(p)}</b>`:`<b style="color:#15803d">持有中 ${gvDays(g.buyDate)} 天</b>`}</div></div>`;};
+  let diary='';
+  if(_gvSort==='star'){diary=L.map(entry).join('');}
+  else{const byM={};L.forEach(g=>{const k=(g.buyDate||'—').slice(0,7);(byM[k]=byM[k]||[]).push(g);});
+    diary=Object.entries(byM).map(([k,l])=>`<div class="gv-mo">${k.length===7?k.slice(0,4)+' 年 '+k.slice(5)+' 月':'沒有日期'}</div>`+l.map(entry).join('')).join('');}
+  const chip=(s,k)=>`<button onclick="_gvShow='${k}';renderGvHome()" style="border:1px solid ${_gvShow===k?'#1c1917':'#e7e5e4'};background:${_gvShow===k?'#1c1917':'#fff'};color:${_gvShow===k?'#fff':'#44403c'};border-radius:999px;padding:5px 12px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit">${s}</button>`;
+  const fpos=gvTop(fav,g=>g.position)[0], fsize=gvTop(fav,g=>g.size).slice(0,2);
+  const sel=document.activeElement&&document.activeElement.id==='gv-q';
+  box.innerHTML=`<div class="gv-hi"><h1>🧤 我的手套日記</h1><span>${first?`從 ${gvYmd(first)} 開始，`:''}經手 ${G.length} 隻，找最適合自己的那一隻</span></div>
+    ${hero}
+    <div class="gv-wrap"><div>
+      <div class="gv-sec" style="flex-wrap:wrap"><b>📔 日記</b><span>${L.length} 隻</span>
+        <div class="gv-tools">${chip('全部','all')}${chip('持有中','hold')}${chip('已賣出','sold')}
+          <input id="gv-q" value="${gvE(_gvQ)}" oninput="_gvQ=this.value;renderGvHome()" placeholder="搜尋品牌、型號、心得…" style="width:170px">
+          <select onchange="_gvSort=this.value;renderGvHome()"><option value="date" ${_gvSort==='date'?'selected':''}>依時間</option><option value="star" ${_gvSort==='star'?'selected':''}>依評分</option></select></div></div>
+      ${diary||'<div style="padding:30px;text-align:center;color:#78716c">沒有符合的手套</div>'}</div>
+    <div class="gv-panel"><h3>🎯 你的本命條件</h3><div style="font-size:13px;color:#a8a29e;margin:4px 0 8px">${fav.length?`從 4～5 星的 ${fav.length} 隻自動整理`:'評 4～5 星的手套多了之後會自動整理'}</div>
+      ${fpos?`<div class="row"><span>最常是</span><b>${gvE(fpos[0])}</b></div>`:''}
+      ${fsize.length?`<div class="row"><span>尺寸</span><b>${fsize.map(x=>gvE(x[0])+'"').join('、')}</b></div>`:''}
+      <div class="row"><span>5 星手套</span><b>${G.filter(g=>+g.stars===5).length} 隻</b></div>
+      <div class="row"><span>1 星（踩雷）</span><b>${G.filter(g=>+g.stars===1).length} 隻</b></div>
+      ${K.ok.length?`<div style="margin-top:12px;font-size:13.5px;color:#e7e5e4">常見的好評：</div>${K.ok.map(([k,n])=>`<span class="gv-chip ok">${k}${n>1?' ×'+n:''}</span>`).join('')}`:''}
+      ${K.ng.length?`<div style="margin-top:12px;font-size:13.5px;color:#e7e5e4">常見的踩雷：</div>${K.ng.map(([k,n])=>`<span class="gv-chip ng">${k}${n>1?' ×'+n:''}</span>`).join('')}`:''}
+      <div style="margin-top:16px;padding-top:8px;border-top:1px solid #44403c">
+        <div class="row"><span>經手</span><b>${G.length} 隻（賣出 ${sold.length}）</b></div>
+        <div class="row"><span>換手套的成本</span><b style="color:${net>=0?'#f87171':'#4ade80'}">${net>=0?'+':'−'}${gvM(net)}</b></div>
+        <div class="row" style="border:none"><span>平均每隻用</span><b>${avgD} 天</b></div></div>
+      <button onclick="openAddDrawer()" style="width:100%;margin-top:12px;background:#facc15;color:#1c1917;border:none;border-radius:12px;padding:11px;font-weight:900;font-size:14px;cursor:pointer;font-family:inherit">＋ 新增手套</button></div></div>`;
+  if(sel){const i=document.getElementById('gv-q');if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length);}}
+}
+(function(){const _r=renderAllPages;renderAllPages=function(){const r=_r.apply(this,arguments);try{renderGvHome();}catch(e){console.warn('手套日記',e);}return r;};})();
+
+// ══ 詳情頁（範本 D）══
+let _gvDetail=null,_gvImg=0;
+openGDetail=function(id){
+  const g=(db.gloves||[]).find(x=>x.id===id); if(!g)return;
+  _gvDetail=id; _detailId=id; if(_gvImg>=(g.images||[]).length)_gvImg=0;
+  let bg=document.getElementById('gv-detail-bg');
+  if(!bg){bg=document.createElement('div');bg.id='gv-detail-bg';bg.onclick=e=>{if(e.target===bg)gvCloseDetail();};document.body.appendChild(bg);}
+  const imgs=g.images||[], s=gvSold(g), p=s?(+g.sellPrice)-(+g.buyPrice):null;
+  const d=s?gvDays(g.buyDate,g.sellDate):gvDays(g.buyDate);
+  bg.innerHTML=`<div id="gv-detail"><button class="x" onclick="gvCloseDetail()" title="關閉">✕</button>
+    <div>${imgs.length?`<img class="big" id="gv-big" src="${gvE(imgs[_gvImg])}" onclick="openLightbox(_gvImg,'${g.id}')" alt="">
+      <div class="ths">${imgs.map((u,i)=>`<img src="${gvE(u)}" class="${i===_gvImg?'on':''}" onclick="gvPick(${i})" alt="" loading="lazy">`).join('')}</div>`
+      :'<div class="big" style="display:flex;align-items:center;justify-content:center;font-size:90px">🧤</div>'}</div>
+    <div><div class="b">${gvE((g.brand||'').trim())}</div><h2>${gvE(g.model||'未命名')}</h2>
+      ${gvStars(g.stars)} <span style="font-size:13px;font-weight:800;border-radius:999px;padding:2px 10px;margin-left:6px;${s?'background:#f5f5f4;color:#44403c':'background:#dcfce7;color:#15803d'}">${s?`已賣出・用了 ${d} 天`:`持有中・${d} 天`}</span>
+      <div class="spec"><div><span>守位</span><b>${gvE(g.position||'—')}</b></div><div><span>尺寸</span><b>${g.size?gvE(g.size)+' 吋':'—'}</b></div>
+        <div><span>買入</span><b style="font-family:var(--mono)">${gvM(g.buyPrice)}</b></div>
+        <div><span>${s?'賣出／賺賠':'照片'}</span><b style="font-family:var(--mono)">${s?`<span class="${p>=0?'gv-r':'gv-g'}">${p>=0?'+':'−'}${gvM(p)}</span>`:imgs.length+' 張'}</b></div></div>
+      <div class="pc"><div style="background:#f0fdf4;color:#14532d"><b>👍 優點</b>\n${gvE(g.pros||'—')}</div><div style="background:#fef2f2;color:#7f1d1d"><b>👎 缺點</b>\n${gvE(g.cons||'—')}</div></div>
+      <div class="tl"><div><b>${gvYmd(g.buyDate)}</b> 買入 ${gvM(g.buyPrice)}</div>
+        ${g.note?`<div><b>備註／保養</b>\n${gvE(g.note)}</div>`:''}
+        ${s?`<div><b>${gvYmd(g.sellDate)}</b> 賣出 ${gvM(g.sellPrice)}・用了 ${d} 天・<b class="${p>=0?'gv-r':'gv-g'}">${p>=0?'賺':'賠'} ${gvM(p)}</b></div>`:''}</div>
+      <div class="btns"><button onclick="gvCloseDetail();openEditDrawer('${g.id}')">✏️ 編輯</button>
+        ${s?'':`<button onclick="gvCloseDetail();openEditDrawer('${g.id}');setTimeout(()=>{const el=document.getElementById('g-sell-date');if(el){if(!el.value)el.value=gvToday();el.scrollIntoView({block:'center'});document.getElementById('g-sell-price')?.focus();}},350)">🤝 標記賣出</button>`}
+        ${imgs.length?`<button onclick="openLightbox(_gvImg,'${g.id}')">🖼 看全部照片（${imgs.length}）</button>`:''}</div></div></div>`;
+  bg.style.display='flex'; document.body.style.overflow='hidden';
+};
+function gvPick(i){_gvImg=i;const g=(db.gloves||[]).find(x=>x.id===_gvDetail);if(!g)return;const b=document.getElementById('gv-big');if(b)b.src=g.images[i];
+  document.querySelectorAll('#gv-detail .ths img').forEach((el,k)=>el.classList.toggle('on',k===i));}
+function gvCloseDetail(){const bg=document.getElementById('gv-detail-bg');if(bg)bg.style.display='none';document.body.style.overflow='';_gvImg=0;}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){const lb=document.getElementById('lightbox');if(lb&&lb.classList.contains('open'))return;const bg=document.getElementById('gv-detail-bg');if(bg&&bg.style.display==='flex')gvCloseDetail();}});
+// 照片放大時要蓋在詳情頁上面
+(function(){const lb=document.getElementById('lightbox');if(lb)lb.style.zIndex='99999';})();
+// 修正：新增／編輯時選的照片，原本是直接塞進資料檔（檔案會越來越大）；改成跟以前一樣先上傳到 GitHub，資料裡只存網址
+handleGImgUpload=function(e){return handleImgUpload(e);};
+// 修正：編輯舊手套時，守位如果是「二壘」這種選單裡沒有的寫法，原本會被存成空白；現在會保留原本的值
+(function(){const _o=openEditDrawer;openEditDrawer=function(id){const r=_o.apply(this,arguments);try{const g=(db.gloves||[]).find(x=>x.id===id);const sel=document.getElementById('g-position');
+  if(g&&g.position&&sel&&![...sel.options].some(o=>o.value===g.position||o.text===g.position)){const o=document.createElement('option');o.textContent=g.position;o.value=g.position;sel.appendChild(o);}if(g&&sel)sel.value=g.position||'';}catch(e){}return r;};})();
+// 修正：按 Esc 時原本會找不到舊版視窗而出錯；補上隱藏的空元素，並讓 Esc 也能關閉編輯抽屜
+['detail-modal','add-modal'].forEach(id=>{if(!document.getElementById(id)){const d=document.createElement('div');d.id=id;d.style.display='none';document.body.appendChild(d);}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&typeof _currentDrawer!=='undefined'&&_currentDrawer&&!document.getElementById('lightbox')?.classList.contains('open'))closeGDrawer();});
+renderGvHome();
+
 </script>
 </body>
 </html>
