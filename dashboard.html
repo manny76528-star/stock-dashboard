@@ -335,6 +335,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
 </script>
 <style>@media(max-width:760px){.b8-k4{grid-template-columns:repeat(2,minmax(0,1fr))!important}}</style>
 <style>#dbpage-dividend>.trend-page-card{display:none!important}.b9c{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:14px 18px;margin-bottom:14px;box-shadow:0 4px 6px -1px rgba(0,0,0,.04)}.b9ck{display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:700;border:1px solid #e2e8f0;border-radius:8px;padding:4px 10px;cursor:pointer;background:#fff;color:#334155;font-family:inherit}.b9ck.on{background:#fef2f2;border-color:#fecaca;color:#b91c1c}.b9rg{padding:4px 12px;border-radius:999px;font-size:12.5px;font-weight:700;border:1px solid #e2e8f0;color:#475569;background:#fff;cursor:pointer;font-family:inherit}.b9rg.on{background:#0f172a;color:#fff;border-color:#0f172a}.b9row{display:flex;align-items:center;gap:10px;font-size:14px;padding:5px 4px;border-radius:8px}.b9row.click{cursor:pointer}.b9row.click:hover{background:#f8fafc}.b9bar{flex:1;height:10px;background:#f1f5f9;border-radius:99px;overflow:hidden;min-width:40px}.b9bar i{display:block;height:100%;border-radius:99px}.b9mono{font-family:'JetBrains Mono',monospace}.b9chip{padding:4px 11px;border-radius:999px;font-size:13px;font-weight:700;border:1.5px solid #e2e8f0;background:#fff;cursor:pointer;font-family:inherit;color:#334155}.b9li{display:grid;grid-template-columns:58px minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:9px 12px;border-top:1px solid #f1f5f9;font-size:14px}.b9li:first-child{border-top:none}.tl-card{align-self:start;border:1px solid #e2e8f0;border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 2px 6px rgba(15,23,42,.05)}.tl-hd{display:flex;align-items:center;gap:8px;background:#f8fafc;border-bottom:1px solid #e2e8f0;padding:7px 12px;min-height:36px}@media(max-width:760px){.b9grid{grid-template-columns:1fr!important}}</style>
+<style>body.privacy .pm-neu,body.privacy .pm-neu *{color:#94a3b8!important}</style>
 </head>
 <body>
 
@@ -17173,8 +17174,8 @@ function renderTrendHead(){
   const iv=f.indexVal&&l.indexVal?(l.indexVal/f.indexVal-1)*100:null;
   el.innerHTML=`<div style="display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;padding:2px 2px 6px">
     <div><div style="font-size:11px;color:#64748b">淨資產（${_ae(String(l.ym).slice(0,10))}）</div><div class="privacy-mask" style="font-size:26px;font-weight:900;color:#0f172a;font-family:'JetBrains Mono',monospace;line-height:1.15">$${Math.round(l.net).toLocaleString()}</div></div>
-    <div style="font-size:13px;font-weight:700;color:${c};padding-bottom:4px"><span class="privacy-mask">${up?'▲':'▼'} $${Math.abs(Math.round(d)).toLocaleString()}</span>（${up?'+':''}${pct.toFixed(1)}%）<span style="color:#94a3b8;font-weight:400">${_ae(CR_NAMES[crGet('trend')]||'')}</span></div>
-    ${iv!=null?`<div style="font-size:12px;color:#64748b;padding-bottom:5px">大盤同期 <b style="color:${iv>=0?'#dc2626':'#16a34a'}">${iv>=0?'+':''}${iv.toFixed(1)}%</b></div>`:''}</div>`;
+    <div class="pm-neu" style="font-size:13px;font-weight:700;color:${c};padding-bottom:4px"><span class="privacy-mask">${up?'▲':'▼'} $${Math.abs(Math.round(d)).toLocaleString()}</span><span class="privacy-mask">（${up?'+':''}${pct.toFixed(1)}%）</span><span style="color:#94a3b8;font-weight:400">${_ae(CR_NAMES[crGet('trend')]||'')}</span></div>
+    ${iv!=null?`<div style="font-size:12px;color:#64748b;padding-bottom:5px">大盤同期 <b class="privacy-mask pm-neu" style="color:${iv>=0?'#dc2626':'#16a34a'}">${iv>=0?'+':''}${iv.toFixed(1)}%</b></div>`:''}</div>`;
   if(typeof applyPrivacy==='function')applyPrivacy();
 }
 (function(){const _r=renderTrendPageChart;renderTrendPageChart=function(){const r=_r.apply(this,arguments);try{renderTrendHead();}catch(e){}return r;};})();
@@ -18612,8 +18613,8 @@ renderTrendPageTable=function(){
     return`<div class="tl-card" style="display:grid;grid-template-columns:110px minmax(0,1fr);margin-bottom:10px">
       <div style="background:#f8fafc;border-right:1px solid #e2e8f0;text-align:center;padding:10px 4px;display:flex;flex-direction:column;justify-content:center">
         <div style="font-size:26px;font-weight:900;line-height:1">${+g.m.slice(5)}<span style="font-size:13px">月</span></div><div style="font-size:12px;color:#475569;margin-top:2px">${g.m.slice(0,4)}・${g.l.length} 次</div>
-        <div class="privacy-mask" style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:800;margin-top:6px;color:${up?'#dc2626':'#16a34a'}">${up?'▲':'▼'}${Math.abs(p).toFixed(1)}%</div>
-        <div class="privacy-mask" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:${up?'#dc2626':'#16a34a'}">${up?'+':'−'}$${Math.abs(Math.round(ch)).toLocaleString()}</div>
+        <div class="privacy-mask pm-neu" style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:800;margin-top:6px;color:${up?'#dc2626':'#16a34a'}">${up?'▲':'▼'}${Math.abs(p).toFixed(1)}%</div>
+        <div class="privacy-mask pm-neu" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:${up?'#dc2626':'#16a34a'}">${up?'+':'−'}$${Math.abs(Math.round(ch)).toLocaleString()}</div>
         ${prevG?'':'<div style="font-size:11px;color:#64748b;margin-top:2px">（月初→月底）</div>'}</div>
       <div>${g.l.map((s,i)=>`<div style="display:grid;${cols};gap:8px;align-items:center;padding:8px 12px;font-size:13.5px;${i?'border-top:1px solid #f1f5f9':''}">
         <b style="font-family:'JetBrains Mono',monospace;color:#1e293b">${(s.ym||'').slice(5,10).replace('-','/')}</b>
