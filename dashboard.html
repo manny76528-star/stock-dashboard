@@ -333,6 +333,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
   }
 })();
 </script>
+<style>@media(max-width:760px){.b8-k4{grid-template-columns:repeat(2,minmax(0,1fr))!important}}</style>
 </head>
 <body>
 
@@ -18015,11 +18016,12 @@ _renderInvestL1Body=function(){
   body.innerHTML=`<div onclick="openInvFaithModal()" style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:16px 18px;cursor:pointer;box-shadow:0 4px 6px -1px rgba(0,0,0,.05);margin-bottom:14px">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap"><b style="font-size:16px">💼 我的持股</b><span style="font-size:13px;color:#475569;font-weight:600">${active.length} 檔・${(Math.round(lots*1000)/1000).toLocaleString()} 張</span>
       <span style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap">${pz?chip(pz[0],pz[1],pz[2],"dbShowPage('pledge')"):''}${lO>0?chip('🏦 信貸已還 '+lPct+'%','#f5f3ff','#6d28d9',"b6GoAssets('b6-loans')"):''}
-        <button onclick="event.stopPropagation();openDivTargetModal()" style="${_b6Btn}">✏️ 股息目標</button><button onclick="event.stopPropagation();openInvModal()" style="${_b6Btn}">＋ 買入</button></span></div>
-    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:12px">
+        <button onclick="event.stopPropagation();openDivTargetModal()" style="${_b6Btn}">✏️ 股息目標</button><button onclick="event.stopPropagation();b8FundTarget()" style="${_b6Btn}">✏️ 基金目標</button><button onclick="event.stopPropagation();openInvModal()" style="${_b6Btn}">＋ 買入</button></span></div>
+    <div class="b8-k4" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:12px">
       ${_b6K('📅 下次股息',`<span style="color:#dc2626">${I.nextAmt?_b6m(I.nextAmt):'—'}</span>`,I.nextDate?`<b style="color:#b91c1c">${_b6md(I.nextDate)}</b> 入帳・${nd===0?'<b>今天</b>':'還有 <b style="color:#b91c1c">'+nd+'</b> 天'}`:'暫無預告','background:#fef2f2;border-color:#fecaca')}
-      ${_b6K('🏆 今年已領',_b6m(Y.ytd),`<div style="margin:5px 0 2px">${_b6Bar(tPct,'#dc2626',6)}</div>目標 ${_b6m(target)}・已達 <b style="color:#b91c1c">${Math.round(tPct)}%</b>`)}
-      ${_b6K('⚔️ 股息付完信貸後',`<span style="color:${I.net>=0?'#dc2626':'#16a34a'}">${_b6s(I.net)}</span>`,I.net>=0?'💪 每月可以無腦再加碼':'股息還不夠付每月支出')}</div>
+      ${_b6K('⚔️ 股息付完信貸後',`<span style="color:${I.net>=0?'#dc2626':'#16a34a'}">${_b6s(I.net)}</span>`,I.net>=0?'💪 每月可以無腦再加碼':'股息還不夠付每月支出')}
+      ${_b6K('🏆 今年已領',_b6m(Y.ytd),`<div style="margin:5px 0 2px">${_b6Bar(tPct,'#dc2626',6)}</div>目標 ${_b6m(target)}・已達 <b style="color:#b91c1c">${Math.round(tPct)}%</b>`).replace('<div style="','<div onclick="event.stopPropagation();dbShowPage(\'dividend\')" title="打開股息管理" style="cursor:pointer;position:relative;').replace('🏆 今年已領','🏆 今年已領<span style="position:absolute;right:10px;top:9px;font-size:12px;color:#dc2626;font-weight:800">股息 ›</span>')}
+      ${_b8FundTile()}</div>
     <div style="border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;margin-bottom:12px">${rows||'<div style="padding:16px;text-align:center;color:#94a3b8;font-size:12px">尚無持股</div>'}</div>
     <div style="font-size:14px;font-weight:800;margin-bottom:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">🎯 ${Y.yr} 股息目標 ${_b6Tag(`年底預估 ${_b6m(Y.yEnd)}（${target?Math.round(Y.yEnd/target*100):0}%）`,'#fef2f2','#b91c1c','#fecaca')}<span style="font-weight:500;font-size:12px;color:#475569"><span style="color:#dc2626">■</span> 已領　<span style="color:rgba(220,38,38,.35)">■</span> 預估</span></div>
     <div style="position:relative;height:130px"><canvas id="b6-divbar"></canvas></div>
@@ -18333,6 +18335,45 @@ function b8SetBal(){
 setTimeout(()=>{try{b8Show();}catch(e){console.warn('登入提醒',e);}},2200);
 // 資產頁的現金跑道加一個「🔔 今天的提醒」按鈕，隨時可以再打開
 (function(){const _r=renderAssetsPro;renderAssetsPro=function(){const r=_r.apply(this,arguments);try{const bt=document.getElementById('b6-run-btn');if(bt&&!document.getElementById('b8-open')){const b=document.createElement('button');b.id='b8-open';b.textContent='🔔 今天的提醒';b.style.cssText=bt.style.cssText;b.onclick=()=>b8Show(true);bt.parentNode.insertBefore(b,bt);}}catch(e){}return r;};})();
+
+// ══ 第一層「基金累積」格（方案 B：進度條＋扣款次數，不顯示金額）══
+function _b8FundStat(){
+  const logs=db.fundDeductionLogs||[]; const cum=logs.reduce((s,x)=>s+(x.amount||0),0);
+  const days=[...new Set(logs.map(x=>x.date).filter(Boolean))].sort();
+  // 連續週數：從本週（或上週）往回算，每週至少扣一次
+  const wk=d=>{const t=new Date(d+'T00:00:00Z');const dw=(t.getUTCDay()+6)%7;t.setUTCDate(t.getUTCDate()-dw);return t.toISOString().slice(0,10);};
+  const W=new Set(days.map(wk)); let cur=wk(_twToday()); if(!W.has(cur))cur=_addDays(cur,-7); let streak=0; while(W.has(cur)){streak++;cur=_addDays(cur,-7);}
+  const target=+(db.settings?.fundTarget||0);
+  return{cum,n:days.length,streak,target,pct:target>0?cum/target*100:null};
+}
+function _b8FundTile(){
+  const F=_b8FundStat();
+  const go=`<span style="position:absolute;right:10px;top:9px;font-size:12px;color:#2563eb;font-weight:800">基金 ›</span>`;
+  const bar=p=>`<div style="height:8px;background:#dbeafe;border-radius:99px;overflow:hidden;margin:6px 0 3px"><i style="display:block;height:100%;width:${Math.max(0,Math.min(100,p))}%;border-radius:99px;background:linear-gradient(90deg,#3b82f6,#2563eb)"></i></div>`;
+  const sub=`已扣 <b>${F.n}</b> 次${F.streak?`・持續 <b>${F.streak}</b> 週 🔥`:''}`;
+  const v=F.pct==null?`<span style="font-size:15px;color:#2563eb">未設目標</span>`:`<span style="color:#2563eb">${Math.floor(F.pct)}%</span>${F.pct>=100?' 🎉':''}`;
+  return `<div onclick="event.stopPropagation();b6GoAssets('b6-fund')" title="打開資產與負債的基金區" style="cursor:pointer;position:relative;background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:10px 12px">${go}<div style="font-size:12.5px;font-weight:700;color:#334155">📈 基金累積</div><div style="font-size:20px;font-weight:800;margin-top:2px;font-family:'JetBrains Mono',monospace">${v}</div>${bar(F.pct||0)}<div class="b6-sub" style="font-size:12.5px;color:#475569;line-height:1.5">${F.pct==null?'按上面「✏️ 基金目標」設定・':''}${sub}</div></div>`;
+}
+function b8FundTarget(){
+  let bg=document.getElementById('b8-ft-bg'); if(!bg){bg=document.createElement('div');bg.id='b8-ft-bg';document.body.appendChild(bg);}
+  bg.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:9000;display:flex;align-items:center;justify-content:center;padding:16px';
+  const cur=+(db.settings?.fundTarget||0);
+  bg.innerHTML=`<div style="background:#fff;border-radius:18px;width:min(380px,100%);padding:20px 22px;box-shadow:0 30px 70px rgba(0,0,0,.35)">
+    <div style="font-size:18px;font-weight:900;margin-bottom:4px">✏️ 設定基金累積目標</div>
+    <div style="font-size:13.5px;color:#475569;line-height:1.6;margin-bottom:12px">只用來算進度的百分比，投資與觀察第一層<b>不會顯示金額</b>。</div>
+    <input id="b8-ft-in" type="number" inputmode="numeric" placeholder="例：100000" value="${cur||''}" style="width:100%;box-sizing:border-box;padding:11px 14px;border:2px solid #bfdbfe;border-radius:10px;font-size:17px;font-weight:800;font-family:'JetBrains Mono',monospace">
+    <div style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end">${cur?`<button onclick="b8FundTargetSave(0)" style="margin-right:auto;border:1px solid #e2e8f0;background:#fff;border-radius:10px;padding:9px 14px;font-weight:700;cursor:pointer;color:#64748b">清除目標</button>`:''}
+      <button onclick="document.getElementById('b8-ft-bg').style.display='none'" style="border:1px solid #e2e8f0;background:#fff;border-radius:10px;padding:9px 14px;font-weight:700;cursor:pointer">取消</button>
+      <button onclick="b8FundTargetSave()" style="border:none;background:#2563eb;color:#fff;border-radius:10px;padding:9px 16px;font-weight:800;cursor:pointer">儲存</button></div></div>`;
+  bg.onclick=e=>{if(e.target===bg)bg.style.display='none';};
+  setTimeout(()=>document.getElementById('b8-ft-in')?.focus(),50);
+}
+function b8FundTargetSave(v){
+  if(v===undefined){v=parseFloat(document.getElementById('b8-ft-in')?.value);if(!(v>0)){toast('請輸入目標金額');return;}}
+  if(!db.settings)db.settings={}; db.settings.fundTarget=Math.round(v); save();
+  document.getElementById('b8-ft-bg').style.display='none';
+  try{_renderInvestL1Body();}catch(e){} toast(v?'✅ 基金目標已設定':'已清除基金目標');
+}
 </script>
 
 </div><!-- /main-content -->
