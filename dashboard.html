@@ -334,7 +334,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
 })();
 </script>
 <style>@media(max-width:760px){.b8-k4{grid-template-columns:repeat(2,minmax(0,1fr))!important}}</style>
-<style>#dbpage-dividend>.trend-page-card{display:none!important}.b9c{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:14px 18px;margin-bottom:14px;box-shadow:0 4px 6px -1px rgba(0,0,0,.04)}.b9ck{display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:700;border:1px solid #e2e8f0;border-radius:8px;padding:4px 10px;cursor:pointer;background:#fff;color:#334155;font-family:inherit}.b9ck.on{background:#fef2f2;border-color:#fecaca;color:#b91c1c}.b9rg{padding:4px 12px;border-radius:999px;font-size:12.5px;font-weight:700;border:1px solid #e2e8f0;color:#475569;background:#fff;cursor:pointer;font-family:inherit}.b9rg.on{background:#0f172a;color:#fff;border-color:#0f172a}.b9row{display:flex;align-items:center;gap:10px;font-size:14px;padding:5px 4px;border-radius:8px}.b9row.click{cursor:pointer}.b9row.click:hover{background:#f8fafc}.b9bar{flex:1;height:10px;background:#f1f5f9;border-radius:99px;overflow:hidden;min-width:40px}.b9bar i{display:block;height:100%;border-radius:99px}.b9mono{font-family:'JetBrains Mono',monospace}.b9chip{padding:4px 11px;border-radius:999px;font-size:13px;font-weight:700;border:1.5px solid #e2e8f0;background:#fff;cursor:pointer;font-family:inherit;color:#334155}.b9li{display:grid;grid-template-columns:58px minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:9px 10px;border-bottom:1px solid #f1f5f9;font-size:14px}@media(max-width:760px){.b9grid{grid-template-columns:1fr!important}}</style>
+<style>#dbpage-dividend>.trend-page-card{display:none!important}.b9c{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:14px 18px;margin-bottom:14px;box-shadow:0 4px 6px -1px rgba(0,0,0,.04)}.b9ck{display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:700;border:1px solid #e2e8f0;border-radius:8px;padding:4px 10px;cursor:pointer;background:#fff;color:#334155;font-family:inherit}.b9ck.on{background:#fef2f2;border-color:#fecaca;color:#b91c1c}.b9rg{padding:4px 12px;border-radius:999px;font-size:12.5px;font-weight:700;border:1px solid #e2e8f0;color:#475569;background:#fff;cursor:pointer;font-family:inherit}.b9rg.on{background:#0f172a;color:#fff;border-color:#0f172a}.b9row{display:flex;align-items:center;gap:10px;font-size:14px;padding:5px 4px;border-radius:8px}.b9row.click{cursor:pointer}.b9row.click:hover{background:#f8fafc}.b9bar{flex:1;height:10px;background:#f1f5f9;border-radius:99px;overflow:hidden;min-width:40px}.b9bar i{display:block;height:100%;border-radius:99px}.b9mono{font-family:'JetBrains Mono',monospace}.b9chip{padding:4px 11px;border-radius:999px;font-size:13px;font-weight:700;border:1.5px solid #e2e8f0;background:#fff;cursor:pointer;font-family:inherit;color:#334155}.b9li{display:grid;grid-template-columns:58px minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:9px 12px;border-top:1px solid #f1f5f9;font-size:14px}.b9li:first-child{border-top:none}.tl-card{align-self:start;border:1px solid #e2e8f0;border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 2px 6px rgba(15,23,42,.05)}.tl-hd{display:flex;align-items:center;gap:8px;background:#f8fafc;border-bottom:1px solid #e2e8f0;padding:7px 12px;min-height:36px}@media(max-width:760px){.b9grid{grid-template-columns:1fr!important}}</style>
 </head>
 <body>
 
@@ -18531,7 +18531,7 @@ function b9List(){
   el.innerHTML=`<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><b style="font-size:17px">📋 全部明細</b><span style="font-size:13.5px;color:#475569">${rows.length} 筆</span>
       <select onchange="_b9.yr=this.value;b9List()" style="margin-left:auto;padding:5px 10px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;font-weight:700;font-family:inherit"><option value="all">全部年份</option>${yrs.map(y=>`<option value="${y}" ${_b9.yr===y?'selected':''}>${y} 年</option>`).join('')}</select></div>
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">${chip('','全部')}${D.codes.map(c=>chip(c,_ae(c),D.col[c])).join('')}</div>${sum}
-    <div style="margin-top:8px">${keys.length?keys.map(k=>{const L=g[k],t=L.reduce((s,d)=>s+d.amount,0);return`<div style="display:flex;align-items:center;gap:8px;padding:10px 10px 6px;font-weight:900;font-size:14px;color:${k==='pend'?'#b45309':'#0f172a'}">${k==='pend'?'⏳ 待入帳':k.slice(0,4)+' / '+(+k.slice(5))+' 月'}<span style="height:1px;flex:1;background:#e2e8f0"></span><span class="b9mono" style="color:#dc2626">${_b6m(t)}</span></div>${L.map(li).join('')}`;}).join(''):'<div style="color:#64748b;padding:16px;text-align:center">沒有符合的記錄</div>'}</div>`;
+    <div style="margin-top:8px">${keys.length?_tlWrap(keys.map(k=>{const L=g[k],t=L.reduce((s,d)=>s+d.amount,0);return{pend:k==='pend',m:k==='pend'?'':k,head:`<span style="color:#475569;font-size:12.5px"><b style="color:#0f172a">${L.length} 筆</b>${k==='pend'?'・還沒入帳':''}</span><span class="b9mono" style="margin-left:auto;color:#dc2626;font-weight:800;font-size:15px">${_b6m(t)}</span>`,body:L.map(li).join('')};})):'<div style="color:#64748b;padding:16px;text-align:center">沒有符合的記錄</div>'}</div>`;
   if(_b9Sp){_b9Sp.destroy();_b9Sp=null;}
   const sp=document.getElementById('b9-sp');
   if(sp&&window.Chart){const P=rows.filter(d=>d.date<=D.T&&!d.pending).sort((a,b)=>a.date.localeCompare(b.date));
@@ -18540,6 +18540,90 @@ function b9List(){
 }
 (function(){const _r=renderDivs;renderDivs=function(){const r=_r.apply(this,arguments);try{if(document.getElementById('dbpage-dividend')?.classList.contains('active'))b9Render();}catch(e){console.warn('b9',e);}return r;};})();
 (function(){const _r=renderDivChart;renderDivChart=function(){const r=_r.apply(this,arguments);try{if(document.getElementById('dbpage-dividend')?.classList.contains('active'))_b9Draw();}catch(e){console.warn('b9c',e);}return r;};})();
+
+// ══════════════════════════════════════════════════════════════
+// 🗂 月份分段（E3 時間軸串卡片／E1 卡片＋左側月份欄）：股息明細、基金扣款紀錄、交易日誌、資產趨勢快照
+// ══════════════════════════════════════════════════════════════
+// groups: [{m:'YYYY-MM', pend:bool, head:html, body:html, collapsed:bool, onHead:'js'}]
+function _tlWrap(groups){
+  let n=0;
+  return groups.map((g,i)=>{
+    const last=i===groups.length-1, c=g.pend?'#d97706':((n++)%2?'#475569':'#dc2626');
+    const top=g.pend?'⏳':(+g.m.slice(5)), sub=g.pend?'待入帳':'月', yr=g.pend?'':g.m.slice(0,4);
+    return `<div class="tl-g" data-m="${g.m||'pend'}" style="display:grid;grid-template-columns:58px minmax(0,1fr);gap:8px">
+      <div style="text-align:center;position:relative"><div style="position:absolute;left:50%;top:0;bottom:${last?'calc(100% - 40px)':'0'};border-left:2px dashed #cbd5e1"></div>
+        <div style="position:relative;margin-top:6px;background:${c};color:#fff;border-radius:12px;padding:6px 0;box-shadow:0 0 0 4px #fff"><div style="font-size:${g.pend?16:20}px;font-weight:900;line-height:1.1">${top}</div><div style="font-size:11px">${sub}</div></div>
+        ${yr?`<div style="position:relative;font-size:11px;color:#475569;background:#fff;margin-top:2px">${yr}</div>`:''}</div>
+      <div class="tl-card" style="margin-bottom:10px"><div class="tl-hd" ${g.onHead?`onclick="event.stopPropagation();${g.onHead}" style="cursor:pointer;${g.collapsed?'border-bottom:none':''}"`:g.collapsed?'style="border-bottom:none"':''}>${g.head}</div>${g.collapsed?'':g.body}</div></div>`;
+  }).join('');
+}
+
+// ── 基金扣款紀錄（E3）──
+(function(){const _o=fundLogBoxHTML;fundLogBoxHTML=function(fundId){
+  const out=_o.apply(this,arguments);
+  try{
+    const hdEnd=out.indexOf('</button></span></div>');if(hdEnd<0)return out;
+    const head=out.slice(0,hdEnd+22).replace('font-size:10px;font-weight:700;color:#374151','font-size:13px;font-weight:800;color:#0f172a').replace('color:#94a3b8;font-weight:400','color:#475569;font-weight:600').replace(/font-size:10px;font-weight:700;cursor:pointer/g,'font-size:12px;font-weight:700;cursor:pointer');
+    const logs=(db.fundDeductionLogs||[]).filter(r=>r.fundId===fundId).sort((a,b)=>b.date.localeCompare(a.date));
+    const view=_fundLogView[fundId]||'m', ym=_twToday().slice(0,7);
+    let months=[...new Set(logs.map(r=>r.date.slice(0,7)))]; if(view==='m')months=[ym];
+    const latest=months[0];
+    const groups=months.map(m=>{const ml=logs.filter(r=>r.date.startsWith(m)), t=ml.reduce((s,r)=>s+(r.amount||0),0);
+      const key='m'+fundId+m, def=m===latest, open=view==='m'||_fundLogOpen.has(key)||(def&&!_fundLogOpen.has('x'+key));
+      return{m,collapsed:!open,onHead:view==='m'?'':`toggleFundLogGroup('${key}',${def?1:0})`,
+        head:`${view==='m'?'':`<span style="color:#94a3b8;width:12px">${open?'▾':'▸'}</span>`}<b style="font-size:13.5px">${ml.length} 次</b><span style="font-size:12.5px;color:#475569">${[...new Set(ml.map(r=>'週'+_WK[_dowOf(r.date)]))].join('、')}</span><span style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-weight:800;color:#16a34a">-$${t.toLocaleString()}</span>`,
+        body:ml.length?ml.map((r,j)=>`<div style="display:flex;justify-content:space-between;padding:6px 12px;font-size:13px;${j?'border-top:1px solid #f1f5f9':''}"><span style="color:#334155"><span style="font-family:'JetBrains Mono',monospace">${_md(r.date)}</span> 週${_WK[_dowOf(r.date)]}</span><span style="font-weight:700;color:#16a34a;font-family:'JetBrains Mono',monospace">-$${(r.amount||0).toLocaleString()}</span></div>`).join(''):'<div style="padding:10px;text-align:center;color:#64748b;font-size:13px">本月尚無扣款</div>'};});
+    return head+`<div style="padding:10px 10px 2px">${logs.length||view==='m'?_tlWrap(groups):'<div style="padding:8px;text-align:center;color:#64748b;font-size:13px">尚無紀錄</div>'}</div>`;
+  }catch(e){console.warn('fundTL',e);return out;}
+};})();
+
+// ── 交易日誌（E3）：原本的每一篇保留，按月份包進時間軸卡片 ──
+(function(){const _o=renderJournalPage;renderJournalPage=function(){
+  const r=_o.apply(this,arguments);
+  try{
+    const box=document.getElementById('journal-page-list');if(!box)return r;
+    const items=[...box.children].filter(el=>/openJournalDrawer\('/.test(el.getAttribute('onclick')||''));if(!items.length)return r;
+    const all=jAll(), byId={};all.forEach(j=>byId[j.id]=j);
+    const ser=jIndexSeries();
+    const idxAt=(m)=>{const inM=ser.filter(x=>x.d.slice(0,7)===m);if(!inM.length)return null;const prev=ser.filter(x=>x.d.slice(0,7)<m).pop();const a=prev?prev.v:inM[0].v,b=inM[inM.length-1].v;return a?(b/a-1)*100:null;};
+    const G=[];items.forEach(el=>{const id=(el.getAttribute('onclick').match(/openJournalDrawer\('([^']+)'/)||[])[1];const j=byId[id];const m=(j?.date||'').slice(0,7)||'—';let g=G[G.length-1];if(!g||g.m!==m){g={m,els:[],js:[]};G.push(g);}g.els.push(el);g.js.push(j);});
+    const frag=document.createElement('div');frag.style.cssText='padding:4px 14px 0';
+    frag.innerHTML=_tlWrap(G.map(g=>{const mc={};g.js.forEach(j=>{const md=jMeta(j).mood;if(md&&J_MOODS[md])mc[md]=(mc[md]||0)+1;});
+      const moods=Object.keys(mc).sort((a,b)=>mc[b]-mc[a]).map(k=>`${J_MOODS[k].e} ${J_MOODS[k].t} ${mc[k]}`).join('・');
+      const ch=g.m==='—'?null:idxAt(g.m);
+      return{m:g.m==='—'?'0000-00':g.m,head:`<b style="font-size:13.5px">${g.els.length} 篇</b>${moods?`<span style="font-size:12.5px;color:#475569">・${moods}</span>`:''}${ch!=null?`<span style="margin-left:auto;font-size:12.5px;color:#475569">這個月大盤 <b style="font-family:'JetBrains Mono',monospace;color:${ch>=0?'#dc2626':'#16a34a'}">${ch>=0?'▲':'▼'}${Math.abs(ch).toFixed(1)}%</b></span>`:''}`,body:''};}));
+    const cards=[...frag.querySelectorAll('.tl-card')];
+    G.forEach((g,i)=>{g.els.forEach((el,k)=>{el.style.borderBottom='none';el.style.padding='10px 14px';if(k)el.style.borderTop='1px solid #f1f5f9';cards[i].appendChild(el);});});
+    box.innerHTML='';box.appendChild(frag);
+  }catch(e){console.warn('journalTL',e);}
+  return r;
+};})();
+
+// ── 資產趨勢・歷史快照（E1：卡片＋左側月份欄；淨資產黑色、股息紅色）──
+renderTrendPageTable=function(){
+  const el=document.getElementById('trend-page-table');if(!el)return;
+  const snaps=(db.snapshots||[]).slice().sort((a,b)=>(b.ym||'').slice(0,10).localeCompare((a.ym||'').slice(0,10)));
+  if(!snaps.length){el.innerHTML='<div style="padding:20px;text-align:center;color:#64748b;font-size:13px">尚無快照記錄</div>';return;}
+  const G=[];snaps.forEach(s=>{const m=(s.ym||'').slice(0,7);let g=G[G.length-1];if(!g||g.m!==m){g={m,l:[]};G.push(g);}g.l.push(s);});
+  const cols='grid-template-columns:96px minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) 72px 92px';
+  const hd=`<div style="display:grid;grid-template-columns:110px 1fr;margin:0 2px 4px"><span></span><div style="display:grid;${cols};gap:8px;padding:0 12px;font-size:12.5px;font-weight:700;color:#475569"><span>日期</span><span style="text-align:right">大盤</span><span style="text-align:right">淨資產</span><span style="text-align:right">每月股息</span><span style="text-align:right">負債比</span><span></span></div></div>`;
+  el.innerHTML=`<div style="padding:12px 14px 4px">${hd}${G.map((g,gi)=>{
+    const end=g.l[0].net||0, prevG=G[gi+1], base=prevG?prevG.l[0].net:g.l[g.l.length-1].net, ch=end-(base||0), p=base?ch/base*100:0, up=ch>=0;
+    return`<div class="tl-card" style="display:grid;grid-template-columns:110px minmax(0,1fr);margin-bottom:10px">
+      <div style="background:#f8fafc;border-right:1px solid #e2e8f0;text-align:center;padding:10px 4px;display:flex;flex-direction:column;justify-content:center">
+        <div style="font-size:26px;font-weight:900;line-height:1">${+g.m.slice(5)}<span style="font-size:13px">月</span></div><div style="font-size:12px;color:#475569;margin-top:2px">${g.m.slice(0,4)}・${g.l.length} 次</div>
+        <div class="privacy-mask" style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:800;margin-top:6px;color:${up?'#dc2626':'#16a34a'}">${up?'▲':'▼'}${Math.abs(p).toFixed(1)}%</div>
+        <div class="privacy-mask" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:${up?'#dc2626':'#16a34a'}">${up?'+':'−'}$${Math.abs(Math.round(ch)).toLocaleString()}</div>
+        ${prevG?'':'<div style="font-size:11px;color:#64748b;margin-top:2px">（月初→月底）</div>'}</div>
+      <div>${g.l.map((s,i)=>`<div style="display:grid;${cols};gap:8px;align-items:center;padding:8px 12px;font-size:13.5px;${i?'border-top:1px solid #f1f5f9':''}">
+        <b style="font-family:'JetBrains Mono',monospace;color:#1e293b">${(s.ym||'').slice(5,10).replace('-','/')}</b>
+        <span style="text-align:right;font-family:'JetBrains Mono',monospace;color:#475569">${s.indexVal?s.indexVal.toLocaleString():'—'}</span>
+        <b class="privacy-mask" style="text-align:right;font-family:'JetBrains Mono',monospace;color:#0f172a">$${Math.round(s.net||0).toLocaleString()}</b>
+        <span class="privacy-mask" style="text-align:right;font-family:'JetBrains Mono',monospace;color:#dc2626;font-weight:700">$${Math.round(s.div||0).toLocaleString()}</span>
+        <span style="text-align:right;color:#334155">${s.debtRatio??'—'}%</span>
+        <span style="text-align:right;white-space:nowrap"><button onclick="openSnapDetail('${s.ym}')" style="padding:3px 8px;background:#eff6ff;border:1px solid #bfdbfe;color:#2563eb;border-radius:6px;font-size:12px;cursor:pointer;font-weight:700">📋</button><button onclick="deleteSnapshot('${s.ym}')" style="padding:3px 8px;background:#fff;border:1px solid #fca5a5;color:#dc2626;border-radius:6px;font-size:12px;cursor:pointer;margin-left:4px;font-weight:700">刪</button></span></div>`).join('')}</div></div>`;}).join('')}</div>`;
+};
+try{if(document.getElementById('dbpage-trend')?.classList.contains('active'))renderTrendPageTable();}catch(e){}
 </script>
 
 </div><!-- /main-content -->
