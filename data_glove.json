@@ -374,7 +374,7 @@
       "brand": "久保田SLUGGER",
       "model": "T9S",
       "position": "二壘",
-      "size": "11",
+      "size": "11.25",
       "buyDate": "2026-06-22",
       "buyPrice": 8000,
       "sellDate": "",
@@ -392,7 +392,7 @@
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1783142476176_sp34.jpg",
         "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/glove-images/1783592296326_nzkg.jpg"
       ],
-      "updatedAt": "2026-07-09T10:18:23.264Z",
+      "updatedAt": "2026-10-22T13:09:42.662Z",
       "createdAt": "2026-07-04T05:21:20.890Z"
     },
     {
@@ -422,5 +422,5 @@
       "createdAt": "2026-07-09T10:17:57.603Z"
     }
   ],
-  "_ts": 1788617803047
+  "_ts": 1792674585677
 }
