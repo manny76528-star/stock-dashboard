@@ -3083,7 +3083,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1792769996196,
+  "_ts": 1792772852429,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -3170,6 +3170,37 @@
     }
   ],
   "journals": [
+    {
+      "id": "mvl6o1cx2k7",
+      "date": "2026-10-23",
+      "tags": [],
+      "jv2": true,
+      "jView": "",
+      "jMood": 2,
+      "jAction": "",
+      "star": false,
+      "market": "Meta財報嚇跑AI股 費半急殺近7％ 記憶體大失血 台股ADR倒一片",
+      "market2": "科技股挫使公債成避風港！10年期美債殖利率跌破5％ 近一個月首見",
+      "market3": "",
+      "marketColor": "",
+      "market2Color": "",
+      "market3Color": "",
+      "marketUrl": "https://www.ctee.com.tw/news/20261023700374-430702",
+      "marketUrl2": "https://www.ctee.com.tw/news/20261023700544-430702",
+      "marketUrl3": "",
+      "youtubeUrl": "",
+      "content": "Meta 這次宣布加碼 AI 投資，結果搞到自己自由現金流變成負的\n讓市場開始嚇壞，擔心 AI 這塊大餅根本是無底洞、不知道什麼時候才能回本，\n導致半導體和記憶體股票被瘋狂倒貨。費城半導體指數單日直接慘崩快 7%\n不只把之前的漲幅全吐回去，還快要跌破 7 月份的前波低點了。\n\n另一邊，過去這兩個月因為通膨和政府亂發債，導致美債殖利率一路失控飆高。\n不過這次剛好碰上科技股大失血，加上中東那邊地緣政治緊張，整個局勢大反轉！大家為了避開股市大殺戮，把債券當成避風港、資金瘋狂湧入，債券價格大漲\n讓 10 年期美債殖利率直接跌破 5% 大關，創下近一個月來首見的明顯回檔。",
+      "stockTags": [],
+      "eventCat": "",
+      "behavior": "",
+      "indexVal": 46041,
+      "stockPrices": null,
+      "aiAnalysis": null,
+      "images": [
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1792772596139_q0sq.jpg",
+        "https://raw.githubusercontent.com/manny76528-star/stock-dashboard/main/journal-images/1792772845212_uq0w.jpg"
+      ]
+    },
     {
       "id": "mvgwhofrrj1",
       "date": "2026-10-20",
@@ -8784,7 +8815,7 @@
         "bank": "line Bank-1",
         "monthly": 17807,
         "deductDay": "13號",
-        "days": 21,
+        "days": 20,
         "pct": 60,
         "paid": 27,
         "remain": 18,
@@ -8795,7 +8826,7 @@
         "bank": "line Bank-2",
         "monthly": 6319,
         "deductDay": "14號",
-        "days": 22,
+        "days": 21,
         "pct": 40,
         "paid": 22,
         "remain": 33,
@@ -8806,7 +8837,7 @@
         "bank": "line Bank-4",
         "monthly": 12400,
         "deductDay": "1號",
-        "days": 9,
+        "days": 8,
         "pct": 41,
         "paid": 14,
         "remain": 20,
@@ -8817,7 +8848,7 @@
         "bank": "line Bank-5",
         "monthly": 9495,
         "deductDay": "12號",
-        "days": 20,
+        "days": 19,
         "pct": 29,
         "paid": 10,
         "remain": 25,
