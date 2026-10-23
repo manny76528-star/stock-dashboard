@@ -3083,7 +3083,7 @@
       "clearedDate": "2026-09-03"
     }
   ],
-  "_ts": 1792772852429,
+  "_ts": 1792772859727,
   "watchlist": [
     {
       "id": "mo4gowml2q0",
@@ -3182,8 +3182,8 @@
       "market": "Meta財報嚇跑AI股 費半急殺近7％ 記憶體大失血 台股ADR倒一片",
       "market2": "科技股挫使公債成避風港！10年期美債殖利率跌破5％ 近一個月首見",
       "market3": "",
-      "marketColor": "",
-      "market2Color": "",
+      "marketColor": "green",
+      "market2Color": "red",
       "market3Color": "",
       "marketUrl": "https://www.ctee.com.tw/news/20261023700374-430702",
       "marketUrl2": "https://www.ctee.com.tw/news/20261023700544-430702",
