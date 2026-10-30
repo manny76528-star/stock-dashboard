@@ -702,6 +702,16 @@ body:not(.privacy) .privacy-mask{filter:none;}
 .v22-ck{display:flex;gap:6px;align-items:center;margin-top:8px;font-size:13px;font-weight:700;cursor:pointer}.v22-warn:not(:empty){background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:8px 10px;font-size:12.5px;color:#9a3412;margin-top:10px;line-height:1.6}
 .v22-ln{display:flex;justify-content:space-between;padding:7px 2px;border-top:1px solid #f1f5f9;font-size:13.5px}
 </style>
+<style>/* v23 */
+#v14-sys{display:none!important}#v21-sec{padding-top:6px}
+.v23-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:16px;align-items:start}.v23-r .v14-g4{grid-template-columns:1fr 1fr!important;margin-top:10px}.v23-r .v14-k{background:#f8fafc;border-color:#eef2f7}
+#v21-sec .v21-card{max-width:none}
+@media(max-width:900px){.v23-grid{grid-template-columns:1fr}}
+.v11-2.v23-3{grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr)!important}
+@media(max-width:900px){.v11-2.v23-3{grid-template-columns:1fr!important}}
+#v23-mg.on{background:#f5f3ff;color:#6d28d9;border-radius:8px;padding:0 6px}
+#v15-loans.v23-mg .v15-lr{border-style:dashed;border-color:#c4b5fd}
+</style>
 </head>
 <body>
 
@@ -20163,9 +20173,10 @@ const V22L={enc:['🔒 已加密','ok'],plain:['🔓 未加密','no'],none:['—
 async function v22Render(){
   const card=document.querySelector('#v21-sec .v21-card');if(!card||typeof encGetKey!=='function'||!syncGetKey())return;
   let el=document.getElementById('v22-enc');if(!el){el=document.createElement('div');el.id='v22-enc';card.querySelector('.v21-btns').before(el);}
-  el.innerHTML=`<div class="v21-row" style="align-items:flex-start"><span class="v21-ic">🗄️</span><div style="flex:1"><b>GitHub 上的資料檔</b><div class="v21-mu">別人打開 GitHub 看到的是不是亂碼</div>
-    <div class="v22-fs">${V22_FILES.map(([f,n])=>`<div><span>${n}</span><b id="v22-s-${f.replace(/\W/g,'')}" class="v21-st">…</b></div>`).join('')}</div></div></div>`;
-  let any=false,all=true;for(const [f] of V22_FILES){const s=await v22State(f),b=document.getElementById('v22-s-'+f.replace(/\W/g,''));if(b){b.textContent=V22L[s][0];b.className='v21-st '+V22L[s][1];}if(s==='plain'){all=false;}if(s==='enc')any=true;}
+  el.innerHTML=`<div class="v21-row"><span class="v21-ic">🗄️</span><div><b>GitHub 資料檔</b><div class="v21-mu" id="v22-sum">股票・進銷存・手套・單字</div></div><span class="v21-st" id="v22-pill">檢查中…</span></div>`;
+  let any=false,all=true,nE=0,nT=0;const det=[];for(const [f,n] of V22_FILES){const s=await v22State(f);if(s!=='none')nT++;if(s==='enc')nE++;det.push(n+' '+V22L[s][0]);if(s==='plain'){all=false;}if(s==='enc')any=true;}
+  const pl=document.getElementById('v22-pill');if(pl){pl.textContent=nE===nT?`✓ ${nE}/${nT} 加密`:`${nE}/${nT} 加密`;pl.className='v21-st '+(nE===nT?'ok':'no');pl.title=det.join('\n');}
+  const sm=document.getElementById('v22-sum');if(sm&&nE!==nT)sm.textContent=det.filter(x=>!/已加密|沒有資料/.test(x)).join('・');
   const btns=card.querySelector('.v21-btns');let bt=document.getElementById('v22-go');if(!bt){bt=document.createElement('button');bt.id='v22-go';bt.className='v21-b1';bt.onclick=v22Start;btns.prepend(bt);}
   bt.textContent=all&&any?'🔒 已全部加密（重新加密一次）':'🔒 開始加密';bt.style.background=all&&any?'#64748b':'';
 }
@@ -20200,6 +20211,43 @@ async function v22Run(){
 
 // 加密後先不給「重新設定資料密碼」：換密碼要連資料一起重新加密，否則每台都會解不開
 (function(){const _s=v21Setup;v21Setup=function(){if(typeof encIsOn==='function'&&encIsOn()&&syncGetKey()){v21Modal(`<div class="v21-mh">🔑 更換資料密碼<span class="v21-x" onclick="v21Close()">×</span></div><div class="v21-mb"><div class="v21-mu" style="line-height:1.8;font-size:13.5px">資料已經用這組密碼加密了。<br>換密碼要「用舊密碼解開 → 用新密碼重新加密 → 更新 Cloudflare 和 GitHub 的兩把鑰匙」一起做，直接換會讓每台裝置都解不開。<br><br>這個「安全換密碼」功能還沒做，需要換的時候跟我說，我再幫你加上。</div><button class="v21-b1" style="width:100%;margin-top:12px" onclick="v21Close()">知道了</button></div>`);return;}return _s.apply(this,arguments);};})();
+
+// ══ v23：關於我 S1（資料安全＋系統狀態合成一張卡、放最上面）／今天 T2（要處理｜提醒｜資料健康檢查 同一排）／信貸 E3（點列＝集點卡、✏️ 管理才編輯）══
+(function(){const _r=v21Render;v21Render=async function(){const r=await _r.apply(this,arguments);try{v23About();}catch(e){console.warn('v23 about',e);}return r;};})();
+function v23About(){
+  const pg=document.getElementById('dbpage-about'),sec=document.getElementById('v21-sec');if(!pg||!sec)return;
+  if(pg.firstElementChild!==sec)pg.prepend(sec);
+  const t=sec.querySelector('.v14-title');if(t)t.textContent='🛡️ 資料安全與系統狀態';
+  const card=sec.querySelector('.v21-card');if(!card||card.querySelector('.v23-grid'))return;
+  const L=document.createElement('div'),R=document.createElement('div'),G=document.createElement('div');G.className='v23-grid';L.className='v23-l';R.className='v23-r';
+  [...card.querySelectorAll(':scope > .v21-row, :scope > #v22-enc')].forEach(x=>L.appendChild(x));
+  try{const tmp=document.createElement('div');tmp.innerHTML=v14SyncHTML();const g=tmp.querySelector('.v14-g4');if(g)R.appendChild(g);}catch(e){}
+  G.append(L,R);card.prepend(G);
+}
+// 今天：健康檢查自己一欄（提醒欄不再塞健康檢查那一行）
+(function(){const _i=v11Items;v11Items=function(){const R=_i.apply(this,arguments);try{R.note=R.note.filter(x=>x[0]!=='🩺');}catch(e){}return R;};})();
+(function(){const _r=v11RenderToday;v11RenderToday=function(){const r=_r.apply(this,arguments);try{
+  const two=document.querySelector('#v11-today .v11-2');if(!two||two.querySelector('.v23-health'))return r;
+  let H=[];try{H=v14Health();}catch(e){}
+  const W=H.filter(x=>x.lv==='warn'),okN=H.length-W.length;
+  const c=document.createElement('div');c.className='v11-col v23-health';c.style.borderColor='#fde68a';
+  c.innerHTML=`<b style="color:#b45309">🩺 資料健康檢查 ${W.length}</b>${W.map(x=>`<div class="v11-it" ${x.go?`onclick="${x.go}"`:''}><span class="v11-ic">⚠️</span><div style="min-width:0"><b>${_ae(x.t)}</b>${x.s?`<div class="v11-sub">${_ae(x.s)}</div>`:''}</div>${x.go?`<span class="v11-go" style="color:#2563eb">${x.btn||''} ›</span>`:''}</div>`).join('')}<div class="v11-sub" style="padding:8px 4px 2px">${W.length?'✅ 其他 '+okN+' 項正常':'✅ '+okN+' 項都正常'}</div>`;
+  two.appendChild(c);two.classList.add('v23-3');
+}catch(e){console.warn('v23 today',e);}return r;};})();
+// 信貸：點整列＝還款卡；右上「✏️ 管理」打開後，點列才是編輯
+let _v23Manage=false;
+function v23ToggleManage(){_v23Manage=!_v23Manage;v23Loans();}
+function v23Loans(){
+  const box=document.getElementById('v15-loans');if(!box)return;
+  const h=box.querySelector('.v15-h');let b=document.getElementById('v23-mg');
+  if(h&&!b){b=document.createElement('span');b.id='v23-mg';b.className='v15-lk';b.onclick=v23ToggleManage;const add=[...h.querySelectorAll('.v15-lk')].find(x=>/新增/.test(x.textContent));add?add.before(b):h.appendChild(b);}
+  if(b){b.textContent=_v23Manage?'✓ 完成':'✏️ 管理';b.classList.toggle('on',_v23Manage);}
+  box.classList.toggle('v23-mg',_v23Manage);
+  box.querySelectorAll('.v15-lr').forEach(row=>{const id=((row.getAttribute('onclick')||'').match(/editLoan\('([^']+)'/)||[])[1];if(!id)return;
+    row.onclick=_v23Manage?()=>editLoan(id):e=>v19Show(id,e);row.title=_v23Manage?'點一下編輯這筆信貸':'點一下看還款卡';
+    const bt=row.querySelector('.v19-bt');if(bt){bt.textContent=_v23Manage?'✏️':'🎫';bt.onclick=e=>{e.stopPropagation();_v23Manage?editLoan(id):v19Show(id,e);};}});
+}
+(function(){const _p=v19Paint;v19Paint=function(){const r=_p.apply(this,arguments);try{v23Loans();}catch(e){console.warn('v23 loans',e);}return r;};})();
 </script>
 
 </div><!-- /main-content -->
