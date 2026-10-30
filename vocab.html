@@ -1,0 +1,1807 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>🇯🇵 日文單字練習</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Sans+JP:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script>
+// ══ 🔐 資料密碼＋資料加密（2026/10）══
+//   1) 呼叫雲端同步服務時自動帶通行碼（X-Sync-Key）；查股價、大盤不用帶
+//   2) 四個資料檔上傳前自動加密（AES-256-GCM）、下載後自動解開；各頁面原本的同步程式完全不用改
+//   3) 這台沒有鑰匙卻讀到加密檔 → 不交出資料、也不准上傳（避免拿舊資料蓋掉雲端），跳出輸入密碼
+(function(){
+  const W='https://dashboard-sync.manny76528.workers.dev', KS='syncKey_v1', KE='encKey_v1', KON='encOn_v1';
+  const ENC_FILES=['data_dashboard.json','data_inventory.json','data_glove.json','data_vocab.json'];
+  const SALT='stock-dashboard/manny76528-star/data-v1', ITER=600000;
+  const ls={get:k=>{try{return localStorage.getItem(k)||'';}catch(e){return'';}},set:(k,v)=>{try{v?localStorage.setItem(k,v):localStorage.removeItem(k);}catch(e){}}};
+  const te=new TextEncoder(), td=new TextDecoder();
+  async function hex(s){const b=await crypto.subtle.digest('SHA-256',typeof s==='string'?te.encode(s):s);return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');}
+  const h2b=h=>new Uint8Array(h.match(/../g).map(x=>parseInt(x,16)));
+  const b2b64=u=>{let s='';for(let i=0;i<u.length;i+=0x8000)s+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return btoa(s);};
+  const b642b=b=>{const s=atob(String(b).replace(/\s/g,''));const u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return u;};
+  window.syncKeyFromPw=pw=>hex('sync:'+pw);
+  window.syncHashFromKey=k=>hex(k);
+  window.syncGetKey=()=>ls.get(KS); window.syncSetKey=k=>ls.set(KS,k);
+  window.encGetKey=()=>ls.get(KE); window.encSetKey=k=>ls.set(KE,k);
+  window.encIsOn=()=>ls.get(KON)==='1'; window.encSetOn=v=>ls.set(KON,v?'1':'');
+  window.encKeyFromPw=async pw=>{const base=await crypto.subtle.importKey('raw',te.encode(pw),'PBKDF2',false,['deriveBits']);
+    const bits=await crypto.subtle.deriveBits({name:'PBKDF2',salt:te.encode(SALT),iterations:ITER,hash:'SHA-256'},base,256);return [...new Uint8Array(bits)].map(x=>x.toString(16).padStart(2,'0')).join('');};
+  window.encKid=async k=>(await hex(h2b(k))).slice(0,8);
+  const isEnv=o=>o&&typeof o==='object'&&o.enc==='v1'&&o.ct&&o.iv;
+  window.encIsEnvelopeText=t=>{try{return isEnv(JSON.parse(t));}catch(e){return false;}};
+  async function aes(k){return crypto.subtle.importKey('raw',h2b(k),'AES-GCM',false,['encrypt','decrypt']);}
+  window.encSeal=async(plainBytes,k)=>{const iv=crypto.getRandomValues(new Uint8Array(12));const ct=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv},await aes(k),plainBytes));
+    return JSON.stringify({enc:'v1',alg:'AES-256-GCM',kdf:'PBKDF2-SHA256-'+ITER,kid:await encKid(k),ts:Date.now(),iv:b2b64(iv),ct:b2b64(ct)});};
+  window.encOpen=async(env,k)=>new Uint8Array(await crypto.subtle.decrypt({name:'AES-GCM',iv:b642b(env.iv)},await aes(k),b642b(env.ct)));
+  const pub=u=>/^\/(price|index)(\?|$)/.test(u.slice(W.length));
+  const fileOf=u=>decodeURIComponent(u.slice(W.length+1).split('?')[0]);
+  const _f=window.fetch.bind(window);window._syncRawFetch=_f;
+  const fail=(st,msg)=>new Response(JSON.stringify({error:msg,message:msg}),{status:st,headers:{'Content-Type':'application/json'}});
+  window.fetch=async function(input,init){
+    const url=typeof input==='string'?input:(input&&input.url)||'';
+    if(!url.startsWith(W)||pub(url))return _f(input,init);
+    const k=window.syncGetKey();
+    init=Object.assign({},init||{});
+    if(k){const h=new Headers(init.headers||(typeof input!=='string'&&input.headers)||{});h.set('X-Sync-Key',k);init.headers=h;}
+    const file=fileOf(url), method=String(init.method||(typeof input!=='string'&&input.method)||'GET').toUpperCase(), enc=ENC_FILES.includes(file);
+    if(enc&&method==='PUT'){
+      try{const body=JSON.parse(init.body);const ek=window.encGetKey();
+        if(ek&&window.encIsOn()){body.content=b2b64(te.encode(await encSeal(b642b(body.content),ek)));init.body=JSON.stringify(body);}
+        else{ // 這台沒開加密：先看雲端是不是已經加密了，是的話不准用明文蓋掉
+          const r0=await _f(W+'/'+file+'?t='+Date.now(),{headers:init.headers});
+          if(r0.ok){const j0=await r0.json();if(j0&&j0.content&&isEnv(JSON.parse(td.decode(b642b(j0.content))))){setTimeout(()=>window.syncAsk('enc'),0);return fail(423,'encrypted: need key');}}}
+      }catch(e){console.warn('[加密] 上傳前處理失敗',e);return fail(500,'encrypt failed');}
+    }
+    const r=await _f(input,init);
+    if(r.status===401){setTimeout(()=>window.syncAsk(k?'wrong':'first'),0);return r;}
+    if(enc&&method==='GET'&&r.ok){
+      let j;try{j=await r.clone().json();}catch(e){return r;}
+      if(!j||!j.content)return r;
+      let env=null;try{const o=JSON.parse(td.decode(b642b(j.content)));if(isEnv(o))env=o;}catch(e){}
+      if(!env)return r;
+      window.encSetOn(true);
+      const ek=window.encGetKey();
+      if(!ek){setTimeout(()=>window.syncAsk('enc'),0);return fail(423,'encrypted: need key');}
+      if(env.kid&&env.kid!==await encKid(ek)){setTimeout(()=>window.syncAsk('enckey'),0);return fail(423,'encrypted: wrong key');}
+      try{const plain=await encOpen(env,ek);j.content=b2b64(plain);return new Response(JSON.stringify(j),{status:200,headers:{'Content-Type':'application/json'}});}
+      catch(e){setTimeout(()=>window.syncAsk('enckey'),0);return fail(423,'decrypt failed');}
+    }
+    return r;
+  };
+  let shown=false;
+  const MSG={first:['這台裝置第一次同步','輸入「資料密碼」才能讀寫雲端資料',''],wrong:['資料密碼不對或已更換','輸入「資料密碼」才能讀寫雲端資料','⚠️ 雲端拒絕了這台裝置記住的密碼，請重新輸入'],
+    enc:['雲端資料已加密','輸入「資料密碼」解開這台的資料',''],enckey:['資料密碼不對或已更換','雲端資料用另一組密碼加密','⚠️ 這台記住的鑰匙解不開，請重新輸入資料密碼']};
+  window.syncAsk=function(why){
+    if(shown||document.getElementById('sa-bg'))return;shown=true;const M=MSG[why]||MSG.first;
+    const go=()=>{const bg=document.createElement('div');bg.id='sa-bg';
+      bg.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:2147483000;display:flex;align-items:center;justify-content:center;padding:16px;font-family:-apple-system,"PingFang TC","Noto Sans TC",sans-serif';
+      bg.innerHTML=`<div style="background:#fff;border-radius:18px;width:min(380px,100%);box-shadow:0 30px 70px rgba(0,0,0,.3);overflow:hidden">
+        <div style="text-align:center;padding:22px 18px 8px;background:linear-gradient(135deg,#eff6ff,#f5f3ff)"><div style="font-size:38px">🔐</div><b style="font-size:17px;color:#0f172a">${M[0]}</b><div style="font-size:12.5px;color:#64748b;margin-top:4px">${M[1]}</div></div>
+        <div style="padding:14px 18px 18px"><div style="display:flex;align-items:center;border:1.5px solid #93c5fd;border-radius:11px;padding:0 10px;box-shadow:0 0 0 3px #dbeafe"><input id="sa-pw" type="password" autocomplete="current-password" style="flex:1;border:none;outline:none;padding:11px 0;font-size:16px;background:transparent;min-width:0" placeholder="資料密碼"><span id="sa-eye" style="cursor:pointer;font-size:16px">👁</span></div>
+        ${M[2]?`<div style="color:#dc2626;font-size:12.5px;margin-top:6px">${M[2]}</div>`:''}
+        <div id="sa-st" style="font-size:12px;color:#64748b;margin-top:8px">輸入一次就會記在這台裝置，之後不會再問。</div>
+        <div style="display:flex;gap:8px;margin-top:14px"><button id="sa-no" style="flex:1;padding:10px;border:1px solid #e2e8f0;border-radius:11px;background:#fff;color:#64748b;font-weight:700;font-size:14px;cursor:pointer">先不要</button><button id="sa-ok" style="flex:2;padding:10px;border:none;border-radius:11px;background:#2563eb;color:#fff;font-weight:800;font-size:14px;cursor:pointer">解開並同步</button></div></div></div>`;
+      document.body.appendChild(bg);const pw=bg.querySelector('#sa-pw');setTimeout(()=>pw.focus(),50);
+      bg.querySelector('#sa-eye').onclick=()=>{pw.type=pw.type==='password'?'text':'password';};
+      bg.querySelector('#sa-no').onclick=()=>{bg.remove();};
+      const ok=async()=>{if(!pw.value)return;const st=bg.querySelector('#sa-st');st.textContent='🔑 產生鑰匙中（第一次約 1–3 秒）…';
+        window.syncSetKey(await window.syncKeyFromPw(pw.value));window.encSetKey(await window.encKeyFromPw(pw.value));location.reload();};
+      bg.querySelector('#sa-ok').onclick=ok;pw.onkeydown=e=>{if(e.key==='Enter')ok();};};
+    if(document.body)go();else document.addEventListener('DOMContentLoaded',go);
+  };
+})();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --sidebar:220px;
+  --bg:#f8f9fa;
+  --white:#ffffff;
+  --border:#eaecf0;
+  --text:#1e293b;
+  --muted:#9ca3af;
+  --accent:#2563eb;
+  --jp:#7c3aed;
+  --gain:#dc2626;
+  --loss:#16a34a;
+  --warn:#f59e0b;
+  --mono:'JetBrains Mono',monospace;
+  --radius:14px;
+  --shadow:0 2px 8px rgba(0,0,0,.05);
+}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;display:flex;min-height:100vh;}
+
+/* ══ SIDEBAR ══ */
+.v-sidebar{
+  width:var(--sidebar);min-height:100vh;background:var(--white);
+  border-right:1px solid var(--border);box-shadow:2px 0 12px rgba(0,0,0,.04);
+  position:fixed;top:0;left:0;display:flex;flex-direction:column;z-index:200;
+}
+.v-brand{padding:20px 16px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.v-brand-icon{font-size:24px;}
+.v-brand-title{font-size:13px;font-weight:800;color:var(--text);}
+.v-brand-sub{font-size:10px;color:var(--muted);margin-top:1px;}
+.v-nav{flex:1;padding:10px 0;overflow-y:auto;min-height:0;}
+.v-nav-section{font-size:9px;font-weight:700;color:#8e92bc;padding:8px 0 3px 14px;letter-spacing:1px;}
+.v-nav-item{
+  display:flex;align-items:center;gap:8px;padding:7px 14px;
+  font-size:12px;font-weight:600;color:#64748b;cursor:pointer;
+  transition:all .15s;border-left:3px solid transparent;margin-bottom:1px;
+}
+.v-nav-item:hover{background:#f8fafc;color:var(--accent);}
+.v-nav-item.active{background:#eff6ff;color:var(--accent);border-left-color:var(--accent);font-weight:700;}
+.v-nav-icon{font-size:13px;width:18px;text-align:center;}
+.v-sidebar-footer{padding:12px 14px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:6px;flex-shrink:0;}
+.v-sidebar-btn{padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--white);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;width:100%;text-align:left;transition:background .15s;font-family:'Noto Sans TC',sans-serif;}
+.v-sidebar-btn:hover{background:#f8fafc;}
+.v-sidebar-btn.primary{background:#2563eb;color:#fff;border-color:#2563eb;}
+.v-sidebar-btn.primary:hover{background:#1d4ed8;}
+.v-sidebar-btn.warn{background:#fef3c7;color:#92400e;border-color:#f59e0b;}
+
+/* ══ MAIN ══ */
+.v-main{margin-left:var(--sidebar);flex:1;height:100vh;overflow-y:auto;display:flex;flex-direction:column;}
+.v-topbar{
+  position:sticky;top:0;z-index:100;background:rgba(248,249,250,.92);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--border);
+  padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;
+}
+.v-topbar-title{font-size:15px;font-weight:800;color:var(--text);}
+.v-content{padding:20px 24px;flex:1;}
+
+/* ══ KPI ══ */
+.v-kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:20px;}
+.v-kpi-card{background:var(--white);border-radius:var(--radius);border:1px solid var(--border);padding:16px 18px;box-shadow:var(--shadow);position:relative;overflow:hidden;}
+.v-kpi-accent{position:absolute;top:0;left:0;width:4px;height:100%;border-radius:2px;}
+.v-kpi-label{font-size:10px;font-weight:600;color:var(--muted);letter-spacing:.3px;padding-left:8px;margin-bottom:4px;}
+.v-kpi-val{font-size:22px;font-weight:800;font-family:var(--mono);color:var(--text);padding-left:8px;}
+
+/* ══ PROGRESS ══ */
+.v-prog-wrap{background:var(--white);border-radius:var(--radius);border:1px solid var(--border);padding:16px 20px;margin-bottom:20px;box-shadow:var(--shadow);}
+.v-prog-label{display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px;}
+.v-prog-bg{height:8px;background:#f1f5f9;border-radius:4px;overflow:hidden;}
+.v-prog-bar{height:8px;background:linear-gradient(to right,#2563eb,#7c3aed);border-radius:4px;transition:width .5s ease;}
+
+/* ══ CARDS ══ */
+.v-card{background:var(--white);border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px;}
+.v-card-hdr{padding:14px 18px;border-bottom:1px solid #f0f2f5;display:flex;align-items:center;justify-content:space-between;}
+.v-card-title{font-size:13px;font-weight:800;color:var(--text);}
+
+/* ══ PAGE ══ */
+.v-page{display:none;}
+.v-page.active{display:block;}
+
+/* ══ WORD ROW ══ */
+.v-word-row{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 16px;border-bottom:1px solid #f5f7fa;
+  transition:background .12s;
+}
+.v-word-row:last-child{border-bottom:none;}
+.v-word-row:hover{background:#fafbff;}
+.v-word-row.weak-row{background:#fff5f5;border-color:rgba(239,68,68,.2);}
+.v-word-q{flex:1;font-size:14px;font-weight:700;color:var(--text);}
+.v-word-a{flex:1;font-size:14px;color:var(--jp);font-family:'Noto Sans JP',sans-serif;font-weight:700;}
+.v-weak-btn{
+  flex-shrink:0;padding:4px 12px;border-radius:8px;border:1.5px solid var(--border);
+  background:transparent;color:var(--muted);font-size:11px;font-weight:700;cursor:pointer;
+  white-space:nowrap;transition:all .15s;
+}
+.v-weak-btn.on{border-color:rgba(239,68,68,.5);background:rgba(239,68,68,.1);color:#ef4444;}
+
+/* ══ PAGINATION ══ */
+.v-page-nav{display:flex;align-items:center;justify-content:space-between;padding:12px 0;margin-bottom:8px;}
+.v-page-info{font-size:12px;color:var(--muted);font-weight:600;}
+.v-page-btns{display:flex;gap:8px;}
+.v-btn{padding:7px 16px;border-radius:8px;border:1.5px solid var(--border);background:var(--white);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;font-family:'Noto Sans TC',sans-serif;}
+.v-btn:hover{background:#f8fafc;}
+.v-btn.primary{background:#2563eb;color:#fff;border-color:#2563eb;}
+.v-btn.primary:hover{background:#1d4ed8;}
+.v-btn.warn{background:#fef3c7;color:#92400e;border-color:#f59e0b;}
+.v-btn.danger{background:#fee2e2;color:#b91c1c;border-color:#fca5a5;}
+
+/* ══ MATCH GAME ══ */
+.match-wrap{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.match-col{display:flex;flex-direction:column;gap:8px;}
+.match-item{
+  padding:12px 16px;border-radius:10px;border:2px solid var(--border);
+  background:var(--white);font-size:14px;font-weight:700;cursor:pointer;
+  transition:all .18s;text-align:center;user-select:none;
+}
+.match-item:hover{border-color:var(--accent);background:#eff6ff;}
+.match-item.selected{border-color:#7c3aed;background:#ede9fe;color:#5b21b6;}
+.match-item.correct{border-color:#16a34a;background:#dcfce7;color:#15803d;pointer-events:none;}
+.match-item.wrong{border-color:#dc2626;background:#fee2e2;animation:shake .3s;}
+.match-item.jp{font-family:'Noto Sans JP',sans-serif;color:var(--jp);}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+/* ══ NUM TYPE BTN ══ */
+.num-type-btn{padding:8px 16px;border-radius:20px;border:1.5px solid var(--border);background:var(--white);color:#64748b;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;font-family:'Noto Sans TC',sans-serif;}
+.num-type-btn.active{background:#2563eb;color:#fff;border-color:#2563eb;}
+
+/* ══ IMPORT ══ */
+.import-zone{border:2.5px dashed var(--border);border-radius:var(--radius);padding:40px;text-align:center;cursor:pointer;transition:all .2s;background:var(--white);}
+.import-zone:hover,.import-zone.drag{border-color:#2563eb;background:#eff6ff;}
+.import-icon{font-size:48px;margin-bottom:12px;}
+.import-title{font-size:16px;font-weight:800;color:var(--text);margin-bottom:6px;}
+.import-sub{font-size:12px;color:var(--muted);line-height:1.6;}
+
+/* ══ RESULT ══ */
+.result-panel{text-align:center;padding:48px 24px;}
+.result-emoji{font-size:56px;margin-bottom:12px;}
+.result-title{font-size:22px;font-weight:800;color:var(--text);margin-bottom:6px;}
+.result-sub{font-size:14px;color:var(--muted);margin-bottom:20px;}
+
+/* ══ CONFIRM ══ */
+.confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9000;display:none;align-items:center;justify-content:center;}
+.confirm-overlay.open{display:flex;}
+.confirm-box{background:var(--white);border-radius:16px;padding:28px 24px;max-width:340px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.2);}
+.confirm-icon{font-size:36px;margin-bottom:10px;}
+.confirm-title{font-size:16px;font-weight:800;color:var(--text);margin-bottom:6px;}
+.confirm-msg{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.5;}
+.confirm-btns{display:flex;gap:10px;justify-content:center;}
+
+/* ══ TOAST ══ */
+.v-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(17,24,39,.92);color:#fff;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;opacity:0;transition:all .3s;z-index:9999;pointer-events:none;white-space:nowrap;}
+.v-toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ══ SYNC STATUS ══ */
+#sync-status{font-size:11px;color:var(--muted);}
+</style>
+</head>
+<body>
+
+<!-- ══ SIDEBAR ══ -->
+<div class="v-sidebar">
+  <div class="v-brand">
+    <div class="v-brand-icon">🇯🇵</div>
+    <div>
+      <div class="v-brand-title">日文單字練習</div>
+      <div class="v-brand-sub" id="top-sub">載入中...</div>
+    </div>
+  </div>
+  <nav class="v-nav">
+    <div class="v-nav-section">主要</div>
+    <div class="v-nav-item active" id="vnav-overview" onclick="vShowPage('overview')">
+      <span class="v-nav-icon">📊</span>學習總覽
+    </div>
+    <div class="v-nav-section">練習</div>
+    <div class="v-nav-item" id="vnav-browse" onclick="vShowPage('browse')">
+      <span class="v-nav-icon">📖</span>對照瀏覽
+    </div>
+    <div class="v-nav-item" id="vnav-weak" onclick="vShowPage('weak')">
+      <span class="v-nav-icon">❌</span>不熟單字
+    </div>
+    <div class="v-nav-item" id="vnav-errors" onclick="vShowPage('errors')">
+      <span class="v-nav-icon">🔥</span>練習常錯
+    </div>
+    <div class="v-nav-item" id="vnav-numbers" onclick="vShowPage('numbers')">
+      <span class="v-nav-icon">🔢</span>數字練習
+    </div>
+    <div class="v-nav-section">文法</div>
+    <div class="v-nav-item" id="vnav-grammar" onclick="vShowPage('grammar')">
+      <span class="v-nav-icon">📝</span>文法選擇題
+    </div>
+    <div class="v-nav-item" id="vnav-grammar-weak" onclick="vShowPage('grammar-weak')">
+      <span class="v-nav-icon">❌</span>文法不熟
+    </div>
+    <div class="v-nav-section">動詞</div>
+    <div class="v-nav-item" id="vnav-verb" onclick="vShowPage('verb')">
+      <span class="v-nav-icon">🔤</span>動詞選擇題
+    </div>
+    <div class="v-nav-item" id="vnav-verb-weak" onclick="vShowPage('verb-weak')">
+      <span class="v-nav-icon">❌</span>動詞不熟
+    </div>
+    <div class="v-nav-section">管理</div>
+    <div class="v-nav-item" id="vnav-import" onclick="vShowPage('import')">
+      <span class="v-nav-icon">📥</span>匯入單字
+    </div>
+  </nav>
+  <div class="v-sidebar-footer" style="padding:8px 10px">
+    <button onclick="toggleSidebarTools()" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:#f8fafc;border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:11px;font-weight:700;color:#64748b;font-family:'Noto Sans TC',sans-serif">
+      <span>⚙️ 工具</span><span id="sidebar-tools-arrow">▲</span>
+    </button>
+    <div id="sidebar-tools" style="display:flex;flex-direction:column;gap:5px;margin-top:6px">
+      <button class="v-sidebar-btn warn" onclick="resetTodayProgress()">🔄 重置進度</button>
+      <button class="v-sidebar-btn" onclick="manualSync()">☁️ 雲端同步</button>
+      <button class="v-sidebar-btn" onclick="document.getElementById('import-file').click()">📥 匯入 Excel</button>
+      <a href="index.html" class="v-sidebar-btn" style="text-decoration:none;display:block">🏠 主目錄</a>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MAIN ══ -->
+<div class="v-main">
+  <div class="v-topbar">
+    <div class="v-topbar-title" id="v-page-name">學習總覽</div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <span id="sync-status"></span>
+      <a href="index.html" style="padding:5px 12px;background:#f3f4f6;color:#4b5563;border:1px solid #e2e8f0;border-radius:7px;font-size:12px;font-weight:700;text-decoration:none">🏠 主目錄</a>
+    </div>
+  </div>
+
+  <div class="v-content">
+
+    <!-- 頁面：總覽 -->
+    <div class="v-page active" id="vpage-overview">
+      <div class="v-kpi-grid">
+        <div class="v-kpi-card"><div class="v-kpi-accent" style="background:#8fa8c8"></div><div class="v-kpi-label">📚 總單字數</div><div class="v-kpi-val" id="s-total">0</div></div>
+        <div class="v-kpi-card"><div class="v-kpi-accent" style="background:#a8c5a0"></div><div class="v-kpi-label">✅ 已完成</div><div class="v-kpi-val" id="s-done">0</div></div>
+        <div class="v-kpi-card"><div class="v-kpi-accent" style="background:#c9a99a"></div><div class="v-kpi-label">📋 待複習</div><div class="v-kpi-val" id="s-remain">0</div></div>
+        <div class="v-kpi-card"><div class="v-kpi-accent" style="background:#f87171"></div><div class="v-kpi-label">❌ 不熟單字</div><div class="v-kpi-val" id="s-errors">0</div></div>
+        <div class="v-kpi-card"><div class="v-kpi-accent" style="background:#b5adc4"></div><div class="v-kpi-label">🔥 連續答對</div><div class="v-kpi-val" id="s-streak">0</div></div>
+      </div>
+
+      <!-- 頁籤 -->
+      <div style="display:flex;gap:8px;margin-bottom:16px">
+        <button id="ov-tab-vocab" onclick="ovSwitchTab('vocab')" style="padding:8px 20px;border-radius:8px;border:1.5px solid #2563eb;background:#2563eb;color:#fff;font-size:13px;font-weight:700;cursor:pointer">📖 單字練習</button>
+        <button id="ov-tab-grammar" onclick="ovSwitchTab('grammar')" style="padding:8px 20px;border-radius:8px;border:1.5px solid var(--border);background:var(--white);color:#64748b;font-size:13px;font-weight:700;cursor:pointer">📝 文法練習</button>
+        <button id="ov-tab-verb" onclick="ovSwitchTab('verb')" style="padding:8px 20px;border-radius:8px;border:1.5px solid var(--border);background:var(--white);color:#64748b;font-size:13px;font-weight:700;cursor:pointer">🔤 動詞練習</button>
+      </div>
+
+      <!-- 單字區 -->
+      <div id="ov-vocab-section">
+        <div class="v-prog-wrap">
+          <div class="v-prog-label"><span>單字學習進度</span><span id="prog-text">0 / 0</span></div>
+          <div class="v-prog-bg"><div class="v-prog-bar" id="prog-bar" style="width:0%"></div></div>
+        </div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <button class="v-btn primary" onclick="vShowPage('browse')">📖 開始對照瀏覽</button>
+          <button class="v-btn" onclick="vShowPage('weak')">❌ 查看不熟單字</button>
+          <button class="v-btn" onclick="vShowPage('errors')">🔥 練習常錯</button>
+          <button class="v-btn" onclick="vShowPage('numbers')">🔢 數字練習</button>
+        </div>
+      </div>
+
+      <!-- 文法區 -->
+      <div id="ov-grammar-section" style="display:none">
+        <div class="v-kpi-grid" style="grid-template-columns:repeat(3,1fr)">
+          <div class="v-kpi-card"><div class="v-kpi-accent" style="background:#7c3aed"></div><div class="v-kpi-label">📝 文法總數</div><div class="v-kpi-val" id="sg-total">0</div></div>
+          <div class="v-kpi-card"><div class="v-kpi-accent" style="background:#f87171"></div><div class="v-kpi-label">❌ 不熟文法</div><div class="v-kpi-val" id="sg-weak">0</div></div>
+          <div class="v-kpi-card"><div class="v-kpi-accent" style="background:#a8c5a0"></div><div class="v-kpi-label">✅ 已練習</div><div class="v-kpi-val" id="sg-done">0</div></div>
+        </div>
+        <div class="v-prog-wrap">
+          <div class="v-prog-label"><span>文法練習進度</span><span id="gprog-text">0 / 0</span></div>
+          <div class="v-prog-bg"><div class="v-prog-bar" id="gprog-bar" style="width:0%;background:linear-gradient(to right,#7c3aed,#2563eb)"></div></div>
+        </div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <button class="v-btn primary" onclick="vShowPage('grammar')">📝 開始文法練習</button>
+          <button class="v-btn" onclick="vShowPage('grammar-weak')">❌ 不熟文法</button>
+        </div>
+      </div>
+
+      <!-- 動詞區 -->
+      <div id="ov-verb-section" style="display:none">
+        <div class="v-kpi-grid" style="grid-template-columns:repeat(3,1fr)">
+          <div class="v-kpi-card"><div class="v-kpi-accent" style="background:#0891b2"></div><div class="v-kpi-label">🔤 動詞總數</div><div class="v-kpi-val" id="sv-total">0</div></div>
+          <div class="v-kpi-card"><div class="v-kpi-accent" style="background:#f87171"></div><div class="v-kpi-label">❌ 不熟動詞</div><div class="v-kpi-val" id="sv-weak">0</div></div>
+          <div class="v-kpi-card"><div class="v-kpi-accent" style="background:#a8c5a0"></div><div class="v-kpi-label">✅ 已練習</div><div class="v-kpi-val" id="sv-done">0</div></div>
+        </div>
+        <div class="v-prog-wrap">
+          <div class="v-prog-label"><span>動詞練習進度</span><span id="vprog-text">0 / 0</span></div>
+          <div class="v-prog-bg"><div class="v-prog-bar" id="vprog-bar" style="width:0%;background:linear-gradient(to right,#0891b2,#2563eb)"></div></div>
+        </div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <button class="v-btn primary" onclick="vShowPage('verb')">🔤 開始動詞練習</button>
+          <button class="v-btn" onclick="vShowPage('verb-weak')">❌ 不熟動詞</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 頁面：對照瀏覽 -->
+    <div class="v-page" id="vpage-browse">
+      <div class="v-card">
+        <div class="v-card-hdr">
+          <div class="v-card-title">📖 對照瀏覽</div>
+          <div class="v-page-btns">
+            <button class="v-btn" onclick="prevPage()">← 上一頁</button>
+            <button class="v-btn primary" onclick="nextPage()">下一頁 +進度 →</button>
+          </div>
+        </div>
+        <div class="v-page-nav" style="padding:8px 18px 0">
+          <span class="v-page-info">第 <b id="page-num">1</b> 頁　<span id="page-range">1-60</span>　共 <b id="total-pages">0</b> 頁</span>
+        </div>
+        <div id="browse-list" style="display:flex;flex-direction:column"></div>
+        <div id="all-done" style="display:none">
+          <div class="result-panel">
+            <div class="result-emoji">🎉</div>
+            <div class="result-title">全部完成！</div>
+            <div class="result-sub" id="all-done-sub"></div>
+            <button class="v-btn primary" onclick="resetTodayProgress()">重新開始</button>
+          </div>
+        </div>
+        <div class="v-card-hdr" style="justify-content:flex-end;border-top:1px solid #f0f2f5;border-bottom:none">
+          <div class="v-page-btns">
+            <button class="v-btn" onclick="prevPage()">← 上一頁</button>
+            <button class="v-btn primary" onclick="nextPage()">下一頁 +進度 →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 頁面：不熟單字 -->
+    <div class="v-page" id="vpage-weak">
+      <div class="v-card">
+        <div class="v-card-hdr">
+          <div class="v-card-title">❌ 不熟單字</div>
+          <div class="v-page-btns">
+            <button class="v-btn" onclick="prevWeakPage()">← 上一頁</button>
+            <button class="v-btn primary" onclick="nextWeakPage()">下一頁 →</button>
+          </div>
+        </div>
+        <div class="v-page-nav" style="padding:8px 18px 0">
+          <span class="v-page-info">第 <b id="weak-page-num">1</b> 頁　共 <b id="weak-total-pages">0</b> 頁</span>
+        </div>
+        <div id="weak-list" style="display:flex;flex-direction:column"></div>
+        <div id="weak-empty" style="display:none">
+          <div class="result-panel">
+            <div class="result-emoji">🎉</div>
+            <div class="result-title">沒有不熟的單字！</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 頁面：練習常錯 -->
+    <div class="v-page" id="vpage-errors">
+      <div class="v-card">
+        <div class="v-card-hdr">
+          <div class="v-card-title">🔥 練習常錯單字</div>
+          <button class="v-btn warn" onclick="startPracticeErrors()">重新出題</button>
+        </div>
+        <div style="padding:14px 18px">
+          <div id="pe-round-bar" style="display:none;margin-bottom:12px">
+            <span class="v-page-info">已配對 <b id="pe-matched">0</b> / <b id="pe-total">0</b></span>
+          </div>
+          <div class="match-wrap" id="pe-match-area"></div>
+          <div id="pe-done" style="display:none">
+            <div class="result-panel">
+              <div class="result-emoji">💪</div>
+              <div class="result-title">常錯單字練習完成！</div>
+              <div class="result-sub">繼續保持，錯誤率會越來越低的！</div>
+              <button class="v-btn warn" onclick="startPracticeErrors()">再練一次</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 常錯單字列表 -->
+      <div class="v-card">
+        <div class="v-card-hdr">
+          <div class="v-card-title">📋 常錯單字列表</div>
+          <button class="v-btn danger" onclick="clearErrors()">清除記錄</button>
+        </div>
+        <div id="error-list-wrap"></div>
+      </div>
+    </div>
+
+    <!-- 頁面：數字練習 -->
+    <div class="v-page" id="vpage-numbers">
+      <div class="v-card">
+        <div class="v-card-hdr">
+          <div class="v-card-title">🔢 數字練習</div>
+          <button class="v-btn primary" onclick="startNumGame()">重新出題</button>
+        </div>
+        <div style="padding:14px 18px">
+          <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+            <button class="num-type-btn active" data-type="count" onclick="selectNumType(this)">🧮 數量詞 1-10</button>
+            <button class="num-type-btn" data-type="num1" onclick="selectNumType(this)">🔢 數字 1-10</button>
+            <button class="num-type-btn" data-type="num2" onclick="selectNumType(this)">🔢 數字 11-20</button>
+            <button class="num-type-btn" data-type="months" onclick="selectNumType(this)">📅 月份 1-12月</button>
+            <button class="num-type-btn" data-type="all" onclick="selectNumType(this)">🎲 全部混合</button>
+          </div>
+          <div id="num-score-bar" style="display:none;margin-bottom:10px">
+            <span class="v-page-info">已配對 <b id="num-matched">0</b> / <b id="num-total">0</b></span>
+          </div>
+          <div class="match-wrap" id="num-match-area"></div>
+          <div id="num-done" style="display:none">
+            <div class="result-panel">
+              <div class="result-emoji">🎉</div>
+              <div class="result-title">練習完成！</div>
+              <div class="result-sub">數字掌握得很好！再來一次鞏固記憶？</div>
+              <button class="v-btn primary" onclick="startNumGame()">再練一次</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 頁面：文法選擇題 -->
+    <div class="v-page" id="vpage-grammar">
+      <div class="v-card">
+        <div class="v-card-hdr">
+          <div class="v-card-title">📝 文法選擇題</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span id="g-progress" style="font-size:12px;color:var(--muted)"></span>
+            <button class="v-btn primary" onclick="startGrammarQuiz()">重新出題</button>
+          </div>
+        </div>
+        <div style="padding:20px">
+          <div id="grammar-quiz-area">
+            <div style="text-align:center;color:var(--muted);padding:40px">
+              <div style="font-size:36px;margin-bottom:12px">📝</div>
+              <div style="font-size:14px;font-weight:700">尚未匯入文法單字</div>
+              <div style="font-size:12px;margin-top:6px">請在 Excel 工作表2 加入文法內容</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 頁面：文法不熟 -->
+    <div class="v-page" id="vpage-grammar-weak">
+      <div class="v-card">
+        <div class="v-card-hdr">
+          <div class="v-card-title">❌ 文法不熟單字</div>
+          <button class="v-btn warn" onclick="startGrammarWeakQuiz()">練習不熟文法</button>
+        </div>
+        <div id="grammar-weak-list" style="display:flex;flex-direction:column"></div>
+        <div id="grammar-weak-empty" style="display:none">
+          <div class="result-panel">
+            <div class="result-emoji">🎉</div>
+            <div class="result-title">沒有不熟的文法！</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 頁面：動詞選擇題 -->
+    <div class="v-page" id="vpage-verb">
+      <div class="v-card">
+        <div class="v-card-hdr">
+          <div class="v-card-title">🔤 動詞選擇題</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span id="v-progress" style="font-size:12px;color:var(--muted)"></span>
+            <button id="verb-mode-btn" onclick="toggleVerbMode()" style="padding:5px 12px;border-radius:8px;border:1.5px solid #0891b2;background:#e0f2fe;color:#0891b2;font-size:11px;font-weight:700;cursor:pointer">🇯🇵→🇹🇼 日文→中文</button>
+            <button class="v-btn primary" onclick="startVerbQuiz(false)">重新出題</button>
+          </div>
+        </div>
+        <div style="padding:20px">
+          <div id="verb-quiz-area">
+            <div style="text-align:center;color:var(--muted);padding:40px">
+              <div style="font-size:36px;margin-bottom:12px">🔤</div>
+              <div style="font-size:14px;font-weight:700">尚未匯入動詞單字</div>
+              <div style="font-size:12px;margin-top:6px">請在 Excel 工作表3 加入動詞內容</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 頁面：動詞不熟 -->
+    <div class="v-page" id="vpage-verb-weak">
+      <div class="v-card">
+        <div class="v-card-hdr">
+          <div class="v-card-title">❌ 動詞不熟</div>
+          <button class="v-btn warn" onclick="startVerbWeakQuiz()">練習不熟動詞</button>
+        </div>
+        <div id="verb-weak-list" style="display:flex;flex-direction:column"></div>
+        <div id="verb-weak-empty" style="display:none">
+          <div class="result-panel">
+            <div class="result-emoji">🎉</div>
+            <div class="result-title">沒有不熟的動詞！</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 頁面：匯入 -->
+    <div class="v-page" id="vpage-import">
+      <div class="v-card">
+        <div class="v-card-hdr"><div class="v-card-title">📥 匯入單字</div></div>
+        <div style="padding:16px">
+          <div class="import-zone" id="drop-zone"
+            ondragover="event.preventDefault();this.classList.add('drag')"
+            ondragleave="this.classList.remove('drag')"
+            ondrop="dropFile(event)"
+            onclick="document.getElementById('import-file').click()">
+            <div class="import-icon">📊</div>
+            <div class="import-title">點擊或拖曳 Excel / CSV 檔案</div>
+            <div class="import-sub">A 欄：中文＋日文（問題）　B 欄：正確解答<br>新匯入會合併保留，不會覆蓋學習記錄</div>
+          </div>
+          <div style="margin-top:16px;background:#f8fafc;border-radius:10px;padding:14px;border:1px solid var(--border)">
+            <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px">📋 目前單字庫</div>
+            <div id="vocab-preview" style="font-size:12px;color:var(--muted)">尚未載入</div>
+          </div>
+          <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+            <button class="v-btn danger" onclick="clearAllVocab()">🗑 清除所有單字</button>
+            <button class="v-btn" onclick="clearAllProgress()">🔄 清除學習記錄</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- 隱藏 elements（JS 相容用）-->
+<div style="display:none">
+  <div class="view active" id="view-match"></div>
+  <div class="view" id="view-errors"></div>
+  <div class="view" id="view-practice-errors"></div>
+  <div class="view" id="view-numbers"></div>
+  <div class="view" id="view-weak"></div>
+  <div class="view" id="view-import"></div>
+  <div id="browse-nav-bottom"></div>
+  <span id="page-num-b"></span><span id="page-range-b"></span><span id="total-pages-b"></span>
+  <span id="weak-page-num-b"></span><span id="weak-total-pages-b"></span>
+  <input type="file" id="import-file" accept=".xlsx,.csv" onchange="importFile(event)">
+</div>
+
+<!-- ══ 確認視窗 ══ -->
+<div class="confirm-overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <div class="confirm-icon" id="confirm-icon">⚠️</div>
+    <div class="confirm-title" id="confirm-title">確認</div>
+    <div class="confirm-msg" id="confirm-msg"></div>
+    <div class="confirm-btns">
+      <button class="v-btn" onclick="closeConfirm(false)">取消</button>
+      <button class="v-btn danger" id="confirm-ok" onclick="closeConfirm(true)">確定</button>
+    </div>
+  </div>
+</div>
+
+<div class="v-toast" id="toast"></div>
+
+<script>
+// ══ 新版導航 ══
+const V_PAGE_NAMES={overview:'學習總覽',browse:'對照瀏覽',weak:'不熟單字',errors:'練習常錯',numbers:'數字練習',grammar:'文法選擇題','grammar-weak':'文法不熟',verb:'動詞選擇題','verb-weak':'動詞不熟',import:'匯入單字'};
+function toggleSidebarTools(){
+  const tools=document.getElementById('sidebar-tools');
+  const arrow=document.getElementById('sidebar-tools-arrow');
+  if(!tools)return;
+  const open=tools.style.display!=='none';
+  tools.style.display=open?'none':'flex';
+  if(arrow)arrow.textContent=open?'▼':'▲';
+}
+
+// ══ 總覽頁籤 ══
+function ovSwitchTab(tab){
+  document.getElementById('ov-vocab-section').style.display=tab==='vocab'?'':'none';
+  document.getElementById('ov-grammar-section').style.display=tab==='grammar'?'':'none';
+  document.getElementById('ov-verb-section').style.display=tab==='verb'?'':'none';
+  ['vocab','grammar','verb'].forEach(t=>{
+    const btn=document.getElementById('ov-tab-'+t);
+    if(!btn)return;
+    const colors={vocab:'#2563eb',grammar:'#7c3aed',verb:'#0891b2'};
+    const active=t===tab;
+    btn.style.background=active?colors[t]:'var(--white)';
+    btn.style.color=active?'#fff':'#64748b';
+    btn.style.borderColor=active?colors[t]:'var(--border)';
+  });
+  if(tab==='grammar')updateGrammarStats();
+  if(tab==='verb')updateVerbStats();
+}
+
+function updateGrammarStats(){
+  const grammar=db.grammar||[];
+  const weakCount=Object.keys(db.grammarWeak||{}).length;
+  const done=db.grammarDone||0;
+  if(el('sg-total'))el('sg-total').textContent=grammar.length;
+  if(el('sg-weak'))el('sg-weak').textContent=weakCount;
+  if(el('sg-done'))el('sg-done').textContent=done;
+  const pct=grammar.length>0?Math.round(done/grammar.length*100):0;
+  if(el('gprog-bar'))el('gprog-bar').style.width=pct+'%';
+  if(el('gprog-text'))el('gprog-text').textContent=done+' / '+grammar.length;
+}
+
+function updateVerbStats(){
+  const verb=db.verb||[];
+  const weakCount=Object.keys(db.verbWeak||{}).length;
+  const done=db.verbDone||0;
+  if(el('sv-total'))el('sv-total').textContent=verb.length;
+  if(el('sv-weak'))el('sv-weak').textContent=weakCount;
+  if(el('sv-done'))el('sv-done').textContent=done;
+  const pct=verb.length>0?Math.round(done/verb.length*100):0;
+  if(el('vprog-bar'))el('vprog-bar').style.width=pct+'%';
+  if(el('vprog-text'))el('vprog-text').textContent=done+' / '+verb.length;
+}
+
+function vShowPage(id){
+  document.querySelectorAll('.v-page').forEach(p=>p.classList.remove('active'));
+  const page=document.getElementById('vpage-'+id);
+  if(page)page.classList.add('active');
+  document.querySelectorAll('.v-nav-item').forEach(el=>el.classList.toggle('active',el.id==='vnav-'+id));
+  const title=document.getElementById('v-page-name');
+  if(title)title.textContent=V_PAGE_NAMES[id]||id;
+  const main=document.querySelector('.v-main');
+  if(main)main.scrollTo({top:0,behavior:'smooth'});
+  // 切換時更新對應內容
+  if(id==='overview'){updateStats();}
+  if(id==='browse'){renderBrowsePage();}
+  if(id==='weak'){renderWeakPage();}
+  if(id==='errors'){renderErrorList();startPracticeErrors();}
+  if(id==='numbers'){startNumGame();}
+  if(id==='import'){renderVocabPreview();}
+  if(id==='grammar'){renderGrammarQuiz();}
+  if(id==='grammar-weak'){renderGrammarWeakList();}
+  if(id==='verb'){renderVerbQuiz();}
+  if(id==='verb-weak'){renderVerbWeakList();}
+}
+
+// 舊版 switchTab 相容
+function switchTab(tab){
+  const tabMap={match:'browse',weak:'weak',errors:'errors','practice-errors':'errors',numbers:'numbers',import:'import'};
+  vShowPage(tabMap[tab]||tab);
+}
+
+// toast 相容（新版用 v-toast）
+function showToast(msg){
+  const el=document.getElementById('toast');
+  if(el){el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500);}
+}
+
+// ══════════════════════════════════════
+// DATA LAYER
+// ══════════════════════════════════════
+const DB_KEY='vocab_db_v1';
+
+function loadDB(){
+  try{ return JSON.parse(localStorage.getItem(DB_KEY))||newDB(); }
+  catch{ return newDB(); }
+}
+function newDB(){
+  return {
+    vocab:[],
+    weak:{},        // {id: true} 不熟單字
+    todayDone:[],   // 已完成的 id（累積）
+    todayDate:'',
+    currentPage:0,  // 目前在第幾頁（0-based）
+    weakPage:0,
+  };
+}
+function saveDB(){
+  localStorage.setItem(DB_KEY,JSON.stringify(db));
+  schedulePush();
+}
+
+let db=loadDB();
+
+// 重置今日（如果換日了）
+function checkNewDay(){
+  // 不再每日重置，todayDone 改為累積完成清單
+  // 只有全部完成後才歸零
+}
+checkNewDay();
+
+// ══════════════════════════════════════
+// BROWSE MODE STATE
+const PAGE_SIZE = 60;
+let currentPage = 0;   // 0-based
+let weakPage = 0;
+
+// ══════════════════════════════════════
+// INIT
+// ══════════════════════════════════════
+function init(){
+  // 相容舊資料
+  if(!db.weak)db.weak={};
+  if(!db.todayDone)db.todayDone=[];
+  if(db.currentPage!==undefined)currentPage=db.currentPage;
+  updateStats();
+  renderBrowsePage();
+}
+
+function updateStats(){
+  const total=db.vocab.length;
+  const done=db.todayDone.length;
+  const weakCount=Object.keys(db.weak||{}).length;
+  const remain=Math.max(0,total-done);
+  if(el('s-total'))el('s-total').textContent=total;
+  if(el('s-done'))el('s-done').textContent=done;
+  if(el('s-remain'))el('s-remain').textContent=remain;
+  if(el('s-errors'))el('s-errors').textContent=weakCount;
+  if(el('s-streak'))el('s-streak').textContent='';
+  const pct=total>0?Math.round(done/total*100):0;
+  if(el('prog-bar'))el('prog-bar').style.width=pct+'%';
+  if(el('prog-text'))el('prog-text').textContent=done+' / '+total;
+  const grammarCount=(db.grammar||[]).length;
+  if(el('top-sub'))el('top-sub').textContent=total>0?`單字 ${total} 個・文法 ${grammarCount} 個・已完成 ${done} 個`:'尚未載入單字';
+}
+
+// 當前這輪的洗牌順序（翻頁時保持固定）
+let _shuffledVocab = [];
+
+function getShuffledNotDone(){
+  const notDoneIds = new Set(db.vocab.filter(v=>!db.todayDone.includes(v.id)).map(v=>v.id));
+  // 過濾掉已完成的，保留順序
+  _shuffledVocab = _shuffledVocab.filter(v=>notDoneIds.has(v.id));
+  // 加入新的（尚未在清單裡的）
+  const existing = new Set(_shuffledVocab.map(v=>v.id));
+  const newWords = shuffle(db.vocab.filter(v=>notDoneIds.has(v.id)&&!existing.has(v.id)));
+  _shuffledVocab = [..._shuffledVocab, ...newWords];
+  return _shuffledVocab;
+}
+function renderBrowsePage(){
+  const list=el('browse-list');
+  const allDone=el('all-done');
+  if(!list)return;
+
+  const notDone=getShuffledNotDone();
+  const totalPages=Math.ceil(notDone.length/PAGE_SIZE);
+
+  if(notDone.length===0){
+    list.style.display='none';
+    if(allDone){
+      allDone.style.display='block';
+      if(el('all-done-sub'))el('all-done-sub').textContent=`共完成 ${db.vocab.length} 個單字！不熟單字 ${Object.keys(db.weak||{}).length} 個`;
+    }
+    updateStats();
+    return;
+  }
+
+  if(allDone)allDone.style.display='none';
+  list.style.display='flex';
+
+  // 確保 currentPage 在範圍內
+  if(currentPage>=totalPages)currentPage=totalPages-1;
+  if(currentPage<0)currentPage=0;
+
+  const start=currentPage*PAGE_SIZE;
+  const pageWords=notDone.slice(start,start+PAGE_SIZE);
+
+  // 更新頁碼（上下兩組同步）
+  if(el('page-num'))el('page-num').textContent=currentPage+1;
+  if(el('total-pages'))el('total-pages').textContent=totalPages;
+  if(el('page-range'))el('page-range').textContent=(start+1)+'-'+Math.min(start+pageWords.length,notDone.length);
+  // 底部導航同步
+  const bottomNav=el('browse-nav-bottom');
+  if(bottomNav)bottomNav.style.display='flex';
+  if(el('page-num-b'))el('page-num-b').textContent=currentPage+1;
+  if(el('total-pages-b'))el('total-pages-b').textContent=totalPages;
+  if(el('page-range-b'))el('page-range-b').textContent=(start+1)+'-'+Math.min(start+pageWords.length,notDone.length);
+
+  // 渲染單字列表
+  list.innerHTML=pageWords.map(v=>{
+    const isWeak=!!(db.weak||{})[v.id];
+    return `<div class="v-word-row${isWeak?' weak-row':''}">
+      <div class="v-word-q">${v.q}</div>
+      <div class="v-word-a">${v.a}</div>
+      <button onclick="toggleWeak('${v.id}')" class="v-weak-btn${isWeak?' on':''}">
+        ${isWeak?'✓ 不熟':'不熟'}
+      </button>
+    </div>`;
+  }).join('');
+
+  updateStats();
+}
+
+function toggleWeak(id){
+  if(!db.weak)db.weak={};
+  if(db.weak[id]){
+    delete db.weak[id];
+  } else {
+    db.weak[id]=true;
+  }
+  saveDB();
+  renderBrowsePage();
+  renderWeakPage();
+}
+
+function prevPage(){
+  if(currentPage>0){
+    currentPage--;
+    db.currentPage=currentPage;
+    saveDB();
+    renderBrowsePage();
+    window.scrollTo(0,0);
+  }
+}
+
+function nextPage(){
+  const notDone=getShuffledNotDone();
+  const totalPages=Math.ceil(notDone.length/PAGE_SIZE);
+  const start=currentPage*PAGE_SIZE;
+  const pageWords=notDone.slice(start,start+PAGE_SIZE);
+
+  // 計算本頁進度：不熟的不計入
+  const weakIds=Object.keys(db.weak||{});
+  const doneCount=pageWords.filter(v=>!weakIds.includes(v.id)).length;
+
+  // 把本頁所有單字加入 todayDone
+  pageWords.forEach(v=>{
+    if(!db.todayDone.includes(v.id))db.todayDone.push(v.id);
+  });
+
+  if(doneCount>0)toast(`✅ +${doneCount} 個單字完成！`);
+
+  if(currentPage<totalPages-1){
+    currentPage++;
+    db.currentPage=currentPage;
+  }
+  saveDB();
+  renderBrowsePage();
+  window.scrollTo(0,0);
+}
+
+function restartAll(){
+  db.todayDone=[];
+  currentPage=0;
+  db.currentPage=0;
+  _shuffledVocab=[];
+  saveDB();
+  renderBrowsePage();
+}
+
+// ══════════════════════════════════════
+// WEAK WORDS PAGE
+// ══════════════════════════════════════
+// ══════════════════════════════════════
+// GRAMMAR
+// ══════════════════════════════════════
+function processGrammarRows(rows){
+  if(!db.grammar)db.grammar=[];
+  if(!db.grammarWeak)db.grammarWeak={};
+  let added=0,skipped=0;
+  const existing=new Set(db.grammar.map(g=>g.q+'|'+g.a));
+  rows.forEach(r=>{
+    const q=(r[0]||'').toString().trim();
+    const a=(r[1]||'').toString().trim();
+    if(!q||!a){skipped++;return;}
+    const key=q+'|'+a;
+    if(existing.has(key)){skipped++;return;}
+    const id='g'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+    db.grammar.push({id,q,a});
+    existing.add(key);added++;
+  });
+  saveDB();renderGrammarQuiz();updateStats();
+  toast('✅ 文法：新增 '+added+' 筆，略過 '+skipped+' 筆');
+}
+
+let gQuizList=[],gQuizIdx=0;
+
+function startGrammarQuiz(weakOnly){
+  if(!db.grammar)db.grammar=[];
+  if(!db.grammarWeak)db.grammarWeak={};
+  const pool=weakOnly?db.grammar.filter(g=>db.grammarWeak[g.id]):db.grammar;
+  const area=document.getElementById('grammar-quiz-area');
+  if(pool.length===0){
+    if(area)area.innerHTML='<div style="text-align:center;color:var(--muted);padding:40px"><div style="font-size:36px;margin-bottom:12px">'+(weakOnly?'🎉':'📝')+'</div><div style="font-size:14px;font-weight:700">'+(weakOnly?'沒有不熟的文法！':'尚未匯入文法單字')+'</div></div>';
+    return;
+  }
+  gQuizList=shuffle(pool);gQuizIdx=0;
+  renderGrammarQuestion();
+}
+
+function renderGrammarQuiz(){
+  if(!db.grammar||db.grammar.length===0){
+    const area=document.getElementById('grammar-quiz-area');
+    if(area)area.innerHTML='<div style="text-align:center;color:var(--muted);padding:40px"><div style="font-size:36px;margin-bottom:12px">📝</div><div style="font-size:14px;font-weight:700">尚未匯入文法單字</div><div style="font-size:12px;margin-top:6px">請在 Excel 工作表2 加入文法內容</div></div>';
+    return;
+  }
+  startGrammarQuiz(false);
+}
+
+function renderGrammarQuestion(){
+  const area=document.getElementById('grammar-quiz-area');
+  const prog=document.getElementById('g-progress');
+  if(!area)return;
+  if(gQuizIdx>=gQuizList.length){
+    area.innerHTML='<div class="result-panel"><div class="result-emoji">🎉</div><div class="result-title">全部完成！</div><div class="result-sub">文法掌握得很好！</div><button class="v-btn primary" onclick="startGrammarQuiz(false)">再練一次</button></div>';
+    if(prog)prog.textContent='';return;
+  }
+  if(prog)prog.textContent=(gQuizIdx+1)+' / '+gQuizList.length;
+  const cur=gQuizList[gQuizIdx];
+  const isWeak=!!(db.grammarWeak||{})[cur.id];
+  const others=db.grammar.filter(g=>g.id!==cur.id).map(g=>g.a);
+  const wrong=shuffle(others).slice(0,3);
+  const opts=shuffle([cur.a,...wrong]);
+  const ca=cur.a.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+  area.innerHTML='<div style="margin-bottom:20px">'
+    +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">'
+    +'<div style="font-size:16px;font-weight:800;color:var(--text);flex:1">'+cur.q+'</div>'
+    +'<button onclick="toggleGrammarWeak(\''+cur.id+'\')" class="v-weak-btn'+(isWeak?' on':'')+'" id="gw-btn">'+(isWeak?'✓ 不熟':'不熟')+'</button>'
+    +'</div>'
+    +'<div style="display:flex;flex-direction:column;gap:10px" id="g-opts">'
+    +opts.map((o,i)=>{
+      const oe=o.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+      return '<button onclick="checkGrammarAnswer(\''+cur.id+'\',\''+ca+'\',\''+oe+'\',this)"'
+        +' style="padding:14px 18px;border-radius:10px;border:2px solid var(--border);background:var(--white);text-align:left;font-size:14px;font-weight:600;cursor:pointer;transition:all .18s;font-family:\'Noto Sans JP\',sans-serif;color:#374151">'
+        +String.fromCharCode(65+i)+'．'+o+'</button>';
+    }).join('')
+    +'</div></div>';
+}
+
+function checkGrammarAnswer(id,correct,chosen,btn){
+  document.querySelectorAll('#g-opts button').forEach(b=>b.onclick=null);
+  if(chosen===correct){
+    btn.style.cssText+=';border-color:#16a34a!important;background:#dcfce7!important;color:#15803d!important';
+    if(!db.grammarDone)db.grammarDone=0;
+    db.grammarDone++;saveDB();
+    toast('✅ 正確！');setTimeout(()=>{gQuizIdx++;renderGrammarQuestion();},800);
+  } else {
+    btn.style.cssText+=';border-color:#dc2626!important;background:#fee2e2!important;color:#b91c1c!important';
+    document.querySelectorAll('#g-opts button').forEach(b=>{
+      if(b.textContent.trim().slice(2).trim()===correct)
+        b.style.cssText+=';border-color:#16a34a!important;background:#dcfce7!important;color:#15803d!important';
+    });
+    // 答錯自動標記為不熟
+    if(!db.grammarWeak)db.grammarWeak={};
+    db.grammarWeak[id]=true;
+    saveDB();
+    // 更新不熟按鈕狀態
+    const gwBtn=document.getElementById('gw-btn');
+    if(gwBtn){gwBtn.classList.add('on');gwBtn.textContent='✓ 不熟';}
+    toast('❌ 答錯了！已加入不熟文法');setTimeout(()=>{gQuizIdx++;renderGrammarQuestion();},1500);
+  }
+}
+
+function toggleGrammarWeak(id){
+  if(!db.grammarWeak)db.grammarWeak={};
+  if(db.grammarWeak[id])delete db.grammarWeak[id];
+  else db.grammarWeak[id]=true;
+  saveDB();
+  const btn=document.getElementById('gw-btn');
+  if(btn){btn.classList.toggle('on',!!db.grammarWeak[id]);btn.textContent=db.grammarWeak[id]?'✓ 不熟':'不熟';}
+}
+
+function renderGrammarWeakList(){
+  const list=document.getElementById('grammar-weak-list');
+  const empty=document.getElementById('grammar-weak-empty');
+  if(!list)return;
+  if(!db.grammar)db.grammar=[];
+  if(!db.grammarWeak)db.grammarWeak={};
+  const weaks=db.grammar.filter(g=>db.grammarWeak[g.id]);
+  if(weaks.length===0){list.style.display='none';if(empty)empty.style.display='';return;}
+  if(empty)empty.style.display='none';list.style.display='flex';
+  list.innerHTML=weaks.map(g=>'<div class="v-word-row weak-row">'
+    +'<div class="v-word-q">'+g.q+'</div>'
+    +'<div class="v-word-a" style="color:var(--jp)">'+g.a+'</div>'
+    +'<button onclick="toggleGrammarWeak(\''+g.id+'\');renderGrammarWeakList()" class="v-weak-btn on">✓ 不熟</button>'
+    +'</div>').join('');
+}
+
+function startGrammarWeakQuiz(){vShowPage('grammar');startGrammarQuiz(true);}
+
+// ══════════════════════════════════════
+// VERB（動詞）- 與文法相同架構
+// ══════════════════════════════════════
+function processVerbRows(rows){
+  if(!db.verb)db.verb=[];
+  if(!db.verbWeak)db.verbWeak={};
+  let added=0,skipped=0;
+  const existing=new Set(db.verb.map(g=>g.pattern+'|'+g.jp));
+  rows.forEach(r=>{
+    const pattern=(r[0]||'').toString().trim(); // A欄：文法形式
+    const jp=(r[1]||'').toString().trim();       // B欄：日文例句
+    const zh=(r[2]||'').toString().trim();       // C欄：中文意思
+    if(!pattern||!jp){skipped++;return;}
+    const key=pattern+'|'+jp;
+    if(existing.has(key)){skipped++;return;}
+    const id='v'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+    // q=題目顯示，a=正確答案，另存jp和zh供切換模式
+    db.verb.push({id,pattern,jp,zh,q:pattern+'\n'+jp,a:zh||jp});
+    existing.add(key);added++;
+  });
+  saveDB();renderVerbQuiz();updateStats();
+  toast('✅ 動詞：新增 '+added+' 筆，略過 '+skipped+' 筆');
+}
+
+let vQuizList=[],vQuizIdx=0,vQuizMode="jp2zh"; // jp2zh=日文→中文, zh2jp=中文→日文
+
+function toggleVerbMode(){
+  vQuizMode = vQuizMode==='jp2zh'?'zh2jp':'jp2zh';
+  const btn=document.getElementById('verb-mode-btn');
+  if(btn){
+    if(vQuizMode==='jp2zh'){
+      btn.textContent='🇯🇵→🇹🇼 日文→中文';
+      btn.style.borderColor='#0891b2';btn.style.background='#e0f2fe';btn.style.color='#0891b2';
+    } else {
+      btn.textContent='🇹🇼→🇯🇵 中文→日文';
+      btn.style.borderColor='#7c3aed';btn.style.background='#ede9fe';btn.style.color='#7c3aed';
+    }
+  }
+  startVerbQuiz(false);
+}
+
+function startVerbQuiz(weakOnly){
+  if(!db.verb)db.verb=[];
+  if(!db.verbWeak)db.verbWeak={};
+  const pool=weakOnly?db.verb.filter(g=>db.verbWeak[g.id]):db.verb;
+  const area=document.getElementById('verb-quiz-area');
+  if(pool.length===0){
+    if(area)area.innerHTML='<div style="text-align:center;color:var(--muted);padding:40px"><div style="font-size:36px;margin-bottom:12px">'+(weakOnly?'🎉':'🔤')+'</div><div style="font-size:14px;font-weight:700">'+(weakOnly?'沒有不熟的動詞！':'尚未匯入動詞單字')+'</div></div>';
+    return;
+  }
+  vQuizList=shuffle(pool);vQuizIdx=0;
+  renderVerbQuestion();
+}
+
+function renderVerbQuiz(){
+  if(!db.verb||db.verb.length===0){
+    const area=document.getElementById('verb-quiz-area');
+    if(area)area.innerHTML='<div style="text-align:center;color:var(--muted);padding:40px"><div style="font-size:36px;margin-bottom:12px">🔤</div><div style="font-size:14px;font-weight:700">尚未匯入動詞單字</div><div style="font-size:12px;margin-top:6px">請在 Excel 工作表3 加入動詞內容</div></div>';
+    return;
+  }
+  startVerbQuiz(false);
+}
+
+function renderVerbQuestion(){
+  const area=document.getElementById('verb-quiz-area');
+  const prog=document.getElementById('v-progress');
+  if(!area)return;
+  if(vQuizIdx>=vQuizList.length){
+    area.innerHTML='<div class="result-panel"><div class="result-emoji">🎉</div><div class="result-title">全部完成！</div><div class="result-sub">動詞掌握得很好！</div><button class="v-btn primary" onclick="startVerbQuiz(false)">再練一次</button></div>';
+    if(prog)prog.textContent='';return;
+  }
+  if(prog)prog.textContent=(vQuizIdx+1)+' / '+vQuizList.length;
+  const cur=vQuizList[vQuizIdx];
+  const isWeak=!!(db.verbWeak||{})[cur.id];
+  const others=db.verb.filter(g=>g.id!==cur.id).map(g=>g.a);
+  const wrong=shuffle(others).slice(0,3);
+  const opts=shuffle([cur.a,...wrong]);
+  const ca=cur.a.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+  area.innerHTML='<div style="margin-bottom:20px">'
+    +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">'
+    +'<div style="font-size:16px;font-weight:800;color:var(--text);flex:1">'+cur.q+'</div>'
+    +'<button onclick="toggleVerbWeak(\''+cur.id+'\')" class="v-weak-btn'+(isWeak?' on':'')+'" id="vw-btn">'+(isWeak?'✓ 不熟':'不熟')+'</button>'
+    +'</div>'
+    +'<div style="display:flex;flex-direction:column;gap:10px" id="v-opts">'
+    +opts.map((o,i)=>{
+      const oe=o.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+      return '<button onclick="checkVerbAnswer(\''+cur.id+'\',\''+ca+'\',\''+oe+'\',this)"'
+        +' style="padding:14px 18px;border-radius:10px;border:2px solid var(--border);background:var(--white);text-align:left;font-size:14px;font-weight:600;cursor:pointer;transition:all .18s;font-family:\'Noto Sans JP\',sans-serif;color:#374151">'
+        +String.fromCharCode(65+i)+'．'+o+'</button>';
+    }).join('')
+    +'</div></div>';
+}
+
+function checkVerbAnswer(id,correct,chosen,btn){
+  document.querySelectorAll('#v-opts button').forEach(b=>b.onclick=null);
+  if(chosen===correct){
+    btn.style.cssText+=';border-color:#16a34a!important;background:#dcfce7!important;color:#15803d!important';
+    if(!db.verbDone)db.verbDone=0;
+    db.verbDone++;saveDB();
+    toast('✅ 正確！');setTimeout(()=>{vQuizIdx++;renderVerbQuestion();},800);
+  } else {
+    btn.style.cssText+=';border-color:#dc2626!important;background:#fee2e2!important;color:#b91c1c!important';
+    document.querySelectorAll('#v-opts button').forEach(b=>{
+      if(b.textContent.trim().slice(2).trim()===correct)
+        b.style.cssText+=';border-color:#16a34a!important;background:#dcfce7!important;color:#15803d!important';
+    });
+    if(!db.verbWeak)db.verbWeak={};
+    db.verbWeak[id]=true;saveDB();
+    const vwBtn=document.getElementById('vw-btn');
+    if(vwBtn){vwBtn.classList.add('on');vwBtn.textContent='✓ 不熟';}
+    toast('❌ 答錯了！已加入不熟動詞');setTimeout(()=>{vQuizIdx++;renderVerbQuestion();},1500);
+  }
+}
+
+function toggleVerbWeak(id){
+  if(!db.verbWeak)db.verbWeak={};
+  if(db.verbWeak[id])delete db.verbWeak[id];
+  else db.verbWeak[id]=true;
+  saveDB();
+  const btn=document.getElementById('vw-btn');
+  if(btn){btn.classList.toggle('on',!!db.verbWeak[id]);btn.textContent=db.verbWeak[id]?'✓ 不熟':'不熟';}
+}
+
+function renderVerbWeakList(){
+  const list=document.getElementById('verb-weak-list');
+  const empty=document.getElementById('verb-weak-empty');
+  if(!list)return;
+  if(!db.verb)db.verb=[];
+  if(!db.verbWeak)db.verbWeak={};
+  const weaks=db.verb.filter(g=>db.verbWeak[g.id]);
+  if(weaks.length===0){list.style.display='none';if(empty)empty.style.display='';return;}
+  if(empty)empty.style.display='none';list.style.display='flex';
+  list.innerHTML=weaks.map(g=>'<div class="v-word-row weak-row">'
+    +'<div class="v-word-q">'+g.q+'</div>'
+    +'<div class="v-word-a" style="color:var(--jp)">'+g.a+'</div>'
+    +'<button onclick="toggleVerbWeak(\''+g.id+'\');renderVerbWeakList()" class="v-weak-btn on">✓ 不熟</button>'
+    +'</div>').join('');
+}
+
+function startVerbWeakQuiz(){vShowPage('verb');startVerbQuiz(true);}
+
+// ══════════════════════════════════════
+// WEAK PAGE
+function renderWeakPage(){
+  const list=el('weak-list');
+  const empty=el('weak-empty');
+  if(!list)return;
+
+  const weakIds=Object.keys(db.weak||{});
+  const weakWords=db.vocab.filter(v=>weakIds.includes(v.id));
+  const totalPages=Math.ceil(weakWords.length/PAGE_SIZE);
+
+  if(el('weak-total-pages'))el('weak-total-pages').textContent=Math.max(1,totalPages);
+
+  if(weakWords.length===0){
+    list.innerHTML='';
+    if(empty)empty.style.display='block';
+    return;
+  }
+  if(empty)empty.style.display='none';
+
+  if(weakPage>=totalPages)weakPage=totalPages-1;
+  if(weakPage<0)weakPage=0;
+  if(el('weak-page-num'))el('weak-page-num').textContent=weakPage+1;
+
+  const start=weakPage*PAGE_SIZE;
+  const pageWords=weakWords.slice(start,start+PAGE_SIZE);
+
+  list.innerHTML=pageWords.map(v=>{
+    return `<div class="v-word-row weak-row">
+      <div class="v-word-q">${v.q}</div>
+      <div class="v-word-a">${v.a}</div>
+      <button onclick="removeWeak('${v.id}')" class="v-weak-btn" style="color:#22c55e;border-color:rgba(34,197,94,.4);background:rgba(34,197,94,.1)">✓ 已熟移除</button>
+    </div>`;
+  }).join('');
+}
+
+function removeWeak(id){
+  if(db.weak)delete db.weak[id];
+  saveDB();
+  renderWeakPage();
+  renderBrowsePage();
+  toast('已從不熟區移除');
+}
+
+function prevWeakPage(){
+  if(weakPage>0){weakPage--;renderWeakPage();window.scrollTo(0,0);}
+}
+function nextWeakPage(){
+  const weakIds=Object.keys(db.weak||{});
+  const totalPages=Math.ceil(weakIds.length/PAGE_SIZE);
+  if(weakPage<totalPages-1){weakPage++;renderWeakPage();window.scrollTo(0,0);}
+}
+
+// IMPORT
+// ══════════════════════════════════════
+function importFile(evt){
+  const file=evt.target.files[0];if(!file)return;
+  evt.target.value='';
+  const ext=file.name.split('.').pop().toLowerCase();
+  if(ext==='csv'){
+    const reader=new FileReader();
+    reader.onload=e=>parseCSV(e.target.result);
+    reader.readAsText(file,'UTF-8');
+  } else {
+    // xlsx - use SheetJS
+    const reader=new FileReader();
+    reader.onload=e=>{
+      try{
+        const data=new Uint8Array(e.target.result);
+        const wb=XLSX.read(data,{type:'array'});
+        // 工作表1 → 單字
+        const ws1=wb.Sheets[wb.SheetNames[0]];
+        const rows1=XLSX.utils.sheet_to_json(ws1,{header:1,defval:''});
+        processRows(rows1);
+        // 工作表2 → 文法（如有）
+        if(wb.SheetNames.length>1){
+          const ws2=wb.Sheets[wb.SheetNames[1]];
+          const rows2=XLSX.utils.sheet_to_json(ws2,{header:1,defval:''});
+          processGrammarRows(rows2);
+        }
+        // 工作表3 → 動詞（如有）
+        if(wb.SheetNames.length>2){
+          const ws3=wb.Sheets[wb.SheetNames[2]];
+          const rows3=XLSX.utils.sheet_to_json(ws3,{header:1,defval:''});
+          processVerbRows(rows3);
+        }
+      } catch(err){ toast('❌ 讀取失敗：'+err.message); }
+    };
+    reader.readAsArrayBuffer(file);
+  }
+}
+
+function dropFile(evt){
+  evt.preventDefault();
+  el('drop-zone').classList.remove('drag');
+  const file=evt.dataTransfer.files[0];if(!file)return;
+  const fakeEvt={target:{files:[file],value:''}};
+  importFile(fakeEvt);
+}
+
+function parseCSV(text){
+  const lines=text.split('\n').filter(l=>l.trim());
+  const rows=lines.map(l=>{
+    // handle quoted CSV
+    const m=l.match(/("(?:[^"]|"")*"|[^,]*),("(?:[^"]|"")*"|[^,]*)/);
+    if(m)return[m[1].replace(/^"|"$/g,'').replace(/""/g,'"'),m[2].replace(/^"|"$/g,'').replace(/""/g,'"')];
+    const parts=l.split(',');return[parts[0]||'',parts[1]||''];
+  });
+  processRows(rows);
+}
+
+function processRows(rows){
+  let added=0,skipped=0;
+  const existing=new Set(db.vocab.map(v=>v.q+'|'+v.a));
+  rows.forEach(row=>{
+    const q=(row[0]||'').toString().trim();
+    const a=(row[1]||'').toString().trim();
+    if(!q||!a)return;
+    const key=q+'|'+a;
+    if(existing.has(key)){skipped++;return;}
+    const id='v'+Date.now()+Math.random().toString(36).slice(2,6);
+    db.vocab.push({id,q,a});
+    existing.add(key);
+    added++;
+  });
+  saveDB();updateStats();renderVocabPreview();
+  toast(`✅ 新增 ${added} 個・跳過重複 ${skipped} 個`);
+  switchTab('match');
+  renderBrowsePage();
+}
+
+function renderVocabPreview(){
+  const wrap=el('vocab-preview');
+  if(db.vocab.length===0){wrap.textContent='尚未載入單字';return;}
+  const sample=db.vocab.slice(0,5);
+  wrap.innerHTML=`<div style="margin-bottom:8px">共 <b style="color:var(--accent)">${db.vocab.length}</b> 個單字</div>`
+    +sample.map(v=>`<div style="padding:4px 0;border-bottom:1px solid var(--border);display:flex;gap:12px"><span style="color:var(--accent);min-width:120px">${escHtml(v.q.split('\n')[0])}</span><span style="color:var(--muted)">→</span><span>${escHtml(v.a)}</span></div>`).join('')
+    +(db.vocab.length>5?`<div style="margin-top:6px;color:var(--muted);font-size:11px">...以及其他 ${db.vocab.length-5} 個單字</div>`:'');
+}
+
+function clearAllVocab(){
+  showConfirm({
+    icon:'🗑',
+    title:'清除所有單字',
+    msg:'確定要刪除全部單字庫嗎？\n所有單字、學習記錄、錯誤統計都會一併清除，且無法恢復！',
+    btnText:'確定清除',
+    btnClass:'btn-danger',
+    onOk:()=>{db.vocab=[];db.errors={};db.todayDone=[];saveDB();updateStats();renderVocabPreview();renderBrowsePage();toast('已清除所有單字');}
+  });
+}
+function clearAllProgress(){
+  showConfirm({
+    icon:'🔄',
+    title:'清除學習記錄',
+    msg:'確定清除所有學習記錄（含今日進度與錯誤次數）？\n單字庫不會受影響。',
+    btnText:'清除記錄',
+    btnClass:'btn-warn',
+    onOk:()=>{db.errors={};db.todayDone=[];db.streak=0;saveDB();updateStats();renderBrowsePage();toast('已清除學習記錄');}
+  });
+}
+function resetTodayProgress(){
+  showConfirm({
+    icon:'🔄',
+    title:'重置練習進度',
+    msg:'確定要重置練習進度嗎？\n\n已完成的累積進度會清空，從頭開始練習。\n但錯誤統計和單字庫不受影響。\n\n⚠️ 還沒全部完成的話建議不要重置！',
+    btnText:'確定重置',
+    btnClass:'btn-warn',
+    onOk:()=>{
+      db.todayDone=[];
+      db.currentPage=0;
+      currentPage=0;
+      weakPage=0;
+      saveDB();
+      updateStats();
+      // 強制清除後再 render，確保從第1頁開始
+      setTimeout(()=>{
+        currentPage=0;
+        db.currentPage=0;
+        renderBrowsePage();
+      },100);
+      toast('進度已重置，從第1頁開始！');
+    }
+  });
+}
+
+// ══════════════════════════════════════
+// TAB
+// ══════════════════════════════════════
+function switchTab(id){
+  const ids=['match','weak','numbers','import'];
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>{
+    b.classList.toggle('active',ids[i]===id);
+  });
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  const view=el('view-'+id);
+  if(view)view.classList.add('active');
+  if(id==='match')renderBrowsePage();
+  if(id==='weak')renderWeakPage();
+  if(id==='numbers')startNumGame();
+}
+
+// ══════════════════════════════════════
+// 數字練習
+// ══════════════════════════════════════
+const NUM_DATA={
+  // 數量詞 1-10（個）
+  count:[
+    {q:'1個',a:'ひとつ（一つ）'},
+    {q:'2個',a:'ふたつ（二つ）'},
+    {q:'3個',a:'みっつ（三つ）'},
+    {q:'4個',a:'よっつ（四つ）'},
+    {q:'5個',a:'いつつ（五つ）'},
+    {q:'6個',a:'むっつ（六つ）'},
+    {q:'7個',a:'ななつ（七つ）'},
+    {q:'8個',a:'やっつ（八つ）'},
+    {q:'9個',a:'ここのつ（九つ）'},
+    {q:'10個',a:'とお（十）'},
+  ],
+  // 數字 1-10
+  num1:[
+    {q:'1',a:'いち（一）'},
+    {q:'2',a:'に（二）'},
+    {q:'3',a:'さん（三）'},
+    {q:'4',a:'し・よん（四）'},
+    {q:'5',a:'ご（五）'},
+    {q:'6',a:'ろく（六）'},
+    {q:'7',a:'しち・なな（七）'},
+    {q:'8',a:'はち（八）'},
+    {q:'9',a:'く・きゅう（九）'},
+    {q:'10',a:'じゅう（十）'},
+  ],
+  // 數字 11-20
+  num2:[
+    {q:'11',a:'じゅういち（十一）'},
+    {q:'12',a:'じゅうに（十二）'},
+    {q:'13',a:'じゅうさん（十三）'},
+    {q:'14',a:'じゅうし（十四）'},
+    {q:'15',a:'じゅうご（十五）'},
+    {q:'16',a:'じゅうろく（十六）'},
+    {q:'17',a:'じゅうしち（十七）'},
+    {q:'18',a:'じゅうはち（十八）'},
+    {q:'19',a:'じゅうく（十九）'},
+    {q:'20',a:'にじゅう（二十）'},
+  ],
+  // 月份 1-12月
+  months:[
+    {q:'1月',a:'いちがつ（一月）'},
+    {q:'2月',a:'にがつ（二月）'},
+    {q:'3月',a:'さんがつ（三月）'},
+    {q:'4月',a:'しがつ（四月）'},
+    {q:'5月',a:'ごがつ（五月）'},
+    {q:'6月',a:'ろくがつ（六月）'},
+    {q:'7月',a:'しちがつ（七月）'},
+    {q:'8月',a:'はちがつ（八月）'},
+    {q:'9月',a:'くがつ（九月）'},
+    {q:'10月',a:'じゅうがつ（十月）'},
+    {q:'11月',a:'じゅういちがつ（十一月）'},
+    {q:'12月',a:'じゅうにがつ（十二月）'},
+  ],
+};
+
+let numType='count';
+let numLeft=null, numRight=null, numRightId=null, numMatched=0, numQueue=[];
+
+function selectNumType(btn){
+  document.querySelectorAll('.num-type-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  numType=btn.dataset.type;
+  startNumGame();
+}
+
+function startNumGame(){
+  const numDoneEl=el('num-done');
+  const numArea=el('num-match-area');
+  const numScoreBar=el('num-score-bar');
+  if(!numDoneEl||!numArea)return; // 元素還沒渲染
+  numDoneEl.style.display='none';
+  numLeft=null;numRight=null;numRightId=null;numMatched=0;
+
+  // 決定資料來源
+  let pool=[];
+  if(numType==='all'){
+    const combined=[...NUM_DATA.count,...NUM_DATA.num1,...NUM_DATA.num2,...NUM_DATA.months];
+    pool=shuffle(combined).slice(0,10); // 隨機抽10題
+  } else {
+    pool=[...NUM_DATA[numType]||NUM_DATA.count];
+  }
+  // 加上唯一 id
+  numQueue=pool.map((v,i)=>({...v,id:'n'+i}));
+  const answers=shuffle([...numQueue]);
+
+  if(numScoreBar)numScoreBar.style.display='block';
+  el('num-total').textContent=numQueue.length;
+  el('num-matched').textContent=0;
+  el('num-sub').textContent=`共 ${numQueue.length} 題`;
+
+  const area=numArea;
+  let lH='',rH='',mH='';
+  numQueue.forEach(v=>{
+    lH+=`<div class="match-item" id="nl-${v.id}" onclick="numSelLeft('${v.id}')">
+      <div style="font-size:13px;font-weight:700;color:var(--accent)">${escHtml(v.q)}</div>
+    </div>`;
+    mH+=`<div class="match-connector"><div class="conn-line"></div></div>`;
+  });
+  answers.forEach((v,i)=>{
+    rH+=`<div class="match-item" id="nr-${i}" onclick="numSelRight(${i},'${v.id}')">
+      <div style="font-size:11px;color:var(--text);font-family:'Noto Sans JP',sans-serif">${escHtml(v.a)}</div>
+    </div>`;
+  });
+  area.innerHTML=`
+    <div class="match-col">${lH}</div>
+    <div class="match-center">${mH}</div>
+    <div class="match-col">${rH}</div>`;
+}
+
+function numSelLeft(id){
+  if(numLeft){const p=el('nl-'+numLeft);if(p)p.classList.remove('selected');}
+  numLeft=id;
+  const item=el('nl-'+id);if(item){item.classList.add('selected');item.classList.remove('wrong');}
+  numTryMatch();
+}
+function numSelRight(idx,id){
+  if(numRight!==null){const p=el('nr-'+numRight);if(p)p.classList.remove('selected');}
+  numRight=idx;numRightId=id;
+  const item=el('nr-'+idx);if(item){item.classList.add('selected');item.classList.remove('wrong');}
+  numTryMatch();
+}
+function numTryMatch(){
+  if(numLeft===null||numRight===null)return;
+  const lId=numLeft,rId=numRightId,rIdx=numRight;
+  numLeft=null;numRight=null;numRightId=null;
+  if(lId===rId){
+    const lEl=el('nl-'+lId),rEl=el('nr-'+rIdx);
+    if(lEl){lEl.classList.remove('selected');lEl.classList.add('matched','pop');}
+    if(rEl){rEl.classList.remove('selected');rEl.classList.add('matched','pop');}
+    numMatched++;
+    el('num-matched').textContent=numMatched;
+    if(numMatched>=numQueue.length)setTimeout(()=>{el('num-done').style.display='block';},400);
+  } else {
+    const lEl=el('nl-'+lId),rEl=el('nr-'+rIdx);
+    if(lEl){lEl.classList.remove('selected');lEl.classList.add('wrong');setTimeout(()=>lEl.classList.remove('wrong'),600);}
+    if(rEl){rEl.classList.remove('selected');rEl.classList.add('wrong');setTimeout(()=>rEl.classList.remove('wrong'),600);}
+  }
+}
+// ══════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════
+function el(id){return document.getElementById(id);}
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function shuffle(arr){
+  const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;
+}
+let _toastTimer=null;
+function toast(msg){
+  const t=el('toast');t.textContent=msg;t.classList.add('show');
+  clearTimeout(_toastTimer);_toastTimer=setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+// ══════════════════════════════════════
+// CUSTOM CONFIRM DIALOG
+// ══════════════════════════════════════
+let _confirmCallback=null;
+function showConfirm({icon='⚠️',title,msg,btnText='確定',btnClass='btn-danger',onOk}){
+  el('confirm-icon').textContent=icon;
+  el('confirm-title').textContent=title;
+  el('confirm-msg').textContent=msg;
+  const okBtn=el('confirm-ok');
+  okBtn.textContent=btnText;
+  okBtn.className='btn '+btnClass;
+  _confirmCallback=onOk;
+  el('confirm-overlay').classList.add('open');
+}
+function closeConfirm(confirmed){
+  el('confirm-overlay').classList.remove('open');
+  if(confirmed===true&&_confirmCallback){const cb=_confirmCallback;_confirmCallback=null;cb();}
+  else _confirmCallback=null;
+}
+el('confirm-ok').addEventListener('click',()=>closeConfirm(true));
+// ESC 關閉
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeConfirm();});
+
+// ══════════════════════════════════════
+// GITHUB 雲端同步
+// ══════════════════════════════════════
+const CF_WORKER='https://dashboard-sync.manny76528.workers.dev';
+const GH_FILE='data_vocab.json';
+const GH_API=CF_WORKER+'/'+GH_FILE;
+let _ghSha='';
+let _syncTimer=null;
+let _syncEnabled=true;
+
+function showSyncStatus(msg){
+  const el2=document.getElementById('sync-status');
+  if(el2){el2.textContent=msg;clearTimeout(el2._t);el2._t=setTimeout(()=>el2.textContent='',4000);}
+}
+
+async function ghPull(){
+  if(!_syncEnabled)return false;
+  try{
+    const r=await fetch(GH_API+'?t='+Date.now());
+    if(!r.ok){if(r.status===404)return false;throw new Error('Pull '+r.status);}
+    const j=await r.json();
+    _ghSha=j.sha;
+    const b64=j.content.replace(/\n/g,'');
+    const binStr=atob(b64);
+    const bytes=new Uint8Array(binStr.length);
+    for(let i=0;i<binStr.length;i++)bytes[i]=binStr.charCodeAt(i);
+    const remote=JSON.parse(new TextDecoder().decode(bytes));
+    const localTs=db._ts||0;
+    const remoteTs=remote._ts||0;
+    console.log('vocab Pull: 本地ts='+localTs+' 遠端ts='+remoteTs);
+    if(remoteTs>=localTs){
+      // 遠端較新或相同 → 合併，保護本地較多的vocab和errors
+      if((db.vocab||[]).length>(remote.vocab||[]).length)remote.vocab=db.vocab;
+      if(Object.keys(db.errors||{}).length>Object.keys(remote.errors||{}).length)remote.errors=db.errors;
+      db=remote;
+      localStorage.setItem(DB_KEY,JSON.stringify(db));
+      showSyncStatus('☁️ 已從雲端同步');
+      console.log('✅ vocab Pull 成功');
+      return true;
+    }
+    console.log('本地資料較新，保留本地');
+    return false;
+  }catch(e){console.warn('Pull失敗:',e.message);return false;}
+}
+
+async function ghPush(){
+  if(!_syncEnabled)return;
+  try{
+    db._ts=Date.now();
+    localStorage.setItem(DB_KEY,JSON.stringify(db));
+    const jsonStr=JSON.stringify(db,null,2);
+    const encoder=new TextEncoder();
+    const bytes=encoder.encode(jsonStr);
+    const binStr=Array.from(bytes,b=>String.fromCharCode(b)).join('');
+    const encoded=btoa(binStr);
+    if(!_ghSha){
+      try{const chk=await fetch(GH_API);if(chk.ok){const cj=await chk.json();_ghSha=cj.sha;}}catch(e){}
+    }
+    const body={message:'vocab-sync:'+Date.now(),content:encoded};
+    if(_ghSha)body.sha=_ghSha;
+    const r=await fetch(GH_API,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    if(!r.ok){
+      const e=await r.json();
+      if(e.message&&e.message.includes('does not match')){
+        try{
+          const chk2=await fetch(GH_API+'?t='+Date.now());
+          if(chk2.ok){const cj2=await chk2.json();_ghSha=cj2.sha;}
+          const body2={message:'vocab-retry:'+Date.now(),content:encoded,sha:_ghSha};
+          const r2=await fetch(GH_API,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body2)});
+          if(r2.ok){const j2=await r2.json();_ghSha=j2.content.sha;showSyncStatus('✅ 已同步至雲端');return;}
+        }catch(e2){}
+      }
+      throw new Error(e.message);
+    }
+    const j=await r.json();
+    _ghSha=j.content.sha;
+    showSyncStatus('✅ 已同步至雲端');
+  }catch(e){showSyncStatus('⚠️ 同步失敗');console.warn('Push失敗:',e.message);}
+}
+
+function schedulePush(){
+  clearTimeout(_syncTimer);
+  _syncTimer=setTimeout(ghPush,3000);
+}
+
+async function manualSync(){
+  showSyncStatus('🔄 同步中...');
+  _ghSha='';
+  const updated=await ghPull();
+  if(updated){updateStats();renderBrowsePage();renderVocabPreview();}
+  await ghPush();
+  showSyncStatus('✅ 同步完成');
+}
+
+// 離開頁面前立即 Push
+document.addEventListener('visibilitychange',async function(){
+  if(document.visibilityState==='hidden'){
+    clearTimeout(_syncTimer);
+    ghPush();
+  }
+  // 切回頁面：停用Push → 強制Pull → 啟用Push
+  if(document.visibilityState==='visible'){
+    if(!_syncEnabled)return;
+    _syncEnabled=false;
+    try{
+      const r=await fetch(GH_API+'?t='+Date.now());
+      if(r.ok){
+        const j=await r.json();
+        _ghSha=j.sha;
+        const b64=j.content.replace(/\n/g,'');
+        const binStr=atob(b64);
+        const bytes=new Uint8Array(binStr.length);
+        for(let i=0;i<binStr.length;i++)bytes[i]=binStr.charCodeAt(i);
+        const remote=JSON.parse(new TextDecoder().decode(bytes));
+        const remoteTs=remote._ts||0;
+        const localTs=db._ts||0;
+        if(remoteTs>=localTs){
+          if((db.vocab||[]).length>(remote.vocab||[]).length)remote.vocab=db.vocab;
+          if(Object.keys(db.errors||{}).length>Object.keys(remote.errors||{}).length)remote.errors=db.errors;
+          db=remote;
+          localStorage.setItem(DB_KEY,JSON.stringify(db));
+          updateStats();renderBrowsePage();renderVocabPreview();
+          showSyncStatus('☁️ 已從雲端同步');
+        }
+      }
+    }catch(e){console.warn('visibilitychange Pull失敗:',e.message);}
+    _syncEnabled=true;
+  }
+});
+
+// 每 5 分鐘自動 Pull 一次
+setInterval(async()=>{
+  if(!_syncEnabled)return;
+  const updated=await ghPull();
+  if(updated){updateStats();renderBrowsePage();renderVocabPreview();showSyncStatus('☁️ 已從雲端同步');}
+},5*60*1000);
+
+// ══════════════════════════════════════
+// LOAD SHEETJS
+// ══════════════════════════════════════
+const script=document.createElement('script');
+script.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+script.onload=async()=>{
+  _syncEnabled=false; // 禁止 Push，先 Pull
+  showSyncStatus('🔄 載入中...');
+  try{
+    const r=await fetch(GH_API+'?t='+Date.now());
+    if(r.ok){
+      const j=await r.json();
+      _ghSha=j.sha;
+      const b64=j.content.replace(/\n/g,'');
+      const binStr=atob(b64);
+      const bytes=new Uint8Array(binStr.length);
+      for(let i=0;i<binStr.length;i++)bytes[i]=binStr.charCodeAt(i);
+      const remote=JSON.parse(new TextDecoder().decode(bytes));
+      const remoteTs=remote._ts||0;
+      const localTs=db._ts||0;
+      const remoteVocab=(remote.vocab||[]).length;
+      const localVocab=(db.vocab||[]).length;
+      console.log(`vocab啟動: 本地ts=${localTs}(${localVocab}字) 雲端ts=${remoteTs}(${remoteVocab}字)`);
+      // 雲端較新 或 雲端有資料而本地沒有 → 用雲端
+      if(remoteTs>=localTs || (remoteVocab>0 && localVocab===0)){
+        if(localVocab>remoteVocab)remote.vocab=db.vocab; // 保護本地較多的字
+        if(Object.keys(db.errors||{}).length>Object.keys(remote.errors||{}).length)remote.errors=db.errors;
+        db=remote;
+        localStorage.setItem(DB_KEY,JSON.stringify(db));
+        showSyncStatus('☁️ 已從雲端同步');
+        console.log('✅ 啟動 Pull 成功');
+      }
+    }
+  }catch(e){
+    console.warn('啟動Pull失敗:',e.message);
+    showSyncStatus('⚠️ 同步失敗，使用本地資料');
+  }
+  _syncEnabled=true;
+  init(); // Pull完才init
+};
+script.onerror=()=>{
+  console.warn('SheetJS 載入失敗，仍可使用 CSV');
+  _syncEnabled=true;
+  init();
+};
+document.head.appendChild(script);
+
+// ══════════════════════════════════════════════════════════════
+// 🛡 雲端同步保護（2026/10/25）：上傳前先讀一次雲端確認
+//   ・讀不到雲端 → 這次不上傳（避免空白或舊資料蓋掉雲端）
+//   ・這台的資料比雲端少很多 → 先問；頁面在背景時直接不上傳
+//   ・切到背景時只在「有修改」才上傳
+// ══════════════════════════════════════════════════════════════
+(function(){
+  const KEYS=[['vocab',10,0.5,'單字']];
+  const cnt=v=>Array.isArray(v)?v.length:(v&&typeof v==='object'?Object.keys(v).length:0);
+  const say=m=>{try{showSyncStatus(m);}catch(e){}};
+  let _gOk=0;
+  window._cloudGuardCheck=async function(){
+    if(document.visibilityState!=='visible'&&_gOk&&Date.now()-_gOk<30*60*1000){return true;}
+    const ok=await _cloudGuardCheck0();if(ok)_gOk=Date.now();return ok;
+  };
+  setTimeout(()=>{if(document.visibilityState==='visible')_cloudGuardCheck0(true).then(ok=>{if(ok)_gOk=Date.now();}).catch(()=>{});},7000);
+  async function _cloudGuardCheck0(silent){
+    let r;
+    try{r=await fetch(GH_API+'?t='+Date.now());}catch(e){say('⚠️ 雲端讀不到，這次先不上傳');console.warn('[同步保護] 讀不到雲端',e);return false;}
+    if(r.status===404)return true;
+    if(!r.ok){say('⚠️ 雲端讀不到，這次先不上傳');console.warn('[同步保護] 雲端回應',r.status);return false;}
+    let remote;
+    try{const j=await r.json();if(!j||typeof j.content!=='string'||!j.content.trim())throw new Error('內容是空的');
+      if(j.sha)_ghSha=j.sha;
+      const bin=atob(j.content.replace(/\n/g,''));const by=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)by[i]=bin.charCodeAt(i);
+      remote=JSON.parse(new TextDecoder().decode(by));}
+    catch(e){say('⚠️ 雲端資料讀取失敗，這次先不上傳');console.warn('[同步保護]',e);return false;}
+    const bad=KEYS.map(([k,min,ratio,label])=>{const rc=cnt(remote[k]),lc=cnt(db[k]);return rc>=min&&lc<rc*ratio?`・${label}：這台 ${lc}，雲端 ${rc}`:null;}).filter(Boolean);
+    if(!bad.length)return true;
+    if(silent||document.visibilityState!=='visible'){console.warn('[同步保護] 資料比雲端少很多，先不上傳',bad);return false;}
+    const ok=confirm(`⚠️ 這台的資料比雲端少很多：\n${bad.join('\n')}\n\n確定要用這台的資料覆蓋雲端嗎？\n（不確定請按「取消」，再重新整理頁面讓它從雲端下載）`);
+    if(!ok)say('🛡 已取消上傳');
+    return ok;
+  };
+  let _gDirty=false; saveDB=(function(o){return function(){_gDirty=true;return o.apply(this,arguments);};})(saveDB);
+  ghPush=(function(o){return async function(){
+    if(!_syncEnabled)return;
+    if(document.visibilityState==='hidden'&&!_gDirty)return;
+    if(!(await window._cloudGuardCheck()))return;
+    _gDirty=false;
+    return o.apply(this,arguments);
+  };})(ghPush);
+})();
+</script>
+</body>
+</html>

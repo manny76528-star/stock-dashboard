@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>資產儀表板</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Noto Sans TC',system-ui,sans-serif;background:#f1f5f9;color:#0f172a;padding-bottom:calc(72px + env(safe-area-inset-bottom,0px))}
+.mono{font-family:'JetBrains Mono',monospace}
+.top{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid #e2e8f0;padding:12px 14px 10px;padding-top:calc(12px + env(safe-area-inset-top,0px));display:flex;align-items:center;gap:8px}
+.top b{font-size:17px}.top .u{font-size:12px;color:#475569}
+.eye{margin-left:auto;border:1px solid #e2e8f0;background:#fff;border-radius:999px;padding:5px 11px;font-size:13px;font-weight:800;font-family:inherit;color:#0f172a}
+.pg{display:none;padding:12px}.pg.on{display:block}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.k{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:10px 12px;min-width:0}
+.k .t{font-size:12.5px;font-weight:700;color:#334155}.k .v{font-size:19px;font-weight:900;font-family:'JetBrains Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.k .s{font-size:12.5px;color:#475569;margin-top:2px}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:12px;margin-top:10px}
+.card h3{font-size:15.5px;font-weight:900;display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.bar{height:8px;background:#f1f5f9;border-radius:99px;overflow:hidden;margin:6px 0 3px}.bar i{display:block;height:100%;border-radius:99px}
+.row{display:flex;align-items:center;gap:8px;padding:9px 8px;border-radius:9px;font-size:14px}
+.row:nth-child(even){background:#f8fafc}
+.chip{display:inline-flex;align-items:center;gap:4px;border-radius:8px;padding:4px 9px;font-size:13px;font-weight:800;text-decoration:none}
+.btn{display:block;text-align:center;border-radius:12px;padding:11px;font-weight:800;font-size:14.5px;text-decoration:none;font-family:inherit;border:1px solid #e2e8f0;background:#fff;color:#0f172a;margin-top:8px}
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:60;background:#fff;border-top:1px solid #e2e8f0;display:grid;grid-template-columns:repeat(5,1fr);padding:6px 0 calc(6px + env(safe-area-inset-bottom,0px))}
+.nav button{border:none;background:none;font-family:inherit;font-size:12px;font-weight:700;color:#64748b;display:flex;flex-direction:column;align-items:center;gap:1px}
+.nav button span{font-size:21px;line-height:1.2}.nav button.on{color:#2563eb}
+.pm{transition:filter .2s}
+body.priv .pm{filter:blur(7px);color:#94a3b8!important;user-select:none}
+.muted{font-size:12.5px;color:#475569}
+.err{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:12px;padding:12px;font-size:14px;line-height:1.6}
+.lk{display:inline-block;border:1px solid #dbeafe;background:#fff;border-radius:999px;padding:3px 10px;font-size:12.5px;font-weight:700;color:#1d4ed8;text-decoration:none;margin:3px 6px 0 0}
+</style>
+<style>/* v19 還款卡 */
+.v19-card{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:20px 26px;max-width:640px;margin:8px auto 4px;box-shadow:0 4px 14px rgba(15,23,42,.05)}
+.v19-hd{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:12px;font-size:13px}.v19-hd>b{font-size:15.5px}.v19-mu{color:#64748b;font-size:12.5px}.v19-sum{margin-left:auto}.v19-sum b{font-family:'JetBrains Mono',monospace}
+.v19-g{display:grid;grid-template-columns:40px repeat(12,minmax(0,1fr));gap:5px;margin-top:5px;align-items:center}.v19-g6{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;margin-top:6px}
+.v19-mh{text-align:center;font-size:10.5px;color:#94a3b8}.v19-yh{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:800;color:#475569}
+.v19-c{border-radius:9px;padding:4px 0;text-align:center;background:#fffdf7;border:1px solid #eef2f7;min-width:0}.v19-c b{display:block;font-size:12.5px;font-weight:800;color:#0f172a}.v19-c span{display:block;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#64748b;white-space:nowrap;letter-spacing:-.3px}
+.v19-c.nx{border:2px dashed}.v19-c.nx b,.v19-c.nx span{color:inherit}
+.v19-c.d{background:#fafafa;border-color:#f1f5f9}.v19-c.d b,.v19-c.d span{color:#fca5a5;text-decoration:line-through;text-decoration-color:#ef4444;text-decoration-thickness:2px}
+.v19-ft{display:flex;flex-wrap:wrap;gap:6px;font-size:12.5px;color:#64748b;margin-top:12px}.v19-ft b{color:#0f172a}
+.v19-row .v19-card{padding:14px 12px;margin:10px 0 2px;border-radius:14px;box-shadow:none}.v19-row summary::-webkit-details-marker{display:none}.v19-row[open]{background:#faf5ff;border-radius:12px}
+</style>
+</head>
+<body class="priv">
+<script>
+// ══ 🔐 資料密碼＋資料加密（2026/10）══
+//   1) 呼叫雲端同步服務時自動帶通行碼（X-Sync-Key）；查股價、大盤不用帶
+//   2) 四個資料檔上傳前自動加密（AES-256-GCM）、下載後自動解開；各頁面原本的同步程式完全不用改
+//   3) 這台沒有鑰匙卻讀到加密檔 → 不交出資料、也不准上傳（避免拿舊資料蓋掉雲端），跳出輸入密碼
+(function(){
+  const W='https://dashboard-sync.manny76528.workers.dev', KS='syncKey_v1', KE='encKey_v1', KON='encOn_v1';
+  const ENC_FILES=['data_dashboard.json','data_inventory.json','data_glove.json','data_vocab.json'];
+  const SALT='stock-dashboard/manny76528-star/data-v1', ITER=600000;
+  const ls={get:k=>{try{return localStorage.getItem(k)||'';}catch(e){return'';}},set:(k,v)=>{try{v?localStorage.setItem(k,v):localStorage.removeItem(k);}catch(e){}}};
+  const te=new TextEncoder(), td=new TextDecoder();
+  async function hex(s){const b=await crypto.subtle.digest('SHA-256',typeof s==='string'?te.encode(s):s);return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');}
+  const h2b=h=>new Uint8Array(h.match(/../g).map(x=>parseInt(x,16)));
+  const b2b64=u=>{let s='';for(let i=0;i<u.length;i+=0x8000)s+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return btoa(s);};
+  const b642b=b=>{const s=atob(String(b).replace(/\s/g,''));const u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return u;};
+  window.syncKeyFromPw=pw=>hex('sync:'+pw);
+  window.syncHashFromKey=k=>hex(k);
+  window.syncGetKey=()=>ls.get(KS); window.syncSetKey=k=>ls.set(KS,k);
+  window.encGetKey=()=>ls.get(KE); window.encSetKey=k=>ls.set(KE,k);
+  window.encIsOn=()=>ls.get(KON)==='1'; window.encSetOn=v=>ls.set(KON,v?'1':'');
+  window.encKeyFromPw=async pw=>{const base=await crypto.subtle.importKey('raw',te.encode(pw),'PBKDF2',false,['deriveBits']);
+    const bits=await crypto.subtle.deriveBits({name:'PBKDF2',salt:te.encode(SALT),iterations:ITER,hash:'SHA-256'},base,256);return [...new Uint8Array(bits)].map(x=>x.toString(16).padStart(2,'0')).join('');};
+  window.encKid=async k=>(await hex(h2b(k))).slice(0,8);
+  const isEnv=o=>o&&typeof o==='object'&&o.enc==='v1'&&o.ct&&o.iv;
+  window.encIsEnvelopeText=t=>{try{return isEnv(JSON.parse(t));}catch(e){return false;}};
+  async function aes(k){return crypto.subtle.importKey('raw',h2b(k),'AES-GCM',false,['encrypt','decrypt']);}
+  window.encSeal=async(plainBytes,k)=>{const iv=crypto.getRandomValues(new Uint8Array(12));const ct=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv},await aes(k),plainBytes));
+    return JSON.stringify({enc:'v1',alg:'AES-256-GCM',kdf:'PBKDF2-SHA256-'+ITER,kid:await encKid(k),ts:Date.now(),iv:b2b64(iv),ct:b2b64(ct)});};
+  window.encOpen=async(env,k)=>new Uint8Array(await crypto.subtle.decrypt({name:'AES-GCM',iv:b642b(env.iv)},await aes(k),b642b(env.ct)));
+  const pub=u=>/^\/(price|index)(\?|$)/.test(u.slice(W.length));
+  const fileOf=u=>decodeURIComponent(u.slice(W.length+1).split('?')[0]);
+  const _f=window.fetch.bind(window);window._syncRawFetch=_f;
+  const fail=(st,msg)=>new Response(JSON.stringify({error:msg,message:msg}),{status:st,headers:{'Content-Type':'application/json'}});
+  window.fetch=async function(input,init){
+    const url=typeof input==='string'?input:(input&&input.url)||'';
+    if(!url.startsWith(W)||pub(url))return _f(input,init);
+    const k=window.syncGetKey();
+    init=Object.assign({},init||{});
+    if(k){const h=new Headers(init.headers||(typeof input!=='string'&&input.headers)||{});h.set('X-Sync-Key',k);init.headers=h;}
+    const file=fileOf(url), method=String(init.method||(typeof input!=='string'&&input.method)||'GET').toUpperCase(), enc=ENC_FILES.includes(file);
+    if(enc&&method==='PUT'){
+      try{const body=JSON.parse(init.body);const ek=window.encGetKey();
+        if(ek&&window.encIsOn()){body.content=b2b64(te.encode(await encSeal(b642b(body.content),ek)));init.body=JSON.stringify(body);}
+        else{ // 這台沒開加密：先看雲端是不是已經加密了，是的話不准用明文蓋掉
+          const r0=await _f(W+'/'+file+'?t='+Date.now(),{headers:init.headers});
+          if(r0.ok){const j0=await r0.json();if(j0&&j0.content&&isEnv(JSON.parse(td.decode(b642b(j0.content))))){setTimeout(()=>window.syncAsk('enc'),0);return fail(423,'encrypted: need key');}}}
+      }catch(e){console.warn('[加密] 上傳前處理失敗',e);return fail(500,'encrypt failed');}
+    }
+    const r=await _f(input,init);
+    if(r.status===401){setTimeout(()=>window.syncAsk(k?'wrong':'first'),0);return r;}
+    if(enc&&method==='GET'&&r.ok){
+      let j;try{j=await r.clone().json();}catch(e){return r;}
+      if(!j||!j.content)return r;
+      let env=null;try{const o=JSON.parse(td.decode(b642b(j.content)));if(isEnv(o))env=o;}catch(e){}
+      if(!env)return r;
+      window.encSetOn(true);
+      const ek=window.encGetKey();
+      if(!ek){setTimeout(()=>window.syncAsk('enc'),0);return fail(423,'encrypted: need key');}
+      if(env.kid&&env.kid!==await encKid(ek)){setTimeout(()=>window.syncAsk('enckey'),0);return fail(423,'encrypted: wrong key');}
+      try{const plain=await encOpen(env,ek);j.content=b2b64(plain);return new Response(JSON.stringify(j),{status:200,headers:{'Content-Type':'application/json'}});}
+      catch(e){setTimeout(()=>window.syncAsk('enckey'),0);return fail(423,'decrypt failed');}
+    }
+    return r;
+  };
+  let shown=false;
+  const MSG={first:['這台裝置第一次同步','輸入「資料密碼」才能讀寫雲端資料',''],wrong:['資料密碼不對或已更換','輸入「資料密碼」才能讀寫雲端資料','⚠️ 雲端拒絕了這台裝置記住的密碼，請重新輸入'],
+    enc:['雲端資料已加密','輸入「資料密碼」解開這台的資料',''],enckey:['資料密碼不對或已更換','雲端資料用另一組密碼加密','⚠️ 這台記住的鑰匙解不開，請重新輸入資料密碼']};
+  window.syncAsk=function(why){
+    if(shown||document.getElementById('sa-bg'))return;shown=true;const M=MSG[why]||MSG.first;
+    const go=()=>{const bg=document.createElement('div');bg.id='sa-bg';
+      bg.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:2147483000;display:flex;align-items:center;justify-content:center;padding:16px;font-family:-apple-system,"PingFang TC","Noto Sans TC",sans-serif';
+      bg.innerHTML=`<div style="background:#fff;border-radius:18px;width:min(380px,100%);box-shadow:0 30px 70px rgba(0,0,0,.3);overflow:hidden">
+        <div style="text-align:center;padding:22px 18px 8px;background:linear-gradient(135deg,#eff6ff,#f5f3ff)"><div style="font-size:38px">🔐</div><b style="font-size:17px;color:#0f172a">${M[0]}</b><div style="font-size:12.5px;color:#64748b;margin-top:4px">${M[1]}</div></div>
+        <div style="padding:14px 18px 18px"><div style="display:flex;align-items:center;border:1.5px solid #93c5fd;border-radius:11px;padding:0 10px;box-shadow:0 0 0 3px #dbeafe"><input id="sa-pw" type="password" autocomplete="current-password" style="flex:1;border:none;outline:none;padding:11px 0;font-size:16px;background:transparent;min-width:0" placeholder="資料密碼"><span id="sa-eye" style="cursor:pointer;font-size:16px">👁</span></div>
+        ${M[2]?`<div style="color:#dc2626;font-size:12.5px;margin-top:6px">${M[2]}</div>`:''}
+        <div id="sa-st" style="font-size:12px;color:#64748b;margin-top:8px">輸入一次就會記在這台裝置，之後不會再問。</div>
+        <div style="display:flex;gap:8px;margin-top:14px"><button id="sa-no" style="flex:1;padding:10px;border:1px solid #e2e8f0;border-radius:11px;background:#fff;color:#64748b;font-weight:700;font-size:14px;cursor:pointer">先不要</button><button id="sa-ok" style="flex:2;padding:10px;border:none;border-radius:11px;background:#2563eb;color:#fff;font-weight:800;font-size:14px;cursor:pointer">解開並同步</button></div></div></div>`;
+      document.body.appendChild(bg);const pw=bg.querySelector('#sa-pw');setTimeout(()=>pw.focus(),50);
+      bg.querySelector('#sa-eye').onclick=()=>{pw.type=pw.type==='password'?'text':'password';};
+      bg.querySelector('#sa-no').onclick=()=>{bg.remove();};
+      const ok=async()=>{if(!pw.value)return;const st=bg.querySelector('#sa-st');st.textContent='🔑 產生鑰匙中（第一次約 1–3 秒）…';
+        window.syncSetKey(await window.syncKeyFromPw(pw.value));window.encSetKey(await window.encKeyFromPw(pw.value));location.reload();};
+      bg.querySelector('#sa-ok').onclick=ok;pw.onkeydown=e=>{if(e.key==='Enter')ok();};};
+    if(document.body)go();else document.addEventListener('DOMContentLoaded',go);
+  };
+})();
+</script>
+<script>
+// 登入：跟主目錄同一組（沒登入或閒置超過 3 分鐘 → 回主目錄登入）
+(function(){const ok=localStorage.getItem('master_auth_v1')==='1',ts=+(localStorage.getItem('master_auth_ts')||0);
+  if(!ok||Date.now()-ts>=3*60*1000){location.replace('index.html');return;}
+  const touch=()=>{if(localStorage.getItem('master_auth_v1')==='1')localStorage.setItem('master_auth_ts',String(Date.now()));};
+  ['touchstart','click','keydown','scroll'].forEach(e=>document.addEventListener(e,touch,{passive:true}));
+  setInterval(()=>{const t=+(localStorage.getItem('master_auth_ts')||0);if(localStorage.getItem('master_auth_v1')!=='1'||Date.now()-t>=3*60*1000){localStorage.removeItem('master_auth_v1');location.replace('index.html');}},15000);
+})();
+</script>
+<div class="top"><div><b id="ttl">📈 投資與觀察</b><div class="u" id="upd">載入中…</div></div><button class="eye" id="eye" onclick="togglePriv()">👁 顯示金額</button></div>
+<div id="pg-inv" class="pg on"></div><div id="pg-ast" class="pg"></div><div id="pg-div" class="pg"></div><div id="pg-wat" class="pg"></div><div id="pg-more" class="pg"></div>
+<div class="nav">
+  <button data-p="inv" class="on" onclick="go('inv')"><span>📈</span>投資</button>
+  <button data-p="ast" onclick="go('ast')"><span>🏦</span>資產</button>
+  <button data-p="div" onclick="go('div')"><span>💰</span>股息</button>
+  <button data-p="wat" onclick="go('wat')"><span>👁</span>觀察股</button>
+  <button data-p="more" onclick="go('more')"><span>☰</span>更多</button>
+</div>
+<script>
+const API='https://dashboard-sync.manny76528.workers.dev/data_dashboard.json';
+let M=null, DB=null;
+const E=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const m=v=>(v<0?'−':'')+'$'+Math.round(Math.abs(v||0)).toLocaleString();
+const sg=v=>(v>=0?'+':'−')+'$'+Math.round(Math.abs(v||0)).toLocaleString();
+const md=s=>s?s.slice(5).replace('-','/'):'—';
+const today=()=>new Date(Date.now()+8*3600e3).toISOString().slice(0,10);
+const dd=(a,b)=>Math.round((new Date(b+'T00:00:00Z')-new Date(a+'T00:00:00Z'))/864e5);
+const TT={inv:'📈 投資與觀察',ast:'🏦 資產與負債',div:'💰 股息',wat:'👁 觀察股',more:'☰ 更多'};
+function go(p){document.querySelectorAll('.pg').forEach(e=>e.classList.toggle('on',e.id==='pg-'+p));document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('on',b.dataset.p===p));document.getElementById('ttl').textContent=TT[p];window.scrollTo(0,0);try{sessionStorage.setItem('m_pg',p);}catch(e){}}
+function togglePriv(){const on=document.body.classList.toggle('priv');document.getElementById('eye').textContent=on?'👁 顯示金額':'🙈 隱藏金額';}
+async function load(){
+  try{const r=await fetch(API+'?t='+Date.now());if(!r.ok)throw new Error('HTTP '+r.status);const j=await r.json();
+    const bin=atob(String(j.content||'').replace(/\n/g,''));const by=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)by[i]=bin.charCodeAt(i);
+    DB=JSON.parse(new TextDecoder().decode(by));M=DB.mobile_v2||null;
+    try{localStorage.setItem('m_v2_cache',JSON.stringify(M));}catch(e){}
+  }catch(e){try{M=JSON.parse(localStorage.getItem('m_v2_cache')||'null');}catch(_){} if(!M){document.getElementById('pg-inv').innerHTML=`<div class="err">⚠️ 讀不到雲端資料（${E(e.message)}）。請確認網路後再按右上重新整理，或先用電腦版。</div>`;document.getElementById('upd').textContent='讀取失敗';return;}}
+  if(!M){document.getElementById('pg-inv').innerHTML=`<div class="err">📱 手機版的資料還沒準備好。<br>請先用<b>電腦版</b>打開一次股票系統（有任何同步就會自動產生），之後手機就看得到了。</div><a class="btn" href="dashboard.html?force=pc">💻 開電腦版</a>`;document.getElementById('upd').textContent='尚無手機資料';return;}
+  const t=new Date(M.ts);document.getElementById('upd').textContent=`資料更新於 ${t.getMonth()+1}/${t.getDate()} ${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}（電腦版同步時更新）`;
+  render();
+}
+function render(){const T=today();
+  // ── 投資 ──
+  const I=M.inv, nd=I.nextDate?dd(T,I.nextDate):null, tp=I.target?I.ytd/I.target*100:0;
+  const pop=M.pop; let popH='';
+  if(pop){const d=dd(T,pop.date);const red=pop.level==='red',amb=pop.level==='amber';
+    popH=`<div class="card" style="background:${red?'#fef2f2':amb?'#fffbeb':'#f0fdf4'};border-color:${red?'#fca5a5':amb?'#fde68a':'#bbf7d0'}"><h3 style="color:${red?'#b91c1c':amb?'#b45309':'#15803d'}">${red?'🚨':amb?'⚠️':'✅'} 下次信貸扣款 ${md(pop.date)}（${d<=0?'今天':d+' 天後'}）</h3>
+      <div style="font-size:14px">${E(pop.label)} 要扣 <b class="mono" style="color:#16a34a">${m(Math.abs(pop.amt))}</b>，扣完${pop.after<0?'會變成':'還剩'} <b class="mono" style="color:${pop.after<0?'#dc2626':'#0f172a'}">${m(pop.after)}</b>${red?'<br><b style="color:#b91c1c">錢不夠，請補錢</b>':''}</div></div>`;}
+  document.getElementById('pg-inv').innerHTML=`<div class="g2">
+    <div class="k" style="background:#fef2f2;border-color:#fecaca"><div class="t">📅 下次股息</div><div class="v" style="color:#dc2626">${I.nextAmt?m(I.nextAmt):'—'}</div><div class="s">${I.nextDate?`<b style="color:#b91c1c">${md(I.nextDate)}</b> 入帳・${nd<=0?'今天':'還有 '+nd+' 天'}`:'暫無預告'}</div></div>
+    <div class="k"><div class="t">⚔️ 股息付完信貸後</div><div class="v" style="color:${I.net>=0?'#dc2626':'#16a34a'}">${sg(I.net)}</div><div class="s">${I.net>=0?'💪 每月可以無腦加碼':'股息還不夠付'}</div></div>
+    <div class="k"><div class="t">🏆 今年已領</div><div class="v">${m(I.ytd)}</div><div class="bar"><i style="width:${Math.min(100,tp)}%;background:#dc2626"></i></div><div class="s">目標 ${m(I.target)}・<b style="color:#b91c1c">${Math.round(tp)}%</b></div></div>
+    <div class="k" style="background:#eff6ff;border-color:#bfdbfe"><div class="t">📈 基金累積</div><div class="v" style="color:#2563eb">${I.fundPct==null?'<span style="font-size:14px">未設目標</span>':Math.floor(I.fundPct)+'%'}</div><div class="bar" style="background:#dbeafe"><i style="width:${Math.min(100,I.fundPct||0)}%;background:#2563eb"></i></div><div class="s">已扣 ${I.fundN} 次${I.streak?'・'+I.streak+' 週 🔥':''}</div></div></div>
+    <div class="card"><h3>💼 我的持股 <span class="muted" style="font-weight:600">${I.holds.length} 檔・${(I.lots||0).toLocaleString()} 張</span></h3>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px">${I.pledge?`<span class="chip" onclick="go('more')" style="background:${I.pledge.bg};color:${I.pledge.fg}">🔒 質押 ${E(I.pledge.txt)} ›</span>`:''}<span class="chip" onclick="go('ast')" style="background:#f5f3ff;color:#6d28d9">🏦 信貸已還 ${I.loanPct}% ›</span></div>
+      ${I.holds.map(h=>`<div class="row"><div style="flex:1;min-width:0"><b>${E(h.code)}</b><div class="muted" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${E(h.name)}</div></div><div style="text-align:right;width:70px"><div class="muted" style="font-size:11.5px">張數</div><b class="mono">${h.lots.toLocaleString()}</b></div><div style="text-align:right;width:96px"><div class="muted" style="font-size:11.5px">每月股息</div><b class="mono" style="color:${h.mo?'#dc2626':'#475569'}">${h.mo?m(h.mo):'不配息'}</b></div></div>`).join('')}
+      <a class="btn" href="dashboard.html?force=pc" style="background:#0f172a;color:#fff;border-color:#0f172a">🔒 看股價與損益（電腦版，輸入 8443）</a></div>${popH}`;
+  // ── 資產 ──
+  const A=M.assets, R=A.runway;
+  const lc=A.flexLimit?Math.round(A.flexUsed/A.flexLimit*100):0;
+  document.getElementById('pg-ast').innerHTML=`<div class="g2">
+    <div class="k" style="border-top:3px solid #3b82f6"><div class="t">💵 現金帳戶</div><div class="v">${m(A.cash)}</div><div class="s" style="color:#1d4ed8">${A.pendAmt?`⏳ 待入帳 +${m(A.pendAmt).slice(0)}・${md(A.pendDate)}`:'&nbsp;'}</div></div>
+    <div class="k" style="border-top:3px solid #7c3aed"><div class="t">🏦 信貸剩餘</div><div class="v">${m(A.loanRemain)}</div><div class="bar"><i style="width:${A.loanPct}%;background:#7c3aed"></i></div><div class="s">已還 ${A.loanPct}%${A.loanEnd?'・'+A.loanEnd.replace('-','/')+' 還清':''}</div></div>
+    <div class="k" style="border-top:3px solid #a78bfa"><div class="t">💳 不限用途已用</div><div class="v" style="font-size:17px">${m(A.flexUsed)}</div><div class="s">${A.flexLimit?'已用 '+lc+'%':''}</div></div>
+    <div class="k" style="border-top:3px solid #dc2626"><div class="t">📈 每月淨現金流</div><div class="v" style="color:${A.net>=0?'#dc2626':'#16a34a'}">${sg(A.net)}</div><div class="s">${A.inc>0&&A.net>0?'股息少 '+Math.round(A.net/A.inc*100)+'% 才會入不敷出':''}</div></div></div>
+    ${R?`<div class="card"><h3>🛫 現金跑道 <span style="margin-left:auto;border-radius:999px;padding:1px 9px;font-size:12.5px;font-weight:800;${R.short?'background:#fee2e2;color:#b91c1c':'background:#dcfce7;color:#15803d'}">${R.short?'🚨 有扣款不夠':'夠用'}${R.min&&R.min.amt!=null?'・最低剩 '+m(R.min.amt)+(R.min.date?'（'+md(R.min.date)+'）':''):''}</span></h3>
+      ${(()=>{const G=[];R.evs.filter(e=>e.d>=T).forEach(e=>{const g=G[G.length-1];if(e.k==='fund'&&g&&g.k==='fund'&&g.d===e.d){g.a+=e.a;g.l='基金扣款';}else G.push({...e,l:e.k==='fund'?'基金扣款':e.l});});return G;})().slice(0,8).map(e=>`<div class="row"><b class="mono" style="width:52px">${md(e.d)}</b><span style="flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${e.k==='div'?'💰 ':e.k==='fund'?'📅 ':'🏦 '}${E(e.l)}</span><b class="mono" style="color:${e.a>=0?'#dc2626':'#16a34a'}">${e.a>=0?'+':'−'}${Math.round(Math.abs(e.a)).toLocaleString()}</b></div>`).join('')}</div>`:''}
+    <div class="card"><h3>🏦 信貸<span class="muted" style="margin-left:auto;font-weight:500;font-size:12px">點一筆看還款卡 🎫</span></h3>${A.loans.map((l,li)=>`<details class="row v19-row" style="display:block"><summary style="list-style:none;cursor:pointer"><div style="display:flex"><b>${E(l.bank)}</b><b class="mono" style="margin-left:auto;color:#16a34a">−${Math.round(l.monthly).toLocaleString()}</b></div><div class="bar"><i style="width:${l.pct}%;background:#7c3aed"></i></div><div class="muted">已還 ${l.pct}%・剩 ${m(l.rem)}${l.day?'・每月 '+l.day+' 號扣':''}${l.left!=null?'・剩 '+l.left+' 期':''}${l.card?' <b style="color:#7c3aed">🎫</b>':''}</div></summary>${l.card?v19CardHTML(Object.assign({},l.card,{name:l.bank}),['#7c3aed','#2563eb','#0891b2','#db2777','#ea580c','#4f46e5'][li%6],6):''}</details>`).join('')}</div>`;
+  // ── 股息 ──
+  const D=M.div, CL=['#dc2626','#f97316','#eab308','#be185d','#8b5cf6','#fb7185','#0891b2','#65a30d'];const codes=[...new Set(D.months.flatMap(x=>Object.keys(x.by)))];const col=c=>CL[codes.indexOf(c)%CL.length];
+  document.getElementById('pg-div').innerHTML=`<div class="g2"><div class="k"><div class="t">🏆 今年已領</div><div class="v" style="color:#dc2626">${m(D.ytd)}</div><div class="s">目標 ${m(D.target)}・${D.target?Math.round(D.ytd/D.target*100):0}%</div></div><div class="k"><div class="t">💰 全部累積</div><div class="v" style="color:#dc2626">${m(D.all)}</div><div class="s">&nbsp;</div></div></div>
+    ${D.pend.length?`<div class="card" style="background:#fffbeb;border-color:#fde68a"><h3>⏳ 待入帳</h3>${D.pend.map(p=>`<div class="row"><b class="mono" style="width:52px">${md(p.d)}</b><span style="flex:1">${E(p.c)}</span><b class="mono" style="color:#dc2626">+${Math.round(p.a).toLocaleString()}</b><span class="muted" style="width:56px;text-align:right">${dd(T,p.d)} 天後</span></div>`).join('')}</div>`:''}
+    <div class="card"><h3>📅 每月入帳${D.target?`<span class="muted" style="margin-left:auto;font-weight:600;font-size:12px">每月目標 ${m(D.target/12)}</span>`:''}</h3>${(()=>{const tt=x=>Object.values(x.by).reduce((a,b)=>a+b,0),en=x=>Object.entries(x.by).sort((a,b)=>b[1]-a[1]),G=D.months.slice(0,8).reverse(),mt=D.target?D.target/12:0,mx=Math.max(1,mt,...G.map(tt)),H=104;
+      const chart=G.length?`<div style="position:relative;height:${H+26}px;display:flex;align-items:flex-end;gap:6px;padding:0 2px;border-bottom:1px solid #e2e8f0">${mt?`<div style="position:absolute;left:0;right:0;bottom:${mt/mx*H}px;border-top:1.5px dashed #94a3b8"></div>`:''}${G.map(x=>{const t=tt(x);return`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;position:relative"><span class="mono" style="font-size:9.5px;color:#dc2626;font-weight:800;background:#fff;padding:0 2px;border-radius:3px;position:relative;z-index:1">${(t/10000).toFixed(1)}</span><div style="width:100%;height:${Math.max(2,t/mx*H)}px;display:flex;flex-direction:column-reverse;border-radius:5px 5px 0 0;overflow:hidden">${en(x).map(([c,v])=>`<i style="display:block;height:${v/t*100}%;background:${col(c)}"></i>`).join('')}</div></div>`;}).join('')}</div><div style="display:flex;gap:6px;padding:3px 2px 6px">${G.map(x=>`<span class="muted" style="flex:1;text-align:center;font-size:10.5px">${+x.m.slice(5)}月</span>`).join('')}</div><div class="muted" style="font-size:10.5px;text-align:right;margin:-2px 2px 4px">單位：萬${mt?'・虛線＝每月目標':''}</div>`:'';
+      return chart+D.months.map(x=>`<div style="padding:8px 2px;border-top:1px solid #f1f5f9;display:flex;gap:10px;align-items:flex-start"><b style="width:44px;font-size:14px;line-height:1.5">${+x.m.slice(5)}月<div class="muted" style="font-weight:500;font-size:10.5px">${x.m.slice(0,4)}</div></b><div style="flex:1;min-width:0;font-size:12.5px;line-height:1.75">${en(x).map(([c,v])=>`<div style="display:flex"><span><i style="display:inline-block;width:8px;height:8px;border-radius:2px;background:${col(c)};margin-right:5px"></i>${E(c)}</span><span class="mono" style="margin-left:auto;color:#475569">${m(v)}</span></div>`).join('')}</div><b class="mono" style="width:86px;text-align:right;color:#dc2626;line-height:1.5">${m(tt(x))}</b></div>`).join('');})()}</div>`;
+  // ── 觀察股 ──
+  const W=M.watch.slice().sort((a,b)=>(b.hit-a.hit)||((a.dist==null?999:Math.abs(a.dist))-(b.dist==null?999:Math.abs(b.dist))));
+  document.getElementById('pg-wat').innerHTML=`<div class="card" style="margin-top:0;padding:4px">${W.map((w,i)=>{const sc=w.hit?'#dc2626':w.near?'#f59e0b':w.dist==null?'#cbd5e1':'#94a3b8';const p=w.dist==null?0:w.hit?100:Math.max(3,Math.min(97,100-Math.abs(w.dist)*2.5));
+    return`<details style="padding:10px 10px 10px 14px;border-radius:10px;background:${i%2?'#f8fafc':'#fff'};box-shadow:inset 5px 0 0 ${sc}"><summary style="list-style:none;cursor:pointer"><div style="display:flex;align-items:baseline;gap:6px"><b style="font-size:15px">${E(w.code)}</b><span class="muted">${E(w.name)}</span><b class="mono" style="margin-left:auto">${w.price!=null?w.price:'—'}</b></div>
+      ${w.dist==null?'<div class="muted">未設目標價</div>':`<div style="position:relative;height:10px;background:#f1f5f9;border-radius:99px;margin:6px 0 3px"><div style="position:absolute;left:0;top:0;bottom:0;width:${p}%;background:${sc};border-radius:99px"></div><div style="position:absolute;right:-1px;top:-3px;bottom:-3px;width:3px;background:#0f172a"></div></div><div style="font-size:13px"><b style="color:${w.hit?'#dc2626':w.near?'#b45309':'#0f172a'}">${w.hit?'🔔 已到價':'還差 '+Math.abs(w.dist).toFixed(1)+'%'}</b> <span class="muted">目標 ${w.dir==='above'?'≥':'≤'} ${w.target}</span></div>`}</summary>
+      <div style="font-size:13.5px;line-height:1.6;margin-top:6px;white-space:pre-wrap">${E(w.reason)}</div><div>${w.links.map(l=>`<a class="lk" href="${E(l.u)}" target="_blank" rel="noopener">🔗 ${E(l.t)}</a>`).join('')}<a class="lk" href="https://tw.stock.yahoo.com/quote/${encodeURIComponent(w.code)}" target="_blank" rel="noopener">Yahoo ↗</a><a class="lk" href="https://goodinfo.tw/tw/StockDetail.asp?STOCK_ID=${encodeURIComponent(w.code)}" target="_blank" rel="noopener">Goodinfo ↗</a></div></details>`;}).join('')||'<div class="muted" style="padding:14px">還沒有觀察股</div>'}</div>
+    <div class="muted" style="margin-top:6px">股價是電腦版最後一次同步時的價格；點一檔看理由和連結</div>`;
+  // ── 更多：質押、切換 ──
+  const P=M.pledge;
+  document.getElementById('pg-more').innerHTML=P.txt?`<div class="card" style="margin-top:0;text-align:center;background:${/安全/.test(P.txt)?'#f0fdf4':'#fef2f2'};border-color:${/安全/.test(P.txt)?'#bbf7d0':'#fecaca'}"><div style="font-size:13px;font-weight:700;color:#334155">🔒 質押目前狀態</div><div style="font-size:30px;font-weight:900;color:${/安全/.test(P.txt)?'#15803d':'#b91c1c'}">${/安全/.test(P.txt)?'🟢':'🔴'} ${E(P.txt)}</div><div style="font-size:14px">維持率 <b class="mono pm">${P.ratio}%</b></div></div>
+    <div class="card"><h3>再跌多少會碰到</h3>${P.drops.map(d=>`<div class="row"><span>${E(d.n)} ${d.x}%</span><b class="mono pm" style="margin-left:auto">${d.drop!=null?(d.drop>0?'−'+d.drop+'%':'已低於'):'—'}</b></div>`).join('')}</div>
+    <div class="card"><h3>擔保品</h3>${P.assets.map(a=>`<div class="row"><span>${E(a.code)}・${(a.lots||0).toLocaleString()} 張</span><span class="mono pm" style="margin-left:auto">現價 ${a.price??'—'}</span></div>`).join('')}${P.used.map(u=>`<div class="row"><span>${E(u.n)} 已借</span><b class="mono" style="margin-left:auto">${u.lim?Math.round(u.u/u.lim*100)+'%':m(u.u)}</b></div>`).join('')}</div>
+    <div class="muted" style="margin:8px 4px">「隱藏金額」時：維持率、再跌 %、股價都模糊；資金總覽、股息、信貸照常顯示（跟電腦版一樣）</div>`:'<div class="card muted">沒有質押資料</div>';
+  document.getElementById('pg-more').innerHTML+=`<a class="btn" href="dashboard.html?force=pc">💻 切到電腦版（新增、修改都在這裡）</a><a class="btn" href="index.html">🏠 回主目錄</a><a class="btn" href="javascript:void 0" onclick="load()">🔄 重新讀取</a><button class="btn" style="width:100%;color:#b91c1c;border-color:#fecaca" onclick="localStorage.removeItem('master_auth_v1');location.replace('index.html')">🔒 登出</button>`;
+}
+try{const p=sessionStorage.getItem('m_pg');if(p&&TT[p])go(p);}catch(e){}
+load();
+
+// ── v19：信貸還款卡（L1：一列一年、一格一月；上面月份、下面那期繳完剩多少本金；已還＝紅色刪除線）──
+function _v19F(v,k,tot){if(k===tot)return'還清🎉';if(v>=10000)return(Math.floor(v/1000)/10).toFixed(1)+'萬';if(v>=1000)return Math.floor(v/1000)+'k';return'<1k';}
+function v19CardHTML(c,col,cols){
+  cols=cols||12;const rem=c.tot-c.paid,ym=k=>{let m=c.sm+k,y=c.sy+Math.floor((m-1)/12);m=(m-1)%12+1;return[y,m];};
+  const [ey,em]=ym(c.tot),[ny,nm]=ym(c.paid+1),y1=ey,bg=col+'14';
+  const cell=(y,m)=>{const k=(y-c.sy)*12+m-c.sm;if(k<1||k>c.tot)return'<span></span>';const d=k<=c.paid,nx=k===c.paid+1,a=_v19F(c.bal[k-1],k,c.tot);
+    return`<div class="v19-c${d?' d':nx?' nx':''}" style="${nx?`border-color:${col};background:${bg};color:${col}`:''}" title="${y}/${m}${d?' 已還':''}・繳完剩 ${Math.round(c.bal[k-1]).toLocaleString()}"><b>${m}月</b><span>${a}</span></div>`;};
+  let g='';
+  if(cols===12){g+=`<div class="v19-g"><span></span>${Array.from({length:12},(_,i)=>`<span class="v19-mh">${i+1}月</span>`).join('')}</div>`;
+    for(let y=c.sy;y<=y1;y++){let r=`<div class="v19-g"><span class="v19-yh">${y}</span>`;for(let m=1;m<=12;m++)r+=cell(y,m);g+=r+'</div>';}}
+  else{for(let y=c.sy;y<=y1;y++){const h=[0,6].map(o=>Array.from({length:6},(_,i)=>cell(y,o+i+1)));const any=h.map(a=>a.some(x=>x!=='<span></span>'));
+    if(!any[0]&&!any[1])continue;g+=`<div class="v19-yh" style="margin:8px 0 2px">${y}</div>`;h.forEach((a,i)=>{if(any[i])g+=`<div class="v19-g6">${a.join('')}</div>`;});}}
+  return`<div class="v19-card"><div class="v19-hd"><b style="color:${col}">📅 ${c.name}</b><span class="v19-mu">每月 ${Math.round(c.mo).toLocaleString()}${c.rate?'・'+c.rate+'%':''}</span><span class="v19-sum">已還 <b>${c.paid}</b>・還剩 <b style="color:${col};font-size:1.45em">${rem}</b>・共 ${c.tot} 格</span></div>${g}
+    <div class="v19-ft"><span>下一格 <b>${rem>0?`${ny}/${String(nm).padStart(2,'0')}/${String(c.dd).padStart(2,'0')}`.slice(5):'—'}</b>${rem>0?`・繳完剩 <b>${_v19F(c.bal[c.paid],c.paid+1,c.tot)}</b>`:''}</span><span style="margin-left:auto">最後一格 <b>${ey}/${String(em).padStart(2,'0')}</b> 🎉</span></div></div>`;
+}
+</script>
+</body>
+</html>

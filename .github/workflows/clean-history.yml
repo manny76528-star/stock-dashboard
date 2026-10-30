@@ -1,0 +1,42 @@
+name: 🧹 清掉舊歷史（只留現在這一版）
+
+# 在 GitHub → Actions → 左邊選「🧹 清掉舊歷史」→ 右邊「Run workflow」按一下就會執行
+# 做的事：把「現在這一版」的所有檔案原封不動放進一個全新的起點，舊的版本紀錄全部拿掉
+# 安全：如果執行中剛好有裝置同步（main 變了），會直接放棄、什麼都不改，請等一下再按一次
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: clean-history
+  cancel-in-progress: false
+
+jobs:
+  clean:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          token: ${{ secrets.GH_TOKEN }}
+
+      - name: 只留現在這一版
+        run: |
+          set -e
+          OLD=$(git rev-parse HEAD)
+          COUNT_FILES=$(git ls-files | wc -l)
+          echo "目前這一版：$OLD，共 $COUNT_FILES 個檔案"
+          git config user.name  "clean-history"
+          git config user.email "clean-history@users.noreply.github.com"
+          git checkout --orphan fresh
+          git add -A
+          git commit -q -m "🧹 清掉舊歷史：只保留 $(date -u -d '+8 hour' '+%Y-%m-%d %H:%M') 這一版"
+          NEW_FILES=$(git ls-files | wc -l)
+          if [ "$NEW_FILES" != "$COUNT_FILES" ]; then echo "❌ 檔案數不一致（$COUNT_FILES → $NEW_FILES），放棄"; exit 1; fi
+          if ! git diff --quiet "$OLD" HEAD; then echo "❌ 內容跟現在這一版不同，放棄"; exit 1; fi
+          # 只有在 main 還是剛才那一版時才換掉（期間有人同步就放棄，不會蓋掉任何資料）
+          git push --force-with-lease=main:"$OLD" origin HEAD:main
+          echo "✅ 完成：舊歷史已清掉，現在只剩 1 個版本，檔案內容完全沒變"

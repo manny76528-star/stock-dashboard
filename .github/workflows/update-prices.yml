@@ -1,0 +1,130 @@
+name: Update Stock Prices
+
+on:
+  schedule:
+    - cron: '30 6 * * 1-5'  # 每個交易日台灣時間 14:30 (UTC 06:30)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch and save prices
+        run: |
+          python3 - << 'EOF'
+          import urllib.request, json, datetime, re, time
+
+          prices = {}
+
+          # ── TWSE 上市（全量）──
+          try:
+              url = 'https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL'
+              req = urllib.request.Request(url, headers={'User-Agent':'Mozilla/5.0','Accept':'application/json'})
+              with urllib.request.urlopen(req, timeout=20) as r:
+                  data = json.loads(r.read().decode('utf-8'))
+              for item in data:
+                  code = str(item.get('Code') or item.get('證券代號') or '').strip().upper()
+                  price_raw = str(item.get('ClosingPrice') or item.get('收盤價') or '')
+                  chg_raw = str(item.get('Change') or item.get('漲跌價差') or '0')
+                  try:
+                      price = float(price_raw.replace(',',''))
+                      chg = float(re.sub(r'[^\d.\-]','', chg_raw) or '0')
+                      if code and price > 0:
+                          prev = price - chg
+                          prices[code] = {'price': price, 'change': round(chg,2),
+                              'changePct': round(chg/prev*100,2) if prev > 0 else 0}
+                  except: pass
+              print(f'TWSE bulk: {len(prices)} stocks')
+          except Exception as e:
+              print(f'TWSE bulk error: {e}')
+
+          # ── TPEx 上櫃（全量）──
+          before = len(prices)
+          try:
+              url2 = 'https://www.tpex.org.tw/openapi/v1/tpex_mainboard_daily_close_quotes'
+              req2 = urllib.request.Request(url2, headers={'User-Agent':'Mozilla/5.0','Accept':'application/json'})
+              with urllib.request.urlopen(req2, timeout=20) as r2:
+                  data2 = json.loads(r2.read().decode('utf-8'))
+              for item in data2:
+                  code = str(item.get('代號') or item.get('Code') or item.get('SecuritiesCompanyCode') or '').strip().upper()
+                  price_raw = str(item.get('收盤') or item.get('Close') or item.get('ClosingPrice') or '')
+                  chg_raw = str(item.get('漲跌') or item.get('Change') or '0')
+                  try:
+                      price = float(price_raw.replace(',',''))
+                      is_neg = '▼' in chg_raw or chg_raw.strip().startswith('-')
+                      chg_val = float(re.sub(r'[^\d.]','', chg_raw) or '0')
+                      chg = -chg_val if is_neg else chg_val
+                      if code and price > 0:
+                          prev = price - chg
+                          prices[code] = {'price': price, 'change': round(chg,2),
+                              'changePct': round(chg/prev*100,2) if prev > 0 else 0}
+                  except: pass
+              print(f'TPEx: +{len(prices)-before} stocks, total: {len(prices)}')
+          except Exception as e:
+              print(f'TPEx error: {e}')
+
+          # ── TWSE 即時行情 API（補抓全量可能遺漏的個股）──
+          # 特別針對新上市ETF或全量API較慢更新的標的
+          realtime_codes = ['00996A', '00988A', '00981D', '00985B', '00864B']
+          print('--- Realtime補抓 ---')
+          for code in realtime_codes:
+              try:
+                  time.sleep(0.3)
+                  # TWSE 即時行情
+                  url3 = f'https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=tse_{code.lower()}.tw&json=1&delay=0'
+                  req3 = urllib.request.Request(url3, headers={
+                      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                      'Referer': 'https://mis.twse.com.tw/stock/fibest.html'
+                  })
+                  with urllib.request.urlopen(req3, timeout=10) as r3:
+                      d3 = json.loads(r3.read().decode('utf-8'))
+                  items3 = d3.get('msgArray', [])
+                  if items3:
+                      it = items3[0]
+                      # z=成交價(即時), y=昨收
+                      z = it.get('z', '-')
+                      y = it.get('y', '0')
+                      if z and z != '-' and z != '0':
+                          price = float(z.replace(',',''))
+                          prev = float(y.replace(',','')) if y and y != '0' else price
+                          chg = round(price - prev, 2)
+                          pct = round(chg/prev*100, 2) if prev > 0 else 0
+                          if price > 0:
+                              prices[code] = {'price': price, 'change': chg, 'changePct': pct}
+                              print(f'  ✓ {code}: {price} (chg:{chg}, {pct}%)')
+                          else:
+                              print(f'  - {code}: price=0, skip')
+                      else:
+                          print(f'  - {code}: z={z!r}, no realtime price (market closed?), keeping bulk: {prices.get(code,{}).get("price","N/A")}')
+              except Exception as e:
+                  print(f'  ✗ {code} realtime error: {e}')
+
+          # ── 結果確認 ──
+          print('--- Final check ---')
+          for check in ['00985B','00864B','00981D','00988A','00996A']:
+              p = prices.get(check)
+              print(f'  {"✓" if p else "✗"} {check}: {p}')
+
+          # ── 寫出 prices.json ──
+          output = {
+              'updated': datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ'),
+              'count': len(prices),
+              'prices': prices
+          }
+          with open('prices.json', 'w', encoding='utf-8') as f:
+              json.dump(output, f, ensure_ascii=False)
+          print(f'Written prices.json: {len(prices)} stocks')
+          EOF
+
+      - name: Commit prices.json
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add prices.json
+          git diff --staged --quiet || git commit -m "prices: $(date -u +'%Y-%m-%d %H:%M') UTC"
+          git push

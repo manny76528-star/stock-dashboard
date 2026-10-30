@@ -1,0 +1,162 @@
+name: Daily Auto Process
+
+on:
+  schedule:
+    - cron: '0 1 * * *'  # 每天 UTC 01:00 = 台灣時間 09:00
+  workflow_dispatch:       # 也可以手動觸發
+
+jobs:
+  daily-process:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run Daily Process
+        run: |
+          node << 'NODEJS'
+          const https = require('https');
+
+          const OWNER = 'manny76528-star';
+          const REPO  = 'stock-dashboard';
+          const FILE  = 'data_dashboard.json';
+          const TOKEN = process.env.GH_TOKEN;
+
+          function ghRequest(method, path, body) {
+            return new Promise((resolve, reject) => {
+              const data = body ? JSON.stringify(body) : null;
+              const req = https.request({
+                hostname: 'api.github.com',
+                path,
+                method,
+                headers: {
+                  'Authorization': `token ${TOKEN}`,
+                  'Accept': 'application/vnd.github.v3+json',
+                  'User-Agent': 'daily-process',
+                  'Content-Type': 'application/json',
+                  ...(data ? { 'Content-Length': Buffer.byteLength(data) } : {})
+                }
+              }, res => {
+                let body = '';
+                res.on('data', c => body += c);
+                res.on('end', () => resolve({ status: res.statusCode, data: JSON.parse(body) }));
+              });
+              req.on('error', reject);
+              if (data) req.write(data);
+              req.end();
+            });
+          }
+
+          async function main() {
+            // 取得現有資料
+            const { status, data: fileData } = await ghRequest('GET', `/repos/${OWNER}/${REPO}/contents/${FILE}`);
+            if (status === 404) { console.log('data_dashboard.json 不存在，略過'); return; }
+            if (status !== 200) { console.error('取得檔案失敗:', status); return; }
+
+            const sha = fileData.sha;
+            const content = Buffer.from(fileData.content.replace(/\n/g, ''), 'base64').toString('utf8');
+            // 🔒 資料加密（2026/10）：雲端檔案是加密的就用 DATA_KEY 解開；存回去時再加密
+            const crypto = require('crypto');
+            const KEY = (process.env.DATA_KEY || '').trim();
+            let parsed = JSON.parse(content);
+            const encrypted = parsed && parsed.enc === 'v1' && parsed.ct && parsed.iv;
+            if (encrypted) {
+              if (!/^[0-9a-f]{64}$/i.test(KEY)) { console.log('🔒 資料已加密，但還沒設定 DATA_KEY，今天先略過（不會動到資料）'); return; }
+              const key = Buffer.from(KEY, 'hex');
+              const kid = crypto.createHash('sha256').update(key).digest('hex').slice(0, 8);
+              if (parsed.kid && parsed.kid !== kid) { console.error('❌ DATA_KEY 跟加密用的鑰匙不同，今天先略過（不會動到資料）'); return; }
+              const raw = Buffer.from(parsed.ct, 'base64');
+              const dec = crypto.createDecipheriv('aes-256-gcm', key, Buffer.from(parsed.iv, 'base64'));
+              dec.setAuthTag(raw.subarray(raw.length - 16));
+              parsed = JSON.parse(Buffer.concat([dec.update(raw.subarray(0, raw.length - 16)), dec.final()]).toString('utf8'));
+              console.log('🔓 已解開加密資料');
+            }
+            const db = parsed;
+            const seal = (text) => {
+              if (!encrypted) return text;
+              const key = Buffer.from(KEY, 'hex');
+              const iv = crypto.randomBytes(12);
+              const c = crypto.createCipheriv('aes-256-gcm', key, iv);
+              const ct = Buffer.concat([c.update(Buffer.from(text, 'utf8')), c.final(), c.getAuthTag()]);
+              return JSON.stringify({ enc: 'v1', alg: 'AES-256-GCM', kdf: 'PBKDF2-SHA256-600000',
+                kid: crypto.createHash('sha256').update(key).digest('hex').slice(0, 8), ts: Date.now(),
+                iv: iv.toString('base64'), ct: ct.toString('base64') });
+            };
+
+            // 今天日期（台灣時間 UTC+8）
+            const now = new Date(Date.now() + 8 * 3600000);
+            const todayStr = now.toISOString().slice(0, 10);
+            const todayDay = now.getUTCDate();
+            console.log('處理日期:', todayStr, '幾號:', todayDay);
+
+            let changed = false;
+            const msgs = [];
+
+            // 找 Line Bank 帳戶
+            const lineBank = (db.cashAccounts || []).find(c =>
+              c.bank && c.bank.toLowerCase().includes('line')
+            );
+
+            // 1. 股息自動入帳：入帳日 <= 今天且 pending=true
+            (db.dividends || []).forEach(d => {
+              if (d.pending && d.date && d.date <= todayStr) {
+                d.pending = false;
+                if (lineBank) {
+                  lineBank.cash = (lineBank.cash || 0) + Math.round(d.amount);
+                  msgs.push(`💰 股息入帳 ${d.code} +$${Math.round(d.amount).toLocaleString()}`);
+                }
+                changed = true;
+              }
+            });
+
+            // 2. 信貸自動扣款：扣款日=今天
+            const ym = todayStr.slice(0, 7);
+            if (!db._loanDeducted) db._loanDeducted = {};
+            (db.loans || []).forEach(l => {
+              const deductDay = parseInt(l.deductDay) || 0;
+              if (deductDay !== todayDay) return;
+              const key = l.id + '_' + ym;
+              if (db._loanDeducted[key]) return; // 這個月已扣過
+              const deductBankName = (l.deductBank || '').toLowerCase().trim();
+              const acc = (db.cashAccounts || []).find(c => {
+                if (!c.bank) return false;
+                const cBank = c.bank.toLowerCase().trim();
+                return cBank === deductBankName || cBank.includes(deductBankName) || deductBankName.includes(cBank);
+              });
+              if (acc) {
+                acc.cash = (acc.cash || 0) - Math.round(l.monthly || 0);
+                db._loanDeducted[key] = true;
+                msgs.push(`🏦 信貸扣款 ${l.bank} -$${Math.round(l.monthly || 0).toLocaleString()}`);
+                changed = true;
+              } else {
+                console.warn(`找不到扣款帳戶: ${l.deductBank} (${l.bank})`);
+              }
+            });
+
+            if (!changed) {
+              console.log('今日無需處理');
+              return;
+            }
+
+            msgs.forEach(m => console.log(m));
+
+            // 更新時間戳
+            db._ts = Date.now();
+
+            // 存回 GitHub
+            const newContent = Buffer.from(seal(JSON.stringify(db, null, 2))).toString('base64');
+            const { status: putStatus } = await ghRequest('PUT', `/repos/${OWNER}/${REPO}/contents/${FILE}`, {
+              message: `daily-process: ${todayStr} ${msgs.join(', ')}`,
+              content: newContent,
+              sha
+            });
+
+            if (putStatus === 200 || putStatus === 201) {
+              console.log('✅ 更新成功');
+            } else {
+              console.error('❌ 更新失敗:', putStatus);
+            }
+          }
+
+          main().catch(console.error);
+          NODEJS
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          DATA_KEY: ${{ secrets.DATA_KEY }}

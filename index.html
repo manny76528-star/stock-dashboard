@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>管理系統</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{min-height:100vh;background:#f4f5f7;color:#0f172a;font-family:'Noto Sans TC','PingFang TC',sans-serif;}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1180px;margin:0 auto;padding:40px 28px 32px}
+.top{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.date{color:#475569;font-size:16px;margin-bottom:4px}
+h1{font-size:34px;font-weight:900;letter-spacing:.5px}
+.lock{margin-left:auto;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:8px 14px;font-size:14px;font-weight:700;color:#334155;cursor:pointer;font-family:inherit}
+.lock:hover{border-color:#a5b4fc;color:#4338ca}
+.grid{display:grid;grid-template-columns:1.35fr 1fr 1fr;grid-template-rows:minmax(260px,auto) minmax(190px,auto);gap:18px;margin-top:26px}
+.c{background:#fff;border:1px solid #e5e7eb;border-radius:24px;padding:24px;position:relative;overflow:hidden;display:block;transition:transform .18s,box-shadow .18s,border-color .18s;cursor:pointer}
+.c:hover{transform:translateY(-3px);box-shadow:0 18px 40px rgba(15,23,42,.10);border-color:#c7d2fe}
+.c.big{grid-row:span 2;background:linear-gradient(160deg,#1e3a8a,#4338ca);color:#fff;border:none}
+.c.big:hover{box-shadow:0 22px 50px rgba(67,56,202,.35)}
+.c.wide{grid-column:span 2}
+.ic{font-size:30px;line-height:1}
+.t{font-size:21px;font-weight:900;margin-top:10px}
+.d{font-size:14px;color:#475569;margin-top:4px;line-height:1.6}
+.big .d{color:#c7d2fe}
+.go{position:absolute;right:20px;top:20px;width:36px;height:36px;border-radius:50%;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-weight:900;color:#334155;transition:transform .18s}
+.c:hover .go{transform:translateX(3px)}
+.big .go{background:rgba(255,255,255,.18);color:#fff}
+.key{position:absolute;right:64px;top:27px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#94a3b8;border:1px solid #e2e8f0;border-radius:6px;padding:0 6px}
+.big .key{color:#c7d2fe;border-color:rgba(255,255,255,.3)}
+.live{margin-top:18px;display:flex;flex-direction:column;gap:10px}
+.row{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.16);border-radius:14px;padding:12px 14px;font-size:15px}
+.row b{margin-left:auto;font-size:15.5px;white-space:nowrap}
+.row.bad{background:#dc2626;border-color:#fca5a5}
+.row.warn{background:rgba(245,158,11,.25);border-color:rgba(253,230,138,.6)}
+.pills{display:flex;flex-direction:column;align-items:flex-start;gap:8px;margin-top:14px}
+.pill{display:inline-block;font-size:13.5px;font-weight:800;border-radius:999px;padding:4px 12px}
+.p-red{background:#fee2e2;color:#b91c1c}.p-amb{background:#ffedd5;color:#c2410c}.p-ok{background:#dcfce7;color:#15803d}.p-gray{background:#f1f5f9;color:#475569}.p-pink{background:#fce7f3;color:#be185d}.p-blue{background:#dbeafe;color:#1d4ed8}
+.bar{height:8px;background:#f1f5f9;border-radius:9px;overflow:hidden;margin-top:12px;max-width:260px}.bar i{display:block;height:100%;background:linear-gradient(90deg,#f472b6,#db2777);border-radius:9px}
+.foot{margin-top:24px;color:#64748b;font-size:13px;display:flex;gap:14px;flex-wrap:wrap}
+.note{font-size:12.5px;color:#94a3b8;margin-top:12px}
+.big .note{color:#a5b4fc}
+@media(max-width:900px){
+  .wrap{padding:24px 16px}
+  h1{font-size:28px}
+  .grid{grid-template-columns:1fr;grid-template-rows:none}
+  .c.big{grid-row:auto}.c.wide{grid-column:auto}
+  .key{display:none}.kb{display:none}
+}
+/* ══ H1-D（2026/10/26）：左邊資產損益表，右邊三列；每個系統一個淡色主題 ══ */
+.th-inv{--c:#2563eb;--bg:#eff6ff;--bd:#bfdbfe}.th-erp{--c:#d97706;--bg:#fffbeb;--bd:#fde68a}.th-voc{--c:#db2777;--bg:#fdf2f8;--bd:#fbcfe8}.th-glv{--c:#92400e;--bg:#fdf6ec;--bd:#f3d9b1}
+.grid{display:grid;grid-template-columns:1.1fr 1.4fr;grid-template-rows:none;gap:18px;margin-top:26px}
+.rcol{display:grid;grid-template-rows:repeat(3,1fr);gap:14px}
+.c{background:var(--bg)!important;border:1px solid var(--bd)!important;color:#0f172a!important;border-radius:22px;padding:20px}
+.c:hover{border-color:var(--c)!important;box-shadow:0 14px 34px rgba(15,23,42,.10)}
+.c.big{grid-row:auto;min-height:420px;padding-bottom:110px}
+.c .t{color:var(--c);margin:0;font-size:22px}.c .d{color:#475569;margin-top:2px;font-size:13.5px}
+.ico{position:relative;width:54px;height:54px;border-radius:16px;background:var(--c);color:#fff;display:flex;align-items:center;justify-content:center;font-size:27px;font-weight:900;flex-shrink:0}
+.dot{position:absolute;top:-8px;right:-8px;background:#dc2626;color:#fff;border-radius:99px;font-size:12.5px;font-weight:900;font-style:normal;min-width:25px;height:25px;padding:0 6px;display:none;align-items:center;justify-content:center;border:3px solid #fff}
+.dot.on{display:flex}
+.hdr{display:flex;align-items:center;gap:14px}
+.go{position:static!important;background:#fff!important;color:var(--c)!important;border:1px solid var(--bd);flex-shrink:0;margin-left:auto}
+.key{position:static!important;display:inline-block;margin-top:4px;color:#94a3b8!important;border-color:#e2e8f0!important}
+.big .key{margin:0 4px 0 auto}.big .go{margin-left:0}
+.art{position:absolute;right:16px;bottom:12px;opacity:.55;pointer-events:none}
+.side .art{position:static;opacity:.5;flex-shrink:0}
+.side{display:flex;align-items:center;gap:14px;padding:14px 18px}
+.side .nm{width:210px;flex-shrink:0}
+.side .st{flex:1;min-width:0}
+.live{margin-top:16px;gap:0}
+.row{background:none!important;border:none!important;border-top:1px solid var(--bd)!important;border-radius:0;padding:10px 2px;font-size:15px}
+.row b{color:#0f172a}
+.row.bad{background:#fef2f2!important;border:1px solid #fecaca!important;border-radius:12px;color:#b91c1c;padding:10px 12px;margin:4px 0}.row.bad b{color:#b91c1c}
+.row.warn{background:#fffbeb!important;border:1px solid #fde68a!important;border-radius:12px;color:#b45309;padding:10px 12px;margin:4px 0}.row.warn b{color:#b45309}
+.big .note{color:#64748b}
+.pills{flex-direction:row;flex-wrap:wrap;margin-top:0;gap:6px}
+.pill{white-space:nowrap}
+#live-inv{display:flex;flex-wrap:wrap;gap:6px}
+.bar{background:var(--bd)}.bar i{background:var(--c)}
+@media(max-width:900px){
+  .grid{grid-template-columns:1fr}.c.big{min-height:0;padding-bottom:20px}.big .art{display:none}
+  .rcol{grid-template-rows:none}.key{display:none!important}.big .go{margin-left:auto}
+  .side{flex-wrap:wrap}.side .nm{width:auto;flex:1}.side .art{display:none}.side .st{flex-basis:100%;order:5}
+}
+
+/* ══ 登入：主目錄模糊＋數字鍵盤 ══ */
+#login-screen{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(244,245,247,.35)}
+body.locked .grid{filter:blur(10px);opacity:.75;pointer-events:none;user-select:none}
+body.locked .lock,body.locked .foot{visibility:hidden}
+.lk{background:rgba(255,255,255,.92);backdrop-filter:blur(6px);border:1px solid #e2e8f0;border-radius:28px;padding:26px 34px 22px;box-shadow:0 24px 60px rgba(15,23,42,.18);text-align:center;width:min(380px,92vw)}
+.lk-grab{display:none;width:44px;height:5px;border-radius:9px;background:#e2e8f0;margin:0 auto 10px}
+.lk-ic{font-size:32px}.lk-t{font-size:22px;font-weight:900;margin-top:2px}.lk-s{font-size:13.5px;color:#64748b}
+.lk-dots-w{position:relative;margin:16px auto 18px;width:max-content}
+.lk-dots{display:flex;gap:14px;justify-content:center;pointer-events:none}
+.lk-dots i{width:14px;height:14px;border-radius:50%;border:2px solid #6366f1;transition:background .12s}
+.lk-dots i.on{background:#6366f1}
+.lk.err .lk-dots i{border-color:#dc2626}.lk.err .lk-dots i.on{background:#dc2626}
+#pw-input{position:absolute;inset:-6px -10px;width:calc(100% + 20px);opacity:0;border:none;font-size:16px;cursor:pointer}
+.pad{display:grid;grid-template-columns:repeat(3,68px);gap:14px;justify-content:center}
+.pk{width:68px;height:68px;border-radius:50%;background:#fff;border:1px solid #e2e8f0;box-shadow:0 2px 6px rgba(15,23,42,.06);font-size:27px;font-weight:600;color:#0f172a;cursor:pointer;font-family:inherit;transition:background .1s,transform .1s}
+.pk:hover{background:#eef2ff}.pk:active{transform:scale(.94);background:#e0e7ff}
+.pk.lg-btn{background:#eef2ff;color:#4f46e5;border-color:#c7d2fe;font-size:24px}
+.pk-bs{background:transparent;border:none;box-shadow:none;font-size:24px}
+#pw-err{color:#b91c1c;font-size:13.5px;margin:-8px 0 10px;display:none;font-weight:700}
+.lg-tip{font-size:12.5px;color:#94a3b8;margin-top:16px}
+.shake{animation:shake .35s}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+@media(max-width:760px){
+  #login-screen{align-items:flex-end;background:rgba(244,245,247,.2)}
+  .lk{width:100%;max-width:520px;border-radius:26px 26px 0 0;padding:18px 24px 26px;box-shadow:0 -14px 40px rgba(15,23,42,.15)}
+  .lk-grab{display:block}.lk-ic{display:none}.lk-t{font-size:19px}.lk-s{display:none}
+  .pad{grid-template-columns:repeat(3,64px);gap:14px 26px}.pk{width:64px;height:64px}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="top">
+    <div><div class="date" id="h-date"></div><h1 id="h-hi">你好</h1></div>
+    <button class="lock" onclick="lockNow()">🔒 鎖定</button>
+  </div>
+
+  <div class="grid">
+    <a href="dashboard.html" class="c big th-inv" id="card-1">
+      <div class="hdr"><div class="ico"><span>📈</span><i class="dot" id="dot-inv"></i></div><div class="nm"><div class="t">資產損益表</div><div class="d">持股・股息・信貸・現金跑道</div></div><span class="key">1</span><div class="go">→</div></div>
+      <div class="live" id="live-asset"></div>
+      <div class="note" id="note-asset"></div>
+      <div class="art"><svg width="190" height="86" viewBox="0 0 150 70"><g opacity=".9"><rect x="10" y="40" width="10" height="22" rx="2" fill="#fca5a5"/><rect x="30" y="30" width="10" height="28" rx="2" fill="#fca5a5"/><rect x="50" y="36" width="10" height="20" rx="2" fill="#86efac"/><rect x="70" y="22" width="10" height="30" rx="2" fill="#fca5a5"/><rect x="90" y="26" width="10" height="24" rx="2" fill="#fca5a5"/><rect x="110" y="12" width="10" height="30" rx="2" fill="#86efac"/><rect x="130" y="8" width="10" height="26" rx="2" fill="#fca5a5"/><polyline points="5,60 35,48 55,52 75,34 95,38 115,20 145,10" fill="none" stroke="#2563eb" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g></svg></div>
+    </a>
+    <div class="rcol">
+      <a href="inventory.html" class="c side th-erp" id="card-2">
+        <div class="ico"><span>📦</span><i class="dot" id="dot-erp"></i></div>
+        <div class="nm"><div class="t">進銷存</div><div class="d">訂單・客戶・庫存序號・應收帳款</div><span class="key">2</span></div>
+        <div class="st" id="live-inv"></div>
+        <div class="art"><svg width="100" height="48" viewBox="0 0 150 70"><g fill="#fde68a" stroke="#d97706" stroke-width="2"><rect x="18" y="34" width="42" height="32" rx="3"/><rect x="62" y="34" width="42" height="32" rx="3"/><rect x="40" y="4" width="42" height="30" rx="3"/></g><g stroke="#d97706" stroke-width="2"><line x1="39" y1="34" x2="39" y2="44"/><line x1="83" y1="34" x2="83" y2="44"/><line x1="61" y1="4" x2="61" y2="14"/></g><rect x="110" y="10" width="34" height="50" rx="4" fill="#fff" stroke="#f59e0b" stroke-width="2"/><g stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round"><line x1="117" y1="22" x2="137" y2="22"/><line x1="117" y1="32" x2="137" y2="32"/><line x1="117" y1="42" x2="130" y2="42"/></g></svg></div>
+        <div class="go">→</div>
+      </a>
+      <a href="vocab.html" class="c side th-voc" id="card-3">
+        <div class="ico"><span>あ</span><i class="dot" id="dot-voc"></i></div>
+        <div class="nm"><div class="t">日文單字</div><div class="d">配對練習・常錯單字・進度</div><span class="key">3</span></div>
+        <div class="st" id="live-vocab"></div>
+        <div class="art"><svg width="100" height="48" viewBox="0 0 150 70"><rect x="30" y="8" width="54" height="56" rx="8" fill="#fff" stroke="#f9a8d4" stroke-width="2" transform="rotate(-8 57 36)"/><rect x="66" y="6" width="54" height="56" rx="8" fill="#fce7f3" stroke="#db2777" stroke-width="2" transform="rotate(6 93 34)"/><text x="93" y="46" text-anchor="middle" font-size="30" font-weight="900" fill="#db2777" transform="rotate(6 93 34)">あ</text></svg></div>
+        <div class="go">→</div>
+      </a>
+      <a href="glove.html" class="c side th-glv" id="card-4">
+        <div class="ico"><span>🧤</span><i class="dot" id="dot-glv"></i></div>
+        <div class="nm"><div class="t">手套收藏</div><div class="d">型號・買賣・評比・圖片</div><span class="key">4</span></div>
+        <div class="st" id="live-glove"></div>
+        <div class="art"><svg width="100" height="48" viewBox="0 0 150 70"><text x="75" y="55" text-anchor="middle" font-size="52">🧤</text></svg></div>
+        <div class="go">→</div>
+      </a>
+    </div>
+  </div>
+  <div class="foot"><span class="kb">⌨️ 按 1～4 直接進入</span><span>⏱ 閒置 3 分鐘自動上鎖</span><span>v2.0 · 2026</span></div>
+</div>
+
+<!-- ══ 登入：主目錄模糊＋數字鍵盤（電腦置中卡片、手機下方滑出）══ -->
+<div id="login-screen">
+  <div class="lk" id="lg-box">
+    <div class="lk-grab"></div>
+    <div class="lk-ic">🔒</div>
+    <div class="lk-t">輸入密碼</div>
+    <div class="lk-s">解鎖後四個系統才會顯示</div>
+    <div class="lk-dots-w"><div class="lk-dots" id="pw-dots"></div>
+      <input id="pw-input" type="password" autocomplete="new-password" inputmode="numeric" aria-label="密碼" oninput="pinSync(true)" onkeydown="if(event.key==='Enter')checkPw()"></div>
+    <div id="pw-err">密碼不對，請再試一次</div>
+    <div class="pad"><button type="button" class="pk" onclick="pinKey('1')">1</button><button type="button" class="pk" onclick="pinKey('2')">2</button><button type="button" class="pk" onclick="pinKey('3')">3</button><button type="button" class="pk" onclick="pinKey('4')">4</button><button type="button" class="pk" onclick="pinKey('5')">5</button><button type="button" class="pk" onclick="pinKey('6')">6</button><button type="button" class="pk" onclick="pinKey('7')">7</button><button type="button" class="pk" onclick="pinKey('8')">8</button><button type="button" class="pk" onclick="pinKey('9')">9</button><button type="button" class="pk lg-btn" onclick="checkPw()" title="進入">✓</button><button type="button" class="pk" onclick="pinKey('0')">0</button><button type="button" class="pk pk-bs" onclick="pinKey('⌫')" title="刪除">⌫</button></div>
+    <div class="lg-tip">也可以直接用鍵盤打數字・閒置 3 分鐘會自動上鎖</div>
+  </div>
+</div>
+<script>
+(function(){
+  const PW='113067';
+  const KEY='master_auth_v1';
+  const TS_KEY='master_auth_ts';
+  const TIMEOUT=3*60*1000; // 3分鐘閒置登出
+  const ls=document.getElementById('login-screen');
+  const inp=document.getElementById('pw-input');
+
+  function show(){
+    ls.style.display='none';document.body.classList.remove('locked');
+    resetTimer();
+    try{renderHome();}catch(e){console.warn('首頁資訊',e);}
+  }
+  function showLogin(){
+    ls.style.display='flex';document.body.classList.add('locked');
+    try{renderHome();}catch(e){}
+    localStorage.removeItem(KEY);
+    localStorage.removeItem(TS_KEY);
+    inp.value='';inp.type='password';if(window.pinSync)pinSync();
+    if(!matchMedia('(max-width:760px)').matches)setTimeout(()=>inp&&inp.focus(),100);
+  }
+
+  let timer=null;
+  function resetTimer(){
+    localStorage.setItem(TS_KEY,Date.now().toString());
+    clearTimeout(timer);
+    timer=setTimeout(()=>{ showLogin(); },TIMEOUT);
+  }
+  ['click','keydown','touchstart'].forEach(ev=>{
+    document.addEventListener(ev,()=>{if(localStorage.getItem(KEY)==='1')resetTimer();},{passive:true});
+  });
+
+  // 檢查是否已登入且未超時
+  const isAuth=localStorage.getItem(KEY)==='1';
+  const lastTs=parseInt(localStorage.getItem(TS_KEY)||'0');
+  if(isAuth&&(Date.now()-lastTs)<TIMEOUT){ show(); }
+  else{ showLogin(); }
+
+  window.checkPw=function(){
+    const val=inp.value.trim();
+    if(val===PW){
+      localStorage.setItem(KEY,'1');
+      localStorage.setItem(TS_KEY,Date.now().toString());
+      document.getElementById('pw-err').style.display='none';
+      show();
+    } else {
+      document.getElementById('pw-err').style.display='block';
+      const box=document.getElementById('lg-box');box.classList.remove('shake');box.classList.add('err');void box.offsetWidth;box.classList.add('shake');
+      setTimeout(()=>{inp.value='';pinSync();box.classList.remove('err');},350);
+      if(!matchMedia('(max-width:760px)').matches)inp.focus();
+    }
+  };
+  // 數字鍵盤：圓點跟密碼位數一樣；打滿自動檢查
+  let _pinT=null;
+  window.pinSync=function(auto){
+    const v=inp.value.replace(/\D/g,'').slice(0,PW.length);if(inp.value!==v)inp.value=v;
+    document.getElementById('pw-dots').innerHTML=Array.from({length:PW.length},(_,i)=>`<i class="${i<v.length?'on':''}"></i>`).join('');
+    if(v.length)document.getElementById('pw-err').style.display='none';
+    clearTimeout(_pinT);if(auto&&v.length===PW.length)_pinT=setTimeout(()=>{if(inp.value.length===PW.length)checkPw();},160);
+  };
+  window.pinKey=function(k){if(k==='⌫')inp.value=inp.value.slice(0,-1);else if(inp.value.length<PW.length)inp.value+=k;pinSync(true);};
+  pinSync();
+  // 鍵盤打數字：不管焦點在哪（例如剛用滑鼠點過按鍵）都收得到
+  document.addEventListener('keydown',e=>{
+    if(ls.style.display==='none'||e.ctrlKey||e.metaKey||e.altKey)return;
+    if(e.target===inp)return; // 焦點在輸入框時交給輸入框自己處理
+    if(/^[0-9]$/.test(e.key)){e.preventDefault();pinKey(e.key);}
+    else if(e.key==='Backspace'){e.preventDefault();pinKey('⌫');}
+    else if(e.key==='Enter'){e.preventDefault();checkPw();}
+  });
+  // 點完數字鍵後把焦點放回輸入框（電腦）
+  document.querySelectorAll('.pk').forEach(b=>b.addEventListener('mouseup',()=>{if(!matchMedia('(max-width:760px)').matches)setTimeout(()=>inp.focus(),0);}));
+  window.togglePwEye=function(btn){inp.type=inp.type==='password'?'text':'password';btn.textContent=inp.type==='password'?'👁':'🙈';inp.focus();};
+  window.lockNow=function(){clearTimeout(timer);showLogin();};
+  // 按 1～4 直接進入
+  document.addEventListener('keydown',e=>{
+    if(ls.style.display!=='none')return;
+    const t=e.target;if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'))return;
+    const a=document.getElementById('card-'+e.key);if(a&&!e.ctrlKey&&!e.metaKey&&!e.altKey)location.href=a.getAttribute('href');
+  });
+})();
+
+// ══ 日期與問候 ══
+const WK=['日','一','二','三','四','五','六'];
+function ymd(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function dayDiff(a,b){return Math.round((new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/864e5);} // b − a
+function addDays(s,n){const d=new Date(s+'T00:00:00');d.setDate(d.getDate()+n);return ymd(d);}
+const md=s=>s.slice(5).replace('-','/');
+const when=n=>n===0?'今天':n===1?'明天':n===2?'後天':n+' 天後';
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function renderDate(){
+  const d=new Date(),h=d.getHours();
+  const hi=h<5?'夜深了':h<11?'早安':h<14?'午安':h<18?'午安':'晚安';
+  const ap=h<12?'上午':h<18?'下午':'晚上';
+  const t=`${d.getMonth()+1} 月 ${d.getDate()} 日 星期${WK[d.getDay()]}`;
+  document.getElementById('h-date').textContent=`${t}・${ap} ${((h+11)%12)+1}:${String(d.getMinutes()).padStart(2,'0')}`;
+  document.getElementById('h-hi').textContent=hi+'，阿豪';
+  {const e=document.getElementById('lg-date');if(e)e.textContent=t;}
+}
+renderDate();setInterval(renderDate,30000);
+
+function readLS(k){try{return JSON.parse(localStorage.getItem(k)||'null');}catch(e){return null;}}
+
+// ══ 首頁資訊（只讀這台電腦上已存的資料；只顯示日期和件數，不顯示金額）══
+function setDot(k,n){const e=document.getElementById('dot-'+k);if(!e)return;e.textContent=n>99?'99+':n;e.classList.toggle('on',n>0);}
+function renderHome(){
+  renderDate();
+  const T=ymd(new Date());
+  // ── 資產損益表 ──
+  const box=document.getElementById('live-asset'), note=document.getElementById('note-asset');
+  const db=readLS('assetDB_v6');
+  if(!db){box.innerHTML='';note.textContent='打開一次資產損益表後，這裡就會顯示下次股息、扣款提醒。';}
+  else{
+    const rows=[];
+    const divs=(db.dividends||[]).filter(d=>d.date&&(d.date>T||(d.date===T&&d.pending))).sort((a,b)=>a.date.localeCompare(b.date));
+    if(divs.length){const n=dayDiff(T,divs[0].date);rows.push(['💰 下次股息入帳',`${md(divs[0].date)}・${when(n)}`]);}
+    // 下次信貸扣款
+    const loans=(db.loans||[]).filter(l=>!l.settled&&parseInt(l.deductDay));
+    let nl=null;
+    loans.forEach(l=>{const dd=parseInt(l.deductDay);for(let k=0;k<=1;k++){const b=new Date();b.setDate(1);b.setMonth(b.getMonth()+k);const dim=new Date(b.getFullYear(),b.getMonth()+1,0).getDate();
+      b.setDate(Math.min(dd,dim));const s=ymd(b);if(s<T)continue;if(s===T&&localStorage.getItem('loan_deducted_'+l.id+'_'+s.slice(0,7)))continue;if(!nl||s<nl.date)nl={date:s,l};break;}});
+    if(nl)rows.push(['🏦 下次信貸扣款',`${md(nl.date)}・${when(dayDiff(T,nl.date))}`]);
+    // 現金跑道（跟資產頁同一套：股息入帳、信貸扣款、基金扣款）
+    const R=runway(db,T);
+    if(R){
+      if(R.short)rows.push(['🚨 信貸扣款餘額不足',`${md(R.short.date)} 前要補錢`,'bad']);
+      else if(R.low)rows.push(['⚠️ 現金跑道',`${md(R.low)} 低於安全水位`,'warn']);
+      else rows.push(['✅ 現金跑道','夠用']);
+    }
+    // 週五快照
+    const snaps=new Set((db.snapshots||[]).map(s=>(s.ym||'').slice(0,10)));
+    const now=new Date(),dow=now.getDay();
+    let lastFri=new Date(now);lastFri.setDate(now.getDate()-((dow+2)%7||7));const lf=ymd(lastFri);
+    if(dow===5){rows.push(['📸 週五快照',snaps.has(T)?'✓ 今天已拍':(now.getHours()>=15?'打開資產損益表就會拍':'今天 15:00 後')]);}
+    else{const nf=addDays(T,(5-dow+7)%7);rows.push(['📸 週五快照',`${md(nf)}（${when(dayDiff(T,nf))}）`]);}
+    if(dow!==5&&!snaps.has(lf)&&(db.snapshots||[]).length)rows.push(['⚠️ 上週五沒拍到快照',md(lf),'warn']);
+    box.innerHTML=rows.map(r=>`<div class="row ${r[2]||''}">${r[0]}<b>${esc(r[1])}</b></div>`).join('');setDot('inv',rows.filter(r=>r[2]).length);
+    note.textContent='';
+  }
+  // ── 進銷存 ──
+  const inv=readLS('inv_db_v1'), ib=document.getElementById('live-inv');
+  if(!inv){ib.innerHTML='<span class="pill p-gray">打開一次後會顯示待辦</span>';}
+  else{
+    const C=invStatus(inv,T);
+    const call=C.filter(c=>!c.snz&&(c.s==='call'||c.s==='lost')).length;
+    const soon=C.filter(c=>!c.snz&&c.s==='soon'&&c.val>0).length;
+    const unpaid=(inv.orders||[]).filter(o=>!o.paid&&o.status!=='cancelled').length;
+    const p=[];
+    if(call)p.push(`<span class="pill p-red">📞 ${call} 家客戶該聯絡</span>`);
+    if(soon)p.push(`<span class="pill p-blue">📦 ${soon} 家快叫貨了</span>`);
+    if(unpaid)p.push(`<span class="pill p-amb">💰 ${unpaid} 張待收款</span>`);
+    ib.innerHTML=p.join('')||'<span class="pill p-ok">✅ 今天沒有待辦</span>';setDot('erp',call+soon+unpaid);
+  }
+  // ── 日文單字 ──
+  const v=readLS('vocab_db_v1'), vb=document.getElementById('live-vocab');
+  if(v&&(v.vocab||[]).length){const tot=v.vocab.length, done=(v.todayDone||[]).length, weak=Object.keys(v.weak||{}).filter(k=>v.weak[k]).length, pct=Math.round(done/tot*100);
+    setDot('voc',weak);vb.innerHTML=`<div class="pills"><span class="pill p-pink">已複習 ${done} / ${tot} 字（${pct}%）</span>${weak?`<span class="pill p-gray">⚠️ 不熟 ${weak} 個</span>`:''}</div><div class="bar"><i style="width:${pct}%"></i></div>`;}
+  else vb.innerHTML='<div class="pills"><span class="pill p-gray">打開一次後會顯示進度</span></div>';
+  // ── 手套 ──
+  const g=readLS('glove_vault_v1'), gb=document.getElementById('live-glove');
+  if(g&&(g.gloves||[]).length){gb.innerHTML=`<span class="pill" style="background:#fef3c7;color:#b45309">🧤 收藏 ${g.gloves.length} 個</span>`;}
+  else gb.innerHTML='';
+}
+
+// 現金跑道（簡化版，跟資產頁同一套規則）
+function runway(db,T){
+  const bal=a=>(a.cash||0)+(a.d1||0)+(a.d2||0);
+  const findAcc=n=>{n=String(n||'Line Bank').toLowerCase().trim();return (db.cashAccounts||[]).find(c=>{const b=String(c.bank||'').toLowerCase().trim();return b&&(b===n||b.includes(n)||n.includes(b));});};
+  const lb=findAcc('Line Bank'); if(!lb)return null;
+  const B={};(db.cashAccounts||[]).forEach(a=>B[a.id]=bal(a));
+  const divs=(db.dividends||[]).filter(d=>d.date&&(d.date>T||(d.date===T&&d.pending))).sort((a,b)=>a.date.localeCompare(b.date));
+  let end=divs.length?addDays(divs[0].date,2):addDays(T,30);
+  if(dayDiff(T,end)<14)end=addDays(T,14); if(dayDiff(T,end)>62)end=addDays(T,62);
+  const ev=[];
+  divs.forEach(d=>{if(d.date<=end)ev.push({date:d.date,amt:+(d.amount||0),k:0,acc:lb.id});});
+  (db.loans||[]).filter(l=>!l.settled&&parseInt(l.deductDay)).forEach(l=>{const dd=parseInt(l.deductDay);const acc=findAcc(l.deductBank);
+    for(let k=0;k<=3;k++){const b=new Date();b.setDate(1);b.setMonth(b.getMonth()+k);const dim=new Date(b.getFullYear(),b.getMonth()+1,0).getDate();b.setDate(Math.min(dd,dim));const s=ymd(b);
+      if(s<T||s>end)continue;if(s===T&&localStorage.getItem('loan_deducted_'+l.id+'_'+s.slice(0,7)))continue;ev.push({date:s,amt:-(l.monthly||0),k:1,acc:acc?.id,loan:1});}});
+  const funds=((db.settings||{}).fundDeductions||[]).filter(f=>f.enabled!==false);const logs=db.fundDeductionLogs||[];
+  for(let s=T;s<=end;s=addDays(s,1)){const w=new Date(s+'T00:00:00').getDay();if(w<1||w>5)continue;
+    funds.forEach(f=>{if(!(f.days||[]).includes(w))return;if(s===T&&logs.some(x=>x.fundId===f.id&&x.date===s))return;ev.push({date:s,amt:-(f.amount||0),k:2,acc:lb.id});});}
+  ev.sort((a,b)=>a.date.localeCompare(b.date)||a.k-b.k);
+  const safe=+((db.settings||{}).cashSafeLine)||0, in10=addDays(T,10);
+  let short=null,low=null;
+  ev.forEach(e=>{if(!e.acc||B[e.acc]==null)return;B[e.acc]+=e.amt;
+    if(e.loan&&e.date<=in10&&B[e.acc]<0&&!short)short=e;
+    if(e.acc===lb.id&&B[e.acc]<safe&&!low)low=e.date;});
+  return{short,low};
+}
+
+// 進銷存客戶狀態（跟進銷存「客戶追蹤」同一套規則）
+function invStatus(inv,T){
+  const calc=o=>(o.items||[]).reduce((s,it)=>s+(parseFloat(it.price)||0)*(parseFloat(it.qty)||1),0);
+  const byId={},byName={};(inv.customers||[]).forEach(c=>{byId[c.id]=c;if(c.name)byName[c.name]=c;});
+  const G={};
+  (inv.orders||[]).forEach(o=>{if(o.status==='cancelled'||!o.date)return;const c=(o.custId&&byId[o.custId])||byName[o.custName];const key=c?c.id:'n:'+(o.custName||'');(G[key]=G[key]||[]).push(o);});
+  const med=a=>{const b=a.slice().sort((x,y)=>x-y),n=b.length;return n%2?b[(n-1)/2]:(b[n/2-1]+b[n/2])/2;};
+  return Object.entries(G).map(([key,os])=>{
+    const ds=[...new Set(os.map(o=>o.date))].sort();const g=[];for(let i=1;i<ds.length;i++)g.push(dayDiff(ds[i-1],ds[i]));
+    const cyc=g.length>=2?Math.max(1,Math.round(med(g))):null;const since=dayDiff(ds[ds.length-1],T);const r=cyc?since/cyc:null;
+    let s;if(since>730)s='sleep';else if(!cyc)s=since>180?'lost':'once';else if(since>365||r>2.5)s='lost';else if(r>1.3)s='call';else if(r>=0.8)s='soon';else s='ok';
+    const val=os.filter(o=>dayDiff(o.date,T)<=730).reduce((a,o)=>a+calc(o),0);
+    const crm=(inv.crm||{})[key]||{};const snz=!!(crm.snooze&&crm.snooze>T);
+    return{s,snz,val};});
+}
+// 從其他頁返回時更新
+window.addEventListener('pageshow',()=>{if(localStorage.getItem('master_auth_v1')==='1'&&document.getElementById('login-screen').style.display==='none'){try{renderHome();}catch(e){}}});
+</script>
+</body>
+</html>
