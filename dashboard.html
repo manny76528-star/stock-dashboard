@@ -712,6 +712,12 @@ body:not(.privacy) .privacy-mask{filter:none;}
 #v23-mg.on{background:#f5f3ff;color:#6d28d9;border-radius:8px;padding:0 6px}
 #v15-loans.v23-mg .v15-lr{border-style:dashed;border-color:#c4b5fd}
 </style>
+<style>/* v24 */
+#v24-bg{position:fixed;inset:0;background:rgba(15,23,42,.4);z-index:9150;display:none;align-items:center;justify-content:center;padding:20px}#v24-bg.open{display:flex}
+.v24-box{position:relative;width:min(1000px,100%);max-height:90vh;overflow:auto;background:#eef2f7;border-radius:20px;box-shadow:0 30px 70px rgba(0,0,0,.3);padding:6px 4px 4px}
+.v24-box #v21-sec{padding:6px 16px 16px}.v24-x{position:absolute;right:16px;top:12px;font-size:24px;color:#94a3b8;cursor:pointer;z-index:2}.v24-x:hover{color:#0f172a}
+#v24-btn{background:#eff6ff!important;color:#1d4ed8!important;border:1px solid #bfdbfe!important}#v24-btn.warn{background:#fff7ed!important;color:#c2410c!important;border-color:#fed7aa!important}
+</style>
 </head>
 <body>
 
@@ -20216,7 +20222,7 @@ async function v22Run(){
 (function(){const _r=v21Render;v21Render=async function(){const r=await _r.apply(this,arguments);try{v23About();}catch(e){console.warn('v23 about',e);}return r;};})();
 function v23About(){
   const pg=document.getElementById('dbpage-about'),sec=document.getElementById('v21-sec');if(!pg||!sec)return;
-  if(pg.firstElementChild!==sec)pg.prepend(sec);
+  v24Place(sec);
   const t=sec.querySelector('.v14-title');if(t)t.textContent='🛡️ 資料安全與系統狀態';
   const card=sec.querySelector('.v21-card');if(!card||card.querySelector('.v23-grid'))return;
   const L=document.createElement('div'),R=document.createElement('div'),G=document.createElement('div');G.className='v23-grid';L.className='v23-l';R.className='v23-r';
@@ -20248,6 +20254,23 @@ function v23Loans(){
     const bt=row.querySelector('.v19-bt');if(bt){bt.textContent=_v23Manage?'✏️':'🎫';bt.onclick=e=>{e.stopPropagation();_v23Manage?editLoan(id):v19Show(id,e);};}});
 }
 (function(){const _p=v19Paint;v19Paint=function(){const r=_p.apply(this,arguments);try{v23Loans();}catch(e){console.warn('v23 loans',e);}return r;};})();
+
+// ══ v24：關於我 A1：資料安全與系統狀態平常收起來，標題列一顆「🛡️ 安全 ✓」，點了跳出視窗 ══
+function v24Place(sec){let bg=document.getElementById('v24-bg');
+  if(!bg){bg=document.createElement('div');bg.id='v24-bg';bg.innerHTML='<div class="v24-box"><span class="v24-x" onclick="v24Close()" title="關閉">×</span></div>';document.body.appendChild(bg);
+    bg.onclick=e=>{if(e.target===bg)v24Close();};document.addEventListener('keydown',e=>{if(e.key==='Escape'&&bg.classList.contains('open')&&!document.querySelector('#v21-bg[style*="flex"]'))v24Close();});}
+  const box=bg.querySelector('.v24-box');if(sec.parentNode!==box)box.appendChild(sec);}
+function v24Open(){const bg=document.getElementById('v24-bg');if(!bg)return;bg.classList.add('open');try{v21Render();}catch(e){}}
+function v24Close(){document.getElementById('v24-bg')?.classList.remove('open');}
+function v24Status(){const b=document.getElementById('v24-btn');if(!b)return;const I=[];
+  try{if(!syncGetKey())I.push('這台沒有資料密碼');}catch(e){}
+  const lk=document.getElementById('v21-lks');if(lk&&/\bno\b/.test(lk.className))I.push(lk.textContent.includes('連線')?'同步服務連不到':'同步服務未上鎖');
+  const pl=document.getElementById('v22-pill');if(pl&&/\bno\b/.test(pl.className))I.push('有資料檔沒加密');
+  b.textContent=I.length?(I.length===1?'⚠️ '+I[0]:`⚠️ 安全：${I.length} 個要注意`):'🛡️ 安全 ✓';b.classList.toggle('warn',!!I.length);b.title=I.length?I.join('、'):'資料密碼、同步上鎖、資料加密都正常（點開看細節）';}
+function v24Btn(){const up=[...document.querySelectorAll('#about-body button')].find(x=>/更新關於我/.test(x.textContent));if(!up||document.getElementById('v24-btn'))return;
+  const b=document.createElement('button');b.id='v24-btn';b.style.cssText=up.style.cssText;b.style.position='';b.onclick=v24Open;b.textContent='🛡️ 安全 …';up.before(b);v24Status();}
+(function(){const _r=renderAboutPage;renderAboutPage=function(){const r=_r.apply(this,arguments);try{v24Btn();}catch(e){console.warn('v24',e);}return r;};})();
+(function(){const _r=v21Render;v21Render=async function(){const r=await _r.apply(this,arguments);try{v24Btn();v24Status();}catch(e){}return r;};})();
 </script>
 
 </div><!-- /main-content -->

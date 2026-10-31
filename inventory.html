@@ -4201,6 +4201,106 @@ function v10Relay(c,dr){
   ['paper','ribbon'].forEach(k=>{const x=rh&&rh[k];if(!x||!x.fast)return;
     h=h.replace(`<b style="font-size:15.5px">${V8CAT[k][0]} ${V8CAT[k][1]}</b>`,`<b style="font-size:15.5px">${V8CAT[k][0]} ${V8CAT[k][1]}</b><span style="background:#fff7ed;color:#c2410c;border:1px solid #fed7aa;border-radius:999px;padding:1px 9px;font-size:12.5px;font-weight:800" title="最近 2 次平均每月 ${x.m30} 捲，比之前的平均（每月 ${x.baseM30} 捲）快">⚡ 最近用得比較快（以前每月 ${x.baseM30} 捲）</span>`);});
   return h;};})();
+
+// ══ v12：按「已收款／已付廠商」之前先跳確認（C2），避免手快按錯 ══
+function _v12Amt(o,kind){return (o.items||[]).reduce((s,i)=>s+(+i.qty||0)*(+(kind==='vendor'?i.cost:i.price)||0),0);}
+function v12Confirm(o,kind,go){
+  const now=kind==='vendor'?o.vendorPaid!==false:!!o.paid, to=!now;
+  const T={paid:[to?'💰 確定標記「客戶已付款」？':'↩️ 確定改回「客戶未付款」？',to?'✓ 確定已收款':'確定改回未收款','收款日'],vendor:[to?'🏭 確定標記「已付廠商」？':'↩️ 確定改回「未付廠商」？',to?'✓ 確定已付廠商':'確定改回未付','付款日']}[kind];
+  const items=(o.items||[]).slice(0,3).map(i=>`${(i.name||i.subtype||'品項')} × ${i.qty||0}`).join('<br>')+((o.items||[]).length>3?`<br>…等 ${(o.items||[]).length} 項`:'');
+  const amt=_v12Amt(o,kind), d=today();
+  let bg=document.getElementById('v12-bg');if(!bg){bg=document.createElement('div');bg.id='v12-bg';document.body.appendChild(bg);}
+  bg.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px';
+  bg.innerHTML=`<div style="background:#fff;border-radius:18px;width:min(400px,100%);box-shadow:0 30px 70px rgba(0,0,0,.3);padding:18px 18px 16px;font-family:inherit">
+    <div style="font-weight:900;font-size:16px;color:#0f172a">${T[0]}</div>
+    <div style="background:#f8fafc;border-radius:12px;padding:10px 12px;margin-top:10px;font-size:13.5px;line-height:1.75;color:#334155">
+      <div>📅 ${(o.date||'').slice(5).replace('-','/')}　🏢 <b>${o.custName||''}</b></div><div style="color:#64748b">${items}</div>
+      <div>${kind==='vendor'?'進貨成本':'金額'} <b style="font-family:'JetBrains Mono',monospace;color:${kind==='vendor'?'#16a34a':'#dc2626'}">$${Math.round(amt).toLocaleString()}</b>${to?`　${T[2]} <b>今天 ${d.slice(5).replace('-','/')}</b>`:''}</div></div>
+    <div style="display:flex;gap:8px;margin-top:14px"><button id="v12-no" style="flex:1;padding:10px;border:1px solid #e2e8f0;border-radius:11px;background:#fff;color:#64748b;font-weight:700;font-size:14px;cursor:pointer">取消</button><button id="v12-ok" style="flex:2;padding:10px;border:none;border-radius:11px;background:${to?'#2563eb':'#64748b'};color:#fff;font-weight:800;font-size:14px;cursor:pointer">${T[1]}</button></div></div>`;
+  const close=()=>{bg.style.display='none';document.removeEventListener('keydown',kd);};
+  const kd=e=>{if(e.key==='Escape')close();if(e.key==='Enter'){close();go();}};document.addEventListener('keydown',kd);
+  bg.querySelector('#v12-no').onclick=close;bg.querySelector('#v12-ok').onclick=()=>{close();go();};bg.onclick=e=>{if(e.target===bg)close();};
+  setTimeout(()=>bg.querySelector('#v12-ok')?.focus(),30);
+}
+(function(){
+  const _p=v8TogglePaid;v8TogglePaid=function(id){const o=db.orders.find(x=>x.id===id);if(!o)return;const a=arguments,t=this;v12Confirm(o,'paid',()=>_p.apply(t,a));};
+  const _v=v8ToggleVendor;v8ToggleVendor=function(id){const o=db.orders.find(x=>x.id===id);if(!o)return;const a=arguments,t=this;v12Confirm(o,'vendor',()=>_v.apply(t,a));};
+  const _m=markPaid;markPaid=function(id){const o=db.orders.find(x=>x.id===id);if(!o)return;const a=arguments,t=this;v12Confirm(o,'paid',()=>_m.apply(t,a));};
+  const _d=showOrderDetail;showOrderDetail=function(id){const r=_d.apply(this,arguments);try{const b=document.getElementById('detail-paid-btn'),o=db.orders.find(x=>x.id===id);if(b&&o&&b.onclick){const h=b.onclick;b.onclick=function(){v12Confirm(o,'paid',()=>h.call(b));};}}catch(e){}return r;};
+})();
+
+// ══ v13：📄 年度成果報告（A4 兩頁，可存成 PDF）══
+function v13YearStats(y){
+  const ok=o=>o&&o.date&&o.status!=='cancelled';
+  const L=(db.orders||[]).filter(o=>ok(o)&&o.date.startsWith(y));
+  let rev=0,cost=0,tax=0,profit=0;const cr={},cn={},pq={},pr={},ty={},mo=Array(12).fill(0);
+  L.forEach(o=>{const c=calcOrder(o);rev+=c.revenue;cost+=c.cost;tax+=c.tax;profit+=c.profit;const k=o.custName||'（未填客戶）';cr[k]=(cr[k]||0)+c.revenue;cn[k]=(cn[k]||0)+1;mo[+o.date.slice(5,7)-1]+=c.revenue;
+    (o.items||[]).forEach(i=>{const n=i.name||i.subtype||'品項',q=parseFloat(i.qty)||1,v=q*(parseFloat(i.price)||0);pq[n]=(pq[n]||0)+q;pr[n]=(pr[n]||0)+v;const t=i.subtype||i.type||'其他';ty[t]=(ty[t]||0)+v;});});
+  const first={};(db.orders||[]).filter(ok).sort((a,b)=>a.date.localeCompare(b.date)).forEach(o=>{const k=o.custName;if(k&&!first[k])first[k]=o.date.slice(0,4);});
+  const top=(o,n)=>Object.entries(o).sort((a,b)=>b[1]-a[1]).slice(0,n);
+  return{y,n:L.length,rev,cost,tax,profit,cust:Object.keys(cn).length,newN:Object.values(first).filter(v=>v===y).length,cr:top(cr,5),cn:top(cn,5),pq:top(pq,5),pr:top(pr,5),ty:top(ty,6),mo};
+}
+function v13Report(y){
+  y=String(y||document.getElementById('monthly-year-sel')?.value||new Date().getFullYear());
+  const A=v13YearStats(y),P=v13YearStats(String(+y-1));
+  if(!A.n){toast('⚠️ '+y+' 年沒有訂單，無法產生報告');return;}
+  const E=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const m=v=>'$'+Math.round(v).toLocaleString(),nf=v=>(+v).toLocaleString(undefined,{maximumFractionDigits:1});
+  const pct=(a,b)=>b?(a-b)/b*100:null,cg=x=>x==null?'':`<b style="color:${x>=0?'#dc2626':'#16a34a'}">${x>=0?'▲':'▼'}${Math.abs(x).toFixed(1)}%</b>`;
+  const mg=A.rev?A.profit/A.rev*100:0,mx=Math.max(1,...A.mo),chg=pct(A.rev,P.rev),pchg=pct(A.profit,P.profit);
+  const bars=A.mo.map((v,i)=>`<div class="b"><span>${v?(v/10000).toFixed(1):''}</span><i style="height:${v/mx*120}px"></i><em>${i+1}月</em></div>`).join('');
+  const rank=(L,fmt,col)=>{const t=L.length?L[0][1]:1;return L.map(([k,v],i)=>`<div class="rk"><b style="color:${col}">${i+1}</b><div><div class="nm">${E(k)}</div><div class="bar"><i style="width:${v/t*100}%;background:${col}"></i></div></div><b class="v">${fmt(v)}</b></div>`).join('')||'<div class="mu">—</div>';};
+  const tyT=A.ty.reduce((s,x)=>s+x[1],0)||1,TC=['#2563eb','#f97316','#14b8a6','#a855f7','#eab308','#94a3b8'];
+  const segs=A.ty.map(([k,v],i)=>`<i style="width:${v/tyT*100}%;background:${TC[i]}"></i>`).join(''),leg=A.ty.map(([k,v],i)=>`<span><i style="background:${TC[i]}"></i>${E(k)} ${(v/tyT*100).toFixed(0)}%</span>`).join('');
+  const kp=(t,v,s)=>`<div class="kp"><div class="t">${t}</div><div class="v">${v}</div><div class="s">${s}</div></div>`;
+  const c1=A.cr[0],c2=A.cr[1],f1=A.cn[0],q1=A.pq[0],q2=A.pq[1];
+  const hi=[`全年營業額 <b>${m(A.rev)}</b>${P.n?`，比 ${+y-1} 年 ${cg(chg)}`:''}；毛利 <b>${m(A.profit)}</b>${P.n?`（${cg(pchg)}）`:''}，毛利率 <b>${mg.toFixed(0)}%</b>。`,
+    c1?`最大客戶 <b>${E(c1[0])}</b>${c2?`、第二 <b>${E(c2[0])}</b>，前兩大合計占 <b>${((c1[1]+c2[1])/A.rev*100).toFixed(0)}%</b>`:''}。`:'',
+    f1?`最常下單是 <b>${E(f1[0])}</b>（${f1[1]} 次）${f1[1]>=3?'，屬於穩定回購的核心客戶':''}。`:'',
+    q1?`熱賣商品${q2?'前兩名':''}：<b>${E(q1[0])}</b>（${nf(q1[1])}）${q2?`、<b>${E(q2[0])}</b>（${nf(q2[1])}）`:''}。`:'',
+    A.newN?`今年新增 <b>${A.newN}</b> 家新客戶。`:''].filter(Boolean).map(x=>'• '+x).join('<br>');
+  const html=`<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><title>${y} 年度營運成果報告</title><style>
+@page{size:A4;margin:0}*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body{margin:0;background:#cbd5e1;font-family:-apple-system,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;color:#0f172a}
+.bar0{position:sticky;top:0;z-index:5;display:flex;gap:10px;align-items:center;justify-content:center;padding:10px;background:#1e293b;color:#fff;font-size:14px}.bar0 button{padding:8px 16px;border:none;border-radius:9px;font-weight:800;font-size:14px;cursor:pointer}
+.pg{width:210mm;height:297mm;margin:16px auto;background:#fff;position:relative;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.18);page-break-after:always}
+.mono,.kp .v,.v{font-family:"JetBrains Mono",Consolas,monospace}
+.cov{height:86mm;background:linear-gradient(135deg,#1e3a8a,#2563eb 60%,#38bdf8);color:#fff;padding:15mm 15mm 0}.cov .e{font-size:12px;letter-spacing:3px;opacity:.85}.cov h1{font-size:34px;margin:8px 0 4px}.cov .big{display:flex;gap:12mm;margin-top:12mm}.cov .big div div:last-child{font-size:32px;font-weight:900;font-family:"JetBrains Mono",Consolas,monospace}
+.in{padding:8mm 15mm}.kg{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.kp{background:#f8fafc;border-radius:12px;padding:11px}.kp .t{font-size:11px;color:#64748b}.kp .v{font-size:19px;font-weight:900}.kp .s{font-size:10.5px;color:#64748b}
+.sec{border:1px solid #e2e8f0;border-radius:12px;padding:11px 13px;margin-top:12px}.sec h3{font-size:14px;margin:0 0 8px}
+.bars{display:flex;gap:3px;align-items:flex-end;height:150px}.b{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end}.b span{font-size:9px;color:#475569}.b i{display:block;width:70%;background:linear-gradient(#60a5fa,#2563eb);border-radius:4px 4px 0 0}.b em{font-style:normal;font-size:9.5px;color:#64748b;margin-top:3px}
+.hl{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}.hl>div{border-radius:12px;padding:11px}.hl .t{font-size:11px}.hl .n{font-size:16px;font-weight:900;margin-top:3px}.hl .s{font-size:11px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.rk{display:grid;grid-template-columns:18px 1fr 80px;gap:7px;align-items:center;padding:4px 0}.rk .nm{font-size:12px;font-weight:700}.rk .bar{height:5px;background:#f1f5f9;border-radius:9px;margin-top:3px}.rk .bar i{display:block;height:100%;border-radius:9px}.rk .v{text-align:right;font-size:12px}
+.seg{display:flex;height:14px;border-radius:9px;overflow:hidden}.seg i{display:block;height:100%}.leg{font-size:11.5px;margin-top:7px;line-height:1.9}.leg span{margin-right:12px;white-space:nowrap}.leg i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:4px}
+.ft{position:absolute;bottom:7mm;left:15mm;right:15mm;display:flex;font-size:10px;color:#94a3b8}.h2{font-size:20px;font-weight:900;border-left:6px solid #2563eb;padding-left:10px}.mu{color:#64748b;font-size:12px}
+@media print{body{background:#fff}.bar0{display:none}.pg{margin:0;box-shadow:none}}
+</style></head><body>
+<div class="bar0">📄 ${y} 年度營運成果報告　<button onclick="print()" style="background:#2563eb;color:#fff">🖨️ 存成 PDF／列印</button><button onclick="close()" style="background:#fff;color:#334155">關閉</button><span style="opacity:.75;font-size:12px">（列印視窗的「目的地」選「另存為 PDF」就會存成 PDF）</span></div>
+<div class="pg"><div class="cov"><div class="e">ANNUAL BUSINESS REPORT</div><h1>${y} 年度營運成果報告</h1><div style="opacity:.9">進銷存年度總結・${A.n} 筆訂單・${A.cust} 家客戶</div>
+<div class="big"><div><div style="opacity:.8;font-size:12px">全年營業額</div><div>${m(A.rev)}</div></div><div><div style="opacity:.8;font-size:12px">全年毛利</div><div>${m(A.profit)}</div></div></div></div>
+<div class="in"><div class="kg">${kp(P.n?`營業額 vs ${+y-1}`:'營業額',m(A.rev),P.n?`去年 ${m(P.rev)}　${cg(chg)}`:'')}${kp('毛利率',mg.toFixed(1)+'%','毛利 '+m(A.profit)+(A.tax?'（已扣稅 '+m(A.tax)+'）':''))}${kp('訂單數',A.n+' 筆','平均每筆 '+m(A.rev/A.n))}${kp('往來客戶',A.cust+' 家','新客戶 '+A.newN+' 家')}</div>
+<div class="sec"><h3>📈 每月營業額 <span class="mu">（單位：萬）</span></h3><div class="bars">${bars}</div></div>
+<div class="hl">${c1?`<div style="background:#fef3c7"><div class="t" style="color:#92400e">🏆 年度最大客戶</div><div class="n">${E(c1[0])}</div><div class="s" style="color:#92400e">貢獻 ${m(c1[1])}（${(c1[1]/A.rev*100).toFixed(0)}%）</div></div>`:''}${f1?`<div style="background:#e0f2fe"><div class="t" style="color:#075985">🔁 最常下單</div><div class="n">${E(f1[0])}</div><div class="s" style="color:#075985">全年 ${f1[1]} 次</div></div>`:''}${q1?`<div style="background:#fce7f3"><div class="t" style="color:#9d174d">🔥 最熱賣商品</div><div class="n">${E(q1[0])}</div><div class="s" style="color:#9d174d">賣出 ${nf(q1[1])}</div></div>`:''}</div></div>
+<div class="ft"><span>${y} 年度營運成果報告</span><span style="margin-left:auto">1 / 2</span></div></div>
+<div class="pg" style="padding:13mm 15mm"><div class="h2">客戶與商品分析</div>
+<div class="g2"><div class="sec" style="margin:0"><h3>💰 營業額前 5 大客戶</h3>${rank(A.cr,m,'#2563eb')}</div><div class="sec" style="margin:0"><h3>🔁 下單次數最多</h3>${rank(A.cn,v=>v+' 次','#0891b2')}</div>
+<div class="sec" style="margin:0"><h3>📦 賣最多的商品（數量）</h3>${rank(A.pq,nf,'#f97316')}</div><div class="sec" style="margin:0"><h3>💵 營收最高的商品</h3>${rank(A.pr,m,'#a855f7')}</div></div>
+<div class="sec"><h3>🧾 商品類別占比（營業額）</h3><div class="seg">${segs}</div><div class="leg">${leg}</div></div>
+<div class="sec" style="background:#f8fafc"><h3>📝 年度重點</h3><div style="font-size:13px;line-height:2;color:#334155">${hi}</div></div>
+<div class="ft"><span>${y} 年度營運成果報告・產生於 ${new Date().toLocaleDateString('zh-TW')}</span><span style="margin-left:auto">2 / 2</span></div></div>
+</body></html>`;
+  const w=window.open('','_blank');
+  if(!w){toast('⚠️ 瀏覽器擋住了新視窗，請允許彈出視窗後再按一次');return;}
+  w.document.open();w.document.write(html);w.document.close();
+}
+function v13Btn(){
+  const yr=document.getElementById('monthly-year-sel');if(!yr)return;let b=document.getElementById('v13-rep');
+  if(!b){b=document.createElement('button');b.id='v13-rep';b.textContent='📄 年度成果報告';b.onclick=()=>v13Report();
+    b.style.cssText='padding:7px 14px;border:none;border-radius:8px;font-size:13px;font-weight:800;cursor:pointer;background:linear-gradient(135deg,#1e3a8a,#2563eb);color:#fff;white-space:nowrap';yr.after(b);}
+  b.style.display=_reportMode==='year'?'':'none';
+}
+(function(){const _s=setReportMode;setReportMode=function(){const r=_s.apply(this,arguments);try{v13Btn();}catch(e){}return r;};})();
+(function(){const _r=renderReports;renderReports=function(){const r=_r.apply(this,arguments);try{v13Btn();}catch(e){}return r;};})();
 </script>
 </div><!-- /main-content -->
 
