@@ -43,6 +43,25 @@ body.priv .pm{filter:blur(7px);color:#94a3b8!important;user-select:none}
 .v19-ft{display:flex;flex-wrap:wrap;gap:6px;font-size:12.5px;color:#64748b;margin-top:12px}.v19-ft b{color:#0f172a}
 .v19-row .v19-card{padding:14px 12px;margin:10px 0 2px;border-radius:14px;box-shadow:none}.v19-row summary::-webkit-details-marker{display:none}.v19-row[open]{background:#faf5ff;border-radius:12px}
 </style>
+<style>/* 家族買入 */
+#fb-fab{position:fixed;right:16px;bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:50;height:52px;padding:0 18px 0 14px;border:none;border-radius:99px;background:#2563eb;color:#fff;font-size:24px;font-weight:900;display:flex;align-items:center;gap:6px;box-shadow:0 8px 20px rgba(37,99,235,.4);font-family:inherit}
+#fb-fab span{font-size:14px}
+#fb-bg{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:2000;display:none;align-items:flex-end}#fb-bg.on{display:flex}
+.fb-sh{width:100%;max-height:92vh;overflow:auto;background:#fff;border-radius:22px 22px 0 0;padding:8px 16px calc(18px + env(safe-area-inset-bottom,0px));animation:fbUp .2s ease}
+@keyframes fbUp{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
+.fb-grab{width:42px;height:5px;border-radius:9px;background:#cbd5e1;margin:0 auto 8px}.fb-hd{display:flex;align-items:center;font-size:16px}.fb-x{margin-left:auto;font-size:24px;color:#94a3b8;padding:0 4px}
+.fb-st{font-size:12.5px;font-weight:800;color:#64748b;margin:12px 0 2px}
+.fb-ch{display:inline-block;padding:7px 12px;border-radius:99px;border:1px solid #e2e8f0;background:#fff;font-size:14px;font-weight:800;margin:6px 6px 0 0;font-family:inherit;color:#0f172a}.fb-ch.on{background:#2563eb;border-color:#2563eb;color:#fff}.fb-ch small{font-weight:500;opacity:.7}
+.fb-card{display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,#eff6ff,#f5f3ff);border-radius:12px;padding:9px 11px;margin-top:14px}
+.fb-r{display:grid;grid-template-columns:48px 1fr;align-items:center;padding:6px 0;border-bottom:1px solid #f1f5f9}.fb-r>b{font-size:13.5px;color:#475569}
+.fb-in{display:flex;align-items:center;gap:6px;border:1.5px solid #e2e8f0;border-radius:10px;padding:0 10px}.fb-in:focus-within{border-color:#2563eb;box-shadow:0 0 0 3px #dbeafe}
+.fb-in input{flex:1;min-width:0;border:none;outline:none;padding:9px 0;font-size:16px;font-family:'JetBrains Mono',monospace;font-weight:700;background:transparent}.fb-in .mu{white-space:nowrap}
+.fb-use{color:#2563eb;font-weight:800;font-size:12.5px;white-space:nowrap}
+#fb-rc{font-size:13.5px;line-height:1.85;margin-top:6px}.fb-ln{display:flex;justify-content:space-between}.fb-tot{display:flex;align-items:baseline;border-top:2px dashed #cbd5e1;margin-top:3px;padding-top:5px}.fb-tot .mono{margin-left:auto;font-size:22px;color:#dc2626}
+.fb-sp{display:flex;gap:6px;margin-top:5px}.fb-sp span{border-radius:8px;padding:3px 8px;font-size:12px;font-weight:800}
+.fb-go{width:100%;margin-top:8px;padding:12px;border:none;border-radius:12px;background:#2563eb;color:#fff;font-size:15px;font-weight:800;font-family:inherit}.fb-go:disabled{background:#cbd5e1}
+#fb-toast{position:fixed;left:50%;bottom:calc(150px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);background:#0f172a;color:#fff;border-radius:12px;padding:10px 14px;font-size:13.5px;font-weight:700;opacity:0;transition:all .25s;z-index:3000;max-width:90vw;text-align:center}#fb-toast.on{opacity:1;transform:translateX(-50%)}
+</style>
 </head>
 <body class="priv">
 <script>
@@ -239,6 +258,73 @@ function v19CardHTML(c,col,cols){
   return`<div class="v19-card"><div class="v19-hd"><b style="color:${col}">📅 ${c.name}</b><span class="v19-mu">每月 ${Math.round(c.mo).toLocaleString()}${c.rate?'・'+c.rate+'%':''}</span><span class="v19-sum">已還 <b>${c.paid}</b>・還剩 <b style="color:${col};font-size:1.45em">${rem}</b>・共 ${c.tot} 格</span></div>${g}
     <div class="v19-ft"><span>下一格 <b>${rem>0?`${ny}/${String(nm).padStart(2,'0')}/${String(c.dd).padStart(2,'0')}`.slice(5):'—'}</b>${rem>0?`・繳完剩 <b>${_v19F(c.bal[c.paid],c.paid+1,c.tot)}</b>`:''}</span><span style="margin-left:auto">最後一格 <b>${ey}/${String(em).padStart(2,'0')}</b> 🎉</span></div></div>`;
 }
+
+// ══ 📱 家族買入（F2）：右下角 ＋ → 選成員 → 選標的 → 收據式填單 → 直接寫進雲端（格式跟電腦版快捷買入一樣）══
+let _fb={m:'',c:'',newC:false};
+const _fbDB=()=>DB&&DB.family&&DB.family.accounts?DB.family:null;
+function _fbShares(h){return (h.transactions||[]).reduce((s,t)=>{const n=t.shares||(t.lots||0)*1000;return s+(t.type==='buy'?n:t.type==='sell'?-n:0);},0);}
+function _fbHolds(mem){const a=_fbDB()?.accounts?.[mem];return (a?.holdings||[]).map(h=>({h,sh:_fbShares(h)})).sort((x,y)=>(y.sh>0)-(x.sh>0));}
+function _fbFee(sh,pr){const g=sh*pr;return g>0?Math.max(1,Math.round(g*0.001425*0.28)):0;}
+function _fbToast(t){let e=document.getElementById('fb-toast');if(!e){e=document.createElement('div');e.id='fb-toast';document.body.appendChild(e);}e.textContent=t;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),2600);}
+function fbFab(){const F=_fbDB();let b=document.getElementById('fb-fab');if(!F||!(F.members||[]).length){if(b)b.remove();return;}
+  if(!b){b=document.createElement('button');b.id='fb-fab';b.innerHTML='＋<span>家族買入</span>';b.onclick=()=>fbOpen();document.body.appendChild(b);}}
+function fbOpen(){const F=_fbDB();if(!F)return;if(!_fb.m||!(F.members||[]).includes(_fb.m))_fb={m:'',c:'',newC:false};
+  let bg=document.getElementById('fb-bg');if(!bg){bg=document.createElement('div');bg.id='fb-bg';bg.innerHTML='<div class="fb-sh"></div>';document.body.appendChild(bg);bg.onclick=e=>{if(e.target===bg)fbClose();};}
+  bg.classList.add('on');document.body.style.overflow='hidden';fbDraw();}
+function fbClose(){document.getElementById('fb-bg')?.classList.remove('on');document.body.style.overflow='';}
+function fbPick(k,v){if(k==='m'){_fb={m:v,c:'',newC:false};}else if(v==='__new__'){_fb.c='';_fb.newC=true;}else{_fb.c=v;_fb.newC=false;}fbDraw();
+  setTimeout(()=>{const t=document.getElementById(_fb.newC?'fb-nc':'fb-sh');if(t&&(_fb.c||_fb.newC))t.focus();},60);}
+function fbDraw(){
+  const F=_fbDB(),sh=document.querySelector('#fb-bg .fb-sh');if(!F||!sh)return;const mem=_fb.m,acc=mem?F.accounts[mem]||{holdings:[]}:null;
+  const chip=(on,lab,fn)=>`<button class="fb-ch${on?' on':''}" onclick="${fn}">${lab}</button>`;
+  let h=`<div class="fb-grab"></div><div class="fb-hd"><b>💰 家族買入${mem?'・'+E(mem):''}</b><span class="fb-x" onclick="fbClose()">×</span></div>`;
+  h+=`<div class="fb-st">① 誰買</div><div>${(F.members||[]).map(x=>chip(x===mem,E(x),`fbPick('m','${E(x).replace(/'/g,"\\'")}')`)).join('')}</div>`;
+  if(mem){const H=_fbHolds(mem);h+=`<div class="fb-st">② 買哪一檔</div><div>${H.map(({h:x,sh:s})=>chip(x.code===_fb.c,E(x.code)+(s>0?'':' <small>(已賣完)</small>'),`fbPick('c','${E(x.code)}')`)).join('')}${chip(_fb.newC,'＋ 新標的',`fbPick('c','__new__')`)}</div>`;}
+  if(mem&&(_fb.c||_fb.newC)){
+    const hd=acc.holdings.find(x=>x.code===_fb.c),px=hd?(DB.prices?.[hd.code]?.price||0):0;
+    h+=`<div class="fb-card">${hd?`<div style="min-width:0"><b class="mono">${E(hd.code)}</b> <span class="mu">${E(hd.name||'')}</span><div class="mu pm">目前持有 ${_fbShares(hd).toLocaleString()} 股</div></div>${px?`<div style="margin-left:auto;text-align:right"><div class="mu">現價</div><b class="mono" style="color:#dc2626">${px}</b></div>`:''}`:'<div><b>＋ 新增一個沒買過的標的</b></div>'}</div>
+    ${_fb.newC?`<div class="fb-r"><b>代碼</b><div class="fb-in"><input id="fb-nc" placeholder="例：00878" autocapitalize="characters" oninput="fbCalc()"></div></div><div class="fb-r"><b>名稱</b><div class="fb-in"><input id="fb-nn" placeholder="選填"></div></div>`:''}
+    <div class="fb-r"><b>日期</b><div class="fb-in"><input id="fb-d" type="date" value="${today()}" oninput="fbCalc()"><span class="mu" id="fb-dh">今天</span></div></div>
+    <div class="fb-r"><b>股數</b><div class="fb-in"><input id="fb-sh" type="number" inputmode="numeric" placeholder="例：500" oninput="fbCalc()"><span class="mu" id="fb-shh">股</span></div></div>
+    <div class="fb-r"><b>單價</b><div class="fb-in"><input id="fb-pr" type="number" inputmode="decimal" step="0.01" placeholder="例：21.50" oninput="fbCalc()">${px?`<span class="fb-use" onclick="document.getElementById('fb-pr').value=${px};fbCalc()">帶入現價</span>`:''}</div></div>
+    <div class="fb-r"><b>備註</b><div class="fb-in"><input id="fb-rm" placeholder="選填，例：定期定額"></div></div>
+    <div id="fb-rc"></div><div id="fb-msg" class="mu" style="color:#dc2626;min-height:16px;margin-top:4px"></div>
+    <button class="fb-go" id="fb-go" onclick="fbSave()" disabled>✓ 確認買入</button>`;}
+  sh.innerHTML=h;if(_fb.c||_fb.newC)fbCalc();
+}
+function fbCalc(){const $=id=>document.getElementById(id);if(!$('fb-rc'))return;const acc=_fbDB().accounts[_fb.m]||{};
+  const sh=parseFloat($('fb-sh').value)||0,pr=parseFloat($('fb-pr').value)||0,g=Math.round(sh*pr),fee=_fbFee(sh,pr),T=today(),d=$('fb-d').value;
+  $('fb-dh').textContent=d===T?'今天':'';$('fb-shh').textContent=sh?`股・${+(sh/1000).toFixed(3)} 張`:'股';
+  const S=acc.defaultSplits||[];let sp='';if(S.length>=2&&g>0){const a1=Math.round(g*S[0].pct/100);sp=`<div class="fb-sp"><span style="flex:${S[0].pct};background:#eff6ff;color:#1d4ed8">${E(S[0].name)} ${S[0].pct}% $${a1.toLocaleString()}</span><span style="flex:${S[1].pct};background:#fdf2f8;color:#be185d">${E(S[1].name)} ${S[1].pct}% $${(g-a1).toLocaleString()}</span></div>`;}
+  $('fb-rc').innerHTML=`<div class="fb-ln"><span class="mu">${sh?sh.toLocaleString():'股數'} × ${pr||'單價'}</span><span class="mono">$${g.toLocaleString()}</span></div><div class="fb-ln"><span class="mu">手續費（2.8 折）</span><span class="mono">+ $${fee.toLocaleString()}</span></div><div class="fb-tot"><b>實付金額</b><b class="mono">$${(g+fee).toLocaleString()}</b></div>${sp}`;
+  const code=_fb.newC?($('fb-nc')?.value||'').trim():_fb.c;$('fb-go').disabled=!(code&&sh>0&&pr>0&&d);$('fb-go').textContent=g?`✓ 確認買入 $${(g+fee).toLocaleString()}`:'✓ 確認買入';}
+function _fbApply(db,o){
+  if(!db.family)db.family={members:[],accounts:{}};if(!db.family.accounts)db.family.accounts={};
+  const acc=db.family.accounts[o.m]||(db.family.accounts[o.m]={holdings:[],log:[]});if(!acc.holdings)acc.holdings=[];if(!acc.log)acc.log=[];
+  const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+  let h=acc.holdings.find(x=>x.code===o.code);if(!h){h={id:uid(),code:o.code,name:o.name||o.code,url:'',transactions:[]};acc.holdings.push(h);}else if(o.name)h.name=o.name;if(!h.transactions)h.transactions=[];
+  const S=acc.defaultSplits||[],g=Math.round(o.shares*o.price),splits=[];if(S.length>=2&&g>0){const a1=Math.round(g*S[0].pct/100);splits.push({name:S[0].name,amt:a1},{name:S[1].name,amt:g-a1});}
+  const txnId=uid();h.transactions.push({id:txnId,type:'buy',date:o.date,shares:o.shares,price:o.price,fee:o.fee,remark:o.remark,...(splits.length?{splits}:{})});
+  acc.log.push({id:uid(),txnId,date:o.date,type:'buy',code:o.code,name:h.name,shares:o.shares,price:o.price,amount:o.shares*o.price+o.fee,fee:o.fee,remark:o.remark});
+  acc.log.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  db._ts=Date.now();db._lastPush={at:db._ts,dev:'📱 手機'};
+}
+async function fbSave(){const $=id=>document.getElementById(id),bt=$('fb-go');
+  const code=(_fb.newC?($('fb-nc').value||''):_fb.c).trim().toUpperCase(),sh=parseFloat($('fb-sh').value)||0,pr=parseFloat($('fb-pr').value)||0;
+  const o={m:_fb.m,code,name:_fb.newC?($('fb-nn').value||'').trim():'',date:$('fb-d').value,shares:sh,price:pr,fee:_fbFee(sh,pr),remark:($('fb-rm').value||'').trim()};
+  if(!o.code||!(sh>0)||!(pr>0)||!o.date)return;bt.disabled=true;bt.textContent='☁️ 寫入雲端中…';$('fb-msg').textContent='';
+  try{for(let t=0;t<3;t++){
+      const r=await fetch(API+'?t='+Date.now());if(!r.ok)throw new Error(r.status===423?'這台還沒輸入資料密碼':'讀不到雲端（'+r.status+'）');
+      const j=await r.json();const bin=atob(String(j.content||'').replace(/\s/g,''));const by=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)by[i]=bin.charCodeAt(i);
+      const db=JSON.parse(new TextDecoder().decode(by));_fbApply(db,o);
+      const u8=new TextEncoder().encode(JSON.stringify(db,null,2));let s='';for(let i=0;i<u8.length;i+=0x8000)s+=String.fromCharCode.apply(null,u8.subarray(i,i+0x8000));
+      const p=await fetch(API,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:'mobile-family-buy:'+Date.now(),content:btoa(s),sha:j.sha})});
+      if(p.ok){DB=db;fbClose();_fb.c='';_fbToast(`✅ ${o.m} 買入 ${o.code} ${o.shares.toLocaleString()} 股（$${Math.round(o.shares*o.price+o.fee).toLocaleString()}）`);return;}
+      if(p.status!==409&&p.status!==422)throw new Error(p.status===423?'這台還沒輸入資料密碼':'寫入失敗（'+p.status+'）');}
+    throw new Error('剛好有其他裝置在同步，請再按一次');
+  }catch(e){$('fb-msg').textContent='⚠️ '+e.message+'（這筆沒有存進去）';bt.disabled=false;fbCalc();}
+}
+(function(){const _r=render;render=function(){const x=_r.apply(this,arguments);try{fbFab();}catch(e){console.warn('fb',e);}return x;};})();
 </script>
 </body>
 </html>
