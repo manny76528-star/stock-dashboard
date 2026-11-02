@@ -3758,8 +3758,8 @@ function v8ItemTags(o){return(o.items||[]).map(it=>{const c=V8CAT[it.type]||['�
   if(!orders.length){box.innerHTML='';return r;}
   const G=[];orders.forEach(o=>{const m=(o.date||'').slice(0,7);let g=G[G.length-1];if(!g||g.m!==m){g={m,l:[]};G.push(g);}g.l.push(o);});
   box.innerHTML=`<div class="v8-ohd"><span>出貨日</span><span>客戶</span><span>品項</span><span style="text-align:right">金額（含稅）</span><span style="text-align:right">利潤</span><span style="text-align:center">收款／付廠商</span><span></span></div>`+G.map(g=>{
-    const tot=g.l.reduce((s,o)=>{const c=calcOrder(o);return s+c.revenue+c.tax;},0),un=g.l.filter(o=>!o.paid).length;
-    return`<div class="v8-mh"><span class="v8-mb">${+g.m.slice(5)||'—'}月</span><span style="font-weight:600;font-size:12.5px">${g.m.slice(0,4)}・${g.l.length} 筆${un?`・<b style="color:#dc2626">${un} 筆未收款</b>`:''}</span><span style="margin-left:auto;font-family:var(--mono)">${fmt(tot)}</span></div>`+
+    const tot=g.l.reduce((s,o)=>{const c=calcOrder(o);return s+c.revenue+c.tax;},0),un=g.l.filter(o=>!o.paid).length,pf=g.l.reduce((s,o)=>s+calcOrder(o).profit,0);
+    return`<div class="v8-mh"><span class="v8-mb">${+g.m.slice(5)||'—'}月</span><span style="font-weight:600;font-size:12.5px">${g.m.slice(0,4)}・${g.l.length} 筆${un?`・<b style="color:#dc2626">${un} 筆未收款</b>`:''}</span><span style="margin-left:auto;display:flex;align-items:baseline;gap:14px;white-space:nowrap"><span style="font-size:12.5px;color:#64748b">營收 <b style="font-family:var(--mono);color:#334155">${fmt(tot)}</b></span><span style="font-size:12.5px;color:#64748b">利潤 <b style="font-family:var(--mono);font-size:17px;color:${pf>=0?'#dc2626':'#16a34a'}">${pf<0?'−':''}${fmt(Math.abs(pf))}</b></span></span></div>`+
       g.l.map((o,k)=>{const c=calcOrder(o);return`<div class="v8-or" onclick="v8Order('${o.id}',_v8OrderList)" style="background:${!o.paid?'#fff7ed':k%2?'#f8fafc':'#fff'}">
         <span style="font-family:var(--mono)">${v7Md(o.date)}</span>
         <span class="v8-lk" onclick="event.stopPropagation();v8Cust('${v7E(o.custId||o.custName||'').replace(/'/g,"\\'")}')">${v7E(o.custName||'—')}</span>
@@ -4301,6 +4301,45 @@ function v13Btn(){
 }
 (function(){const _s=setReportMode;setReportMode=function(){const r=_s.apply(this,arguments);try{v13Btn();}catch(e){}return r;};})();
 (function(){const _r=renderReports;renderReports=function(){const r=_r.apply(this,arguments);try{v13Btn();}catch(e){}return r;};})();
+
+// ══ v14（2026/11）：①報表趨勢圖改「只看利潤」長條（G2） ②訂單月份標題加營收＋利潤（O1） ③紙張依規格分開算節奏 ══
+// ① 原本的圖照樣算好，再換成單一刻度的利潤長條（營收放在提示裡）
+const _v14Lbl={id:'v14lbl',afterDatasetsDraw(c){const ds=c.data.datasets[0],m=c.getDatasetMeta(0);if(!ds||!m)return;const g=c.ctx;g.save();g.textAlign='center';g.font='700 11px "JetBrains Mono",monospace';
+  m.data.forEach((b,i)=>{const v=ds.data[i];if(v==null||!v)return;g.fillStyle=v>=0?'#b91c1c':'#15803d';const t=Math.abs(v)>=10000?(v/10000).toFixed(1)+'萬':Math.abs(v)>=1000?(v/1000).toFixed(1)+'k':Math.round(v);g.fillText(t,b.x,v>=0?b.y-5:b.y+13);});g.restore();}};
+function v14ProfitBars(){
+  try{if(!_trendChart||_trendChart.config.type!=='line')return;const D=_trendChart.data,cv=_trendChart.canvas;if(!D||D.datasets.length<2)return;
+    const L=D.labels.slice(),R=D.datasets[0].data.slice(),P=D.datasets[1].data.slice();_trendChart.destroy();
+    const sum=P.reduce((s,v)=>s+(v||0),0),rs=R.reduce((s,v)=>s+(v||0),0);
+    _trendChart=new Chart(cv,{type:'bar',plugins:[_v14Lbl],data:{labels:L,datasets:[{label:'利潤',data:P,backgroundColor:P.map(v=>v<0?'#22c55e':'#dc2626'),borderRadius:5,maxBarThickness:46}]},
+      options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:18}},plugins:{legend:{display:false},
+        tooltip:{callbacks:{title:it=>it[0].label,label:it=>' 利潤 $'+Math.round(it.raw||0).toLocaleString(),afterLabel:it=>{const r=R[it.dataIndex]||0;return r?` 營收 $${Math.round(r).toLocaleString()}・利潤率 ${Math.round((it.raw||0)/r*100)}%`:'';}}}},
+        scales:{x:{grid:{display:false},ticks:{font:{size:11},maxRotation:0,autoSkip:true}},y:{beginAtZero:true,grid:{color:'#f1f5f9'},ticks:{font:{size:10},callback:v=>Math.abs(v)>=10000?(v/10000)+'萬':Math.abs(v)>=1000?(v/1000)+'k':v}}}}});
+    const t=document.getElementById('rpt-trend-title');if(t){t.innerHTML=t.textContent.replace('趨勢','利潤')+`<span style="font-weight:600;color:#64748b;font-size:12px;margin-left:10px">合計 <b style="color:#dc2626;font-family:var(--mono)">$${Math.round(sum).toLocaleString()}</b>　營收 $${Math.round(rs).toLocaleString()}（滑過長條看每月營收）</span>`;}
+  }catch(e){console.warn('v14 bars',e);}
+}
+(function(){const _r=renderReports;renderReports=function(){const r=_r.apply(this,arguments);v14ProfitBars();return r;};})();
+(function(){const _r=renderTrendChartForOrders;renderTrendChartForOrders=function(){const r=_r.apply(this,arguments);v14ProfitBars();return r;};})();
+
+// ③ 紙張依規格分開：從品名／規格找「70*40」這種尺寸；沒寫尺寸的用同價格那一筆判斷
+function v14Dim(i){const t=((i.spec||'')+' '+(i.name||'')).replace(/[xX×＊]/g,'*');const m=t.match(/(\d{2,3})\s*\*\s*(\d{2,3})(?!\s*\d*\s*米)/);return m?m[1]+'*'+m[2]:'';}
+let _v14In=false;
+(function(){const _r=v8Rhythm;v8Rhythm=function(orders){const out=_r.apply(this,arguments);if(_v14In||!out.paper)return out;
+  try{const P=(orders||[]).filter(o=>o.date&&o.status!=='cancelled').flatMap(o=>(o.items||[]).filter(i=>i.type==='paper'));
+    const pd={};P.forEach(i=>{const d=v14Dim(i);if(d&&pd[i.price]==null)pd[i.price]=d;});
+    const key=i=>v14Dim(i)||pd[i.price]||'';const ks=[...new Set(P.map(key))];if(ks.length<2)return out;
+    const by={};_v14In=true;
+    try{ks.forEach(k=>{const os=orders.map(o=>({...o,items:(o.items||[]).filter(i=>i.type!=='paper'||key(i)===k)}));const x=v8Rhythm(os).paper;if(x)by[k||'其他']=x;});}finally{_v14In=false;}
+    const ok=Object.keys(by);if(!ok.length)return out;
+    out.paperBy=by;out.paper=ok.map(k=>by[k]).sort((a,b)=>b.ratio-a.ratio)[0];  // 客戶整體狀態看最需要注意的那一種
+  }catch(e){console.warn('v14 split',e);}return out;};})();
+(function(){const _c=v8Chips;v8Chips=function(rh,sm){if(!rh||!rh.paperBy)return _c.apply(this,arguments);
+  const ks=Object.keys(rh.paperBy).sort((a,b)=>rh.paperBy[b].last.d.localeCompare(rh.paperBy[a].last.d));
+  return ks.map(k=>_c({paper:rh.paperBy[k]},sm).replace(`<b>${V8CAT.paper[1][0]}</b>`,`<b>${V8CAT.paper[1][0]} (${v7E(k)})</b>`).replace(`title="${V8CAT.paper[1]}：`,`title="${V8CAT.paper[1]} ${v7E(k)}：`)).join('')+(rh.ribbon?_c({ribbon:rh.ribbon},sm):'');};})();
+(function(){const _h=v8RhythmHTML;v8RhythmHTML=function(rh){if(!rh||!rh.paperBy)return _h.apply(this,arguments);
+  const ks=Object.keys(rh.paperBy).sort((a,b)=>rh.paperBy[b].last.d.localeCompare(rh.paperBy[a].last.d));const lab=`${V8CAT.paper[0]} ${V8CAT.paper[1]}`;
+  const parts=ks.map(k=>(_h({paper:rh.paperBy[k]})||'').replace(lab,`${lab} (${v7E(k)})`)).concat(rh.ribbon?[_h({ribbon:rh.ribbon})||'']:[]).filter(Boolean);
+  // 每段都會帶一次「📦 叫貨節奏」標題，只留第一段的
+  return parts.map((h,i)=>i?h.replace(/^<div class="v7-ht"[\s\S]*?<\/div>/,''):h).join('');};})();
 </script>
 </div><!-- /main-content -->
 
