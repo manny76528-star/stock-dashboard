@@ -718,6 +718,7 @@ body:not(.privacy) .privacy-mask{filter:none;}
 .v24-box #v21-sec{padding:6px 16px 16px}.v24-x{position:absolute;right:16px;top:12px;font-size:24px;color:#94a3b8;cursor:pointer;z-index:2}.v24-x:hover{color:#0f172a}
 #v24-btn{background:#eff6ff!important;color:#1d4ed8!important;border:1px solid #bfdbfe!important}#v24-btn.warn{background:#fff7ed!important;color:#c2410c!important;border-color:#fed7aa!important}
 </style>
+<style>/* v25 */.v25-req{color:#dc2626;font-size:11px;font-weight:800}.v25-need{animation:v25s .5s 2;border-radius:10px;box-shadow:0 0 0 3px #fecaca}@keyframes v25s{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}</style>
 </head>
 <body>
 
@@ -20271,6 +20272,32 @@ function v24Btn(){const up=[...document.querySelectorAll('#about-body button')].
   const b=document.createElement('button');b.id='v24-btn';b.style.cssText=up.style.cssText;b.style.position='';b.onclick=v24Open;b.textContent='🛡️ 安全 …';up.before(b);v24Status();}
 (function(){const _r=renderAboutPage;renderAboutPage=function(){const r=_r.apply(this,arguments);try{v24Btn();}catch(e){console.warn('v24',e);}return r;};})();
 (function(){const _r=v21Render;v21Render=async function(){const r=await _r.apply(this,arguments);try{v24Btn();v24Status();}catch(e){}return r;};})();
+
+// ══ v25：家族帳戶買入一定要選「資金來源」（完整買入、快捷買入都一樣）══
+function _v25Need(box){if(!box)return;box.classList.remove('v25-need');void box.offsetWidth;box.classList.add('v25-need');box.scrollIntoView({block:'center',behavior:'smooth'});}
+// ① 完整買入視窗：新增時必選；系統依備註預先選好的也算（照原本自動判斷），但存檔時一律記下來
+(function(){const _s=saveFamilyBuy;saveFamilyBuy=function(){
+  if(!_familyEditTxn){const el=document.getElementById('fb-src');
+    if(!el||!el.value){toast('⚠️ 請選「資金來源」');_v25Need(document.getElementById('fb-src-chips'));return;}
+    el.dataset.manual='1';}
+  return _s.apply(this,arguments);};})();
+(function(){const _c=famSrcChips;famSrcChips=function(){const r=_c.apply(this,arguments);try{const l=document.querySelector('#fb-src-chips')?.closest('.fg')?.querySelector('.fl');
+  if(l&&!l.querySelector('.v25-req'))l.innerHTML=`資金來源 <b class="v25-req">＊必填</b> <span style="font-weight:400;color:#94a3b8;font-size:11px">（打備註會自動判斷，也可以自己選）</span>`;}catch(e){}return r;};})();
+// ② 快捷買入（收據式）：多一行「來源」
+let _v25Src='';
+function v25QbChips(){const box=document.getElementById('v25-qb-src');if(!box)return;famSrcApplyNames();
+  box.innerHTML=Object.entries(FAM_SRC).map(([k,S])=>`<button type="button" onclick="_v25Src=(_v25Src==='${k}'?'':'${k}');v25QbChips()" style="padding:4px 9px;border-radius:99px;font-size:12px;cursor:pointer;margin:2px 4px 2px 0;border:1.5px solid ${_v25Src===k?S.c:'#e2e8f0'};background:${_v25Src===k?S.bg:'#fff'};color:${_v25Src===k?S.fg:'#475569'};font-weight:${_v25Src===k?800:500}">${S.e} ${_ae(S.n)}</button>`).join('');}
+function v25QbRow(){const rm=document.getElementById('fqb-remark');if(!rm||document.getElementById('v25-qb-row'))return;
+  const row=rm.closest('.v20-r');if(!row)return;const r=document.createElement('div');r.className='v20-r';r.id='v25-qb-row';r.style.alignItems='start';
+  r.innerHTML='<span class="v20-l" style="padding-top:6px">來源 <b class="v25-req">＊</b></span><div id="v25-qb-src"></div>';row.after(r);
+  rm.addEventListener('input',()=>{if(!_v25Src||_v25Src===rm.dataset.v25g){const g=famSrcGuess(rm.value);if(g&&g!=='other'){_v25Src=g;rm.dataset.v25g=g;v25QbChips();}}});}
+['openFamilyBuyForHolding','openFamilyQuickBuy'].forEach(fn=>{const _o=window[fn];if(typeof _o!=='function')return;window[fn]=function(){const r=_o.apply(this,arguments);try{_v25Src='';v25QbRow();v25QbChips();const rm=document.getElementById('fqb-remark');if(rm)rm.dataset.v25g='';}catch(e){console.warn('v25',e);}return r;};});
+(function(){const _s=saveQuickBuy;saveQuickBuy=function(){
+  if(!_v25Src){toast('⚠️ 請選「資金來源」');_v25Need(document.getElementById('v25-qb-src'));return;}
+  const member=_quickBuyMember,acc=member?getFamilyAccount(member):null,n0=acc?(acc.log||[]).length:0,ids=new Set((acc?.log||[]).map(l=>l.id));
+  const r=_s.apply(this,arguments);
+  try{if(acc&&(acc.log||[]).length>n0){const l=acc.log.find(x=>!ids.has(x.id));if(l){l.src=_v25Src;const t=_famTxnOf(acc,l);if(t)t.src=_v25Src;save();}}}catch(e){console.warn('v25 save',e);}
+  return r;};})();
 </script>
 
 </div><!-- /main-content -->

@@ -325,6 +325,20 @@ async function fbSave(){const $=id=>document.getElementById(id),bt=$('fb-go');
   }catch(e){$('fb-msg').textContent='⚠️ '+e.message+'（這筆沒有存進去）';bt.disabled=false;fbCalc();}
 }
 (function(){const _r=render;render=function(){const x=_r.apply(this,arguments);try{fbFab();}catch(e){console.warn('fb',e);}return x;};})();
+
+// 資金來源（必填）：跟電腦版同一套分類與名稱
+const FB_SRC=[['regular','🔁','定期定額'],['save','💵','自己存入'],['div','💰','股息再投入'],['gift','🎁','親友贈與'],['bonus','💼','獎金禮金'],['profit','📈','交易獲利'],['move','🔄','資金轉移'],['thrift','♻️','變賣／省下'],['other','✍️','其他']];
+const FB_RULES=[['regular',/定期定額|定額|每月.{0,6}(投入|扣款|扣)/],['div',/配息|股息|領息|息.{0,3}(再|投|買)/],['gift',/贈與|阿嬤|阿公|奶奶|爺爺|外婆|外公|大姑|姑姑|阿姨|舅|叔|紅包|壓歲|給\s*[\d,]|給.{0,4}(一萬|萬|千)/],['bonus',/獎金|禮金|業績|年終|分紅|三節/],['profit',/獲利|期貨|價差|停利/],['move',/轉移|轉入|轉到|資金移/],['thrift',/出清|變賣|二手|賣掉|減免|省下|退款|退費|輪胎/],['save',/零用錢|存錢|存\s*[\d一二三四五六七八九十百千萬]|加碼|自己存|_存|姊姊|哥哥|弟弟|妹妹|兒子|女兒/]];
+function _fbSrcName(k){const o=_fbDB()?.srcNames?.[k]||{},d=FB_SRC.find(x=>x[0]===k)||['','',''];return[(o.e||'').trim()||d[1],(o.n||'').trim()||d[2]];}
+function fbSrcDraw(){const b=document.getElementById('fb-src');if(!b)return;b.innerHTML=FB_SRC.map(([k])=>{const [e,n]=_fbSrcName(k);return`<button type="button" class="fb-ch${_fb.src===k?' on':''}" style="font-size:13px;padding:6px 10px" onclick="_fb.src=(_fb.src==='${k}'?'':'${k}');_fb.srcAuto=false;fbSrcDraw();fbCalc()">${e} ${E(n)}</button>`;}).join('');}
+function fbSrcGuess(){const r=(document.getElementById('fb-rm')?.value||'').trim();if(!r||(_fb.src&&!_fb.srcAuto))return;for(const [k,re] of FB_RULES)if(re.test(r)){_fb.src=k;_fb.srcAuto=true;fbSrcDraw();return;}}
+(function(){const _d=fbDraw;fbDraw=function(){_d.apply(this,arguments);const rm=document.getElementById('fb-rm');if(!rm||document.getElementById('fb-src'))return;
+  if(_fb.srcFor!==_fb.m+'|'+_fb.c+'|'+_fb.newC){_fb.src='';_fb.srcAuto=false;_fb.srcFor=_fb.m+'|'+_fb.c+'|'+_fb.newC;}
+  const r=document.createElement('div');r.innerHTML='<div class="fb-st">③ 錢從哪裡來 <b style="color:#dc2626">＊必填</b></div><div id="fb-src"></div>';rm.closest('.fb-r').after(r);rm.addEventListener('input',fbSrcGuess);fbSrcDraw();fbCalc();};})();
+(function(){const _c=fbCalc;fbCalc=function(){_c.apply(this,arguments);const b=document.getElementById('fb-go');if(b&&!_fb.src){b.disabled=true;if(!b.textContent.includes('來源'))b.textContent='請選「錢從哪裡來」';}};})();
+(function(){const _a=_fbApply;_fbApply=function(db,o){_a.apply(this,arguments);if(!o.src)return;const acc=db.family.accounts[o.m];const l=acc.log.find(x=>x.code===o.code&&x.date===o.date&&x.shares===o.shares&&x.price===o.price&&!x.src);if(!l)return;l.src=o.src;
+  for(const h of acc.holdings)for(const t of (h.transactions||[]))if(t.id===l.txnId)t.src=o.src;};})();
+(function(){const _s=fbSave;fbSave=async function(){if(!_fb.src)return;const _a=_fbApply,src=_fb.src;_fbApply=function(db,o){o.src=src;return _a.apply(this,arguments);};try{return await _s.apply(this,arguments);}finally{_fbApply=_a;}};})();
 </script>
 </body>
 </html>
