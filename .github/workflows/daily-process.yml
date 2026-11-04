@@ -51,7 +51,13 @@ jobs:
             if (status !== 200) { console.error('取得檔案失敗:', status); return; }
 
             const sha = fileData.sha;
-            const content = Buffer.from(fileData.content.replace(/\n/g, ''), 'base64').toString('utf8');
+            let b64 = (fileData.content || '').replace(/\n/g, '');
+            if (!b64) { // 檔案超過 1MB 時 contents API 不給內容 → 改用 blob API
+              const { status: bs, data: blob } = await ghRequest('GET', `/repos/${OWNER}/${REPO}/git/blobs/${sha}`);
+              if (bs !== 200) { console.error('取得檔案內容失敗:', bs); return; }
+              b64 = (blob.content || '').replace(/\n/g, '');
+            }
+            const content = Buffer.from(b64, 'base64').toString('utf8');
             // 🔒 資料加密（2026/10）：雲端檔案是加密的就用 DATA_KEY 解開；存回去時再加密
             const crypto = require('crypto');
             const KEY = (process.env.DATA_KEY || '').trim();
@@ -130,6 +136,36 @@ jobs:
               }
             });
 
+            // 3. 基金定期定額（週一～週五，照每檔基金設定的星期）
+            //    不用開電腦版也會記；往回看 10 天，沒記到的日子（例如那天沒開網頁）一起補上
+            //    同一檔、同一天只記一次 → 電腦版之後打開看到已扣，不會重複扣
+            const funds = ((db.settings || {}).fundDeductions || []).filter(f => f && f.enabled !== false && (f.days || []).length);
+            if (funds.length) {
+              if (!db.fundDeductionLogs) db.fundDeductionLogs = [];
+              const logs = db.fundDeductionLogs;
+              const addDays = (ds, n) => { const d = new Date(ds + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+              const dowOf = ds => new Date(ds + 'T00:00:00Z').getUTCDay();
+              const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+              funds.forEach(f => {
+                const mine = logs.filter(l => l.fundId === f.id).map(l => l.date).sort();
+                const first = mine[0] || todayStr;          // 從來沒扣過的新基金：只從今天開始，不往回補
+                const have = new Set(mine);
+                for (let back = 10; back >= 0; back--) {
+                  const d = addDays(todayStr, -back);
+                  if (d < first) continue;
+                  const w = dowOf(d);
+                  if (w === 0 || w === 6 || !(f.days || []).includes(w) || have.has(d)) continue;
+                  const amt = Math.round(f.amount || 0);
+                  logs.push({ id: uid(), fundId: f.id, fundName: f.name, date: d, amount: amt, auto: 'daily-process' });
+                  have.add(d);
+                  if (lineBank) lineBank.cash = (lineBank.cash || 0) - amt;
+                  msgs.push(`📅 基金扣款 ${f.name} ${d.slice(5)}${d === todayStr ? '' : '（補記）'} -$${amt.toLocaleString()}`);
+                  changed = true;
+                }
+              });
+              logs.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+            }
+
             if (!changed) {
               console.log('今日無需處理');
               return;
@@ -150,12 +186,25 @@ jobs:
 
             if (putStatus === 200 || putStatus === 201) {
               console.log('✅ 更新成功');
+              return true;
+            } else if (putStatus === 409 || putStatus === 422) {
+              console.log('⚠️ 剛好有人在同步（' + putStatus + '），等一下重新讀一次再做');
+              return 'retry';
             } else {
               console.error('❌ 更新失敗:', putStatus);
+              process.exitCode = 1;
             }
           }
 
-          main().catch(console.error);
+          (async () => {
+            for (let k = 0; k < 4; k++) {
+              const r = await main();
+              if (r !== 'retry') return;
+              await new Promise(ok => setTimeout(ok, 8000 * (k + 1)));
+            }
+            console.error('❌ 試了 4 次都衝突，明天會再補');
+            process.exitCode = 1;
+          })().catch(e => { console.error(e); process.exitCode = 1; });
           NODEJS
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
