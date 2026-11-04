@@ -719,6 +719,42 @@ body:not(.privacy) .privacy-mask{filter:none;}
 #v24-btn{background:#eff6ff!important;color:#1d4ed8!important;border:1px solid #bfdbfe!important}#v24-btn.warn{background:#fff7ed!important;color:#c2410c!important;border-color:#fed7aa!important}
 </style>
 <style>/* v25 */.v25-req{color:#dc2626;font-size:11px;font-weight:800}.v25-need{animation:v25s .5s 2;border-radius:10px;box-shadow:0 0 0 3px #fecaca}@keyframes v25s{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}</style>
+<style>
+/* 📉 v26 大跌回測 */
+#v26-root{color:#0f172a}#v26-root .mono,.v26-form .mono{font-family:'JetBrains Mono',monospace}
+.v26-top{display:flex;align-items:center;gap:12px;margin:0 0 12px;flex-wrap:wrap}
+.v26-wrap{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:16px;align-items:start}
+@media(max-width:1100px){.v26-wrap{grid-template-columns:1fr}}
+.v26-box{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:14px 18px;margin-bottom:14px}
+.v26-box.live{border:2px solid #fecaca;cursor:pointer}
+.v26-h{font-size:15px;font-weight:900;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.v26-mu{color:#64748b;font-size:12px}.v26-box .r,#v26-root .r,.v26-form .r{color:#dc2626}#v26-root .b{color:#2563eb}
+.v26-tag{display:inline-block;border-radius:99px;padding:1px 8px;font-size:11px;font-weight:800;white-space:nowrap}
+.v26-btn{background:#2563eb;color:#fff;border:0;border-radius:10px;padding:8px 14px;font-weight:800;font-size:13px;cursor:pointer;font-family:inherit}
+.v26-btn.ghost{background:#fff;color:#2563eb;border:1.5px solid #cbd5e1;padding:5px 11px;font-size:12px}
+.v26-row{display:grid;grid-template-columns:22px 62px 128px minmax(0,1fr) 64px 14px;gap:8px;align-items:center;padding:7px 6px;border-top:1px solid #f1f5f9;font-size:12.5px;cursor:pointer}
+.v26-row:hover{background:#f8fafc}.v26-row.on{background:#eff6ff;border-radius:10px}.v26-row.avg{border-top:2px solid #e2e8f0;cursor:default;background:none}
+.v26-bar{display:flex;flex-shrink:0}.v26-bar i{display:block;height:14px}
+.v26-ks{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}.v26-ks.two{grid-template-columns:repeat(2,1fr)}
+.v26-k{background:#f8fafc;border-radius:9px;padding:6px 9px}.v26-k .t{font-size:10.5px;color:#64748b}.v26-k .v{font-weight:900;font-size:15px;font-family:'JetBrains Mono',monospace}.v26-k .v.sm{font-size:13px}
+.v26-two{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:14px;margin-top:6px}
+@media(max-width:900px){.v26-two{grid-template-columns:1fr}}
+.v26-sec{border-left:3px solid;padding:4px 0 4px 11px;margin:9px 0}.v26-sec b{font-size:13px}.v26-sec div{font-size:12.5px;color:#334155;line-height:1.7;white-space:pre-line}
+.v26-sec.self{background:#f0fdf4;border-radius:0 8px 8px 0}
+.v26-you{background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:9px 11px;margin-top:9px}.v26-you>b{font-size:13px}
+.v26-jn{display:flex;gap:7px;align-items:center;font-size:12.5px;padding:5px 0;border-top:1px dashed #fde68a;cursor:pointer}.v26-jn:hover{color:#2563eb}
+.v26-jn .ell{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.v26-tip{font-size:12px;color:#92400e;margin-top:6px;line-height:1.6}
+.v26-blue{background:#eff6ff;border-radius:10px;padding:8px 10px;margin-top:8px;font-size:12.5px;color:#1e3a8a;line-height:1.7}
+.v26-form{position:relative;background:#fff;border-radius:18px;padding:20px 22px;width:min(680px,100%);box-shadow:0 20px 50px rgba(15,23,42,.25);color:#0f172a}
+.v26-form .fl{font-size:12px;font-weight:800;color:#475569;margin-top:10px}
+.v26-form .in{width:100%;box-sizing:border-box;border:1.5px solid #e2e8f0;border-radius:9px;padding:7px 10px;font-size:13px;margin-top:4px;font-family:inherit;color:#0f172a;background:#fff}
+.v26-form .in:focus{outline:0;border-color:#2563eb}.v26-form textarea.in{resize:vertical;line-height:1.6}
+.v26-form .g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.v26-form .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.v26-chip{border-radius:99px;padding:3px 10px;font-size:12px;font-weight:700;background:#f1f5f9;color:#64748b;cursor:pointer;user-select:none}
+.v26-chip.on{background:#fef2f2;color:#b91c1c;box-shadow:inset 0 0 0 1.5px #fecaca}
+.v26-fs{border-left:3px solid;padding-left:10px;margin-top:8px}.v26-fs b{font-size:12.5px}
+</style>
 </head>
 <body>
 
@@ -20298,6 +20334,186 @@ function v25QbRow(){const rm=document.getElementById('fqb-remark');if(!rm||docum
   const r=_s.apply(this,arguments);
   try{if(acc&&(acc.log||[]).length>n0){const l=acc.log.find(x=>!ids.has(x.id));if(l){l.src=_v25Src;const t=_famTxnOf(acc,l);if(t)t.src=_v25Src;save();}}}catch(e){console.warn('v25 save',e);}
   return r;};})();
+
+// ══════════════════════════════════════════════════════════════
+// 📉 v26（2026/11/03）大跌回測：回顧與分析 → 第三個分頁
+//   資料：db.drawdowns=[{id,title,start,end,peak,low,tags:[],sec:{env,mood,talk,fix,rec,hind,self},upd,del}]
+//   只有「開始日」必填；end 留空＝進行中。跌幅、天數由大盤序列（jIndexSeries＋今天即時）自動算
+//   peak / low 可手動覆蓋（序列只有日誌日＋週五快照，不是每天）
+//   V2 大盤＋心情表情　V4 每次跌多久／多久回來　V1 展開卡片（七段＋當時的你）
+// ══════════════════════════════════════════════════════════════
+const V26SEC=[['env','🌍','時空環境','#0ea5e9'],['mood','😱','當下氛圍','#dc2626'],['talk','🏦','當下說法','#7c3aed'],['fix','🔥','怎麼解、誰點火','#f59e0b'],['rec','📈','站回高點','#2563eb'],['hind','🔁','事後馬後炮','#94a3b8'],['self','🧠','給自己','#16a34a']];
+const V26TAGS=['關稅','戰爭','Fed','通膨','外資提款','去槓桿','AI泡沫','地緣政治','財報','黑天鵝'];
+const V26TC=[['#fef3c7','#b45309'],['#eff6ff','#1d4ed8'],['#fff7ed','#c2410c'],['#f5f3ff','#6d28d9'],['#fef2f2','#b91c1c'],['#ecfeff','#0e7490'],['#fdf2f8','#be185d']];
+let _v26Sel=null,_v26Now=null;
+function v26List(){return (db.drawdowns||[]).filter(d=>!d.del&&d.start).sort((a,b)=>a.start.localeCompare(b.start));}
+function v26Series(){const s=jIndexSeries().slice();if(_v26Now&&_v26Now.v){const T=_twToday();const i=s.findIndex(p=>p.d===T);if(i>=0)s[i]={d:T,v:_v26Now.v};else s.push({d:T,v:_v26Now.v});}return s.sort((a,b)=>a.d.localeCompare(b.d));}
+async function v26FetchNow(){if(_v26Now&&Date.now()-_v26Now.t<10*60000)return;try{const r=await fetch(CF_WORKER+'/index?t='+Date.now());if(r.ok){const d=await r.json();if(d.price){_v26Now={v:Math.round(d.price),t:Date.now()};return true;}}}catch(e){}}
+// 建議高點：開始日前後找序列最高點
+function v26SuggestPeak(start,S){S=S||v26Series();let b=null;S.forEach(p=>{const dd=_dayDiff(p.d,start);if(dd>=-10&&dd<=5&&(!b||p.v>b.v))b=p;});return b;}
+function v26Stats(d,S){
+  S=S||v26Series();const T=_twToday();const end=d.end||T;
+  let pk=d.peak?{d:d.start,v:+d.peak}:null;
+  if(!pk){let best=null;S.forEach(p=>{const dd=Math.abs(_dayDiff(p.d,d.start));if(dd<=7&&(!best||dd<best.dd||(dd===best.dd&&p.v>best.v)))best={...p,dd};});pk=best;}
+  const inWin=S.filter(p=>p.d>=d.start&&p.d<=end);
+  let lo=null;inWin.forEach(p=>{if(!lo||p.v<lo.v)lo=p;});
+  if(d.low){lo={d:d.lowDate||(lo&&lo.d)||d.start,v:+d.low};}
+  const last=S.length?S[S.length-1]:null;
+  const r={peak:pk,low:lo,ongoing:!d.end,last};
+  if(pk&&lo){r.dd=(lo.v/pk.v-1)*100;r.dn=Math.max(0,_dayDiff(lo.d,d.start));}
+  if(d.end&&lo)r.up=Math.max(0,_dayDiff(d.end,lo.d));
+  if(!d.end){r.days=_dayDiff(T,d.start);if(pk&&last){r.cur=(last.v/pk.v-1)*100;r.need=(pk.v/last.v-1)*100;}
+    // 已經站回高點了？（低點之後的點 ≥ 高點）
+    if(pk&&lo){const back=S.find(p=>p.d>lo.d&&p.v>=pk.v);if(back)r.backOn=back.d;}}
+  return r;
+}
+function v26Tag(t){let h=0;for(const c of String(t))h=(h*31+c.charCodeAt(0))>>>0;const c=V26TC[h%V26TC.length];return`<span class="v26-tag" style="background:${c[0]};color:${c[1]}">${_ae(t)}</span>`;}
+function v26Js(d){const T=_twToday(),e=d.end||T;return (db.journals||[]).filter(j=>j.date&&j.date>=_addDays(d.start,-3)&&j.date<=e).sort((a,b)=>a.date.localeCompare(b.date));}
+function v26Fmt(v){return v==null?'—':Math.round(v).toLocaleString();}
+function v26Pct(p,plus){if(p==null||isNaN(p))return'—';return(p>=0?(plus===false?'':'+'):'−')+Math.abs(p).toFixed(1)+'%';}
+function v26Avg(L,S){const done=L.map(d=>[d,v26Stats(d,S)]).filter(([d,s])=>d.end&&s.dd!=null&&s.up!=null);if(!done.length)return null;
+  const a=k=>done.reduce((x,[,s])=>x+s[k],0)/done.length;return{n:done.length,dd:a('dd'),dn:a('dn'),up:a('up'),mn:{dd:Math.min(...done.map(x=>x[1].dd)),dn:Math.min(...done.map(x=>x[1].dn)),up:Math.min(...done.map(x=>x[1].up))},mx:{dd:Math.max(...done.map(x=>x[1].dd)),dn:Math.max(...done.map(x=>x[1].dn)),up:Math.max(...done.map(x=>x[1].up))}};}
+
+// ── V2：大盤＋心情 ──
+function v26Chart(L,S){
+  if(!L.length||S.length<2)return'<div class="v26-mu" style="padding:30px;text-align:center">還沒有大盤資料可以畫（日誌或週五快照會自動累積）</div>';
+  const T=_twToday();const from=_addDays(L[0].start,-30);const P=S.filter(p=>p.d>=from);if(P.length<2)return'';
+  const W=760,H=210,x0=P[0].d,span=Math.max(1,_dayDiff(T>P[P.length-1].d?T:P[P.length-1].d,x0));
+  const vs=P.map(p=>p.v),mn=Math.min(...vs),mx=Math.max(...vs);
+  const X=d=>14+_dayDiff(d,x0)/span*(W-28),Y=v=>12+(1-(v-mn)/Math.max(1,mx-mn))*(H-50);
+  let s='';
+  let _lx=-99;L.forEach(d=>{const st=v26Stats(d,S);const on=d.id===_v26Sel;const lo=st.low?st.low.d:d.start;const e=d.end||T;
+    s+=`<g style="cursor:pointer" onclick="v26Pick('${d.id}')"><rect x="${X(d.start)}" y="4" width="${Math.max(3,X(lo)-X(d.start))}" height="${H-38}" fill="#fecaca" opacity="${on?.95:.5}"/>`;
+    if(lo<e)s+=`<rect x="${X(lo)}" y="4" width="${Math.max(2,X(e)-X(lo))}" height="${H-38}" fill="${d.end?'#bfdbfe':'#fee2e2'}" opacity="${on?.85:.5}"/>`;
+    const lx=(X(d.start)+X(e))/2;const showL=lx-_lx>58||on;if(showL)_lx=lx;
+    if(showL)s+=`<text x="${lx}" y="${H-12}" font-size="11.5" text-anchor="middle" fill="${on?'#b91c1c':'#64748b'}" font-weight="${on?800:500}">${_ae(((d.title||'').split(/[｜|]/)[0].trim()||d.start.slice(0,7).replace('-','/')).slice(0,10))}</text>`;s+='</g>';});
+  s+=`<polyline fill="none" stroke="#334155" stroke-width="2" stroke-linejoin="round" points="${P.map(p=>X(p.d).toFixed(1)+','+Y(p.v).toFixed(1)).join(' ')}"/>`;
+  const MC={1:'#dc2626',2:'#f97316',3:'#94a3b8',4:'#0ea5e9',5:'#2563eb'};
+  L.forEach(d=>v26Js(d).forEach(j=>{const m=jMeta(j).mood;if(!m||!J_MOODS[m])return;const big=m===1||m===5;const v=j.indexVal||(P.reduce((a,p)=>Math.abs(_dayDiff(p.d,j.date))<Math.abs(_dayDiff(a.d,j.date))?p:a).v);if(j.date<x0)return;
+    s+=`<g style="cursor:pointer" onclick="openJournalDrawer('${j.id}')"><title>${j.date} ${J_MOODS[m].t}｜${_ae((jTitles(j)[0]?.t||j.content||'').slice(0,40))}</title>${big?`<circle cx="${X(j.date)}" cy="${Y(v)}" r="10" fill="#fff" stroke="${MC[m]}" stroke-width="2"/><text x="${X(j.date)}" y="${Y(v)+4.5}" font-size="12" text-anchor="middle">${J_MOODS[m].e}</text>`:`<circle cx="${X(j.date)}" cy="${Y(v)}" r="3.5" fill="${MC[m]}" stroke="#fff" stroke-width="1"/>`}</g>`;}));
+  return`<svg viewBox="0 0 ${W} ${H}" width="100%" style="display:block">${s}</svg>`;
+}
+// ── V4：每次跌多久、多久回來 ──
+function v26Gantt(L,S){
+  const R=L.map(d=>[d,v26Stats(d,S)]);const A=v26Avg(L,S);
+  const mxD=Math.max(30,...R.map(([d,s])=>(s.dn||0)+(s.up!=null?s.up:(s.days||0)-(s.dn||0))),A?A.dn+A.up:0);const k=190/mxD;
+  const bar=(dn,up,ongo,days)=>`<div class="v26-bar"><i style="width:${Math.max(3,dn*k)}px;background:${ongo?'repeating-linear-gradient(45deg,#f87171,#f87171 4px,#fecaca 4px,#fecaca 8px)':'#f87171'};border-radius:4px ${up!=null||ongo?0:4}px ${up!=null||ongo?0:4}px 4px"></i>${up!=null?`<i style="width:${Math.max(3,up*k)}px;background:#93c5fd;border-radius:0 4px 4px 0"></i>`:ongo&&days>dn?`<i style="width:${(days-dn)*k}px;background:#fee2e2;border-radius:0 4px 4px 0"></i>`:''}</div>`;
+  const rows=R.map(([d,s],i)=>{const ms=[1,2,3,4,5].filter(m=>v26Js(d).some(j=>jMeta(j).mood===m)).map(m=>J_MOODS[m].e).join('');const on=d.id===_v26Sel;
+    const txt=s.ongoing?`已 ${s.days} 天・<b class="r">進行中</b>${s.dn!=null?`（低點第 ${s.dn} 天）`:''}`:(s.dn!=null&&s.up!=null?`${s.dn} 天＋${s.up} 天`:'—');
+    return`<div class="v26-row${on?' on':''}" onclick="v26Pick('${d.id}')"><b class="r">${i+1}</b><span class="mono">${d.start.slice(0,7).replace('-','/')}</span><span>${(d.tags||[]).slice(0,2).map(v26Tag).join(' ')||'<span class="v26-mu">—</span>'}</span><div style="display:flex;align-items:center;gap:6px;min-width:0;overflow:hidden">${bar(s.dn||0,s.up!=null?s.up:null,s.ongoing,s.days)}<span style="white-space:nowrap;letter-spacing:-2px;flex-shrink:0" title="這段期間日誌的心情">${ms}</span><span class="v26-mu" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${txt}</span></div><b class="mono r" style="text-align:right">${s.dd!=null?v26Pct(s.dd):'—'}</b><span class="v26-mu">${on?'▾':'▸'}</span></div>`;}).join('');
+  const avg=A?`<div class="v26-row avg"><span></span><b>平均</b><span class="v26-mu">${A.n} 次已收復</span><div style="display:flex;align-items:center;gap:6px">${bar(A.dn,A.up)}<span class="v26-mu">落底 ${Math.round(A.dn)} 天＋收復 ${Math.round(A.up)} 天</span></div><b class="mono r" style="text-align:right">${v26Pct(A.dd)}</b><span></span></div>`:'';
+  return rows+avg;
+}
+// ── V1：展開卡片 ──
+function v26Card(d,S){
+  const s=v26Stats(d,S);const J=v26Js(d);
+  const k=(t,v,c)=>`<div class="v26-k"><div class="t">${t}</div><div class="v ${c||''}">${v}</div></div>`;
+  const secs=V26SEC.map(([key,ic,nm,col])=>{const v=(d.sec||{})[key];if(!v)return'';return`<div class="v26-sec${key==='self'?' self':''}" style="border-color:${col}"><b>${ic} ${nm}</b><div>${_ae(v)}</div></div>`;}).join('');
+  const empty=V26SEC.filter(([key])=>!(d.sec||{})[key]).map(x=>x[1]+x[2]);
+  const S30=jIndexSeries();
+  const jl=J.map(j=>{const m=jMeta(j).mood;const r=jAfter(j,30,S30);return`<div class="v26-jn" onclick="openJournalDrawer('${j.id}')"><span class="mono">${j.date.slice(5).replace('-','/')}</span><span>${m&&J_MOODS[m]?J_MOODS[m].e:'·'}</span><span class="ell">${_ae((jTitles(j)[0]?.t||j.content||'').slice(0,30))}</span><span class="v26-mu" style="margin-left:auto;white-space:nowrap">1月後 ${jFmtRet(r)}</span></div>`;}).join('');
+  let tip='';
+  if(J.length){const c={};[1,2,3,4,5].forEach(m=>{const n=J.filter(j=>jMeta(j).mood===m).length;if(n)c[J_MOODS[m].t]=n;});
+    tip=`這段你寫了 ${J.length} 篇`+(Object.keys(c).length?'，'+Object.entries(c).map(([t,n])=>`${n} 篇${t}`).join('、'):'');
+    const lowD=s.low?s.low.d:'9';const pb=m=>J.filter(j=>jMeta(j).mood===m&&j.date<=lowD).slice(-1)[0];const pan=pb(1)||pb(2);
+    if(pan&&s.low){const g=_dayDiff(s.low.d,pan.date);tip+=g>0?`；<b>最接近低點的那篇${jMeta(pan).mood===1?'恐慌':'煩躁'}日誌是 ${pan.date.slice(5).replace('-','/')}，${g} 天後就是最低點</b>`:g===0?`；<b>你最${jMeta(pan).mood===1?'恐慌':'煩躁'}的那天就是最低點</b>`:'';}}
+  const st=s.ongoing?(s.backOn?`<span class="v26-tag" style="background:#eff6ff;color:#1d4ed8">看起來 ${s.backOn.slice(5).replace('-','/')} 已站回</span>`:`<span class="v26-tag" style="background:#fef2f2;color:#b91c1c">進行中</span>`):`<span class="v26-tag" style="background:#eff6ff;color:#1d4ed8">已收復 ✓</span>`;
+  return`<div class="v26-h">📅 ${_ae(d.title||d.start.slice(0,7))} ${(d.tags||[]).map(v26Tag).join(' ')}<span style="margin-left:auto">${st}</span><button class="v26-btn ghost" onclick="v26Edit('${d.id}')">✏️ 編輯</button></div>
+  <div class="v26-ks">${k('高點 → 低點',`${v26Fmt(s.peak&&s.peak.v)} → ${v26Fmt(s.low&&s.low.v)}`,'sm')}${k('跌幅',v26Pct(s.dd),'r')}${k('落底',s.dn!=null?s.dn+' 天':'—')}${k(s.ongoing?'已經':'收復',s.ongoing?s.days+' 天':(s.up!=null?s.up+' 天':'—'))}</div>
+  <div class="v26-mu" style="margin:4px 0 0">${d.start.replace(/-/g,'/')} → ${d.end?d.end.replace(/-/g,'/'):'還沒結束'}${s.low?`・低點 ${s.low.d.slice(5).replace('-','/')}`:''}${d.peak||d.low?'・高低點為手動填寫':''}</div>
+  <div class="v26-two"><div>${secs||'<div class="v26-mu" style="padding:14px 0">七段內容還沒寫，按「✏️ 編輯」慢慢補</div>'}${secs&&empty.length?`<div class="v26-mu" style="margin-top:6px">還沒寫：${empty.join('、')}</div>`:''}</div>
+  <div><div class="v26-you"><b>📓 當時的你（這段期間的日誌）</b><div style="max-height:340px;overflow:auto">${jl||'<div class="v26-mu" style="padding:8px 0">這段期間沒有日誌</div>'}</div>${tip?`<div class="v26-tip">💡 ${tip}</div>`:''}</div></div></div>`;
+}
+// ── 右欄：進行中 ──
+function v26Live(L,S){
+  const on=L.filter(d=>!d.end);const A=v26Avg(L,S);
+  const selfs=L.filter(d=>d.end&&(d.sec||{}).self).slice(-3).map(d=>(d.sec.self||'').split('\n').filter(Boolean).slice(0,2).map(t=>`<div>・${_ae(t)}（${d.start.slice(0,7).replace('-','/')}）</div>`).join('')).join('');
+  if(!on.length)return`<div class="v26-box"><div class="v26-h">🟦 目前沒有進行中的大跌</div><div class="v26-mu" style="margin:6px 0">市場開始大跌時，按「＋ 新增一次大跌」只填開始日就好，其他之後再補。</div>${A?`<div class="v26-blue">📊 過去 ${A.n} 次：跌幅 ${v26Pct(A.mx.dd)}～${v26Pct(A.mn.dd)}，落底 ${A.mn.dn}～${A.mx.dn} 天，收復 ${A.mn.up}～${A.mx.up} 天</div>`:''}${selfs?`<div style="margin-top:8px;font-size:12.5px">🧠 你寫給自己的：${selfs}</div>`:''}</div>`;
+  return on.map(d=>{const s=v26Stats(d,S);
+    let cmp='';if(A&&s.cur!=null){const deep=s.cur<A.dd-2?'比平均深':s.cur>A.dd+2?'比平均淺':'深度≈平均';const lg=s.days>A.dn+A.up?`天數已超過平均 ${Math.round(A.dn+A.up)} 天`:s.days>A.dn?`已超過平均落底 ${Math.round(A.dn)} 天`:`平均 ${Math.round(A.dn)} 天落底`;cmp=`${deep}；${lg}`;}
+    return`<div class="v26-box live" onclick="v26Pick('${d.id}')"><div class="v26-h">🔴 進行中：${_ae(d.title||d.start.slice(0,7))}${s.backOn?'':'<span class="v26-tag" style="background:#fef2f2;color:#b91c1c;margin-left:auto">還沒收復</span>'}</div>
+    ${s.backOn?`<div class="v26-blue" style="margin:8px 0">🎉 大盤 ${s.backOn.slice(5).replace('-','/')} 已經站回 ${v26Fmt(s.peak.v)}，要把這次標成「已收復」嗎？<div style="margin-top:6px"><button class="v26-btn" onclick="event.stopPropagation();v26Close('${d.id}','${s.backOn}')">✓ 收復日填 ${s.backOn.slice(5).replace('-','/')}</button> <button class="v26-btn ghost" onclick="event.stopPropagation();v26Edit('${d.id}')">自己改日期</button></div></div>`:''}
+    <div class="v26-mu" style="margin:4px 0 8px">開始日 ${d.start.slice(5).replace('-','/')}，其他每天自動更新${s.last?`（最新大盤 ${s.last.d.slice(5).replace('-','/')} ${v26Fmt(s.last.v)}）`:''}</div>
+    <div class="v26-ks two"><div class="v26-k"><div class="t">從高點 ${v26Fmt(s.peak&&s.peak.v)} 算起</div><div class="v ${s.cur<0?'r':'b'}">${v26Pct(s.cur)}</div></div><div class="v26-k"><div class="t">已經跌了</div><div class="v">${s.days} 天</div></div><div class="v26-k"><div class="t">最深曾到</div><div class="v r">${v26Pct(s.dd)}${s.low?`<span class="v26-mu" style="font-weight:500"> ${s.low.d.slice(5).replace('-','/')}</span>`:''}</div></div><div class="v26-k"><div class="t">離收復還差</div><div class="v ${s.need>0?'r':'b'}">${s.need>0?v26Pct(s.need):'已站回 ✓'}</div></div></div>
+    ${A?`<div class="v26-blue">📊 過去 ${A.n} 次：跌幅 ${v26Pct(A.mx.dd)}～${v26Pct(A.mn.dd)}，落底 ${A.mn.dn}～${A.mx.dn} 天，收復 ${A.mn.up}～${A.mx.up} 天。${cmp?`<br>這次目前：${cmp}`:''}</div>`:''}
+    ${selfs?`<div style="margin-top:8px;font-size:12.5px;line-height:1.7">🧠 你過去寫給自己的：${selfs}</div>`:''}
+    <div class="v26-mu" style="margin-top:8px">📝 七段可以邊跌邊寫，收復後再補「怎麼解」「站回高點」</div></div>`;}).join('');
+}
+function v26Render(){
+  const host=document.getElementById('v26-root');if(!host)return;
+  const L=v26List(),S=v26Series();
+  if(_v26Sel&&!L.some(d=>d.id===_v26Sel))_v26Sel=null;
+  if(!_v26Sel&&L.length){const done=L.filter(d=>d.end);_v26Sel=(done[done.length-1]||L[L.length-1]).id;}
+  const sel=L.find(d=>d.id===_v26Sel);
+  host.innerHTML=`<div class="v26-top"><span class="v26-mu" style="font-size:13px">把每次大跌記下來：當時怎麼了、你怎麼想、多久站回來。下次跌的時候回來看。</span><button class="v26-btn" style="margin-left:auto" onclick="v26Edit()">＋ 新增一次大跌</button></div>
+  ${L.length?`<div class="v26-wrap"><div>
+   <div class="v26-box"><div class="v26-h">📈 大盤＋你的心情 <span class="v26-mu" style="font-weight:500">紅＝跌下去・藍＝收復・😱 恐慌／💪 信心的日誌（小點＝其他心情，點了看全文）</span></div>${v26Chart(L,S)}</div>
+   <div class="v26-box"><div class="v26-h">⏱ 每次跌多久、多久回來 <span class="v26-mu" style="font-weight:500">點一列展開</span></div>${v26Gantt(L,S)}</div>
+   ${sel?`<div class="v26-box" id="v26-card">${v26Card(sel,S)}</div>`:''}
+  </div><div>${v26Live(L,S)}</div></div>`
+  :`<div class="v26-box" style="text-align:center;padding:40px 20px"><div style="font-size:40px">📉</div><div class="v26-h" style="justify-content:center;margin:8px 0">還沒有記錄任何一次大跌</div><div class="v26-mu" style="line-height:1.8">按「＋ 新增一次大跌」，只要填開始日（高點那天）。<br>結束日、七段內容都可以之後再補；跌幅、天數、當時的日誌系統會自動帶出來。</div><button class="v26-btn" style="margin-top:14px" onclick="v26Edit()">＋ 新增第一次</button></div>`}`;
+  if(!_v26Now&&L.some(d=>!d.end))v26FetchNow().then(ok=>{if(ok)v26Render();});
+}
+function v26Pick(id){_v26Sel=id;v26Render();setTimeout(()=>document.getElementById('v26-card')?.scrollIntoView({behavior:'smooth',block:'nearest'}),30);}
+function v26Close(id,day){const d=(db.drawdowns||[]).find(x=>x.id===id);if(!d)return;d.end=day;d.upd=Date.now();save();toast('✓ 已標成收復，記得補「站回高點」「事後馬後炮」');_v26Sel=id;v26Render();}
+
+// ── 新增／編輯 ──
+function v26Edit(id){
+  const d=id?(db.drawdowns||[]).find(x=>x.id===id):null;const v=d||{start:'',end:'',title:'',tags:[],sec:{}};
+  let bg=document.getElementById('v26-bg');if(!bg){bg=document.createElement('div');bg.id='v26-bg';document.body.appendChild(bg);document.addEventListener('keydown',e=>{if(e.key==='Escape'&&bg.style.display!=='none')v26Hide();});}
+  bg.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.35);z-index:9100;display:flex;align-items:flex-start;justify-content:center;padding:28px 16px;overflow:auto';
+  const allTags=[...new Set(V26TAGS.concat(...(db.drawdowns||[]).map(x=>x.tags||[])))];
+  bg.innerHTML=`<div class="v26-form" onclick="event.stopPropagation()"><span class="v19-x" onclick="v26Hide()" title="關閉">×</span>
+   <div class="v26-h" style="font-size:17px">${d?'✏️ 編輯這次大跌':'＋ 新增一次大跌'}</div>
+   <div class="fl">標題</div><input id="v26-title" class="in" placeholder="例：2026/10｜通膨＋外資提款" value="${_ae(v.title||'')}">
+   <div class="g2"><div><div class="fl">開始（高點那天）<span class="r">＊</span></div><input id="v26-start" class="in" type="date" value="${v.start||''}" oninput="v26Hint()"><div class="v26-mu" id="v26-hint" style="margin-top:3px"></div></div>
+   <div><div class="fl">結束（站回高點那天）</div><input id="v26-end" class="in" type="date" value="${v.end||''}"><div class="v26-mu" style="margin-top:3px">留空＝進行中；站回高點時系統會提醒你</div></div></div>
+   <details ${v.peak||v.low?'open':''} style="margin-top:8px"><summary class="v26-mu" style="cursor:pointer">🔧 高點／低點點位自己填（系統只有日誌日和週五的大盤，想精確可以手動填）</summary>
+   <div class="g3"><div><div class="fl">高點點位</div><input id="v26-peak" class="in" inputmode="numeric" placeholder="自動" value="${v.peak||''}"></div><div><div class="fl">低點點位</div><input id="v26-low" class="in" inputmode="numeric" placeholder="自動" value="${v.low||''}"></div><div><div class="fl">低點日期</div><input id="v26-lowd" class="in" type="date" value="${v.lowDate||''}"></div></div></details>
+   <div class="fl">主因標籤（可多選）</div><div id="v26-tags" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:4px">${allTags.map(t=>`<span class="v26-chip${(v.tags||[]).includes(t)?' on':''}" onclick="this.classList.toggle('on')">${_ae(t)}</span>`).join('')}<input id="v26-tnew" class="in" style="width:110px;padding:3px 8px;margin:0" placeholder="＋ 自己打" onkeydown="if(event.key==='Enter'){v26AddTag();event.preventDefault();}"></div>
+   <div class="fl">七段內容（每段都選填，可以之後再補）</div>
+   <details style="margin:4px 0"><summary class="v26-mu" style="cursor:pointer">📋 整段貼上（像你 2025/11 那篇），照 🌍😱🏦🔥📈🔁🧠 自動分段</summary><textarea id="v26-paste" class="in" rows="4" placeholder="把整篇貼在這裡，按下面的按鈕"></textarea><button class="v26-btn ghost" onclick="v26Split()">✂️ 自動分段填入</button></details>
+   ${V26SEC.map(([k,ic,nm,col])=>`<div class="v26-fs" style="border-color:${col}"><b>${ic} ${nm}</b><textarea id="v26-s-${k}" class="in" rows="2" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'">${_ae((v.sec||{})[k]||'')}</textarea></div>`).join('')}
+   <div style="display:flex;gap:8px;margin-top:14px;align-items:center">${d?`<button class="v26-btn ghost" style="color:#64748b" onclick="v26Del('${d.id}')">🗑 刪除</button>`:''}<span style="margin-left:auto"></span><button class="v26-btn ghost" onclick="v26Hide()">取消</button><button class="v26-btn" onclick="v26Save('${d?d.id:''}')">${d?'儲存':'儲存（其他之後再補）'}</button></div></div>`;
+  bg.onclick=e=>{if(e.target===bg)v26Hide();};
+  bg.querySelectorAll('textarea[id^="v26-s-"]').forEach(t=>{t.style.height='auto';t.style.height=Math.max(44,t.scrollHeight)+'px';});
+  v26Hint();
+}
+function v26Hide(){const b=document.getElementById('v26-bg');if(b)b.style.display='none';}
+function v26Hint(){const h=document.getElementById('v26-hint'),s=document.getElementById('v26-start')?.value;if(!h)return;if(!s){h.textContent='填高點那天，例如大盤創高後開始跌的那天';return;}
+  const p=v26SuggestPeak(s);h.innerHTML=p?`系統看到附近最高點：${p.d.slice(5).replace('-','/')} ${v26Fmt(p.v)}${p.d!==s?` <a href="javascript:void 0" onclick="document.getElementById('v26-start').value='${p.d}';v26Hint()">改用這天</a>`:''}`:'附近沒有大盤資料，可以在下面自己填高點點位';}
+function v26AddTag(){const i=document.getElementById('v26-tnew');const t=(i.value||'').trim();if(!t)return;const w=document.getElementById('v26-tags');const c=document.createElement('span');c.className='v26-chip on';c.textContent=t;c.onclick=()=>c.classList.toggle('on');w.insertBefore(c,i);i.value='';}
+function v26Parse(txt){const M={'🌍':'env','🌏':'env','🌎':'env','😱':'mood','🏦':'talk','🔥':'fix','📈':'rec','🔁':'hind','🧠':'self'};const out={};let cur=null;
+  String(txt||'').split('\n').forEach(line=>{const t=line.trim();const k=Object.keys(M).find(e=>t.startsWith(e));
+    if(k){cur=M[k];let rest=t.slice(k.length).replace(/^️/,'').trim();
+      // 標題那段（例如「時空環境」「當下氛圍」）拿掉，冒號後的留下
+      rest=rest.replace(/^(時空環境|當下氛圍|當下說法|怎麼解[^：:\n]*|誰點火|站回高點|事後馬後炮[？?]?[有沒]*|給自己)[：:\s]*/,'');
+      out[cur]=out[cur]?out[cur]+'\n'+rest:rest;}
+    else if(cur&&t)out[cur]+=(out[cur]?'\n':'')+t;});
+  Object.keys(out).forEach(k=>out[k]=out[k].trim());return out;}
+function v26Split(){const o=v26Parse(document.getElementById('v26-paste').value);const n=Object.keys(o).length;if(!n)return toast('找不到 🌍😱🏦🔥📈🔁🧠 開頭的段落');
+  Object.entries(o).forEach(([k,v])=>{const t=document.getElementById('v26-s-'+k);if(t){t.value=v;t.style.height='auto';t.style.height=t.scrollHeight+'px';}});toast(`✓ 分好 ${n} 段`);}
+function v26Save(id){
+  const g=x=>(document.getElementById(x)?.value||'').trim();const start=g('v26-start'),end=g('v26-end');
+  if(!start)return toast('開始日一定要填（高點那天）');if(end&&end<start)return toast('結束日不能早於開始日');
+  const num=x=>{const n=parseFloat(g(x).replace(/,/g,''));return n>0?Math.round(n):null;};
+  const tags=[...document.querySelectorAll('#v26-tags .v26-chip.on')].map(c=>c.textContent.trim());
+  const sec={};V26SEC.forEach(([k])=>{const v=g('v26-s-'+k);if(v)sec[k]=v;});
+  if(!db.drawdowns)db.drawdowns=[];
+  let d=id?db.drawdowns.find(x=>x.id===id):null;if(!d){d={id:'dd'+uid()};db.drawdowns.push(d);}
+  Object.assign(d,{title:g('v26-title')||start.slice(0,7).replace('-','/'),start,end:end||'',tags,sec,peak:num('v26-peak'),low:num('v26-low'),lowDate:g('v26-lowd')||'',upd:Date.now()});
+  save();v26Hide();_v26Sel=d.id;v26Render();toast(end?'✓ 已儲存':'✓ 已儲存（進行中，之後再補）');
+}
+function v26Del(id){if(!confirm('確定刪除這次大跌紀錄？（日誌不會受影響）'))return;const d=(db.drawdowns||[]).find(x=>x.id===id);if(d){d.del=true;d.upd=Date.now();save();}v26Hide();_v26Sel=null;v26Render();}
+
+// ── 分頁、頁面、同步合併 ──
+(function(){
+  try{V11G.review.tabs.push(['drawdown','📉 大跌回測']);V11OF.drawdown='review';DB_PAGE_NAMES.drawdown='回顧與分析';}catch(e){}
+  const content=document.querySelector('.db-content');
+  if(content&&!document.getElementById('dbpage-drawdown')){const p=document.createElement('div');p.className='db-page';p.id='dbpage-drawdown';p.innerHTML='<div id="v26-root"></div>';content.appendChild(p);}
+  const _s=dbShowPage;dbShowPage=function(id){const r=_s.apply(this,arguments);if(id==='drawdown'){try{v26Render();}catch(e){console.warn('v26',e);}const n=document.getElementById('db-page-name');if(n)n.textContent='回顧與分析';}return r;};
+  const _m=mergeAppendOnly;mergeAppendOnly=function(t,o){const r=_m.apply(this,arguments);try{if(t&&o&&(o.drawdowns||[]).length){const M={};(t.drawdowns||[]).concat(o.drawdowns||[]).forEach(x=>{if(x&&x.id&&(!M[x.id]||(x.upd||0)>(M[x.id].upd||0)))M[x.id]=x;});t.drawdowns=Object.values(M);}}catch(e){}return r;};
+})();
 </script>
 
 </div><!-- /main-content -->
