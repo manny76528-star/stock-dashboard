@@ -1,0 +1,160 @@
+name: Auto Snapshot & Daily Close
+# 收盤後自動做三件事（不用開電腦版）：
+#   ① 觀察股、個股研究：記當天收盤（河流圖每天延伸）
+#   ② 週五快照（週五收盤價）
+#   ③ 季末快照（3/31、6/30、9/30、12/31）
+# 做法：在雲端用「同一份 dashboard.html」打開一次、呼叫原本的功能、加密存回 → 算法跟電腦版完全一樣
+# 什麼時候跑：每天更新股價之後；另外每天 16:30、週六 21:00 各檢查一次（股價晚更新時補做）
+on:
+  workflow_run:
+    workflows: ["Update Stock Prices"]
+    types: [completed]
+  schedule:
+    - cron: '30 8 * * *'   # 台灣 16:30
+    - cron: '0 13 * * 6'   # 台灣週六 21:00（補週五）
+  workflow_dispatch:
+
+concurrency:
+  group: auto-snapshot
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 今天要不要做
+        id: decide
+        run: |
+          cat > /tmp/decide.js << 'NODEJS'
+          // 第一步：判斷今天要不要做（不用開瀏覽器，省時間）
+          const fs=require('fs'),crypto=require('crypto'),https=require('https');
+          const OWNER='manny76528-star',REPO='stock-dashboard',FILE='data_dashboard.json';
+          const TOKEN=process.env.GH_TOKEN,KEY=(process.env.DATA_KEY||'').trim(),API=process.env.GH_API||'https://api.github.com';
+          const NOW=process.env.FAKE_NOW?Date.parse(process.env.FAKE_NOW):Date.now();
+          const addDays=(ds,n)=>{const d=new Date(ds+'T00:00:00Z');d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10);};
+          const dowOf=ds=>new Date(ds+'T00:00:00Z').getUTCDay();
+          function get(path){return new Promise((ok,no)=>{const u=new URL(API+path);const req=(u.protocol==='http:'?require('http'):https).request(u,{headers:{'Authorization':'token '+TOKEN,'Accept':'application/vnd.github.v3+json','User-Agent':'auto-snapshot'}},res=>{let b='';res.on('data',c=>b+=c);res.on('end',()=>ok({status:res.statusCode,data:b?JSON.parse(b):{}}));});req.on('error',no);req.end();});}
+          function out(k,v){console.log(`${k}=${v}`);if(process.env.GITHUB_OUTPUT)fs.appendFileSync(process.env.GITHUB_OUTPUT,`${k}=${v}\n`);}
+          (async()=>{
+            const tw=new Date(NOW+8*3600000);const today=tw.toISOString().slice(0,10);
+            // 收盤 14:00 以前跑的，算前一天的
+            let T=tw.getUTCHours()<14?addDays(today,-1):today;
+            const P=JSON.parse(fs.readFileSync('prices.json','utf8'));const up=new Date(Date.parse(P.updated)+8*3600000);const upD=up.toISOString().slice(0,10),upH=up.getUTCHours();
+            const freshFor=d=>upD>d||(upD===d&&upH>=14);   // 股價是不是 d 那天收盤之後抓的
+            // 週末跑的：回頭看最近的週五
+            let F=T;while(dowOf(F)===0||dowOf(F)===6)F=addDays(F,-1);
+            const r=await get(`/repos/${OWNER}/${REPO}/contents/${FILE}`);if(r.status!==200){console.error('讀不到資料',r.status);out('go','0');return;}
+            let b64=(r.data.content||'').replace(/\n/g,'');if(!b64){const bl=await get(`/repos/${OWNER}/${REPO}/git/blobs/${r.data.sha}`);b64=(bl.data.content||'').replace(/\n/g,'');}
+            let db=JSON.parse(Buffer.from(b64,'base64').toString('utf8'));
+            if(db&&db.enc==='v1'){const key=Buffer.from(KEY,'hex');const raw=Buffer.from(db.ct,'base64');const d=crypto.createDecipheriv('aes-256-gcm',key,Buffer.from(db.iv,'base64'));d.setAuthTag(raw.subarray(raw.length-16));db=JSON.parse(Buffer.concat([d.update(raw.subarray(0,raw.length-16)),d.final()]).toString('utf8'));}
+            const snapDone=d=>(db.snapshots||[]).some(s=>(s.ym||'').startsWith(d));
+            const trade=F;   // 最近一個交易日（週一～五）
+            const jobs=[];
+            // ① 每日收盤：觀察股、研究股
+            if(freshFor(trade)){const codes=new Set((db.watchlist||[]).map(w=>w.code).concat(Object.keys(db.research||{})));
+              const miss=[...codes].some(c=>{const a=(db.watchPx||{})[c]||[],b=((db.research||{})[c]||{}).px||[];const inW=(db.watchlist||[]).some(w=>w.code===c),inR=!!(db.research||{})[c];
+                return (inW&&!a.some(x=>x[0]===trade))||(inR&&!b.some(x=>x[0]===trade));});
+              if(miss)jobs.push('px');}
+            // ② 週五快照
+            if(dowOf(trade)===5&&freshFor(trade)&&!snapDone(trade))jobs.push('snap');
+            // ③ 季末快照（每季最後一天；那天是週末也記）
+            const Q=['03-31','06-30','09-30','12-31'];let qd=null;for(let k=0;k<=3;k++){const d=addDays(T,-k);if(Q.includes(d.slice(5))){qd=d;break;}}
+            if(qd&&qd!==trade&&!snapDone(qd)&&freshFor(qd))jobs.push('qend:'+qd);
+            else if(qd&&qd===trade&&!snapDone(qd)&&freshFor(qd)&&!jobs.includes('snap'))jobs.push('qend:'+qd);
+            console.log(`台灣時間 ${tw.toISOString().slice(0,16).replace('T',' ')}｜交易日 ${trade}｜股價更新 ${upD} ${upH}點｜要做：${jobs.join(', ')||'沒有'}`);
+            out('go',jobs.length?'1':'0');out('trade',trade);out('jobs',jobs.join(','));
+          })().catch(e=>{console.error(e);out('go','0');});
+
+          NODEJS
+          node /tmp/decide.js
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          DATA_KEY: ${{ secrets.DATA_KEY }}
+
+      - name: 安裝瀏覽器
+        if: steps.decide.outputs.go == '1'
+        run: |
+          npm i --no-save playwright@1.48.2
+          npx playwright install --with-deps chromium
+
+      - name: 記收盤、拍快照、存回
+        if: steps.decide.outputs.go == '1'
+        run: |
+          cat > /tmp/run.js << 'NODEJS'
+          // 第二步：在雲端用同一份 dashboard.html 打開一次 → 記收盤、拍快照 → 存回 GitHub（加密）
+          const fs=require('fs'),crypto=require('crypto');const {chromium}=require('playwright');
+          const OWNER='manny76528-star',REPO='stock-dashboard',FILE='data_dashboard.json';
+          const TOKEN=process.env.GH_TOKEN,KEY=(process.env.DATA_KEY||'').trim(),API=process.env.GH_API||'https://api.github.com';
+          const W='https://dashboard-sync.manny76528.workers.dev',PAGE='https://manny76528-star.github.io/stock-dashboard/';
+          const TRADE=process.env.TRADE,JOBS=(process.env.JOBS||'').split(',').filter(Boolean);
+          const log=(...a)=>console.log('['+new Date().toISOString().slice(11,19)+']',...a);
+          async function gh(method,path,body){const r=await fetch(`${API}/repos/${OWNER}/${REPO}/contents/${path}${method==='GET'?'?t='+Date.now():''}`,{method,headers:{'Authorization':'token '+TOKEN,'Accept':'application/vnd.github.v3+json','User-Agent':'auto-snapshot','Content-Type':'application/json'},body});return{status:r.status,text:await r.text()};}
+          function openDb(text){let j=JSON.parse(text);let o=JSON.parse(Buffer.from((j.content||'').replace(/\n/g,''),'base64').toString('utf8'));
+            if(o&&o.enc==='v1'){const key=Buffer.from(KEY,'hex');const raw=Buffer.from(o.ct,'base64');const d=crypto.createDecipheriv('aes-256-gcm',key,Buffer.from(o.iv,'base64'));d.setAuthTag(raw.subarray(raw.length-16));o=JSON.parse(Buffer.concat([d.update(raw.subarray(0,raw.length-16)),d.final()]).toString('utf8'));}return o;}
+          (async()=>{
+            if(!/^[0-9a-f]{64}$/i.test(KEY))throw new Error('沒有 DATA_KEY');
+            const remote0=openDb((await gh('GET',FILE)).text);
+            log('雲端資料：持股',(remote0.investments||[]).length,'筆、快照',(remote0.snapshots||[]).length,'筆');
+            const browser=await chromium.launch();const ctx=await browser.newContext({viewport:{width:1440,height:900},timezoneId:'Asia/Taipei'});
+            await ctx.addInitScript(k=>{try{localStorage.setItem('master_auth_v1','1');localStorage.setItem('master_auth_ts',String(Date.now()));localStorage.setItem('encKey_v1',k);localStorage.setItem('encOn_v1','1');localStorage.setItem('syncKey_v1','github-actions');localStorage.setItem('b8pop_'+new Date(Date.now()+8*3600000).toISOString().slice(0,10),'1');}catch(e){}},KEY);
+            let allowPut=false,puts=0,putErr=0;
+            await ctx.route('**/*',async route=>{const q=route.request(),u=q.url(),m=q.method();
+              try{
+                if(u.startsWith(PAGE)){const f=decodeURIComponent(u.slice(PAGE.length).split('?')[0]);if(f&&fs.existsSync(f))return route.fulfill({path:f,contentType:f.endsWith('.html')?'text/html; charset=utf-8':f.endsWith('.json')?'application/json':undefined});return route.fulfill({status:404,body:''});}
+                if(u.startsWith(W)){const path=decodeURIComponent(u.slice(W.length+1).split('?')[0]);
+                  if(path==='price'||path==='index')return route.continue();
+                  if(path!==FILE)return route.fulfill({status:404,contentType:'application/json',body:'{}'});   // 只碰股票資料這一個檔
+                  if(m==='GET'){const r=await gh('GET',FILE);return route.fulfill({status:r.status,contentType:'application/json',body:r.text});}
+                  if(m==='PUT'){if(!allowPut)return route.fulfill({status:503,contentType:'application/json',body:'{"message":"wait"}'});const r=await gh('PUT',FILE,q.postData());puts++;if(r.status>=300){putErr++;log('存檔回應',r.status);}return route.fulfill({status:r.status,contentType:'application/json',body:r.text});}
+                  return route.fulfill({status:405,body:'{}'});}
+                if(process.env.LOCAL_ASSETS){const b=u.split('?')[0].split('/').pop();const f=process.env.LOCAL_ASSETS+'/'+b;if(b&&fs.existsSync(f))return route.fulfill({path:f});if(/\/(price|index)/.test(u))return route.fulfill({status:200,contentType:'application/json',body:'{"price":28100.5}'});}
+                return route.continue();
+              }catch(e){try{await route.fulfill({status:502,body:''});}catch(_){}}});
+            const page=await ctx.newPage();const errs=[];page.on('pageerror',e=>errs.push(String(e)));page.on('dialog',d=>d.dismiss().catch(()=>{}));
+            await page.goto(PAGE+'dashboard.html?force=pc',{waitUntil:'domcontentloaded',timeout:60000});
+            // 等資料從雲端載入完、股價載入完
+            let ok=false;for(let i=0;i<90;i++){await page.waitForTimeout(1000);
+              ok=await page.evaluate(()=>typeof db!=='undefined'&&(db.investments||[]).length>0&&Object.keys(db.prices||{}).length>0).catch(()=>false);if(ok)break;}
+            if(!ok)throw new Error('網頁沒有載入資料，不做任何動作');
+            await page.waitForTimeout(6000);
+            // 安全檢查：網頁裡的資料要跟雲端一致（持股筆數、快照筆數不能變少）
+            const chk=await page.evaluate(()=>({inv:(db.investments||[]).length,snap:(db.snapshots||[]).length,ts:db._ts||0}));
+            if(chk.inv<(remote0.investments||[]).length||chk.snap<(remote0.snapshots||[]).length)throw new Error('網頁資料比雲端少，停止：'+JSON.stringify(chk));
+            const res=await page.evaluate(async({T,J})=>{const out=[];const real=_twToday;
+              if(J.includes('px')){_twToday=()=>T;try{watchRecordPx();}catch(e){out.push('觀察股收盤失敗 '+e.message);}try{await rsRecordPx();}catch(e){out.push('研究股收盤失敗 '+e.message);}_twToday=real;
+                out.push(`記收盤 ${T}：觀察股 ${(db.watchlist||[]).filter(w=>((db.watchPx||{})[w.code]||[]).some(x=>x[0]===T)).length} 檔、研究股 ${Object.values(db.research||{}).filter(r=>(r.px||[]).some(x=>x[0]===T)).length} 檔`);}
+              const snapAt=async(d,label)=>{if((db.snapshots||[]).some(s=>(s.ym||'').startsWith(d))){out.push(label+' 已經有了');return;}
+                const before=new Set((db.snapshots||[]).map(s=>s.ym));await recordSnapshot(false);
+                const s=(db.snapshots||[]).find(x=>!before.has(x.ym))||(db.snapshots||[]).find(x=>x.ym===new Date().toISOString().slice(0,10));
+                if(s&&s.ym!==d){const old=s.ym;s.ym=d;db.snapshots.sort((a,b)=>a.ym.localeCompare(b.ym));Object.values(db.family?.accounts||{}).forEach(a=>(a.mktHistory||[]).forEach(r=>{if(r.date===old)r.date=d;}));}
+                out.push(`${label} ${d}：淨資產 ${s?Math.round(s.net).toLocaleString():'?'}、大盤 ${s&&s.indexVal||'—'}`);};
+              if(J.includes('snap'))await snapAt(T,'📸 週五快照');
+              const q=J.find(x=>x.startsWith('qend:'));if(q)await snapAt(q.slice(5),'📸 季末快照');
+              return out;},{T:TRADE,J:JOBS});
+            res.forEach(x=>log(x));
+            allowPut=true;await page.evaluate(()=>{save();});
+            for(let i=0;i<60;i++){await page.waitForTimeout(1000);const d=await page.evaluate(()=>typeof isDirty==='function'?isDirty():false).catch(()=>true);if(puts>0&&!d)break;}
+            if(!puts||putErr)throw new Error(`存回雲端失敗（存了 ${puts} 次、失敗 ${putErr} 次）`);
+            const remote1=openDb((await gh('GET',FILE)).text);
+            log('✅ 已存回雲端：快照',(remote0.snapshots||[]).length,'→',(remote1.snapshots||[]).length,'筆');
+            if(errs.length)log('網頁訊息：',errs.slice(0,3).join(' | '));
+            await browser.close();
+          })().catch(e=>{console.error('❌',e.message);process.exitCode=1;});
+
+          NODEJS
+          cp /tmp/run.js ./_auto_run.js
+          node ./_auto_run.js
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          DATA_KEY: ${{ secrets.DATA_KEY }}
+          TRADE: ${{ steps.decide.outputs.trade }}
+          JOBS: ${{ steps.decide.outputs.jobs }}
