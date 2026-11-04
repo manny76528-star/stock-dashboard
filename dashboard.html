@@ -8435,7 +8435,7 @@ function runDailyProcess(force){
 
   // 2. DAY1/DAY2 交割自動連動
   (db.cashAccounts||[]).forEach(acc=>{
-    if(acc.d1&&acc.d1!==0&&acc.d1Date){
+    if(false&&acc.d1&&acc.d1!==0&&acc.d1Date){ // v29（2026/11/04）交割 DAY1/DAY2 自動處理已取消（使用者不用了）
       // 優先用已算好的 d1SettleDate，沒有才動態算
       const settleDate=acc.d1SettleDate||getSettleDate(acc.d1Date);
       if(settleDate<=todayStr){
@@ -8473,7 +8473,7 @@ function runDailyProcess(force){
   });
 
   // 3. B/C 帳戶每月1號自動累加
-  if(todayDay===1){
+  if(false&&todayDay===1){ // v29（2026/11/04）財務規劃 B/C 每月累加已取消（使用者不用了）
     const FP_BC_KEY='fp_bc_added_'+todayStr.slice(0,7);
     if(force||!localStorage.getItem(FP_BC_KEY)){
       if(!db.finPlan)db.finPlan={};
@@ -8502,7 +8502,9 @@ function runDailyProcess(force){
     const deductDay=parseInt(l.deductDay)||0;
     if(deductDay!==todayDay)return;
     const LOAN_KEY='loan_deducted_'+l.id+'_'+todayStr.slice(0,7);
-    if(!force&&localStorage.getItem(LOAN_KEY))return;
+    // v29：也看雲端的扣款紀錄（每天的雲端排程也會扣），避免同一個月扣兩次
+    if(!db._loanDeducted)db._loanDeducted={};const LK2=l.id+'_'+todayStr.slice(0,7);
+    if(!force&&(localStorage.getItem(LOAN_KEY)||db._loanDeducted[LK2])){localStorage.setItem(LOAN_KEY,'1');return;}
     const deductBankName=(l.deductBank||'').toLowerCase().trim();
     const acc=db.cashAccounts.find(c=>{
       if(!c.bank)return false;
@@ -8511,7 +8513,7 @@ function runDailyProcess(force){
     });
     if(acc){
       acc.cash=(acc.cash||0)-Math.round(l.monthly||0);
-      localStorage.setItem(LOAN_KEY,'1');
+      localStorage.setItem(LOAN_KEY,'1');db._loanDeducted[LK2]=true;
       msgs.push('🏦 信貸扣款 '+l.bank+' -$'+Math.round(l.monthly||0).toLocaleString());
       changed=true;
     } else {
@@ -18098,7 +18100,7 @@ function cashRunway(minDays){
     for(let k=0;k<=3;k++){const t=new Date(today+'T00:00:00Z');t.setUTCDate(1);t.setUTCMonth(t.getUTCMonth()+k);
       const y=t.getUTCFullYear(),m=t.getUTCMonth()+1;const ds=`${y}-${String(m).padStart(2,'0')}-${String(Math.min(dd,_b6Dim(y,m))).padStart(2,'0')}`;
       if(ds<today||ds>end)continue;
-      if(ds===today){try{if(localStorage.getItem('loan_deducted_'+l.id+'_'+ds.slice(0,7)))continue;}catch(e){}}
+      if(ds===today){try{if((localStorage.getItem('loan_deducted_'+l.id+'_'+ds.slice(0,7))||(db._loanDeducted||{})[l.id+'_'+ds.slice(0,7)]))continue;}catch(e){}}
       evs.push({date:ds,amt:-(l.monthly||0),kind:'loan',label:l.bank||'信貸',loan:l,acc:acc?.id});}
   });
   // 定期基金 → Line Bank
@@ -19505,7 +19507,7 @@ function v13Runway(days){
   _b6ActiveLoans().forEach(l=>{const dd=parseInt(l.deductDay)||0;if(!dd)return;const acc=_b6Acc(l.deductBank);
     for(let k=0;k<=4;k++){const t=new Date(today+'T00:00:00Z');t.setUTCDate(1);t.setUTCMonth(t.getUTCMonth()+k);
       const y=t.getUTCFullYear(),m=t.getUTCMonth()+1;const ds=`${y}-${String(m).padStart(2,'0')}-${String(Math.min(dd,_b6Dim(y,m))).padStart(2,'0')}`;
-      if(ds<today||ds>end)continue;if(ds===today){try{if(localStorage.getItem('loan_deducted_'+l.id+'_'+ds.slice(0,7)))continue;}catch(e){}}
+      if(ds<today||ds>end)continue;if(ds===today){try{if((localStorage.getItem('loan_deducted_'+l.id+'_'+ds.slice(0,7))||(db._loanDeducted||{})[l.id+'_'+ds.slice(0,7)]))continue;}catch(e){}}
       evs.push({date:ds,amt:-(l.monthly||0),kind:'loan',label:l.bank||'信貸',loan:l,acc:acc?.id});}});
   const funds=(db.settings?.fundDeductions||[]).filter(f=>f.enabled!==false), logs=db.fundDeductionLogs||[];
   for(let d=today;d<=end;d=_addDays(d,1)){const w=_dowOf(d);if(w<1||w>5)continue;
@@ -21072,6 +21074,9 @@ function v28Go(){const cur=v28List().find(x=>x.i.id===_v28.id);if(!cur)return;co
 (function(){const _r=_renderInvestL1Body;_renderInvestL1Body=function(){const r=_r.apply(this,arguments);try{
   const body=document.getElementById('invest-l1-body');if(body&&!body.querySelector('.v28-btn')){const b=[...body.querySelectorAll('button')].find(x=>/＋ 買入/.test(x.textContent)&&/openInvModal/.test(x.getAttribute('onclick')||''));
     if(b){const s=document.createElement('button');s.className='v28-btn';s.style.cssText=b.style.cssText;s.textContent='－ 賣出';s.onclick=e=>{e.stopPropagation();v28Open();};b.after(s);}}}catch(e){console.warn('v28',e);}return r;};})();
+
+// ══ v29（2026/11/04）信貸扣款紀錄雲端合併：兩邊誰扣過都算（避免重複扣）══
+(function(){const _m=mergeAppendOnly;mergeAppendOnly=function(t,o){const r=_m.apply(this,arguments);try{if(t&&o&&o._loanDeducted){t._loanDeducted={...(o._loanDeducted||{}),...(t._loanDeducted||{})};}}catch(e){}return r;};})();
 </script>
 
 </div><!-- /main-content -->
