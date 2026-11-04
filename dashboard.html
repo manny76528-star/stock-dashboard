@@ -20868,10 +20868,16 @@ function rsModalClose(){const b=document.getElementById('rs-bg');if(b)b.style.di
 function rsB64(u){let s='';for(let i=0;i<u.length;i+=0x8000)s+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return btoa(s);}
 function rsUnB64(b){const s=atob(String(b).replace(/\s/g,''));const u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return u;}
 async function rsPut(path,bytes){const ek=encGetKey();if(!ek)throw new Error('這台裝置沒有資料密碼，不能上傳');
-  const env=await encSeal(bytes,ek);const content=rsB64(new TextEncoder().encode(env));
-  let body={message:'research '+path,content};let res=await fetch(CF_WORKER+'/'+path,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-  if(res.status===422||res.status===409){const g=await fetch(CF_WORKER+'/'+path+'?t='+Date.now());if(g.ok){const j=await g.json();body.sha=j.sha;res=await fetch(CF_WORKER+'/'+path,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});}}
-  if(!res.ok)throw new Error('上傳失敗 '+res.status);}
+  const env=await encSeal(bytes,ek);const content=rsB64(new TextEncoder().encode(env));const body={message:'research '+path,content};let last='';
+  for(let k=0;k<6;k++){
+    if(k)await new Promise(r=>setTimeout(r,1200*k+Math.random()*800));
+    let res;try{res=await fetch(CF_WORKER+'/'+path,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});}catch(e){last='連線失敗';continue;}
+    if(res.ok)return;
+    last=String(res.status);
+    if(res.status===422){try{const g=await fetch(CF_WORKER+'/'+path+'?t='+Date.now());if(g.ok){const j=await g.json();if(j&&j.sha)body.sha=j.sha;}}catch(e){}continue;}
+    if(res.status===409||res.status===429||res.status>=500)continue;   // 同時有別的同步在寫 GitHub → 等一下再試
+    break;}
+  throw new Error('上傳失敗（'+last+'），可以按「重試失敗的」');}
 async function rsGet(path){const ek=encGetKey();if(!ek)throw new Error('這台裝置沒有資料密碼');const g=await fetch(CF_WORKER+'/'+path+'?t='+Date.now());if(!g.ok)throw new Error('讀取失敗 '+g.status);
   const j=await g.json();const env=JSON.parse(new TextDecoder().decode(rsUnB64(j.content)));return encOpen(env,ek);}
 async function rsUploadPdf(code,date,bytes,prog){const base=`research/${code}_${date.replace(/-/g,'')}_${Math.random().toString(36).slice(2,7)}`;const n=Math.max(1,Math.ceil(bytes.length/RS_PART));
@@ -20890,11 +20896,11 @@ async function rsShowImg(code,id,i){const R=(db.research[code].reports||[]).find
 // ── 匯入 ──
 async function rsAddReport(sum,pdfBytes,imgs,pages,prog){
   const S=rsParse(sum);if(!S.code)throw new Error('摘要裡沒有「代號」');if(!S.date)throw new Error('摘要裡沒有「報告日期」');
-  db.research=db.research||{};if(db.researchDel)delete db.researchDel[S.code];const r=db.research[S.code]=db.research[S.code]||{code:S.code,name:S.name,reports:[],alerts:[],drv:{},px:[],done:{}};r.name=S.name||r.name;
-  const old=(r.reports||[]).find(x=>x.date===S.date);
   const R={id:'rr'+uid(),date:S.date,title:S.title,price:S.price,sum,pages:pages||null,added:_twToday(),addedTs:Date.now()};
   if(pdfBytes){R.pdf=await rsUploadPdf(S.code,S.date,pdfBytes,prog);R.img=await rsUploadImgs(R.pdf.base,imgs,prog);}
   else if(imgs&&imgs.length){const base=`research/${S.code}_${S.date.replace(/-/g,'')}_${Math.random().toString(36).slice(2,7)}`;R.img=await rsUploadImgs(base,imgs,prog);}
+  db.research=db.research||{};if(db.researchDel)delete db.researchDel[S.code];const r=db.research[S.code]=db.research[S.code]||{code:S.code,name:S.name,reports:[],alerts:[],drv:{},px:[],done:{}};r.name=S.name||r.name;
+  const old=(r.reports||[]).find(x=>x.date===S.date);
   if(old)r.reports=r.reports.filter(x=>x!==old);r.reports.push(R);
   const newest=r.reports.slice().sort((a,b)=>b.date.localeCompare(a.date))[0];r.cur=newest.id;
   if(!r.alerts||!r.alerts.length){try{r.alerts=rsDefaultAlerts(rsCalc(r));}catch(e){r.alerts=[];}}
@@ -20905,12 +20911,18 @@ async function rsAddReport(sum,pdfBytes,imgs,pages,prog){
 function rsPickBundle(){const i=document.createElement('input');i.type='file';i.accept='.json,application/json';i.onchange=async()=>{const f=i.files[0];if(!f)return;
   let B;try{B=JSON.parse(await f.text());}catch(e){return toast('❌ 這不是研究報告包');}if(!B||!Array.isArray(B.items))return toast('❌ 這不是研究報告包');
   if(!encGetKey())return toast('❌ 這台裝置沒有資料密碼，PDF 不能加密上傳');
+  window._rsBundle=B;rsRunBundle(B.items.map((x,k)=>k));};i.click();}
+async function rsRunBundle(idx){const B=window._rsBundle;if(!B)return;
   rsModal(`<div class=rs-h>📦 匯入研究報告包（${B.items.length} 份）</div><div id=rs-prog style="margin-top:10px;font-size:13px;line-height:1.9"></div>`);
-  const P=document.getElementById('rs-prog');const lines=B.items.map(x=>{const S=rsParse(x.summary);return`${S.name} ${S.code}`;});
-  const paint=(i,msg)=>{P.innerHTML=lines.map((n,j)=>`<div>${j<i?'✅':j===i?'⏳':'⬜'} ${_ae(n)}${j===i&&msg?` <span class=rs-mu>${_ae(msg)}</span>`:''}</div>`).join('');};
-  let ok=0;for(let i=0;i<B.items.length;i++){const x=B.items[i];paint(i,'');try{await rsAddReport(x.summary,x.pdf?rsUnB64(x.pdf):null,x.imgs||[],x.pages,m=>paint(i,m));ok++;}catch(e){paint(i,'❌ '+e.message);await new Promise(r=>setTimeout(r,1500));}}
-  paint(B.items.length,'');P.innerHTML+=`<div style="margin-top:8px"><b>完成 ${ok}/${B.items.length} 份</b>，資料已加密存到雲端。</div><div style="text-align:right;margin-top:10px"><button class=rs-btn onclick="rsModalClose()">好</button></div>`;
-  rsRecordPx();rsRender();};i.click();}
+  const P=document.getElementById('rs-prog');const ST=B.items.map(x=>{const S=rsParse(x.summary);return{n:`${S.name} ${S.code}`,S,st:'wait',msg:''};});
+  const has=S=>{const r=(db.research||{})[S.code];return r&&(r.reports||[]).some(x=>x.date===S.date&&x.pdf);};
+  ST.forEach((s,k)=>{if(!idx.includes(k))s.st='skip';else if(has(s.S)){s.st='have';}});
+  const paint=()=>{P.innerHTML=ST.map(s=>`<div>${{ok:'✅',have:'✅',fail:'❌',run:'⏳',wait:'⬜',skip:'✅'}[s.st]} ${_ae(s.n)}${s.st==='have'?' <span class=rs-mu>已經有了，略過</span>':''}${s.msg?` <span class=rs-mu style="${s.st==='fail'?'color:#dc2626':''}">${_ae(s.msg)}</span>`:''}</div>`).join('');};
+  for(let k=0;k<ST.length;k++){const s=ST[k];if(s.st!=='wait')continue;s.st='run';paint();const x=B.items[k];
+    try{await rsAddReport(x.summary,x.pdf?rsUnB64(x.pdf):null,x.imgs||[],x.pages,m=>{s.msg=m;paint();});s.st='ok';s.msg='';}catch(e){s.st='fail';s.msg=e.message;}paint();}
+  const bad=ST.map((s,k)=>s.st==='fail'?k:-1).filter(k=>k>=0);const okN=ST.filter(s=>s.st==='ok'||s.st==='have').length;
+  P.innerHTML+=`<div style="margin-top:8px">${bad.length?`<b style="color:#dc2626">${bad.length} 份失敗</b>，其他 ${okN} 份已加密存到雲端。`:`<b>全部完成</b>（這次處理 ${okN} 份），資料已加密存到雲端。`}</div><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">${bad.length?`<button class="rs-btn" style="background:#d97706" onclick="rsRunBundle([${bad.join(',')}])">🔁 重試失敗的</button>`:''}<button class=rs-btn onclick="rsModalClose()">好</button></div>`;
+  rsRecordPx();rsRender();}
 // PDF：用 pdf.js 讀文字（第一次用才載入）
 async function rsPdfLib(){if(window.pdfjsLib)return window.pdfjsLib;await new Promise((ok,no)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';s.onload=ok;s.onerror=()=>no(new Error('PDF 工具載入失敗'));document.head.appendChild(s);});
   window.pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';return window.pdfjsLib;}
