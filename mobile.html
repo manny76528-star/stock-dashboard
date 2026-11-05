@@ -62,6 +62,16 @@ body.priv .pm{filter:blur(7px);color:#94a3b8!important;user-select:none}
 .fb-go{width:100%;margin-top:8px;padding:12px;border:none;border-radius:12px;background:#2563eb;color:#fff;font-size:15px;font-weight:800;font-family:inherit}.fb-go:disabled{background:#cbd5e1}
 #fb-toast{position:fixed;left:50%;bottom:calc(150px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);background:#0f172a;color:#fff;border-radius:12px;padding:10px 14px;font-size:13.5px;font-weight:700;opacity:0;transition:all .25s;z-index:3000;max-width:90vw;text-align:center}#fb-toast.on{opacity:1;transform:translateX(-50%)}
 </style>
+<style>
+/* P2 出資分配拉桿（2026/11/05） */
+#fb-split{background:#f8fafc;border-radius:12px;padding:10px 12px;margin-top:8px}
+#fb-split .h{display:flex;align-items:center;font-size:13px;font-weight:800;color:#475569}
+#fb-split .rs{margin-left:auto;font-size:12.5px;color:#64748b;font-weight:600}
+#fb-sl{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:3px;margin:16px 0 10px;outline:none;background:linear-gradient(90deg,#93c5fd var(--p,50%),#f9a8d4 var(--p,50%))}
+#fb-sl::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 1px 5px rgba(0,0,0,.35);border:0}
+#fb-sl::-moz-range-thumb{width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 1px 5px rgba(0,0,0,.35);border:0}
+#fb-split .am{display:flex;font-size:14px;font-weight:800}#fb-split .am span{cursor:pointer;border-bottom:1.5px dashed transparent}#fb-split .am span:active{border-bottom-color:currentColor}
+</style>
 </head>
 <body class="priv">
 <script>
@@ -339,6 +349,35 @@ function fbSrcGuess(){const r=(document.getElementById('fb-rm')?.value||'').trim
 (function(){const _a=_fbApply;_fbApply=function(db,o){_a.apply(this,arguments);if(!o.src)return;const acc=db.family.accounts[o.m];const l=acc.log.find(x=>x.code===o.code&&x.date===o.date&&x.shares===o.shares&&x.price===o.price&&!x.src);if(!l)return;l.src=o.src;
   for(const h of acc.holdings)for(const t of (h.transactions||[]))if(t.id===l.txnId)t.src=o.src;};})();
 (function(){const _s=fbSave;fbSave=async function(){if(!_fb.src)return;const _a=_fbApply,src=_fb.src;_fbApply=function(db,o){o.src=src;return _a.apply(this,arguments);};try{return await _s.apply(this,arguments);}finally{_fbApply=_a;}};})();
+
+// ══ P2（2026/11/05）琁 & 軒 這類兩人出資的帳戶：拉桿調出資比例（每格 5%），點金額可以打精確數字 ══
+//   沒動就照帳戶預設比例；存檔時把分配寫進那筆交易的 splits（電腦版的「各自出資累計」照這個算）
+function _fbSpl(){const acc=(_fbDB()?.accounts||{})[_fb.m]||{},S=acc.defaultSplits||[];if(S.length<2)return null;
+  const sh=parseFloat(document.getElementById('fb-sh')?.value)||0,pr=parseFloat(document.getElementById('fb-pr')?.value)||0,g=Math.round(sh*pr);
+  if(_fb.spA1!=null&&_fb.spG&&_fb.spG!==g){_fb.spPct=_fb.spA1/_fb.spG*100;_fb.spA1=null;}   // 填了精確金額後又改股數 → 改成照比例
+  const pct=_fb.spPct!=null?_fb.spPct:S[0].pct;let a1=_fb.spA1!=null?Math.max(0,Math.min(g,Math.round(_fb.spA1))):Math.round(g*pct/100);
+  return{S,g,a1,a2:g-a1,p1:g>0?a1/g*100:pct};}
+function fbSplitUpd(){const X=_fbSpl(),box=document.getElementById('fb-split');if(!X||!box)return;const sl=document.getElementById('fb-sl');
+  if(document.activeElement!==sl&&_fb.spA1!=null&&X.g>0)sl.value=Math.round(X.p1/5)*5;sl.style.setProperty('--p',(+sl.value)+'%');
+  const f=n=>'$'+n.toLocaleString();document.getElementById('fb-s1').textContent=`${X.S[0].name} ${Math.round(X.p1)}%　${X.g?f(X.a1):'—'}`;
+  document.getElementById('fb-s2').textContent=`${X.S[1].name} ${Math.round(100-X.p1)}%　${X.g?f(X.a2):'—'}`;
+  document.getElementById('fb-sr').textContent=(_fb.spPct==null&&_fb.spA1==null)?`預設 ${X.S[0].pct}/${X.S[1].pct}`:`回預設 ${X.S[0].pct}/${X.S[1].pct} ↺`;}
+function fbSplitSet(v){_fb.spPct=+v;_fb.spA1=null;fbSplitUpd();}
+function fbSplitReset(){_fb.spPct=null;_fb.spA1=null;const X=_fbSpl();if(X)document.getElementById('fb-sl').value=X.S[0].pct;fbSplitUpd();}
+function fbSplitAmt(k){const X=_fbSpl();if(!X||!X.g)return;const who=X.S[k].name;const v=prompt(`${who} 出多少錢？（這筆共 $${X.g.toLocaleString()}）`,k?X.a2:X.a1);if(v==null)return;
+  const n=parseFloat(String(v).replace(/[,$\s]/g,''));if(isNaN(n)||n<0||n>X.g){alert(`要介於 0 到 ${X.g.toLocaleString()}`);return;}_fb.spA1=k?X.g-n:n;_fb.spG=X.g;_fb.spPct=Math.round((_fb.spA1/X.g*100)/5)*5;fbSplitUpd();}
+(function(){const _c=fbCalc;fbCalc=function(){const r=_c.apply(this,arguments);try{const rc=document.getElementById('fb-rc');if(!rc)return r;const X=_fbSpl();
+    let box=document.getElementById('fb-split');if(!X){if(box)box.remove();return r;}
+    rc.querySelector('.fb-sp')?.remove();   // 原本只能看的分配條換成拉桿
+    if(!box){box=document.createElement('div');box.id='fb-split';const v=_fb.spPct!=null?_fb.spPct:X.S[0].pct;
+      box.innerHTML=`<div class="h">出資分配<span class="rs" id="fb-sr" onclick="fbSplitReset()"></span></div><input type="range" id="fb-sl" min="0" max="100" step="5" value="${v}" oninput="fbSplitSet(this.value)"><div class="am"><span id="fb-s1" style="color:#1d4ed8" onclick="fbSplitAmt(0)"></span><span id="fb-s2" style="margin-left:auto;color:#be185d" onclick="fbSplitAmt(1)"></span></div><div class="mu" style="margin-top:4px;font-size:12px">每格 5%；要精確金額點數字直接改</div>`;
+      rc.after(box);}
+    fbSplitUpd();}catch(e){console.warn('fb split',e);}return r;};})();
+// 存檔：照拉好的比例寫 splits（原本 _fbApply 只用預設比例）
+(function(){const _a=_fbApply;_fbApply=function(db,o){const r=_a.apply(this,arguments);try{if(o.splits){const acc=db.family.accounts[o.m];const h=acc.holdings.find(x=>x.code===o.code);
+    const t=h&&[...(h.transactions||[])].reverse().find(x=>x.type==='buy'&&x.date===o.date&&x.shares===o.shares&&x.price===o.price);if(t)t.splits=o.splits;}}catch(e){}return r;};})();
+(function(){const _s=fbSave;fbSave=async function(){const X=_fbSpl();if(!X||!X.g)return _s.apply(this,arguments);
+  const sp=[{name:X.S[0].name,amt:X.a1},{name:X.S[1].name,amt:X.a2}];const _a=_fbApply;_fbApply=function(db,o){o.splits=sp;return _a.apply(this,arguments);};try{return await _s.apply(this,arguments);}finally{_fbApply=_a;}};})();
 </script>
 </body>
 </html>
