@@ -815,6 +815,21 @@ body:not(.privacy) .privacy-mask{filter:none;}
 </style>
 <style id="v31-css">
 /* v31 */
+.v31-sh{display:flex;align-items:baseline;margin:10px 0 2px;font-size:13.5px}
+.v31-sr{display:flex;align-items:center;gap:7px;margin:6px 0}.v31-sr.ck{cursor:pointer;border-radius:8px}.v31-sr.ck:hover{background:#f8fafc}
+.v31-sd{width:50px;flex-shrink:0;font-size:11.5px;font-weight:800;color:#334155}.v31-sd.now{color:#2563eb}
+.v31-sb{flex:1;height:22px;background:#f1f5f9;border-radius:7px;min-width:0}.v31-sb>div{height:100%;border-radius:7px;display:flex;align-items:center;padding:0 7px;box-sizing:border-box;font-size:10.5px;font-weight:800;white-space:nowrap;overflow:hidden}
+.v31-sv{width:50px;text-align:right;font-size:12.5px;flex-shrink:0}
+.v31-top{display:flex;gap:10px;align-items:stretch}.v31-top .v16-light{flex-shrink:0}
+.v31-bc{flex:1;min-width:0;border-radius:16px;padding:12px 14px;background:linear-gradient(135deg,#e0f2fe,#dbeafe 55%,#ede9fe);border:1px solid #bfdbfe;position:relative;cursor:pointer;min-height:112px;box-sizing:border-box}
+.v31-bc:hover{box-shadow:0 6px 18px rgba(37,99,235,.15)}.v31-bn{font-size:13px;color:#1e3a8a}.v31-bs{margin-left:auto;font-size:11px;color:#1e40af}
+.v31-chip{width:28px;height:20px;border-radius:5px;background:linear-gradient(135deg,#fde68a,#f59e0b);margin:7px 0 3px}
+.v31-bb{font-size:26px;font-weight:900;color:#0f172a;line-height:1.15}.v31-bno{position:absolute;right:14px;bottom:10px;font-size:10.5px;color:#64748b;letter-spacing:1.5px}
+.v31-mcs{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.v31-mcs>.v31-mc{flex:1 1 120px}.v31-mcs>.v31-mc.add{flex:0 0 72px}
+.v31-mc{border-radius:12px;padding:8px 10px;border:1px solid;cursor:pointer}.v31-mc b{font-size:16px;font-weight:900}.v31-mn{font-size:11.5px;font-weight:800;margin-bottom:2px}
+.v31-mc.add{border:1.5px dashed #cbd5e1;background:#fff;color:#2563eb;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:13px}
+.v31-pd{margin-top:8px;border:1.5px dashed #fca5a5;border-radius:10px;padding:6px 10px;font-size:12.5px;display:flex;align-items:center;gap:8px;background:#fff}
+
 .v31-hit{position:absolute;inset:0;display:flex;padding:0 8px}.v31-hit>div{flex:1;cursor:pointer;border-radius:8px}.v31-hit>div:hover{background:rgba(37,99,235,.07)}
 .v31-mm{background:#fff;border-radius:18px;width:min(520px,100%);max-height:86vh;display:flex;flex-direction:column;box-shadow:0 30px 70px rgba(0,0,0,.3)}
 .v31-mr{display:flex;gap:10px;align-items:center;padding:7px 0;border-bottom:1px solid #f1f5f9;font-size:13.5px}
@@ -21265,7 +21280,7 @@ function _v31FundM(){const on=(db.settings?.fundDeductions||[]).filter(f=>f.enab
 function v31Flow(){
   const I=_b6Income(), inc=I.inc, fundM=_v31FundM(), out=I.loanM+I.flexM+fundM, net=inc-out;
   const loans=I.loans, ends=loans.map(l=>({l,e:_cfLoanEnd(l)})).filter(x=>x.e).sort((a,b)=>a.e.ym.localeCompare(b.e.ym));
-  let cur=out;const steps=ends.map(x=>{cur-=x.l.monthly||0;return{ym:x.e.ym,net:inc-Math.max(0,cur)};});
+  let cur=out;const steps=ends.map(x=>{cur-=x.l.monthly||0;return{ym:x.e.ym,net:inc-Math.max(0,cur),l:x.l};});
   const wan=v=>(v>=0?'+':'−')+(Math.abs(v)/10000).toFixed(1)+' 萬';
   const pw=v=>inc>0?Math.min(100,v/inc*100).toFixed(0):0;
   const ln=(ic,t,v,c,sub,click)=>v?`<div class="v31-fl"${click?` onclick="${click}"`:''} title="${sub}"><div class="v31-fr"><span class="v31-fn">${ic} ${t}</span><span class="v15-sub">${pw(v)}%</span><span class="v15-mono v31-fv">${Math.round(v).toLocaleString()}</span></div><div class="v31-fb"><i style="width:${pw(v)}%;background:${c}"></i></div></div>`:'';
@@ -21280,11 +21295,40 @@ function v31Flow(){
       <div class="v15-sub" style="margin-top:2px">條長＝占股息的比例</div></div>
     <div class="v15-ar">▼</div>
     <div class="v15-k" style="background:#eff6ff;border-color:#bfdbfe"><div class="t">💵 ${net>=0?'每月留下':'每月不足'}</div><div class="v" style="color:${net>=0?'#dc2626':'#16a34a'}">${net>=0?'+':'−'}${_b6m(net)}</div><div class="s">${net>=0?`一年約 +${_b6m(net*12)}・股息少 ${inc>0?Math.round((1-out/inc)*100):0}% 才會不夠`:'股息不夠付，要從現金補'}</div></div>
-    ${steps.length?`<div class="v15-ct" style="font-size:13px;margin-top:6px;text-align:left">📅 還清後每月多出</div><div class="v15-steps"><span class="v15-st">現在 ${wan(net)}</span>${steps.map((s,k)=>`<span class="v15-st${k===steps.length-1?' last':''}" onclick="v15Debt(true)">${s.ym} ${wan(s.net)}</span>`).join('')}</div>`:''}`;
+    ${steps.length?v31Steps(net,steps):''}`;
+}
+// v31b：還清後每月多出 A1（名稱在條裡、金額在右；點一列看還款卡）
+function v31Steps(net,steps){
+  const all=[{ym:'現在',net,l:null}].concat(steps), mx=Math.max(...all.map(x=>x.net),1), n=all.length;
+  const C=['#bfdbfe','#93c5fd','#60a5fa','#3b82f6'], wan=v=>(v<0?'−':'')+(Math.abs(v)/10000).toFixed(1)+' 萬';
+  const rows=all.map((x,k)=>{const last=k===n-1&&k>0, now=k===0;
+    const bg=now?'#e2e8f0':last?'#0891b2':C[Math.min(C.length-1,Math.floor((k-1)*C.length/Math.max(1,n-2)))];
+    const dark=last||bg==='#3b82f6';const w=58+42*Math.max(0,x.net)/mx;
+    const nm=now?'目前':_ae(String(x.l.bank||'信貸').replace(/^line\s*/i,''))+(last?' 🎉':'');
+    const click=x.l?` onclick="v19Show('${x.l.id}',event)" title="看 ${_ae(x.l.bank||'信貸')} 還款卡"`:'';
+    return`<div class="v31-sr${x.l?' ck':''}"${click}><span class="v15-mono v31-sd${now?' now':''}">${x.ym}</span><div class="v31-sb"><div style="width:${w}%;background:${bg};color:${now?'#64748b':dark?'#fff':'#1e3a8a'}">${nm}</div></div><b class="v15-mono v31-sv"${last?' style="color:#0891b2"':''}>${wan(x.net)}</b></div>`;}).join('');
+  return`<div class="v31-sh"><b>📅 還清後每月多出</b></div>${rows}<div class="v15-sub" style="margin-top:2px">條裡是那時還清的信貸・點一筆看還款卡</div>`;
 }
 (function(){const _o=v15Ov;v15Ov=function(){const h=_o.apply(this,arguments);try{
   const t=document.createElement('template');t.innerHTML=h;const m=t.content.querySelector('.v15-flow');if(m)m.innerHTML=v31Flow();return t.innerHTML;
 }catch(e){console.warn('v31 flow',e);return h;}};})();
+
+
+// v31b：現金帳戶 B1 金融卡樣式（包住 v16CashHead）
+function _v31AccSub(a){const n=String(a.bank||a.name||'');return /券|證/.test(n)?'交割':/期貨/.test(n)?'保證金':/複委託/.test(n)?'複委託':'活存';}
+const V31AC=[['#fef3c7','#fff7ed','#fde68a','#92400e'],['#dcfce7','#f0fdf4','#bbf7d0','#166534'],['#fce7f3','#fdf2f8','#fbcfe8','#9d174d'],['#e0e7ff','#eef2ff','#c7d2fe','#3730a3']];
+(function(){const _h=v16CashHead;v16CashHead=function(R){try{
+  const lbA=_b6Acc('Line Bank'), lb=_b6Bal(lbA), I=R.I, others=(db.cashAccounts||[]).filter(a=>a!==lbA), safe=R.safe;
+  const m=R.min?R.min.bal:lb, lv=m<0?['bad','🚨 不夠']:safe>0&&m<safe?['low','⚠️ 偏緊']:['ok','✓ 夠用'];
+  const card=`<div class="v31-bc" ${lbA?`onclick="editCash('${lbA.id}')"`:''} title="點一下編輯 Line Bank"><div style="display:flex;align-items:center"><b class="v31-bn">Line Bank・活存</b><span class="v31-bs">主要帳戶 ★</span></div>
+    <div class="v31-chip"></div><div class="v15-mono v31-bb">${_v15m(lb)}</div><div class="v15-mono v31-bno">•••• 扣款帳戶 ✏️</div></div>`;
+  const light=`<div class="v16-light ${lv[0]}" onclick="document.getElementById('v15-run')?.scrollIntoView({behavior:'smooth',block:'start'})"><div class="t">撐到下次股息</div><div class="v">${lv[1]}</div><div class="s">${R.min?`最低 ${_b6md(R.min.date)} ${R.min.bal<0?'−':''}${_b6m(R.min.bal)}`:''}</div></div>`;
+  const minis=others.map((a,i)=>{const c=V31AC[i%V31AC.length];return`<div class="v31-mc" style="background:linear-gradient(135deg,${c[0]},${c[1]});border-color:${c[2]}" onclick="editCash('${a.id}')"><div class="v31-mn" style="color:${c[3]}">${_ae(a.bank||a.name||'帳戶')}・${_v31AccSub(a)}</div><b class="v15-mono">${_v15m(_b6Bal(a))}</b></div>`;}).join('')
+    +`<div class="v31-mc add" onclick="openCashModal()">＋ 帳戶</div>`;
+  const nc=[...new Set((db.dividends||[]).filter(d=>d.date===I.nextDate).map(d=>d.code||d.stockCode||'').filter(Boolean))].join('・');
+  const pend=I.nextAmt?`<div class="v31-pd"><span>⏳ ${_b6md(I.nextDate)} 待入帳${nc?`（${_ae(nc)} 股息）`:''}</span><b class="v15-mono" style="color:#dc2626;margin-left:auto">+${_b6m(I.nextAmt)}</b></div>`:'';
+  return`<div class="v15-tot"><div class="v31-top">${card}${light}</div><div class="v31-mcs">${minis}</div>${pend}</div>`;
+}catch(e){console.warn('v31 cash',e);return _h.apply(this,arguments);}};})();
 
 </script>
 
