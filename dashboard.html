@@ -20402,7 +20402,7 @@ function v25QbRow(){const rm=document.getElementById('fqb-remark');if(!rm||docum
 //   peak / low 可手動覆蓋（序列只有日誌日＋週五快照，不是每天）
 //   V2 大盤＋心情表情　V4 每次跌多久／多久回來　V1 展開卡片（七段＋當時的你）
 // ══════════════════════════════════════════════════════════════
-const V26SEC=[['env','🌍','時空環境','#0ea5e9'],['mood','😱','當下氛圍','#dc2626'],['talk','🏦','當下說法','#7c3aed'],['fix','🔥','怎麼解、誰點火','#f59e0b'],['rec','📈','站回高點','#2563eb'],['hind','🔁','事後馬後炮','#94a3b8'],['self','🧠','給自己','#16a34a']];
+const V26SEC=[['env','🌍','時空環境','#0ea5e9'],['mood','😱','當下氛圍','#dc2626'],['talk','🏦','當下說法','#7c3aed'],['fix','🔥','怎麼解、誰點火','#f59e0b'],['rec','📈','站回高點','#2563eb'],['hind','🔁','事後馬後炮','#94a3b8'],['ind','🌡️','悲觀指標（低點當下）','#64748b'],['self','🧠','給自己','#16a34a']];
 const V26TAGS=['關稅','戰爭','Fed','通膨','外資提款','去槓桿','AI泡沫','地緣政治','財報','黑天鵝'];
 const V26TC=[['#fef3c7','#b45309'],['#eff6ff','#1d4ed8'],['#fff7ed','#c2410c'],['#f5f3ff','#6d28d9'],['#fef2f2','#b91c1c'],['#ecfeff','#0e7490'],['#fdf2f8','#be185d']];
 let _v26Sel=null,_v26Now=null;
@@ -20505,7 +20505,7 @@ function v26Render(){
   if(_v26Sel&&!L.some(d=>d.id===_v26Sel))_v26Sel=null;
   if(!_v26Sel&&L.length){const done=L.filter(d=>d.end);_v26Sel=(done[done.length-1]||L[L.length-1]).id;}
   const sel=L.find(d=>d.id===_v26Sel);
-  host.innerHTML=`<div class="v26-top"><span class="v26-mu" style="font-size:13px">把每次大跌記下來：當時怎麼了、你怎麼想、多久站回來。下次跌的時候回來看。</span><button class="v26-btn" style="margin-left:auto" onclick="v26Edit()">＋ 新增一次大跌</button></div>
+  host.innerHTML=`<div class="v26-top"><span class="v26-mu" style="font-size:13px">把每次大跌記下來：當時怎麼了、你怎麼想、多久站回來。下次跌的時候回來看。</span><button class="v26-btn ghost" style="margin-left:auto" onclick="v30Pick()">📦 匯入整理好的回測</button><button class="v26-btn" onclick="v26Edit()">＋ 新增一次大跌</button></div>${v30Notes()}
   ${L.length?`<div class="v26-wrap"><div>
    <div class="v26-box"><div class="v26-h">📈 大盤＋你的心情 <span class="v26-mu" style="font-weight:500">紅＝跌下去・藍＝收復・😱 恐慌／💪 信心的日誌（小點＝其他心情，點了看全文）</span></div>${v26Chart(L,S)}</div>
    <div class="v26-box"><div class="v26-h">⏱ 每次跌多久、多久回來 <span class="v26-mu" style="font-weight:500">點一列展開</span></div>${v26Gantt(L,S)}</div>
@@ -20532,7 +20532,7 @@ function v26Edit(id){
    <div class="g3"><div><div class="fl">高點點位</div><input id="v26-peak" class="in" inputmode="numeric" placeholder="自動" value="${v.peak||''}"></div><div><div class="fl">低點點位</div><input id="v26-low" class="in" inputmode="numeric" placeholder="自動" value="${v.low||''}"></div><div><div class="fl">低點日期</div><input id="v26-lowd" class="in" type="date" value="${v.lowDate||''}"></div></div></details>
    <div class="fl">主因標籤（可多選）</div><div id="v26-tags" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:4px">${allTags.map(t=>`<span class="v26-chip${(v.tags||[]).includes(t)?' on':''}" onclick="this.classList.toggle('on')">${_ae(t)}</span>`).join('')}<input id="v26-tnew" class="in" style="width:110px;padding:3px 8px;margin:0" placeholder="＋ 自己打" onkeydown="if(event.key==='Enter'){v26AddTag();event.preventDefault();}"></div>
    <div class="fl">七段內容（每段都選填，可以之後再補）</div>
-   <details style="margin:4px 0"><summary class="v26-mu" style="cursor:pointer">📋 整段貼上（像你 2025/11 那篇），照 🌍😱🏦🔥📈🔁🧠 自動分段</summary><textarea id="v26-paste" class="in" rows="4" placeholder="把整篇貼在這裡，按下面的按鈕"></textarea><button class="v26-btn ghost" onclick="v26Split()">✂️ 自動分段填入</button></details>
+   <details style="margin:4px 0"><summary class="v26-mu" style="cursor:pointer">📋 整段貼上（像你 2025/11 那篇），照 🌍😱🏦🔥📈🔁🌡️🧠 自動分段</summary><textarea id="v26-paste" class="in" rows="4" placeholder="把整篇貼在這裡，按下面的按鈕"></textarea><button class="v26-btn ghost" onclick="v26Split()">✂️ 自動分段填入</button></details>
    ${V26SEC.map(([k,ic,nm,col])=>`<div class="v26-fs" style="border-color:${col}"><b>${ic} ${nm}</b><textarea id="v26-s-${k}" class="in" rows="2" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'">${_ae((v.sec||{})[k]||'')}</textarea></div>`).join('')}
    <div style="display:flex;gap:8px;margin-top:14px;align-items:center">${d?`<button class="v26-btn ghost" style="color:#64748b" onclick="v26Del('${d.id}')">🗑 刪除</button>`:''}<span style="margin-left:auto"></span><button class="v26-btn ghost" onclick="v26Hide()">取消</button><button class="v26-btn" onclick="v26Save('${d?d.id:''}')">${d?'儲存':'儲存（其他之後再補）'}</button></div></div>`;
   bg.onclick=e=>{if(e.target===bg)v26Hide();};
@@ -20543,11 +20543,11 @@ function v26Hide(){const b=document.getElementById('v26-bg');if(b)b.style.displa
 function v26Hint(){const h=document.getElementById('v26-hint'),s=document.getElementById('v26-start')?.value;if(!h)return;if(!s){h.textContent='填高點那天，例如大盤創高後開始跌的那天';return;}
   const p=v26SuggestPeak(s);h.innerHTML=p?`系統看到附近最高點：${p.d.slice(5).replace('-','/')} ${v26Fmt(p.v)}${p.d!==s?` <a href="javascript:void 0" onclick="document.getElementById('v26-start').value='${p.d}';v26Hint()">改用這天</a>`:''}`:'附近沒有大盤資料，可以在下面自己填高點點位';}
 function v26AddTag(){const i=document.getElementById('v26-tnew');const t=(i.value||'').trim();if(!t)return;const w=document.getElementById('v26-tags');const c=document.createElement('span');c.className='v26-chip on';c.textContent=t;c.onclick=()=>c.classList.toggle('on');w.insertBefore(c,i);i.value='';}
-function v26Parse(txt){const M={'🌍':'env','🌏':'env','🌎':'env','😱':'mood','🏦':'talk','🔥':'fix','📈':'rec','🔁':'hind','🧠':'self'};const out={};let cur=null;
+function v26Parse(txt){const M={'🌍':'env','🌏':'env','🌎':'env','😱':'mood','🏦':'talk','🔥':'fix','📈':'rec','🔁':'hind','🌡️':'ind','🌡':'ind','🧠':'self'};const out={};let cur=null;
   String(txt||'').split('\n').forEach(line=>{const t=line.trim();const k=Object.keys(M).find(e=>t.startsWith(e));
     if(k){cur=M[k];let rest=t.slice(k.length).replace(/^️/,'').trim();
       // 標題那段（例如「時空環境」「當下氛圍」）拿掉，冒號後的留下
-      rest=rest.replace(/^(時空環境|當下氛圍|當下說法|怎麼解[^：:\n]*|誰點火|站回高點|事後馬後炮[？?]?[有沒]*|給自己)[：:\s]*/,'');
+      rest=rest.replace(/^(悲觀指標[^：:\n]*|華爾街當下|當下怎麼說|時空環境|當下氛圍|當下說法|怎麼解[^：:\n]*|誰點火|站回高點|事後馬後炮[？?]?[有沒]*|給自己)[：:\s]*/,'');
       out[cur]=out[cur]?out[cur]+'\n'+rest:rest;}
     else if(cur&&t)out[cur]+=(out[cur]?'\n':'')+t;});
   Object.keys(out).forEach(k=>out[k]=out[k].trim());return out;}
@@ -21077,6 +21077,30 @@ function v28Go(){const cur=v28List().find(x=>x.i.id===_v28.id);if(!cur)return;co
 
 // ══ v29（2026/11/04）信貸扣款紀錄雲端合併：兩邊誰扣過都算（避免重複扣）══
 (function(){const _m=mergeAppendOnly;mergeAppendOnly=function(t,o){const r=_m.apply(this,arguments);try{if(t&&o&&o._loanDeducted){t._loanDeducted={...(o._loanDeducted||{}),...(t._loanDeducted||{})};}}catch(e){}return r;};})();
+
+// ══════════════════════════════════════════════════════════════
+// 📦 v30（2026/11/07）大跌回測：一次匯入整理好的多次大跌（JSON），加「🌡️ 悲觀指標」段落、頁面上方「🧭 規律與我的規則」
+//   同一個開始日 → 更新那一筆（保留 id）；沒有 → 新增。規則存 db.ddNotes={purpose,rules}
+// ══════════════════════════════════════════════════════════════
+function v30Pick(){const i=document.createElement('input');i.type='file';i.accept='.json,application/json';i.onchange=async()=>{const f=i.files[0];if(!f)return;
+  let B;try{B=JSON.parse(await f.text());}catch(e){return toast('❌ 這不是大跌回測的匯入檔');}if(!B||!Array.isArray(B.items))return toast('❌ 這不是大跌回測的匯入檔');
+  db.drawdowns=db.drawdowns||[];let add=0,upd=0;
+  B.items.forEach(x=>{if(!x||!x.start)return;const o=db.drawdowns.find(d=>!d.del&&d.start===x.start);
+    const v={title:x.title||x.start.slice(0,7).replace('-','/'),start:x.start,end:x.end||'',tags:x.tags||[],sec:x.sec||{},peak:x.peak||null,low:x.low||null,lowDate:x.lowDate||'',upd:Date.now()};
+    if(o){Object.assign(o,v);upd++;}else{db.drawdowns.push({id:'dd'+uid(),...v});add++;}});
+  if(B.notes&&(B.notes.rules||B.notes.purpose))db.ddNotes={...(db.ddNotes||{}),...B.notes,upd:Date.now()};
+  save();_v26Sel=null;v26Render();toast(`✓ 匯入完成：新增 ${add} 次、更新 ${upd} 次`);};i.click();}
+function v30Notes(){const N=db.ddNotes;if(!N||!(N.rules||N.purpose))return'';
+  return`<details class="v26-box" style="padding:10px 16px" ${(()=>{try{return localStorage.getItem('v30_notes_open')==='1'?'open':'';}catch(e){return'';}})()} ontoggle="try{localStorage.setItem('v30_notes_open',this.open?'1':'0')}catch(e){}">
+   <summary style="cursor:pointer;font-weight:900;font-size:14.5px">🧭 我的規律與規則 <span class="v26-mu" style="font-weight:500">大跌時先看這裡${N.purpose?'・'+_ae(N.purpose.split('\n')[0]):''}</span></summary>
+   <div id="v30-nv" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:10px">${v30NoteCols(N.rules||'')}</div>
+   <div style="text-align:right;margin-top:6px"><a class="v26-mu" style="cursor:pointer" onclick="v30EditNotes()">✏️ 修改</a></div></details>`;}
+function v30NoteCols(t){const parts=[];let cur=null;String(t).split('\n').forEach(l=>{const s=l.replace(/^\s+/,'');if(!s)return;
+    if(!/^[　\s]/.test(l)&&!/^\d+\./.test(s)){cur={h:s,b:[]};parts.push(cur);}else{if(!cur){cur={h:'',b:[]};parts.push(cur);}cur.b.push(s);}});
+  const col={'點火規律':'#f59e0b','投行規律':'#7c3aed','指標規律':'#0ea5e9','我的規則':'#16a34a'};
+  return parts.map(p=>`<div style="border-left:3px solid ${col[p.h]||'#94a3b8'};padding:2px 0 2px 10px;${p.h==='我的規則'?'background:#f0fdf4;border-radius:0 8px 8px 0':''}"><b style="font-size:13px">${_ae(p.h)}</b><div style="font-size:12.5px;color:#334155;line-height:1.7;white-space:pre-line">${_ae(p.b.join('\n'))}</div></div>`).join('');}
+function v30EditNotes(){const N=db.ddNotes||{};const box=document.getElementById('v30-nv');if(!box)return;
+  box.style.display='block';box.innerHTML=`<textarea id="v30-ta" style="width:100%;box-sizing:border-box;min-height:360px;border:1.5px solid #e2e8f0;border-radius:9px;padding:8px 10px;font-size:12.5px;line-height:1.6;font-family:inherit">${_ae(N.rules||'')}</textarea><div style="text-align:right;margin-top:6px"><button class="v26-btn ghost" onclick="v26Render()">取消</button> <button class="v26-btn" onclick="db.ddNotes={...(db.ddNotes||{}),rules:document.getElementById('v30-ta').value,upd:Date.now()};save();v26Render();toast('✓ 已儲存')">儲存</button></div>`;}
 </script>
 
 </div><!-- /main-content -->
