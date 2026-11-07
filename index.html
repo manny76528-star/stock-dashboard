@@ -50,9 +50,9 @@ h1{font-size:34px;font-weight:900;letter-spacing:.5px}
   .key{display:none}.kb{display:none}
 }
 /* ══ H1-D（2026/10/26）：左邊資產損益表，右邊三列；每個系統一個淡色主題 ══ */
-.th-inv{--c:#2563eb;--bg:#eff6ff;--bd:#bfdbfe}.th-erp{--c:#d97706;--bg:#fffbeb;--bd:#fde68a}.th-voc{--c:#db2777;--bg:#fdf2f8;--bd:#fbcfe8}.th-glv{--c:#92400e;--bg:#fdf6ec;--bd:#f3d9b1}
+.th-inv{--c:#2563eb;--bg:#eff6ff;--bd:#bfdbfe}.th-erp{--c:#d97706;--bg:#fffbeb;--bd:#fde68a}.th-voc{--c:#db2777;--bg:#fdf2f8;--bd:#fbcfe8}.th-glv{--c:#92400e;--bg:#fdf6ec;--bd:#f3d9b1}.th-fit{--c:#0891b2;--bg:#ecfeff;--bd:#a5f3fc}.th-fit.has .art{opacity:0}
 .grid{display:grid;grid-template-columns:1.1fr 1.4fr;grid-template-rows:none;gap:18px;margin-top:26px}
-.rcol{display:grid;grid-template-rows:repeat(3,1fr);gap:14px}
+.rcol{display:grid;grid-template-rows:repeat(4,1fr);gap:14px}
 .c{background:var(--bg)!important;border:1px solid var(--bd)!important;color:#0f172a!important;border-radius:22px;padding:20px}
 .c:hover{border-color:var(--c)!important;box-shadow:0 14px 34px rgba(15,23,42,.10)}
 .c.big{grid-row:auto;min-height:420px;padding-bottom:110px}
@@ -150,11 +150,16 @@ body.locked .lock,body.locked .foot{visibility:hidden}
         <div class="nm"><div class="t">手套收藏</div><div class="d">型號・買賣・評比・圖片</div><span class="key">4</span></div>
         <div class="st" id="live-glove"></div>
         <div class="art"><svg width="100" height="48" viewBox="0 0 150 70"><text x="75" y="55" text-anchor="middle" font-size="52">🧤</text></svg></div>
+      <a href="fitness.html" class="c side th-fit" id="card-5">
+        <div class="ico"><span>🏋️</span><i class="dot" id="dot-fit"></i></div>
+        <div class="nm"><div class="t">健身紀錄</div><div class="d">重訓・有氧・InBody 趨勢</div><span class="key">5</span></div>
+        <div class="st" id="live-fit"></div>
+        <div class="art"><svg width="100" height="48" viewBox="0 0 150 70"><g fill="#a5f3fc" stroke="#0891b2" stroke-width="2"><rect x="18" y="22" width="12" height="28" rx="3"/><rect x="120" y="22" width="12" height="28" rx="3"/><rect x="32" y="14" width="12" height="44" rx="3"/><rect x="106" y="14" width="12" height="44" rx="3"/></g><rect x="44" y="32" width="62" height="8" rx="4" fill="#0891b2"/></svg></div>
         <div class="go">→</div>
       </a>
     </div>
   </div>
-  <div class="foot"><span class="kb">⌨️ 按 1～4 直接進入</span><span>⏱ 閒置 3 分鐘自動上鎖</span><span>v2.0 · 2026</span></div>
+  <div class="foot"><span class="kb">⌨️ 按 1～5 直接進入</span><span>⏱ 閒置 3 分鐘自動上鎖</span><span>v2.0 · 2026</span></div>
 </div>
 
 <!-- ══ 登入：主目錄模糊＋數字鍵盤（電腦置中卡片、手機下方滑出）══ -->
@@ -246,7 +251,7 @@ body.locked .lock,body.locked .foot{visibility:hidden}
   document.querySelectorAll('.pk').forEach(b=>b.addEventListener('mouseup',()=>{if(!matchMedia('(max-width:760px)').matches)setTimeout(()=>inp.focus(),0);}));
   window.togglePwEye=function(btn){inp.type=inp.type==='password'?'text':'password';btn.textContent=inp.type==='password'?'👁':'🙈';inp.focus();};
   window.lockNow=function(){clearTimeout(timer);showLogin();};
-  // 按 1～4 直接進入
+  // 按 1～5 直接進入
   document.addEventListener('keydown',e=>{
     if(ls.style.display!=='none')return;
     const t=e.target;if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'))return;
@@ -334,6 +339,18 @@ function renderHome(){
   const g=readLS('glove_vault_v1'), gb=document.getElementById('live-glove');
   if(g&&(g.gloves||[]).length){gb.innerHTML=`<span class="pill" style="background:#fef3c7;color:#b45309">🧤 收藏 ${g.gloves.length} 個</span>`;}
   else gb.innerHTML='';
+  // ── 健身 ──
+  try{const f=readLS('fitness_db_v1'), fb=document.getElementById('live-fit');
+    const ok=s=>(s.items||[]).some(it=>(it.sets||[]).some(x=>+x.r))||(s.cardio||[]).some(c=>+c.min);
+    const L=f?(f.sessions||[]).filter(ok).sort((a,b)=>(a.date+(a.start||'')).localeCompare(b.date+(b.start||''))):[];
+    if(L.length){const d=new Date(T+'T00:00:00Z'),mon=new Date(d);mon.setUTCDate(d.getUTCDate()-((d.getUTCDay()+6)%7));const M=mon.toISOString().slice(0,10);
+      const wk=L.filter(s=>s.date>=M&&s.date<=T).length, last=L[L.length-1];
+      const GN={chest:'胸',back:'背',legs:'腿',shoulder:'肩',bi:'二頭',tri:'三頭'},ORD=['chest','back','legs','shoulder','bi','tri'];
+      const g=new Set();(last.items||[]).forEach(it=>{const e=(f.ex||{})[it.ex];if(e&&(it.sets||[]).some(x=>+x.r))g.add(e.g);});
+      let t=ORD.filter(k=>g.has(k)).map(k=>GN[k]).join('＋');if((last.cardio||[]).some(c=>+c.min))t=t?t+'＋有氧':'有氧';
+      document.getElementById('card-5').classList.add('has');
+      fb.innerHTML=`<div class="pills"><span class="pill" style="background:#cffafe;color:#0e7490">本週 ${wk} 次</span><span class="pill p-gray">上次 ${md(last.date)} ${t}</span></div>`;}
+    else fb.innerHTML='<div class="pills"><span class="pill p-gray">打開一次後會顯示本週次數</span></div>';}catch(e){}
 }
 
 // 現金跑道（簡化版，跟資產頁同一套規則）
