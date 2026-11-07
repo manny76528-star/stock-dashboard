@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-<!-- fitness build 2026-11-08c -->
+<!-- fitness build 2026-11-08d -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -137,13 +137,24 @@ tr.sr{cursor:pointer}tr.sr:hover td{background:#f8fafc}td.num{text-align:right;f
 .cal2{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}.cal2 .wh{text-align:center;font-size:12px;color:var(--mu);font-weight:700}
 .cd2{border:1px solid var(--line);border-radius:10px;min-height:74px;display:flex;flex-direction:column;overflow:hidden;background:#fff}.cd2.has{cursor:pointer}.cd2.has:hover{box-shadow:0 4px 14px rgba(15,23,42,.1)}
 .cd2.td{border:2px solid var(--ac)}.cd2 .dn{font-size:12px;font-weight:800;padding:3px 6px;font-family:var(--mono)}
-.gb2{flex:1;display:flex;flex-direction:column;gap:2px;padding:0 4px 4px}.gb2 span{flex:1;border-radius:5px;color:#fff;font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center;min-height:17px}
+
 .calsum{margin-top:10px;font-size:13px}
 .tabs.sm{padding:3px}.tabs.sm span{padding:5px 12px;font-size:13px}
 .gch{display:flex;gap:6px;margin:-2px 0 10px}.gch span{border:1.5px solid var(--c,#cbd5e1);color:var(--c,#334155);border-radius:99px;padding:3px 12px;font-size:12.5px;font-weight:800;cursor:pointer}.gch span.on{background:var(--c,#0f172a);color:#fff;border-color:var(--c,#0f172a)}
 .acc{border:1px solid var(--line);border-radius:14px;margin-bottom:8px;overflow:hidden}.ah{display:flex;align-items:center;gap:10px;padding:11px 14px;cursor:pointer;font-size:14.5px}.ah:hover{background:#f8fafc}.ah i{width:11px;height:11px;border-radius:50%}
 .pt th{background:#fafbfd}.pt tr.sr.on td{background:#eff6ff}
 .ibin{border:1.5px solid var(--ac);border-radius:8px;padding:5px 8px;font-family:var(--mono);font-size:13.5px;width:90px;text-align:right}
+.gb2{display:flex;flex-direction:column;gap:3px;padding:0 5px 6px}.ev{border-left:3px solid;border-radius:5px;padding:3px 6px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:clip;letter-spacing:-.2px}.ev i{font-style:normal;color:#94a3b8;font-weight:500;margin:0 1px}
+.ev.car{background:#ffedd5;border-left-color:#f97316;color:#c2410c;font-size:11.5px;font-weight:800}
+.cd2{min-height:84px!important}
+.dc{display:flex;gap:12px;margin-bottom:9px;cursor:pointer}.dd{width:64px;flex-shrink:0;text-align:center;border-radius:12px;padding:8px 0;display:flex;flex-direction:column;justify-content:center}
+.db{flex:1;min-width:0;border:1px solid var(--line);border-radius:12px;padding:6px 12px;background:#fff}.dc:hover .db{border-color:#cbd5e1;box-shadow:0 4px 14px rgba(15,23,42,.06)}
+.dl{display:flex;align-items:center;gap:10px;padding:5px 0;font-size:13px}.dl.sep{border-top:1px dashed #e2e8f0}
+.dtag{font-weight:900;white-space:nowrap}.dtag i{font-style:normal;color:#94a3b8;font-weight:500;margin:0 3px}.dtx{flex:1;min-width:0;color:#475569;font-size:12.5px}.dsum{white-space:nowrap;font-size:12.5px}.dact{white-space:nowrap;opacity:.55}.dc:hover .dact{opacity:1}
+.dx{background:#fafbfd;border-radius:9px;padding:8px 12px;margin:2px 0 6px;font-size:12.5px;line-height:1.9}
+.ibr{display:flex;gap:12px;margin-bottom:9px}.ibd{width:66px;flex-shrink:0;text-align:center;border-radius:12px;background:#f1f5f9;padding:8px 0;display:flex;flex-direction:column;justify-content:center}
+.ibc{flex:1;border:1px solid var(--line);border-radius:12px;padding:8px 14px;display:grid;grid-template-columns:repeat(4,1fr) 120px;align-items:center;gap:8px}.ibr.ed .ibc{grid-template-columns:150px repeat(4,1fr) 140px;border-color:var(--ac);background:#f8fbff}
+.iba{text-align:right;white-space:nowrap}
 #emb{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:100;display:none;align-items:center;justify-content:center}#emb iframe{width:430px;height:min(860px,94vh);border:none;border-radius:24px;background:#f1f5f9;box-shadow:0 30px 70px rgba(0,0,0,.35)}
 .prl div{display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px dashed #f1f5f9;font-size:13px}
 .mgr{display:flex;align-items:center;gap:8px;padding:7px 2px;border-bottom:1px solid #f1f5f9;font-size:13.5px}.mgr.off{opacity:.45}
@@ -326,11 +337,11 @@ function vOv(){
      <svg width="128" height="128" viewBox="0 0 36 36" style="cursor:pointer;flex-shrink:0" onclick="setGoal()"><title>點一下改目標</title><circle cx="18" cy="18" r="15.5" fill="none" stroke="#e2e8f0" stroke-width="4"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="${pct>=1?'#0891b2':'#2563eb'}" stroke-width="4" stroke-dasharray="${C*pct} ${C}" transform="rotate(-90 18 18)" stroke-linecap="round"/><text x="18" y="18" text-anchor="middle" font-size="9" font-weight="900" font-family="JetBrains Mono,monospace">${A.cnt}/${goal}</text><text x="18" y="24.5" text-anchor="middle" font-size="3.6" fill="#64748b">本週次數</text></svg>
      <div style="font-size:14px;line-height:1.95"><b style="font-size:17px">本週 ${A.cnt} 次</b> <span class=mu>（目標 ${goal}，點圓圈可改）</span><br>${A.sets} 組・${fmt(A.vol)} kg${A.min?`・🏃 ${A.min} 分`:''}<br>${dc>0?`<span class=up>比上週多 ${dc} 次 ▲</span>`:dc<0?`<span class=dn>比上週少 ${-dc} 次</span>`:'<span class=dn>跟上週一樣</span>'}${PRw.length?`　<span style="color:#0891b2;font-weight:800">🏆 新紀錄 ${PRw.length} 項</span>`:''}</div></div>
     <div class="o1h">各部位多久沒練</div><div class="o1g">${tiles}</div>
-    <div class="o1h">最近三次</div>${rec.map(s=>{const S=sessStats(s),pr=prsIn(s.date,s.date).filter(p=>db.sessions.find(z=>z.date===s.date));return`<div class="o1r" onclick="OPENROW='${s.id}';TAB='log';REF='${s.date}';PER='w';render()"><span class=mono style="width:62px"><b>${md(s.date)}</b> <span class=mu>${WK[dow(s.date)]}</span></span><b>${esc(sessTitle(s))}</b><span class=mu style="margin-left:auto">${S.sets?S.sets+' 組':''}${S.min?`${S.sets?'・':''}🏃 ${S.min} 分`:''}</span></div>`;}).join('')||'<div class=mu>還沒有紀錄</div>'}
+    <div class="o1h">最近三次</div>${recDays().map(([d,g,st,mn])=>`<div class="o1r" onclick="OPENROW='${d}';TAB='log';LOGG='all';REF='${d}';PER='w';render()"><span class=mono style="width:62px"><b>${md(d)}</b> <span class=mu>${WK[dow(d)]}</span></span><b>${g.length?g.map(k=>`<span style="color:${GC[k]}">${GN[k]}</span>`).join('<span style="color:#cbd5e1"> / </span>'):''}${mn?`${g.length?' <span style="color:#cbd5e1">＋</span> ':''}<span style="color:#ea580c">有氧</span>`:''}</b><span class=mu style="margin-left:auto">${st?st+' 組':''}${mn?`${st?'・':''}🏃 ${mn} 分`:''}</span></div>`).join('')||'<div class=mu>還沒有紀錄</div>'}
     ${ib?`<div class="o1h">最新 InBody <span class=mu style="font-weight:500">${md(ib.date)}</span></div><div style="font-size:13px" class=mono>⚖️ ${ib.wt||'—'} kg・💪 ${ib.mm||'—'} kg・體脂 ${ib.fat||'—'}%・代謝 ${ib.bmr||'—'}</div>`:''}</div>
    <div class="card" style="margin:0">${calHtml()}</div></div>
   <div class="card" style="margin-top:16px">${trendHead()}<div style="height:320px;position:relative"><canvas id="tr"></canvas></div></div>
-  <div class="card"><div class="ct">📒 最近的訓練<span class=mu>點一列展開</span><button class="lk" style="margin-left:auto" onclick="TAB='log';render()">看全部 ›</button></div>${logTable(db.sessions.filter(s=>s.date>=addDays(T,-13)))}</div>`;
+  <div class="card"><div class="ct">📒 最近的訓練<span class=mu>點一張展開每組明細</span><button class="lk" style="margin-left:auto" onclick="TAB='log';render()">看全部 ›</button></div>${dayCards(db.sessions.filter(s=>s.date>=addDays(T,-13)))}</div>`;
   if(O1M==='car')document.querySelector('.ovg>.card').innerHTML=o1Car();
   drawT3();
 }
@@ -350,16 +361,18 @@ function o1Car(){
    <div class="o1h">最近三次有氧</div>${L.map(c=>`<div class="o1r" style="cursor:default"><span class=mono style="width:62px"><b>${md(c.date)}</b> <span class=mu>${WK[dow(c.date)]}</span></span><b>${esc(c.type)}</b><span class="mono mu" style="margin-left:auto">${c.min||'—'} 分・${c.km||'—'} km・${c.kcal||'—'} 卡</span></div>`).join('')||'<div class=mu>還沒有有氧紀錄</div>'}`;
 }
 function setCGoal(){const v=prompt('每週有氧目標（分鐘）',(db.cfg&&db.cfg.cgoal)||150);if(v&&+v>0){db.cfg=touch({...(db.cfg||{}),cgoal:+v});save();render();}}
+function recDays(){const by={};db.sessions.forEach(s=>{const S=sessStats(s);if(!S.sets&&!S.min)return;const o=by[s.date]=by[s.date]||{g:new Set(),st:0,mn:0};sessGroups(s).forEach(g=>o.g.add(g));o.st+=S.sets;o.mn+=S.min;});
+  return Object.keys(by).sort().reverse().slice(0,3).map(d=>[d,GROUPS.map(g=>g[0]).filter(k=>by[d].g.has(k)),by[d].st,by[d].mn]);}
 function setGoal(){const v=prompt('每週目標次數',(db.cfg&&db.cfg.goal)||4);if(v&&+v>0){db.cfg=touch({...(db.cfg||{}),goal:+v});save();render();}}
 // ── C2 月曆 ──
 let CALM=today().slice(0,7);
 function calHtml(){
   const a=CALM+'-01',d0=(dow(a)+6)%7,y=+CALM.slice(0,4),m=+CALM.slice(5,7),n=new Date(Date.UTC(y,m,0)).getUTCDate(),T=today();
-  const byDay={};db.sessions.forEach(s=>{if(!s.date.startsWith(CALM))return;const o=byDay[s.date]=byDay[s.date]||{g:new Set(),c:0,ids:[]};sessGroups(s).forEach(g=>o.g.add(g));o.c+=(s.cardio||[]).filter(c=>+c.min||+c.km).length;o.ids.push(s.id);});
+  const byDay={};db.sessions.forEach(s=>{if(!s.date.startsWith(CALM))return;const o=byDay[s.date]=byDay[s.date]||{g:new Set(),c:0,cl:[],ids:[]};sessGroups(s).forEach(g=>o.g.add(g));const cs=(s.cardio||[]).filter(c=>+c.min||+c.km||+c.kcal);o.c+=cs.length;o.cl.push(...cs);o.ids.push(s.id);});
   const cnt={},cd=Object.values(byDay).filter(o=>o.c).length,td=Object.values(byDay).filter(o=>o.g.size).length;GROUPS.forEach(g=>cnt[g[0]]=Object.values(byDay).filter(o=>o.g.has(g[0])).length);
   let h='';for(let i=0;i<d0;i++)h+='<div></div>';
   for(let dd=1;dd<=n;dd++){const s=CALM+'-'+String(dd).padStart(2,'0'),o=byDay[s],gs=o?GROUPS.filter(g=>o.g.has(g[0])):[];
-    h+=`<div class="cd2${s===T?' td':''}${o?' has':''}"${o?` onclick="OPENROW='${o.ids[o.ids.length-1]}';TAB='log';REF='${s}';PER='w';render()"`:''}><div class="dn">${dd}${o&&o.c?` <span title="有氧 ${o.c} 次">🏃${o.c>1?'×'+o.c:''}</span>`:''}</div><div class="gb2">${gs.map(g=>`<span style="background:${g[2]}">${g[1]}</span>`).join('')}</div></div>`;}
+    h+=`<div class="cd2${s===T?' td':''}${o?' has':''}"${o?` onclick="OPENROW='${s}';TAB='log';LOGG='all';REF='${s}';PER='w';render()"`:''}><div class="dn">${dd}</div><div class="gb2">${gs.length?`<div class="ev" style="background:${gs[0][2]}14;border-left-color:${gs[0][2]};font-size:${gs.length>2?10.5:gs.length>1?11.5:12}px">${gs.map(g=>`<span style="color:${g[2]}">${g[1]}</span>`).join('<i>/</i>')}</div>`:''}${o?o.cl.map(c=>`<div class="ev car">🏃 ${esc(c.type)} ${c.min?c.min+'′':c.km?c.km+'km':''}</div>`).join(''):''}</div></div>`;}
   const prev=(()=>{const t=new Date(Date.UTC(y,m-2,1));return t.toISOString().slice(0,7);})(),next=(()=>{const t=new Date(Date.UTC(y,m,1));return t.toISOString().slice(0,7);})();
   return`<div class="ct">🗓️ 各部位訓練月曆<span class=mu>點有練的那天看明細</span><span style="margin-left:auto;display:flex;align-items:center;gap:6px"><button class="nav" onclick="CALM='${prev}';render()">‹</button><b class=mono style="font-size:15px;min-width:86px;text-align:center">${y}/${String(m).padStart(2,'0')}</b><button class="nav" onclick="CALM='${next}';render()">›</button>${CALM!==T.slice(0,7)?`<button class="tb" onclick="CALM=today().slice(0,7);render()">本月</button>`:''}</span></div>
    <div class="cal2">${'一二三四五六日'.split('').map(x=>`<div class="wh">${x}</div>`).join('')}${h}</div>
@@ -428,7 +441,27 @@ function vLog(){const[a,b]=range(PER,REF);const A=agg(a,b);
   if(one){const L=A.list.filter(s=>sessGroups(s).includes(one));const v=A.byG[one]||{sets:0,vol:0};sum=`只看有練${GN[one]}的 ${L.length} 次・${GN[one]} ${v.sets} 組・${GN[one]}訓練量 ${fmt(v.vol)} kg`;}
   if(car){const L=A.list.filter(s=>(s.cardio||[]).some(c=>+c.min||+c.km));const n=L.reduce((t,s)=>t+(s.cardio||[]).filter(c=>+c.min||+c.km).length,0);sum=`有氧 ${n} 次・${fmt(A.min)} 分・${fmt(A.km,1)} km・${fmt(A.kcal)} 大卡`;}
   $('app').innerHTML=`<div class="per"><div class="tabs">${[['w','週'],['m','月'],['y','年']].map(p=>`<span class="${PER===p[0]?'on':''}" onclick="PER='${p[0]}';render()">${p[1]}</span>`).join('')}</div><button class="nav" onclick="REF=shift(PER,REF,-1);render()">‹</button><b style="font-size:16px;min-width:150px;text-align:center" class=mono>${perLabel(PER,REF)}</b><button class="nav" onclick="REF=shift(PER,REF,1);render()">›</button>${REF!==today()?`<button class="tb" onclick="REF=today();render()">回到現在</button>`:''}</div>
-   <div class="card"><div class="gch"><span class="${LOGG==='all'?'on':''}" onclick="LOGG='all';render()">全部</span>${GROUPS.map(g=>`<span class="${LOGG===g[0]?'on':''}" style="--c:${g[2]}" onclick="LOGG=LOGG==='${g[0]}'?'all':'${g[0]}';render()">${g[1]}</span>`).join('')}<span class="${car?'on':''}" style="--c:#f97316" onclick="LOGG=LOGG==='car'?'all':'car';render()">🏃 有氧</span><span class=mu style="margin-left:10px;align-self:center">${sum}</span></div>${logTable(A.list,LOGG)}</div>`;}
+   <div class="card"><div class="gch"><span class="${LOGG==='all'?'on':''}" onclick="LOGG='all';render()">全部</span>${GROUPS.map(g=>`<span class="${LOGG===g[0]?'on':''}" style="--c:${g[2]}" onclick="LOGG=LOGG==='${g[0]}'?'all':'${g[0]}';render()">${g[1]}</span>`).join('')}<span class="${car?'on':''}" style="--c:#f97316" onclick="LOGG=LOGG==='car'?'all':'car';render()">🏃 有氧</span><span class=mu style="margin-left:10px;align-self:center">${sum}</span></div>${dayCards(A.list,LOGG)}</div>`;}
+
+// ── R2：一天一張卡（同一天的重訓＋有氧合在一起）──
+function dayCards(L,fg){
+  fg=fg||'all';const one=GN[fg]?fg:null,car=fg==='car';
+  const by={};L.forEach(s=>{(by[s.date]=by[s.date]||[]).push(s);});
+  let days=Object.keys(by).sort().reverse();
+  const rows=days.map(d=>{const ss=by[d].sort((a,b)=>(a.start||'').localeCompare(b.start||''));
+    let st=ss.filter(s=>sessStats(s).sets),cs=ss.flatMap(s=>(s.cardio||[]).filter(c=>+c.min||+c.km||+c.kcal).map(c=>({...c,sid:s.id})));
+    if(one)st=st.filter(s=>sessGroups(s).includes(one));
+    if(one&&!st.length)return'';if(car&&!cs.length)return'';
+    const show=car?[]:st,showC=one?[]:cs;
+    const gs=[...new Set(show.flatMap(s=>sessGroups(s)))],main=one||gs[0],open=OPENROW===d;
+    const strength=show.map(s=>{const S=sessStats(s);let its=(s.items||[]).filter(it=>(it.sets||[]).some(x=>+x.r));const hid=one?its.filter(it=>db.ex[it.ex]?.g!==one).length:0;if(one)its=its.filter(it=>db.ex[it.ex]?.g===one);const v=one?(S.byG[one]||{sets:0,vol:0}):S;const g=sessGroups(s).filter(k=>!one||k===one);
+      return`<div class="dl"><span class="dtag">${g.map(k=>`<span style="color:${GC[k]}">${GN[k]}</span>`).join('<i>/</i>')}</span><span class="dtx">${its.map(it=>esc(db.ex[it.ex]?.n||'?')+' '+it.sets.filter(x=>+x.r).length+'組').join('・')}${hid?` <span style="color:#cbd5e1">（另有 ${hid} 個其他部位動作）</span>`:''}${s.end?'':' <span class="pill" style="background:#2563eb">進行中</span>'}</span><b class="mono dsum">${v.sets} 組・${v.vol?fmt(v.vol)+' kg':'—'}</b><span class="dact" onclick="event.stopPropagation()"><button class="lk" onclick="emb('#s=${s.id}')">編輯</button><button class="lk red" onclick="if(confirm('刪除 ${md(s.date)} 這次重訓？')){delRec('sessions','${s.id}');render();}">刪除</button></span></div>
+       ${open?`<div class="dx">${its.map(it=>{const e=db.ex[it.ex];return`<div><b style="color:${GC[e?.g]||'#334155'}">${esc(e?.n||'?')}</b>　<span class=mono>${it.sets.filter(x=>+x.r).map(x=>setTxt(x,e?.bw)+(x.u==='lb'&&+x.w?`<span class=mu style="font-size:10.5px">≈${(x.w*LB).toFixed(0)}kg</span>`:'')).join('　')}</span></div>`;}).join('')}${s.note?`<div class=mu>📝 ${esc(s.note)}</div>`:''}</div>`:''}`;}).join('');
+    const cm=showC.reduce((t,c)=>t+(+c.min||0),0),ck=showC.reduce((t,c)=>t+(+c.km||0),0),cc=showC.reduce((t,c)=>t+(+c.kcal||0),0);
+    const cardio=showC.length?`<div class="dl${show.length?' sep':''}"><span class="dtag" style="background:#f97316;color:#fff;border-radius:99px;padding:1px 9px;font-size:11.5px">有氧</span><span class="dtx" style="color:#9a3412">${showC.map(c=>esc(c.type)+' '+(c.min||'—')+'分').join('・')}</span><b class="mono dsum" style="color:#c2410c">${cm} 分${ck?'・'+(+ck.toFixed(1))+' km':''}${cc?'・'+fmt(cc)+' 卡':''}</b><span class="dact" onclick="event.stopPropagation()"><button class="lk" onclick="emb('#s=${showC[showC.length-1].sid}')">編輯</button></span></div>`:'';
+    return`<div class="dc" onclick="OPENROW=OPENROW==='${d}'?null:'${d}';render()"><div class="dd" style="background:${main?GC[main]+'14':'#fff7ed'}"><div class="mono" style="font-size:17px;font-weight:900">${md(d).split('/').map((x,i)=>i?String(x).padStart(2,'0'):x).join('/')}</div><div class=mu>週${WK[dow(d)]}</div></div><div class="db">${strength}${cardio}</div></div>`;}).join('');
+  return rows||'<div class="empty">這段期間沒有紀錄</div>';
+}
 
 // ── 動作進步（P3：部位折疊表格）──
 let OPENG=new Set();
@@ -470,11 +503,17 @@ function vIb(){
     <button class="tb pri" onclick="addIB()">儲存</button></div></div>
    <div class="ibk">${K.map(k=>{const z=L.filter(x=>x[k[0]]!==''&&x[k[0]]!=null);const l=z[z.length-1],f=z[0];return`<div class="card" style="margin:0"><div class="ct" style="margin-bottom:2px"><span style="color:${k[3]}">●</span>${k[1]}<span class="mono" style="margin-left:auto;font-size:18px">${l?l[k[0]]:'—'}<span class=mu> ${k[2]}</span></span></div>
      <div class="mu">${z.length>1?`${md(f.date)} 起 ${(l[k[0]]-f[k[0]]>0?'+':'')+(l[k[0]]-f[k[0]]).toFixed(k[4])} ${k[2]}`:'需要 2 筆以上才看得出趨勢'}</div><div style="height:150px"><canvas id="ib-${k[0]}"></canvas></div></div>`;}).join('')}</div>
-   <div class="card" style="margin-top:16px"><div class="ct">歷史紀錄</div>${L.length?`<table><tr><th>日期</th>${K.map(k=>`<th style="text-align:right">${k[1]}</th>`).join('')}<th></th></tr>${L.slice().reverse().map((x,i,R)=>{const p=R[i+1];if(IBED===x.id)return`<tr style="background:#eff6ff"><td><input type="date" id="e-date" value="${x.date}" class="ibin" style="width:140px"></td>${K.map(k=>`<td style="text-align:right"><input id="e-${k[0]}" class="ibin" inputmode="decimal" value="${x[k[0]]??''}"></td>`).join('')}<td style="text-align:right;white-space:nowrap"><button class="tb pri" style="padding:5px 12px" onclick="saveIBE('${x.id}')">儲存</button> <button class="lk" style="color:#64748b" onclick="IBED=null;render()">取消</button></td></tr>`;return`<tr><td class=mono><b>${x.date.replace(/-/g,'/')}</b></td>${K.map(k=>{const d=p&&x[k[0]]!==''&&p[k[0]]!==''&&p[k[0]]!=null?x[k[0]]-p[k[0]]:null;return`<td class=num>${x[k[0]]===''||x[k[0]]==null?'—':x[k[0]]}${d!=null&&d!==0?` <span class="${(k[0]==='fat'?d<0:d>0)?'up':'dn'}" style="font-size:11px">${d>0?'+':''}${d.toFixed(k[4])}</span>`:''}</td>`;}).join('')}<td style="text-align:right;white-space:nowrap"><button class="lk" onclick="IBED='${x.id}';render()">編輯</button><button class="lk red" onclick="if(confirm('刪除 ${x.date} 這筆？')){delRec('inbody','${x.id}');render();}">刪除</button></td></tr>`;}).join('')}</table>`:'<div class="empty">還沒有 InBody 紀錄</div>'}</div>`;
+   <div class="card" style="margin-top:16px"><div class="ct">歷史紀錄<span class=mu>小字是跟前一次比</span></div>${ibHist(L,K)}</div>`;
   K.forEach(k=>{const z=L.filter(x=>x[k[0]]!==''&&x[k[0]]!=null);if(!z.length)return;const Y=z.map(x=>+x[k[0]]);
     CH['ib'+k[0]]=new Chart($('ib-'+k[0]),{type:'line',data:{labels:z.map(x=>md(x.date)),datasets:[{data:Y,borderColor:k[3],backgroundColor:k[3]+'22',fill:true,tension:.3,pointRadius:3,borderWidth:2.5},...(TREND&&z.length>2?[{data:linreg(Y),borderColor:k[3]+'88',borderDash:[6,5],borderWidth:1.5,pointRadius:0}]:[])]},
       options:{maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:'#f1f5f9'},ticks:{font:{size:10}}}}}});});
 }
+function ibHist(L,K){if(!L.length)return'<div class="empty">還沒有 InBody 紀錄</div>';
+  return L.slice().reverse().map((x,i,R)=>{const p=R[i+1],ed=IBED===x.id;
+    return`<div class="ibr${ed?' ed':''}"><div class="ibd"><div class=mu style="font-size:11px">${x.date.slice(0,4)}</div><div class="mono" style="font-size:18px;font-weight:900">${+x.date.slice(5,7)}/${x.date.slice(8)}</div><div class=mu style="font-size:11px">週${WK[dow(x.date)]}</div></div>
+     <div class="ibc">${ed?`<div><div class=mu>日期</div><input type="date" id="e-date" class="ibin" style="width:140px" value="${x.date}"></div>`:''}${K.map(k=>{const v=x[k[0]],d=p&&v!==''&&v!=null&&p[k[0]]!==''&&p[k[0]]!=null?v-p[k[0]]:null;
+       return`<div><div class=mu>${k[1]}</div>${ed?`<input id="e-${k[0]}" class="ibin" inputmode="decimal" value="${v??''}">`:`<b class="mono" style="font-size:16px">${v===''||v==null?'—':(k[0]==='bmr'?fmt(v):v)}<span style="font-size:11.5px;font-weight:600;color:#64748b">${k[0]==='fat'?'%':k[0]==='bmr'?'':' kg'}</span></b>${d!=null&&d!==0?` <span class="${(k[0]==='fat'?d<0:d>0)?'up':'dn'}" style="font-size:11.5px">${d>0?'+':''}${d.toFixed(k[4])}</span>`:''}`}</div>`;}).join('')}
+      <div class="iba">${ed?`<button class="tb pri" style="padding:6px 14px" onclick="saveIBE('${x.id}')">儲存</button><button class="lk" style="color:#64748b" onclick="IBED=null;render()">取消</button>`:`<button class="lk" onclick="IBED='${x.id}';render()">編輯</button><button class="lk red" onclick="if(confirm('刪除 ${x.date} 這筆？')){delRec('inbody','${x.id}');render();}">刪除</button>`}</div></div></div>`;}).join('');}
 function saveIBE(id){const x=db.inbody.find(z=>z.id===id);if(!x)return;const g=k=>{const v=$('e-'+k).value.trim();return v===''?'':+v;};x.date=$('e-date').value||x.date;['wt','mm','fat','bmr'].forEach(k=>x[k]=g(k));touch(x);save();IBED=null;render();}
 function addIB(){const g=k=>{const v=$('f-'+k).value.trim();return v===''?'':+v;};const r={id:uid(),date:$('f-date').value||today(),wt:g('wt'),mm:g('mm'),fat:g('fat'),bmr:g('bmr')};if(r.wt===''&&r.mm===''&&r.fat===''&&r.bmr===''){alert('至少填一項');return;}db.inbody.push(touch(r));save();render();}
 
