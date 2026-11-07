@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-<!-- fitness build 2026-11-08b -->
+<!-- fitness build 2026-11-08c -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -372,8 +372,10 @@ function tt(k,v){TT[k]=v;if(k==='tab')TT.m=T3M[v][0][0];try{localStorage.setItem
 function trendHead(){const sg=(arr,key)=>`<div class="tabs sm">${arr.map(([k,l])=>`<span class="${TT[key]===k?'on':''}" onclick="tt('${key}','${k}')">${l}</span>`).join('')}</div>`;
   return`<div class="ct" style="flex-wrap:wrap;gap:10px">📈 趨勢 ${sg([['fit','🏋️ 健身'],['car','🏃 有氧'],['ib','📊 InBody']],'tab')}${sg(T3M[TT.tab].map(x=>[x[0],x[1]]),'m')}<span style="margin-left:auto">${TT.tab==='ib'?'':sg([['w','每週'],['m','每月'],['y','每年']],'per')}</span></div>
    ${TT.tab==='fit'?`<div class="gch"><span class="${TT.g==='all'?'on':''}" onclick="tt('g','all')">全部</span>${GROUPS.map(g=>`<span class="${TT.g===g[0]?'on':''}" style="--c:${g[2]}" onclick="tt('g','${g[0]}')">${g[1]}</span>`).join('')}</div>`:''}`;}
-function t3Buckets(){const T=today(),out=[];if(TT.per==='y'){const y1=+T.slice(0,4);for(let y=y1-4;y<=y1;y++)out.push([y+'-01-01',y+'-12-31',y+'']);return out;}
-  for(let i=11;i>=0;i--){const r=TT.per==='w'?addDays(T,-7*i):shift('m',T,-i),[a,b]=range(TT.per,r);out.push([a,b,TT.per==='w'?md(a):a.slice(2,7).replace('-','/')]);}return out;}
+function t3Buckets(){const T=today(),out=[];if(TT.per==='y'){const y1=+T.slice(0,4),f=db.sessions.map(s=>s.date).sort()[0],y0=f?Math.max(+f.slice(0,4),y1-4):y1;for(let y=y0;y<=y1;y++)out.push([y+'-01-01',y+'-12-31',y+'']);return out;}
+  for(let i=11;i>=0;i--){const r=TT.per==='w'?addDays(T,-7*i):shift('m',T,-i),[a,b]=range(TT.per,r);out.push([a,b,TT.per==='w'?md(a):a.slice(0,7).replace('-','/')]);}
+  // 從第一筆紀錄那一期開始畫，前面沒資料的空白期不顯示
+  const first=db.sessions.map(s=>s.date).sort()[0];if(first){const k=out.findIndex(o=>o[1]>=first);if(k>0)return out.slice(k);}return out;}
 function drawT3(){
   const m=T3M[TT.tab].find(x=>x[0]===TT.m)||T3M[TT.tab][0];let labels,Y,col;
   if(TT.tab==='ib'){const L=db.inbody.filter(x=>x[m[0]]!==''&&x[m[0]]!=null).sort((a,b)=>a.date.localeCompare(b.date));labels=L.map(x=>md(x.date));Y=L.map(x=>+x[m[0]]);col={wt:'#0f172a',mm:'#0891b2',fat:'#a855f7',bmr:'#10b981'}[m[0]];}
@@ -384,7 +386,7 @@ function drawT3(){
       if(m[0]==='cnt')return L.filter(s=>sessGroups(s).includes(TT.g)).length;const k=m[0]==='sets'?'sets':'vol';return Math.round(L.reduce((t,s)=>t+((sessStats(s).byG[TT.g]||{})[k]||0),0));});}
   if(!Y.length){$('tr').parentElement.innerHTML='<div class="empty">還沒有資料</div>';return;}
   const R=Y.length>2?linreg(Y):null,goal=+(db.cfg&&db.cfg.goal)||4,showGoal=TT.tab==='fit'&&TT.m==='cnt'&&TT.g==='all'&&TT.per==='w';
-  const ds=[{type:TT.tab==='ib'?'line':'bar',label:m[1],data:Y,backgroundColor:TT.tab==='ib'?col+'22':col+'cc',borderColor:col,borderWidth:TT.tab==='ib'?2.5:0,borderRadius:6,pointRadius:4,fill:TT.tab==='ib',tension:.3,order:2}];
+  const ds=[{type:TT.tab==='ib'?'line':'bar',label:m[1],data:Y,backgroundColor:TT.tab==='ib'?col+'22':col+'cc',borderColor:col,borderWidth:TT.tab==='ib'?2.5:0,borderRadius:6,maxBarThickness:56,pointRadius:4,fill:TT.tab==='ib',tension:.3,order:2}];
   if(R)ds.push({type:'line',label:'趨勢',data:R,borderColor:'#0f172a',borderDash:[6,5],borderWidth:1.5,pointRadius:0,order:1,trend:1});
   if(showGoal)ds.push({type:'line',label:'目標',data:Y.map(()=>goal),borderColor:'#16a34a',borderWidth:1.5,pointRadius:0,order:0,trend:1});
   CH.tr=new Chart($('tr'),{data:{labels,datasets:ds},options:{maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
