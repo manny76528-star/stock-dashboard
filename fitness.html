@@ -140,7 +140,7 @@ tr.sr{cursor:pointer}tr.sr:hover td{background:#f8fafc}td.num{text-align:right;f
 <div id="emb" onclick="if(event.target===this)ftCloseEmbed()"><iframe id="embf"></iframe></div>
 <div id="imp" onclick="if(event.target===this)this.style.display='none'"><div class="ib"><div class="ct" style="font-size:17px">📥 貼上訓練紀錄<span class=mu>一行日期、底下每個動作一行</span><button class="tb" style="margin-left:auto" onclick="$('imp').style.display='none'">✕</button></div>
  <div style="display:grid;grid-template-columns:1fr 1.2fr;gap:14px;flex:1;min-height:0"><div style="display:flex;flex-direction:column"><textarea id="impT" oninput="impPrev()" placeholder="2026/11/7（胸）&#10;槓鈴平板臥推：80×9、74×8、70×8&#10;機器上胸：9、8、9、8&#10;雙槓下胸：11、8、8"></textarea>
-  <div class=mu style="margin-top:6px;line-height:1.7">・有重量寫「80×9」，只有次數寫「9」（重量之後可以在編輯補）<br>・機器是磅就寫「90P×10」<br>・雙槓這種自重動作只寫次數＝沒加負重<br>・同一段文字重複貼不會重複匯入</div></div>
+  <div class=mu style="margin-top:6px;line-height:1.7">・有重量寫「80×9」，只有次數寫「9」（重量之後可以在編輯補）<br>・機器是磅就寫「90P×10」<br>・有氧寫「跑步機：25分、1.5公里、206kcal」<br>・雙槓這種自重動作只寫次數＝沒加負重<br>・同一段文字重複貼不會重複匯入</div></div>
   <div style="overflow:auto;border:1px solid var(--line);border-radius:12px;padding:10px" id="impP"><div class="empty">貼上後這裡會預覽</div></div></div>
  <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px"><span class=mu id="impS" style="margin-right:auto;align-self:center"></span><button class="tb pri" id="impGo" onclick="impGo()" disabled>匯入</button></div></div></div>
 <script>
@@ -252,16 +252,21 @@ function parseImport(text){
     if(d){cur={date:`${d[1]}-${String(d[2]).padStart(2,'0')}-${String(d[3]).padStart(2,'0')}`,label:d[4]||'',groups:[],items:[],cardio:[]};
       (d[4]||'').split(/[＋+、,，\/]/).forEach(g=>{g=g.trim();if(GMAP[g])cur.groups.push(GMAP[g]);});out.push(cur);return;}
     const m=line.match(/^(.+?)[：:]\s*(.+)$/);if(!m||!cur){warn.push('看不懂：'+line);return;}
+    // 有氧：「跑步機：25分、1.5公里、206kcal」
+    const ct=CARDIO.find(c=>m[1].replace(/\s/g,'').includes(c))||(/有氧|走路|快走|跑步|單車|腳踏車/.test(m[1])?m[1].trim():null);
+    if(ct){const v=m[2],g=re=>{const x=v.match(re);return x?+x[1]:'';};
+      const c={id:uid(),type:ct,min:g(/(\d+(?:\.\d+)?)\s*(?:分|min)/i),km:g(/(\d+(?:\.\d+)?)\s*(?:公里|km)/i),kcal:g(/(\d+(?:\.\d+)?)\s*(?:kcal|大卡|卡)/i)};
+      if(c.min===''&&c.km===''&&c.kcal===''){warn.push(`${cur.date} ${m[1]} 看不懂：${v}（例：25分、1.5公里、206kcal）`);return;}cur.cardio.push(c);return;}
     const id=findEx(m[1]);if(!id){warn.push(`${cur.date} 找不到動作「${m[1]}」（可以先到動作清單新增）`);return;}
     const sets=m[2].split(/[、,，\s]+/).filter(Boolean).map(t=>{const x=t.match(/^(\d+(?:\.\d+)?)\s*([pP磅]|kg|KG|公斤)?\s*[×xX*]\s*(\d+)$/);if(x)return /^[pP磅]$/.test(x[2]||'')?{w:+x[1],u:'lb',r:+x[3]}:{w:+x[1],r:+x[3]};const y=t.match(/^(\d+)$/);return y?{w:'',r:+y[1]}:null;});
     if(sets.some(s=>!s)){warn.push(`${cur.date} ${m[1]} 有看不懂的組：${m[2]}`);}
     const ok=sets.filter(Boolean);if(!ok.length)return;if(db.ex[id].bw)ok.forEach(x=>{if(x.w==='')x.w=0;});
     const it=cur.items.find(x=>x.ex===id);if(it)it.sets.push(...ok);else cur.items.push({ex:id,sets:ok,done:true,src:m[1]});
     const g=db.ex[id].g;if(!cur.groups.includes(g))cur.groups.push(g);});
-  return{sessions:out.filter(s=>s.items.length),warn};}
-function importKey(s){return s.date+'|'+s.items.map(it=>it.ex+':'+it.sets.map(x=>(x.w===''?'':x.w)+(x.u==='lb'?'P':'')+'x'+x.r).join(',')).join(';');}
+  return{sessions:out.filter(s=>s.items.length||s.cardio.length),warn};}
+function importKey(s){return s.date+'|'+(s.cardio||[]).map(c=>c.type+c.min+'/'+c.km+'/'+c.kcal).join(',')+'|'+s.items.map(it=>it.ex+':'+it.sets.map(x=>(x.w===''?'':x.w)+(x.u==='lb'?'P':'')+'x'+x.r).join(',')).join(';');}
 function doImport(P){let n=0,skip=0;P.sessions.forEach(s=>{const k=importKey(s);if(db.sessions.some(z=>z.ik===k)){skip++;return;}
-  s.items.forEach(it=>{if(it.sets.some(x=>x.u==='lb')&&db.ex[it.ex].u!=='lb'){db.ex[it.ex].u='lb';touch(db.ex[it.ex]);}});db.sessions.push(touch({id:uid(),date:s.date,start:'',end:'匯入',groups:s.groups,items:s.items.map(it=>({ex:it.ex,sets:it.sets,done:true})),cardio:[],note:'',ik:k}));n++;});save();return{n,skip};}
+  s.items.forEach(it=>{if(it.sets.some(x=>x.u==='lb')&&db.ex[it.ex].u!=='lb'){db.ex[it.ex].u='lb';touch(db.ex[it.ex]);}});db.sessions.push(touch({id:uid(),date:s.date,start:'',end:'匯入',groups:s.groups,items:s.items.map(it=>({ex:it.ex,sets:it.sets,done:true})),cardio:(s.cardio||[]).map(c=>({...c,id:uid()})),note:'',ik:k}));n++;});save();return{n,skip};}
 
 </script>
 <script>
@@ -407,6 +412,7 @@ function impPrev(){const t=$('impT').value;_impP=t.trim()?parseImport(t):null;co
   $('impP').innerHTML=(P.warn.length?`<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:8px 10px;margin-bottom:8px;font-size:12.5px;color:#92400e">${P.warn.map(esc).join('<br>')}</div>`:'')+
    P.sessions.map(s=>{const dp=db.sessions.some(z=>z.ik===importKey(s));const same=db.sessions.filter(z=>z.date===s.date&&!z.ik).length;
     return`<div style="margin-bottom:12px;${dp?'opacity:.45':''}"><b class=mono>${s.date.replace(/-/g,'/')}</b> 週${WK[dow(s.date)]} ${s.groups.map(k=>`<span class="pill" style="background:${GC[k]}">${GN[k]}</span>`).join('')}${dp?' <span class=mu>已匯入過，會略過</span>':same?` <span style="color:#d97706;font-size:12px">⚠️ 這天已經有 ${same} 筆紀錄</span>`:''}
+    ${(s.cardio||[]).map(c=>`<div style="font-size:13px;margin-top:4px">🏃 <b style="color:#f97316">${esc(c.type)}</b>　<span class=mono>${c.min||'—'} 分・${c.km||'—'} km・${c.kcal||'—'} 大卡</span></div>`).join('')}
     <table style="margin-top:4px">${s.items.map(it=>`<tr><td style="width:44%"><b>${esc(db.ex[it.ex].n)}</b>${_exNorm(it.src)!==_exNorm(db.ex[it.ex].n)?` <span class=mu>← ${esc(it.src)}</span>`:''}</td><td class=mono>${it.sets.map(x=>x.w===''?`<span style="color:#94a3b8">?</span>×${x.r}`:setTxt(x,db.ex[it.ex].bw)).join('　')}</td></tr>`).join('')}</table></div>`;}).join('');
   const n=P.sessions.length-dup;$('impGo').disabled=!n;$('impGo').textContent=n?`匯入 ${n} 次訓練`:'匯入';
   const noW=P.sessions.reduce((a,s)=>a+s.items.filter(it=>it.sets.some(x=>x.w==='')&&!db.ex[it.ex].bw).length,0);

@@ -150,6 +150,7 @@ body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"Pi
 .del{color:#dc2626;font-size:13px;font-weight:800;background:none;border:none;font-family:inherit;padding:8px}
 .cd{display:flex;align-items:center;gap:8px;padding:9px 11px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:12px;margin-bottom:6px;font-size:13.5px}
 .mgr{display:flex;align-items:center;gap:8px;padding:9px 4px;border-bottom:1px solid #f1f5f9;font-size:14px}.mgr.off{opacity:.45}.mgr button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:4px 8px;font-size:12px;font-family:inherit;font-weight:700;color:#475569}
+.rc{display:flex;align-items:center;gap:10px;border:2px solid #fdba74;background:#fff7ed;border-radius:14px;padding:10px 12px;margin-bottom:8px}.rc button{border:none;background:#f97316;color:#fff;border-radius:11px;padding:10px 13px;font-weight:900;font-size:14px;font-family:inherit;white-space:nowrap}
 .empty{text-align:center;color:var(--mu);padding:26px 0;font-size:13.5px}
 .pr{color:#0891b2;font-weight:900}
 body.embed .top a.hm,body.embed .top a.pc{display:none}
@@ -269,16 +270,21 @@ function parseImport(text){
     if(d){cur={date:`${d[1]}-${String(d[2]).padStart(2,'0')}-${String(d[3]).padStart(2,'0')}`,label:d[4]||'',groups:[],items:[],cardio:[]};
       (d[4]||'').split(/[＋+、,，\/]/).forEach(g=>{g=g.trim();if(GMAP[g])cur.groups.push(GMAP[g]);});out.push(cur);return;}
     const m=line.match(/^(.+?)[：:]\s*(.+)$/);if(!m||!cur){warn.push('看不懂：'+line);return;}
+    // 有氧：「跑步機：25分、1.5公里、206kcal」
+    const ct=CARDIO.find(c=>m[1].replace(/\s/g,'').includes(c))||(/有氧|走路|快走|跑步|單車|腳踏車/.test(m[1])?m[1].trim():null);
+    if(ct){const v=m[2],g=re=>{const x=v.match(re);return x?+x[1]:'';};
+      const c={id:uid(),type:ct,min:g(/(\d+(?:\.\d+)?)\s*(?:分|min)/i),km:g(/(\d+(?:\.\d+)?)\s*(?:公里|km)/i),kcal:g(/(\d+(?:\.\d+)?)\s*(?:kcal|大卡|卡)/i)};
+      if(c.min===''&&c.km===''&&c.kcal===''){warn.push(`${cur.date} ${m[1]} 看不懂：${v}（例：25分、1.5公里、206kcal）`);return;}cur.cardio.push(c);return;}
     const id=findEx(m[1]);if(!id){warn.push(`${cur.date} 找不到動作「${m[1]}」（可以先到動作清單新增）`);return;}
     const sets=m[2].split(/[、,，\s]+/).filter(Boolean).map(t=>{const x=t.match(/^(\d+(?:\.\d+)?)\s*([pP磅]|kg|KG|公斤)?\s*[×xX*]\s*(\d+)$/);if(x)return /^[pP磅]$/.test(x[2]||'')?{w:+x[1],u:'lb',r:+x[3]}:{w:+x[1],r:+x[3]};const y=t.match(/^(\d+)$/);return y?{w:'',r:+y[1]}:null;});
     if(sets.some(s=>!s)){warn.push(`${cur.date} ${m[1]} 有看不懂的組：${m[2]}`);}
     const ok=sets.filter(Boolean);if(!ok.length)return;if(db.ex[id].bw)ok.forEach(x=>{if(x.w==='')x.w=0;});
     const it=cur.items.find(x=>x.ex===id);if(it)it.sets.push(...ok);else cur.items.push({ex:id,sets:ok,done:true,src:m[1]});
     const g=db.ex[id].g;if(!cur.groups.includes(g))cur.groups.push(g);});
-  return{sessions:out.filter(s=>s.items.length),warn};}
-function importKey(s){return s.date+'|'+s.items.map(it=>it.ex+':'+it.sets.map(x=>(x.w===''?'':x.w)+(x.u==='lb'?'P':'')+'x'+x.r).join(',')).join(';');}
+  return{sessions:out.filter(s=>s.items.length||s.cardio.length),warn};}
+function importKey(s){return s.date+'|'+(s.cardio||[]).map(c=>c.type+c.min+'/'+c.km+'/'+c.kcal).join(',')+'|'+s.items.map(it=>it.ex+':'+it.sets.map(x=>(x.w===''?'':x.w)+(x.u==='lb'?'P':'')+'x'+x.r).join(',')).join(';');}
 function doImport(P){let n=0,skip=0;P.sessions.forEach(s=>{const k=importKey(s);if(db.sessions.some(z=>z.ik===k)){skip++;return;}
-  s.items.forEach(it=>{if(it.sets.some(x=>x.u==='lb')&&db.ex[it.ex].u!=='lb'){db.ex[it.ex].u='lb';touch(db.ex[it.ex]);}});db.sessions.push(touch({id:uid(),date:s.date,start:'',end:'匯入',groups:s.groups,items:s.items.map(it=>({ex:it.ex,sets:it.sets,done:true})),cardio:[],note:'',ik:k}));n++;});save();return{n,skip};}
+  s.items.forEach(it=>{if(it.sets.some(x=>x.u==='lb')&&db.ex[it.ex].u!=='lb'){db.ex[it.ex].u='lb';touch(db.ex[it.ex]);}});db.sessions.push(touch({id:uid(),date:s.date,start:'',end:'匯入',groups:s.groups,items:s.items.map(it=>({ex:it.ex,sets:it.sets,done:true})),cardio:(s.cardio||[]).map(c=>({...c,id:uid()})),note:'',ik:k}));n++;});save();return{n,skip};}
 
 </script>
 <script>
@@ -310,12 +316,19 @@ function vHome(){
   <div class="chips">${GROUPS.map(g=>`<span class="chip g${PICK.has(g[0])?' on':''}" style="${PICK.has(g[0])?`background:${g[2]};border-color:${g[2]}`:''}" onclick="pickG('${g[0]}')">${PICK.has(g[0])?'✓ ':''}${g[1]}</span>`).join('')}</div>
   ${hints?`<div class="hint">${hints}</div>`:''}
   <div class="mu" style="margin:14px 0 6px">有氧（可以跟重訓一起，也可以只做有氧）</div>
+  ${(()=>{const lc=lastCardio();if(!lc)return'';const D0=SDATE||today(),n=db.sessions.filter(z=>z.date===D0).reduce((a,z)=>a+(z.cardio||[]).filter(c=>+c.min||+c.km||+c.kcal).length,0);
+    return`<div class="rc"><span style="font-size:22px">🔁</span><div style="flex:1;min-width:0"><b>同上次有氧</b><div class=mu>${esc(lc.type)} ${lc.min||'—'} 分・${lc.km||'—'} km・${lc.kcal||'—'} 大卡</div>${n?`<div class=mu style="color:#c2410c">${D0===today()?'今天':md(D0)}已記 ${n} 筆</div>`:''}</div><button onclick="repeatCardio()">＋ 記一筆</button></div>`;})()}
   <div class="chips">${CARDIO.map(c=>`<span class="chip${PICKC.has(c)?' on':''}" onclick="pickC('${c}')">${PICKC.has(c)?'✓ ':''}${c}</span>`).join('')}</div>
   <div class="h" style="margin-top:20px">其他</div>
   <div class="q"><div onclick="go('inbody')"><span>📊</span>InBody</div><div onclick="go('hist')"><span>📒</span>訓練紀錄</div><div onclick="go('mgr')"><span>⚙️</span>動作清單</div></div>
   ${rec.length?`<div class="h">最近</div>${rec.map(liSess).join('')}`:''}`;
   bar(`<button class="btn pri" ${PICK.size||PICKC.size?'':'disabled'} onclick="startSess()">開始訓練 →</button>`);
 }
+function lastCardio(){const L=db.sessions.slice().sort((a,b)=>(a.date+(a.start||'')).localeCompare(b.date+(b.start||'')));for(let i=L.length-1;i>=0;i--){const c=(L[i].cardio||[]).filter(c=>+c.min||+c.km||+c.kcal);if(c.length)return c[c.length-1];}return null;}
+function repeatCardio(){const lc=lastCardio();if(!lc)return;const D0=SDATE||today();const c={id:uid(),type:lc.type,min:lc.min,km:lc.km,kcal:lc.kcal};
+  let s=db.sessions.find(z=>z.date===D0&&!z.end);if(!s)s=db.sessions.find(z=>z.date===D0&&z.end==='有氧');
+  if(!s){s={id:uid(),date:D0,start:D0===today()?nowHM():'',end:'有氧',groups:[],items:[],cardio:[],note:''};db.sessions.push(s);}
+  (s.cardio=s.cardio||[]).push(c);touch(s);save();toast(`✅ ${D0===today()?'今天':md(D0)}記了一筆 ${lc.type} ${lc.min||''} 分`);render();}
 function pickPreset(s){const a=s.split(',');const same=a.length===PICK.size&&a.every(g=>PICK.has(g));PICK=new Set(same?[]:a);render();}
 function pickG(g){PICK.has(g)?PICK.delete(g):PICK.add(g);render();}
 function pickC(c){PICKC.has(c)?PICKC.delete(c):PICKC.add(c);render();}
@@ -323,7 +336,7 @@ function startSess(){
   const D0=SDATE||today(),past=D0!==today();const s=touch({id:uid(),date:D0,start:past?'':nowHM(),end:'',groups:[...PICK],items:[],cardio:[...PICKC].map(t=>({id:uid(),type:t,min:'',km:'',kcal:''})),note:''});
   db.sessions.push(s);save();PICK=new Set();PICKC=new Set();SDATE=null;OPEN=null;go('sess',s.id);
 }
-function liSess(s){const S=sessStats(s);return`<div class="li" onclick="go('sess','${s.id}')"><span class="d">${md(s.date)}<div class=mu style="font-weight:500">週${WK[dow(s.date)]}</div></span><div class="t"><b>${esc(sessTitle(s))}</b>${s.end?'':' <span class="pill" style="background:#2563eb">進行中</span>'}<div>${(s.items||[]).filter(it=>(it.sets||[]).some(x=>+x.r)).map(it=>esc(db.ex[it.ex]?.n||'')+' '+it.sets.filter(x=>+x.r).length+'組').join('・')}${S.min?`・🏃 ${S.min} 分`:''}</div></div><span class="v">${S.vol?fmt(S.vol)+' kg':''}<div class=mu>${S.sets?S.sets+' 組':''}</div></span></div>`;}
+function liSess(s){const S=sessStats(s);return`<div class="li" onclick="go('sess','${s.id}')"><span class="d">${md(s.date)}<div class=mu style="font-weight:500">週${WK[dow(s.date)]}</div></span><div class="t"><b>${esc(sessTitle(s))}</b>${s.end?'':' <span class="pill" style="background:#2563eb">進行中</span>'}<div>${[...(s.items||[]).filter(it=>(it.sets||[]).some(x=>+x.r)).map(it=>esc(db.ex[it.ex]?.n||'')+' '+it.sets.filter(x=>+x.r).length+'組'),...(S.min?[`🏃 ${S.min} 分${S.km?' '+S.km+' km':''}`]:[])].join('・')}</div></div><span class="v">${S.vol?fmt(S.vol)+' kg':''}<div class=mu>${S.sets?S.sets+' 組':''}</div></span></div>`;}
 
 // ── 訓練中 ──
 function vSess(){
