@@ -813,6 +813,27 @@ body:not(.privacy) .privacy-mask{filter:none;}
 .v28-sum{padding:10px 18px;font-size:13px;line-height:1.8;background:#f8fafc}
 .v28-go{display:block;width:calc(100% - 36px);margin:12px 18px 16px;background:#16a34a;color:#fff;border:0;border-radius:12px;padding:11px;font-weight:900;font-size:15px;cursor:pointer;font-family:inherit}.v28-go:disabled{background:#e2e8f0;color:#94a3b8;cursor:not-allowed}
 </style>
+<style id="v31-css">
+/* v31 */
+.v31-hit{position:absolute;inset:0;display:flex;padding:0 8px}.v31-hit>div{flex:1;cursor:pointer;border-radius:8px}.v31-hit>div:hover{background:rgba(37,99,235,.07)}
+.v31-mm{background:#fff;border-radius:18px;width:min(520px,100%);max-height:86vh;display:flex;flex-direction:column;box-shadow:0 30px 70px rgba(0,0,0,.3)}
+.v31-mr{display:flex;gap:10px;align-items:center;padding:7px 0;border-bottom:1px solid #f1f5f9;font-size:13.5px}
+.v31-ms{display:flex;gap:16px;flex-wrap:wrap;padding:10px 18px;border-top:1px dashed #e2e8f0;font-size:13px;background:#fafbff;border-radius:0 0 18px 18px}
+#v15-fund.v31-six{height:auto;min-height:0}#v15-fund.v31-six .v15-low{min-height:0}#v15-fund.v31-six .v15-cd{min-height:50px!important}
+#v15-run .v15-line{background:#e2e8f0}
+.v16-tr.bad .v16-af{color:#dc2626!important}
+body:not(.v31-plon) .v31-pl{filter:blur(7px)!important;user-select:none;pointer-events:none}
+.v31-plb{padding:5px 12px;background:#fff;border:1.5px solid #cbd5e1;color:#475569;border-radius:7px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit}.v31-plb.on{border-color:#93c5fd;color:#1d4ed8;background:#eff6ff}
+.v31-cf{background:#fff;border-radius:16px;box-shadow:0 30px 70px rgba(0,0,0,.3);padding:20px 22px;width:min(380px,100%)}
+#v31-jmini{position:fixed;right:28px;bottom:28px;z-index:8000;background:#fff;border:2px solid #93c5fd;border-radius:14px;box-shadow:0 10px 30px rgba(15,23,42,.2);padding:10px 14px;display:none;align-items:center;gap:12px;width:min(380px,calc(100vw - 32px))}
+.v31-jgo{background:#2563eb;color:#fff;border:none;border-radius:9px;padding:7px 12px;font-weight:800;font-size:12.5px;cursor:pointer;white-space:nowrap;font-family:inherit}
+.v31-jx{color:#94a3b8;font-size:20px;cursor:pointer;padding:0 2px}
+.v31-fo{border:1px solid #e2e8f0;border-radius:12px;padding:8px 12px;background:#fff}
+.v31-fh{display:flex;align-items:center;font-size:13.5px;margin-bottom:2px}
+.v31-fl{padding:5px 0;font-size:13px;cursor:pointer}.v31-fr{display:flex;align-items:center;gap:6px;margin-bottom:3px}
+.v31-fn{font-weight:700}.v31-fb{height:7px;border-radius:4px;background:#f1f5f9;overflow:hidden}.v31-fb i{display:block;height:100%;border-radius:4px}
+.v31-fv{margin-left:auto;text-align:right;font-weight:800}
+</style>
 </head>
 <body>
 
@@ -10312,8 +10333,9 @@ function renderJournalChart(){
                 {t:j.market3,c:j.market3Color}
               ].filter(m=>m.t);
               return ms.map(m=>{
-                const col=m.c==='red'?'#dc2626':m.c==='green'?'#16a34a':'#1e293b';
-                return'📰 <span style="color:'+col+'">'+m.t+'</span>';
+                // v31：提示框只能顯示純文字，用 ▲▼ 代替顏色
+                const mk=m.c==='red'?'▲ ':m.c==='green'?'▼ ':'';
+                return'📰 '+mk+String(m.t).replace(/<[^>]*>/g,'').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>');
               });
             }
           },
@@ -21101,6 +21123,169 @@ function v30NoteCols(t){const parts=[];let cur=null;String(t).split('\n').forEac
   return parts.map(p=>`<div style="border-left:3px solid ${col[p.h]||'#94a3b8'};padding:2px 0 2px 10px;${p.h==='我的規則'?'background:#f0fdf4;border-radius:0 8px 8px 0':''}"><b style="font-size:13px">${_ae(p.h)}</b><div style="font-size:12.5px;color:#334155;line-height:1.7;white-space:pre-line">${_ae(p.b.join('\n'))}</div></div>`).join('');}
 function v30EditNotes(){const N=db.ddNotes||{};const box=document.getElementById('v30-nv');if(!box)return;
   box.style.display='block';box.innerHTML=`<textarea id="v30-ta" style="width:100%;box-sizing:border-box;min-height:360px;border:1.5px solid #e2e8f0;border-radius:9px;padding:8px 10px;font-size:12.5px;line-height:1.6;font-family:inherit">${_ae(N.rules||'')}</textarea><div style="text-align:right;margin-top:6px"><button class="v26-btn ghost" onclick="v26Render()">取消</button> <button class="v26-btn" onclick="db.ddNotes={...(db.ddNotes||{}),rules:document.getElementById('v30-ta').value,upd:Date.now()};save();v26Render();toast('✓ 已儲存')">儲存</button></div>`;}
+
+// ══════════════════════════════════════════════════════════════
+// 🧩 v31（2026/11/07）
+//   ① 基金每週五報酬率：今天頁「要處理」提醒（週五 15:00 後～填好為止）
+//   ② 每月投入＋累積：點月份 → 當月扣款明細
+//   ③ 扣款日曆 6 排不擋字；現金跑道圓點統一淡灰、餘額黑字（金額扣款綠、入帳紅）
+//   ④ 投資第二層：損益預設模糊，「顯示」要再確認一次，離開就自動遮回
+//   ⑤ 日誌寫到一半點外面 → 收成右下角小卡，可以展開繼續寫
+//   ⑦ 每月錢怎麼流 W1：信貸／不限用途利息／基金合成「每月固定出去」一格
+// ══════════════════════════════════════════════════════════════
+function _v31Hr(){return new Date(Date.now()+8*3600e3).getUTCHours();}
+// 最近一個「該填」的週五：今天週五且過 15:00 → 今天；否則往前找上一個週五
+function _v31DueFri(){const T=_twToday(),w=_dowOf(T);if(w===5&&_v31Hr()>=15)return T;const back=w===5?7:(w-5+7)%7;return _addDays(T,-back);}
+function _v31PerfMissing(){
+  const on=(db.settings?.fundDeductions||[]).filter(f=>f.enabled!==false);if(!on.length)return null;
+  const F=_v31DueFri(), first=(db.fundDeductionLogs||[]).map(x=>x.date).sort()[0];if(!first||first>F)return null;
+  return (db.fundPerf||[]).some(x=>x.wk===F)?null:F;
+}
+// 補填「上週五」時，存進那個週五（原本週一～四會算成下一個週五）
+let _v31Wk=null;
+(function(){const _f=_v18Fri;_v18Fri=function(d){if(_v31Wk&&d===_twToday())return _v31Wk;return _f.apply(this,arguments);};})();
+(function(){const _c=v18Close;v18Close=function(){_v31Wk=null;return _c.apply(this,arguments);};})();
+function v31FillPerf(F){_v31Wk=F;v18PerfEdit();}
+(function(){const _i=v11Items;v11Items=function(){const X=_i.apply(this,arguments);try{
+  const F=_v31PerfMissing();if(F){const T=_twToday();
+    X.todo.push(['📈',`${F===T?'今天':_dowOf(T)===5?'上週五':'這週五'}（${_b6md(F)}）基金報酬率還沒填`,'每週五填一次，畫總績效線用','去填',`v31FillPerf('${F}')`,'#2563eb']);}
+}catch(e){console.warn('v31 perf todo',e);}return X;};})();
+
+// ② 點月份看扣款明細
+function _v31Months(){const logs=(db.fundDeductionLogs||[]).slice().sort((a,b)=>a.date.localeCompare(b.date));if(!logs.length)return[];
+  const T=_twToday(),ms=[];for(let m=logs[0].date.slice(0,7);m<=T.slice(0,7);m=_v13MonAdd(m+'-01',1).slice(0,7))ms.push(m);return ms.slice(-8);}
+(function(){const _c=v15Chart;v15Chart=function(){const r=_c.apply(this,arguments);try{
+  const w=document.getElementById('v15-chw');if(!w||!w.querySelector('svg'))return r;const M=_v31Months();if(!M.length)return r;
+  w.style.position='relative';let h=w.querySelector('.v31-hit');if(!h){h=document.createElement('div');h.className='v31-hit';w.appendChild(h);}
+  h.innerHTML=M.map(m=>`<div title="${+m.slice(5)} 月扣款明細" onclick="v31FundMon('${m}')"></div>`).join('');
+  const t=document.querySelector('.v15-chc .v15-h');if(t&&!t.querySelector('.v31-tip')){const s=document.createElement('span');s.className='v15-sub v31-tip';s.style.marginLeft='8px';s.textContent='點月份看當月扣款';t.appendChild(s);}
+}catch(e){console.warn('v31 chart',e);}return r;};})();
+function v31FundMon(m){
+  const all=db.settings?.fundDeductions||[], L=(db.fundDeductionLogs||[]).filter(x=>x.date.startsWith(m)).sort((a,b)=>a.date.localeCompare(b.date)||String(a.fundId).localeCompare(String(b.fundId)));
+  const fi=id=>{const i=all.findIndex(f=>f.id===id);return{f:all[i],c:i>=0?V15FC[i%V15FC.length][0]:'#64748b'};};
+  const tot=L.reduce((s,x)=>s+(x.amount||0),0), WK='日一二三四五六';
+  const rows=L.map(x=>{const{f,c}=fi(x.fundId);return`<div class="v31-mr"><span class="v15-mono">${_b6md(x.date)}</span><span class="v15-sub">週${WK[_dowOf(x.date)]}</span><b style="color:${c}">${_ae(f?.name||x.fundName||'基金')}</b><span class="v15-mono" style="margin-left:auto">${_b6m(x.amount||0)}</span></div>`;}).join('');
+  const by={};L.forEach(x=>{const k=x.fundId;(by[k]=by[k]||{n:0,s:0}).n++;by[k].s+=x.amount||0;});
+  const sum=Object.keys(by).map(k=>{const{f,c}=fi(k);return`<span><b style="color:${c}">${_ae(String(f?.name||'基金').replace(/基金$/,''))}</b> ${by[k].n} 次 ${_b6m(by[k].s)}</span>`;}).join('');
+  let bg=document.getElementById('v31-mon-bg');if(!bg){bg=document.createElement('div');bg.id='v31-mon-bg';document.body.appendChild(bg);}
+  bg.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.4);z-index:9000;display:flex;align-items:center;justify-content:center;padding:16px';
+  bg.innerHTML=`<div class="v31-mm"><div style="display:flex;align-items:center;padding:14px 18px;border-bottom:1px solid #f1f5f9"><b style="font-size:17px">📋 ${m.replace('-','/')} 扣款明細</b><span class="v15-sub" style="margin-left:10px">共 ${L.length} 次・${_b6m(tot)}</span><button onclick="document.getElementById('v31-mon-bg').style.display='none'" style="margin-left:auto;border:none;background:#f1f5f9;border-radius:9px;padding:6px 12px;font-weight:800;cursor:pointer">✕</button></div>
+    <div style="overflow:auto;padding:8px 18px;flex:1">${rows||'<div class="v15-sub" style="padding:16px 0">這個月沒有扣款紀錄</div>'}</div>
+    ${sum?`<div class="v31-ms">${sum}</div>`:''}</div>`;
+  bg.onclick=e=>{if(e.target===bg)bg.style.display='none';};
+}
+
+// ③ 日曆 6 排：格子變矮、卡片長高，底下那行不被蓋住
+(function(){const _r=v15RenderFund;v15RenderFund=function(){const r=_r.apply(this,arguments);try{
+  const box=document.getElementById('v15-fund'),cal=box&&box.querySelector('.v15-cal');if(!cal)return r;
+  const n=cal.querySelectorAll('.v15-cd').length+[...cal.children].filter(c=>!c.className).length, six=Math.ceil(n/7)>=6;
+  box.classList.toggle('v31-six',six);
+}catch(e){console.warn('v31 cal',e);}return r;};})();
+
+// ③ 現金跑道：圓點統一、餘額黑字（不夠才變橘／紅）
+const V31DOT='#cbd5e1';
+function _v31Run(html){
+  const t=document.createElement('template');t.innerHTML=html;
+  t.content.querySelectorAll('.v16-tr:not(.now)').forEach(tr=>{const d=tr.querySelector('.v15-dot'),a=tr.querySelector('.v16-af'),bad=tr.classList.contains('bad');
+    if(d){d.style.borderColor=bad?'#dc2626':V31DOT;d.style.background=bad?'#dc2626':V31DOT;}
+    if(a)a.style.color=bad?'#dc2626':/⚠️/.test(a.textContent)?'#d97706':'#0f172a';});
+  t.content.querySelectorAll('.v15-sub').forEach(s=>{if(/高於安全水位紅字/.test(s.textContent))s.textContent='線從上往下＝日子往後走・右邊是當天扣完剩多少（低於安全水位變橘色、不夠變紅色）';});
+  return t.innerHTML;
+}
+(function(){const _r=v15Run;v15Run=function(){const h=_r.apply(this,arguments);try{return _v31Run(h);}catch(e){console.warn('v31 run',e);return h;}};})();
+(function(){const _r=v16T1;v16T1=function(){const h=_r.apply(this,arguments);try{
+  const t=document.createElement('template');t.innerHTML=h;
+  t.content.querySelectorAll('.v16-seg').forEach(s=>{s.style.background='#e2e8f0';s.style.opacity='1';});
+  t.content.querySelectorAll('.v16-st:not(.now)').forEach(st=>{const i=st.querySelector(':scope>i'),b=st.querySelector('.v16-bal'),bad=st.classList.contains('bad'),est=i&&i.style.borderStyle==='dashed';
+    if(i&&!bad){i.style.borderColor=est?'#94a3b8':V31DOT;i.style.background=est?'#fff':V31DOT;}
+    if(b&&!bad)b.style.color=/⚠️/.test(b.textContent)?'#d97706':'#0f172a';});
+  t.content.querySelectorAll('.v11-sub').forEach(s=>{s.innerHTML=s.innerHTML.replace('・橘圈＝最低那天','');});
+  return t.innerHTML;}catch(e){console.warn('v31 t1',e);return h;}};})();
+
+// ④ 投資第二層：損益預設遮住
+let _v31Show=false;
+function _v31MaskMark(){
+  const pg=document.getElementById('dbpage-invest');if(!pg)return;
+  ['inv-kpi-pnl','inv-kpi-roi','inv-kpi-real'].forEach(id=>document.getElementById(id)?.classList.add('v31-pl'));
+  document.querySelectorAll('#invest-page-body>div').forEach(row=>{
+    const top=row.firstElementChild;const r=top&&[...top.children].find(c=>c.style&&c.style.textAlign==='right');if(r)r.classList.add('v31-pl');
+    row.querySelectorAll('div').forEach(d=>{const k=d.firstElementChild;if(k&&/^均成本$/.test(k.textContent.trim()))d.querySelector('b')?.classList.add('v31-pl');});});
+  const hdr=pg.querySelector('#invest-page-body')?.parentElement?.querySelector('.inv-page-hdr>div:last-child');
+  if(hdr&&!document.getElementById('v31-plbtn')){const b=document.createElement('button');b.id='v31-plbtn';b.onclick=()=>v31PlToggle();hdr.prepend(b);}
+  _v31Paint();
+}
+function _v31DetailMark(){const b=document.getElementById('inv-detail-modal-body');if(!b)return;
+  b.querySelectorAll('.irow-l3-kv').forEach(kv=>{if(/均買價|總成本/.test(kv.querySelector('.irow-l3-k')?.textContent||''))kv.querySelector('.irow-l3-v')?.classList.add('v31-pl');});
+  b.querySelectorAll('div,span').forEach(e=>{if(e.children.length<=1&&/^[+\-−][\d,]+\s*\(?[+\-−]?[\d.]+%\)?$/.test(e.textContent.replace(/\s+/g,'')))e.classList.add('v31-pl');});
+  _v31Paint();}
+function _v31Paint(){document.body.classList.toggle('v31-plon',_v31Show);const b=document.getElementById('v31-plbtn');if(b){b.textContent=_v31Show?'👁 損益顯示中・隱藏':'🙈 損益已隱藏・顯示';b.className='v31-plb'+(_v31Show?' on':'');}}
+function v31PlToggle(){
+  if(_v31Show){_v31Show=false;_v31Paint();return;}
+  let bg=document.getElementById('v31-pl-bg');if(!bg){bg=document.createElement('div');bg.id='v31-pl-bg';document.body.appendChild(bg);}
+  bg.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.4);z-index:9200;display:flex;align-items:center;justify-content:center;padding:16px';
+  bg.innerHTML=`<div class="v31-cf"><b style="font-size:17px">👁 要顯示損益嗎？</b><div class="v15-sub" style="margin:8px 0 16px;line-height:1.7;font-size:13.5px">會顯示每檔的成本、損益和報酬率。<br>離開這頁再回來，會自動再隱藏。</div>
+    <div style="display:flex;gap:8px;justify-content:flex-end"><button class="v15-btn" onclick="document.getElementById('v31-pl-bg').style.display='none'">先不要</button><button class="v15-btn" style="background:#0f172a;color:#fff;border-color:#0f172a" onclick="document.getElementById('v31-pl-bg').style.display='none';_v31Show=true;_v31Paint()">確定顯示</button></div></div>`;
+  bg.onclick=e=>{if(e.target===bg)bg.style.display='none';};
+}
+(function(){const _r=renderInvestPage;renderInvestPage=function(){const r=_r.apply(this,arguments);try{_v31MaskMark();}catch(e){console.warn('v31 mask',e);}return r;};})();
+(function(){const _t=toggleInvDetail;toggleInvDetail=function(){const r=_t.apply(this,arguments);try{_v31DetailMark();}catch(e){}return r;};})();
+(function(){const _e=confirmInvFaithEntry;confirmInvFaithEntry=function(){_v31Show=false;_v31Paint();return _e.apply(this,arguments);};})();
+(function(){const _s=dbShowPage;dbShowPage=function(id){if(id!=='invest'){_v31Show=false;_v31Paint();}return _s.apply(this,arguments);};})();
+// 年份篩選等重畫交易列時也要遮
+(function(){const m=document.getElementById('inv-detail-modal-body');if(m&&window.MutationObserver){let busy=false;new MutationObserver(()=>{if(busy)return;busy=true;try{_v31DetailMark();}catch(e){}busy=false;}).observe(m,{childList:true,subtree:true});}})();
+
+// ⑤ 日誌寫到一半點外面 → 收成小卡
+let _v31JMin=false;
+function _v31JEditing(){const d=document.getElementById('journal-drawer'),em=document.getElementById('jd-edit-mode');
+  if(!d||!d.classList.contains('open')||!em||em.style.display==='none')return false;
+  return ['j-content','j-market','j-market2','j-market3'].some(id=>(document.getElementById(id)?.value||'').trim());}
+function v31OverlayClick(){if(_currentDrawer==='journal-drawer'&&_v31JEditing()){v31JMin();return;}closeDrawer();}
+function v31JMin(){
+  const d=document.getElementById('journal-drawer'),o=document.getElementById('drawer-overlay');
+  try{if(typeof autoSaveJournalDraft==='function')autoSaveJournalDraft();}catch(e){}
+  if(d)d.classList.remove('open');if(o)o.classList.remove('open');_currentDrawer=null;document.body.style.overflow='';_v31JMin=true;
+  let c=document.getElementById('v31-jmini');if(!c){c=document.createElement('div');c.id='v31-jmini';document.body.appendChild(c);}
+  const txt=(document.getElementById('j-content')?.value||document.getElementById('j-market')?.value||'').replace(/\s+/g,' ').trim();
+  const isEdit=!!document.getElementById('journal-drawer')?.dataset.editId;
+  c.innerHTML=`<span style="font-size:22px">📝</span><div style="flex:1;min-width:0"><b style="font-size:13.5px">日誌${isEdit?'修改':'寫'}到一半（還沒存）</b><div class="v15-sub" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${_ae(txt.slice(0,60))}</div></div><button class="v31-jgo" onclick="v31JRestore()">展開繼續寫</button><span class="v31-jx" title="不要了" onclick="v31JDiscard()">×</span>`;
+  c.style.display='flex';
+}
+function v31JRestore(){const c=document.getElementById('v31-jmini');if(c)c.style.display='none';_v31JMin=false;openDrawer('journal-drawer');}
+function v31JDiscard(){if(!confirm('這篇寫到一半的日誌不要了嗎？'))return;const c=document.getElementById('v31-jmini');if(c)c.style.display='none';_v31JMin=false;try{clearJournalDraft();}catch(e){}}
+(function(){const _o=openJournalDrawer;openJournalDrawer=function(id){
+  if(_v31JMin){if(!id){v31JRestore();return;}if(!confirm('有一篇日誌寫到一半還沒存，要放棄它、打開這篇嗎？\n（按取消會回到寫到一半的那篇）')){v31JRestore();return;}
+    const c=document.getElementById('v31-jmini');if(c)c.style.display='none';_v31JMin=false;}
+  return _o.apply(this,arguments);};})();
+// 存檔／取消（正常關閉）時小卡一起收掉
+(function(){const _c=closeDrawer;closeDrawer=function(){if(_currentDrawer==='journal-drawer'){const c=document.getElementById('v31-jmini');if(c)c.style.display='none';_v31JMin=false;}return _c.apply(this,arguments);};})();
+(function(){const o=document.getElementById('drawer-overlay');if(o){o.removeAttribute('onclick');o.onclick=v31OverlayClick;}})();
+
+// ⑦ 每月錢怎麼流 W1：三種固定出去合成一格（加入基金）
+function _v31FundM(){const on=(db.settings?.fundDeductions||[]).filter(f=>f.enabled!==false);return on.reduce((s,f)=>s+(f.amount||0)*(f.days||[]).length,0)*52/12;}
+function v31Flow(){
+  const I=_b6Income(), inc=I.inc, fundM=_v31FundM(), out=I.loanM+I.flexM+fundM, net=inc-out;
+  const loans=I.loans, ends=loans.map(l=>({l,e:_cfLoanEnd(l)})).filter(x=>x.e).sort((a,b)=>a.e.ym.localeCompare(b.e.ym));
+  let cur=out;const steps=ends.map(x=>{cur-=x.l.monthly||0;return{ym:x.e.ym,net:inc-Math.max(0,cur)};});
+  const wan=v=>(v>=0?'+':'−')+(Math.abs(v)/10000).toFixed(1)+' 萬';
+  const pw=v=>inc>0?Math.min(100,v/inc*100).toFixed(0):0;
+  const ln=(ic,t,v,c,sub,click)=>v?`<div class="v31-fl"${click?` onclick="${click}"`:''} title="${sub}"><div class="v31-fr"><span class="v31-fn">${ic} ${t}</span><span class="v15-sub">${pw(v)}%</span><span class="v15-mono v31-fv">${Math.round(v).toLocaleString()}</span></div><div class="v31-fb"><i style="width:${pw(v)}%;background:${c}"></i></div></div>`:'';
+  const flexTxt=I.flex.filter(f=>f.monthly).map(f=>_ae(f.name||f.bank||'')).join('＋');
+  return`<div class="v15-ct">🔀 每月錢怎麼流</div>
+    <div class="v15-k" style="background:#fef2f2;border-color:#fecaca"><div class="t">💰 每月股息進來</div><div class="v" style="color:#dc2626">${_b6m(inc)}</div><div class="s">近 3 個月平均</div></div>
+    <div class="v15-ar">▼</div>
+    <div class="v31-fo"><div class="v31-fh"><b>每月固定出去</b><b class="v15-mono" style="color:#15803d;margin-left:auto">−${Math.round(out).toLocaleString()}</b></div>
+      ${ln('🏦','信貸',I.loanM,'#a78bfa',`${loans.length} 筆信貸月繳`,"document.getElementById('v15-loans')?.scrollIntoView({behavior:'smooth',block:'center'})")}
+      ${ln('💳','利息',I.flexM,'#fda4af',`不限用途利息：${flexTxt}`,"document.getElementById('v15-flex')?.scrollIntoView({behavior:'smooth',block:'center'})")}
+      ${ln('📅','基金',fundM,'#86efac','定期定額：每週 '+_b6m(fundM*12/52)+' × 52 ÷ 12',"dbShowPage('fund')")}
+      <div class="v15-sub" style="margin-top:2px">條長＝占股息的比例</div></div>
+    <div class="v15-ar">▼</div>
+    <div class="v15-k" style="background:#eff6ff;border-color:#bfdbfe"><div class="t">💵 ${net>=0?'每月留下':'每月不足'}</div><div class="v" style="color:${net>=0?'#dc2626':'#16a34a'}">${net>=0?'+':'−'}${_b6m(net)}</div><div class="s">${net>=0?`一年約 +${_b6m(net*12)}・股息少 ${inc>0?Math.round((1-out/inc)*100):0}% 才會不夠`:'股息不夠付，要從現金補'}</div></div>
+    ${steps.length?`<div class="v15-ct" style="font-size:13px;margin-top:6px;text-align:left">📅 還清後每月多出</div><div class="v15-steps"><span class="v15-st">現在 ${wan(net)}</span>${steps.map((s,k)=>`<span class="v15-st${k===steps.length-1?' last':''}" onclick="v15Debt(true)">${s.ym} ${wan(s.net)}</span>`).join('')}</div>`:''}`;
+}
+(function(){const _o=v15Ov;v15Ov=function(){const h=_o.apply(this,arguments);try{
+  const t=document.createElement('template');t.innerHTML=h;const m=t.content.querySelector('.v15-flow');if(m)m.innerHTML=v31Flow();return t.innerHTML;
+}catch(e){console.warn('v31 flow',e);return h;}};})();
+
 </script>
 
 </div><!-- /main-content -->
