@@ -247,6 +247,34 @@ function exHistory(exId){const e=db.ex[exId];return db.sessions.filter(s=>(s.ite
   let best=0,top=0,vol=0;st.forEach(x=>{const L=setLoad(e,x,s.date);best=Math.max(best,e1rm(L,x.r));top=Math.max(top,+x.w||0);vol+=L*(+x.r);});return{date:s.date,id:s.id,best,top,vol,sets:st};}).filter(x=>x.sets.length).sort((a,b)=>a.date.localeCompare(b.date));}
 function prsIn(from,to){const out=[];Object.keys(db.ex).forEach(id=>{const H=exHistory(id);let mx=0;H.forEach(h=>{if(h.best>mx+0.01){if(mx>0&&h.date>=from&&h.date<=to)out.push({ex:id,date:h.date,best:h.best,prev:mx,top:h.top});mx=h.best;}});});return out;}
 
+// ── 文字匯入：「2026/10/30（胸）」＋「動作：60×10、60×10」或「動作：8、9、8」──
+const EX_ALIAS={'平板臥推':'槓鈴臥推','槓鈴平板臥推':'槓鈴臥推','臥推':'槓鈴臥推','機器上胸':'上胸臥推','上胸':'上胸臥推','下胸':'雙槓下胸','夾胸':'機器夾胸','腿後勾':'股二頭機器','機械腿後勾':'股二頭機器','機器腿後勾':'股二頭機器','腿部伸展':'股四頭坐姿腿部伸展','機械肩推':'肩推','機器肩推':'肩推','啞鈴肩推':'肩推','啞鈴側平舉':'側平舉','啞鈴前平舉':'前平舉','握推':'臥推'};
+function _exNorm(n){return String(n).replace(/\s/g,'').replace(/握推/g,'臥推').replace(/灣舉/g,'彎舉').replace(/[vV]行/g,'V型').replace(/V 型/g,'V型');}
+function findEx(name){
+  const raw=_exNorm(name), all=Object.entries(db.ex);
+  const by=n=>all.find(([id,e])=>_exNorm(e.n)===_exNorm(n));
+  let hit=by(raw)||(EX_ALIAS[raw]&&by(EX_ALIAS[raw]));if(hit)return hit[0];
+  const strip=s=>_exNorm(s).replace(/^(槓鈴|啞鈴|機器|機械|器械|纜繩|滑輪)/,'').replace(/^平板/,'');
+  hit=all.find(([id,e])=>strip(e.n)===strip(raw))||(EX_ALIAS[strip(raw)]&&by(EX_ALIAS[strip(raw)]))||all.find(([id,e])=>strip(e.n).includes(strip(raw))||strip(raw).includes(strip(e.n)));
+  return hit?hit[0]:null;}
+function parseImport(text){
+  const out=[],warn=[];let cur=null;const GMAP={'胸':'chest','背':'back','腿':'legs','肩':'shoulder','二頭':'bi','三頭':'tri','手臂':null};
+  String(text).split(/\n|。/).map(l=>l.trim()).filter(Boolean).forEach(line=>{
+    const d=line.match(/^(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})\s*(?:[（(]([^）)]*)[）)])?/);
+    if(d){cur={date:`${d[1]}-${String(d[2]).padStart(2,'0')}-${String(d[3]).padStart(2,'0')}`,label:d[4]||'',groups:[],items:[],cardio:[]};
+      (d[4]||'').split(/[＋+、,，\/]/).forEach(g=>{g=g.trim();if(GMAP[g])cur.groups.push(GMAP[g]);});out.push(cur);return;}
+    const m=line.match(/^(.+?)[：:]\s*(.+)$/);if(!m||!cur){warn.push('看不懂：'+line);return;}
+    const id=findEx(m[1]);if(!id){warn.push(`${cur.date} 找不到動作「${m[1]}」（可以先到動作清單新增）`);return;}
+    const sets=m[2].split(/[、,，\s]+/).filter(Boolean).map(t=>{const x=t.match(/^(\d+(?:\.\d+)?)\s*[×xX*]\s*(\d+)$/);if(x)return{w:+x[1],r:+x[2]};const y=t.match(/^(\d+)$/);return y?{w:'',r:+y[1]}:null;});
+    if(sets.some(s=>!s)){warn.push(`${cur.date} ${m[1]} 有看不懂的組：${m[2]}`);}
+    const ok=sets.filter(Boolean);if(!ok.length)return;if(db.ex[id].bw)ok.forEach(x=>{if(x.w==='')x.w=0;});
+    const it=cur.items.find(x=>x.ex===id);if(it)it.sets.push(...ok);else cur.items.push({ex:id,sets:ok,done:true,src:m[1]});
+    const g=db.ex[id].g;if(!cur.groups.includes(g))cur.groups.push(g);});
+  return{sessions:out.filter(s=>s.items.length),warn};}
+function importKey(s){return s.date+'|'+s.items.map(it=>it.ex+':'+it.sets.map(x=>(x.w===''?'':x.w)+'x'+x.r).join(',')).join(';');}
+function doImport(P){let n=0,skip=0;P.sessions.forEach(s=>{const k=importKey(s);if(db.sessions.some(z=>z.ik===k)){skip++;return;}
+  db.sessions.push(touch({id:uid(),date:s.date,start:'',end:'匯入',groups:s.groups,items:s.items.map(it=>({ex:it.ex,sets:it.sets,done:true})),cardio:[],note:'',ik:k}));n++;});save();return{n,skip};}
+
 </script>
 <script>
 // ══ 手機：快速輸入 ══
@@ -324,7 +352,7 @@ function exRow(s,e){
     <div class="rbox"><input class="r-in" inputmode="numeric" value="${x.r??''}" placeholder="${L&&L.sets[i]?L.sets[i].r:'次'}" oninput="setR(${i},this.value)" onfocus="this.select()"></div>
     ${+x.r?'<span class="ck">✓</span>':`<button class="x" onclick="rmSet(${i})">×</button>`}</div>`).join('');
   return`<div class="ex cur" onclick="openEx(null)">▶ <b>${esc(e.n)}</b><span class="r">收起 ▲</span></div><div class="ed">
-    ${L?`<div class="last">上次 ${md(L.date)}：${L.sets.map(x=>`<b>${+x.w||0}</b>×${x.r}`).join('　')}${e.bw?'<br>自重動作：重量填「額外負重」，沒加就填 0':''}</div>`:`<div class="last">第一次記這個動作${e.bw?'・重量填「額外負重」，沒加就填 0':''}</div>`}
+    ${L?`<div class="last">上次 ${md(L.date)}：${L.sets.map(x=>`<b>${x.w===''?'?':+x.w||0}</b>×${x.r}`).join('　')}${e.bw?'<br>自重動作：重量填「額外負重」，沒加就填 0':''}</div>`:`<div class="last">第一次記這個動作${e.bw?'・重量填「額外負重」，沒加就填 0':''}</div>`}
     <div class="sh"><span>組</span><span style="text-align:center">重量 kg</span><span style="text-align:center">次數</span><span></span></div>${rows}
     ${(it.sets||[]).some(x=>x.p)?'<div class="mu" style="margin:2px 0 4px">灰字＝上次這組的重量，一樣就直接填次數</div>':''}
     <div class="row2"><button class="btn gh" onclick="addSet()">＋ 下一組</button><button class="btn ok" style="flex:1.4" onclick="doneEx()">✓ 這個動作結束</button></div></div>`;
@@ -340,7 +368,7 @@ function openEx(id){
   render();
   if(id)setTimeout(()=>{const ed=document.querySelector('.ed');if(ed)ed.previousElementSibling.scrollIntoView({behavior:'smooth',block:'start'});const r=[...document.querySelectorAll('.ed .r-in')].find(x=>!x.value);if(r)r.focus();},60);
 }
-function nextSet(s,it,i){const L=lastSets(it.ex,s.date,s.id);if(L&&L.sets[i])return{w:+L.sets[i].w||0,r:'',p:1};const prev=it.sets[it.sets.length-1];if(prev)return{w:prev.w,r:''};if(L&&L.sets.length)return{w:+L.sets[L.sets.length-1].w||0,r:'',p:1};return{w:'',r:''};}
+function nextSet(s,it,i){const L=lastSets(it.ex,s.date,s.id);const W=x=>x.w===''||x.w==null?'':+x.w;if(L&&L.sets[i])return{w:W(L.sets[i]),r:'',p:1};const prev=it.sets[it.sets.length-1];if(prev)return{w:prev.w,r:''};if(L&&L.sets.length)return{w:W(L.sets[L.sets.length-1]),r:'',p:1};return{w:'',r:''};}
 function cleanEx(){const s=sess(CUR);const it=s&&s.items.find(x=>x.ex===OPEN);if(!it)return;it.sets=it.sets.filter(x=>+x.r);it.sets.forEach(x=>delete x.p);if(!it.sets.length)s.items=s.items.filter(x=>x!==it);touch(s);save();}
 function setW(i,v){const[s,it]=curIt();it.sets[i].w=v===''?'':+v;delete it.sets[i].p;v!==''&&event.target.closest('.st').classList.remove('pre');touch(s);save();}
 function setR(i,v){const[s,it]=curIt();it.sets[i].r=v===''?'':parseInt(v)||'';if(+it.sets[i].r)delete it.sets[i].p;touch(s);save();const row=event.target.closest('.st');row.classList.toggle('ok',!!+it.sets[i].r);if(+it.sets[i].r)row.classList.remove('pre');}

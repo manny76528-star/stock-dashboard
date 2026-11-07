@@ -127,6 +127,7 @@ tr.sr{cursor:pointer}tr.sr:hover td{background:#f8fafc}td.num{text-align:right;f
 .empty{text-align:center;color:var(--mu);padding:40px 0}
 .ibk{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
 .form{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}.form label{font-size:12px;color:var(--mu);display:block;margin-bottom:3px}.form input{border:1.5px solid #cbd5e1;border-radius:9px;padding:8px 10px;font-size:14px;font-family:var(--mono);width:120px}
+#imp{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:100;display:none;align-items:center;justify-content:center}#imp .ib{background:#fff;border-radius:20px;width:min(1100px,94vw);height:min(720px,90vh);padding:18px 20px;display:flex;flex-direction:column}#impT{flex:1;border:1.5px solid #cbd5e1;border-radius:12px;padding:12px;font-size:14px;font-family:var(--mono);line-height:1.7;resize:none}
 #emb{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:100;display:none;align-items:center;justify-content:center}#emb iframe{width:430px;height:min(860px,94vh);border:none;border-radius:24px;background:#f1f5f9;box-shadow:0 30px 70px rgba(0,0,0,.35)}
 .prl div{display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px dashed #f1f5f9;font-size:13px}
 .mgr{display:flex;align-items:center;gap:8px;padding:7px 2px;border-bottom:1px solid #f1f5f9;font-size:13.5px}.mgr.off{opacity:.45}
@@ -134,9 +135,14 @@ tr.sr{cursor:pointer}tr.sr:hover td{background:#f8fafc}td.num{text-align:right;f
 </head>
 <body>
 <div class="top"><b>🏋️ 健身數據</b><div class="tabs" id="tabs"></div><span class="sp"></span><span id="sync"></span>
- <button class="tb pri" onclick="emb('#new')">＋ 補記一次訓練</button><a href="fitness-m.html">📱 手機版</a><a href="index.html">🏠 主目錄</a></div>
+ <button class="tb" onclick="impOpen()">📥 貼上匯入</button><button class="tb pri" onclick="emb('#new')">＋ 補記一次訓練</button><a href="fitness-m.html">📱 手機版</a><a href="index.html">🏠 主目錄</a></div>
 <div class="wrap" id="app"></div>
 <div id="emb" onclick="if(event.target===this)ftCloseEmbed()"><iframe id="embf"></iframe></div>
+<div id="imp" onclick="if(event.target===this)this.style.display='none'"><div class="ib"><div class="ct" style="font-size:17px">📥 貼上訓練紀錄<span class=mu>一行日期、底下每個動作一行</span><button class="tb" style="margin-left:auto" onclick="$('imp').style.display='none'">✕</button></div>
+ <div style="display:grid;grid-template-columns:1fr 1.2fr;gap:14px;flex:1;min-height:0"><div style="display:flex;flex-direction:column"><textarea id="impT" oninput="impPrev()" placeholder="2026/11/7（胸）&#10;槓鈴平板臥推：80×9、74×8、70×8&#10;機器上胸：9、8、9、8&#10;雙槓下胸：11、8、8"></textarea>
+  <div class=mu style="margin-top:6px;line-height:1.7">・有重量寫「80×9」，只有次數寫「9」（重量之後可以在編輯補）<br>・雙槓這種自重動作只寫次數＝沒加負重<br>・同一段文字重複貼不會重複匯入</div></div>
+  <div style="overflow:auto;border:1px solid var(--line);border-radius:12px;padding:10px" id="impP"><div class="empty">貼上後這裡會預覽</div></div></div>
+ <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px"><span class=mu id="impS" style="margin-right:auto;align-self:center"></span><button class="tb pri" id="impGo" onclick="impGo()" disabled>匯入</button></div></div></div>
 <script>
 // ══ 🏋️ 健身紀錄：共用核心（資料、同步、統計）══
 const FT_KEY='fitness_db_v1', FT_FILE='data_fitness.json', CF_WORKER='https://dashboard-sync.manny76528.workers.dev', FT_API=CF_WORKER+'/'+FT_FILE;
@@ -224,6 +230,34 @@ function lastGroup(g,beforeDate,exceptId){const L=db.sessions.filter(s=>s.id!==e
 function exHistory(exId){const e=db.ex[exId];return db.sessions.filter(s=>(s.items||[]).some(it=>it.ex===exId)).map(s=>{const st=s.items.find(it=>it.ex===exId).sets.filter(x=>+x.r);
   let best=0,top=0,vol=0;st.forEach(x=>{const L=setLoad(e,x,s.date);best=Math.max(best,e1rm(L,x.r));top=Math.max(top,+x.w||0);vol+=L*(+x.r);});return{date:s.date,id:s.id,best,top,vol,sets:st};}).filter(x=>x.sets.length).sort((a,b)=>a.date.localeCompare(b.date));}
 function prsIn(from,to){const out=[];Object.keys(db.ex).forEach(id=>{const H=exHistory(id);let mx=0;H.forEach(h=>{if(h.best>mx+0.01){if(mx>0&&h.date>=from&&h.date<=to)out.push({ex:id,date:h.date,best:h.best,prev:mx,top:h.top});mx=h.best;}});});return out;}
+
+// ── 文字匯入：「2026/10/30（胸）」＋「動作：60×10、60×10」或「動作：8、9、8」──
+const EX_ALIAS={'平板臥推':'槓鈴臥推','槓鈴平板臥推':'槓鈴臥推','臥推':'槓鈴臥推','機器上胸':'上胸臥推','上胸':'上胸臥推','下胸':'雙槓下胸','夾胸':'機器夾胸','腿後勾':'股二頭機器','機械腿後勾':'股二頭機器','機器腿後勾':'股二頭機器','腿部伸展':'股四頭坐姿腿部伸展','機械肩推':'肩推','機器肩推':'肩推','啞鈴肩推':'肩推','啞鈴側平舉':'側平舉','啞鈴前平舉':'前平舉','握推':'臥推'};
+function _exNorm(n){return String(n).replace(/\s/g,'').replace(/握推/g,'臥推').replace(/灣舉/g,'彎舉').replace(/[vV]行/g,'V型').replace(/V 型/g,'V型');}
+function findEx(name){
+  const raw=_exNorm(name), all=Object.entries(db.ex);
+  const by=n=>all.find(([id,e])=>_exNorm(e.n)===_exNorm(n));
+  let hit=by(raw)||(EX_ALIAS[raw]&&by(EX_ALIAS[raw]));if(hit)return hit[0];
+  const strip=s=>_exNorm(s).replace(/^(槓鈴|啞鈴|機器|機械|器械|纜繩|滑輪)/,'').replace(/^平板/,'');
+  hit=all.find(([id,e])=>strip(e.n)===strip(raw))||(EX_ALIAS[strip(raw)]&&by(EX_ALIAS[strip(raw)]))||all.find(([id,e])=>strip(e.n).includes(strip(raw))||strip(raw).includes(strip(e.n)));
+  return hit?hit[0]:null;}
+function parseImport(text){
+  const out=[],warn=[];let cur=null;const GMAP={'胸':'chest','背':'back','腿':'legs','肩':'shoulder','二頭':'bi','三頭':'tri','手臂':null};
+  String(text).split(/\n|。/).map(l=>l.trim()).filter(Boolean).forEach(line=>{
+    const d=line.match(/^(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})\s*(?:[（(]([^）)]*)[）)])?/);
+    if(d){cur={date:`${d[1]}-${String(d[2]).padStart(2,'0')}-${String(d[3]).padStart(2,'0')}`,label:d[4]||'',groups:[],items:[],cardio:[]};
+      (d[4]||'').split(/[＋+、,，\/]/).forEach(g=>{g=g.trim();if(GMAP[g])cur.groups.push(GMAP[g]);});out.push(cur);return;}
+    const m=line.match(/^(.+?)[：:]\s*(.+)$/);if(!m||!cur){warn.push('看不懂：'+line);return;}
+    const id=findEx(m[1]);if(!id){warn.push(`${cur.date} 找不到動作「${m[1]}」（可以先到動作清單新增）`);return;}
+    const sets=m[2].split(/[、,，\s]+/).filter(Boolean).map(t=>{const x=t.match(/^(\d+(?:\.\d+)?)\s*[×xX*]\s*(\d+)$/);if(x)return{w:+x[1],r:+x[2]};const y=t.match(/^(\d+)$/);return y?{w:'',r:+y[1]}:null;});
+    if(sets.some(s=>!s)){warn.push(`${cur.date} ${m[1]} 有看不懂的組：${m[2]}`);}
+    const ok=sets.filter(Boolean);if(!ok.length)return;if(db.ex[id].bw)ok.forEach(x=>{if(x.w==='')x.w=0;});
+    const it=cur.items.find(x=>x.ex===id);if(it)it.sets.push(...ok);else cur.items.push({ex:id,sets:ok,done:true,src:m[1]});
+    const g=db.ex[id].g;if(!cur.groups.includes(g))cur.groups.push(g);});
+  return{sessions:out.filter(s=>s.items.length),warn};}
+function importKey(s){return s.date+'|'+s.items.map(it=>it.ex+':'+it.sets.map(x=>(x.w===''?'':x.w)+'x'+x.r).join(',')).join(';');}
+function doImport(P){let n=0,skip=0;P.sessions.forEach(s=>{const k=importKey(s);if(db.sessions.some(z=>z.ik===k)){skip++;return;}
+  db.sessions.push(touch({id:uid(),date:s.date,start:'',end:'匯入',groups:s.groups,items:s.items.map(it=>({ex:it.ex,sets:it.sets,done:true})),cardio:[],note:'',ik:k}));n++;});save();return{n,skip};}
 
 </script>
 <script>
@@ -359,6 +393,21 @@ function vMgr(){
 function renEx(id){const e=db.ex[id];const v=prompt('動作名稱',e.n);if(v&&v.trim()){e.n=v.trim();touch(e);save();render();}}
 function togEx(id){const e=db.ex[id];e.off=!e.off;touch(e);save();render();}
 function addEx(g){const v=prompt(GN[g]+'：新動作名稱');if(!v||!v.trim())return;const bw=confirm('這是自身體重的動作嗎？（按確定＝自重）');db.ex['u'+uid()]=touch({g,n:v.trim(),bw,sub:'',o:Object.keys(db.ex).length+1});save();render();}
+
+// ── 貼上匯入 ──
+let _impP=null;
+function impOpen(){$('imp').style.display='flex';setTimeout(()=>$('impT').focus(),50);impPrev();}
+function impPrev(){const t=$('impT').value;_impP=t.trim()?parseImport(t):null;const P=_impP;
+  if(!P){$('impP').innerHTML='<div class="empty">貼上後這裡會預覽</div>';$('impGo').disabled=true;$('impS').textContent='';return;}
+  const dup=P.sessions.filter(s=>db.sessions.some(z=>z.ik===importKey(s))).length;
+  $('impP').innerHTML=(P.warn.length?`<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:8px 10px;margin-bottom:8px;font-size:12.5px;color:#92400e">${P.warn.map(esc).join('<br>')}</div>`:'')+
+   P.sessions.map(s=>{const dp=db.sessions.some(z=>z.ik===importKey(s));const same=db.sessions.filter(z=>z.date===s.date&&!z.ik).length;
+    return`<div style="margin-bottom:12px;${dp?'opacity:.45':''}"><b class=mono>${s.date.replace(/-/g,'/')}</b> 週${WK[dow(s.date)]} ${s.groups.map(k=>`<span class="pill" style="background:${GC[k]}">${GN[k]}</span>`).join('')}${dp?' <span class=mu>已匯入過，會略過</span>':same?` <span style="color:#d97706;font-size:12px">⚠️ 這天已經有 ${same} 筆紀錄</span>`:''}
+    <table style="margin-top:4px">${s.items.map(it=>`<tr><td style="width:44%"><b>${esc(db.ex[it.ex].n)}</b>${_exNorm(it.src)!==_exNorm(db.ex[it.ex].n)?` <span class=mu>← ${esc(it.src)}</span>`:''}</td><td class=mono>${it.sets.map(x=>x.w===''?`<span style="color:#94a3b8">?</span>×${x.r}`:db.ex[it.ex].bw&&!x.w?`自重×${x.r}`:`${x.w}×${x.r}`).join('　')}</td></tr>`).join('')}</table></div>`;}).join('');
+  const n=P.sessions.length-dup;$('impGo').disabled=!n;$('impGo').textContent=n?`匯入 ${n} 次訓練`:'匯入';
+  const noW=P.sessions.reduce((a,s)=>a+s.items.filter(it=>it.sets.some(x=>x.w==='')&&!db.ex[it.ex].bw).length,0);
+  $('impS').textContent=noW?`灰色 ? ＝ 沒寫重量（${noW} 個動作），訓練量不會算到，之後可以點「編輯」補重量`:'';}
+function impGo(){if(!_impP)return;const r=doImport(_impP);$('imp').style.display='none';$('impT').value='';alert(`✅ 匯入 ${r.n} 次訓練${r.skip?`（${r.skip} 次已經有，略過）`:''}`);TAB='log';render();}
 
 // ── 補記／編輯：用手機版畫面開在視窗裡 ──
 function emb(h){$('embf').src='fitness-m.html?embed=1'+h;$('emb').style.display='flex';}
