@@ -198,6 +198,7 @@ function mergeDb(a,b){
     [...(a[k]||[]),...(b[k]||[])].forEach(x=>{if(!x||!x.id)return;if(!m[x.id]||(x._u||0)>(m[x.id]._u||0))m[x.id]=x;});
     o[k]=Object.values(m).filter(x=>!(D[x.id]&&D[x.id]>=(x._u||0))).sort((p,q)=>(p.date+(p.start||'')).localeCompare(q.date+(q.start||'')));});
   [a.ex||{},b.ex||{}].forEach(E=>Object.entries(E).forEach(([id,e])=>{if(!o.ex[id]||(e._u||0)>(o.ex[id]._u||0))o.ex[id]=e;}));
+  const ca=a.cfg||{},cb=b.cfg||{};o.cfg=(ca._u||0)>=(cb._u||0)?ca:cb;
   o._ts=Math.max(a._ts||0,b._ts||0);return o;}
 let _sha='',_pushT=null,_pulling=false;
 const b64e=s=>{const u=new TextEncoder().encode(s);let r='';for(let i=0;i<u.length;i+=0x8000)r+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return btoa(r);};
@@ -344,7 +345,7 @@ function vSess(){
   $('ttl').textContent='💪 '+sessTitle(s);
   const groups=[...new Set([...(s.groups||[]),...sessGroups(s)])];
   const S=sessStats(s);
-  let h=`<div class="card" style="display:flex;align-items:center;gap:10px;padding:10px 12px"><div><b class=mono>${md(s.date)}</b> <span class=mu>週${WK[dow(s.date)]}・${s.start||''}${s.end?'～'+s.end:' 開始'}</span><div class=mu>已記 ${S.sets} 組・${fmt(S.vol)} kg${S.min?`・有氧 ${S.min} 分`:''}</div></div><button class="del" style="margin-left:auto;color:#475569" onclick="editDate()">改日期</button></div>`;
+  let h=`<div class="card" style="display:flex;align-items:center;gap:10px;padding:10px 12px"><div><b class=mono>${md(s.date)}</b> <span class=mu>週${WK[dow(s.date)]}・${s.start||''}${s.end?'～'+s.end:' 開始'}</span><div class=mu>已記 ${S.sets} 組・${fmt(S.vol)} kg${S.min?`・有氧 ${S.min} 分`:''}</div></div><span style="margin-left:auto;display:flex;flex-direction:column;align-items:flex-end"><button class="del" style="color:#475569;padding:4px 8px" onclick="if(OPEN)cleanEx();OPEN=null;go('home')">← 首頁</button><button class="del" style="color:#475569;padding:4px 8px" onclick="editDate()">改日期</button></span></div>`;
   groups.forEach(g=>{
     h+=`<div class="gh2"><i style="background:${GC[g]}"></i>${GN[g]}</div>`;let sub='';
     exList(g).forEach(e=>{if(e.sub&&e.sub!==sub){sub=e.sub;h+=`<div class="sub">${esc(e.sub)}</div>`;}h+=exRow(s,e);});
@@ -379,7 +380,7 @@ function lastTxt(exId,s){const L=lastSets(exId,s.date,s.id);return L?`上次 ${m
 function curIt(){const s=sess(CUR);let it=s.items.find(x=>x.ex===OPEN);return[s,it];}
 function openEx(id){
   if(OPEN&&OPEN!==id)cleanEx();
-  OPEN=id;if(id){const s=sess(CUR);let it=s.items.find(x=>x.ex===id);
+  OPEN=id;try{localStorage.setItem('ft_open',JSON.stringify({s:CUR,ex:id}));}catch(e){}if(id){const s=sess(CUR);let it=s.items.find(x=>x.ex===id);
     if(!it){it={ex:id,sets:[],done:false};s.items.push(it);}
     if(it.done)it.done=false;
     if(!it.sets.length)it.sets.push(nextSet(s,it,0));}
@@ -484,7 +485,9 @@ function addEx(g){const v=prompt(GN[g]+'：新動作名稱');if(!v||!v.trim())re
 (async function(){
   const m=location.hash.match(/s=([\w]+)/);if(location.hash==='#new'){}
   if(m&&sess(m[1])){CUR=m[1];V='sess';}
-  render();
+  else if(!EMBED){// 休息時被系統關掉也沒關係：打開直接回到進行中的訓練和剛剛那個動作
+    const o=openSess();if(o){CUR=o.id;V='sess';try{const j=JSON.parse(localStorage.getItem('ft_open')||'null');if(j&&j.s===o.id&&o.items.some(it=>it.ex===j.ex&&!it.done))OPEN=j.ex;}catch(e){}}}
+  render();if(OPEN)setTimeout(()=>{const ed=document.querySelector('.ed');if(ed)ed.previousElementSibling.scrollIntoView({block:'start'});},80);
   const ch=await pull();if(ch){if(V==='sess'&&!sess(CUR))V='home';render();}
   document.addEventListener('visibilitychange',async()=>{if(document.visibilityState==='visible'&&!OPEN){if(await pull())render();}});
 })();
