@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-<!-- fitness build 2026-11-08e -->
+<!-- fitness build 2026-11-08f -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -158,6 +158,23 @@ tr.sr{cursor:pointer}tr.sr:hover td{background:#f8fafc}td.num{text-align:right;f
 #emb{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:100;display:none;align-items:center;justify-content:center}#emb iframe{width:430px;height:min(860px,94vh);border:none;border-radius:24px;background:#f1f5f9;box-shadow:0 30px 70px rgba(0,0,0,.35)}
 .prl div{display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px dashed #f1f5f9;font-size:13px}
 .mgr{display:flex;align-items:center;gap:8px;padding:7px 2px;border-bottom:1px solid #f1f5f9;font-size:13.5px}.mgr.off{opacity:.45}
+/* 📄 教練報告 */
+.rpbar{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.rp{background:#fff;border:1px solid var(--line);border-radius:18px;padding:30px 40px;max-width:980px;margin:0 auto}
+.rhd{display:flex;align-items:flex-end}.rp h1{font-size:23px;margin:0}
+.rp h2{font-size:15.5px;margin:24px 0 8px;padding-bottom:5px;border-bottom:2px solid #0f172a;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}.rp h2 span{font-size:11.5px;color:#64748b;font-weight:500}
+.rk{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:14px}.rk div{border:1px solid #e2e8f0;border-radius:10px;padding:7px 10px;display:flex;flex-direction:column}.rk b{font-size:18px;font-family:var(--mono);margin:1px 0}
+.rfl{border-radius:10px;padding:7px 12px;margin:6px 0;font-size:13px;line-height:1.65}.rfl.r{background:#fef2f2;border-left:4px solid #dc2626}.rfl.y{background:#fffbeb;border-left:4px solid #f59e0b}.rfl.g{background:#ecfeff;border-left:4px solid #0891b2}
+.rt th{background:#f1f5f9;padding:5px 8px;font-size:11.5px}.rt td{padding:6px 8px;font-size:12.5px;border-bottom:1px solid #eef2f7}
+.rbar{height:8px;background:#f1f5f9;border-radius:4px;position:relative;margin:4px 0 2px}.rbar i{position:absolute;left:0;top:0;bottom:0;border-radius:4px}.rbar u{position:absolute;top:-3px;bottom:-3px;border-left:2px dashed #94a3b8}
+.rr{color:#dc2626!important;font-weight:800}.rtag{display:inline-block;border-radius:5px;padding:0 6px;font-size:11px;font-weight:800}.rdot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+.rgb{margin-top:12px;break-inside:avoid}.rgh{display:flex;align-items:baseline;gap:10px;padding:6px 10px;border-radius:8px;margin-bottom:2px}.rgh b{font-size:15px}
+.rbox{border:1.5px dashed #cbd5e1;border-radius:10px;height:110px}
+.rptx textarea{width:100%;height:280px;border:1.5px solid #cbd5e1;border-radius:12px;padding:12px;font-family:var(--mono);font-size:13px;line-height:1.7;resize:vertical}
+#rpnag{display:flex;align-items:center;gap:8px;background:#ecfeff;border:1px solid #a5f3fc;color:#0e7490;border-radius:14px;padding:10px 16px;margin-bottom:14px;cursor:pointer;font-size:14px}#rpnag:hover{box-shadow:0 4px 14px rgba(8,145,178,.15)}
+#rptoast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%) translateY(20px);background:#0f172a;color:#fff;padding:11px 18px;border-radius:12px;font-weight:700;opacity:0;transition:.25s;z-index:200;pointer-events:none}#rptoast.on{opacity:1;transform:translateX(-50%)}
+@page{size:A4;margin:10mm}
+@media print{body{min-width:0;background:#fff}.top,.rpbar,.rptx,#imp,#emb,#rptoast{display:none!important}.wrap{padding:0;max-width:none}.rp{border:none;padding:0;max-width:none;border-radius:0}.rfl,.rt tr,.rk{break-inside:avoid}h2.pb{break-before:page}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 </style>
 </head>
 <body>
@@ -276,6 +293,7 @@ function findEx(name){
 function parseImport(text){
   const out=[],warn=[];let cur=null;const GMAP={'胸':'chest','背':'back','腿':'legs','肩':'shoulder','二頭':'bi','三頭':'tri','手臂':null};
   String(text).split(/\n|。/).map(l=>l.trim()).filter(Boolean).forEach(line=>{
+    if(/^【[^】]*】$/.test(line)||/^🏋️|^共 \d+ 次/.test(line))return; // 複製出來的清單：肌群標題、表頭略過
     const d=line.match(/^(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})\s*(?:[（(]([^）)]*)[）)])?/);
     if(d){cur={date:`${d[1]}-${String(d[2]).padStart(2,'0')}-${String(d[3]).padStart(2,'0')}`,label:d[4]||'',groups:[],items:[],cardio:[]};
       (d[4]||'').split(/[＋+、,，\/]/).forEach(g=>{g=g.trim();if(GMAP[g])cur.groups.push(GMAP[g]);});out.push(cur);return;}
@@ -286,7 +304,7 @@ function parseImport(text){
       const c={id:uid(),type:ct,min:g(/(\d+(?:\.\d+)?)\s*(?:分|min)/i),km:g(/(\d+(?:\.\d+)?)\s*(?:公里|km)/i),kcal:g(/(\d+(?:\.\d+)?)\s*(?:kcal|大卡|卡)/i)};
       if(c.min===''&&c.km===''&&c.kcal===''){warn.push(`${cur.date} ${m[1]} 看不懂：${v}（例：25分、1.5公里、206kcal）`);return;}cur.cardio.push(c);return;}
     const id=findEx(m[1]);if(!id){warn.push(`${cur.date} 找不到動作「${m[1]}」（可以先到動作清單新增）`);return;}
-    const sets=m[2].split(/[、,，\s]+/).filter(Boolean).map(t=>{const x=t.match(/^(\d+(?:\.\d+)?)\s*([pP磅]|kg|KG|公斤)?\s*[×xX*]\s*(\d+)$/);if(x)return /^[pP磅]$/.test(x[2]||'')?{w:+x[1],u:'lb',r:+x[3]}:{w:+x[1],r:+x[3]};const y=t.match(/^(\d+)$/);return y?{w:'',r:+y[1]}:null;});
+    const sets=m[2].split(/[、,，\s]+/).filter(Boolean).map(t=>{const x=t.match(/^(\d+(?:\.\d+)?)\s*([pP磅]|kg|KG|公斤)?\s*[×xX*]\s*(\d+)$/);if(x)return /^[pP磅]$/.test(x[2]||'')?{w:+x[1],u:'lb',r:+x[3]}:{w:+x[1],r:+x[3]};const z=t.match(/^自重\s*[×xX*]\s*(\d+)$/);if(z)return{w:0,r:+z[1]};const y=t.match(/^(\d+)$/);return y?{w:'',r:+y[1]}:null;});
     if(sets.some(s=>!s)){warn.push(`${cur.date} ${m[1]} 有看不懂的組：${m[2]}`);}
     const ok=sets.filter(Boolean);if(!ok.length)return;if(db.ex[id].bw)ok.forEach(x=>{if(x.w==='')x.w=0;});
     const it=cur.items.find(x=>x.ex===id);if(it)it.sets.push(...ok);else cur.items.push({ex:id,sets:ok,done:true,src:m[1]});
@@ -545,6 +563,134 @@ function impGo(){if(!_impP)return;const r=doImport(_impP);$('imp').style.display
 function emb(h){$('embf').src='fitness-m.html?embed=1'+h;$('emb').style.display='flex';}
 window.ftCloseEmbed=function(){$('emb').style.display='none';$('embf').src='about:blank';try{const j=JSON.parse(localStorage.getItem(FT_KEY));if(j)db=mergeDb(db,j);}catch(e){}render();};
 window.addEventListener('storage',e=>{if(e.key===FT_KEY){try{db=mergeDb(db,JSON.parse(e.newValue));render();}catch(x){}}});
+
+// ══ 📄 教練報告（月報）＋ 一鍵複製本月訓練清單 ══
+const RP_NAME='阿豪訓練計劃';
+let RPM=(()=>{const t=today();if(+t.slice(8)<=5){const d=new Date(t.slice(0,8)+'01T00:00:00Z');d.setUTCMonth(d.getUTCMonth()-1);return d.toISOString().slice(0,7);}return t.slice(0,7);})();
+let RPTXT=false;
+TABS.splice(4,0,['rp','📄 教練報告']);
+const _rpRender0=render;
+render=function(){if(TAB==='rp'){tabs();Object.values(CH).forEach(c=>c.destroy());CH={};vRp();return;}_rpRender0();if(TAB==='ov')rpNag();};
+
+function rpPrevMonth(m,n=-1){const d=new Date(m+'-01T00:00:00Z');d.setUTCMonth(d.getUTCMonth()+n);return d.toISOString().slice(0,7);}
+function rpRange(m){const[a,b]=range('m',m+'-01');const e=b<today()?b:today();return{a,b,e,days:Math.max(1,dayDiff(e,a)+1)};}
+const rpHasW=(e,s)=>e&&e.bw?true:!(s.w===''||s.w==null);
+// 某段期間：每個肌群的每次訓練（日期＋那天這個肌群的動作）
+function rpGroupRows(a,e){const out={};GROUPS.forEach(g=>out[g[0]]=[]);
+  db.sessions.filter(s=>s.date<=e).sort((p,q)=>(p.date+(p.start||'')).localeCompare(q.date+(q.start||''))).forEach(s=>{const by={};
+    (s.items||[]).forEach(it=>{const ex=db.ex[it.ex];if(!ex)return;const st=(it.sets||[]).filter(x=>+x.r);if(!st.length)return;(by[ex.g]=by[ex.g]||[]).push({ex:it.ex,e:ex,sets:st});});
+    Object.entries(by).forEach(([g,items])=>{if(out[g])out[g].push({date:s.date,sid:s.id,items,inP:s.date>=a});});});
+  return out;}
+function rpStats(m){
+  const R=rpRange(m),{a,e}=R,wk=R.days/7,A=agg(a,e);const pm=rpPrevMonth(m),PR=range('m',pm+'-01'),P=agg(PR[0],addDays(PR[0],R.days-1));
+  const GR=rpGroupRows(a,e),G={};
+  GROUPS.forEach(([k])=>{const all=GR[k],rows=all.filter(r=>r.inP);let prev=null;const dates=[];
+    all.forEach(r=>{if(r.inP){r.gap=prev?dayDiff(r.date,prev):null;}if(prev!==r.date)prev=r.date;});
+    rows.forEach(r=>{if(!dates.includes(r.date))dates.push(r.date);});
+    const reps=[],sets=rows.reduce((n,r)=>n+r.items.reduce((x,i)=>x+i.sets.length,0),0);rows.forEach(r=>r.items.forEach(i=>i.sets.forEach(x=>reps.push(+x.r))));
+    const gaps=rows.map(r=>r.gap).filter(x=>x!=null&&x>0);const last=dates[dates.length-1]||null,sinceLast=last?dayDiff(e,last):null;
+    const before=all.filter(r=>!r.inP).pop();
+    const mx=Math.max(0,...gaps,sinceLast||0, !dates.length&&before?dayDiff(e,before.date):0);
+    reps.sort((x,y)=>x-y);const q=p=>reps.length?reps[Math.min(reps.length-1,Math.floor(p*(reps.length-1)+.5))]:0;
+    const sh=f=>reps.length?reps.filter(f).length/reps.length:0;
+    let tag='';if(reps.length){if(sh(r=>r>15)>=.3)tag='hi';else if(sh(r=>r<=5)>=.5)tag='str';else if(sh(r=>r>=6&&r<=12)>=.6)tag='hyp';}
+    const jumpy=rows.some(r=>r.items.some(i=>{const v=i.sets.map(x=>+x.r);return Math.max(...v)-Math.min(...v)>=10;}));
+    G[k]={rows,dates,sets,wsets:sets/wk,freq:dates.length/wk,avgGap:gaps.length?gaps.reduce((x,y)=>x+y,0)/gaps.length:null,maxGap:mx,last:last||(before?before.date:null),lastIn:!!last,lo:q(.1),hi:q(.9),tag,jumpy};});
+  // 各動作
+  const EX=[];Object.keys(db.ex).forEach(id=>{const H=exHistory(id).filter(h=>h.date>=a&&h.date<=e);if(!H.length)return;const ex=db.ex[id];
+    const all=H.flatMap(h=>h.sets),noW=all.filter(x=>!rpHasW(ex,x)).length,B=H.filter(h=>h.best>0);
+    let top=null;all.forEach(x=>{if(rpHasW(ex,x)&&(!top||wKg(x)>wKg(top)||wKg(x)===wKg(top)&&+x.r>+top.r))top=x;});
+    const f=B[0],l=B[B.length-1],d=B.length>=2?(l.best-f.best)/f.best*100:null;
+    const jump=H.find(h=>{const v=h.sets.map(x=>+x.r);return Math.max(...v)-Math.min(...v)>=10;});
+    if(ex.bw&&all.every(x=>!(+x.w))){const mr=h=>Math.max(...h.sets.map(x=>+x.r)),F0=mr(H[0]),L0=mr(H[H.length-1]);
+      EX.push({id,ex,reps:1,n:H.length,first:F0,last:L0,d:H.length>=2?L0-F0:null,top:null,avgR:all.reduce((x,y)=>x+(+y.r),0)/all.length,maxR:Math.max(...all.map(x=>+x.r)),noW:0,nSets:all.length,jump});return;}
+    EX.push({id,ex,n:H.length,first:f?f.best:0,last:l?l.best:0,d,top,avgR:all.reduce((x,y)=>x+(+y.r),0)/all.length,maxR:Math.max(...all.map(x=>+x.r)),noW,nSets:all.length,jump});});
+  EX.sort((p,q)=>GROUPS.findIndex(g=>g[0]===p.ex.g)-GROUPS.findIndex(g=>g[0]===q.ex.g)||(p.ex.o||0)-(q.ex.o||0));
+  const noWsets=EX.reduce((x,y)=>x+(y.ex.bw?0:y.noW),0);
+  const ib=db.inbody.filter(x=>x.date<=e).sort((p,q)=>p.date.localeCompare(q.date)),ibIn=ib.filter(x=>x.date>=a),ibBase=ib.filter(x=>x.date<a).pop();
+  return{m,R,wk,A,P,G,EX,noWsets,ibIn,ibBase};}
+
+function rpFlags(S){const F=[],G=S.G,gn=k=>`<b style="color:${GC[k]}">${GN[k]}</b>`;
+  const none=GROUPS.filter(g=>!G[g[0]].dates.length).map(g=>g[0]);
+  if(none.length)F.push(['r',`${none.map(gn).join('、')} 這個月沒練`,`${none.map(k=>G[k].last?`${GN[k]}上次 ${md(G[k].last)}（已 ${dayDiff(S.R.e,G[k].last)} 天）`:`${GN[k]}還沒有紀錄`).join('；')}。建議每個肌群每週至少練 1～2 次。`]);
+  GROUPS.forEach(([k])=>{const g=G[k];if(!g.dates.length)return;
+    if(g.wsets<6)F.push(['r',`${GN[k]}練不夠`,`平均每週只有 <b>${g.wsets.toFixed(1)} 組</b>（建議 10～20 組/週），${S.R.days} 天練 ${g.dates.length} 次。`]);
+    else if(g.wsets<10)F.push(['y',`${GN[k]}組數偏少`,`平均每週 ${g.wsets.toFixed(1)} 組（建議至少 10 組/週）。`]);
+    if(g.maxGap>7)F.push(['r',`${GN[k]}間隔太久`,`最長隔了 <b>${g.maxGap} 天</b>${g.lastIn&&dayDiff(S.R.e,g.last)===g.maxGap?`（${md(g.last)} 之後到現在都沒練）`:''}，建議同一個肌群間隔 ≤ 5～7 天。`]);});
+  const hi=S.EX.filter(x=>x.avgR>15||x.maxR>=18);if(hi.length)F.push(['y','次數偏高，張力可能不足',`${hi.map(x=>`${esc(x.ex.n)}（最高 ${x.maxR} 下、平均 ${x.avgR.toFixed(1)}）`).join('、')} → 重量可能太輕，可加重讓次數回到 8～12 下。`]);
+  const jp=S.EX.filter(x=>x.jump);if(jp.length)F.push(['y','同一動作次數跳動大',jp.map(x=>`${esc(x.ex.n)} ${md(x.jump.date)}：${x.jump.sets.map(s=>setTxt(s,x.ex.bw)).join('・')}`).join('；')+' → 每組重量／次數不穩定，張力時有時無。']);
+  const ps=['chest','shoulder','tri'].reduce((n,k)=>n+G[k].sets,0),pl=['back','bi'].reduce((n,k)=>n+G[k].sets,0);
+  if(ps&&!pl)F.push(['r','只有推、沒有拉',`推（胸＋肩＋三頭）${ps} 組，拉（背＋二頭）0 組 → 肩膀前後不平衡，容易圓肩。`]);
+  else if(ps&&pl&&(ps/pl>1.5||pl/ps>1.5))F.push(['y','推拉比例不平均',`推 ${ps} 組 vs 拉 ${pl} 組 ＝ <b>${(ps/pl).toFixed(1)} : 1</b>（建議接近 1:1）。`]);
+  const nw=S.EX.filter(x=>!x.ex.bw&&x.noW);if(nw.length)F.push(['y',`${nw.length} 個動作沒填重量`,`${nw.map(x=>esc(x.ex.n)).join('、')} → 只有次數，看不出有沒有加重。建議之後每組都記重量。`]);
+  const th=x=>x.reps?2:2.5,up=S.EX.filter(x=>x.d!=null&&x.d>=th(x)),flat=S.EX.filter(x=>x.d!=null&&Math.abs(x.d)<th(x)&&x.n>=3),dn=S.EX.filter(x=>x.d!=null&&x.d<=-th(x));
+  const pt=x=>x.reps?`${esc(x.ex.n)}（自重）最多 ${x.first} → <b>${x.last} 下</b>`:null;
+  if(up.length)F.push(['g','進步中',up.map(x=>pt(x)||`${esc(x.ex.n)} 估算最大重量 ${x.first.toFixed(1)} → <b>${x.last.toFixed(1)} kg（+${x.d.toFixed(0)}%）</b>`).join('；')]);
+  if(dn.length)F.push(['y','退步',dn.map(x=>pt(x)||`${esc(x.ex.n)} ${x.first.toFixed(1)} → ${x.last.toFixed(1)} kg（${x.d.toFixed(0)}%）`).join('；')+'，留意睡眠／恢復。']);
+  if(flat.length)F.push(['y','沒進步',flat.map(x=>esc(x.ex.n)).join('、')+` 這個月練 ${flat.map(x=>x.n).join('／')} 次都持平，可能要調整重量或次數。`]);
+  if(!F.some(f=>f[0]!=='g'))F.unshift(['g','組數、間隔都在建議範圍','這個月各肌群的量和頻率都 OK。']);
+  return F.sort((p,q)=>'rygx'.indexOf(p[0])-'rygx'.indexOf(q[0]));}
+
+function rpSetsTxt(x,bw){if(x.w===''||x.w==null)return String(x.r);return setTxt(x,bw);}
+function rpText(m){const{a,e}=rpRange(m),L=db.sessions.filter(s=>s.date>=a&&s.date<=e).sort((p,q)=>(p.date+(p.start||'')).localeCompare(q.date+(q.start||'')));
+  const D={};L.forEach(s=>{(D[s.date]=D[s.date]||[]).push(s);});const A=agg(a,e);
+  let t=`🏋️ ${RP_NAME}｜${m.replace('-','/')} 訓練清單\n共 ${A.cnt} 次重訓・${A.sets} 組${A.min?`・有氧 ${A.min} 分`:''}\n`;
+  Object.keys(D).sort().forEach(d=>{const by={},car=[];D[d].forEach(s=>{(s.items||[]).forEach(it=>{const ex=db.ex[it.ex];if(!ex)return;const st=(it.sets||[]).filter(x=>+x.r);if(!st.length)return;(by[ex.g]=by[ex.g]||[]).push([ex,st]);});car.push(...(s.cardio||[]));});
+    const gs=GROUPS.map(g=>g[0]).filter(k=>by[k]);if(!gs.length&&!car.length)return;
+    t+=`\n${d.replace(/-/g,'/')}（${[...gs.map(k=>GN[k]),...(car.length?['有氧']:[])].join('＋')}）週${WK[dow(d)]}\n`;
+    gs.forEach(k=>{t+=`【${GN[k]}】\n`;by[k].forEach(([ex,st])=>{t+=`${ex.n}：${st.map(x=>rpSetsTxt(x,ex.bw)).join('、')}\n`;});});
+    if(car.length){t+='【有氧】\n';car.forEach(c=>{t+=`${c.type}：${[c.min!==''&&c.min!=null?c.min+'分':'',c.km!==''&&c.km!=null?c.km+'公里':'',c.kcal!==''&&c.kcal!=null?c.kcal+'kcal':''].filter(Boolean).join('、')}\n`;});}});
+  return t.trim()+'\n';}
+const rpDone=m=>((db.cfg||{}).rpDoneL||[]).includes(m);
+function rpMark(){if(rpDone(RPM))return;db.cfg=touch({...(db.cfg||{}),rpDoneL:[...((db.cfg||{}).rpDoneL||[]),RPM]});save();}
+async function rpCopy(){const t=rpText(RPM);let ok=false;try{await navigator.clipboard.writeText(t);ok=true;}catch(e){}
+  if(!ok){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{ok=document.execCommand('copy');}catch(e){}ta.remove();}
+  rpMark();RPTXT=true;vRp();rpToast(ok?'✅ 已複製本月訓練清單，可以直接貼到 LINE':'⚠️ 無法自動複製，請在下面文字框全選複製');}
+function rpToast(m){let d=$('rptoast');if(!d){d=document.createElement('div');d.id='rptoast';document.body.appendChild(d);}d.textContent=m;d.className='on';clearTimeout(d._t);d._t=setTimeout(()=>d.className='',2600);}
+function rpPrint(){rpMark();setTimeout(()=>window.print(),50);}
+function rpNag(){const pm=rpPrevMonth(today().slice(0,7));if(+today().slice(8)>10||rpDone(pm))return;const[a,b]=range('m',pm+'-01');if(!db.sessions.some(s=>s.date>=a&&s.date<=b&&sessStats(s).sets))return;
+  const w=$('app');if(!w||$('rpnag'))return;w.insertAdjacentHTML('afterbegin',`<div id="rpnag" onclick="RPM='${pm}';TAB='rp';render()">📄 <b>${+pm.slice(5)} 月的教練報告</b>還沒給教練<span class=mu>（產出或複製後這個提醒會消失）</span><span style="margin-left:auto;font-weight:900">產出 ›</span></div>`);}
+
+function vRp(){const S=rpStats(RPM),F=rpFlags(S),{A,P,R}=S,T=today();
+  const dl=(v,p,u,d=0)=>p==null||!p?'':`<span class="${v>=p?'up':'dn'}">${v>=p?'+':''}${fmt(v-p,d)}${u}</span>`;
+  const ib=S.ibIn[S.ibIn.length-1],ib0=S.ibIn.length>1?S.ibIn[0]:S.ibBase;
+  const ibd=(k,u,d)=>ib&&ib0&&ib[k]!==''&&ib0[k]!==''&&ib[k]!=null&&ib0[k]!=null?` ${(+ib[k]-ib0[k]>=0?'+':'')+(+ib[k]-ib0[k]).toFixed(d)}${u}`:'';
+  const fl=F.map(f=>`<div class="rfl ${f[0]}"><b>${f[0]==='r'?'🔴':f[0]==='y'?'🟡':'🟢'} ${f[1]}</b>：${f[2]}</div>`).join('');
+  const TAG={hyp:['增肌區間','#ecfeff','#0e7490'],hi:['偏高','#fffbeb','#b45309'],str:['力量區間','#eff6ff','#1d4ed8']};
+  const gt=GROUPS.map(([k,n,c])=>{const g=S.G[k],p=Math.min(100,g.wsets/25*100),red=g.wsets<6,tg=TAG[g.tag];
+    return`<tr><td><b style="color:${c}">${n}</b></td><td><div class="rbar"><i style="width:${p}%;background:${c}"></i><u style="left:40%"></u></div><span class="mono${red?' rr':''}">${g.wsets.toFixed(1)} 組</span> <span class=mu>（共 ${g.sets}）</span></td>
+     <td class=mono>${g.dates.length} 次 <span class=mu>${g.freq.toFixed(1)}/週</span></td><td class=mono>${g.avgGap==null?'—':g.avgGap.toFixed(1)+' 天'}</td><td class="mono${g.maxGap>7?' rr':''}">${g.maxGap?g.maxGap+' 天':'—'}</td><td class=mono>${g.last?md(g.last):'—'}</td>
+     <td>${g.sets?`<span class=mono>${g.lo===g.hi?g.lo:g.lo+'–'+g.hi} 下</span>`:'—'} ${tg?`<span class="rtag" style="background:${tg[1]};color:${tg[2]}">${tg[0]}</span>`:''}${g.jumpy?' <span class="rtag" style="background:#fffbeb;color:#b45309">跳動大</span>':''}</td></tr>`;}).join('');
+  const et=S.EX.map(x=>{const c=GC[x.ex.g];if(x.reps){const dd=x.d;return`<tr><td><i class="rdot" style="background:${c}"></i>${esc(x.ex.n)} <span class=mu>自重</span></td><td class=mono>${x.n}</td><td class=mono>${x.nSets}</td><td class=mono>${x.first} 下</td><td class=mono>${dd!=null?x.last+' 下':'—'}</td><td>${dd==null?'<span class=mu>只練 1 次</span>':Math.abs(dd)<2?'<span class=mu>持平（比最多次數）</span>':`<b style="color:${dd>0?'#0891b2':'#94a3b8'}">${dd>0?'▲ +':'▼ '}${dd} 下</b>`}</td><td class=mono>自重×${x.maxR}</td><td class=mono>${x.avgR.toFixed(1)} 下</td></tr>`;}const ch=x.d==null?(x.first?'<span class=mu>只練 1 次</span>':'<span class=mu>沒填重量</span>'):Math.abs(x.d)<2.5?'<span class=mu>持平</span>':`<b style="color:${x.d>0?'#0891b2':'#94a3b8'}">${x.d>0?'▲ +':'▼ '}${(x.last-x.first).toFixed(1)}（${x.d>0?'+':''}${x.d.toFixed(0)}%）</b>`;
+    return`<tr><td><i class="rdot" style="background:${c}"></i>${esc(x.ex.n)}</td><td class=mono>${x.n}</td><td class=mono>${x.nSets}</td><td class=mono>${x.first?x.first.toFixed(1):'—'}</td><td class=mono>${x.last&&x.d!=null?x.last.toFixed(1):'—'}</td><td>${ch}</td><td class=mono>${x.top?setTxt(x.top,x.ex.bw):'—'}</td><td class=mono>${x.avgR.toFixed(1)} 下</td></tr>`;}).join('');
+  const gd=GROUPS.map(([k,n,c])=>{const g=S.G[k];if(!g.rows.length)return'';
+    return`<div class="rgb"><div class="rgh" style="background:color-mix(in srgb,${c} 9%,#fff)"><b style="color:${c}">${n}</b><span class=mu>本月 ${g.dates.length} 次・${g.sets} 組${g.avgGap!=null?`・平均間隔 ${g.avgGap.toFixed(1)} 天`:''}</span></div>
+     <table class="rt"><tr><th style="width:84px">日期</th><th style="width:58px">間隔</th><th>動作（重量 × 次數）</th><th style="width:44px">組數</th></tr>${g.rows.map(r=>`<tr><td class=mono><b>${md(r.date)}</b> ${WK[dow(r.date)]}</td><td class="mono${r.gap>7?' rr':''}" style="font-weight:800">${r.gap==null?'—':r.gap===0?'同天':r.gap+' 天'}</td>
+      <td>${r.items.map(i=>`<b>${esc(i.e.n)}</b> ${i.sets.map(x=>x.w===''||x.w==null?`<span style="color:#94a3b8">?</span>×${x.r}`:setTxt(x,i.e.bw)).join('・')}${!i.e.bw&&i.sets.some(x=>x.w===''||x.w==null)?' <span class="rtag" style="background:#fffbeb;color:#b45309">沒填重量</span>':''}`).join('<br>')}</td><td class=mono>${r.items.reduce((n,i)=>n+i.sets.length,0)}</td></tr>`).join('')}</table></div>`;}).join('');
+  const car=A.list.filter(s=>(s.cardio||[]).length).flatMap(s=>s.cardio.map(c=>({d:s.date,...c})));
+  const ibRows=[...(S.ibBase?[S.ibBase]:[]),...S.ibIn];
+  const txt=rpText(RPM);
+  $('app').innerHTML=`<div class="rpbar"><button class="nav" onclick="RPM=rpPrevMonth(RPM);vRp()">‹</button><b style="font-size:16px;min-width:110px;text-align:center">${RPM.slice(0,4)} 年 ${+RPM.slice(5)} 月</b><button class="nav" onclick="RPM=rpPrevMonth(RPM,1);vRp()" ${RPM>=T.slice(0,7)?'disabled style="opacity:.3"':''}>›</button>
+    <span class=mu>${rpDone(RPM)?'✅ 這個月已經給過教練':'每月 1 號左右給教練上個月的報告'}</span><span class="sp"></span>
+    <button class="tb" onclick="rpCopy()">📋 一鍵複製本月訓練清單</button><button class="lk" onclick="RPTXT=!RPTXT;vRp()">${RPTXT?'收起文字':'看文字'}</button><button class="tb pri" onclick="rpPrint()">🖨️ 下載 PDF／列印</button></div>
+   ${RPTXT?`<div class="card rptx"><div class="ct">📋 本月訓練清單（文字）<span class=mu>按日期 → 肌群；這段文字也可以直接貼回「貼上匯入」</span></div><textarea readonly onclick="this.select()">${esc(txt)}</textarea></div>`:''}
+   <div class="rp">
+    <div class="rhd"><div><h1>🏋️ ${RP_NAME}</h1><div class=mu style="font-size:13px;margin-top:4px">${RPM.slice(0,4)} 年 ${+RPM.slice(5)} 月 月報・${md(R.a)}～${md(R.e)}（${R.days} 天）・給教練</div></div><div class=mu style="margin-left:auto;text-align:right">產出 ${T.replace(/-/g,'/')}<br>和上個月同期比較</div></div>
+    ${A.cnt||A.min?`<div class="rk"><div><span class=mu>重訓次數</span><b>${A.cnt} 次</b><span class=mu>每週 ${(A.cnt/S.wk).toFixed(1)} 次 ${dl(A.cnt,P.cnt,' 次')}</span></div><div><span class=mu>總組數</span><b>${A.sets} 組</b><span class=mu>每次 ${A.cnt?(A.sets/A.cnt).toFixed(1):0} 組 ${dl(A.sets,P.sets,' 組')}</span></div>
+     <div><span class=mu>訓練量</span><b>${fmt(A.vol)} kg</b><span class=mu>${S.noWsets?`${S.noWsets} 組沒填重量未計`:dl(A.vol,P.vol,' kg')}</span></div><div><span class=mu>有氧</span><b>${A.min} 分</b><span class=mu>${fmt(A.km,1)} km・${fmt(A.kcal)} 卡</span></div>
+     <div><span class=mu>InBody${ib?' '+md(ib.date):''}</span><b>${ib&&ib.wt?ib.wt+' kg':'—'}</b><span class=mu>${ib?`肌肉 ${ib.mm||'—'}${ibd('mm','',1)}・體脂 ${ib.fat||'—'}%${ibd('fat','',1)}`:'這個月沒量'}</span></div></div>
+    <h2>🩺 重點診斷<span>依常用訓練建議自動判斷（每肌群每週 10～20 組、間隔 ≤ 7 天、6～12 下為增肌區間），給教練參考</span></h2>${fl}
+    <h2>💪 各肌群<span>虛線＝建議下限 10 組/週</span></h2>
+    <table class="rt"><tr><th>肌群</th><th style="width:210px">每週組數</th><th>練幾次</th><th>平均間隔</th><th>最長間隔</th><th>上次</th><th>主要次數區間</th></tr>${gt}</table>
+    <div class=mu style="margin-top:4px">次數區間：1–5 力量、6–12 增肌、13 以上耐力；組數只算有填次數的組；最長間隔含「上次到今天」</div>
+    <h2 class="pb">📈 各動作進步<span>估算最大重量（1RM）＝ 重量 ×（1 ＋ 次數 ÷ 30），磅已換算公斤；自重動作比「單組最多次數」</span></h2>
+    <table class="rt"><tr><th>動作</th><th>練幾次</th><th>組數</th><th>第一次</th><th>最近</th><th>變化</th><th>最重一組</th><th>平均每組</th></tr>${et}</table>
+    <h2>📒 訓練明細（依肌群）<span>每個肌群按日期排；間隔＝距離上次練這個肌群幾天</span></h2>${gd}
+    ${car.length?`<div class="rgb"><div class="rgh" style="background:#fff7ed"><b style="color:#ea580c">🏃 有氧</b><span class=mu>本月 ${car.length} 次・${A.min} 分・${fmt(A.km,1)} km・${fmt(A.kcal)} 卡</span></div><table class="rt"><tr><th style="width:84px">日期</th><th>項目</th><th>時間</th><th>距離</th><th>消耗</th></tr>${car.map(c=>`<tr><td class=mono><b>${md(c.d)}</b> ${WK[dow(c.d)]}</td><td>${esc(c.type)}</td><td class=mono>${c.min||'—'} 分</td><td class=mono>${c.km||'—'} km</td><td class=mono>${c.kcal||'—'} 卡</td></tr>`).join('')}</table></div>`:''}
+    ${ibRows.length?`<h2>📊 InBody<span>${S.ibBase?'第一列是上個月最後一次':''}</span></h2><table class="rt"><tr><th>日期</th><th>體重</th><th>肌肉量</th><th>體脂肪</th><th>基礎代謝</th></tr>${ibRows.map((x,i)=>{const p=ibRows[i-1],dd=(k,d)=>p&&x[k]!==''&&p[k]!==''&&x[k]!=null&&p[k]!=null&&+x[k]!==+p[k]?` <span style="color:${(k==='fat'?x[k]<p[k]:x[k]>p[k])?'#0891b2':'#94a3b8'}">${x[k]-p[k]>0?'+':''}${(x[k]-p[k]).toFixed(d)}</span>`:'';
+      return`<tr${x.date<R.a?' style="color:#94a3b8"':''}><td class=mono>${md(x.date)}</td><td class=mono>${x.wt||'—'}${dd('wt',1)}</td><td class=mono>${x.mm||'—'}${dd('mm',1)}</td><td class=mono>${x.fat!==''&&x.fat!=null?x.fat+'%':'—'}${dd('fat',1)}</td><td class=mono>${x.bmr?fmt(x.bmr):'—'}</td></tr>`;}).join('')}</table>`:''}
+    <h2>✍️ 教練建議</h2><div class="rbox"></div>`:'<div class="empty">這個月還沒有訓練紀錄</div>'}
+   </div>`;}
 
 (async function(){render();if(await pull())render();setInterval(async()=>{if(document.visibilityState==='visible'&&$('emb').style.display!=='flex'){if(await pull())render();}},60000);})();
 </script>

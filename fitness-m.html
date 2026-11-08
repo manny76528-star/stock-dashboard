@@ -267,6 +267,7 @@ function findEx(name){
 function parseImport(text){
   const out=[],warn=[];let cur=null;const GMAP={'胸':'chest','背':'back','腿':'legs','肩':'shoulder','二頭':'bi','三頭':'tri','手臂':null};
   String(text).split(/\n|。/).map(l=>l.trim()).filter(Boolean).forEach(line=>{
+    if(/^【[^】]*】$/.test(line)||/^🏋️|^共 \d+ 次/.test(line))return; // 複製出來的清單：肌群標題、表頭略過
     const d=line.match(/^(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})\s*(?:[（(]([^）)]*)[）)])?/);
     if(d){cur={date:`${d[1]}-${String(d[2]).padStart(2,'0')}-${String(d[3]).padStart(2,'0')}`,label:d[4]||'',groups:[],items:[],cardio:[]};
       (d[4]||'').split(/[＋+、,，\/]/).forEach(g=>{g=g.trim();if(GMAP[g])cur.groups.push(GMAP[g]);});out.push(cur);return;}
@@ -277,7 +278,7 @@ function parseImport(text){
       const c={id:uid(),type:ct,min:g(/(\d+(?:\.\d+)?)\s*(?:分|min)/i),km:g(/(\d+(?:\.\d+)?)\s*(?:公里|km)/i),kcal:g(/(\d+(?:\.\d+)?)\s*(?:kcal|大卡|卡)/i)};
       if(c.min===''&&c.km===''&&c.kcal===''){warn.push(`${cur.date} ${m[1]} 看不懂：${v}（例：25分、1.5公里、206kcal）`);return;}cur.cardio.push(c);return;}
     const id=findEx(m[1]);if(!id){warn.push(`${cur.date} 找不到動作「${m[1]}」（可以先到動作清單新增）`);return;}
-    const sets=m[2].split(/[、,，\s]+/).filter(Boolean).map(t=>{const x=t.match(/^(\d+(?:\.\d+)?)\s*([pP磅]|kg|KG|公斤)?\s*[×xX*]\s*(\d+)$/);if(x)return /^[pP磅]$/.test(x[2]||'')?{w:+x[1],u:'lb',r:+x[3]}:{w:+x[1],r:+x[3]};const y=t.match(/^(\d+)$/);return y?{w:'',r:+y[1]}:null;});
+    const sets=m[2].split(/[、,，\s]+/).filter(Boolean).map(t=>{const x=t.match(/^(\d+(?:\.\d+)?)\s*([pP磅]|kg|KG|公斤)?\s*[×xX*]\s*(\d+)$/);if(x)return /^[pP磅]$/.test(x[2]||'')?{w:+x[1],u:'lb',r:+x[3]}:{w:+x[1],r:+x[3]};const z=t.match(/^自重\s*[×xX*]\s*(\d+)$/);if(z)return{w:0,r:+z[1]};const y=t.match(/^(\d+)$/);return y?{w:'',r:+y[1]}:null;});
     if(sets.some(s=>!s)){warn.push(`${cur.date} ${m[1]} 有看不懂的組：${m[2]}`);}
     const ok=sets.filter(Boolean);if(!ok.length)return;if(db.ex[id].bw)ok.forEach(x=>{if(x.w==='')x.w=0;});
     const it=cur.items.find(x=>x.ex===id);if(it)it.sets.push(...ok);else cur.items.push({ex:id,sets:ok,done:true,src:m[1]});
