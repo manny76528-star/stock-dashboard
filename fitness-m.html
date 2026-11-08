@@ -301,7 +301,7 @@ function findEx(name){
 function parseImport(text){
   const out=[],warn=[];let cur=null;const GMAP={'胸':'chest','背':'back','腿':'legs','肩':'shoulder','二頭':'bi','三頭':'tri','手臂':null};
   String(text).split(/\n|。/).map(l=>l.trim()).filter(Boolean).forEach(line=>{
-    if(/^【[^】]*】$/.test(line)||/^🏋️|^共 \d+ 次/.test(line))return; // 複製出來的清單：肌群標題、表頭略過
+    if(/^【[^】]*】$/.test(line)||/^🏋️|^共 \d+ 次|^🧘/.test(line))return; // 複製出來的清單：肌群標題、表頭略過
     const d=line.match(/^(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})\s*(?:[（(]([^）)]*)[）)])?/);
     if(d){cur={date:`${d[1]}-${String(d[2]).padStart(2,'0')}-${String(d[3]).padStart(2,'0')}`,label:d[4]||'',groups:[],items:[],cardio:[]};
       (d[4]||'').split(/[＋+、,，\/]/).forEach(g=>{g=g.trim();if(GMAP[g])cur.groups.push(GMAP[g]);});out.push(cur);return;}
@@ -410,14 +410,14 @@ function rpFlags(S){const F=[],G=S.G,gn=k=>`<b style="color:${GC[k]}">${GN[k]}</
 
 function rpSetsTxt(x,bw){if(x.w===''||x.w==null)return String(x.r);return setTxt(x,bw);}
 function rpText(m){const{a,e}=rpRange(m),L=db.sessions.filter(s=>s.date>=a&&s.date<=e).sort((p,q)=>(p.date+(p.start||'')).localeCompare(q.date+(q.start||'')));
-  const D={};L.forEach(s=>{(D[s.date]=D[s.date]||[]).push(s);});const A=agg(a,e);
-  let t=`🏋️ ${RP_NAME}｜${m.replace('-','/')} 訓練清單\n共 ${A.cnt} 次重訓・${A.sets} 組${A.min?`・有氧 ${A.min} 分`:''}\n`;
+  const D={};L.forEach(s=>{(D[s.date]=D[s.date]||[]).push(s);});const A=agg(a,e),AB=new Set(absDates().filter(d=>d>=a&&d<=e));AB.forEach(d=>{D[d]=D[d]||[];});
+  let t=`🏋️ ${RP_NAME}｜${m.replace('-','/')} 訓練清單\n共 ${A.cnt} 次重訓・${A.sets} 組${A.min?`・有氧 ${A.min} 分`:''}${AB.size?`・腹肌 ${AB.size} 次`:''}\n`;
   Object.keys(D).sort().forEach(d=>{const by={},car=[];D[d].forEach(s=>{(s.items||[]).forEach(it=>{const ex=db.ex[it.ex];if(!ex)return;const st=(it.sets||[]).filter(x=>+x.r);if(!st.length)return;(by[ex.g]=by[ex.g]||[]).push([ex,st]);});car.push(...(s.cardio||[]));});
-    const gs=GROUPS.map(g=>g[0]).filter(k=>by[k]);if(!gs.length&&!car.length)return;
-    t+=`\n${d.replace(/-/g,'/')}（${[...gs.map(k=>GN[k]),...(car.length?['有氧']:[])].join('＋')}）週${WK[dow(d)]}\n`;
+    const gs=GROUPS.map(g=>g[0]).filter(k=>by[k]),ab=AB.has(d);if(!gs.length&&!car.length&&!ab)return;
+    t+=`\n${d.replace(/-/g,'/')}（${[...gs.map(k=>GN[k]),...(car.length?['有氧']:[]),...(ab?['腹肌']:[])].join('＋')}）週${WK[dow(d)]}\n`;
     gs.forEach(k=>{t+=`【${GN[k]}】\n`;by[k].forEach(([ex,st])=>{t+=`${ex.n}：${st.map(x=>rpSetsTxt(x,ex.bw)).join('、')}\n`;});});
-    if(car.length){t+='【有氧】\n';car.forEach(c=>{t+=`${c.type}：${[c.min!==''&&c.min!=null?c.min+'分':'',c.km!==''&&c.km!=null?c.km+'公里':'',c.kcal!==''&&c.kcal!=null?c.kcal+'kcal':''].filter(Boolean).join('、')}\n`;});}});
-  const AB=absMonth(m);if(AB.length)t+=`\n【腹肌】${absPlan()}，本月 ${AB.length} 次：${AB.map(d=>d.slice(5).replace('-','/')).join('、')}\n`;
+    if(car.length){t+='【有氧】\n';car.forEach(c=>{t+=`${c.type}：${[c.min!==''&&c.min!=null?c.min+'分':'',c.km!==''&&c.km!=null?c.km+'公里':'',c.kcal!==''&&c.kcal!=null?c.kcal+'kcal':''].filter(Boolean).join('、')}\n`;});}
+    if(ab)t+=`【腹肌】\n🧘 ${absPlan()}\n`;});
   return t.trim()+'\n';}
 const rpDone=m=>((db.cfg||{}).rpDoneL||[]).includes(m);
 function rpMark(m){m=m||RPM;if(rpDone(m))return;db.cfg=touch({...(db.cfg||{}),rpDoneL:[...((db.cfg||{}).rpDoneL||[]),m]});save();}
