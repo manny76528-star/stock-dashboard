@@ -817,7 +817,41 @@ body:not(.privacy) .privacy-mask{filter:none;}
 </style>
 <style id="v31-css">
 
+
+/* v33 觀察股 W3 */
+.w3-top{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}.w3-tabs{display:flex;gap:3px;background:#f1f5f9;border-radius:11px;padding:3px;flex-wrap:wrap}
+.w3-tabs span{padding:6px 13px;border-radius:9px;font-weight:800;font-size:13px;color:#64748b;cursor:pointer}.w3-tabs span b{font-family:'JetBrains Mono',monospace;margin-left:2px}.w3-tabs .on{background:#fff;color:#0f172a;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.w3-sort{margin-left:auto;font-size:12.5px;color:#64748b;display:flex;gap:10px}.w3-sort a{color:#64748b;text-decoration:none}.w3-sort a.on{color:#0f172a;font-weight:900}
+.w3-box{background:#fff;border:1px solid #e2e8f0;border-radius:16px;overflow:hidden}
+.w3-sh{display:flex;align-items:center;gap:6px;padding:8px 16px;background:#f8fafc;font-size:12.5px;font-weight:900;border-bottom:1px solid #f1f5f9}
+.w3-r{display:grid;grid-template-columns:6px minmax(150px,1.1fr) 96px minmax(170px,1fr) minmax(200px,1.5fr) 70px;gap:14px;align-items:center;padding:11px 16px 11px 12px;border-bottom:1px solid #f1f5f9;cursor:pointer}
+.w3-r:hover{background:#fafcff}.w3-r.on{background:#eff6ff}.w3-r.ro{cursor:default}.w3-st{width:6px;height:36px;border-radius:4px;display:block}
+.w3-mu{color:#64748b}.w3-mono{font-family:'JetBrains Mono',monospace}.w3-tg{display:inline-block;font-size:11.5px;font-weight:900;border-radius:6px;padding:1px 7px;white-space:nowrap}.w3-tg.nr{background:#f8fafc;color:#94a3b8;border:1px dashed #cbd5e1}
+.w3-bar{height:7px;background:#f1f5f9;border-radius:4px;position:relative}.w3-bar i{position:absolute;left:0;top:0;bottom:0;border-radius:4px}
+.w3-b{border:1px solid #e2e8f0;background:#fff;border-radius:10px;padding:6px 12px;font-weight:800;font-size:12.5px;cursor:pointer;font-family:inherit;color:#334155}.w3-b.p{background:#2563eb;border-color:#2563eb;color:#fff}
+.w3-det{background:#f8fafc;padding:12px 16px 14px;border-bottom:1px solid #e2e8f0;cursor:default}.w3-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.w3-c{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:12px 14px;min-width:0}.w3-ct{font-size:13px;font-weight:900;color:#0f172a;margin-bottom:8px}
+.w3-zb{position:relative;height:24px;border-radius:7px;overflow:hidden;margin-bottom:4px}.w3-zb span{position:absolute;top:0;bottom:0;display:grid;place-items:center;font-size:11px;font-weight:900}.w3-zb i{position:absolute;top:0;bottom:0;width:3px;background:#0f172a;margin-left:-1px}
+.w3-zl{display:flex;justify-content:space-between;font-size:11.5px;color:#64748b;margin-bottom:8px}.w3-zl b{font-family:'JetBrains Mono',monospace;color:#0f172a}
+.w3-kv{font-size:13px;margin:4px 0}.w3-kv span:first-child{color:#64748b;margin-right:6px}.w3-kv b{font-family:'JetBrains Mono',monospace}
+.w3-mt2{display:grid;grid-template-columns:1fr 1fr;gap:6px}.w3-mt2 div{background:#f8fafc;border-radius:10px;padding:6px 10px}.w3-mt2 span{display:block;font-size:11.5px;color:#64748b}.w3-mt2 b{font-family:'JetBrains Mono',monospace;font-size:18px}
+.w3-concl{font-size:12.5px;line-height:1.6;color:#1e3a8a;background:#eff6ff;border-radius:10px;padding:7px 10px;margin-top:8px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.w3-nr{border:1.5px dashed #fcd34d;background:#fffbeb;border-radius:12px;padding:14px;text-align:center;font-size:13px}
+.w3-note{font-size:13px;line-height:1.6;white-space:pre-wrap;max-height:110px;overflow:auto;color:#1e293b}.w3-sub{font-size:12px;font-weight:900;color:#475569;margin:10px 0 4px}
+.w3-j{display:block;font-size:12.5px;color:#1e293b;text-decoration:none;padding:3px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.w3-j:hover{color:#2563eb}
+.w3-lk{display:inline-block;font-size:12px;font-weight:800;color:#1d4ed8;background:#eff6ff;border-radius:99px;padding:2px 9px;margin:2px 4px 2px 0;text-decoration:none}.w3-lk.g{background:#f1f5f9;color:#475569}
+.w3-in{flex:1;border:1px solid #e2e8f0;border-radius:8px;padding:5px 9px;font-size:12.5px;font-family:inherit}
+.w3-btns{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+@media(max-width:900px){.w3-r{grid-template-columns:6px 1fr 80px;}.w3-r>div:nth-child(4),.w3-r>div:nth-child(5){grid-column:2/-1}.w3-cards{grid-template-columns:1fr}}
 /* v32 今天頁三欄 */
+.v33-3{grid-template-columns:repeat(3,minmax(0,1fr))!important}.v33-3>.v32-st>.v11-col:first-child{flex:0 0 auto;border-color:#fecaca}.v33-3>.v32-st>.v11-col:last-child{flex:1}
+.v33-pb{background:#f8fafc;border-radius:12px;padding:10px 12px;margin:6px 0 8px;display:flex;align-items:center;gap:10px}.v33-bal{font-family:'JetBrains Mono',monospace;font-size:22px;color:#0f172a}
+.v33-io{margin-left:auto;text-align:right;font-size:12.5px;line-height:1.7}.v33-io span{color:#64748b}.v33-io b{font-family:'JetBrains Mono',monospace}
+.v33-cap .v33-more{display:none}.v33-tog{text-align:center;font-size:12.5px;font-weight:800;color:#2563eb;padding:8px 0 2px;cursor:pointer}
+.v33-sep{font-size:11px;font-weight:800;color:#64748b;letter-spacing:1px;border-bottom:1px solid #e2e8f0;padding-bottom:3px;margin-bottom:6px}
+@media(max-width:1100px){.v33-3>.v32-st{grid-column:auto!important;flex-direction:column!important}.v33-3{grid-template-columns:1fr 1fr!important}.v33-3>.v11-col:last-child{grid-column:1/-1}}
+@media(max-width:900px){.v33-3{grid-template-columns:1fr!important}}
+
 .v32-g{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.3fr) minmax(0,.8fr);gap:12px;margin-top:14px;align-items:stretch}
 .v32-g>.v13-card,.v32-g .v11-col{margin:0}.v32-st{display:flex;flex-direction:column;gap:12px;min-width:0}.v32-st>.v11-col:last-child{flex:1}
 .v32-g>.v11-col:nth-child(2){border-color:#fecaca}
@@ -21469,13 +21503,102 @@ function v32Today(){
     const hf=items(health).find(it=>/基金/.test(ttl(it))&&/扣款/.test(ttl(it))),tf=ti.find(it=>/基金/.test(ttl(it))&&/漏扣/.test(ttl(it)));
     if(hf&&tf)hf.remove();
     const left=items(health).length,hb=health.querySelector(':scope > b');
-    if(hb)hb.innerHTML=left?`🩺 資料健康檢查 ${left}`:`🩺 資料健康檢查 <span class="v11-sub" style="font-weight:500">重複的已併進要處理</span>`;
+    if(hb)hb.innerHTML=left?`🩺 資料健康檢查 ${left}`:`🩺 資料健康檢查 <span class="v11-sub" style="font-weight:500">重複的已併到提醒</span>`;
     if(!left)health.style.borderColor='#e2e8f0';}
-  // ③ 三欄：這兩週｜要處理｜提醒＋健康檢查
-  const g=document.createElement('div');g.className='v32-g';const st=document.createElement('div');st.className='v32-st';
-  if(note)st.appendChild(note);if(health)st.appendChild(health);
-  card.classList.add('v32-tw');g.append(card,todo,st);mid.replaceWith(g);two.remove();
+  // v33：要處理只留「跟錢有關」的（扣款不夠、觀察股到價…），其他資料類的搬到提醒
+  if(note){const isMoney=it=>{const ic=it.querySelector('.v11-ic')?.textContent.trim()||'';return /🚨|👁|💸|🏦/.test(ic)||/扣成負數|轉入|到價|不夠|餘額/.test(ttl(it));};
+    const of0=items(note)[0]||null;
+    const mv=items(todo).filter(it=>!isMoney(it));const nb=note.querySelector(':scope > b');const first=nb?nb.nextSibling:null;
+    mv.forEach(it=>note.insertBefore(it,first));
+    const emp=[...note.querySelectorAll(':scope > .v11-sub')].filter(x=>!x.closest('.v11-it'));if(items(note).length)emp.forEach(x=>x.remove());
+    try{const X=v33ResearchNag();if(X){if(of0)of0.insertAdjacentHTML('beforebegin',X);else note.insertAdjacentHTML('beforeend',X);}}catch(e){}
+    const fix=(c,t)=>{const b=c.querySelector(':scope > b');if(b)b.textContent=`${t} ${items(c).length}`;};fix(todo,'🔴 要處理');fix(note,'🔵 提醒');
+    const NI=items(note);if(NI.length>7){NI.slice(6).forEach(it=>it.classList.add('v33-more'));note.classList.add('v33-cap');note.insertAdjacentHTML('beforeend',`<div class="v33-tog" onclick="event.stopPropagation();this.parentNode.classList.toggle('v33-cap');this.textContent=this.parentNode.classList.contains('v33-cap')?'還有 ${NI.length-6} 項 ▾':'收起 ▴'">還有 ${NI.length-6} 項 ▾</div>`);}
+    if(!items(todo).length&&!todo.querySelector('.v33-empty'))todo.insertAdjacentHTML('beforeend','<div class="v11-sub v33-empty" style="padding:10px 4px">✅ 沒有跟錢有關的急事</div>');}
+  // v33 H2：Line Bank 存摺樣式（餘額放大、扣／入靠右，下面「每天明細」分隔）
+  const sub=card.querySelector('.v13-hd .v11-sub');
+  if(sub){const B=[...sub.querySelectorAll('b')].map(b=>b.textContent);
+    if(B.length>=3){sub.remove();card.querySelector('.v13-hd').insertAdjacentHTML('afterend',`<div class="v33-pb"><div><div class="v11-sub">🏦 Line Bank 現在</div><b class="v33-bal">${B[0]}</b></div><div class="v33-io"><div><span>兩週扣</span> <b style="color:#16a34a">${B[1]}</b></div><div><span>兩週入</span> <b style="color:#dc2626">${B[2]}</b></div></div></div><div class="v33-sep">每天明細</div>`);}}
+  // ③ 三欄等寬：這兩週｜要處理＋健康檢查｜提醒
+  const g=document.createElement('div');g.className='v32-g v33-3';const st=document.createElement('div');st.className='v32-st';
+  st.appendChild(todo);if(health)st.appendChild(health);
+  card.classList.add('v32-tw');g.append(card,st);if(note)g.appendChild(note);mid.replaceWith(g);two.remove();
 }
+
+// ══ v33（2026/11/08）：👁 觀察股 W3——清單分組（有研究｜待研究｜只有研究），整合個股研究的甜蜜區、本益比／淨值比；第二層三張小卡 ══
+var _w3Tab='';
+function _w3Res(code){try{const r=(db.research||{})[code];if(!r||!r.reports||!r.reports.length)return null;const C=rsCalc(r);return C?{r,C}:null;}catch(e){return null;}}
+function _w3Wk(){const T=_twToday(),d=new Date(T+'T00:00:00Z'),k=(d.getUTCDay()+6)%7;d.setUTCDate(d.getUTCDate()-k);return d.toISOString().slice(0,10);}
+function _w3NoRes(){return (db.watchlist||[]).filter(w=>!_w3Res(w.code));}
+// 今天頁「提醒」：觀察股還沒研究報告（每週提醒一次，看過「待研究」就收起來到下週）
+function v33ResearchNag(){const L=_w3NoRes();if(!L.length)return'';if((db.settings||{}).rsNagWk===_w3Wk())return'';
+  const hit=L.filter(w=>_wCalc(w).hit);
+  return`<div class="v11-it" onclick="_w3Tab='nores';dbShowPage('watch')"><span class="v11-ic">🔬</span><div style="min-width:0"><b>${L.length} 檔觀察股還沒有研究報告</b><div class="v11-sub">${hit.length?`<b style="color:#dc2626">已到價先研究：${_ae(hit.map(w=>w.name||w.code).join('、'))}</b>`:_ae(L.slice(0,4).map(w=>w.name||w.code).join('、'))+(L.length>4?'…':'')}</div></div><span class="v11-go" style="color:#2563eb">去看 ›</span></div>`;}
+function w3AddFromRs(code){const r=(db.research||{})[code];if(!r)return;if((db.watchlist||[]).some(w=>w.code===code))return;const R=_w3Res(code);
+  db.watchlist=db.watchlist||[];db.watchlist.push({id:uid(),code,name:(R&&R.C.S.name)||r.name||'',reason:'從個股研究加入'+(R&&R.C.S.concl?'：'+R.C.S.concl:''),target:R&&R.C.Z.sweet?Math.round(R.C.Z.sweet.hi*10)/10:null,alertDir:'below',priority:'中',addedDate:_twToday()});
+  save();_wOpen=null;renderWatchPage();toast('👁 已加入觀察股'+(R&&R.C.Z.sweet?'（目標＝甜蜜價）':''));}
+function w3GoRs(code){dbShowPage('research');setTimeout(()=>{_rsOpen=null;rsOpen(code);},250);}
+function _w3Zone(C){const Z=C.Z,p=C.p;if(p==null||!Z.sweet)return'';const sw=Z.sweet.hi,ri=Z.rich?Z.rich.lo:(Z.fair?Z.fair.hi*1.25:sw*1.6);
+  const lo=Math.min(p,sw)*0.85,hi=Math.max(p,ri)*1.08,x=v=>Math.max(0,Math.min(100,(v-lo)/(hi-lo)*100));
+  return`<div class="w3-zb"><span style="left:0;width:${x(sw)}%;background:#bfdbfe;color:#1d4ed8">🍬</span><span style="left:${x(sw)}%;width:${x(ri)-x(sw)}%;background:#f1f5f9"></span><span style="left:${x(ri)}%;right:0;background:#fecaca"></span><i style="left:${x(p)}%"></i></div>
+   <div class="w3-zl"><span>今天 <b>${rsFmt(p)}</b></span><span>甜蜜價 <b>${rsFmt(sw)}</b></span>${Z.rich?`<span>偏貴 <b>${rsFmt(Z.rich.lo)}</b></span>`:''}</div>`;}
+renderWatchPage=function(){
+  if(!db.watchlist)db.watchlist=[];
+  try{updateWatchNavBadge();}catch(e){}
+  const body=document.getElementById('watch-page-body');if(!body)return;
+  const rows=db.watchlist.map(w=>({w,c:_wCalc(w),R:_w3Res(w.code)}));
+  const rsOnly=(typeof rsAll==='function'?rsAll():[]).filter(r=>!db.watchlist.some(w=>w.code===r.code)).map(r=>({r,C:rsCalc(r)})).filter(x=>x.C);
+  const key={dist:r=>r.c.hit?-1:r.c.dist==null?999:Math.abs(r.c.dist),day:r=>r.c.day==null?999:-r.c.day,since:r=>r.c.since==null?999:-r.c.since,pri:r=>r.c.pri}[_wSort]||(r=>0);
+  rows.sort((a,b)=>key(a)-key(b)||a.c.pri-b.c.pri);
+  if(_w3Tab==='nores'&&(db.settings||{}).rsNagWk!==_w3Wk()){db.settings=db.settings||{};db.settings.rsNagWk=_w3Wk();save();}
+  const has=rows.filter(x=>x.R),no=rows.filter(x=>!x.R),hits=rows.filter(x=>x.c.hit),sweet=rows.filter(x=>x.R&&/sweet|deep/.test(x.R.C.lv));
+  const F={'':rows,hit:hits,sweet,nores:no,rsonly:[]}[_w3Tab]||rows;
+  const tab=(k,t,n)=>`<span class="${_w3Tab===k?'on':''}" onclick="_w3Tab='${k}';_wOpen=null;renderWatchPage()">${t} <b>${n}</b></span>`;
+  const sortB=(k,t)=>`<a href="javascript:void 0" onclick="_wSort='${k}';renderWatchPage()" class="${_wSort===k?'on':''}">${t}</a>`;
+  const bar=(c,R)=>{if(c.dist==null&&R&&R.C.Z.sweet&&R.C.p){const sw=R.C.Z.sweet.hi,inS=R.C.p<=sw,d=(sw/R.C.p-1)*100,pp=inS?100:Math.max(3,Math.min(97,100+d*2.5));
+      return`<div class="w3-bar"><i style="width:${pp}%;background:${inS?'#2563eb':'#93c5fd'}"></i></div><div style="font-size:12.5px;margin-top:3px">${inS?'<b style="color:#1d4ed8">🍬 在甜蜜價內</b>':`<span class="w3-mu">離甜蜜價</span> <b>${Math.abs(d).toFixed(1)}%</b>`}</div>`;}
+    const sc=c.hit?'#dc2626':c.near?'#f59e0b':'#94a3b8',p=c.dist==null?0:c.hit?100:Math.max(3,Math.min(97,100-Math.abs(c.dist)*2.5));
+    return c.dist==null?'<span class="w3-mu">未設目標價</span>':`<div class="w3-bar"><i style="width:${p}%;background:${sc}"></i></div><div style="font-size:12.5px;margin-top:3px">${c.hit?'<b style="color:#dc2626">🔔 已到價</b>':`<span class="w3-mu">還差</span> <b style="color:${c.near?'#b45309':'#0f172a'}">${Math.abs(c.dist).toFixed(1)}%</b>`}</div>`;};
+  const resCell=R=>{if(!R)return'<span class="w3-tg nr">📄 還沒研究</span>';const C=R.C,S=C.S,cc=RS_LV[C.lv];
+    const v=S.val==='pb'?`淨值比 <b>${rsFmt(C.pb,2)}</b>`:`本益比 <b>${rsFmt(C.useFwd?C.pef:C.pe,1)}</b>`;
+    return`<span class="w3-tg" style="background:${cc[1]};color:${cc[0]}">${C.txt}</span> <span class="w3-mu" style="font-size:12.5px">${v}${C.y!=null?`・殖 <b>${rsFmt(C.y,1)}%</b>`:''}</span>`;};
+  const row=({w,c,R})=>{const open=_wOpen===w.id,sc=c.hit?'#dc2626':c.near?'#f59e0b':'#e2e8f0';
+    let h=`<div class="w3-r${open?' on':''}${c.hit?' hit':''}" onclick="_wOpen=_wOpen==='${w.id}'?null:'${w.id}';renderWatchPage()"><i class="w3-st" style="background:${sc}"></i>
+      <div style="min-width:0"><b style="font-size:14.5px">${_ae(w.name||w.code)}</b> <span class="w3-mu">${_ae(w.code)}</span>${w.priority==='高'?' <span class="w3-tg" style="background:#fee2e2;color:#b91c1c">高</span>':''}<div class="w3-mu" style="font-size:12px">${w.target?`目標 ${w.alertDir==='above'?'≥':'≤'} ${w.target}`:R&&R.C.Z.sweet?`甜蜜價 ≤ ${rsFmt(R.C.Z.sweet.hi)}`:'未設目標'}</div></div>
+      <div style="text-align:right"><b class="w3-mono" style="font-size:16px">${c.price!=null?c.price.toFixed(c.price<100?2:1):'—'}</b><div class="w3-mono" style="font-size:12px;color:${_wCol(c.day)}">${_wPct(c.day,2)}</div></div>
+      <div>${bar(c,R)}</div><div style="min-width:0">${resCell(R)}</div><span class="w3-mu">${open?'▴':'›'}</span></div>`;
+    if(open)h+=w3Detail(w,c,R);return h;};
+  const sec=(t,col,L,extra)=>L.length?`<div class="w3-sh" style="color:${col}">${t} ${L.length}${extra||''}</div>${L.map(row).join('')}`:'';
+  let list='';
+  if(_w3Tab==='rsonly'||_w3Tab===''){}
+  if(_w3Tab==='')list=sec('🔬 有研究報告','#0e7490',has)+sec('📄 待研究','#b45309',no,`<span class="w3-mu" style="margin-left:auto;font-weight:700">已到價、還沒研究的最該先研究</span>`);
+  else if(_w3Tab!=='rsonly')list=F.map(row).join('')||'<div class="w3-mu" style="padding:18px;text-align:center">沒有符合的觀察股</div>';
+  const ro=(_w3Tab===''||_w3Tab==='rsonly')&&rsOnly.length?`<div class="w3-sh" style="color:#475569">🔬 只有研究、還沒加觀察 ${rsOnly.length}<span class="w3-mu" style="margin-left:auto;font-weight:700">按「＋ 觀察」就加進來，目標價先用甜蜜價</span></div>${rsOnly.map(({r,C})=>`<div class="w3-r ro"><i class="w3-st" style="background:#e2e8f0"></i><div><b style="font-size:14.5px">${_ae(C.S.name||r.name)}</b> <span class="w3-mu">${r.code}</span></div><div style="text-align:right"><b class="w3-mono" style="font-size:16px">${rsFmt(C.p)}</b></div><div></div><div style="min-width:0">${resCell({C})}</div><span><button class="w3-b" onclick="w3AddFromRs('${r.code}')">＋ 觀察</button></span></div>`).join('')}`:'';
+  body.innerHTML=`<div class="w3-top"><div class="w3-tabs">${tab('','全部',rows.length)}${tab('hit','🔔 已到價',hits.length)}${tab('sweet','🍬 甜蜜區',sweet.length)}${tab('nores','📄 待研究',no.length)}${rsOnly.length?tab('rsonly','🔬 只有研究',rsOnly.length):''}</div>
+     <span class="w3-sort">排序 ${sortB('dist','距目標')}${sortB('day','今日')}${sortB('since','加入後')}${sortB('pri','優先度')}</span></div>
+   ${db.watchlist.length||rsOnly.length?`<div class="w3-box">${list}${ro}</div>`:'<div style="text-align:center;color:#64748b;padding:40px;font-size:14px">尚無觀察股，點「＋ 新增」開始追蹤</div>'}
+   <div class="w3-mu" style="margin-top:6px;font-size:12px">左邊色條：紅＝已到價、橘＝5% 內。研究位置、本益比／淨值比來自「個股研究」的報告；點一列看第二層。</div>`;
+};
+function w3Detail(w,c,R){
+  const J=_wRelJ(w),LL=_wLinks(w),dd=w.addedDate?Math.max(0,_dayDiff(_twToday(),w.addedDate)):null;
+  let c1,c2;
+  if(R){const C=R.C,S=C.S;
+    c1=`${_w3Zone(C)||`<div class="w3-mu">報告沒有甜蜜價</div>`}<div class="w3-kv"><span>位置</span><b style="color:${RS_LV[C.lv][0]}">${C.txt}</b></div>`;
+    const v=S.val==='pb'?['淨值比',rsFmt(C.pb,2)]:[C.useFwd?'預估本益比':'本益比',rsFmt(C.useFwd?C.pef:C.pe,1)];
+    c2=`<div class="w3-mt2"><div><span>${v[0]}</span><b>${v[1]}</b></div><div><span>殖利率</span><b>${C.y!=null?rsFmt(C.y,1)+'%':'—'}</b></div><div><span>預估殖利率</span><b>${C.yf!=null?rsFmt(C.yf,1)+'%':'—'}</b></div><div><span>警訊</span><b style="font-size:14px;color:${C.hits?'#b91c1c':'#334155'}">${C.hits?C.hits+' 個觸發':C.W.length?'都安全':'—'}</b></div></div>${S.concl?`<div class="w3-concl">📄 ${_ae(S.concl)}</div>`:''}`;
+  }else{c1='';c2=`<div class="w3-nr"><b>📄 這檔還沒有研究報告</b><div class="w3-mu" style="margin:4px 0 8px">匯入後這裡會出現甜蜜區、本益比／淨值比、報告結論</div><button class="w3-b p" onclick="event.stopPropagation();dbShowPage('research');setTimeout(()=>{try{rsPickPdf()}catch(e){}},300)">匯入研究報告 PDF</button></div>`;}
+  const tgt=c.dist==null?'<div class="w3-mu">還沒設目標價</div>':`<div class="w3-kv"><span>觀察目標</span><b>${w.alertDir==='above'?'≥':'≤'} ${w.target}</b>${c.hit?' <b style="color:#dc2626">已到價</b>':` <span class="w3-mu">還差 ${Math.abs(c.dist).toFixed(1)}%</span>`}</div>`;
+  const since=c.ap?`<div class="w3-kv"><span>加入後</span><b style="color:${_wCol(c.since)}">${_wPct(c.since)}</b> <span class="w3-mu">自 ${c.ap.p}${dd!=null?'・觀察 '+dd+' 天':''}</span></div>`:'';
+  const c3=`<div class="w3-note">${_ae(w.reason||'（沒寫理由）')}</div>
+    ${J.length?`<div class="w3-sub">📓 相關日誌 ${J.length}</div>${J.slice(0,3).map(j=>`<a class="w3-j" href="javascript:void 0" onclick="event.stopPropagation();openJournalDrawer('${j.id}')"><b class="w3-mono">${_ae(j.date.slice(5))}</b> ${_ae((j.market||String(j.content||'').replace(/<[^>]+>/g,'')).slice(0,26))}</a>`).join('')}`:''}
+    <div class="w3-sub">🔗 連結</div><div>${LL.map(l=>`<a class="w3-lk" href="${_ae(l.u)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${_ae(l.t||_wHost(l.u))}</a>`).join('')}${W_AUTO.slice(0,3).map(([n,f])=>`<a class="w3-lk g" href="${f(encodeURIComponent(w.code))}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${n} ↗</a>`).join('')}</div>
+    <div onclick="event.stopPropagation()" style="display:flex;gap:4px;margin-top:6px"><input id="wl-t-${w.id}" type="hidden"><input id="wl-u-${w.id}" placeholder="＋ 貼上網址" onkeydown="if(event.key==='Enter')wAddLink('${w.id}')" class="w3-in"></div>`;
+  return`<div class="w3-det" onclick="event.stopPropagation()"><div class="w3-cards">
+    <div class="w3-c"><div class="w3-ct">① 價格在哪</div>${c1}${tgt}${since}</div>
+    <div class="w3-c"><div class="w3-ct">② 數字${R?` <span class="w3-mu" style="font-weight:600">報告 ${R.C.S.date.replace(/-/g,'/')}</span>`:''}</div>${c2}</div>
+    <div class="w3-c"><div class="w3-ct">③ 我的筆記${w.addedDate?` <span class="w3-mu" style="font-weight:600">${_ae(w.addedDate)} 加入</span>`:''}</div>${c3}</div></div>
+   <div class="w3-btns">${R?`<button class="w3-b p" onclick="w3GoRs('${w.code}')">🔬 完整研究</button>`:''}<button class="w3-b" onclick="openWatchModal('${w.id}')">✏️ 編輯觀察</button><button class="w3-b" onclick="watchToHolding('${w.id}')">⭐ 轉成持股</button><button class="w3-b" style="margin-left:auto;color:#64748b" onclick="_wOpen=null;renderWatchPage()">收合 ▴</button></div></div>`;}
+try{if(document.getElementById('dbpage-watch')?.classList.contains('active'))renderWatchPage();}catch(e){}
 </script>
 
 </div><!-- /main-content -->
