@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-<!-- fitness build 2026-11-08h -->
+<!-- fitness build 2026-11-08i -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -140,7 +140,9 @@ tr.sr{cursor:pointer}tr.sr:hover td{background:#f8fafc}td.num{text-align:right;f
 
 .calst{background:#f8fafc;border-radius:12px;padding:6px 10px;margin:-2px 0 10px}.csr{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:3px 0}.csl{font-size:13px;font-weight:900;min-width:92px}
 .cpl{border:1px solid;border-radius:99px;padding:1px 9px;font-size:12.5px;font-weight:900;white-space:nowrap}
-.o2t{display:flex;gap:8px;align-items:center}.o2t.r{background:#fef2f2;border-color:#fca5a5}
+.o2t{display:flex;gap:8px;align-items:center;position:relative}.o2t.r{background:#fef2f2;border-color:#fca5a5}.o2t.w{background:#fff7ed;border-color:#fdba74}.o2t.go{background:#ecfeff;border-color:#a5f3fc}.o2t.rest{opacity:.78}
+.dno{position:absolute;top:3px;left:6px;font-size:10px;color:#94a3b8;font-weight:900}.dbd{font-size:11px;font-weight:800;border-radius:5px;padding:0 6px}
+.dsg{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;background:#eff6ff;border:1px solid #bfdbfe;color:#1e3a8a;border-radius:12px;padding:8px 12px;margin:12px 0 2px;font-size:14px}.dsg b{font-size:15px}
 .calsum{margin-top:10px;font-size:13px}
 .tabs.sm{padding:3px}.tabs.sm span{padding:5px 12px;font-size:13px}
 .gch{display:flex;gap:6px;margin:-2px 0 10px}.gch span{border:1.5px solid var(--c,#cbd5e1);color:var(--c,#334155);border-radius:99px;padding:3px 12px;font-size:12.5px;font-weight:800;cursor:pointer}.gch span.on{background:var(--c,#0f172a);color:#fff;border-color:var(--c,#0f172a)}
@@ -323,6 +325,22 @@ function agg(a,b){const L=db.sessions.filter(s=>s.date>=a&&s.date<=b);const o={c
   L.forEach(s=>{const S=sessStats(s);if(S.sets)o.cnt++;o.vol+=S.vol;o.sets+=S.sets;o.min+=S.min;o.km+=S.km;o.kcal+=S.kcal;if(S.sets||S.min)o.days.add(s.date);Object.entries(S.byG).forEach(([g,v])=>{(o.byG[g]=o.byG[g]||{sets:0,vol:0}).sets+=v.sets;o.byG[g].vol+=v.vol;});});
   const I=db.inbody.filter(x=>x.date>=a&&x.date<=b).sort((p,q)=>p.date.localeCompare(q.date));const li=I[I.length-1];['wt','mm','fat','bmr'].forEach(k=>{const z=I.filter(x=>x[k]!==''&&x[k]!=null);o[k]=z.length?+z[z.length-1][k]:null;});o.ib=li;o.list=L;return o;}
 
+// ── 該練哪裡（週一～五是訓練日，六日強迫休息不算天數；一週為一個週期，從那週第一次起算，二練不歸零）──
+const TRAIN_DOW=[1,2,3,4,5],DUE_REC={chest:2,back:2,legs:3,shoulder:2,bi:2,tri:2},DUE_W=5,DUE_R=8;
+const wkStart=d=>addDays(d,-((dow(d)+6)%7));
+function trainDays(a,b){let n=0;for(let d=addDays(a,1);d<=b;d=addDays(d,1))if(TRAIN_DOW.includes(dow(d)))n++;return n;}
+function groupDue(g,T){T=T||today();const D=[...new Set(db.sessions.filter(s=>s.date<=T&&sessGroups(s).includes(g)).map(s=>s.date))].sort();
+  const name=(GROUPS.find(x=>x[0]===g)||[])[1],rec=DUE_REC[g]||2;
+  if(!D.length)return{g,name,n:null,rank:4,cls:'r',dates:[],anchor:null,last:null,wk:0,rec};
+  const last=D[D.length-1],ws=wkStart(last),anchor=D.find(d=>d>=ws),n=trainDays(anchor,T),wk=D.filter(d=>d>=wkStart(T)).length;
+  const rank=n>=DUE_R?3:n>=DUE_W?2:n>=rec?1:0;
+  return{g,name,n,rank,cls:['rest','go','w','r'][rank],dates:D,anchor,last,wk,rec};}
+function dueList(T){return GROUPS.map(x=>groupDue(x[0],T)).sort((a,b)=>b.rank-a.rank||(b.n??99)-(a.n??99)||GROUPS.findIndex(x=>x[0]===a.g)-GROUPS.findIndex(x=>x[0]===b.g));}
+// 今天建議：從預設組合挑整體最該練的（每個部位：等級×10＋隔幾天，取平均；有部位還在恢復中的組合扣分）
+function suggestPreset(T){const L={};dueList(T).forEach(x=>L[x.g]=x);
+  const sc=p=>{const xs=p[1].map(g=>L[g]);return xs.reduce((a,x)=>a+x.rank*10+Math.min(x.n??10,10),0)/xs.length-(xs.some(x=>x.rank===0)?15:0);};
+  const best=PRESETS.map(p=>({p,s:sc(p)})).sort((a,b)=>b.s-a.s)[0];return best?{name:best.p[0],groups:best.p[1],items:best.p[1].map(g=>L[g])}:null;}
+
 // ══ 📄 教練報告：計算＋文字清單（網頁、手機共用）══
 const RP_NAME='阿豪訓練計劃';
 let RPM=(()=>{const t=today();if(+t.slice(8)<=5){const d=new Date(t.slice(0,8)+'01T00:00:00Z');d.setUTCMonth(d.getUTCMonth()-1);return d.toISOString().slice(0,7);}return t.slice(0,7);})();
@@ -427,12 +445,13 @@ function cmp(v,p,u='',rev){if(p==null||!isFinite(p)||p===0&&v===0)return'';const
 function vOv(){
   const T=today(),M=monday(T),A=agg(M,addDays(M,6)),P=agg(addDays(M,-7),addDays(M,-1)),goal=+(db.cfg&&db.cfg.goal)||4;
   const pct=Math.min(1,A.cnt/goal),C=2*Math.PI*15.5;
-  // G-C② 圓環：隔幾天（滿 7 天一圈；4 天變橘、7 天變紅）＋上次 ← 前一次・本月次數
-  const gDates=g=>[...new Set(db.sessions.filter(s=>s.date<=T&&sessGroups(s).includes(g)).map(s=>s.date))].sort().reverse();
-  const ring=(n,c)=>{const p=n==null?0:Math.min(1,n/7),k=n==null?'#cbd5e1':n>=7?'#dc2626':n>=4?'#f59e0b':c,R=2*Math.PI*15.5;return`<svg width="46" height="46" viewBox="0 0 36 36" style="flex-shrink:0"><circle cx="18" cy="18" r="15.5" fill="none" stroke="#e2e8f0" stroke-width="4"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="${k}" stroke-width="4" stroke-dasharray="${R*p} ${R}" transform="rotate(-90 18 18)" stroke-linecap="round"/><text x="18" y="21.6" text-anchor="middle" font-size="10" font-weight="900" font-family="JetBrains Mono,monospace">${n==null?'—':n}</text></svg>`;};
-  const tiles=GROUPS.map(g=>{const D=gDates(g[0]),d=D[0]||null,n=d?dayDiff(T,d):null,warn=n===null||n>=4,mc=db.sessions.filter(s=>s.date.slice(0,7)===T.slice(0,7)&&s.date<=T&&sessGroups(s).includes(g[0])).length;
-    return`<div class="o1t o2t${warn?' w':''}${n!=null&&n>=7?' r':''}">${ring(n,g[2])}<div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:6px"><b style="color:${g[2]};font-size:15px">${g[1]}</b><span class="mono" style="margin-left:auto;font-weight:900;font-size:13px">${n===null?'還沒練過':n===0?'今天':n+' 天前'}</span></div>
-     <div class="mu mono">${d?md(d)+(D[1]?' ← '+md(D[1]):''):'—'}</div><div class=mu>${warn&&n!==null?'<span class="o1w">該練了</span>':`本月 ${mc} 次`}</div></div></div>`;}).join('');
+  // 圓環＝隔幾個訓練日（週一～五），滿 5 天一圈；依「最該練」排序
+  const ring=(n,c,k)=>{const p=n==null?0:Math.min(1,n/DUE_W),col=k==='r'?'#dc2626':k==='w'?'#f59e0b':c,R=2*Math.PI*15.5;return`<svg width="46" height="46" viewBox="0 0 36 36" style="flex-shrink:0"><circle cx="18" cy="18" r="15.5" fill="none" stroke="#e2e8f0" stroke-width="4"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="${col}" stroke-width="4" stroke-dasharray="${R*p} ${R}" transform="rotate(-90 18 18)" stroke-linecap="round"/><text x="18" y="21.6" text-anchor="middle" font-size="10" font-weight="900" font-family="JetBrains Mono,monospace">${n==null?'—':n}</text></svg>`;};
+  const BD={r:'<span class="dbd" style="background:#fee2e2;color:#b91c1c">隔太久</span>',w:'<span class="dbd" style="background:#ffedd5;color:#c2410c">該練了</span>',go:'<span class="dbd" style="background:#cffafe;color:#0e7490">可以練了</span>'};
+  const tiles=dueList(T).map((x,i)=>{const c=GC[x.g],sub=x.n==null?'—':md(x.anchor)+(x.last!==x.anchor?' 起算':'')+(x.wk?`・本週 ✓${x.wk}`:'');
+    return`<div class="o1t o2t ${x.cls}"><span class="dno">${i+1}</span>${ring(x.n,c,x.cls)}<div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:6px"><b style="color:${c};font-size:15px">${x.name}</b><span class="mono" style="margin-left:auto;font-weight:900;font-size:13px;white-space:nowrap">${x.n==null?'還沒練過':'隔 '+x.n+' 天'}</span></div>
+     <div class="mu mono" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${sub}</div><div>${x.n==null?BD.r.replace('隔太久','還沒練過'):x.cls==='rest'?`<span class=mu>恢復中・再 ${x.rec-x.n} 天</span>`:BD[x.cls]}</div></div></div>`;}).join('');
+  const SG=suggestPreset(T);
   const rec=db.sessions.filter(s=>sessStats(s).sets||sessStats(s).min).sort((a,b)=>(b.date+(b.start||'')).localeCompare(a.date+(a.start||''))).slice(0,3);
   const PRw=prsIn(M,addDays(M,6));
   const ib=db.inbody.slice().sort((a,b)=>a.date.localeCompare(b.date)).pop();
@@ -442,7 +461,7 @@ function vOv(){
     <div style="display:flex;gap:18px;align-items:center">
      <svg width="128" height="128" viewBox="0 0 36 36" style="cursor:pointer;flex-shrink:0" onclick="setGoal()"><title>點一下改目標</title><circle cx="18" cy="18" r="15.5" fill="none" stroke="#e2e8f0" stroke-width="4"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="${pct>=1?'#0891b2':'#2563eb'}" stroke-width="4" stroke-dasharray="${C*pct} ${C}" transform="rotate(-90 18 18)" stroke-linecap="round"/><text x="18" y="18" text-anchor="middle" font-size="9" font-weight="900" font-family="JetBrains Mono,monospace">${A.cnt}/${goal}</text><text x="18" y="24.5" text-anchor="middle" font-size="3.6" fill="#64748b">本週次數</text></svg>
      <div style="font-size:14px;line-height:1.95"><b style="font-size:17px">本週 ${A.cnt} 次</b> <span class=mu>（目標 ${goal}，點圓圈可改）</span><br>${A.sets} 組・${fmt(A.vol)} kg${A.min?`・🏃 ${A.min} 分`:''}<br>${dc>0?`<span class=up>比上週多 ${dc} 次 ▲</span>`:dc<0?`<span class=dn>比上週少 ${-dc} 次</span>`:'<span class=dn>跟上週一樣</span>'}${PRw.length?`　<span style="color:#0891b2;font-weight:800">🏆 新紀錄 ${PRw.length} 項</span>`:''}</div></div>
-    <div class="o1h">各部位多久沒練 <span class=mu style="font-weight:500">圓環＝隔幾天，滿 7 天一圈（4 天變橘、7 天變紅）</span></div><div class="o1g">${tiles}</div>
+    ${SG?`<div class="dsg">💡 今天建議：<b>${SG.name}</b><span class=mu>${SG.items.map(x=>x.name+(x.n==null?' 還沒練過':' 隔 '+x.n+' 天')).join('、')}</span></div>`:''}<div class="o1h">各部位多久沒練 <span class=mu style="font-weight:500">只算週一～五；最該練的排前面（隔 5 天該練了、8 天隔太久）</span></div><div class="o1g">${tiles}</div>
     <div class="o1h">最近三次</div>${recDays().map(([d,g,st,mn])=>`<div class="o1r" onclick="OPENROW='${d}';TAB='log';LOGG='all';REF='${d}';PER='w';render()"><span class=mono style="width:62px"><b>${md(d)}</b> <span class=mu>${WK[dow(d)]}</span></span><b>${g.length?g.map(k=>`<span style="color:${GC[k]}">${GN[k]}</span>`).join('<span style="color:#cbd5e1"> / </span>'):''}${mn?`${g.length?' <span style="color:#cbd5e1">＋</span> ':''}<span style="color:#ea580c">有氧</span>`:''}</b><span class=mu style="margin-left:auto">${st?st+' 組':''}${mn?`${st?'・':''}🏃 ${mn} 分`:''}</span></div>`).join('')||'<div class=mu>還沒有紀錄</div>'}
     ${ib?`<div class="o1h">最新 InBody <span class=mu style="font-weight:500">${md(ib.date)}</span></div><div style="font-size:13px" class=mono>⚖️ ${ib.wt||'—'} kg・💪 ${ib.mm||'—'} kg・體脂 ${ib.fat||'—'}%・代謝 ${ib.bmr||'—'}</div>`:''}</div>
    <div class="card" style="margin:0">${calHtml()}</div></div>
