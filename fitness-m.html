@@ -183,7 +183,7 @@ body.embed .top a.hm,body.embed .top a.pc{display:none}
 </style>
 </head>
 <body>
-<div class="top"><b id="ttl">🏋️ 健身</b><span id="sync"></span><span style="font-size:10px;color:#cbd5e1">v1109a</span><span class="sp"></span><a class="pc" href="fitness.html?force=pc">📊 數據</a><a class="hm" href="index.html">🏠</a><button id="closeEmbed" style="display:none" onclick="parent.ftCloseEmbed&&parent.ftCloseEmbed()">✕ 關閉</button></div>
+<div class="top"><b id="ttl">🏋️ 健身</b><span id="sync"></span><span style="font-size:10px;color:#cbd5e1">v1109c</span><span class="sp"></span><a class="pc" href="fitness.html?force=pc">📊 數據</a><a class="hm" href="index.html">🏠</a><button id="closeEmbed" style="display:none" onclick="parent.ftCloseEmbed&&parent.ftCloseEmbed()">✕ 關閉</button></div>
 <div class="wrap" id="app"></div>
 <div class="bar" id="bar" style="display:none"><div class="in" id="barIn"></div></div>
 <div class="toast" id="toast"></div>
@@ -434,9 +434,9 @@ function phNagMonth(){const m=today().slice(0,7);return phOf(m)?null:m;}
 const _phCache={};
 function _b64(u){let s='';for(let i=0;i<u.length;i+=0x8000)s+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return btoa(s);}
 function _unb64(b){const s=atob(String(b).replace(/\s/g,''));const u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return u;}
-// 壓縮：長邊 1080、JPEG 0.82（一張約 100～250KB）
-function phShrink(file){return new Promise((ok,no)=>{const img=new Image(),url=URL.createObjectURL(file);img.onload=()=>{const k=Math.min(1,1080/Math.max(img.width,img.height)),w=Math.round(img.width*k),h=Math.round(img.height*k);
-  const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);URL.revokeObjectURL(url);c.toBlob(b=>b?b.arrayBuffer().then(a=>ok({bytes:new Uint8Array(a),w,h})):no(new Error('壓縮失敗')),'image/jpeg',0.82);};img.onerror=()=>no(new Error('讀不到這張照片'));img.src=url;});}
+// 壓縮：長邊 1600、JPEG 0.85（一張約 200～450KB；放大看細節夠用）
+function phShrink(file){return new Promise((ok,no)=>{const img=new Image(),url=URL.createObjectURL(file);img.onload=()=>{const k=Math.min(1,1600/Math.max(img.width,img.height)),w=Math.round(img.width*k),h=Math.round(img.height*k);
+  const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);URL.revokeObjectURL(url);c.toBlob(b=>b?b.arrayBuffer().then(a=>ok({bytes:new Uint8Array(a),w,h})):no(new Error('壓縮失敗')),'image/jpeg',0.85);};img.onerror=()=>no(new Error('讀不到這張照片'));img.src=url;});}
 async function phUpload(file,month){const ek=window.encGetKey&&window.encGetKey();if(!ek)throw new Error('這台還沒輸入資料密碼，照片不能上傳');
   const {bytes,w,h}=await phShrink(file),id=uid(),path=PH_DIR+id+'.json';
   const env=await encSeal(bytes,ek);const body={message:'fitness photo '+month,content:_b64(new TextEncoder().encode(env))};
@@ -449,6 +449,17 @@ async function phUrl(p){if(!p)return null;if(_phCache[p.id])return _phCache[p.id
   const env=JSON.parse(new TextDecoder().decode(_unb64(j.content)));const b=await encOpen(env,ek);return _phCache[p.id]=URL.createObjectURL(new Blob([b],{type:'image/jpeg'}));}
 // 照片當月的 InBody（當月最後一次，沒有就用之前最近一次）
 function phIb(m){const L=(db.inbody||[]).filter(x=>x.date.slice(0,7)<=m).sort((a,b)=>a.date.localeCompare(b.date));return L.filter(x=>x.date.startsWith(m)).pop()||L.pop()||null;}
+// 點照片放大（手機、電腦共用）：全螢幕看；點一下放大 2.5 倍可拖曳看細節，再點一下縮回；✕ 或背景關閉
+function phZoom(id){const p=(db.photos||[]).find(x=>x.id===id);if(!p)return;document.getElementById('phz')?.remove();
+  const ib=phIb(p.month),lab=(+p.month.slice(5))+' 月'+(ib?`・${ib.wt||'—'}kg・體脂 ${ib.fat!==''&&ib.fat!=null?ib.fat+'%':'—'}`:'');
+  const d=document.createElement('div');d.id='phz';d.innerHTML=`<style>#phz{position:fixed;inset:0;background:rgba(15,23,42,.94);z-index:9999;display:flex;flex-direction:column}#phz .zt{display:flex;align-items:center;gap:10px;color:#fff;padding:12px 16px;font-weight:800}#phz .zt button{margin-left:auto;border:none;background:rgba(255,255,255,.15);color:#fff;font-size:20px;width:40px;height:40px;border-radius:50%;cursor:pointer}
+   #phz .zs{flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;-webkit-overflow-scrolling:touch}#phz img{max-width:100%;max-height:100%;object-fit:contain;cursor:zoom-in;display:block}#phz.big .zs{display:block}#phz.big img{max-width:none;max-height:none;width:250%;cursor:zoom-out}#phz .zh{color:#cbd5e1;text-align:center;font-size:12.5px;padding:8px}</style>
+   <div class="zt">📸 ${lab}<button onclick="document.getElementById('phz').remove()">✕</button></div><div class="zs"><img alt=""></div><div class="zh">點照片放大／縮回・放大後可以拖動看細節</div>`;
+  document.body.appendChild(d);const im=d.querySelector('img'),zs=d.querySelector('.zs');
+  im.onclick=e=>{e.stopPropagation();const big=!d.classList.contains('big');const rx=e.offsetX/im.clientWidth,ry=e.offsetY/im.clientHeight;d.classList.toggle('big',big);if(big)requestAnimationFrame(()=>{zs.scrollLeft=im.clientWidth*rx-zs.clientWidth/2;zs.scrollTop=im.clientHeight*ry-zs.clientHeight/2;});};
+  zs.onclick=e=>{if(e.target===zs)d.remove();};
+  phUrl(p).then(u=>{if(u)im.src=u;});}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementById('phz')?.remove();});
 
 </script>
 <script>
@@ -696,7 +707,7 @@ const mLab=m=>(m.slice(0,4)!==today().slice(0,4)?m.slice(2,4)+'/':'')+(+m.slice(
 async function phPick(inp){const f=inp.files&&inp.files[0];if(!f)return;const m=$('phm')?.value||today().slice(0,7);
   if(phOf(m)&&!confirm(mLab(m)+'已經有照片了，要換成這張嗎？')){inp.value='';return;}
   toast('📸 上傳中…');try{await phUpload(f,m);PHB=m;toast('✅ '+mLab(m)+'的照片存好了（已加密）');}catch(e){alert(e.message||e);}inp.value='';vPhoto();}
-function phImg(p,cls,st){return p?`<img class="${cls||''}" data-ph="${p.id}" style="${st||''}" alt="">`:`<div class="phe" style="${st||''}">沒有照片</div>`;}
+function phImg(p,cls,st,z){return p?`<img class="${cls||''}" data-ph="${p.id}" style="${st||''}" alt=""${z?` onclick="event.stopPropagation();phZoom('${p.id}')"`:''}>`:`<div class="phe" style="${st||''}">沒有照片</div>`;}
 function phIbTxt(m){const x=phIb(m);return x?`${x.wt||'—'}kg・體脂 ${x.fat!==''&&x.fat!=null?x.fat+'%':'—'}`:'—';}
 function vPhoto(){$('ttl').textContent='📸 身形照';const L=phList(),Ms=L.map(p=>p.month);
   if(!PHB||!Ms.includes(PHB))PHB=Ms[Ms.length-1]||null;
@@ -707,10 +718,10 @@ function vPhoto(){$('ttl').textContent='📸 身形照';const L=phList(),Ms=L.ma
   if(!L.length)body=`<div class="card mu" style="text-align:center;padding:30px 12px;line-height:1.8">還沒有身形照<br>每月初拍一張正面，<b>同樣地點、燈光、時間</b>（早上空腹最好），才好比較</div>`;
   else{const pick=(v,name)=>`<div class="phc">${Ms.map(m=>`<span class="${v===m?'on':''}" onclick="${name}='${m}';vPhoto()">${mLab(m)}</span>`).join('')}</div>`;
     const pa=L.find(p=>p.month===PHA),pb=L.find(p=>p.month===PHB);
-    if(PHSEG==='grid')body=`<div class="phg">${L.slice().reverse().map(p=>`<div onclick="PHB='${p.month}';phSeg('pair')">${phImg(p,'pht')}<b>${mLab(p.month)}</b><span class=mu>${phIbTxt(p.month)}</span></div>`).join('')}</div>`;
+    if(PHSEG==='grid')body=`<div class="phg">${L.slice().reverse().map(p=>`<div>${phImg(p,'pht','',1)}<b>${mLab(p.month)}</b><span class=mu>${phIbTxt(p.month)}</span></div>`).join('')}</div><div class=mu style="text-align:center;margin-top:6px">點照片放大</div>`;
     else if(PHSEG==='slide')body=pa&&pb?`<div class="phsl">${phImg(pa,'phi')}${phImg(pb,'phi',`clip-path:inset(0 0 0 ${PHX}%)`)}<div class="phln" style="left:${PHX}%"></div><span class="phtg l">${mLab(PHA)}</span><span class="phtg r">${mLab(PHB)}</span>
-      <input type="range" min="0" max="100" value="${PHX}" oninput="PHX=+this.value;const s=this.parentNode;s.querySelectorAll('img')[1].style.clipPath='inset(0 0 0 '+PHX+'%)';s.querySelector('.phln').style.left=PHX+'%'"></div><div class=mu style="text-align:center;margin:4px 0 8px">左右拖，看哪裡變了</div><div class=mu>舊的</div>${pick(PHA,'PHA')}<div class=mu>新的</div>${pick(PHB,'PHB')}`:'<div class="card mu">要兩個月以上的照片才能用滑桿</div>';
-    else body=`<div style="display:flex;gap:6px">${[[PHA,pa],[PHB,pb]].map(([m,p])=>`<div style="flex:1;min-width:0;text-align:center"><b style="font-size:13px">${m?mLab(m):'—'}</b>${phImg(p,'phi2')}<div class="mu mono" style="font-size:11px">${m?phIbTxt(m):''}</div></div>`).join('')}</div>
+      <input type="range" min="0" max="100" value="${PHX}" oninput="PHX=+this.value;const s=this.parentNode;s.querySelectorAll('img')[1].style.clipPath='inset(0 0 0 '+PHX+'%)';s.querySelector('.phln').style.left=PHX+'%'"></div><div class=mu style="text-align:center;margin:4px 0 8px">左右拖，看哪裡變了・要看細節到「並排比較」點照片放大</div><div class=mu>舊的</div>${pick(PHA,'PHA')}<div class=mu>新的</div>${pick(PHB,'PHB')}`:'<div class="card mu">要兩個月以上的照片才能用滑桿</div>';
+    else body=`<div style="display:flex;gap:6px">${[[PHA,pa],[PHB,pb]].map(([m,p])=>`<div style="flex:1;min-width:0;text-align:center"><b style="font-size:13px">${m?mLab(m):'—'}</b>${phImg(p,'phi2','',1)}<div class="mu mono" style="font-size:11px">${m?phIbTxt(m):''}</div></div>`).join('')}</div>
       <div class=mu style="margin-top:8px">左邊（舊）</div>${pick(PHA,'PHA')}<div class=mu>右邊（新）</div>${pick(PHB,'PHB')}`;}
   $('app').innerHTML=`<div class="rps"><span class="${PHSEG==='pair'?'on':''}" onclick="phSeg('pair')">並排比較</span><span class="${PHSEG==='grid'?'on':''}" onclick="phSeg('grid')">每月格子</span><span class="${PHSEG==='slide'?'on':''}" onclick="phSeg('slide')">滑桿</span></div>${body}<div style="margin-top:10px">${up}</div><div class=mu style="line-height:1.6">🔒 照片用資料密碼加密後才上傳，別人打不開；教練報告不會放照片。</div>`;
   bar(`<button class="btn gh" style="flex:1" onclick="go('home')">← 首頁</button>`);

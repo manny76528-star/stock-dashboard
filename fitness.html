@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-<!-- fitness build 2026-11-09a -->
+<!-- fitness build 2026-11-09c -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -142,6 +142,15 @@ tr.sr{cursor:pointer}tr.sr:hover td{background:#f8fafc}td.num{text-align:right;f
 .cpl{border:1px solid;border-radius:99px;padding:1px 9px;font-size:12.5px;font-weight:900;white-space:nowrap}
 .o2t{display:flex;gap:8px;align-items:center;position:relative}.o2t.r{background:#fef2f2;border-color:#fca5a5}.o2t.w{background:#fff7ed;border-color:#fdba74}.o2t.go{background:#ecfeff;border-color:#a5f3fc}.o2t.rest{opacity:.78}
 .wab{display:flex;align-items:center;gap:8px;border:1px solid #e2e8f0;background:#f8fafc;border-radius:12px;padding:7px 12px;margin-top:8px;font-size:14px}.wab.due{background:#f0fdfa;border-color:#5eead4}.wab b{color:#0f766e}.wab button{margin-left:auto;border:none;background:#0891b2;color:#fff;font-weight:800;border-radius:9px;padding:5px 12px;cursor:pointer;font-family:inherit}.wab .wabu{background:#fff;color:#64748b;border:1px solid #e2e8f0}
+.o2t b{white-space:nowrap}
+.tabs span{white-space:nowrap;padding:8px 11px!important}.top a,.top .tb,.top h1,#sync{white-space:nowrap}.top{gap:10px!important}
+@media(max-width:1350px){#sync{display:none}}
+.wps{border:1px solid var(--line);border-radius:10px;padding:7px 10px;font-size:13px;font-family:inherit}.wphe{aspect-ratio:3/4;display:grid;place-items:center;background:#f1f5f9;border-radius:12px;color:#94a3b8}
+.wpg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:12px}.wpi{text-align:center}.wpi img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:12px;background:#e2e8f0;cursor:zoom-in;display:block;margin-bottom:4px;border:3px solid transparent}.wpi.sel img{border-color:#2563eb}.wpi b{display:block;font-size:13.5px}
+.wpcmp{display:grid;grid-template-columns:1.2fr 1fr;gap:16px;margin-top:16px}.wp2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.wp2 div{text-align:center}.wp2 img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:12px;background:#e2e8f0;cursor:zoom-in;display:block;margin:6px 0}
+.wpc{display:inline-block;border:1px solid var(--line);border-radius:99px;padding:2px 10px;margin:2px 4px;font-size:12.5px;font-weight:800;cursor:pointer;background:#fff;color:#334155}.wpc.on{border-color:#2563eb;color:#1d4ed8;background:#eff6ff}
+.wpsl{position:relative;aspect-ratio:3/4;max-height:640px;margin:0 auto;border-radius:12px;overflow:hidden;background:#e2e8f0}.wpsl img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.wpln{position:absolute;top:0;bottom:0;width:3px;background:#fff;margin-left:-1px;box-shadow:0 0 4px rgba(0,0,0,.4)}
+.wpsl input{position:absolute;inset:0;width:100%;height:100%;opacity:0;margin:0;cursor:ew-resize}.wptg{position:absolute;top:10px;background:rgba(0,0,0,.5);color:#fff;font-size:12px;border-radius:6px;padding:1px 8px}.wptg.l{left:10px}.wptg.r{right:10px}
 .dno{position:absolute;top:3px;left:6px;font-size:10px;color:#94a3b8;font-weight:900}.dbd{font-size:11px;font-weight:800;border-radius:5px;padding:0 6px}
 .dsg{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;background:#eff6ff;border:1px solid #bfdbfe;color:#1e3a8a;border-radius:12px;padding:8px 12px;margin:12px 0 2px;font-size:14px}.dsg b{font-size:15px}
 .calsum{margin-top:10px;font-size:13px}
@@ -440,9 +449,9 @@ function phNagMonth(){const m=today().slice(0,7);return phOf(m)?null:m;}
 const _phCache={};
 function _b64(u){let s='';for(let i=0;i<u.length;i+=0x8000)s+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return btoa(s);}
 function _unb64(b){const s=atob(String(b).replace(/\s/g,''));const u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return u;}
-// 壓縮：長邊 1080、JPEG 0.82（一張約 100～250KB）
-function phShrink(file){return new Promise((ok,no)=>{const img=new Image(),url=URL.createObjectURL(file);img.onload=()=>{const k=Math.min(1,1080/Math.max(img.width,img.height)),w=Math.round(img.width*k),h=Math.round(img.height*k);
-  const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);URL.revokeObjectURL(url);c.toBlob(b=>b?b.arrayBuffer().then(a=>ok({bytes:new Uint8Array(a),w,h})):no(new Error('壓縮失敗')),'image/jpeg',0.82);};img.onerror=()=>no(new Error('讀不到這張照片'));img.src=url;});}
+// 壓縮：長邊 1600、JPEG 0.85（一張約 200～450KB；放大看細節夠用）
+function phShrink(file){return new Promise((ok,no)=>{const img=new Image(),url=URL.createObjectURL(file);img.onload=()=>{const k=Math.min(1,1600/Math.max(img.width,img.height)),w=Math.round(img.width*k),h=Math.round(img.height*k);
+  const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);URL.revokeObjectURL(url);c.toBlob(b=>b?b.arrayBuffer().then(a=>ok({bytes:new Uint8Array(a),w,h})):no(new Error('壓縮失敗')),'image/jpeg',0.85);};img.onerror=()=>no(new Error('讀不到這張照片'));img.src=url;});}
 async function phUpload(file,month){const ek=window.encGetKey&&window.encGetKey();if(!ek)throw new Error('這台還沒輸入資料密碼，照片不能上傳');
   const {bytes,w,h}=await phShrink(file),id=uid(),path=PH_DIR+id+'.json';
   const env=await encSeal(bytes,ek);const body={message:'fitness photo '+month,content:_b64(new TextEncoder().encode(env))};
@@ -455,6 +464,17 @@ async function phUrl(p){if(!p)return null;if(_phCache[p.id])return _phCache[p.id
   const env=JSON.parse(new TextDecoder().decode(_unb64(j.content)));const b=await encOpen(env,ek);return _phCache[p.id]=URL.createObjectURL(new Blob([b],{type:'image/jpeg'}));}
 // 照片當月的 InBody（當月最後一次，沒有就用之前最近一次）
 function phIb(m){const L=(db.inbody||[]).filter(x=>x.date.slice(0,7)<=m).sort((a,b)=>a.date.localeCompare(b.date));return L.filter(x=>x.date.startsWith(m)).pop()||L.pop()||null;}
+// 點照片放大（手機、電腦共用）：全螢幕看；點一下放大 2.5 倍可拖曳看細節，再點一下縮回；✕ 或背景關閉
+function phZoom(id){const p=(db.photos||[]).find(x=>x.id===id);if(!p)return;document.getElementById('phz')?.remove();
+  const ib=phIb(p.month),lab=(+p.month.slice(5))+' 月'+(ib?`・${ib.wt||'—'}kg・體脂 ${ib.fat!==''&&ib.fat!=null?ib.fat+'%':'—'}`:'');
+  const d=document.createElement('div');d.id='phz';d.innerHTML=`<style>#phz{position:fixed;inset:0;background:rgba(15,23,42,.94);z-index:9999;display:flex;flex-direction:column}#phz .zt{display:flex;align-items:center;gap:10px;color:#fff;padding:12px 16px;font-weight:800}#phz .zt button{margin-left:auto;border:none;background:rgba(255,255,255,.15);color:#fff;font-size:20px;width:40px;height:40px;border-radius:50%;cursor:pointer}
+   #phz .zs{flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;-webkit-overflow-scrolling:touch}#phz img{max-width:100%;max-height:100%;object-fit:contain;cursor:zoom-in;display:block}#phz.big .zs{display:block}#phz.big img{max-width:none;max-height:none;width:250%;cursor:zoom-out}#phz .zh{color:#cbd5e1;text-align:center;font-size:12.5px;padding:8px}</style>
+   <div class="zt">📸 ${lab}<button onclick="document.getElementById('phz').remove()">✕</button></div><div class="zs"><img alt=""></div><div class="zh">點照片放大／縮回・放大後可以拖動看細節</div>`;
+  document.body.appendChild(d);const im=d.querySelector('img'),zs=d.querySelector('.zs');
+  im.onclick=e=>{e.stopPropagation();const big=!d.classList.contains('big');const rx=e.offsetX/im.clientWidth,ry=e.offsetY/im.clientHeight;d.classList.toggle('big',big);if(big)requestAnimationFrame(()=>{zs.scrollLeft=im.clientWidth*rx-zs.clientWidth/2;zs.scrollTop=im.clientHeight*ry-zs.clientHeight/2;});};
+  zs.onclick=e=>{if(e.target===zs)d.remove();};
+  phUrl(p).then(u=>{if(u)im.src=u;});}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementById('phz')?.remove();});
 
 </script>
 <script>
@@ -484,7 +504,7 @@ function vOv(){
   const ring=(n,c,k)=>{const p=n==null?0:Math.min(1,n/DUE_W),col=k==='r'?'#dc2626':k==='w'?'#f59e0b':c,R=2*Math.PI*15.5;return`<svg width="46" height="46" viewBox="0 0 36 36" style="flex-shrink:0"><circle cx="18" cy="18" r="15.5" fill="none" stroke="#e2e8f0" stroke-width="4"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="${col}" stroke-width="4" stroke-dasharray="${R*p} ${R}" transform="rotate(-90 18 18)" stroke-linecap="round"/><text x="18" y="21.6" text-anchor="middle" font-size="10" font-weight="900" font-family="JetBrains Mono,monospace">${n==null?'—':n}</text></svg>`;};
   const BD={r:'<span class="dbd" style="background:#fee2e2;color:#b91c1c">隔太久</span>',w:'<span class="dbd" style="background:#ffedd5;color:#c2410c">該練了</span>',go:'<span class="dbd" style="background:#cffafe;color:#0e7490">可以練了</span>'};
   const tiles=dueList(T).map((x,i)=>{const c=GC[x.g],sub=x.n==null?'—':md(x.anchor)+(x.last!==x.anchor?' 起算':'')+(x.wk?`・本週 ✓${x.wk}`:'');
-    return`<div class="o1t o2t ${x.cls}"><span class="dno">${i+1}</span>${ring(x.n,c,x.cls)}<div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:6px"><b style="color:${c};font-size:15px">${x.name}</b><span class="mono" style="margin-left:auto;font-weight:900;font-size:13px;white-space:nowrap">${x.n==null?'還沒練過':'隔 '+x.n+' 天'}</span></div>
+    return`<div class="o1t o2t ${x.cls}"><span class="dno">${i+1}</span>${ring(x.n,c,x.cls)}<div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:6px"><b style="color:${c};font-size:15px">${x.name}</b><span class="mono" style="margin-left:auto;font-weight:900;font-size:13px;white-space:nowrap">${x.n==null?'沒練過':'隔 '+x.n+' 天'}</span></div>
      <div class="mu mono" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${sub}</div><div>${x.n==null?BD.r.replace('隔太久','還沒練過'):x.cls==='rest'?`<span class=mu>恢復中・再 ${x.rec-x.n} 天</span>`:BD[x.cls]}</div></div></div>`;}).join('');
   const SG=suggestPreset(T);
   const rec=db.sessions.filter(s=>sessStats(s).sets||sessStats(s).min).sort((a,b)=>(b.date+(b.start||'')).localeCompare(a.date+(a.start||''))).slice(0,3);
@@ -550,7 +570,7 @@ function trendHead(){const sg=(arr,key)=>`<div class="tabs sm">${arr.map(([k,l])
   return`<div class="ct" style="flex-wrap:wrap;gap:10px">📈 趨勢 ${sg([['fit','🏋️ 健身'],['car','🏃 有氧'],['ib','📊 InBody']],'tab')}${sg(T3M[TT.tab].map(x=>[x[0],x[1]]),'m')}<span style="margin-left:auto">${TT.tab==='ib'?'':sg([['w','每週'],['m','每月'],['y','每年']],'per')}</span></div>
    ${TT.tab==='fit'?`<div class="gch"><span class="${TT.g==='all'?'on':''}" onclick="tt('g','all')">全部</span>${GROUPS.map(g=>`<span class="${TT.g===g[0]?'on':''}" style="--c:${g[2]}" onclick="tt('g','${g[0]}')">${g[1]}</span>`).join('')}</div>`:''}`;}
 function t3Buckets(){const T=today(),out=[];if(TT.per==='y'){const y1=+T.slice(0,4),f=db.sessions.map(s=>s.date).sort()[0],y0=f?Math.max(+f.slice(0,4),y1-4):y1;for(let y=y0;y<=y1;y++)out.push([y+'-01-01',y+'-12-31',y+'']);return out;}
-  for(let i=11;i>=0;i--){const r=TT.per==='w'?addDays(T,-7*i):shift('m',T,-i),[a,b]=range(TT.per,r);out.push([a,b,TT.per==='w'?md(a):a.slice(0,7).replace('-','/')]);}
+  for(let i=11;i>=0;i--){const r=TT.per==='w'?addDays(T,-7*i):shift('m',T,-i),[a,b]=range(TT.per,r);out.push([a,b,TT.per==='w'?[md(a)+'～',md(b)]:a.slice(0,7).replace('-','/')]);}
   // 從第一筆紀錄那一期開始畫，前面沒資料的空白期不顯示
   const first=db.sessions.map(s=>s.date).sort()[0];if(first){const k=out.findIndex(o=>o[1]>=first);if(k>0)return out.slice(k);}return out;}
 function drawT3(){
@@ -767,6 +787,34 @@ function vRp(){const S=rpStats(RPM),F=rpFlags(S),{A,P,R}=S,T=today();
 
 // 手機按「PDF」會開 fitness.html?force=pc&rp=YYYY-MM&print=1
 (()=>{const q=new URLSearchParams(location.search),m=q.get('rp');if(m&&/^\d{4}-\d{2}$/.test(m)){RPM=m;TAB='rp';if(q.get('print'))addEventListener('load',()=>setTimeout(()=>{render();rpPrint();},900));}})();
+// ══ 📸 身形照（電腦版）：每月格子＋並排比較＋滑桿；點照片放大 ══
+TABS.splice(5,0,['ph','📸 身形照']);
+let WPA=null,WPB=null,WPX=50;
+const _phRender0=render;
+render=function(){if(TAB==='ph'){tabs();Object.values(CH).forEach(c=>c.destroy());CH={};vPhW();return;}_phRender0();};
+const wmLab=m=>m.slice(0,4)+'/'+(+m.slice(5))+' 月';
+function wphIb(m){const x=phIb(m);return x?`${x.wt||'—'} kg・體脂 ${x.fat!==''&&x.fat!=null?x.fat+'%':'—'}・肌肉 ${x.mm||'—'}`:'（沒有 InBody）';}
+async function wphPick(inp){const f=inp.files&&inp.files[0];if(!f)return;const m=document.getElementById('wphm').value;if(phOf(m)&&!confirm(wmLab(m)+' 已經有照片了，要換成這張嗎？')){inp.value='';return;}
+  try{rpToast('📸 上傳中…');await phUpload(f,m);WPB=m;rpToast('✅ '+wmLab(m)+' 的照片存好了（已加密）');}catch(e){alert(e.message||e);}inp.value='';vPhW();}
+function vPhW(){const L=phList(),Ms=L.map(p=>p.month);
+  if(!WPB||!Ms.includes(WPB))WPB=Ms[Ms.length-1]||null;
+  if(!WPA||!Ms.includes(WPA)||WPA>=WPB){const w=WPB?rpPrevMonth(WPB,-3):null;WPA=Ms.filter(m=>m<WPB&&m<=w).pop()||Ms.find(m=>m<WPB)||null;}
+  const img=(p,st)=>p?`<img data-ph="${p.id}" style="${st||''}" onclick="phZoom('${p.id}')" alt="">`:'<div class="wphe">沒有照片</div>';
+  const pick=(v,n)=>Ms.map(m=>`<span class="wpc${v===m?' on':''}" onclick="${n}='${m}';vPhW()">${wmLab(m)}</span>`).join('');
+  const months=[];{let m=today().slice(0,7);for(let i=0;i<13;i++){months.push(m);m=rpPrevMonth(m);}}
+  const pa=L.find(p=>p.month===WPA),pb=L.find(p=>p.month===WPB);
+  $('app').innerHTML=`<div class="card"><div class="ct">📸 身形照<span class=mu>每月初拍一張正面；同樣地點、燈光、時間（早上空腹）最好比較・點照片放大</span>
+     <span style="margin-left:auto;display:flex;gap:8px;align-items:center"><select id="wphm" class="wps">${months.map(m=>`<option value="${m}">${wmLab(m)}${phOf(m)?'（已有，換一張）':m===today().slice(0,7)?'（這個月）':'（補拍）'}</option>`).join('')}</select><label class="tb pri" style="cursor:pointer">📸 上傳／補照片<input type="file" accept="image/*" style="display:none" onchange="wphPick(this)"></label></span></div>
+   ${!L.length?'<div class="empty">還沒有身形照（手機版首頁或這裡都可以上傳）</div>':`
+   <div class="wpg">${L.slice().reverse().map(p=>`<div class="wpi${p.month===WPA||p.month===WPB?' sel':''}">${img(p)}<b>${wmLab(p.month)}</b><span class=mu>${wphIb(p.month)}</span></div>`).join('')}</div></div>
+   ${L.length>1?`<div class="wpcmp"><div class="card"><div class="ct">↔ 並排比較<span class=mu>點照片放大看細節</span></div>
+      <div class="wp2">${[[WPA,pa],[WPB,pb]].map(([m,p])=>`<div><b>${m?wmLab(m):'—'}</b>${img(p)}<div class="mu mono">${m?wphIb(m):''}</div></div>`).join('')}</div>
+      <div class="mu" style="margin-top:8px">左邊（舊）${pick(WPA,'WPA')}</div><div class="mu" style="margin-top:4px">右邊（新）${pick(WPB,'WPB')}</div></div>
+     <div class="card"><div class="ct">⇆ 滑桿<span class=mu>左右拖，看哪裡變了</span></div>
+      ${pa&&pb?`<div class="wpsl">${img(pa,'pointer-events:none')}${img(pb,`clip-path:inset(0 0 0 ${WPX}%);pointer-events:none`)}<div class="wpln" style="left:${WPX}%"></div><span class="wptg l">${wmLab(WPA)}</span><span class="wptg r">${wmLab(WPB)}</span>
+       <input type="range" min="0" max="100" value="${WPX}" oninput="WPX=+this.value;const s=this.parentNode;s.querySelectorAll('img')[1].style.clipPath='inset(0 0 0 '+WPX+'%)';s.querySelector('.wpln').style.left=WPX+'%'"></div>`:''}</div></div>`:'<div class="card mu">有兩個月以上的照片，就會出現並排比較和滑桿</div>'}`}
+   <div class="mu" style="margin-top:8px">🔒 照片用資料密碼加密後才上傳，別人打不開；教練報告不會放照片。</div>`;
+  document.querySelectorAll('#app img[data-ph]').forEach(async im=>{const p=L.find(x=>x.id===im.dataset.ph);try{const u=await phUrl(p);if(u)im.src=u;}catch(e){}});}
 
 (async function(){render();if(await pull())render();setInterval(async()=>{if(document.visibilityState==='visible'&&$('emb').style.display!=='flex'){if(await pull())render();}},60000);})();
 </script>
