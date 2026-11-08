@@ -191,7 +191,7 @@ body.embed .top a.hm,body.embed .top a.pc{display:none}
 </style>
 </head>
 <body>
-<div class="top"><b id="ttl">🏋️ 健身</b><span id="sync"></span><span style="font-size:10px;color:#cbd5e1">v1109g</span><span class="sp"></span><a class="pc" href="fitness.html?force=pc">📊 數據</a><a class="hm" href="index.html">🏠</a><button id="closeEmbed" style="display:none" onclick="parent.ftCloseEmbed&&parent.ftCloseEmbed()">✕ 關閉</button></div>
+<div class="top"><b id="ttl">🏋️ 健身</b><span id="sync"></span><span style="font-size:10px;color:#cbd5e1">v1109h</span><span class="sp"></span><a class="pc" href="fitness.html?force=pc">📊 數據</a><a class="hm" href="index.html">🏠</a><button id="closeEmbed" style="display:none" onclick="parent.ftCloseEmbed&&parent.ftCloseEmbed()">✕ 關閉</button></div>
 <div class="wrap" id="app"></div>
 <div class="bar" id="bar" style="display:none"><div class="in" id="barIn"></div></div>
 <div class="toast" id="toast"></div>
@@ -417,7 +417,7 @@ function rpText(m){const{a,e}=rpRange(m),L=db.sessions.filter(s=>s.date>=a&&s.da
     t+=`\n${d.replace(/-/g,'/')}（${[...gs.map(k=>GN[k]),...(car.length?['有氧']:[])].join('＋')}）週${WK[dow(d)]}\n`;
     gs.forEach(k=>{t+=`【${GN[k]}】\n`;by[k].forEach(([ex,st])=>{t+=`${ex.n}：${st.map(x=>rpSetsTxt(x,ex.bw)).join('、')}\n`;});});
     if(car.length){t+='【有氧】\n';car.forEach(c=>{t+=`${c.type}：${[c.min!==''&&c.min!=null?c.min+'分':'',c.km!==''&&c.km!=null?c.km+'公里':'',c.kcal!==''&&c.kcal!=null?c.kcal+'kcal':''].filter(Boolean).join('、')}\n`;});}});
-  const AB=absMonth(m);if(AB.length)t+=`\n【腹肌】本月 ${AB.length} 次（在家練）：${AB.map(d=>d.slice(5).replace('-','/')).join('、')}\n`;
+  const AB=absMonth(m);if(AB.length)t+=`\n【腹肌】${absPlan()}，本月 ${AB.length} 次：${AB.map(d=>d.slice(5).replace('-','/')).join('、')}\n`;
   return t.trim()+'\n';}
 const rpDone=m=>((db.cfg||{}).rpDoneL||[]).includes(m);
 function rpMark(m){m=m||RPM;if(rpDone(m))return;db.cfg=touch({...(db.cfg||{}),rpDoneL:[...((db.cfg||{}).rpDoneL||[]),m]});save();}
@@ -428,6 +428,8 @@ function rpNagMonth(){const pm=rpPrevMonth(today().slice(0,7));if(+today().slice
 
 // ══ 🧘 腹肌（在家練，練 1 天休 3 天，用日曆天算；只記「有沒有練」）＋ 📸 每月身形照（正面一張，加密存雲端）══
 const ABS_GAP=4;
+const absPlan=()=>((db.cfg||{}).absPlan)||'捲腹 20 下 × 6 組';
+function absPlanEdit(){const v=prompt('腹肌的內容（之後每次都顯示這個）',absPlan());if(v==null)return;db.cfg=touch({...(db.cfg||{}),absPlan:v.trim()||'捲腹 20 下 × 6 組'});save();if(typeof render==='function')render();}
 function absDates(){return [...new Set((db.abs||[]).map(x=>x.date))].sort();}
 function absState(T){T=T||today();const D=absDates().filter(d=>d<=T),last=D[D.length-1]||null,n=last?dayDiff(T,last):null;
   return{last,n,done:last===T,due:n==null||n>=ABS_GAP,next:last?addDays(last,ABS_GAP):T,left:last?Math.max(0,ABS_GAP-n):0,dates:D};}
@@ -715,8 +717,8 @@ const _rpmRender1=render;
 render=function(){if(V==='photo'){vPhoto();return;}_rpmRender1();if(V==='home'){try{habHome();}catch(e){console.warn(e);}}};
 function habHome(){const app=$('app');if(!app)return;app.querySelectorAll('.abc,.phn').forEach(e=>e.remove());const T=SDATE||today(),A=absState(T);
   const dots=[...Array(8)].map((_,i)=>{const d=addDays(T,i-5);return`<i class="${A.dates.includes(d)?'d':''}${d===T?' t':''}">${+d.slice(8)}</i>`;}).join('');
-  const card=A.done?`<div class="abc ok"><span style="font-size:22px">🧘</span><div style="flex:1"><b>腹肌 ✓ 今天練了</b><div class=mu>下次 ${md(A.next)}・練 1 休 3</div></div><button class="abu" onclick="absUndo('${T}');render()">取消</button></div>`
-    :`<div class="abc${A.due?'':' rest'}"><span style="font-size:26px">🧘</span><div style="flex:1;min-width:0"><b>${A.due?'腹肌：今天該練了':'腹肌：休息中・再 '+A.left+' 天'}</b><div class=mu>${A.last?`上次 ${md(A.last)}（${A.n} 天前）`:'還沒有紀錄'}・練 1 休 3</div><div class="abd">${dots}</div></div><button class="abb" onclick="if(!confirm('今天確定練了腹肌嗎？'))return;absDone('${T}');toast('🧘 腹肌記好了，下次 '+md(addDays('${T}',ABS_GAP)));render()">✓ 練完了</button></div>`;
+  const card=A.done?`<div class="abc ok"><span style="font-size:22px">🧘</span><div style="flex:1"><b>腹肌 ✓ 今天練了</b><div class=mu>下次 ${md(A.next)}・${esc(absPlan())}</div></div><button class="abu" onclick="absUndo('${T}');render()">取消</button></div>`
+    :`<div class="abc${A.due?'':' rest'}"><span style="font-size:26px">🧘</span><div style="flex:1;min-width:0"><b>${A.due?'腹肌：今天該練了':'腹肌：休息中・再 '+A.left+' 天'}</b><div class=mu>${A.last?`上次 ${md(A.last)}（${A.n} 天前）`:'還沒有紀錄'}・${esc(absPlan())}</div><div class="abd">${dots}</div></div><button class="abb" onclick="if(!confirm('今天確定練了腹肌嗎？'))return;absDone('${T}');toast('🧘 腹肌記好了，下次 '+md(addDays('${T}',ABS_GAP)));render()">✓ 練完了</button></div>`;
   const AN=absNagLv(T),hero=app.querySelector('.dsgm');
   if(AN&&AN.strong){const c=`<div class="abc strong"><span style="font-size:26px">🧘</span><div style="flex:1;min-width:0"><b><i class="pls"></i>腹肌超過 ${AN.over} 天沒練</b><div class="sm">上次 ${md(AN.A.last)}（${AN.A.n} 天前）・該練了</div></div><button class="abw" onclick="if(!confirm('今天確定練了腹肌嗎？'))return;absDone('${T}');toast('🧘 腹肌記好了');render()">✓ 練完了</button></div>`;if(hero)hero.insertAdjacentHTML('afterend',c);else app.insertAdjacentHTML('afterbegin',c);}
   else{const hint=app.querySelector('.dgr')?.nextElementSibling;if(hint)hint.insertAdjacentHTML('afterend',card);else app.insertAdjacentHTML('afterbegin',card);}
