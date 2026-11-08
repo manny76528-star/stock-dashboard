@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-<!-- fitness build 2026-11-09c -->
+<!-- fitness build 2026-11-09d -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -143,7 +143,10 @@ tr.sr{cursor:pointer}tr.sr:hover td{background:#f8fafc}td.num{text-align:right;f
 .o2t{display:flex;gap:8px;align-items:center;position:relative}.o2t.r{background:#fef2f2;border-color:#fca5a5}.o2t.w{background:#fff7ed;border-color:#fdba74}.o2t.go{background:#ecfeff;border-color:#a5f3fc}.o2t.rest{opacity:.78}
 .wab{display:flex;align-items:center;gap:8px;border:1px solid #e2e8f0;background:#f8fafc;border-radius:12px;padding:7px 12px;margin-top:8px;font-size:14px}.wab.due{background:#f0fdfa;border-color:#5eead4}.wab b{color:#0f766e}.wab button{margin-left:auto;border:none;background:#0891b2;color:#fff;font-weight:800;border-radius:9px;padding:5px 12px;cursor:pointer;font-family:inherit}.wab .wabu{background:#fff;color:#64748b;border:1px solid #e2e8f0}
 .o2t b{white-space:nowrap}
-.tabs span{white-space:nowrap;padding:8px 11px!important}.top a,.top .tb,.top h1,#sync{white-space:nowrap}.top{gap:10px!important}
+.tabs span{white-space:nowrap;padding:8px 11px!important}
+#tabs.tabs{display:flex;flex-direction:column;gap:6px;background:none;padding:0}.trow{display:flex;align-items:center;gap:8px}.trl{font-size:12px;font-weight:900;color:#94a3b8;width:58px;white-space:nowrap}
+.tgrp{display:inline-flex;background:#eef2f7;border-radius:12px;padding:4px;gap:2px}.tgrp span{padding:7px 13px;border-radius:9px;font-weight:800;color:var(--mu);cursor:pointer;font-size:14px;white-space:nowrap}.tgrp span.on{background:#fff;color:var(--tx);box-shadow:0 1px 3px rgba(0,0,0,.08)}.tgrp span:hover:not(.on){color:var(--tx)}
+.tbtns{display:grid;grid-template-columns:auto auto;gap:6px;justify-items:stretch}.tbtns>*{text-align:center}.top{padding:10px 28px!important}.top a,.top .tb,.top h1,#sync{white-space:nowrap}.top{gap:10px!important}
 @media(max-width:1350px){#sync{display:none}}
 .wps{border:1px solid var(--line);border-radius:10px;padding:7px 10px;font-size:13px;font-family:inherit}.wphe{aspect-ratio:3/4;display:grid;place-items:center;background:#f1f5f9;border-radius:12px;color:#94a3b8}
 .wpg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:12px}.wpi{text-align:center}.wpi img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:12px;background:#e2e8f0;cursor:zoom-in;display:block;margin-bottom:4px;border:3px solid transparent}.wpi.sel img{border-color:#2563eb}.wpi b{display:block;font-size:13.5px}
@@ -464,14 +467,19 @@ async function phUrl(p){if(!p)return null;if(_phCache[p.id])return _phCache[p.id
   const env=JSON.parse(new TextDecoder().decode(_unb64(j.content)));const b=await encOpen(env,ek);return _phCache[p.id]=URL.createObjectURL(new Blob([b],{type:'image/jpeg'}));}
 // 照片當月的 InBody（當月最後一次，沒有就用之前最近一次）
 function phIb(m){const L=(db.inbody||[]).filter(x=>x.date.slice(0,7)<=m).sort((a,b)=>a.date.localeCompare(b.date));return L.filter(x=>x.date.startsWith(m)).pop()||L.pop()||null;}
-// 點照片放大（手機、電腦共用）：全螢幕看；點一下放大 2.5 倍可拖曳看細節，再點一下縮回；✕ 或背景關閉
+// 點照片放大（手機、電腦共用）：點一下放大 1.6 倍（從點的位置），再點縮回；右上 －／＋ 可以調 1.3～2.5 倍；✕、背景或 Esc 關閉
+const PHZ_STEPS=[1,1.3,1.6,2,2.5];
 function phZoom(id){const p=(db.photos||[]).find(x=>x.id===id);if(!p)return;document.getElementById('phz')?.remove();
   const ib=phIb(p.month),lab=(+p.month.slice(5))+' 月'+(ib?`・${ib.wt||'—'}kg・體脂 ${ib.fat!==''&&ib.fat!=null?ib.fat+'%':'—'}`:'');
-  const d=document.createElement('div');d.id='phz';d.innerHTML=`<style>#phz{position:fixed;inset:0;background:rgba(15,23,42,.94);z-index:9999;display:flex;flex-direction:column}#phz .zt{display:flex;align-items:center;gap:10px;color:#fff;padding:12px 16px;font-weight:800}#phz .zt button{margin-left:auto;border:none;background:rgba(255,255,255,.15);color:#fff;font-size:20px;width:40px;height:40px;border-radius:50%;cursor:pointer}
-   #phz .zs{flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;-webkit-overflow-scrolling:touch}#phz img{max-width:100%;max-height:100%;object-fit:contain;cursor:zoom-in;display:block}#phz.big .zs{display:block}#phz.big img{max-width:none;max-height:none;width:250%;cursor:zoom-out}#phz .zh{color:#cbd5e1;text-align:center;font-size:12.5px;padding:8px}</style>
-   <div class="zt">📸 ${lab}<button onclick="document.getElementById('phz').remove()">✕</button></div><div class="zs"><img alt=""></div><div class="zh">點照片放大／縮回・放大後可以拖動看細節</div>`;
-  document.body.appendChild(d);const im=d.querySelector('img'),zs=d.querySelector('.zs');
-  im.onclick=e=>{e.stopPropagation();const big=!d.classList.contains('big');const rx=e.offsetX/im.clientWidth,ry=e.offsetY/im.clientHeight;d.classList.toggle('big',big);if(big)requestAnimationFrame(()=>{zs.scrollLeft=im.clientWidth*rx-zs.clientWidth/2;zs.scrollTop=im.clientHeight*ry-zs.clientHeight/2;});};
+  const d=document.createElement('div');d.id='phz';d.innerHTML=`<style>#phz{position:fixed;inset:0;background:rgba(15,23,42,.95);z-index:9999;display:flex;flex-direction:column}#phz .zt{display:flex;align-items:center;gap:8px;color:#fff;padding:10px 14px;font-weight:800}#phz .zt button{border:none;background:rgba(255,255,255,.15);color:#fff;font-size:18px;min-width:38px;height:38px;border-radius:19px;cursor:pointer;font-weight:900}#phz .zt .zk{margin-left:auto;font-family:monospace;font-size:13px;color:#cbd5e1;min-width:44px;text-align:center}
+   #phz .zs{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;display:flex}#phz img{margin:auto;display:block;cursor:zoom-in;max-width:100%;max-height:100%;object-fit:contain}#phz.big img{max-width:none;max-height:none;cursor:zoom-out}#phz .zh{color:#cbd5e1;text-align:center;font-size:12.5px;padding:8px}</style>
+   <div class="zt">📸 ${lab}<span class="zk">1×</span><button data-z="-1">－</button><button data-z="1">＋</button><button onclick="document.getElementById('phz').remove()">✕</button></div><div class="zs"><img alt=""></div><div class="zh">點照片放大／縮回・放大後可以拖動看細節</div>`;
+  document.body.appendChild(d);const im=d.querySelector('img'),zs=d.querySelector('.zs'),zk=d.querySelector('.zk');let k=1,fw=0,fh=0;
+  const fit=()=>{if(k===1){fw=im.clientWidth;fh=im.clientHeight;}};
+  const setK=(nk,rx,ry)=>{fit();k=nk;zk.textContent=(k===1?'1':k)+'×';if(k===1){d.classList.remove('big');im.style.width=im.style.height='';return;}
+    d.classList.add('big');im.style.width=fw*k+'px';im.style.height=fh*k+'px';requestAnimationFrame(()=>{zs.scrollLeft=fw*k*(rx??.5)-zs.clientWidth/2;zs.scrollTop=fh*k*(ry??.4)-zs.clientHeight/2;});};
+  im.onclick=e=>{e.stopPropagation();if(k>1)setK(1);else setK(1.6,e.offsetX/im.clientWidth,e.offsetY/im.clientHeight);};
+  d.querySelectorAll('[data-z]').forEach(b=>b.onclick=e=>{e.stopPropagation();const i=PHZ_STEPS.indexOf(k)+(+b.dataset.z);if(i>=0&&i<PHZ_STEPS.length){const cx=(zs.scrollLeft+zs.clientWidth/2)/(im.clientWidth||1),cy=(zs.scrollTop+zs.clientHeight/2)/(im.clientHeight||1);setK(PHZ_STEPS[i],k>1?cx:.5,k>1?cy:.4);}});
   zs.onclick=e=>{if(e.target===zs)d.remove();};
   phUrl(p).then(u=>{if(u)im.src=u;});}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementById('phz')?.remove();});
@@ -815,6 +823,12 @@ function vPhW(){const L=phList(),Ms=L.map(p=>p.month);
        <input type="range" min="0" max="100" value="${WPX}" oninput="WPX=+this.value;const s=this.parentNode;s.querySelectorAll('img')[1].style.clipPath='inset(0 0 0 '+WPX+'%)';s.querySelector('.wpln').style.left=WPX+'%'"></div>`:''}</div></div>`:'<div class="card mu">有兩個月以上的照片，就會出現並排比較和滑桿</div>'}`}
    <div class="mu" style="margin-top:8px">🔒 照片用資料密碼加密後才上傳，別人打不開；教練報告不會放照片。</div>`;
   document.querySelectorAll('#app img[data-ph]').forEach(async im=>{const p=L.find(x=>x.id===im.dataset.ph);try{const u=await phUrl(p);if(u)im.src=u;}catch(e){}});}
+// ══ N1：分頁分兩排（上排訓練、下排身體與報告）；右邊按鈕排成 2×2 ══
+const TAB_ROWS=[['🏋️ 訓練',['ov','log','ex','mgr']],['🧍 身體',['ib','ph','rp']]];
+tabs=function(){const N=Object.fromEntries(TABS);const used=new Set(TAB_ROWS.flatMap(r=>r[1]));const rows=TAB_ROWS.map(r=>[r[0],r[1].filter(k=>N[k])]);
+  const rest=TABS.map(t=>t[0]).filter(k=>!used.has(k));if(rest.length)rows[0][1].push(...rest);
+  $('tabs').innerHTML=rows.map(([lab,ks])=>`<div class="trow"><span class="trl">${lab}</span><div class="tgrp">${ks.map(k=>`<span class="${k===TAB?'on':''}" onclick="TAB='${k}';render()">${N[k]}</span>`).join('')}</div></div>`).join('');};
+(()=>{const top=document.querySelector('.top');if(!top||top.querySelector('.tbtns'))return;const B=[...top.querySelectorAll(':scope > .tb, :scope > a')];const g=document.createElement('div');g.className='tbtns';B.forEach(b=>g.appendChild(b));top.appendChild(g);})();
 
 (async function(){render();if(await pull())render();setInterval(async()=>{if(document.visibilityState==='visible'&&$('emb').style.display!=='flex'){if(await pull())render();}},60000);})();
 </script>
