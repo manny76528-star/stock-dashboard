@@ -166,10 +166,12 @@ body.embed .top a.hm,body.embed .top a.pc{display:none}
 .rpf{border-radius:10px;padding:7px 10px;margin:5px 0;font-size:13px;line-height:1.55}.rpf.r{background:#fef2f2;border-left:4px solid #dc2626}.rpf.y{background:#fffbeb;border-left:4px solid #f59e0b}.rpf.g{background:#ecfeff;border-left:4px solid #0891b2}
 .rpg{display:grid;grid-template-columns:36px 1fr 44px;gap:8px;align-items:center;font-size:13px;padding:4px 0}.rpg span{text-align:right}.rpb{height:9px;background:#e2e8f0;border-radius:5px;position:relative}.rpb i{position:absolute;left:0;top:0;bottom:0;border-radius:5px}.rpb u{position:absolute;left:40%;top:-3px;bottom:-3px;border-left:2px dashed #94a3b8}
 .dsgm{display:flex;align-items:center;gap:10px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:16px;padding:10px 12px;margin-bottom:10px}.dsgm b{font-size:18px;color:#1e3a8a}.dsgm button{border:none;background:#2563eb;color:#fff;font-weight:900;font-size:15px;border-radius:12px;padding:11px 14px;white-space:nowrap}
+.dgr{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin:0 0 6px}.dgi{background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:6px 0 5px;display:flex;flex-direction:column;align-items:center;gap:1px;cursor:pointer}
+.dgi b{font-size:12.5px;white-space:nowrap}.dgi span{font-size:10px;font-weight:800;color:#64748b;white-space:nowrap}.dgi.w{background:#fff7ed;border-color:#fdba74}.dgi.w span{color:#c2410c}.dgi.r{background:#fef2f2;border-color:#fca5a5}.dgi.r span{color:#b91c1c}.dgi.go{background:#ecfeff;border-color:#a5f3fc}.dgi.go span{color:#0e7490}.dgi.rest{opacity:.7}.dgi.on{outline:2.5px solid #2563eb;outline-offset:1px;opacity:1}
 </style>
 </head>
 <body>
-<div class="top"><b id="ttl">🏋️ 健身</b><span id="sync"></span><span style="font-size:10px;color:#cbd5e1">v1108i</span><span class="sp"></span><a class="pc" href="fitness.html?force=pc">📊 數據</a><a class="hm" href="index.html">🏠</a><button id="closeEmbed" style="display:none" onclick="parent.ftCloseEmbed&&parent.ftCloseEmbed()">✕ 關閉</button></div>
+<div class="top"><b id="ttl">🏋️ 健身</b><span id="sync"></span><span style="font-size:10px;color:#cbd5e1">v1108j</span><span class="sp"></span><a class="pc" href="fitness.html?force=pc">📊 數據</a><a class="hm" href="index.html">🏠</a><button id="closeEmbed" style="display:none" onclick="parent.ftCloseEmbed&&parent.ftCloseEmbed()">✕ 關閉</button></div>
 <div class="wrap" id="app"></div>
 <div class="bar" id="bar" style="display:none"><div class="in" id="barIn"></div></div>
 <div class="toast" id="toast"></div>
@@ -421,7 +423,7 @@ function vHome(){
   const o=openSess();
   const hints=[...PICK].map(g=>{const D0=SDATE||today(),L=lastGroup(g,D0);if(!L)return`<div>💡 <b>${GN[g]}</b>：還沒有紀錄</div>`;
     const top=(L.items||[]).filter(it=>db.ex[it.ex]?.g===g&&(it.sets||[]).some(x=>+x.r)).slice(0,2).map(it=>`${esc(db.ex[it.ex].n)} ${it.sets.filter(x=>+x.r).map(x=>setTxt(x,db.ex[it.ex].bw)).join('→')}`).join('<br>');
-    return`<div>💡 上次練<b>${GN[g]}</b>：${md(L.date)}（${dayDiff(D0,L.date)?dayDiff(D0,L.date)+' 天前':'同一天'}）<div class=mu>${top}</div></div>`;}).join('');
+    return`<div>💡 上次練<b>${GN[g]}</b>：${md(L.date)}（${dayDiff(D0,L.date)?dayDiff(D0,L.date)+' 天前・平日隔 '+trainDays(L.date,D0)+' 天':'同一天'}）<div class=mu>${top}</div></div>`;}).join('');
   const rec=db.sessions.slice(-4).reverse();
   $('app').innerHTML=`
   ${o?`<div class="card" style="border-color:#93c5fd;background:#eff6ff" onclick="go('sess','${o.id}')"><b>▶ 訓練進行中：${esc(sessTitle(o))}</b><div class=mu>${md(o.date)} ${o.start} 開始・點這裡繼續</div></div>`:''}
@@ -604,7 +606,11 @@ let RPSEG=(()=>{try{return localStorage.getItem('ft_rpseg')||'txt';}catch(e){ret
 const _rpmRender0=render;
 render=function(){if(V==='rp'){vRpM();return;}_rpmRender0();if(V==='home'){rpmHome();try{dueHome();}catch(e){console.warn(e);}}};
 function dueHome(){document.querySelectorAll('.dsgm').forEach(e=>e.remove());const SG=suggestPreset(SDATE||today());if(!SG||!$('app'))return;
-  $('app').insertAdjacentHTML('afterbegin',`<div class="dsgm"><div style="flex:1;min-width:0"><div class=mu style="color:#1e40af">💡 今天建議練</div><b>${SG.name}</b><div class=mu>${SG.items.map(x=>x.name+(x.n==null?' 還沒練過':' 隔 '+x.n+' 天')).join('、')}</div></div><button onclick="PICK=new Set(${JSON.stringify(SG.groups).replace(/"/g,"'")});startSess()">開始 ›</button></div>`);}
+  $('app').insertAdjacentHTML('afterbegin',`<div class="dsgm"><div style="flex:1;min-width:0"><div class=mu style="color:#1e40af">💡 今天建議練</div><b>${SG.name}</b><div class=mu>${SG.items.map(x=>x.name+(x.n==null?' 還沒練過':' 隔 '+x.n+' 天')).join('、')}</div></div><button onclick="PICK=new Set(${JSON.stringify(SG.groups).replace(/"/g,"'")});startSess()">開始 ›</button></div>${dueRow()}`);}
+// 手機首頁：六個小圓環（最該練的在左邊；點一下＝勾選那個部位）
+function dueRow(){const R=2*Math.PI*15.5;return`<div class="dgr">${dueList(SDATE||today()).map(x=>{const c=GC[x.g],col=x.cls==='r'?'#dc2626':x.cls==='w'?'#f59e0b':c,p=x.n==null?0:Math.min(1,x.n/DUE_W);
+  return`<div class="dgi ${x.cls}${PICK.has(x.g)?' on':''}" onclick="pickG('${x.g}')"><svg width="40" height="40" viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.5" fill="none" stroke="#e2e8f0" stroke-width="4"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="${col}" stroke-width="4" stroke-dasharray="${R*p} ${R}" transform="rotate(-90 18 18)" stroke-linecap="round"/><text x="18" y="21.8" text-anchor="middle" font-size="11" font-weight="900" font-family="monospace">${x.n==null?'—':x.n}</text></svg><b style="color:${c}">${x.name}</b><span>${x.n==null?'沒練過':x.cls==='rest'?'恢復中':x.cls==='go'?'可以練':x.cls==='w'?'該練了':'太久'}</span></div>`;}).join('')}</div><div class="mu" style="text-align:center;margin:-2px 0 10px;font-size:11px">數字＝隔幾天（只算週一～五）・左邊最該練・點一下就勾選</div>`;}
+
 function rpmHome(){const q=document.querySelector('#app .q');if(!q||q.querySelector('.rpq'))return;const pm=rpNagMonth();
   q.insertAdjacentHTML('beforeend',`<div class="rpq${pm?' dot':''}" onclick="${pm?`RPM='${pm}';`:''}go('rp')"><span>📄</span>給教練</div>`);
   if(pm)$('app').insertAdjacentHTML('afterbegin',`<div class="rpnag" onclick="RPM='${pm}';go('rp')">📄 <b>${+pm.slice(5)} 月的教練報告</b>還沒給教練<span style="margin-left:auto;font-weight:900">去產出 ›</span></div>`);}
