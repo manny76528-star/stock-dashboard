@@ -1802,6 +1802,25 @@ document.head.appendChild(script);
     return o.apply(this,arguments);
   };})(ghPush);
 })();
+
+// ══ v2（2026/11/08）：動詞練習「日文→中文／中文→日文」真的會切換；選項優先出同一個動詞的其他變化 ══
+// A 欄寫「食べる｜過去・普通」：｜前面是動詞原形（用來找同一組），後面是變化名稱
+function _vbBase(g){const p=String(g.pattern||'');return p.includes('｜')||p.includes('|')?p.split(/[｜|]/)[0].trim():'';}
+function _vbView(g){const b=_vbBase(g),form=b?String(g.pattern).split(/[｜|]/)[1].trim():'';
+  if(vQuizMode==='zh2jp')return{id:g.id,q:(g.zh||g.a)+(b?'<div style="font-size:12px;color:#64748b;font-weight:600;margin-top:4px">'+b+'・'+form+'　→ 選日文</div>':'<div style="font-size:12px;color:#64748b;font-weight:600;margin-top:4px">→ 選日文</div>'),a:g.jp};
+  if(b)return{id:g.id,q:g.jp+'<div style="font-size:12px;color:#64748b;font-weight:600;margin-top:4px">'+b+'　→ 選中文</div>',a:g.zh||g.jp};
+  return{id:g.id,q:g.q,a:g.a};}
+(function(){const _r=renderVerbQuestion;renderVerbQuestion=function(){
+  if(!db.verb||vQuizIdx>=vQuizList.length)return _r.apply(this,arguments);
+  const cur=vQuizList[vQuizIdx],b=_vbBase(cur);
+  let pool=b?db.verb.filter(g=>g.id!==cur.id&&_vbBase(g)===b):[];
+  if(pool.length<3)pool=pool.concat(shuffle(db.verb.filter(g=>g.id!==cur.id&&!pool.includes(g))).slice(0,3-pool.length));
+  else pool=shuffle(pool).slice(0,3);
+  const sv=db.verb,sl=vQuizList;
+  try{const v=_vbView(cur);db.verb=[v,...pool.map(_vbView)];vQuizList=sl.slice();vQuizList[vQuizIdx]=v;return _r.apply(this,arguments);}
+  finally{db.verb=sv;vQuizList=sl;}
+};})();
+
 </script>
 </body>
 </html>
