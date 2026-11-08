@@ -157,7 +157,7 @@ body.embed .top a.hm,body.embed .top a.pc{display:none}
 </style>
 </head>
 <body>
-<div class="top"><b id="ttl">🏋️ 健身</b><span id="sync"></span><span class="sp"></span><a class="pc" href="fitness.html?force=pc">📊 數據</a><a class="hm" href="index.html">🏠</a><button id="closeEmbed" style="display:none" onclick="parent.ftCloseEmbed&&parent.ftCloseEmbed()">✕ 關閉</button></div>
+<div class="top"><b id="ttl">🏋️ 健身</b><span id="sync"></span><span style="font-size:10px;color:#cbd5e1">v1108f</span><span class="sp"></span><a class="pc" href="fitness.html?force=pc">📊 數據</a><a class="hm" href="index.html">🏠</a><button id="closeEmbed" style="display:none" onclick="parent.ftCloseEmbed&&parent.ftCloseEmbed()">✕ 關閉</button></div>
 <div class="wrap" id="app"></div>
 <div class="bar" id="bar" style="display:none"><div class="in" id="barIn"></div></div>
 <div class="toast" id="toast"></div>
@@ -323,7 +323,7 @@ function vHome(){
   <div class="h" style="margin-top:20px">其他</div>
   <div class="q"><div onclick="go('inbody')"><span>📊</span>InBody</div><div onclick="go('hist')"><span>📒</span>訓練紀錄</div><div onclick="go('mgr')"><span>⚙️</span>動作清單</div></div>
   ${rec.length?`<div class="h">最近</div>${rec.map(liSess).join('')}`:''}`;
-  bar(`<button class="btn pri" ${PICK.size||PICKC.size?'':'disabled'} onclick="startSess()">開始訓練 →</button>`);
+  bar(`<button class="btn pri" style="${PICK.size||PICKC.size?'':'opacity:.55'}" onclick="startSess()">開始訓練 →</button>`);
 }
 function lastCardio(){const L=db.sessions.slice().sort((a,b)=>(a.date+(a.start||'')).localeCompare(b.date+(b.start||'')));for(let i=L.length-1;i>=0;i--){const c=(L[i].cardio||[]).filter(c=>+c.min||+c.km||+c.kcal);if(c.length)return c[c.length-1];}return null;}
 function repeatCardio(){const lc=lastCardio();if(!lc)return;const D0=SDATE||today();const c={id:uid(),type:lc.type,min:lc.min,km:lc.km,kcal:lc.kcal};
@@ -334,8 +334,11 @@ function pickPreset(s){const a=s.split(',');const same=a.length===PICK.size&&a.e
 function pickG(g){PICK.has(g)?PICK.delete(g):PICK.add(g);render();}
 function pickC(c){PICKC.has(c)?PICKC.delete(c):PICKC.add(c);render();}
 function startSess(){
+  if(!PICK.size&&!PICKC.size){toast('先點上面要練的部位（或有氧）');document.querySelector('.chips')?.scrollIntoView({behavior:'smooth',block:'center'});return;}
+  try{
   const D0=SDATE||today(),past=D0!==today();const s=touch({id:uid(),date:D0,start:past?'':nowHM(),end:'',groups:[...PICK],items:[],cardio:[...PICKC].map(t=>({id:uid(),type:t,min:'',km:'',kcal:''})),note:''});
   db.sessions.push(s);save();PICK=new Set();PICKC=new Set();SDATE=null;OPEN=null;go('sess',s.id);
+  }catch(e){console.error(e);alert('開始訓練失敗，請截圖給我：\n'+(e&&e.message||e));}
 }
 function liSess(s){const S=sessStats(s);return`<div class="li" onclick="go('sess','${s.id}')"><span class="d">${md(s.date)}<div class=mu style="font-weight:500">週${WK[dow(s.date)]}</div></span><div class="t"><b>${esc(sessTitle(s))}</b>${s.end?'':' <span class="pill" style="background:#2563eb">進行中</span>'}<div>${[...(s.items||[]).filter(it=>(it.sets||[]).some(x=>+x.r)).map(it=>esc(db.ex[it.ex]?.n||'')+' '+it.sets.filter(x=>+x.r).length+'組'),...(S.min?[`🏃 ${S.min} 分${S.km?' '+S.km+' km':''}`]:[])].join('・')}</div></div><span class="v">${S.vol?fmt(S.vol)+' kg':''}<div class=mu>${S.sets?S.sets+' 組':''}</div></span></div>`;}
 
