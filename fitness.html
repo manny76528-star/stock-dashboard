@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-<!-- fitness build 2026-11-08f -->
+<!-- fitness build 2026-11-08g -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -314,6 +314,92 @@ function importKey(s){return s.date+'|'+(s.cardio||[]).map(c=>c.type+c.min+'/'+c
 function doImport(P){let n=0,skip=0;P.sessions.forEach(s=>{const k=importKey(s);if(db.sessions.some(z=>z.ik===k)){skip++;return;}
   s.items.forEach(it=>{if(it.sets.some(x=>x.u==='lb')&&db.ex[it.ex].u!=='lb'){db.ex[it.ex].u='lb';touch(db.ex[it.ex]);}});db.sessions.push(touch({id:uid(),date:s.date,start:'',end:'匯入',groups:s.groups,items:s.items.map(it=>({ex:it.ex,sets:it.sets,done:true})),cardio:(s.cardio||[]).map(c=>({...c,id:uid()})),note:'',ik:k}));n++;});save();return{n,skip};}
 
+// ── 期間＆彙總（網頁、手機、教練報告共用）──
+function range(per,ref){if(per==='w'){const a=monday(ref);return[a,addDays(a,6)];}if(per==='m'){const a=ref.slice(0,8)+'01';const d=new Date(a+'T00:00:00Z');d.setUTCMonth(d.getUTCMonth()+1);d.setUTCDate(0);return[a,d.toISOString().slice(0,10)];}const y=ref.slice(0,4);return[y+'-01-01',y+'-12-31'];}
+function agg(a,b){const L=db.sessions.filter(s=>s.date>=a&&s.date<=b);const o={cnt:0,vol:0,sets:0,min:0,km:0,kcal:0,byG:{},days:new Set()};
+  L.forEach(s=>{const S=sessStats(s);if(S.sets)o.cnt++;o.vol+=S.vol;o.sets+=S.sets;o.min+=S.min;o.km+=S.km;o.kcal+=S.kcal;if(S.sets||S.min)o.days.add(s.date);Object.entries(S.byG).forEach(([g,v])=>{(o.byG[g]=o.byG[g]||{sets:0,vol:0}).sets+=v.sets;o.byG[g].vol+=v.vol;});});
+  const I=db.inbody.filter(x=>x.date>=a&&x.date<=b).sort((p,q)=>p.date.localeCompare(q.date));const li=I[I.length-1];['wt','mm','fat','bmr'].forEach(k=>{const z=I.filter(x=>x[k]!==''&&x[k]!=null);o[k]=z.length?+z[z.length-1][k]:null;});o.ib=li;o.list=L;return o;}
+
+// ══ 📄 教練報告：計算＋文字清單（網頁、手機共用）══
+const RP_NAME='阿豪訓練計劃';
+let RPM=(()=>{const t=today();if(+t.slice(8)<=5){const d=new Date(t.slice(0,8)+'01T00:00:00Z');d.setUTCMonth(d.getUTCMonth()-1);return d.toISOString().slice(0,7);}return t.slice(0,7);})();
+
+function rpPrevMonth(m,n=-1){const d=new Date(m+'-01T00:00:00Z');d.setUTCMonth(d.getUTCMonth()+n);return d.toISOString().slice(0,7);}
+function rpRange(m){const[a,b]=range('m',m+'-01');const e=b<today()?b:today();return{a,b,e,days:Math.max(1,dayDiff(e,a)+1)};}
+const rpHasW=(e,s)=>e&&e.bw?true:!(s.w===''||s.w==null);
+// 某段期間：每個肌群的每次訓練（日期＋那天這個肌群的動作）
+function rpGroupRows(a,e){const out={};GROUPS.forEach(g=>out[g[0]]=[]);
+  db.sessions.filter(s=>s.date<=e).sort((p,q)=>(p.date+(p.start||'')).localeCompare(q.date+(q.start||''))).forEach(s=>{const by={};
+    (s.items||[]).forEach(it=>{const ex=db.ex[it.ex];if(!ex)return;const st=(it.sets||[]).filter(x=>+x.r);if(!st.length)return;(by[ex.g]=by[ex.g]||[]).push({ex:it.ex,e:ex,sets:st});});
+    Object.entries(by).forEach(([g,items])=>{if(out[g])out[g].push({date:s.date,sid:s.id,items,inP:s.date>=a});});});
+  return out;}
+function rpStats(m){
+  const R=rpRange(m),{a,e}=R,wk=R.days/7,A=agg(a,e);const pm=rpPrevMonth(m),PR=range('m',pm+'-01'),P=agg(PR[0],addDays(PR[0],R.days-1));
+  const GR=rpGroupRows(a,e),G={};
+  GROUPS.forEach(([k])=>{const all=GR[k],rows=all.filter(r=>r.inP);let prev=null;const dates=[];
+    all.forEach(r=>{if(r.inP){r.gap=prev?dayDiff(r.date,prev):null;}if(prev!==r.date)prev=r.date;});
+    rows.forEach(r=>{if(!dates.includes(r.date))dates.push(r.date);});
+    const reps=[],sets=rows.reduce((n,r)=>n+r.items.reduce((x,i)=>x+i.sets.length,0),0);rows.forEach(r=>r.items.forEach(i=>i.sets.forEach(x=>reps.push(+x.r))));
+    const gaps=rows.map(r=>r.gap).filter(x=>x!=null&&x>0);const last=dates[dates.length-1]||null,sinceLast=last?dayDiff(e,last):null;
+    const before=all.filter(r=>!r.inP).pop();
+    const mx=Math.max(0,...gaps,sinceLast||0, !dates.length&&before?dayDiff(e,before.date):0);
+    reps.sort((x,y)=>x-y);const q=p=>reps.length?reps[Math.min(reps.length-1,Math.floor(p*(reps.length-1)+.5))]:0;
+    const sh=f=>reps.length?reps.filter(f).length/reps.length:0;
+    let tag='';if(reps.length){if(sh(r=>r>15)>=.3)tag='hi';else if(sh(r=>r<=5)>=.5)tag='str';else if(sh(r=>r>=6&&r<=12)>=.6)tag='hyp';}
+    const jumpy=rows.some(r=>r.items.some(i=>{const v=i.sets.map(x=>+x.r);return Math.max(...v)-Math.min(...v)>=10;}));
+    G[k]={rows,dates,sets,wsets:sets/wk,freq:dates.length/wk,avgGap:gaps.length?gaps.reduce((x,y)=>x+y,0)/gaps.length:null,maxGap:mx,last:last||(before?before.date:null),lastIn:!!last,lo:q(.1),hi:q(.9),tag,jumpy};});
+  // 各動作
+  const EX=[];Object.keys(db.ex).forEach(id=>{const H=exHistory(id).filter(h=>h.date>=a&&h.date<=e);if(!H.length)return;const ex=db.ex[id];
+    const all=H.flatMap(h=>h.sets),noW=all.filter(x=>!rpHasW(ex,x)).length,B=H.filter(h=>h.best>0);
+    let top=null;all.forEach(x=>{if(rpHasW(ex,x)&&(!top||wKg(x)>wKg(top)||wKg(x)===wKg(top)&&+x.r>+top.r))top=x;});
+    const f=B[0],l=B[B.length-1],d=B.length>=2?(l.best-f.best)/f.best*100:null;
+    const jump=H.find(h=>{const v=h.sets.map(x=>+x.r);return Math.max(...v)-Math.min(...v)>=10;});
+    if(ex.bw&&all.every(x=>!(+x.w))){const mr=h=>Math.max(...h.sets.map(x=>+x.r)),F0=mr(H[0]),L0=mr(H[H.length-1]);
+      EX.push({id,ex,reps:1,n:H.length,first:F0,last:L0,d:H.length>=2?L0-F0:null,top:null,avgR:all.reduce((x,y)=>x+(+y.r),0)/all.length,maxR:Math.max(...all.map(x=>+x.r)),noW:0,nSets:all.length,jump});return;}
+    EX.push({id,ex,n:H.length,first:f?f.best:0,last:l?l.best:0,d,top,avgR:all.reduce((x,y)=>x+(+y.r),0)/all.length,maxR:Math.max(...all.map(x=>+x.r)),noW,nSets:all.length,jump});});
+  EX.sort((p,q)=>GROUPS.findIndex(g=>g[0]===p.ex.g)-GROUPS.findIndex(g=>g[0]===q.ex.g)||(p.ex.o||0)-(q.ex.o||0));
+  const noWsets=EX.reduce((x,y)=>x+(y.ex.bw?0:y.noW),0);
+  const ib=db.inbody.filter(x=>x.date<=e).sort((p,q)=>p.date.localeCompare(q.date)),ibIn=ib.filter(x=>x.date>=a),ibBase=ib.filter(x=>x.date<a).pop();
+  return{m,R,wk,A,P,G,EX,noWsets,ibIn,ibBase};}
+
+function rpFlags(S){const F=[],G=S.G,gn=k=>`<b style="color:${GC[k]}">${GN[k]}</b>`;
+  const none=GROUPS.filter(g=>!G[g[0]].dates.length).map(g=>g[0]);
+  if(none.length)F.push(['r',`${none.map(gn).join('、')} 這個月沒練`,`${none.map(k=>G[k].last?`${GN[k]}上次 ${md(G[k].last)}（已 ${dayDiff(S.R.e,G[k].last)} 天）`:`${GN[k]}還沒有紀錄`).join('；')}。建議每個肌群每週至少練 1～2 次。`]);
+  GROUPS.forEach(([k])=>{const g=G[k];if(!g.dates.length)return;
+    if(g.wsets<6)F.push(['r',`${GN[k]}練不夠`,`平均每週只有 <b>${g.wsets.toFixed(1)} 組</b>（建議 10～20 組/週），${S.R.days} 天練 ${g.dates.length} 次。`]);
+    else if(g.wsets<10)F.push(['y',`${GN[k]}組數偏少`,`平均每週 ${g.wsets.toFixed(1)} 組（建議至少 10 組/週）。`]);
+    if(g.maxGap>7)F.push(['r',`${GN[k]}間隔太久`,`最長隔了 <b>${g.maxGap} 天</b>${g.lastIn&&dayDiff(S.R.e,g.last)===g.maxGap?`（${md(g.last)} 之後到現在都沒練）`:''}，建議同一個肌群間隔 ≤ 5～7 天。`]);});
+  const hi=S.EX.filter(x=>x.avgR>15||x.maxR>=18);if(hi.length)F.push(['y','次數偏高，張力可能不足',`${hi.map(x=>`${esc(x.ex.n)}（最高 ${x.maxR} 下、平均 ${x.avgR.toFixed(1)}）`).join('、')} → 重量可能太輕，可加重讓次數回到 8～12 下。`]);
+  const jp=S.EX.filter(x=>x.jump);if(jp.length)F.push(['y','同一動作次數跳動大',jp.map(x=>`${esc(x.ex.n)} ${md(x.jump.date)}：${x.jump.sets.map(s=>setTxt(s,x.ex.bw)).join('・')}`).join('；')+' → 每組重量／次數不穩定，張力時有時無。']);
+  const ps=['chest','shoulder','tri'].reduce((n,k)=>n+G[k].sets,0),pl=['back','bi'].reduce((n,k)=>n+G[k].sets,0);
+  if(ps&&!pl)F.push(['r','只有推、沒有拉',`推（胸＋肩＋三頭）${ps} 組，拉（背＋二頭）0 組 → 肩膀前後不平衡，容易圓肩。`]);
+  else if(ps&&pl&&(ps/pl>1.5||pl/ps>1.5))F.push(['y','推拉比例不平均',`推 ${ps} 組 vs 拉 ${pl} 組 ＝ <b>${(ps/pl).toFixed(1)} : 1</b>（建議接近 1:1）。`]);
+  const nw=S.EX.filter(x=>!x.ex.bw&&x.noW);if(nw.length)F.push(['y',`${nw.length} 個動作沒填重量`,`${nw.map(x=>esc(x.ex.n)).join('、')} → 只有次數，看不出有沒有加重。建議之後每組都記重量。`]);
+  const th=x=>x.reps?2:2.5,up=S.EX.filter(x=>x.d!=null&&x.d>=th(x)),flat=S.EX.filter(x=>x.d!=null&&Math.abs(x.d)<th(x)&&x.n>=3),dn=S.EX.filter(x=>x.d!=null&&x.d<=-th(x));
+  const pt=x=>x.reps?`${esc(x.ex.n)}（自重）最多 ${x.first} → <b>${x.last} 下</b>`:null;
+  if(up.length)F.push(['g','進步中',up.map(x=>pt(x)||`${esc(x.ex.n)} 估算最大重量 ${x.first.toFixed(1)} → <b>${x.last.toFixed(1)} kg（+${x.d.toFixed(0)}%）</b>`).join('；')]);
+  if(dn.length)F.push(['y','退步',dn.map(x=>pt(x)||`${esc(x.ex.n)} ${x.first.toFixed(1)} → ${x.last.toFixed(1)} kg（${x.d.toFixed(0)}%）`).join('；')+'，留意睡眠／恢復。']);
+  if(flat.length)F.push(['y','沒進步',flat.map(x=>esc(x.ex.n)).join('、')+` 這個月練 ${flat.map(x=>x.n).join('／')} 次都持平，可能要調整重量或次數。`]);
+  if(!F.some(f=>f[0]!=='g'))F.unshift(['g','組數、間隔都在建議範圍','這個月各肌群的量和頻率都 OK。']);
+  return F.sort((p,q)=>'rygx'.indexOf(p[0])-'rygx'.indexOf(q[0]));}
+
+function rpSetsTxt(x,bw){if(x.w===''||x.w==null)return String(x.r);return setTxt(x,bw);}
+function rpText(m){const{a,e}=rpRange(m),L=db.sessions.filter(s=>s.date>=a&&s.date<=e).sort((p,q)=>(p.date+(p.start||'')).localeCompare(q.date+(q.start||'')));
+  const D={};L.forEach(s=>{(D[s.date]=D[s.date]||[]).push(s);});const A=agg(a,e);
+  let t=`🏋️ ${RP_NAME}｜${m.replace('-','/')} 訓練清單\n共 ${A.cnt} 次重訓・${A.sets} 組${A.min?`・有氧 ${A.min} 分`:''}\n`;
+  Object.keys(D).sort().forEach(d=>{const by={},car=[];D[d].forEach(s=>{(s.items||[]).forEach(it=>{const ex=db.ex[it.ex];if(!ex)return;const st=(it.sets||[]).filter(x=>+x.r);if(!st.length)return;(by[ex.g]=by[ex.g]||[]).push([ex,st]);});car.push(...(s.cardio||[]));});
+    const gs=GROUPS.map(g=>g[0]).filter(k=>by[k]);if(!gs.length&&!car.length)return;
+    t+=`\n${d.replace(/-/g,'/')}（${[...gs.map(k=>GN[k]),...(car.length?['有氧']:[])].join('＋')}）週${WK[dow(d)]}\n`;
+    gs.forEach(k=>{t+=`【${GN[k]}】\n`;by[k].forEach(([ex,st])=>{t+=`${ex.n}：${st.map(x=>rpSetsTxt(x,ex.bw)).join('、')}\n`;});});
+    if(car.length){t+='【有氧】\n';car.forEach(c=>{t+=`${c.type}：${[c.min!==''&&c.min!=null?c.min+'分':'',c.km!==''&&c.km!=null?c.km+'公里':'',c.kcal!==''&&c.kcal!=null?c.kcal+'kcal':''].filter(Boolean).join('、')}\n`;});}});
+  return t.trim()+'\n';}
+const rpDone=m=>((db.cfg||{}).rpDoneL||[]).includes(m);
+function rpMark(m){m=m||RPM;if(rpDone(m))return;db.cfg=touch({...(db.cfg||{}),rpDoneL:[...((db.cfg||{}).rpDoneL||[]),m]});save();}
+// 複製文字（手機／電腦共用）
+async function rpClip(t){let ok=false;try{await navigator.clipboard.writeText(t);ok=true;}catch(e){}if(!ok){const ta=document.createElement('textarea');ta.value=t;ta.setAttribute('readonly','');ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();ta.setSelectionRange(0,t.length);try{ok=document.execCommand('copy');}catch(e){}ta.remove();}return ok;}
+// 上個月的報告還沒給教練？（每月 1～10 號）
+function rpNagMonth(){const pm=rpPrevMonth(today().slice(0,7));if(+today().slice(8)>10||rpDone(pm))return null;const[a,b]=range('m',pm+'-01');return db.sessions.some(s=>s.date>=a&&s.date<=b&&sessStats(s).sets)?pm:null;}
+
 </script>
 <script>
 // ══ 網頁版：數據 ══
@@ -330,12 +416,8 @@ function tabs(){$('tabs').innerHTML=TABS.map(t=>`<span class="${t[0]===TAB?'on':
 function render(){tabs();Object.values(CH).forEach(c=>c.destroy());CH={};({ov:vOv,log:vLog,ex:vEx,ib:vIb,mgr:vMgr})[TAB]();}
 
 // ── 期間 ──
-function range(per,ref){if(per==='w'){const a=monday(ref);return[a,addDays(a,6)];}if(per==='m'){const a=ref.slice(0,8)+'01';const d=new Date(a+'T00:00:00Z');d.setUTCMonth(d.getUTCMonth()+1);d.setUTCDate(0);return[a,d.toISOString().slice(0,10)];}const y=ref.slice(0,4);return[y+'-01-01',y+'-12-31'];}
 function shift(per,ref,n){if(per==='w')return addDays(ref,7*n);if(per==='m'){const d=new Date(ref.slice(0,8)+'01T00:00:00Z');d.setUTCMonth(d.getUTCMonth()+n);return d.toISOString().slice(0,10);}return(+ref.slice(0,4)+n)+ref.slice(4);}
 function perLabel(per,ref){const[a,b]=range(per,ref);return per==='w'?`${a.slice(0,4)}/${md(a)}～${md(b)}`:per==='m'?a.slice(0,7).replace('-','/'):a.slice(0,4)+' 年';}
-function agg(a,b){const L=db.sessions.filter(s=>s.date>=a&&s.date<=b);const o={cnt:0,vol:0,sets:0,min:0,km:0,kcal:0,byG:{},days:new Set()};
-  L.forEach(s=>{const S=sessStats(s);if(S.sets)o.cnt++;o.vol+=S.vol;o.sets+=S.sets;o.min+=S.min;o.km+=S.km;o.kcal+=S.kcal;if(S.sets||S.min)o.days.add(s.date);Object.entries(S.byG).forEach(([g,v])=>{(o.byG[g]=o.byG[g]||{sets:0,vol:0}).sets+=v.sets;o.byG[g].vol+=v.vol;});});
-  const I=db.inbody.filter(x=>x.date>=a&&x.date<=b).sort((p,q)=>p.date.localeCompare(q.date));const li=I[I.length-1];['wt','mm','fat','bmr'].forEach(k=>{const z=I.filter(x=>x[k]!==''&&x[k]!=null);o[k]=z.length?+z[z.length-1][k]:null;});o.ib=li;o.list=L;return o;}
 function cmp(v,p,u='',rev){if(p==null||!isFinite(p)||p===0&&v===0)return'';const d=v-p;if(Math.abs(d)<1e-9)return'<span class=dn>持平</span>';const pc=p?Math.round(d/Math.abs(p)*100):0;return`<span class="${d>0?'up':'dn'}">${d>0?'▲':'▼'} ${p?Math.abs(pc)+'%':fmt(Math.abs(d))+u}</span>`;}
 
 // ── 總覽 ──
@@ -564,91 +646,16 @@ function emb(h){$('embf').src='fitness-m.html?embed=1'+h;$('emb').style.display=
 window.ftCloseEmbed=function(){$('emb').style.display='none';$('embf').src='about:blank';try{const j=JSON.parse(localStorage.getItem(FT_KEY));if(j)db=mergeDb(db,j);}catch(e){}render();};
 window.addEventListener('storage',e=>{if(e.key===FT_KEY){try{db=mergeDb(db,JSON.parse(e.newValue));render();}catch(x){}}});
 
-// ══ 📄 教練報告（月報）＋ 一鍵複製本月訓練清單 ══
-const RP_NAME='阿豪訓練計劃';
-let RPM=(()=>{const t=today();if(+t.slice(8)<=5){const d=new Date(t.slice(0,8)+'01T00:00:00Z');d.setUTCMonth(d.getUTCMonth()-1);return d.toISOString().slice(0,7);}return t.slice(0,7);})();
+// ══ 📄 教練報告：電腦版畫面 ══
 let RPTXT=false;
 TABS.splice(4,0,['rp','📄 教練報告']);
 const _rpRender0=render;
 render=function(){if(TAB==='rp'){tabs();Object.values(CH).forEach(c=>c.destroy());CH={};vRp();return;}_rpRender0();if(TAB==='ov')rpNag();};
-
-function rpPrevMonth(m,n=-1){const d=new Date(m+'-01T00:00:00Z');d.setUTCMonth(d.getUTCMonth()+n);return d.toISOString().slice(0,7);}
-function rpRange(m){const[a,b]=range('m',m+'-01');const e=b<today()?b:today();return{a,b,e,days:Math.max(1,dayDiff(e,a)+1)};}
-const rpHasW=(e,s)=>e&&e.bw?true:!(s.w===''||s.w==null);
-// 某段期間：每個肌群的每次訓練（日期＋那天這個肌群的動作）
-function rpGroupRows(a,e){const out={};GROUPS.forEach(g=>out[g[0]]=[]);
-  db.sessions.filter(s=>s.date<=e).sort((p,q)=>(p.date+(p.start||'')).localeCompare(q.date+(q.start||''))).forEach(s=>{const by={};
-    (s.items||[]).forEach(it=>{const ex=db.ex[it.ex];if(!ex)return;const st=(it.sets||[]).filter(x=>+x.r);if(!st.length)return;(by[ex.g]=by[ex.g]||[]).push({ex:it.ex,e:ex,sets:st});});
-    Object.entries(by).forEach(([g,items])=>{if(out[g])out[g].push({date:s.date,sid:s.id,items,inP:s.date>=a});});});
-  return out;}
-function rpStats(m){
-  const R=rpRange(m),{a,e}=R,wk=R.days/7,A=agg(a,e);const pm=rpPrevMonth(m),PR=range('m',pm+'-01'),P=agg(PR[0],addDays(PR[0],R.days-1));
-  const GR=rpGroupRows(a,e),G={};
-  GROUPS.forEach(([k])=>{const all=GR[k],rows=all.filter(r=>r.inP);let prev=null;const dates=[];
-    all.forEach(r=>{if(r.inP){r.gap=prev?dayDiff(r.date,prev):null;}if(prev!==r.date)prev=r.date;});
-    rows.forEach(r=>{if(!dates.includes(r.date))dates.push(r.date);});
-    const reps=[],sets=rows.reduce((n,r)=>n+r.items.reduce((x,i)=>x+i.sets.length,0),0);rows.forEach(r=>r.items.forEach(i=>i.sets.forEach(x=>reps.push(+x.r))));
-    const gaps=rows.map(r=>r.gap).filter(x=>x!=null&&x>0);const last=dates[dates.length-1]||null,sinceLast=last?dayDiff(e,last):null;
-    const before=all.filter(r=>!r.inP).pop();
-    const mx=Math.max(0,...gaps,sinceLast||0, !dates.length&&before?dayDiff(e,before.date):0);
-    reps.sort((x,y)=>x-y);const q=p=>reps.length?reps[Math.min(reps.length-1,Math.floor(p*(reps.length-1)+.5))]:0;
-    const sh=f=>reps.length?reps.filter(f).length/reps.length:0;
-    let tag='';if(reps.length){if(sh(r=>r>15)>=.3)tag='hi';else if(sh(r=>r<=5)>=.5)tag='str';else if(sh(r=>r>=6&&r<=12)>=.6)tag='hyp';}
-    const jumpy=rows.some(r=>r.items.some(i=>{const v=i.sets.map(x=>+x.r);return Math.max(...v)-Math.min(...v)>=10;}));
-    G[k]={rows,dates,sets,wsets:sets/wk,freq:dates.length/wk,avgGap:gaps.length?gaps.reduce((x,y)=>x+y,0)/gaps.length:null,maxGap:mx,last:last||(before?before.date:null),lastIn:!!last,lo:q(.1),hi:q(.9),tag,jumpy};});
-  // 各動作
-  const EX=[];Object.keys(db.ex).forEach(id=>{const H=exHistory(id).filter(h=>h.date>=a&&h.date<=e);if(!H.length)return;const ex=db.ex[id];
-    const all=H.flatMap(h=>h.sets),noW=all.filter(x=>!rpHasW(ex,x)).length,B=H.filter(h=>h.best>0);
-    let top=null;all.forEach(x=>{if(rpHasW(ex,x)&&(!top||wKg(x)>wKg(top)||wKg(x)===wKg(top)&&+x.r>+top.r))top=x;});
-    const f=B[0],l=B[B.length-1],d=B.length>=2?(l.best-f.best)/f.best*100:null;
-    const jump=H.find(h=>{const v=h.sets.map(x=>+x.r);return Math.max(...v)-Math.min(...v)>=10;});
-    if(ex.bw&&all.every(x=>!(+x.w))){const mr=h=>Math.max(...h.sets.map(x=>+x.r)),F0=mr(H[0]),L0=mr(H[H.length-1]);
-      EX.push({id,ex,reps:1,n:H.length,first:F0,last:L0,d:H.length>=2?L0-F0:null,top:null,avgR:all.reduce((x,y)=>x+(+y.r),0)/all.length,maxR:Math.max(...all.map(x=>+x.r)),noW:0,nSets:all.length,jump});return;}
-    EX.push({id,ex,n:H.length,first:f?f.best:0,last:l?l.best:0,d,top,avgR:all.reduce((x,y)=>x+(+y.r),0)/all.length,maxR:Math.max(...all.map(x=>+x.r)),noW,nSets:all.length,jump});});
-  EX.sort((p,q)=>GROUPS.findIndex(g=>g[0]===p.ex.g)-GROUPS.findIndex(g=>g[0]===q.ex.g)||(p.ex.o||0)-(q.ex.o||0));
-  const noWsets=EX.reduce((x,y)=>x+(y.ex.bw?0:y.noW),0);
-  const ib=db.inbody.filter(x=>x.date<=e).sort((p,q)=>p.date.localeCompare(q.date)),ibIn=ib.filter(x=>x.date>=a),ibBase=ib.filter(x=>x.date<a).pop();
-  return{m,R,wk,A,P,G,EX,noWsets,ibIn,ibBase};}
-
-function rpFlags(S){const F=[],G=S.G,gn=k=>`<b style="color:${GC[k]}">${GN[k]}</b>`;
-  const none=GROUPS.filter(g=>!G[g[0]].dates.length).map(g=>g[0]);
-  if(none.length)F.push(['r',`${none.map(gn).join('、')} 這個月沒練`,`${none.map(k=>G[k].last?`${GN[k]}上次 ${md(G[k].last)}（已 ${dayDiff(S.R.e,G[k].last)} 天）`:`${GN[k]}還沒有紀錄`).join('；')}。建議每個肌群每週至少練 1～2 次。`]);
-  GROUPS.forEach(([k])=>{const g=G[k];if(!g.dates.length)return;
-    if(g.wsets<6)F.push(['r',`${GN[k]}練不夠`,`平均每週只有 <b>${g.wsets.toFixed(1)} 組</b>（建議 10～20 組/週），${S.R.days} 天練 ${g.dates.length} 次。`]);
-    else if(g.wsets<10)F.push(['y',`${GN[k]}組數偏少`,`平均每週 ${g.wsets.toFixed(1)} 組（建議至少 10 組/週）。`]);
-    if(g.maxGap>7)F.push(['r',`${GN[k]}間隔太久`,`最長隔了 <b>${g.maxGap} 天</b>${g.lastIn&&dayDiff(S.R.e,g.last)===g.maxGap?`（${md(g.last)} 之後到現在都沒練）`:''}，建議同一個肌群間隔 ≤ 5～7 天。`]);});
-  const hi=S.EX.filter(x=>x.avgR>15||x.maxR>=18);if(hi.length)F.push(['y','次數偏高，張力可能不足',`${hi.map(x=>`${esc(x.ex.n)}（最高 ${x.maxR} 下、平均 ${x.avgR.toFixed(1)}）`).join('、')} → 重量可能太輕，可加重讓次數回到 8～12 下。`]);
-  const jp=S.EX.filter(x=>x.jump);if(jp.length)F.push(['y','同一動作次數跳動大',jp.map(x=>`${esc(x.ex.n)} ${md(x.jump.date)}：${x.jump.sets.map(s=>setTxt(s,x.ex.bw)).join('・')}`).join('；')+' → 每組重量／次數不穩定，張力時有時無。']);
-  const ps=['chest','shoulder','tri'].reduce((n,k)=>n+G[k].sets,0),pl=['back','bi'].reduce((n,k)=>n+G[k].sets,0);
-  if(ps&&!pl)F.push(['r','只有推、沒有拉',`推（胸＋肩＋三頭）${ps} 組，拉（背＋二頭）0 組 → 肩膀前後不平衡，容易圓肩。`]);
-  else if(ps&&pl&&(ps/pl>1.5||pl/ps>1.5))F.push(['y','推拉比例不平均',`推 ${ps} 組 vs 拉 ${pl} 組 ＝ <b>${(ps/pl).toFixed(1)} : 1</b>（建議接近 1:1）。`]);
-  const nw=S.EX.filter(x=>!x.ex.bw&&x.noW);if(nw.length)F.push(['y',`${nw.length} 個動作沒填重量`,`${nw.map(x=>esc(x.ex.n)).join('、')} → 只有次數，看不出有沒有加重。建議之後每組都記重量。`]);
-  const th=x=>x.reps?2:2.5,up=S.EX.filter(x=>x.d!=null&&x.d>=th(x)),flat=S.EX.filter(x=>x.d!=null&&Math.abs(x.d)<th(x)&&x.n>=3),dn=S.EX.filter(x=>x.d!=null&&x.d<=-th(x));
-  const pt=x=>x.reps?`${esc(x.ex.n)}（自重）最多 ${x.first} → <b>${x.last} 下</b>`:null;
-  if(up.length)F.push(['g','進步中',up.map(x=>pt(x)||`${esc(x.ex.n)} 估算最大重量 ${x.first.toFixed(1)} → <b>${x.last.toFixed(1)} kg（+${x.d.toFixed(0)}%）</b>`).join('；')]);
-  if(dn.length)F.push(['y','退步',dn.map(x=>pt(x)||`${esc(x.ex.n)} ${x.first.toFixed(1)} → ${x.last.toFixed(1)} kg（${x.d.toFixed(0)}%）`).join('；')+'，留意睡眠／恢復。']);
-  if(flat.length)F.push(['y','沒進步',flat.map(x=>esc(x.ex.n)).join('、')+` 這個月練 ${flat.map(x=>x.n).join('／')} 次都持平，可能要調整重量或次數。`]);
-  if(!F.some(f=>f[0]!=='g'))F.unshift(['g','組數、間隔都在建議範圍','這個月各肌群的量和頻率都 OK。']);
-  return F.sort((p,q)=>'rygx'.indexOf(p[0])-'rygx'.indexOf(q[0]));}
-
-function rpSetsTxt(x,bw){if(x.w===''||x.w==null)return String(x.r);return setTxt(x,bw);}
-function rpText(m){const{a,e}=rpRange(m),L=db.sessions.filter(s=>s.date>=a&&s.date<=e).sort((p,q)=>(p.date+(p.start||'')).localeCompare(q.date+(q.start||'')));
-  const D={};L.forEach(s=>{(D[s.date]=D[s.date]||[]).push(s);});const A=agg(a,e);
-  let t=`🏋️ ${RP_NAME}｜${m.replace('-','/')} 訓練清單\n共 ${A.cnt} 次重訓・${A.sets} 組${A.min?`・有氧 ${A.min} 分`:''}\n`;
-  Object.keys(D).sort().forEach(d=>{const by={},car=[];D[d].forEach(s=>{(s.items||[]).forEach(it=>{const ex=db.ex[it.ex];if(!ex)return;const st=(it.sets||[]).filter(x=>+x.r);if(!st.length)return;(by[ex.g]=by[ex.g]||[]).push([ex,st]);});car.push(...(s.cardio||[]));});
-    const gs=GROUPS.map(g=>g[0]).filter(k=>by[k]);if(!gs.length&&!car.length)return;
-    t+=`\n${d.replace(/-/g,'/')}（${[...gs.map(k=>GN[k]),...(car.length?['有氧']:[])].join('＋')}）週${WK[dow(d)]}\n`;
-    gs.forEach(k=>{t+=`【${GN[k]}】\n`;by[k].forEach(([ex,st])=>{t+=`${ex.n}：${st.map(x=>rpSetsTxt(x,ex.bw)).join('、')}\n`;});});
-    if(car.length){t+='【有氧】\n';car.forEach(c=>{t+=`${c.type}：${[c.min!==''&&c.min!=null?c.min+'分':'',c.km!==''&&c.km!=null?c.km+'公里':'',c.kcal!==''&&c.kcal!=null?c.kcal+'kcal':''].filter(Boolean).join('、')}\n`;});}});
-  return t.trim()+'\n';}
-const rpDone=m=>((db.cfg||{}).rpDoneL||[]).includes(m);
-function rpMark(){if(rpDone(RPM))return;db.cfg=touch({...(db.cfg||{}),rpDoneL:[...((db.cfg||{}).rpDoneL||[]),RPM]});save();}
-async function rpCopy(){const t=rpText(RPM);let ok=false;try{await navigator.clipboard.writeText(t);ok=true;}catch(e){}
-  if(!ok){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{ok=document.execCommand('copy');}catch(e){}ta.remove();}
+async function rpCopy(){const t=rpText(RPM);const ok=await rpClip(t);
   rpMark();RPTXT=true;vRp();rpToast(ok?'✅ 已複製本月訓練清單，可以直接貼到 LINE':'⚠️ 無法自動複製，請在下面文字框全選複製');}
 function rpToast(m){let d=$('rptoast');if(!d){d=document.createElement('div');d.id='rptoast';document.body.appendChild(d);}d.textContent=m;d.className='on';clearTimeout(d._t);d._t=setTimeout(()=>d.className='',2600);}
 function rpPrint(){rpMark();setTimeout(()=>window.print(),50);}
-function rpNag(){const pm=rpPrevMonth(today().slice(0,7));if(+today().slice(8)>10||rpDone(pm))return;const[a,b]=range('m',pm+'-01');if(!db.sessions.some(s=>s.date>=a&&s.date<=b&&sessStats(s).sets))return;
+function rpNag(){const pm=rpNagMonth();if(!pm)return;
   const w=$('app');if(!w||$('rpnag'))return;w.insertAdjacentHTML('afterbegin',`<div id="rpnag" onclick="RPM='${pm}';TAB='rp';render()">📄 <b>${+pm.slice(5)} 月的教練報告</b>還沒給教練<span class=mu>（產出或複製後這個提醒會消失）</span><span style="margin-left:auto;font-weight:900">產出 ›</span></div>`);}
 
 function vRp(){const S=rpStats(RPM),F=rpFlags(S),{A,P,R}=S,T=today();
@@ -691,6 +698,9 @@ function vRp(){const S=rpStats(RPM),F=rpFlags(S),{A,P,R}=S,T=today();
       return`<tr${x.date<R.a?' style="color:#94a3b8"':''}><td class=mono>${md(x.date)}</td><td class=mono>${x.wt||'—'}${dd('wt',1)}</td><td class=mono>${x.mm||'—'}${dd('mm',1)}</td><td class=mono>${x.fat!==''&&x.fat!=null?x.fat+'%':'—'}${dd('fat',1)}</td><td class=mono>${x.bmr?fmt(x.bmr):'—'}</td></tr>`;}).join('')}</table>`:''}
     <h2>✍️ 教練建議</h2><div class="rbox"></div>`:'<div class="empty">這個月還沒有訓練紀錄</div>'}
    </div>`;}
+
+// 手機按「PDF」會開 fitness.html?force=pc&rp=YYYY-MM&print=1
+(()=>{const q=new URLSearchParams(location.search),m=q.get('rp');if(m&&/^\d{4}-\d{2}$/.test(m)){RPM=m;TAB='rp';if(q.get('print'))addEventListener('load',()=>setTimeout(()=>{render();rpPrint();},900));}})();
 
 (async function(){render();if(await pull())render();setInterval(async()=>{if(document.visibilityState==='visible'&&$('emb').style.display!=='flex'){if(await pull())render();}},60000);})();
 </script>
