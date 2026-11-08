@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-<!-- fitness build 2026-11-09d -->
+<!-- fitness build 2026-11-09f -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -143,10 +143,20 @@ tr.sr{cursor:pointer}tr.sr:hover td{background:#f8fafc}td.num{text-align:right;f
 .o2t{display:flex;gap:8px;align-items:center;position:relative}.o2t.r{background:#fef2f2;border-color:#fca5a5}.o2t.w{background:#fff7ed;border-color:#fdba74}.o2t.go{background:#ecfeff;border-color:#a5f3fc}.o2t.rest{opacity:.78}
 .wab{display:flex;align-items:center;gap:8px;border:1px solid #e2e8f0;background:#f8fafc;border-radius:12px;padding:7px 12px;margin-top:8px;font-size:14px}.wab.due{background:#f0fdfa;border-color:#5eead4}.wab b{color:#0f766e}.wab button{margin-left:auto;border:none;background:#0891b2;color:#fff;font-weight:800;border-radius:9px;padding:5px 12px;cursor:pointer;font-family:inherit}.wab .wabu{background:#fff;color:#64748b;border:1px solid #e2e8f0}
 .o2t b{white-space:nowrap}
+.whero{display:flex;align-items:center;gap:18px;background:linear-gradient(135deg,#1d4ed8,#2563eb 55%,#3b82f6);color:#fff;border-radius:20px;padding:18px 24px;margin-bottom:14px;box-shadow:0 10px 24px rgba(37,99,235,.3);position:relative;overflow:hidden}
+.whero:after{content:'';position:absolute;right:-40px;top:-50px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.12);pointer-events:none}
+.whero .hk{font-size:13px;font-weight:800;opacity:.92;letter-spacing:1px}.whero .ht{font-size:36px;font-weight:900;letter-spacing:1px;line-height:1.25}.whero .hs{font-size:13.5px;opacity:.92}
+.whero button{margin-left:auto;border:none;background:#fff;color:#1d4ed8;font-weight:900;font-size:16px;border-radius:14px;padding:13px 22px;cursor:pointer;font-family:inherit;position:relative;z-index:1}
+.wdone{display:flex;align-items:baseline;gap:10px;background:#f1f5f9;border:1px solid var(--line);border-radius:14px;padding:10px 16px;margin-bottom:14px;color:#334155}
+.wbars{display:flex;gap:12px;margin:-4px 0 14px}.wbar{flex:1;display:flex;align-items:center;gap:10px;border-radius:14px;padding:10px 14px;cursor:pointer;background:#fdf4ff;border:1px solid #f0abfc;color:#86198f}.wbar .sm{font-size:12px;opacity:.9}
+.wbar button{margin-left:auto;border:none;border-radius:10px;padding:8px 14px;font-weight:900;cursor:pointer;font-family:inherit;background:#c026d3;color:#fff}
+.wbar.ph.strong{background:linear-gradient(135deg,#a21caf,#c026d3);color:#fff;border:none;box-shadow:0 8px 18px rgba(192,38,211,.25)}.wbar.ph.strong button{background:#fff;color:#a21caf}
+.wbar.ab.strong{background:linear-gradient(135deg,#ea580c,#f97316);color:#fff;border:none;box-shadow:0 8px 18px rgba(234,88,12,.25)}.wbar.ab.strong button{background:#fff;color:#c2410c}
+.pls{display:inline-block;width:9px;height:9px;border-radius:50%;background:#fff;margin-right:7px;vertical-align:2px;animation:pls 1.4s infinite}@keyframes pls{0%{box-shadow:0 0 0 0 rgba(255,255,255,.85)}70%{box-shadow:0 0 0 9px rgba(255,255,255,0)}100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}}
 .tabs span{white-space:nowrap;padding:8px 11px!important}
-#tabs.tabs{display:flex;flex-direction:column;gap:6px;background:none;padding:0}.trow{display:flex;align-items:center;gap:8px}.trl{font-size:12px;font-weight:900;color:#94a3b8;width:58px;white-space:nowrap}
-.tgrp{display:inline-flex;background:#eef2f7;border-radius:12px;padding:4px;gap:2px}.tgrp span{padding:7px 13px;border-radius:9px;font-weight:800;color:var(--mu);cursor:pointer;font-size:14px;white-space:nowrap}.tgrp span.on{background:#fff;color:var(--tx);box-shadow:0 1px 3px rgba(0,0,0,.08)}.tgrp span:hover:not(.on){color:var(--tx)}
-.tbtns{display:grid;grid-template-columns:auto auto;gap:6px;justify-items:stretch}.tbtns>*{text-align:center}.top{padding:10px 28px!important}.top a,.top .tb,.top h1,#sync{white-space:nowrap}.top{gap:10px!important}
+#tabs.tabs{display:flex;gap:10px;background:none;padding:0}.tgrp{display:inline-flex;background:#eef2f7;border-radius:12px;padding:4px;gap:2px}.tgrp.g2{background:#f3f0ff}
+.tgrp span{padding:7px 12px;border-radius:9px;font-weight:800;color:var(--mu);cursor:pointer;font-size:14px;white-space:nowrap}.tgrp span.on{background:#fff;color:var(--tx);box-shadow:0 1px 3px rgba(0,0,0,.08)}.tgrp span:hover:not(.on){color:var(--tx)}
+.top .tic{width:36px;height:36px;padding:0!important;display:grid;place-items:center;font-size:16px}.top a,.top .tb,.top h1,#sync{white-space:nowrap}.top{gap:10px!important}
 @media(max-width:1350px){#sync{display:none}}
 .wps{border:1px solid var(--line);border-radius:10px;padding:7px 10px;font-size:13px;font-family:inherit}.wphe{aspect-ratio:3/4;display:grid;place-items:center;background:#f1f5f9;border-radius:12px;color:#94a3b8}
 .wpg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:12px}.wpi{text-align:center}.wpi img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:12px;background:#e2e8f0;cursor:zoom-in;display:block;margin-bottom:4px;border:3px solid transparent}.wpi.sel img{border-color:#2563eb}.wpi b{display:block;font-size:13.5px}
@@ -483,6 +493,10 @@ function phZoom(id){const p=(db.photos||[]).find(x=>x.id===id);if(!p)return;docu
   zs.onclick=e=>{if(e.target===zs)d.remove();};
   phUrl(p).then(u=>{if(u)im.src=u;});}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementById('phz')?.remove();});
+// ── 強烈提醒（手機、電腦共用的判斷）──
+function todayDone(T){T=T||today();const L=db.sessions.filter(s=>s.date===T&&sessStats(s).sets);if(!L.length)return null;const g=[...new Set(L.flatMap(s=>sessGroups(s)))];return{groups:g,sets:L.reduce((a,s)=>a+sessStats(s).sets,0),name:g.map(k=>GN[k]).join('＋')};}
+function phNagLv(){const m=phNagMonth();if(!m)return null;const d=+today().slice(8);return{m,day:d,strong:d>=4};}
+function absNagLv(T){const A=absState(T);if(A.done||!A.due)return null;const over=A.n==null?0:A.n-ABS_GAP;return{A,over,strong:over>=1};}
 
 </script>
 <script>
@@ -524,7 +538,7 @@ function vOv(){
     <div style="display:flex;gap:18px;align-items:center">
      <svg width="128" height="128" viewBox="0 0 36 36" style="cursor:pointer;flex-shrink:0" onclick="setGoal()"><title>點一下改目標</title><circle cx="18" cy="18" r="15.5" fill="none" stroke="#e2e8f0" stroke-width="4"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="${pct>=1?'#0891b2':'#2563eb'}" stroke-width="4" stroke-dasharray="${C*pct} ${C}" transform="rotate(-90 18 18)" stroke-linecap="round"/><text x="18" y="18" text-anchor="middle" font-size="9" font-weight="900" font-family="JetBrains Mono,monospace">${A.cnt}/${goal}</text><text x="18" y="24.5" text-anchor="middle" font-size="3.6" fill="#64748b">本週次數</text></svg>
      <div style="font-size:14px;line-height:1.95"><b style="font-size:17px">本週 ${A.cnt} 次</b> <span class=mu>（目標 ${goal}，點圓圈可改）</span><br>${A.sets} 組・${fmt(A.vol)} kg${A.min?`・🏃 ${A.min} 分`:''}<br>${dc>0?`<span class=up>比上週多 ${dc} 次 ▲</span>`:dc<0?`<span class=dn>比上週少 ${-dc} 次</span>`:'<span class=dn>跟上週一樣</span>'}${PRw.length?`　<span style="color:#0891b2;font-weight:800">🏆 新紀錄 ${PRw.length} 項</span>`:''}</div></div>
-    ${SG?`<div class="dsg">💡 今天建議：<b>${SG.name}</b><span class=mu>${SG.items.map(x=>x.name+(x.n==null?' 還沒練過':' 隔 '+x.n+' 天')).join('、')}</span></div>`:''}<div class="o1h">各部位多久沒練 <span class=mu style="font-weight:500">只算週一～五；最該練的排前面（隔 5 天該練了、8 天隔太久）</span></div><div class="o1g">${tiles}</div>${(()=>{const A=absState(T);return`<div class="wab${A.due&&!A.done?' due':''}">🧘 <b>腹肌</b><span class=mu>${A.done?'✓ 今天練了・下次 '+md(A.next):A.due?(A.last?'上次 '+md(A.last)+'（'+A.n+' 天前）・今天該練了':'還沒有紀錄'):'休息中・再 '+A.left+' 天（上次 '+md(A.last)+'）'}・本月 ${absMonth(T.slice(0,7)).length} 次</span>${A.done?`<button onclick="absUndo();render()" class="wabu">取消</button>`:`<button onclick="absDone();render()">✓ 練完了</button>`}</div>`;})()}
+    <div class="o1h">各部位多久沒練 <span class=mu style="font-weight:500">只算週一～五；最該練的排前面（隔 5 天該練了、8 天隔太久）</span></div><div class="o1g">${tiles}</div>${(()=>{const A=absState(T);return`<div class="wab${A.due&&!A.done?' due':''}">🧘 <b>腹肌</b><span class=mu>${A.done?'✓ 今天練了・下次 '+md(A.next):A.due?(A.last?'上次 '+md(A.last)+'（'+A.n+' 天前）・今天該練了':'還沒有紀錄'):'休息中・再 '+A.left+' 天（上次 '+md(A.last)+'）'}・本月 ${absMonth(T.slice(0,7)).length} 次</span>${A.done?`<button onclick="absUndo();render()" class="wabu">取消</button>`:`<button onclick="absDone();render()">✓ 練完了</button>`}</div>`;})()}
     <div class="o1h">最近三次</div>${recDays().map(([d,g,st,mn])=>`<div class="o1r" onclick="OPENROW='${d}';TAB='log';LOGG='all';REF='${d}';PER='w';render()"><span class=mono style="width:62px"><b>${md(d)}</b> <span class=mu>${WK[dow(d)]}</span></span><b>${g.length?g.map(k=>`<span style="color:${GC[k]}">${GN[k]}</span>`).join('<span style="color:#cbd5e1"> / </span>'):''}${mn?`${g.length?' <span style="color:#cbd5e1">＋</span> ':''}<span style="color:#ea580c">有氧</span>`:''}</b><span class=mu style="margin-left:auto">${st?st+' 組':''}${mn?`${st?'・':''}🏃 ${mn} 分`:''}</span></div>`).join('')||'<div class=mu>還沒有紀錄</div>'}
     ${ib?`<div class="o1h">最新 InBody <span class=mu style="font-weight:500">${md(ib.date)}</span></div><div style="font-size:13px" class=mono>⚖️ ${ib.wt||'—'} kg・💪 ${ib.mm||'—'} kg・體脂 ${ib.fat||'—'}%・代謝 ${ib.bmr||'—'}</div>`:''}</div>
    <div class="card" style="margin:0">${calHtml()}</div></div>
@@ -823,12 +837,25 @@ function vPhW(){const L=phList(),Ms=L.map(p=>p.month);
        <input type="range" min="0" max="100" value="${WPX}" oninput="WPX=+this.value;const s=this.parentNode;s.querySelectorAll('img')[1].style.clipPath='inset(0 0 0 '+WPX+'%)';s.querySelector('.wpln').style.left=WPX+'%'"></div>`:''}</div></div>`:'<div class="card mu">有兩個月以上的照片，就會出現並排比較和滑桿</div>'}`}
    <div class="mu" style="margin-top:8px">🔒 照片用資料密碼加密後才上傳，別人打不開；教練報告不會放照片。</div>`;
   document.querySelectorAll('#app img[data-ph]').forEach(async im=>{const p=L.find(x=>x.id===im.dataset.ph);try{const u=await phUrl(p);if(u)im.src=u;}catch(e){}});}
-// ══ N1：分頁分兩排（上排訓練、下排身體與報告）；右邊按鈕排成 2×2 ══
-const TAB_ROWS=[['🏋️ 訓練',['ov','log','ex','mgr']],['🧍 身體',['ib','ph','rp']]];
+// ══ P3：同一排兩組分頁（訓練＝灰底、身體與報告＝淡紫底）；右邊按鈕縮成小圖示 ══
+const TAB_ROWS=[['訓練',['ov','log','ex','mgr']],['身體',['ib','ph','rp']]];
+const TAB_SHORT={log:'📒 日誌',ex:'💪 進步',mgr:'⚙️ 動作'};
 tabs=function(){const N=Object.fromEntries(TABS);const used=new Set(TAB_ROWS.flatMap(r=>r[1]));const rows=TAB_ROWS.map(r=>[r[0],r[1].filter(k=>N[k])]);
   const rest=TABS.map(t=>t[0]).filter(k=>!used.has(k));if(rest.length)rows[0][1].push(...rest);
-  $('tabs').innerHTML=rows.map(([lab,ks])=>`<div class="trow"><span class="trl">${lab}</span><div class="tgrp">${ks.map(k=>`<span class="${k===TAB?'on':''}" onclick="TAB='${k}';render()">${N[k]}</span>`).join('')}</div></div>`).join('');};
-(()=>{const top=document.querySelector('.top');if(!top||top.querySelector('.tbtns'))return;const B=[...top.querySelectorAll(':scope > .tb, :scope > a')];const g=document.createElement('div');g.className='tbtns';B.forEach(b=>g.appendChild(b));top.appendChild(g);})();
+  $('tabs').innerHTML=rows.map(([lab,ks],i)=>`<div class="tgrp${i?' g2':''}" title="${lab}">${ks.map(k=>`<span class="${k===TAB?'on':''}" title="${N[k].replace(/^\S+\s/,'')}" onclick="TAB='${k}';render()">${TAB_SHORT[k]||N[k]}</span>`).join('')}</div>`).join('');};
+(()=>{const top=document.querySelector('.top');if(!top)return;const ic={'📥':'貼上匯入','📱':'手機版','🏠':'主目錄'};
+  top.querySelectorAll(':scope > .tb, :scope > a').forEach(b=>{const t=b.textContent.trim(),e=t.split(/\s/)[0];if(ic[e]){b.title=ic[e];b.textContent=e;b.classList.add('tic');}else if(/補記/.test(t)){b.textContent='＋ 補記';b.title='補記一次訓練';}});})();
+// ══ A：總覽最上面「今天一定要練」大橫幅＋照片／腹肌過期的實心提醒條 ══
+const _heroRender0=render;
+render=function(){_heroRender0();if(TAB==='ov'){try{webHero();}catch(e){console.warn('hero',e);}}};
+function webHero(){const app=$('app');if(!app||app.querySelector('.whero,.wdone'))return;const T=today(),SG=suggestPreset(T),DN=todayDone(T),PN=phNagLv(),AN=absNagLv(T);
+  let h=DN?`<div class="wdone">✓ <b>今天練完了：${DN.name}</b><span class=mu>${DN.sets} 組・明天建議：${(suggestPreset(addDays(T,1))||{}).name||'—'}</span></div>`
+   :SG?`<div class="whero"><div><div class="hk">💡 今天一定要練</div><div class="ht">${SG.name}</div><div class="hs">${SG.items.map(x=>x.name+(x.n==null?' 還沒練過':' 隔 '+x.n+' 天')).join('・')}</div></div><button onclick="emb('')">📱 用手機開始</button></div>`:'';
+  const bars=[];
+  if(PN)bars.push(`<div class="wbar ph${PN.strong?' strong':''}" onclick="TAB='ph';render()"><span style="font-size:22px">📸</span><div><b>${PN.strong?'<i class="pls"></i>':''}${+PN.m.slice(5)} 月身形照還沒拍</b><div class="sm">${PN.strong?'已經第 '+PN.day+' 天了・':''}月初拍最準</div></div><button>上傳</button></div>`);
+  if(AN&&AN.strong)bars.push(`<div class="wbar ab strong"><span style="font-size:22px">🧘</span><div><b><i class="pls"></i>腹肌超過 ${AN.over} 天沒練</b><div class="sm">上次 ${md(AN.A.last)}（${AN.A.n} 天前）</div></div><button onclick="absDone();render()">✓ 練完了</button></div>`);
+  if(bars.length)h+=`<div class="wbars">${bars.join('')}</div>`;
+  app.insertAdjacentHTML('afterbegin',h);}
 
 (async function(){render();if(await pull())render();setInterval(async()=>{if(document.visibilityState==='visible'&&$('emb').style.display!=='flex'){if(await pull())render();}},60000);})();
 </script>

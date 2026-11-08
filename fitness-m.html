@@ -180,10 +180,18 @@ body.embed .top a.hm,body.embed .top a.pc{display:none}
 .phsl{position:relative;aspect-ratio:3/4;border-radius:12px;overflow:hidden;background:#e2e8f0}.phsl img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.phsl .phe{position:absolute;inset:0;margin:0}
 .phln{position:absolute;top:0;bottom:0;width:3px;background:#fff;margin-left:-1px;box-shadow:0 0 4px rgba(0,0,0,.4)}.phsl input{position:absolute;inset:0;width:100%;height:100%;opacity:0;margin:0}
 .phtg{position:absolute;top:8px;background:rgba(0,0,0,.5);color:#fff;font-size:11.5px;border-radius:6px;padding:1px 7px}.phtg.l{left:8px}.phtg.r{right:8px}
+.dsgm.hero{display:block;background:linear-gradient(135deg,#1d4ed8,#2563eb 55%,#3b82f6);color:#fff;border:none;border-radius:20px;padding:16px;box-shadow:0 10px 24px rgba(37,99,235,.35);position:relative;overflow:hidden}
+.dsgm.hero:after{content:'';position:absolute;right:-30px;top:-30px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.12);pointer-events:none}
+.hero .hk{font-size:12.5px;font-weight:800;opacity:.92;letter-spacing:1px}.hero .ht{font-size:32px;font-weight:900;margin:2px 0;letter-spacing:1px;line-height:1.2}.hero .hs{font-size:13px;opacity:.92}
+.dsgm.hero button{display:block;margin-top:12px;width:100%;border:none;background:#fff;color:#1d4ed8;font-weight:900;font-size:17px;border-radius:14px;padding:13px;position:relative;z-index:1}
+.dsgm.hdone{background:#f1f5f9;border:1px solid var(--line)}.dsgm.hdone b{font-size:15px;color:#334155}
+.pls{display:inline-block;width:9px;height:9px;border-radius:50%;background:#fff;margin-right:7px;vertical-align:2px;animation:pls 1.4s infinite}@keyframes pls{0%{box-shadow:0 0 0 0 rgba(255,255,255,.85)}70%{box-shadow:0 0 0 9px rgba(255,255,255,0)}100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}}
+.phn.strong{background:linear-gradient(135deg,#a21caf,#c026d3);color:#fff;border:none;box-shadow:0 8px 18px rgba(192,38,211,.3)}.phn.strong b{font-size:16px}.phn.strong .sm{font-size:12px;opacity:.92}.phn.strong button{background:#fff;color:#a21caf}
+.abc.strong{background:linear-gradient(135deg,#ea580c,#f97316);border:none;color:#fff;box-shadow:0 8px 18px rgba(234,88,12,.3)}.abc.strong b{color:#fff}.abc.strong .sm{font-size:12px;opacity:.92}.abc .abw{border:none;background:#fff;color:#c2410c;font-weight:900;font-size:14.5px;border-radius:12px;padding:11px 12px;white-space:nowrap}
 </style>
 </head>
 <body>
-<div class="top"><b id="ttl">🏋️ 健身</b><span id="sync"></span><span style="font-size:10px;color:#cbd5e1">v1109c</span><span class="sp"></span><a class="pc" href="fitness.html?force=pc">📊 數據</a><a class="hm" href="index.html">🏠</a><button id="closeEmbed" style="display:none" onclick="parent.ftCloseEmbed&&parent.ftCloseEmbed()">✕ 關閉</button></div>
+<div class="top"><b id="ttl">🏋️ 健身</b><span id="sync"></span><span style="font-size:10px;color:#cbd5e1">v1109f</span><span class="sp"></span><a class="pc" href="fitness.html?force=pc">📊 數據</a><a class="hm" href="index.html">🏠</a><button id="closeEmbed" style="display:none" onclick="parent.ftCloseEmbed&&parent.ftCloseEmbed()">✕ 關閉</button></div>
 <div class="wrap" id="app"></div>
 <div class="bar" id="bar" style="display:none"><div class="in" id="barIn"></div></div>
 <div class="toast" id="toast"></div>
@@ -465,6 +473,10 @@ function phZoom(id){const p=(db.photos||[]).find(x=>x.id===id);if(!p)return;docu
   zs.onclick=e=>{if(e.target===zs)d.remove();};
   phUrl(p).then(u=>{if(u)im.src=u;});}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementById('phz')?.remove();});
+// ── 強烈提醒（手機、電腦共用的判斷）──
+function todayDone(T){T=T||today();const L=db.sessions.filter(s=>s.date===T&&sessStats(s).sets);if(!L.length)return null;const g=[...new Set(L.flatMap(s=>sessGroups(s)))];return{groups:g,sets:L.reduce((a,s)=>a+sessStats(s).sets,0),name:g.map(k=>GN[k]).join('＋')};}
+function phNagLv(){const m=phNagMonth();if(!m)return null;const d=+today().slice(8);return{m,day:d,strong:d>=4};}
+function absNagLv(T){const A=absState(T);if(A.done||!A.due)return null;const over=A.n==null?0:A.n-ABS_GAP;return{A,over,strong:over>=1};}
 
 </script>
 <script>
@@ -667,8 +679,10 @@ function addEx(g){const v=prompt(GN[g]+'：新動作名稱');if(!v||!v.trim())re
 let RPSEG=(()=>{try{return localStorage.getItem('ft_rpseg')||'txt';}catch(e){return'txt';}})();
 const _rpmRender0=render;
 render=function(){if(V==='rp'){vRpM();return;}_rpmRender0();if(V==='home'){rpmHome();try{dueHome();}catch(e){console.warn(e);}}};
-function dueHome(){document.querySelectorAll('.dsgm').forEach(e=>e.remove());const SG=suggestPreset(SDATE||today());if(!SG||!$('app'))return;
-  $('app').insertAdjacentHTML('afterbegin',`<div class="dsgm"><div style="flex:1;min-width:0"><div class=mu style="color:#1e40af">💡 今天建議練</div><b>${SG.name}</b><div class=mu>${SG.items.map(x=>x.name+(x.n==null?' 還沒練過':' 隔 '+x.n+' 天')).join('、')}</div></div><button onclick="PICK=new Set(${JSON.stringify(SG.groups).replace(/"/g,"'")});startSess()">開始 ›</button></div>${dueRow()}`);}
+function dueHome(){document.querySelectorAll('.dsgm').forEach(e=>e.remove());const T=SDATE||today(),SG=suggestPreset(T);if(!SG||!$('app'))return;const DN=todayDone(T);
+  const hero=DN?`<div class="dsgm hdone"><div style="flex:1;min-width:0"><b>✓ 今天練完了：${DN.name}</b><div class=mu>${DN.sets} 組・明天建議：${(suggestPreset(addDays(T,1))||{}).name||'—'}</div></div></div>`
+   :`<div class="dsgm hero"><div class="hk">💡 今天一定要練</div><div class="ht">${SG.name}</div><div class="hs">${SG.items.map(x=>x.name+(x.n==null?' 還沒練過':' 隔 '+x.n+' 天')).join('・')}</div><button onclick="PICK=new Set(${JSON.stringify(SG.groups).replace(/"/g,"'")});startSess()">🔥 開始練 ${SG.name}</button></div>`;
+  $('app').insertAdjacentHTML('afterbegin',hero+dueRow());}
 // 手機首頁：六個小圓環（最該練的在左邊；點一下＝勾選那個部位）
 function dueRow(){const R=2*Math.PI*15.5;return`<div class="dgr">${dueList(SDATE||today()).map(x=>{const c=GC[x.g],col=x.cls==='r'?'#dc2626':x.cls==='w'?'#f59e0b':c,p=x.n==null?0:Math.min(1,x.n/DUE_W);
   return`<div class="dgi ${x.cls}${PICK.has(x.g)?' on':''}" onclick="pickG('${x.g}')"><svg width="40" height="40" viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.5" fill="none" stroke="#e2e8f0" stroke-width="4"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="${col}" stroke-width="4" stroke-dasharray="${R*p} ${R}" transform="rotate(-90 18 18)" stroke-linecap="round"/><text x="18" y="21.8" text-anchor="middle" font-size="11" font-weight="900" font-family="monospace">${x.n==null?'—':x.n}</text></svg><b style="color:${c}">${x.name}</b><span>${x.n==null?'沒練過':x.cls==='rest'?'恢復中':x.cls==='go'?'可以練':x.cls==='w'?'該練了':'太久'}</span></div>`;}).join('')}</div><div class="mu" style="text-align:center;margin:-2px 0 10px;font-size:11px">數字＝隔幾天（只算週一～五）・左邊最該練・點一下就勾選</div>`;}
@@ -703,8 +717,10 @@ function habHome(){const app=$('app');if(!app)return;app.querySelectorAll('.abc,
   const dots=[...Array(8)].map((_,i)=>{const d=addDays(T,i-5);return`<i class="${A.dates.includes(d)?'d':''}${d===T?' t':''}">${+d.slice(8)}</i>`;}).join('');
   const card=A.done?`<div class="abc ok"><span style="font-size:22px">🧘</span><div style="flex:1"><b>腹肌 ✓ 今天練了</b><div class=mu>下次 ${md(A.next)}・練 1 休 3</div></div><button class="abu" onclick="absUndo('${T}');render()">取消</button></div>`
     :`<div class="abc${A.due?'':' rest'}"><span style="font-size:26px">🧘</span><div style="flex:1;min-width:0"><b>${A.due?'腹肌：今天該練了':'腹肌：休息中・再 '+A.left+' 天'}</b><div class=mu>${A.last?`上次 ${md(A.last)}（${A.n} 天前）`:'還沒有紀錄'}・練 1 休 3</div><div class="abd">${dots}</div></div><button class="abb" onclick="absDone('${T}');toast('🧘 腹肌記好了，下次 '+md(addDays('${T}',ABS_GAP)));render()">✓ 練完了</button></div>`;
-  const hint=app.querySelector('.dgr')?.nextElementSibling;if(hint)hint.insertAdjacentHTML('afterend',card);else app.insertAdjacentHTML('afterbegin',card);
-  const pm=phNagMonth();if(pm)app.insertAdjacentHTML('afterbegin',`<div class="phn" onclick="go('photo')">📸 <b>${+pm.slice(5)} 月的身形照還沒拍</b><span style="margin-left:auto"><button>拍／上傳</button></span></div>`);
+  const AN=absNagLv(T),hero=app.querySelector('.dsgm');
+  if(AN&&AN.strong){const c=`<div class="abc strong"><span style="font-size:26px">🧘</span><div style="flex:1;min-width:0"><b><i class="pls"></i>腹肌超過 ${AN.over} 天沒練</b><div class="sm">上次 ${md(AN.A.last)}（${AN.A.n} 天前）・該練了</div></div><button class="abw" onclick="absDone('${T}');toast('🧘 腹肌記好了');render()">✓ 練完了</button></div>`;if(hero)hero.insertAdjacentHTML('afterend',c);else app.insertAdjacentHTML('afterbegin',c);}
+  else{const hint=app.querySelector('.dgr')?.nextElementSibling;if(hint)hint.insertAdjacentHTML('afterend',card);else app.insertAdjacentHTML('afterbegin',card);}
+  const PN=phNagLv();if(PN)app.insertAdjacentHTML('afterbegin',PN.strong?`<div class="phn strong" onclick="go('photo')"><span style="font-size:24px">📸</span><div><b><i class="pls"></i>${+PN.m.slice(5)} 月身形照還沒拍</b><div class="sm">已經第 ${PN.day} 天了・月初拍最準</div></div><span style="margin-left:auto"><button>拍／上傳</button></span></div>`:`<div class="phn" onclick="go('photo')">📸 <b>${+PN.m.slice(5)} 月的身形照還沒拍</b><span style="margin-left:auto"><button>拍／上傳</button></span></div>`);
   const q=app.querySelector('.q');if(q&&!q.querySelector('.phq'))q.insertAdjacentHTML('beforeend',`<div class="phq" onclick="go('photo')"><span>📸</span>身形照</div>`);}
 function phSeg(s){PHSEG=s;try{localStorage.setItem('ft_phseg',s)}catch(e){}vPhoto();}
 function phMonths(){const L=[],t=today().slice(0,7);let d=new Date(t+'-01T00:00:00Z');for(let i=0;i<13;i++){L.push(d.toISOString().slice(0,7));d.setUTCMonth(d.getUTCMonth()-1);}return L;}
