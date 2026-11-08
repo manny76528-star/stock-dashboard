@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-<!-- fitness build 2026-11-08d -->
+<!-- fitness build 2026-11-08e -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>🏋️ 健身數據</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
 <script>
-if(window.innerWidth<768&&!location.search.includes('force=pc'))location.href='fitness-m.html';
+if((window.innerWidth<768||(Math.min(screen.width,screen.height)<768&&navigator.maxTouchPoints>0))&&!location.search.includes('force=pc'))location.href='fitness-m.html';
 // ══ 🔐 資料密碼＋資料加密（2026/10）══
 //   1) 呼叫雲端同步服務時自動帶通行碼（X-Sync-Key）；查股價、大盤不用帶
 //   2) 四個資料檔上傳前自動加密（AES-256-GCM）、下載後自動解開；各頁面原本的同步程式完全不用改

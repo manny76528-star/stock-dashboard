@@ -408,7 +408,9 @@ body:not(.privacy) .privacy-mask{filter:none;}
 <script>
 // 自動偵測手機，跳轉到手機版
 (function(){
-  if(window.innerWidth < 768 && !window.location.search.includes('force=pc')){
+  // 手機判斷：除了視窗寬度，也看螢幕實際大小（手機開了「要求電腦版網站」時視窗會假裝是 980 寬）
+  var _sm=Math.min(screen.width,screen.height)<768, _ios=navigator.maxTouchPoints>1&&/Macintosh/.test(navigator.userAgent);
+  if((window.innerWidth < 768 || (_sm&&(_ios||navigator.maxTouchPoints>0))) && !window.location.search.includes('force=pc')){
     window.location.href = 'mobile.html';
     return;
   }
