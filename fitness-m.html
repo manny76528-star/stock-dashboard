@@ -188,10 +188,11 @@ body.embed .top a.hm,body.embed .top a.pc{display:none}
 .pls{display:inline-block;width:9px;height:9px;border-radius:50%;background:#fff;margin-right:7px;vertical-align:2px;animation:pls 1.4s infinite}@keyframes pls{0%{box-shadow:0 0 0 0 rgba(255,255,255,.85)}70%{box-shadow:0 0 0 9px rgba(255,255,255,0)}100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}}
 .phn.strong{background:linear-gradient(135deg,#a21caf,#c026d3);color:#fff;border:none;box-shadow:0 8px 18px rgba(192,38,211,.3)}.phn.strong b{font-size:16px}.phn.strong .sm{font-size:12px;opacity:.92}.phn.strong button{background:#fff;color:#a21caf}
 .abc.strong{background:linear-gradient(135deg,#ea580c,#f97316);border:none;color:#fff;box-shadow:0 8px 18px rgba(234,88,12,.3)}.abc.strong b{color:#fff}.abc.strong .sm{font-size:12px;opacity:.92}.abc .abw{border:none;background:#fff;color:#c2410c;font-weight:900;font-size:14.5px;border-radius:12px;padding:11px 12px;white-space:nowrap}
+.abp{color:#0e7490;font-weight:800;text-decoration:underline}.abp.w{color:#fff}
 </style>
 </head>
 <body>
-<div class="top"><b id="ttl">🏋️ 健身</b><span id="sync"></span><span style="font-size:10px;color:#cbd5e1">v1109h</span><span class="sp"></span><a class="pc" href="fitness.html?force=pc">📊 數據</a><a class="hm" href="index.html">🏠</a><button id="closeEmbed" style="display:none" onclick="parent.ftCloseEmbed&&parent.ftCloseEmbed()">✕ 關閉</button></div>
+<div class="top"><b id="ttl">🏋️ 健身</b><span id="sync"></span><span style="font-size:10px;color:#cbd5e1">v1109i</span><span class="sp"></span><a class="pc" href="fitness.html?force=pc">📊 數據</a><a class="hm" href="index.html">🏠</a><button id="closeEmbed" style="display:none" onclick="parent.ftCloseEmbed&&parent.ftCloseEmbed()">✕ 關閉</button></div>
 <div class="wrap" id="app"></div>
 <div class="bar" id="bar" style="display:none"><div class="in" id="barIn"></div></div>
 <div class="toast" id="toast"></div>
@@ -479,6 +480,10 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementB
 function todayDone(T){T=T||today();const L=db.sessions.filter(s=>s.date===T&&sessStats(s).sets);if(!L.length)return null;const g=[...new Set(L.flatMap(s=>sessGroups(s)))];return{groups:g,sets:L.reduce((a,s)=>a+sessStats(s).sets,0),name:g.map(k=>GN[k]).join('＋')};}
 function phNagLv(){const m=phNagMonth();if(!m)return null;const d=+today().slice(8);return{m,day:d,strong:d>=4};}
 function absNagLv(T){const A=absState(T);if(A.done||!A.due)return null;const over=A.n==null?0:A.n-ABS_GAP;return{A,over,strong:over>=1};}
+// 補記腹肌：選日期（手機、電腦共用）
+function absPick(){const i=document.createElement('input');i.type='date';i.max=today();i.value=today();i.style.cssText='position:fixed;left:50%;top:40%;opacity:0;width:1px;height:1px';document.body.appendChild(i);
+  i.onchange=()=>{const d=i.value;i.remove();if(!d||d>today())return;if(absDates().includes(d)){alert(md(d)+' 已經記過腹肌了');return;}if(confirm(md(d)+'（週'+WK[dow(d)]+'）有練腹肌，要補記嗎？')){absDone(d);if(typeof render==='function')render();}};
+  i.onblur=()=>setTimeout(()=>i.remove(),400);try{i.showPicker?i.showPicker():i.click();}catch(e){i.click();}}
 
 </script>
 <script>
@@ -717,10 +722,10 @@ const _rpmRender1=render;
 render=function(){if(V==='photo'){vPhoto();return;}_rpmRender1();if(V==='home'){try{habHome();}catch(e){console.warn(e);}}};
 function habHome(){const app=$('app');if(!app)return;app.querySelectorAll('.abc,.phn').forEach(e=>e.remove());const T=SDATE||today(),A=absState(T);
   const dots=[...Array(8)].map((_,i)=>{const d=addDays(T,i-5);return`<i class="${A.dates.includes(d)?'d':''}${d===T?' t':''}">${+d.slice(8)}</i>`;}).join('');
-  const card=A.done?`<div class="abc ok"><span style="font-size:22px">🧘</span><div style="flex:1"><b>腹肌 ✓ 今天練了</b><div class=mu>下次 ${md(A.next)}・${esc(absPlan())}</div></div><button class="abu" onclick="absUndo('${T}');render()">取消</button></div>`
-    :`<div class="abc${A.due?'':' rest'}"><span style="font-size:26px">🧘</span><div style="flex:1;min-width:0"><b>${A.due?'腹肌：今天該練了':'腹肌：休息中・再 '+A.left+' 天'}</b><div class=mu>${A.last?`上次 ${md(A.last)}（${A.n} 天前）`:'還沒有紀錄'}・${esc(absPlan())}</div><div class="abd">${dots}</div></div><button class="abb" onclick="if(!confirm('今天確定練了腹肌嗎？'))return;absDone('${T}');toast('🧘 腹肌記好了，下次 '+md(addDays('${T}',ABS_GAP)));render()">✓ 練完了</button></div>`;
+  const card=A.done?`<div class="abc ok"><span style="font-size:22px">🧘</span><div style="flex:1"><b>腹肌 ✓ 今天練了</b><div class=mu>下次 ${md(A.next)}・${esc(absPlan())}・<a class="abp" onclick="absPick()">補記其他天</a></div></div><button class="abu" onclick="absUndo('${T}');render()">取消</button></div>`
+    :`<div class="abc${A.due?'':' rest'}"><span style="font-size:26px">🧘</span><div style="flex:1;min-width:0"><b>${A.due?'腹肌：今天該練了':'腹肌：休息中・再 '+A.left+' 天'}</b><div class=mu>${A.last?`上次 ${md(A.last)}（${A.n} 天前）`:'還沒有紀錄'}・${esc(absPlan())}・<a class="abp" onclick="absPick()">補記</a></div><div class="abd">${dots}</div></div><button class="abb" onclick="if(!confirm('今天確定練了腹肌嗎？'))return;absDone('${T}');toast('🧘 腹肌記好了，下次 '+md(addDays('${T}',ABS_GAP)));render()">✓ 練完了</button></div>`;
   const AN=absNagLv(T),hero=app.querySelector('.dsgm');
-  if(AN&&AN.strong){const c=`<div class="abc strong"><span style="font-size:26px">🧘</span><div style="flex:1;min-width:0"><b><i class="pls"></i>腹肌超過 ${AN.over} 天沒練</b><div class="sm">上次 ${md(AN.A.last)}（${AN.A.n} 天前）・該練了</div></div><button class="abw" onclick="if(!confirm('今天確定練了腹肌嗎？'))return;absDone('${T}');toast('🧘 腹肌記好了');render()">✓ 練完了</button></div>`;if(hero)hero.insertAdjacentHTML('afterend',c);else app.insertAdjacentHTML('afterbegin',c);}
+  if(AN&&AN.strong){const c=`<div class="abc strong"><span style="font-size:26px">🧘</span><div style="flex:1;min-width:0"><b><i class="pls"></i>腹肌超過 ${AN.over} 天沒練</b><div class="sm">上次 ${md(AN.A.last)}（${AN.A.n} 天前）・<a class="abp w" onclick="absPick()">補記其他天</a></div></div><button class="abw" onclick="if(!confirm('今天確定練了腹肌嗎？'))return;absDone('${T}');toast('🧘 腹肌記好了');render()">✓ 練完了</button></div>`;if(hero)hero.insertAdjacentHTML('afterend',c);else app.insertAdjacentHTML('afterbegin',c);}
   else{const hint=app.querySelector('.dgr')?.nextElementSibling;if(hint)hint.insertAdjacentHTML('afterend',card);else app.insertAdjacentHTML('afterbegin',card);}
   const PN=phNagLv();if(PN)app.insertAdjacentHTML('afterbegin',PN.strong?`<div class="phn strong" onclick="go('photo')"><span style="font-size:24px">📸</span><div><b><i class="pls"></i>${+PN.m.slice(5)} 月身形照還沒拍</b><div class="sm">已經第 ${PN.day} 天了・月初拍最準</div></div><span style="margin-left:auto"><button>拍／上傳</button></span></div>`:`<div class="phn" onclick="go('photo')">📸 <b>${+PN.m.slice(5)} 月的身形照還沒拍</b><span style="margin-left:auto"><button>拍／上傳</button></span></div>`);
   const q=app.querySelector('.q');if(q&&!q.querySelector('.phq'))q.insertAdjacentHTML('beforeend',`<div class="phq" onclick="go('photo')"><span>📸</span>身形照</div>`);}
