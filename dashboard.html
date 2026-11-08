@@ -816,6 +816,18 @@ body:not(.privacy) .privacy-mask{filter:none;}
 .v28-go{display:block;width:calc(100% - 36px);margin:12px 18px 16px;background:#16a34a;color:#fff;border:0;border-radius:12px;padding:11px;font-weight:900;font-size:15px;cursor:pointer;font-family:inherit}.v28-go:disabled{background:#e2e8f0;color:#94a3b8;cursor:not-allowed}
 </style>
 <style id="v31-css">
+
+/* v32 今天頁三欄 */
+.v32-g{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.3fr) minmax(0,.8fr);gap:12px;margin-top:14px;align-items:stretch}
+.v32-g>.v13-card,.v32-g .v11-col{margin:0}.v32-st{display:flex;flex-direction:column;gap:12px;min-width:0}.v32-st>.v11-col:last-child{flex:1}
+.v32-g>.v11-col:nth-child(2){border-color:#fecaca}
+.v32-tw .v13-hd{flex-wrap:wrap;font-size:15px;row-gap:2px}.v32-tw .v13-hd .v11-link{margin-left:auto}
+.v32-tw .v31w-r>div:first-child{white-space:nowrap}.v32-tw .v31w-r{grid-template-columns:78px minmax(0,1fr) 78px;gap:6px;padding:5px 6px;margin-bottom:3px}
+.v32-tw .v31w-d{font-size:13.5px}.v32-tw .v31w-cs{gap:3px}.v32-tw .v31w-ev{font-size:11.5px;padding:1px 6px}.v32-tw .v31w-b{font-size:13px}.v32-tw .v31w-r .v11-sub{font-size:11px}
+.v32-fix{background:#dc2626;color:#fff;border:none;border-radius:8px;padding:3px 10px;font-weight:900;font-size:12px;cursor:pointer;font-family:inherit}
+.v32-lk{color:#b45309;font-weight:800;font-size:12px;cursor:pointer}.v32-lk:hover{text-decoration:underline}
+@media(max-width:1100px){.v32-g{grid-template-columns:1fr 1fr}.v32-g>.v32-st{grid-column:1/-1;flex-direction:row}.v32-st>.v11-col{flex:1}}
+@media(max-width:900px){.v32-g{grid-template-columns:1fr}.v32-g>.v32-st{flex-direction:column}}
 /* v31 */
 .v31-kl{display:flex;justify-content:space-between;align-items:baseline;border-radius:10px;padding:6px 10px;margin:6px 0;font-size:12.5px;color:#475569}.v31-kl b{font-family:'JetBrains Mono',monospace;font-size:17px;font-weight:900}
 .v31-fo{margin:2px 0;padding:6px 10px!important}.v31-fl{padding:3px 0!important}.v31-sr{margin:4px 0!important}.v31-sb{height:18px!important}.v31-sh{margin:8px 0 2px!important}
@@ -21432,6 +21444,38 @@ function v31TwoWeeks(){
     const sp=document.createElement('span');sp.className='v31-pend';sp.title=nc?nc+' 股息':'';sp.innerHTML=`⏳ ${_b6md(I.nextDate)} 待入帳 <b class="v15-mono">+${_b6m(I.nextAmt)}</b>`;hd.insertBefore(sp,hd.querySelector('.v15-lk'));}
   return t.innerHTML;}catch(e){console.warn('v31d run',e);return h;}};})();
 
+
+// ══ v32（2026/11/08）：今天頁 ②——這兩週｜要處理｜提醒＋健康檢查 三欄同一排；紅色警示併進要處理；健康檢查跟要處理重複的只留一邊 ══
+(function(){const _r=v11RenderToday;v11RenderToday=function(){const r=_r.apply(this,arguments);try{v32Today();}catch(e){console.warn('v32 today',e);}return r;};})();
+function v32Today(){
+  const box=document.getElementById('v11-today');if(!box||box.querySelector('.v32-g'))return;
+  const mid=box.querySelector('.v13-mid'),two=box.querySelector('.v11-2');if(!mid||!two)return;
+  const card=mid.querySelector('.v13-card');const cols=[...two.querySelectorAll(':scope > .v11-col')];if(!card||cols.length<2)return;
+  const todo=cols[0],note=cols.find(c=>c!==todo&&!c.classList.contains('v23-health')),health=two.querySelector('.v23-health');
+  const items=c=>[...c.querySelectorAll(':scope > .v11-it')];
+  const ttl=it=>(it.querySelector('b')?.textContent||'');
+  // ① 紅色「X 前要轉入」：按鈕搬進「要處理」那一條，警示條拿掉
+  const pre=card.querySelector('.v16-pre');
+  if(pre){const neg=items(todo).find(it=>it.querySelector('.v11-ic')?.textContent.trim()==='🚨');
+    if(neg){const sub=neg.querySelector('.v11-sub')||neg.querySelector('div');const b=document.createElement('div');b.style.marginTop='5px';
+      b.innerHTML='<button class="v32-fix" onclick="event.stopPropagation();v13EditLB()">💵 我補好錢了</button>';(sub?sub.parentNode:neg).appendChild(b);pre.remove();}}
+  // ② 健康檢查跟要處理重複的（快照、基金漏扣）只留在要處理
+  if(health){const hi=items(health),ti=items(todo);
+    const hs=hi.find(it=>/週五沒有快照/.test(ttl(it))),ts=ti.find(it=>/快照/.test(ttl(it)));
+    if(hs&&ts){const n=(ttl(hs).match(/(\d+)\s*個/)||[])[1],go=hs.getAttribute('onclick');const sub=ts.querySelector('.v11-sub');
+      if(sub&&n)sub.insertAdjacentHTML('beforeend',`；總共 ${n} 個週五沒有快照`);
+      if(go&&/v31SnapIgnore/.test(go)){const d=document.createElement('div');d.style.marginTop='4px';d.innerHTML=`<span class="v32-lk" onclick="event.stopPropagation();${go.replace(/"/g,'&quot;')}">3 週前的不用補了 ›</span>`;(sub?sub.parentNode:ts).appendChild(d);}
+      hs.remove();}
+    const hf=items(health).find(it=>/基金/.test(ttl(it))&&/扣款/.test(ttl(it))),tf=ti.find(it=>/基金/.test(ttl(it))&&/漏扣/.test(ttl(it)));
+    if(hf&&tf)hf.remove();
+    const left=items(health).length,hb=health.querySelector(':scope > b');
+    if(hb)hb.innerHTML=left?`🩺 資料健康檢查 ${left}`:`🩺 資料健康檢查 <span class="v11-sub" style="font-weight:500">重複的已併進要處理</span>`;
+    if(!left)health.style.borderColor='#e2e8f0';}
+  // ③ 三欄：這兩週｜要處理｜提醒＋健康檢查
+  const g=document.createElement('div');g.className='v32-g';const st=document.createElement('div');st.className='v32-st';
+  if(note)st.appendChild(note);if(health)st.appendChild(health);
+  card.classList.add('v32-tw');g.append(card,todo,st);mid.replaceWith(g);two.remove();
+}
 </script>
 
 </div><!-- /main-content -->
