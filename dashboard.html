@@ -815,6 +815,21 @@ body:not(.privacy) .privacy-mask{filter:none;}
 </style>
 <style id="v31-css">
 /* v31 */
+.v31-kl{display:flex;justify-content:space-between;align-items:baseline;border-radius:10px;padding:6px 10px;margin:6px 0;font-size:12.5px;color:#475569}.v31-kl b{font-family:'JetBrains Mono',monospace;font-size:17px;font-weight:900}
+.v31-fo{margin:2px 0;padding:6px 10px!important}.v31-fl{padding:3px 0!important}.v31-sr{margin:4px 0!important}.v31-sb{height:18px!important}.v31-sh{margin:8px 0 2px!important}
+
+.v31w-r{display:grid;grid-template-columns:86px 1fr 120px;align-items:center;gap:12px;padding:7px 10px;border-radius:10px;margin-bottom:5px;border:1px solid #f1f5f9}.v31w-r.bad{background:#fef2f2;border:1.5px solid #fca5a5}
+.v31w-d{font-family:'JetBrains Mono',monospace;font-size:15px}.v31w-cs{display:flex;flex-wrap:wrap;gap:6px}.v31w-ev{border-radius:7px;padding:3px 8px;font-size:12.5px;font-weight:800;white-space:nowrap}.v31w-ev b{font-family:'JetBrains Mono',monospace;margin-left:4px}
+.v31w-b{font-family:'JetBrains Mono',monospace;font-size:15px}
+.v31-tot{padding-bottom:6px!important}.v31-bc{min-height:0!important;padding:8px 12px!important}.v31-bb{font-size:22px!important}
+.v31-sub{display:flex;gap:10px;flex-wrap:wrap;font-size:11.5px;color:#475569;margin-top:2px}.v31-sub span{cursor:pointer}.v31-sub .v31-add{color:#2563eb;font-weight:800}
+.v31-top .v16-light{width:118px;flex-shrink:0;padding:6px 8px!important}.v31-top .v16-light .v{font-size:17px!important}
+#v15-run>.v15-h{flex-wrap:wrap;row-gap:4px;align-items:center}.v31-sf{display:inline-flex;align-items:center;gap:4px}.v31-sf .v15-safe{width:70px;padding:2px 6px}
+.v31-pend{font-size:11.5px;color:#c2410c;background:#fff7ed;border:1px dashed #fdba74;border-radius:8px;padding:1px 7px;margin-left:auto;font-weight:600}.v31-pend+.v15-lk{margin-left:8px!important}
+#v15-run .v16-tr{padding:3px 2px;gap:6px;grid-template-columns:auto minmax(0,1fr) 78px}#v15-run .v16-d{min-width:86px}#v15-run .v16-ev{gap:6px}#v15-run .v16-ev>span{overflow:visible}#v15-run .v16-d{flex-direction:row;gap:5px;align-items:baseline}#v15-run .v16-d b{font-size:12px}#v15-run .v16-d span{font-size:10.5px;color:#94a3b8}
+#v15-run .v16-ev{font-size:12.5px}#v15-run .v16-af{font-size:12.5px}#v15-run .v16-tr.now b{font-size:12.5px!important}
+#v15-run .v16-pre{padding:6px 10px;margin:4px 0;font-size:12px}#v15-run .v16-pi{font-size:17px}#v15-run .v16-ps{font-size:11px}#v15-run .v16-pre button{padding:4px 8px;font-size:11.5px}
+
 .v31-sh{display:flex;align-items:baseline;margin:10px 0 2px;font-size:13.5px}
 .v31-sr{display:flex;align-items:center;gap:7px;margin:6px 0}.v31-sr.ck{cursor:pointer;border-radius:8px}.v31-sr.ck:hover{background:#f8fafc}
 .v31-sd{width:50px;flex-shrink:0;font-size:11.5px;font-weight:800;color:#334155}.v31-sd.now{color:#2563eb}
@@ -19754,8 +19769,8 @@ function v14Health(){
   // 3. 漏拍快照
   const S=new Set((db.snapshots||[]).map(s=>String(s.ym||'').slice(0,10)));const mis=[];
   let f=_addDays(T,-((_dowOf(T)+2)%7));if(f===T&&new Date().getHours()<15)f=_addDays(f,-7);
-  for(let d=f,i=0;d>='2026-04-17'&&i<26;d=_addDays(d,-7),i++)if(!S.has(d))mis.push(d);
-  if(mis.length)add('warn',`${mis.length} 個週五沒有快照`,mis.slice(0,4).map(_b6md).join('、')+(mis.length>4?'…':''),"dbShowPage('trend')",'資產趨勢');
+  for(let d=f,i=0;d>='2026-04-17'&&i<26;d=_addDays(d,-7),i++)if(!S.has(d)&&!(db.snapIgnore||[]).includes(d))mis.push(d);
+  if(mis.length)add('warn',`${mis.length} 個週五沒有快照`,mis.slice(0,4).map(_b6md).join('、')+(mis.length>4?'…':'')+(mis.some(d=>d<_addDays(T,-21))?'（3 週前的補不回來可以按「不用補了」）':''),mis.some(d=>d<_addDays(T,-21))?`v31SnapIgnore('${mis.join(',')}')`:"dbShowPage('trend')",mis.some(d=>d<_addDays(T,-21))?'不用補了':'資產趨勢');
   else add('ok','週五快照都有存','');
   // 4. 基金漏扣（近 4 週）
   const funds=(db.settings?.fundDeductions||[]).filter(f=>f.enabled!==false), logs=db.fundDeductionLogs||[];
@@ -21286,15 +21301,14 @@ function v31Flow(){
   const ln=(ic,t,v,c,sub,click)=>v?`<div class="v31-fl"${click?` onclick="${click}"`:''} title="${sub}"><div class="v31-fr"><span class="v31-fn">${ic} ${t}</span><span class="v15-sub">${pw(v)}%</span><span class="v15-mono v31-fv">${Math.round(v).toLocaleString()}</span></div><div class="v31-fb"><i style="width:${pw(v)}%;background:${c}"></i></div></div>`:'';
   const flexTxt=I.flex.filter(f=>f.monthly).map(f=>_ae(f.name||f.bank||'')).join('＋');
   return`<div class="v15-ct">🔀 每月錢怎麼流</div>
-    <div class="v15-k" style="background:#fef2f2;border-color:#fecaca"><div class="t">💰 每月股息進來</div><div class="v" style="color:#dc2626">${_b6m(inc)}</div><div class="s">近 3 個月平均</div></div>
-    <div class="v15-ar">▼</div>
+    <div class="v31-kl" style="background:#fef2f2" title="近 3 個月平均"><span>💰 每月股息進來</span><b style="color:#dc2626">${_b6m(inc)}</b></div>
     <div class="v31-fo"><div class="v31-fh"><b>每月固定出去</b><b class="v15-mono" style="color:#15803d;margin-left:auto">−${Math.round(out).toLocaleString()}</b></div>
       ${ln('🏦','信貸',I.loanM,'#a78bfa',`${loans.length} 筆信貸月繳`,"document.getElementById('v15-loans')?.scrollIntoView({behavior:'smooth',block:'center'})")}
       ${ln('💳','利息',I.flexM,'#fda4af',`不限用途利息：${flexTxt}`,"document.getElementById('v15-flex')?.scrollIntoView({behavior:'smooth',block:'center'})")}
       ${ln('📅','基金',fundM,'#86efac','定期定額：每週 '+_b6m(fundM*12/52)+' × 52 ÷ 12',"dbShowPage('fund')")}
-      <div class="v15-sub" style="margin-top:2px">條長＝占股息的比例</div></div>
-    <div class="v15-ar">▼</div>
-    <div class="v15-k" style="background:#eff6ff;border-color:#bfdbfe"><div class="t">💵 ${net>=0?'每月留下':'每月不足'}</div><div class="v" style="color:${net>=0?'#dc2626':'#16a34a'}">${net>=0?'+':'−'}${_b6m(net)}</div><div class="s">${net>=0?`一年約 +${_b6m(net*12)}・股息少 ${inc>0?Math.round((1-out/inc)*100):0}% 才會不夠`:'股息不夠付，要從現金補'}</div></div>
+</div>
+    <div class="v31-kl" style="background:#eff6ff"><span>💵 ${net>=0?'每月留下':'每月不足'}</span><b style="color:${net>=0?'#dc2626':'#16a34a'}">${net>=0?'+':'−'}${_b6m(net)}</b></div>
+    <div class="v15-sub" style="text-align:right;margin-top:-2px">${net>=0?`一年約 +${_b6m(net*12)}・股息少 ${inc>0?Math.round((1-out/inc)*100):0}% 才會不夠`:'股息不夠付，要從現金補'}</div>
     ${steps.length?v31Steps(net,steps):''}`;
 }
 // v31b：還清後每月多出 A1（名稱在條裡、金額在右；點一列看還款卡）
@@ -21329,6 +21343,92 @@ const V31AC=[['#fef3c7','#fff7ed','#fde68a','#92400e'],['#dcfce7','#f0fdf4','#bb
   const pend=I.nextAmt?`<div class="v31-pd"><span>⏳ ${_b6md(I.nextDate)} 待入帳${nc?`（${_ae(nc)} 股息）`:''}</span><b class="v15-mono" style="color:#dc2626;margin-left:auto">+${_b6m(I.nextAmt)}</b></div>`:'';
   return`<div class="v15-tot"><div class="v31-top">${card}${light}</div><div class="v31-mcs">${minis}</div>${pend}</div>`;
 }catch(e){console.warn('v31 cash',e);return _h.apply(this,arguments);}};})();
+
+
+// ══ v31c：家族帳戶、交易明細、賣出試算也遮住損益（跟「我的持股」同一個顯示開關）══
+const V31PL_RE=/^[+\-−]\$?[\d,]+(\.\d+)?\s*(\(?[+\-−]?[\d.]+%\)?)?$/;
+function _v31MarkPat(root){if(!root)return;root.querySelectorAll('div,span,strong,b').forEach(e=>{if(e.children.length>1)return;const t=e.textContent.replace(/\s+/g,'');if(V31PL_RE.test(t)&&!/^[+\-−]\$/.test(t))e.classList.add('v31-pl');});}
+function _v31LabelMark(root,labels){if(!root)return;root.querySelectorAll('div').forEach(d=>{const k=d.firstElementChild;if(k&&k.nextElementSibling&&labels.includes(k.textContent.trim()))k.nextElementSibling.classList.add('v31-pl');});}
+function _v31FamMark(){
+  const c=document.getElementById('family-content');if(!c||c.style.display==='none')return;
+  ['fm-pnl','fm-roi'].forEach(id=>document.getElementById(id)?.classList.add('v31-pl'));
+  document.querySelectorAll('#family-holdings-body > div').forEach(row=>{const top=row.firstElementChild;const r=top&&[...top.children].find(x=>x.style&&x.style.textAlign==='right');if(r)r.classList.add('v31-pl');
+    row.querySelectorAll('span').forEach(sp=>{const k=sp.firstElementChild;if(k&&/^均成本$/.test(k.textContent.trim()))sp.querySelector('b')?.classList.add('v31-pl');});});
+  // 歷史紀錄：買入的「未實現／已實現」、賣出的損益（淨收入保留）
+  document.querySelectorAll('#family-log-body > div > div[style*="margin-top:3px"]').forEach(line=>{[...line.children].forEach(sp=>{if(!/淨收入/.test(sp.textContent))sp.classList.add('v31-pl');});});
+  _v31MarkPat(document.getElementById('family-split-body'));
+  const ch=document.getElementById('family-trend-chart');if(ch)ch.classList.add('v31-pl');
+  // 家族標題列也放一顆顯示開關
+  const rb=document.getElementById('family-refresh-btn');
+  if(rb&&!document.getElementById('v31-plbtn-fam')){const b=document.createElement('button');b.id='v31-plbtn-fam';b.onclick=()=>v31PlToggle();b.style.marginLeft='8px';rb.parentElement.insertBefore(b,rb.nextSibling);}
+  _v31Paint();
+}
+function _v31ColMark(root){if(!root)return;root.querySelectorAll('table').forEach(t=>{const hr=[...t.rows].find(r=>r.querySelector('th'));if(!hr)return;const idx=[...hr.cells].map((c,i)=>/^(損益|報酬|報酬率|已實現|未實現)/.test(c.textContent.trim())?i:-1).filter(i=>i>=0);if(!idx.length)return;
+  [...t.rows].forEach(r=>{if(r===hr)return;idx.forEach(i=>{const c=r.cells[i];if(c&&c.textContent.trim())c.classList.add('v31-pl');});});});
+  root.querySelectorAll('div,span').forEach(e=>{if(e.children.length===0&&/^均(成本|價)\s*[\d.,]+/.test(e.textContent.trim()))e.classList.add('v31-pl');});}
+function _v31FamDetailMark(){const b=document.getElementById('family-detail-body');if(!b)return;_v31LabelMark(b,['均成本','損益','投報率','未實現','已實現','報酬率']);_v31MarkPat(b);_v31ColMark(b);_v31Paint();}
+(function(){const _d=_v31DetailMark;_v31DetailMark=function(){_d.apply(this,arguments);try{_v31ColMark(document.getElementById('inv-detail-modal-body'));_v31LabelMark(document.getElementById('inv-detail-modal-body'),['均成本','損益','未實現','已實現','報酬率']);}catch(e){}};})();
+// 顯示開關的文字同步到兩顆按鈕
+(function(){const _p=_v31Paint;_v31Paint=function(){_p.apply(this,arguments);const f=document.getElementById('v31-plbtn-fam'),m=document.getElementById('v31-plbtn');if(f){f.textContent=m?m.textContent:(_v31Show?'👁 損益顯示中・隱藏':'🙈 損益已隱藏・顯示');f.className='v31-plb'+(_v31Show?' on':'');}};})();
+(function(){const _r=renderFamilyPage;renderFamilyPage=function(){const r=_r.apply(this,arguments);try{_v31FamMark();}catch(e){console.warn('v31c fam',e);}return r;};})();
+(function(){const _o=openFamilyDetail;openFamilyDetail=function(){const r=_o.apply(this,arguments);try{_v31FamDetailMark();}catch(e){}return r;};})();
+(function(){const _s=selectFamilyMember;selectFamilyMember=function(){_v31Show=false;return _s.apply(this,arguments);};})();
+if(typeof backToFamilyCards==='function')(function(){const _b=backToFamilyCards;backToFamilyCards=function(){_v31Show=false;_v31Paint();return _b.apply(this,arguments);};})();
+// 賣出試算（第二層的完整賣出視窗）裡的「損益」
+(function(){const el=document.getElementById('sell-sum');if(!el||!window.MutationObserver)return;new MutationObserver(()=>{const s=el.querySelector('strong');if(s)s.classList.add('v31-pl');}).observe(el,{childList:true});})();
+// 家族區塊重畫（年份／月份篩選、股價更新）時也重新遮
+(function(){const t=document.getElementById('family-content');if(!t||!window.MutationObserver)return;let busy=false;new MutationObserver(()=>{if(busy)return;busy=true;requestAnimationFrame(()=>{try{_v31FamMark();}catch(e){}busy=false;});}).observe(t,{childList:true,subtree:true});})();
+(function(){const t=document.getElementById('family-detail-body');if(!t||!window.MutationObserver)return;let busy=false;new MutationObserver(()=>{if(busy)return;busy=true;requestAnimationFrame(()=>{try{_v31FamDetailMark();}catch(e){}busy=false;});}).observe(t,{childList:true,subtree:true});})();
+
+
+// v31c：漏拍快照的週五，確定補不回來就「不用補了」（只關掉提醒，不會建立假的快照）
+function v31SnapIgnore(list){const lim=_addDays(_twToday(),-21),all=String(list).split(',').filter(Boolean),L=all.filter(d=>d<lim);if(!L.length){alert('列出的都是最近 3 週內的週五，系統還會自動補拍，先不用處理。');return;}
+  if(!confirm(`這 ${L.length} 個週五（${L.map(_b6md).join('、')}）的快照不補了？\n只是不再提醒，資產趨勢圖那幾週會維持空白。`))return;
+  db.snapIgnore=[...new Set([...(db.snapIgnore||[]),...L])];save();try{toast('✅ 這幾個週五不再提醒');}catch(e){}try{renderTodayPage&&renderTodayPage();}catch(e){}try{dbShowPage(_v11Cur||'today');}catch(e){}}
+(function(){const _m=mergeAppendOnly;mergeAppendOnly=function(t,o){const r=_m.apply(this,arguments);try{if(t&&o&&o.snapIgnore){t.snapIgnore=[...new Set([...(o.snapIgnore||[]),...(t.snapIgnore||[])])];}}catch(e){}return r;};})();
+
+
+// ══ v31d（2026/11/08）：今天頁只留「這兩週」（T2 清單式）＋資產頁一個螢幕看完（A1）══
+// ── T2：這兩週・只列有事的日子 ──
+function v31TwoWeeks(){
+  const T=_twToday(),R=v13Runway(90),end=_addDays(T,13);if(!R.lb)return'<div class="v11-sub">還沒有 Line Bank 帳戶</div>';
+  const KC={loan:['#f5f3ff','#6d28d9','🏦'],fund:['#f0fdf4','#15803d','📅'],div:['#fef2f2','#dc2626','💰'],snap:['#eff6ff','#1d4ed8','📸']};
+  const snaps=new Set((db.snapshots||[]).map(s=>String(s.ym||'').slice(0,10)));
+  let N=null;try{N=_v16Need(_v16Rows(R));}catch(e){}
+  const ev2=R.evs.filter(e=>e.date<=end),out=ev2.filter(e=>e.amt<0).reduce((s,e)=>s+e.amt,0),inn=ev2.filter(e=>e.amt>0).reduce((s,e)=>s+e.amt,0);
+  let rows='';
+  for(let d=T;d<=end;d=_addDays(d,1)){const L=R.evs.filter(e=>e.date===d),fund=L.filter(e=>e.kind==='fund'),rest=L.filter(e=>e.kind!=='fund'),fri=_dowOf(d)===5;
+    if(!L.length&&!(fri&&!snaps.has(d)))continue;
+    const chips=rest.map(e=>{const c=KC[e.kind];return`<span class="v31w-ev" style="background:${c[0]};color:${c[1]};${e.est?'border:1px dashed '+c[1]+'66;background:#fff':''}">${c[2]} ${_ae(e.kind==='div'?e.label+(e.est?' 預估':''):String(e.label).replace(/^line\s*/i,''))} <b>${e.amt>0?'+':'−'}${Math.round(Math.abs(e.amt)).toLocaleString()}</b></span>`;});
+    if(fund.length){const s=fund.reduce((a,e)=>a+e.amt,0);chips.push(`<span class="v31w-ev" style="background:${KC.fund[0]};color:${KC.fund[1]}">📅 基金${fund.length>1?' '+fund.length+' 筆':''} <b>−${Math.round(-s).toLocaleString()}</b></span>`);}
+    if(fri)chips.push(`<span class="v31w-ev" style="background:${KC.snap[0]};color:${KC.snap[1]}">📸 週五快照${snaps.has(d)?' ✓':''}</span>`);
+    const mine=L.filter(e=>e.acc===R.lb.id&&e.after!=null),after=mine.length?mine[mine.length-1].after:null,bad=after!=null&&after<0,low=after!=null&&!bad&&R.safe>0&&after<R.safe,n=_dayDiff?_dayDiff(d,T):0;
+    rows+=`<div class="v31w-r${bad?' bad':''}"><div><b class="v31w-d">${_b6md(d)}</b> <span class="v11-sub">週${'日一二三四五六'[_dowOf(d)]}</span><div class="v11-sub">${d===T?'<b style="color:#1d4ed8">今天</b>':n+' 天後'}</div></div>
+      <div class="v31w-cs">${chips.join('')}</div>
+      <div style="text-align:right">${after!=null?`<div class="v11-sub">扣完剩</div><b class="v31w-b" style="color:${bad?'#dc2626':low?'#d97706':'#0f172a'}">${bad?'−'+_b6m(-after):_b6m(after)}${low?' ⚠️':''}</b>`:''}</div></div>`;}
+  const lbBal=_b6Bal(R.lb);
+  return`<div class="v13-mid" style="grid-template-columns:1fr"><div class="v13-card"><div class="v13-hd"><b>🗓 這兩週</b><span class="v11-sub">Line Bank 現在 <b style="color:#0f172a">${_b6m(lbBal)}</b>　・兩週扣款 <b style="color:#16a34a">−${Math.round(-out).toLocaleString()}</b>・入帳 <b style="color:#dc2626">+${Math.round(inn).toLocaleString()}</b></span><span class="v11-link" onclick="dbShowPage('assets');setTimeout(()=>_b6Scroll('b6-runway'),300)">看完整現金跑道 ›</span></div>
+    ${N?v16Pre(N,R.safe):''}${rows||'<div class="v11-sub" style="padding:10px 0">這兩週沒有扣款或入帳 👍</div>'}</div></div>`;
+}
+(function(){const _m=v13Mid;v13Mid=function(){try{return v31TwoWeeks();}catch(e){console.warn('v31 two weeks',e);return _m.apply(this,arguments);}};})();
+
+// ── A1：Line Bank 小卡（統一、期貨併進卡片），待入帳移到跑道標題旁 ──
+(function(){const _h=v16CashHead;v16CashHead=function(R){try{
+  const lbA=_b6Acc('Line Bank'),lb=_b6Bal(lbA),others=(db.cashAccounts||[]).filter(a=>a!==lbA),safe=R.safe;
+  const m=R.min?R.min.bal:lb,lv=m<0?['bad','🚨 不夠']:safe>0&&m<safe?['low','⚠️ 偏緊']:['ok','✓ 夠用'];
+  const sub=others.map(a=>`<span onclick="event.stopPropagation();editCash('${a.id}')" title="點一下編輯">${_ae(a.bank||a.name||'帳戶')}${_v31AccSub(a)!=='活存'?'・'+_v31AccSub(a):''} <b class="v15-mono">${_v15m(_b6Bal(a))}</b></span>`).join('')+`<span class="v31-add" onclick="event.stopPropagation();openCashModal()">＋帳戶</span>`;
+  return`<div class="v15-tot v31-tot"><div class="v31-top"><div class="v31-bc" ${lbA?`onclick="editCash('${lbA.id}')"`:''} title="點一下編輯 Line Bank"><div style="display:flex;align-items:center"><b class="v31-bn">Line Bank・活存</b><span class="v31-bs">主要 ★ ✏️</span></div>
+    <div class="v15-mono v31-bb">${_v15m(lb)}</div><div class="v31-sub">${sub}</div></div>
+    <div class="v16-light ${lv[0]}" onclick="document.getElementById('v15-run')?.scrollIntoView({behavior:'smooth',block:'start'})"><div class="t">撐到下次股息</div><div class="v">${lv[1]}</div><div class="s">${R.min?`最低 ${_b6md(R.min.date)} ${R.min.bal<0?'−':''}${_b6m(R.min.bal)}`:''}</div></div></div></div>`;
+}catch(e){console.warn('v31d head',e);return _h.apply(this,arguments);}};})();
+(function(){const _r=v15Run;v15Run=function(){const h=_r.apply(this,arguments);try{
+  const t=document.createElement('template');t.innerHTML=h;const hd=t.content.querySelector('#v15-run > .v15-h');if(!hd)return h;
+  // 安全水位搬到標題同一行
+  const sf=t.content.querySelector('#v15-run > .v15-sub');if(sf&&sf.querySelector('.v15-safe')){sf.style.margin='0 0 0 8px';sf.classList.add('v31-sf');hd.insertBefore(sf,hd.querySelector('.v15-lk'));}
+  // 待入帳放標題右邊
+  const I=_b6Income();if(I.nextAmt){const nc=[...new Set((db.dividends||[]).filter(d=>d.date===I.nextDate).map(d=>d.code||d.stockCode||'').filter(Boolean))].join('・');
+    const sp=document.createElement('span');sp.className='v31-pend';sp.title=nc?nc+' 股息':'';sp.innerHTML=`⏳ ${_b6md(I.nextDate)} 待入帳 <b class="v15-mono">+${_b6m(I.nextAmt)}</b>`;hd.insertBefore(sp,hd.querySelector('.v15-lk'));}
+  return t.innerHTML;}catch(e){console.warn('v31d run',e);return h;}};})();
 
 </script>
 
