@@ -1821,6 +1821,29 @@ function _vbView(g){const b=_vbBase(g),form=b?String(g.pattern).split(/[｜|]/)[
   finally{db.verb=sv;vQuizList=sl;}
 };})();
 
+
+// ══ v3：答完後每個選項都標出它的意思／日文，按「下一題」才換（不再自動跳走）══
+let _vbAnn={};
+(function(){const _r=renderVerbQuestion;renderVerbQuestion=function(){
+  _vbAnn={};
+  if(db.verb&&vQuizIdx<vQuizList.length){const cur=vQuizList[vQuizIdx],b=_vbBase(cur);
+    const cand=db.verb.filter(g=>g.id===cur.id||(b?_vbBase(g)===b:true));
+    db.verb.forEach(g=>{const v=_vbView(g),form=_vbBase(g)?String(g.pattern).split(/[｜|]/)[1].trim():(g.pattern||'');
+      _vbAnn[v.a]=vQuizMode==='zh2jp'?(g.zh||g.a)+(form?'　・'+form:''):g.jp+(form?'　・'+form:'');});}
+  return _r.apply(this,arguments);};})();
+(function(){const _c=checkVerbAnswer;checkVerbAnswer=function(id,correct,chosen,btn){
+  let next=null;const st=window.setTimeout;
+  window.setTimeout=function(fn,ms){next=fn;return 0;};
+  try{_c.apply(this,arguments);}finally{window.setTimeout=st;}
+  document.querySelectorAll('#v-opts button').forEach(b=>{const t=b.textContent.trim().slice(2).trim(),a=_vbAnn[t];
+    if(a&&!b.querySelector('.vb-ann')){const d=document.createElement('div');d.className='vb-ann';d.style.cssText='font-size:12.5px;font-weight:700;color:'+(t===correct?'#15803d':'#64748b')+';margin-top:4px;font-family:inherit';d.textContent=(t===correct?'✓ ':'＝ ')+a;b.appendChild(d);}
+    b.style.cursor='default';});
+  const area=document.getElementById('v-opts');
+  if(area&&next){const nb=document.createElement('button');nb.className='v-btn primary';nb.textContent='下一題 →（Enter）';nb.style.cssText+='margin-top:6px;align-self:flex-end';
+    const go=()=>{document.removeEventListener('keydown',kd);next();};const kd=e=>{if(e.key==='Enter'){e.preventDefault();go();}};
+    nb.onclick=go;area.appendChild(nb);document.addEventListener('keydown',kd);}
+};})();
+
 </script>
 </body>
 </html>
