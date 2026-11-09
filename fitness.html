@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-<!-- fitness build 2026-11-09j -->
+<!-- fitness build 2026-11-09n -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -304,8 +304,9 @@ function setLoad(e,s,date){return (e&&e.bw?bwAt(date)+wKg(s):wKg(s));}
 function e1rm(w,r){r=+r||0;w=+w||0;if(!w||!r)return 0;return r===1?w:w*(1+Math.min(r,15)/30);}
 function sessStats(s){let vol=0,sets=0;const byG={};(s.items||[]).forEach(it=>{const e=db.ex[it.ex];(it.sets||[]).forEach(st=>{if(!(+st.r))return;sets++;const v=setLoad(e,st,s.date)*(+st.r);vol+=v;const g=e?e.g:'?';(byG[g]=byG[g]||{sets:0,vol:0}).sets++;byG[g].vol+=v;});});
   const c=(s.cardio||[]).reduce((a,x)=>({min:a.min+(+x.min||0),km:a.km+(+x.km||0),kcal:a.kcal+(+x.kcal||0)}),{min:0,km:0,kcal:0});return{vol,sets,byG,...c};}
-function sessGroups(s){const g=new Set(s.groups||[]);(s.items||[]).forEach(it=>{const e=db.ex[it.ex];if(e&&(it.sets||[]).some(x=>+x.r))g.add(e.g);});return GROUPS.map(x=>x[0]).filter(k=>g.has(k));}
-function sessTitle(s){const g=sessGroups(s);const p=PRESETS.find(p=>p[1].length===g.length&&p[1].every(x=>g.includes(x)));let t=p?p[0]:g.map(k=>GN[k]).join('＋');if(!t&&(s.cardio||[]).length)t='有氧';else if((s.cardio||[]).length)t+='＋有氧';return t||'訓練';}
+// 只算真的有做組的部位（開始時多勾、或開了沒練的那場，都不算進月曆／統計）
+function sessGroups(s){const act=new Set();(s.items||[]).forEach(it=>{const e=db.ex[it.ex];if(e&&(it.sets||[]).some(x=>+x.r))act.add(e.g);});const g=act;return GROUPS.map(x=>x[0]).filter(k=>g.has(k));}
+function sessTitle(s){let g=sessGroups(s);if(!g.length&&!s.end)g=GROUPS.map(x=>x[0]).filter(k=>(s.groups||[]).includes(k));const p=PRESETS.find(p=>p[1].length===g.length&&p[1].every(x=>g.includes(x)));let t=p?p[0]:g.map(k=>GN[k]).join('＋');if(!t&&(s.cardio||[]).length)t='有氧';else if((s.cardio||[]).length)t+='＋有氧';return t||'訓練';}
 // 某動作上一次（在 beforeDate 之前、或同一天但不同場）的組
 function lastSets(exId,beforeDate,exceptId){const L=db.sessions.filter(s=>s.id!==exceptId&&s.date<=beforeDate&&(s.items||[]).some(it=>it.ex===exId&&(it.sets||[]).some(x=>+x.r))).sort((a,b)=>(a.date+(a.start||'')).localeCompare(b.date+(b.start||'')));
   if(!L.length)return null;const s=L[L.length-1];return{date:s.date,sets:s.items.find(it=>it.ex===exId).sets.filter(x=>+x.r)};}
