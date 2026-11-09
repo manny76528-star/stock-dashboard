@@ -843,6 +843,27 @@ body:not(.privacy) .privacy-mask{filter:none;}
 .w3-in{flex:1;border:1px solid #e2e8f0;border-radius:8px;padding:5px 9px;font-size:12.5px;font-family:inherit}
 .w3-btns{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
 @media(max-width:900px){.w3-r{grid-template-columns:6px 1fr 80px;}.w3-r>div:nth-child(4),.w3-r>div:nth-child(5){grid-column:2/-1}.w3-cards{grid-template-columns:1fr}}
+
+/* v35 家族帳戶・存摺 */
+#fam2{display:flex;flex-direction:column;gap:14px}
+.f2top{display:flex;align-items:flex-end;gap:30px;flex-wrap:wrap;background:linear-gradient(135deg,#1e3a8a,#2563eb);color:#fff;border-radius:20px;padding:20px 24px;box-shadow:0 10px 24px rgba(37,99,235,.25)}
+.f2top>div>b{font-family:'JetBrains Mono',monospace;font-size:19px}.f2top>div>span{font-size:12px;opacity:.85;margin-left:6px}.f2k{font-size:12.5px;opacity:.85;margin-bottom:2px}.f2top b.f2big{font-size:36px;letter-spacing:.5px}
+.f2btn{margin-left:auto;display:flex;gap:8px}.f2btn button{border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.12);color:#fff;font-weight:800;border-radius:12px;padding:10px 16px;cursor:pointer;font-family:inherit;font-size:14px}.f2btn button.w{background:#fff;color:#1d4ed8;border-color:#fff}
+.f2g{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:14px;align-items:start}.f2g>div:first-child{display:flex;flex-direction:column;gap:14px}
+.f2c{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:14px 18px}.f2h{font-weight:900;font-size:15px;margin-bottom:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}.f2mu{color:#64748b;font-size:12px;font-weight:500}.f2h .f2mu{margin-left:4px}
+.f2r{display:grid;grid-template-columns:minmax(150px,1.3fr) minmax(60px,1fr) 104px 104px 56px;gap:12px;align-items:center;padding:10px 6px;border-bottom:1px solid #f1f5f9;cursor:pointer;border-radius:10px}.f2r:hover{background:#f8fafc}.f2r.on{background:#eff6ff}.f2r:last-child{border-bottom:none}
+.f2n b{color:#1d4ed8;font-size:14px}.f2n span{color:#64748b;font-size:12px}.f2b{height:8px;background:#f1f5f9;border-radius:4px;overflow:hidden}.f2b i{display:block;height:100%;border-radius:4px}
+.f2v{text-align:right;font-family:'JetBrains Mono',monospace;font-size:13px}.f2v b{display:block;white-space:nowrap}.f2v span{font-size:11px;color:#64748b;font-family:inherit}
+.f2led{position:sticky;top:8px}.f2sel{margin-left:auto;border:1px solid #e2e8f0;border-radius:8px;padding:4px 8px;font-size:12px;font-family:inherit}.f2chip{background:#dbeafe;color:#1d4ed8;border-radius:99px;padding:1px 10px;font-size:12px;cursor:pointer}
+.f2list{max-height:620px;overflow-y:auto}.f2l{display:flex;gap:12px;align-items:flex-start;padding:9px 4px;border-bottom:1px solid #f1f5f9;font-size:13px}
+.f2d{width:46px;flex-shrink:0;text-align:center;font-family:'JetBrains Mono',monospace}.f2d b{display:block;font-size:13.5px}.f2d span{font-size:10.5px;color:#94a3b8}
+.f2t{border-radius:6px;padding:0 7px;font-size:11.5px;font-weight:800}.f2a{text-align:right;font-family:'JetBrains Mono',monospace;white-space:nowrap}.f2a b{display:block;font-size:14px}.f2a span{font-size:11px;color:#94a3b8}
+.f2act{display:flex;gap:6px;margin-bottom:8px}.f2act button{border:1px solid #e2e8f0;background:#fff;border-radius:9px;padding:5px 11px;font-weight:800;font-size:12.5px;cursor:pointer;font-family:inherit}
+.f2e{text-align:center;color:#94a3b8;padding:24px;font-size:13px}.f2sb{display:flex;height:12px;border-radius:7px;overflow:hidden;margin-bottom:8px}.f2sb i{display:block;height:100%}
+.f2kv{display:flex;align-items:center;gap:8px;font-size:13px;padding:3px 0}.f2kv b{margin-left:auto;font-family:'JetBrains Mono',monospace}.f2kv i{font-style:normal;color:#64748b;width:40px;text-align:right}
+#fam3bar{display:flex;align-items:center;gap:10px;background:#fffbeb;border:1px solid #fde68a;color:#92400e;border-radius:12px;padding:8px 14px;margin-bottom:12px;font-size:13px}#fam3bar button{margin-left:auto;border:none;background:#0f172a;color:#fff;border-radius:9px;padding:6px 12px;font-weight:800;cursor:pointer;font-family:inherit}
+body.fam2on #v20-px,body.fam2on #v31-plbtn-fam,body.fam3on #v31-plbtn-fam{display:none!important}
+@media(max-width:1000px){.f2g{grid-template-columns:1fr}.f2led{position:static}.f2r{grid-template-columns:1fr 90px 60px}.f2r .f2b,.f2r .f2v:nth-child(4){display:none}}
 /* v32 今天頁三欄 */
 .v33-3{grid-template-columns:repeat(3,minmax(0,1fr))!important}.v33-3>.v32-st>.v11-col:first-child{flex:0 0 auto;border-color:#fecaca}.v33-3>.v32-st>.v11-col:last-child{flex:1}
 .v33-pb{background:#f8fafc;border-radius:12px;padding:10px 12px;margin:6px 0 8px;display:flex;align-items:center;gap:10px}.v33-bal{font-family:'JetBrains Mono',monospace;font-size:22px;color:#0f172a}
@@ -21602,6 +21623,74 @@ function w3Detail(w,c,R){
     <div class="w3-c"><div class="w3-ct">③ 我的筆記${w.addedDate?` <span class="w3-mu" style="font-weight:600">${_ae(w.addedDate)} 加入</span>`:''}</div>${c3}</div></div>
    <div class="w3-btns">${R?`<button class="w3-b p" onclick="w3GoRs('${w.code}')">🔬 完整研究</button>`:''}<button class="w3-b" onclick="openWatchModal('${w.id}')">✏️ 編輯觀察</button><button class="w3-b" onclick="watchToHolding('${w.id}')">⭐ 轉成持股</button><button class="w3-b" style="margin-left:auto;color:#64748b" onclick="_wOpen=null;renderWatchPage()">收合 ▴</button></div></div>`;}
 try{if(document.getElementById('dbpage-watch')?.classList.contains('active'))renderWatchPage();}catch(e){}
+
+// ══ v35（2026/11/09）：家族帳戶三層——① 成員卡片 ② 存摺（不用密碼：只看投入，沒有市值／現價／漲跌／損益）③ 完整（輸入密碼才看，10 分鐘沒動自動鎖回）══
+let _fam3=0,_fam2Code='',_fam2Y='',_fam3T=null;
+const FAM3_MIN=10;
+function fam3On(){return _fam3&&Date.now()-_fam3<FAM3_MIN*60000;}
+function fam3Lock(silent){if(!_fam3)return;_fam3=0;clearTimeout(_fam3T);if(document.getElementById('dbpage-family')?.classList.contains('active')||document.getElementById('family-content'))try{renderFamilyPage();}catch(e){}if(!silent)toast('🔒 已鎖回存摺模式');}
+function fam3Touch(){if(!_fam3)return;_fam3=Date.now();clearTimeout(_fam3T);_fam3T=setTimeout(()=>fam3Lock(),FAM3_MIN*60000);}
+['click','keydown','scroll'].forEach(ev=>document.addEventListener(ev,()=>{if(_fam3)fam3Touch();},{passive:true,capture:true}));
+function fam2Go(member){_fam2Code='';_fam2Y='';_fam3=0;selectFamilyMember(member);}
+function fam3Ask(){const m=curFamilyMember();if(!m)return;window._fam3Want=1;openFamilyFaithModal(m);}
+(function(){const _c=confirmFaithEntry;confirmFaithEntry=function(){const want=window._fam3Want;window._fam3Want=0;const r=_c.apply(this,arguments);if(want&&!document.getElementById('familyFaithModal')?.classList.contains('open')){_fam3=Date.now();fam3Touch();renderFamilyPage();}return r;};})();
+(function(){const _b=backToFamilyCards;backToFamilyCards=function(){_fam3=0;document.getElementById('fam2')?.remove();document.body.classList.remove('fam2on');return _b.apply(this,arguments);};})();
+(function(){const _s=dbShowPage;dbShowPage=function(id){if(_fam3&&id!=='invest'&&id!=='family')fam3Lock(true);return _s.apply(this,arguments);};})();
+// ① 卡片：點卡片直接進存摺；比重改用投入成本
+(function(){const _r=renderFamilyMemberCards;renderFamilyMemberCards=function(){const r=_r.apply(this,arguments);const g=document.getElementById('family-member-cards');
+  if(g){g.querySelectorAll('[onclick*="openFamilyFaithModal("]').forEach(el=>{el.setAttribute('onclick',el.getAttribute('onclick').replace('openFamilyFaithModal(','fam2Go('));});
+    g.querySelectorAll('button,span').forEach(b=>{if(/🔒\s*明細/.test(b.textContent)&&!b.children.length)b.textContent='📒 存摺';});}return r;};})();
+// ② ③ 切換
+(function(){const _r=renderFamilyPage;renderFamilyPage=function(){const r=_r.apply(this,arguments);try{fam2Paint(1);}catch(e){console.warn('fam2',e);}return r;};})();
+function fam2Paint(fromRender){const member=curFamilyMember(),content=document.getElementById('family-content');let box=document.getElementById('fam2');
+  if(!member||!content||(fromRender&&content.style.display==='none')){box?.remove();document.body.classList.remove('fam2on','fam3on');return;}
+  if(fam3On()){box?.remove();document.body.classList.remove('fam2on');content.style.display='';
+    if(!document.getElementById('fam3bar'))content.insertAdjacentHTML('afterbegin',`<div id="fam3bar"><span>🔓 <b>完整模式</b>：市值、現價、漲跌、損益都顯示中・${FAM3_MIN} 分鐘沒動會自動鎖回</span><button onclick="fam3Lock()">🔒 鎖回存摺</button></div>`);
+    _v31Show=true;try{_v31Paint();}catch(e){}document.body.classList.add('fam3on');return;}
+  document.getElementById('fam3bar')?.remove();document.body.classList.remove('fam3on');_v31Show=false;try{_v31Paint();}catch(e){}
+  content.style.display='none';document.body.classList.add('fam2on');
+  if(!box){box=document.createElement('div');box.id='fam2';content.parentNode.insertBefore(box,content);}
+  box.innerHTML=fam2Html(member);fam2Chart(member);}
+function fam2Pre(fn,id,code){fn();setTimeout(()=>{const el=document.getElementById(id);if(el&&[...el.options].some(o=>o.value===code)){el.value=code;el.dispatchEvent(new Event('change'));}},60);}
+function _f2m(v){return'$'+Math.round(v||0).toLocaleString();}
+function fam2Html(member){const acc=getFamilyAccount(member),T=_twToday(),ym=T.slice(0,7);
+  const hs=acc.holdings.map(h=>({h,c:calcFamilyHolding(h)})).filter(x=>x.c.shares>0).sort((a,b)=>b.c.cost-a.c.cost);
+  const tot=hs.reduce((a,x)=>a+x.c.cost,0),logs=(acc.log||[]).slice().sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  const buys=logs.filter(l=>l.type==='buy'),mon=buys.filter(l=>(l.date||'').startsWith(ym)),div=logs.filter(l=>l.type==='div').reduce((a,l)=>a+(l.amount||0),0);
+  const COL=['#2563eb','#db2777','#0ea5e9','#f59e0b','#7c3aed','#16a34a','#64748b','#ea580c'];
+  const mxP=Math.max(1,...hs.map(x=>tot?x.c.cost/tot*100:0));const rows=hs.map((x,i)=>{const p=tot?x.c.cost/tot*100:0,lots=x.c.lotsDisplay||(x.c.shares.toLocaleString()+' 股'),on=_fam2Code===x.h.code;
+    return`<div class="f2r${on?' on':''}" onclick="_fam2Code=_fam2Code==='${x.h.code}'?'':'${x.h.code}';fam2Paint()"><div class="f2n"><b>${_ae(x.h.code)}</b> <span>${_ae(x.h.name||'')}</span></div><div class="f2b"><i style="width:${Math.max(2,p/mxP*100)}%;background:${COL[i%COL.length]}"></i></div>
+      <div class="f2v"><b>${_f2m(x.c.cost)}</b><span>投入成本</span></div><div class="f2v"><b>${lots}</b><span>均價 ${x.c.avgCost?(+x.c.avgCost.toFixed(2)):'—'}</span></div><div class="f2v"><b>${p.toFixed(0)}%</b><span>佔投入</span></div></div>`;}).join('')||'<div class="f2e">還沒有持股，按「💰 再存一筆」開始</div>';
+  // 存摺：照時間由舊到新算累計存入，再倒過來顯示
+  let run=0;const asc=logs.slice().reverse().map(l=>{if(l.type==='buy')run+=(l.amount||0);return{l,run};}).reverse();
+  const ys=[...new Set(logs.map(l=>(l.date||'').slice(0,4)).filter(Boolean))];
+  const L=asc.filter(({l})=>(!_fam2Code||l.code===_fam2Code)&&(!_fam2Y||(l.date||'').startsWith(_fam2Y)));
+  const TY={buy:['存入','#dbeafe','#1d4ed8'],sell:['取出','#dcfce7','#15803d'],div:['股息','#f3e8ff','#7e22ce']};
+  const led=L.map(({l,run})=>{const t=TY[l.type]||[l.type,'#f1f5f9','#475569'];
+    return`<div class="f2l"><div class="f2d"><b>${(l.date||'').slice(5).replace('-','/')}</b><span>${(l.date||'').slice(0,4)}</span></div>
+      <div style="min-width:0;flex:1"><div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap"><span class="f2t" style="background:${t[1]};color:${t[2]}">${t[0]}</span><b>${_ae(l.code||'')}</b>${l.shares?`<span class="f2mu">${(+l.shares).toLocaleString()} 股</span>`:''}${l.type==='buy'?famSrcPill(acc,l):''}</div>${l.remark?`<div class="f2mu" style="margin-top:2px">${_ae(l.remark)}</div>`:''}</div>
+      <div class="f2a"><b style="color:${l.type==='buy'?'#0f172a':'#15803d'}">${l.type==='buy'?'':'+'}${_f2m(l.amount)}</b>${l.type==='buy'?`<span>累計 ${_f2m(run)}</span>`:''}</div></div>`;}).join('')||'<div class="f2e">這個條件沒有紀錄</div>';
+  // 出資比例（琁＆軒這種共同帳戶）
+  let split='';const sp=acc.defaultSplits;if(sp&&sp.length>1){const tt={};sp.forEach(x=>tt[x.name]=0);acc.holdings.forEach(h=>(h.transactions||[]).filter(t=>t.type==='buy'&&t.splits).forEach(t=>t.splits.forEach(z=>{if(tt[z.name]!=null)tt[z.name]+=z.amt||0;})));const g=Object.values(tt).reduce((a,b)=>a+b,0);
+    split=`<div class="f2c"><div class="f2h">👫 出資比例</div><div class="f2sb">${sp.map((x,i)=>`<i style="width:${g?tt[x.name]/g*100:x.pct}%;background:${['#3b82f6','#ec4899','#f59e0b'][i%3]}"></i>`).join('')}</div>${sp.map(x=>`<div class="f2kv"><span>${_ae(x.name)}</span><b>${_f2m(tt[x.name])}</b><i>${g?Math.round(tt[x.name]/g*100):x.pct}%</i></div>`).join('')}</div>`;}
+  const fc=_fam2Code?hs.find(x=>x.h.code===_fam2Code):null;
+  return`<div class="f2top"><div><div class="f2k">總共幫${_ae(member)}存了</div><b class="f2big">${_f2m(tot)}</b></div>
+     <div><div class="f2k">本月存入</div><b>+${_f2m(mon.reduce((a,l)=>a+(l.amount||0),0))}</b><span>${mon.length} 筆</span></div>
+     <div><div class="f2k">累積股息</div><b>${_f2m(div)}</b></div><div><div class="f2k">買入</div><b>${buys.length} 筆</b></div><div><div class="f2k">持有</div><b>${hs.length} 檔</b></div>
+     <div class="f2btn"><button class="w" onclick="openFamilyQuickBuy('${member}')">💰 再存一筆</button><button onclick="fam3Ask()">🔒 完整</button></div></div>
+   <div class="f2g"><div><div class="f2c"><div class="f2h">💼 存在哪些標的<span class="f2mu">點一檔，右邊存摺只看那一檔</span></div>${rows}</div>${split}
+      <div class="f2c"><div class="f2h">📈 累積存入走勢<span class="f2mu">只算存進去的錢</span></div><div style="height:170px;position:relative"><canvas id="fam2ch"></canvas></div></div>
+      <div id="fam2src"></div></div>
+     <div class="f2c f2led"><div class="f2h">📒 存摺${fc?` <span class="f2chip" onclick="_fam2Code='';fam2Paint()">${_ae(fc.h.code)} ✕</span>`:''}<select onchange="_fam2Y=this.value;fam2Paint()" class="f2sel"><option value="">全部年份</option>${ys.map(y=>`<option value="${y}"${y===_fam2Y?' selected':''}>${y} 年</option>`).join('')}</select></div>
+      ${fc?`<div class="f2act"><button onclick="openFamilyBuyModal('${fc.h.id}')">💰 買入 ${_ae(fc.h.code)}</button><button onclick="fam2Pre(openFamilySellModal,'fs-code','${fc.h.code}')">💸 賣出</button><button onclick="fam2Pre(openFamilyDivModal,'fd-code','${fc.h.code}')">🎁 股息</button></div>`:''}
+      <div class="f2list">${led}</div></div></div>`;}
+function fam2Chart(member){const cv=document.getElementById('fam2ch');if(!cv||typeof Chart==='undefined')return;const acc=getFamilyAccount(member);
+  const B=(acc.log||[]).filter(l=>l.type==='buy'&&l.date).sort((a,b)=>a.date.localeCompare(b.date));if(!B.length)return;let run=0;const pts=[];B.forEach(l=>{run+=l.amount||0;const last=pts[pts.length-1];if(last&&last.x===l.date)last.y=run;else pts.push({x:l.date,y:run});});
+  if(window._fam2C)try{window._fam2C.destroy();}catch(e){}
+  window._fam2C=new Chart(cv,{type:'line',data:{labels:pts.map(p=>p.x.slice(2).replace(/-/g,'/')),datasets:[{data:pts.map(p=>p.y),borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,.12)',fill:true,tension:.25,pointRadius:0,borderWidth:2,stepped:true}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},styleA:false,tooltip:{callbacks:{label:c=>'累計存入 $'+Math.round(c.raw).toLocaleString()}}},scales:{x:{ticks:{maxTicksLimit:6,font:{size:10}},grid:{display:false}},y:{ticks:{callback:v=>v>=10000?Math.round(v/10000)+'萬':v,font:{size:10}}}}}});
+  // 錢從哪裡來：沿用原本的卡片（第二層金額直接顯示）
+  const src=document.getElementById('family-src-card'),to=document.getElementById('fam2src');if(src&&to&&src.innerHTML.trim()){to.innerHTML=`<div class="f2c">${src.innerHTML}</div>`;to.querySelectorAll('.v31-pl').forEach(x=>x.classList.remove('v31-pl'));}}
 </script>
 
 </div><!-- /main-content -->
