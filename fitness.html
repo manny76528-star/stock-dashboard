@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-<!-- fitness build 2026-11-09n -->
+<!-- fitness build 2026-11-09p -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -143,6 +143,9 @@ tr.sr{cursor:pointer}tr.sr:hover td{background:#f8fafc}td.num{text-align:right;f
 .o2t{display:flex;gap:8px;align-items:center;position:relative}.o2t.r{background:#fef2f2;border-color:#fca5a5}.o2t.w{background:#fff7ed;border-color:#fdba74}.o2t.go{background:#ecfeff;border-color:#a5f3fc}.o2t.rest{opacity:.78}
 .wab{display:flex;align-items:center;gap:8px;border:1px solid #e2e8f0;background:#f8fafc;border-radius:12px;padding:7px 12px;margin-top:8px;font-size:14px}.wab.due{background:#f0fdfa;border-color:#5eead4}.wab b{color:#0f766e}.wab button{margin-left:auto;border:none;background:#0891b2;color:#fff;font-weight:800;border-radius:9px;padding:5px 12px;cursor:pointer;font-family:inherit}.wab .wabu{background:#fff;color:#64748b;border:1px solid #e2e8f0}
 .o2t b{white-space:nowrap}
+.wbars #rpnag.inrow{flex:1;margin:0}
+.trg{display:grid;grid-template-columns:1.25fr 1fr;gap:16px;margin-top:16px}
+.ibk{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.ibk div{background:#f8fafc;border:1px solid #eef2f7;border-radius:12px;padding:7px 10px}.ibk span{display:block;font-size:11.5px;color:var(--mu)}.ibk b{font-family:var(--mono);font-size:18px}.ibk i{font-style:normal;font-size:11px;color:var(--mu);margin-left:3px}.ibk .gl{background:#ecfeff;border-color:#a5f3fc;cursor:pointer}.ibk .gl b{color:#0e7490}
 .whc{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,#1d4ed8,#2563eb 60%,#3b82f6);color:#fff;border-radius:16px;padding:12px 16px;margin:14px 0 4px;box-shadow:0 8px 20px rgba(37,99,235,.3);position:relative;overflow:hidden}
 .whc:after{content:'';position:absolute;right:-30px;top:-40px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.12);pointer-events:none}
 .whc .hk{font-size:12px;font-weight:800;opacity:.92;letter-spacing:1px;white-space:nowrap}.whc .ht{font-size:26px;font-weight:900;letter-spacing:1px;line-height:1.15;white-space:nowrap}.whc .hs{font-size:12.5px;opacity:.92}
@@ -528,6 +531,11 @@ function walkDay(D0){return db.sessions.filter(z=>z.date===D0).flatMap(z=>(z.car
 // 以前記成「跑步機」的，一次改成「爬坡機」
 function walkOldN(){return db.sessions.reduce((a,s)=>a+(s.cardio||[]).filter(c=>c.type==='跑步機').length,0);}
 function walkMigrate(){const n=walkOldN();if(!n)return;if(!confirm(`把以前 ${n} 筆「跑步機」都改成「爬坡機」？`))return;db.sessions.forEach(s=>{let ch=0;(s.cardio||[]).forEach(c=>{if(c.type==='跑步機'){c.type='爬坡機';ch=1;}});if(ch)touch(s);});db.cfg=touch({...(db.cfg||{}),walkMig:1});save();if(typeof render==='function')render();}
+// 下一個訓練日（週一～五）；標籤：今天／明天／週X
+function nextTrainDay(T){let d=addDays(T,1);for(let i=0;i<7&&!TRAIN_DOW.includes(dow(d));i++)d=addDays(d,1);return d;}
+function dayLab(d,T){return d===T?'今天':d===addDays(T,1)?'明天':'週'+WK[dow(d)];}
+// 首頁大卡要顯示哪一天的訓練項目：今天練完了→下一個訓練日；今天是週末→下週一；否則今天
+function heroPlan(T){T=T||today();const DN=todayDone(T);const d=DN||!TRAIN_DOW.includes(dow(T))?nextTrainDay(T):T;return{d,lab:dayLab(d,T),DN,SG:suggestPreset(d)};}
 
 </script>
 <script>
@@ -571,13 +579,14 @@ function vOv(){
      <div style="font-size:14px;line-height:1.95"><b style="font-size:17px">本週 ${A.cnt} 次</b> <span class=mu>（目標 ${goal}，點圓圈可改）</span><br>${A.sets} 組・${fmt(A.vol)} kg${A.min?`・🏃 ${A.min} 分`:''}<br>${dc>0?`<span class=up>比上週多 ${dc} 次 ▲</span>`:dc<0?`<span class=dn>比上週少 ${-dc} 次</span>`:'<span class=dn>跟上週一樣</span>'}${PRw.length?`　<span style="color:#0891b2;font-weight:800">🏆 新紀錄 ${PRw.length} 項</span>`:''}</div></div>
     ${heroCard(T)}
     <div class="o1h">各部位多久沒練 <span class=mu style="font-weight:500">只算週一～五；最該練的排前面（隔 5 天該練了、8 天隔太久）</span></div><div class="o1g">${tiles}</div>${(()=>{const A=absState(T);return`<div class="wab${A.due&&!A.done?' due':''}">🧘 <b>腹肌</b><span class=mu>${A.done?'✓ 今天練了・下次 '+md(A.next):A.due?(A.last?'上次 '+md(A.last)+'（'+A.n+' 天前）・今天該練了':'還沒有紀錄'):'休息中・再 '+A.left+' 天（上次 '+md(A.last)+'）'}・本月 ${absMonth(T.slice(0,7)).length} 次・<a class="abp" onclick="absPick()">補記其他天</a></span>${A.done?`<button onclick="absUndo();render()" class="wabu">取消</button>`:`<button onclick="if(confirm('今天確定練了腹肌嗎？'))absDone();render()">✓ 練完了</button>`}</div>`;})()}
-    <div class="o1h">最近三次</div>${recDays().map(([d,g,st,mn])=>`<div class="o1r" onclick="OPENROW='${d}';TAB='log';LOGG='all';REF='${d}';PER='w';render()"><span class=mono style="width:62px"><b>${md(d)}</b> <span class=mu>${WK[dow(d)]}</span></span><b>${g.length?g.map(k=>`<span style="color:${GC[k]}">${GN[k]}</span>`).join('<span style="color:#cbd5e1"> / </span>'):''}${mn?`${g.length?' <span style="color:#cbd5e1">＋</span> ':''}<span style="color:#ea580c">有氧</span>`:''}</b><span class=mu style="margin-left:auto">${st?st+' 組':''}${mn?`${st?'・':''}🏃 ${mn} 分`:''}</span></div>`).join('')||'<div class=mu>還沒有紀錄</div>'}
-    ${ib?`<div class="o1h">最新 InBody <span class=mu style="font-weight:500">${md(ib.date)}</span></div><div style="font-size:13px" class=mono>⚖️ ${ib.wt||'—'} kg・💪 ${ib.mm||'—'} kg・體脂 ${ib.fat||'—'}%・代謝 ${ib.bmr||'—'}</div>`:''}</div>
+    ${ib?(()=>{const g=+(db.cfg&&db.cfg.fatGoal)||13,f=+ib.fat,w=+ib.wt,need=f&&w?Math.max(0,w-w*(1-f/100)/(1-g/100)):null;
+      return`<div class="o1h">最新 InBody <span class=mu style="font-weight:500">${md(ib.date)}</span></div><div class="ibk"><div><span>體重</span><b>${ib.wt||'—'}</b><i>kg</i></div><div><span>體脂</span><b>${ib.fat!==''&&ib.fat!=null?ib.fat+'%':'—'}</b></div><div><span>肌肉</span><b>${ib.mm||'—'}</b><i>kg</i></div><div class="gl" onclick="setFatGoal()" title="點一下改目標"><span>離 ${g}% 還差</span><b>${need==null?'—':need<0.05?'✓ 到了':'−'+need.toFixed(1)}</b><i>${need&&need>=0.05?'kg 脂肪':''}</i></div></div>`;})():''}</div>
    <div class="card" style="margin:0">${calHtml()}</div></div>
-  <div class="card" style="margin-top:16px">${trendHead()}<div style="height:320px;position:relative"><canvas id="tr"></canvas></div></div>
-  <div class="card"><div class="ct">📒 最近的訓練<span class=mu>點一張展開每組明細</span><button class="lk" style="margin-left:auto" onclick="TAB='log';render()">看全部 ›</button></div>${dayCards(db.sessions.filter(s=>s.date>=addDays(T,-13)),'all',[addDays(T,-13),T])}</div>`;
+  <div class="trg"><div class="card" style="margin:0">${trendHead()}<div style="height:230px;position:relative"><canvas id="tr"></canvas></div></div>
+   <div class="card" style="margin:0"><div class="ct">⚖️ 體重／體脂<span class=mu>InBody 每次的紀錄</span><button class="lk" style="margin-left:auto" onclick="TAB='ib';render()">InBody ›</button></div>${db.inbody.length>1?'<div style="height:262px;position:relative"><canvas id="ibtr"></canvas></div>':'<div class="empty">量兩次以上 InBody 就會畫出趨勢</div>'}</div></div>
+  `;
   if(O1M==='car')document.querySelector('.ovg>.card').innerHTML=o1Car();
-  drawT3();
+  drawT3();drawIbTr();
 }
 let O1M=(()=>{try{return localStorage.getItem('ft_o1')||'fit';}catch(e){return'fit';}})();
 function o1Seg(){return`<div class="tabs sm" style="margin-left:auto"><span class="${O1M==='fit'?'on':''}" onclick="O1M='fit';try{localStorage.setItem('ft_o1','fit')}catch(e){};render()">🏋️ 健身</span><span class="${O1M==='car'?'on':''}" onclick="O1M='car';try{localStorage.setItem('ft_o1','car')}catch(e){};render()">🏃 有氧</span></div>`;}
@@ -890,12 +899,22 @@ function webHero(){const app=$('app');if(!app||app.querySelector('.wbars'))retur
   const bars=[];
   if(PN)bars.push(`<div class="wbar ph${PN.strong?' strong':''}" onclick="TAB='ph';render()"><span style="font-size:22px">📸</span><div><b>${PN.strong?'<i class="pls"></i>':''}${+PN.m.slice(5)} 月身形照還沒拍</b><div class="sm">${PN.strong?'已經第 '+PN.day+' 天了・':''}月初拍最準</div></div><button>上傳</button></div>`);
   if(AN&&AN.strong)bars.push(`<div class="wbar ab strong"><span style="font-size:22px">🧘</span><div><b><i class="pls"></i>腹肌超過 ${AN.over} 天沒練</b><div class="sm">上次 ${md(AN.A.last)}（${AN.A.n} 天前）</div></div><button onclick="if(confirm('今天確定練了腹肌嗎？'))absDone();render()">✓ 練完了</button></div>`);
-  if(bars.length){h+=`<div class="wbars">${bars.join('')}</div>`;app.insertAdjacentHTML('afterbegin',h);}}
+  const rn=document.getElementById('rpnag');
+  if(bars.length||rn){app.insertAdjacentHTML('afterbegin',`<div class="wbars">${bars.join('')}</div>`);const wb=app.querySelector('.wbars');if(rn){rn.classList.add('inrow');wb.appendChild(rn);}}}
 
-function heroCard(T){const SG=suggestPreset(T),DN=todayDone(T);
-  if(DN)return`<div class="whc dn"><div><div class="hk">✓ 今天練完了</div><div class="ht">${DN.name}</div><div class="hs" style="color:#64748b">${DN.sets} 組・明天建議：${(suggestPreset(addDays(T,1))||{}).name||'—'}</div></div></div>`;
-  if(!SG)return'';
-  return`<div class="whc"><div><div class="hk">💡 今天一定要練</div><div class="ht">${SG.name}</div></div><div class="hs">${SG.items.map(x=>x.name+(x.n==null?' 還沒練過':' 隔 '+x.n+' 天')).join('<br>')}</div><button onclick="emb('')">📱 用手機開始</button></div>`;}
+function heroCard(T){const H=heroPlan(T),SG=H.SG;if(!SG)return'';
+  const sub=(H.DN?`✓ 今天 ${H.DN.name} 練完了（${H.DN.sets} 組）<br>`:'')+SG.items.map(x=>x.name+(x.n==null?' 還沒練過':' 隔 '+x.n+' 天')).join(H.DN?'・':'<br>');
+  return`<div class="whc"><div><div class="hk">${H.lab==='今天'?'💪':'📅'} ${H.lab}訓練項目</div><div class="ht">${SG.name}</div></div><div class="hs">${sub}</div>${H.lab==='今天'?`<button onclick="emb('')">📱 用手機開始</button>`:''}</div>`;}
+// ══ V2 總覽：體重／體脂小圖、體脂目標、提醒併一排 ══
+function setFatGoal(){const g=+(db.cfg&&db.cfg.fatGoal)||13;const v=prompt('體脂目標（%）',g);if(v==null)return;const n=parseFloat(v);if(!(n>3&&n<40)){alert('請輸入 3～40 之間的數字');return;}db.cfg=touch({...(db.cfg||{}),fatGoal:n});save();render();}
+function drawIbTr(){const cv=document.getElementById('ibtr');if(!cv||typeof Chart==='undefined')return;const L=db.inbody.slice().sort((a,b)=>a.date.localeCompare(b.date));if(L.length<2)return;
+  const g=+(db.cfg&&db.cfg.fatGoal)||13,num=v=>v===''||v==null?null:+v;
+  CH.ib=new Chart(cv,{type:'line',data:{labels:L.map(x=>md(x.date)),datasets:[
+    {label:'體重 kg',data:L.map(x=>num(x.wt)),borderColor:'#2563eb',backgroundColor:'#2563eb',yAxisID:'y',tension:.3,pointRadius:3,spanGaps:true},
+    {label:'體脂 %',data:L.map(x=>num(x.fat)),borderColor:'#f59e0b',backgroundColor:'#f59e0b',yAxisID:'y2',tension:.3,pointRadius:3,spanGaps:true},
+    {label:`目標 ${g}%`,data:L.map(()=>g),borderColor:'#0891b2',borderDash:[5,4],borderWidth:1.5,pointRadius:0,yAxisID:'y2'}]},
+   options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:11}}}},
+    scales:{y:{position:'left',title:{display:true,text:'kg'},grace:'10%'},y2:{position:'right',title:{display:true,text:'%'},grid:{drawOnChartArea:false},suggestedMin:g-1,grace:'10%'}}}});}
 
 (async function(){render();if(await pull())render();setInterval(async()=>{if(document.visibilityState==='visible'&&$('emb').style.display!=='flex'){if(await pull())render();}},60000);})();
 </script>

@@ -196,7 +196,7 @@ body.embed .top a.hm,body.embed .top a.pc{display:none}
 </style>
 </head>
 <body>
-<div class="top"><b id="ttl">🏋️ 健身</b><span id="sync"></span><span style="font-size:10px;color:#cbd5e1">v1109n</span><span class="sp"></span><a class="pc" href="fitness.html?force=pc">📊 數據</a><a class="hm" href="index.html">🏠</a><button id="closeEmbed" style="display:none" onclick="parent.ftCloseEmbed&&parent.ftCloseEmbed()">✕ 關閉</button></div>
+<div class="top"><b id="ttl">🏋️ 健身</b><span id="sync"></span><span style="font-size:10px;color:#cbd5e1">v1109p</span><span class="sp"></span><a class="pc" href="fitness.html?force=pc">📊 數據</a><a class="hm" href="index.html">🏠</a><button id="closeEmbed" style="display:none" onclick="parent.ftCloseEmbed&&parent.ftCloseEmbed()">✕ 關閉</button></div>
 <div class="wrap" id="app"></div>
 <div class="bar" id="bar" style="display:none"><div class="in" id="barIn"></div></div>
 <div class="toast" id="toast"></div>
@@ -506,6 +506,11 @@ function walkDay(D0){return db.sessions.filter(z=>z.date===D0).flatMap(z=>(z.car
 // 以前記成「跑步機」的，一次改成「爬坡機」
 function walkOldN(){return db.sessions.reduce((a,s)=>a+(s.cardio||[]).filter(c=>c.type==='跑步機').length,0);}
 function walkMigrate(){const n=walkOldN();if(!n)return;if(!confirm(`把以前 ${n} 筆「跑步機」都改成「爬坡機」？`))return;db.sessions.forEach(s=>{let ch=0;(s.cardio||[]).forEach(c=>{if(c.type==='跑步機'){c.type='爬坡機';ch=1;}});if(ch)touch(s);});db.cfg=touch({...(db.cfg||{}),walkMig:1});save();if(typeof render==='function')render();}
+// 下一個訓練日（週一～五）；標籤：今天／明天／週X
+function nextTrainDay(T){let d=addDays(T,1);for(let i=0;i<7&&!TRAIN_DOW.includes(dow(d));i++)d=addDays(d,1);return d;}
+function dayLab(d,T){return d===T?'今天':d===addDays(T,1)?'明天':'週'+WK[dow(d)];}
+// 首頁大卡要顯示哪一天的訓練項目：今天練完了→下一個訓練日；今天是週末→下週一；否則今天
+function heroPlan(T){T=T||today();const DN=todayDone(T);const d=DN||!TRAIN_DOW.includes(dow(T))?nextTrainDay(T):T;return{d,lab:dayLab(d,T),DN,SG:suggestPreset(d)};}
 
 </script>
 <script>
@@ -719,9 +724,10 @@ function addEx(g){const v=prompt(GN[g]+'：新動作名稱');if(!v||!v.trim())re
 let RPSEG=(()=>{try{return localStorage.getItem('ft_rpseg')||'txt';}catch(e){return'txt';}})();
 const _rpmRender0=render;
 render=function(){if(V==='rp'){vRpM();return;}_rpmRender0();if(V==='home'){rpmHome();try{dueHome();}catch(e){console.warn(e);}}};
-function dueHome(){document.querySelectorAll('.dsgm').forEach(e=>e.remove());const T=SDATE||today(),SG=suggestPreset(T);if(!SG||!$('app'))return;const DN=todayDone(T);
-  const hero=DN?`<div class="dsgm hdone"><div style="flex:1;min-width:0"><b>✓ 今天練完了：${DN.name}</b><div class=mu>${DN.sets} 組・明天建議：${(suggestPreset(addDays(T,1))||{}).name||'—'}</div></div></div>`
-   :`<div class="dsgm hero"><div class="hk">💡 今天一定要練</div><div class="ht">${SG.name}</div><div class="hs">${SG.items.map(x=>x.name+(x.n==null?' 還沒練過':' 隔 '+x.n+' 天')).join('・')}</div><button onclick="PICK=new Set(${JSON.stringify(SG.groups).replace(/"/g,"'")});startSess()">🔥 開始練 ${SG.name}</button></div>`;
+function dueHome(){document.querySelectorAll('.dsgm').forEach(e=>e.remove());const T=SDATE||today(),H=heroPlan(T),SG=H.SG;if(!SG||!$('app'))return;
+  const its=SG.items.map(x=>x.name+(x.n==null?' 還沒練過':' 隔 '+x.n+' 天')).join('・');
+  const hero=H.lab==='今天'?`<div class="dsgm hero"><div class="hk">💪 今天訓練項目</div><div class="ht">${SG.name}</div><div class="hs">${its}</div><button onclick="PICK=new Set(${JSON.stringify(SG.groups).replace(/"/g,"'")});startSess()">🔥 開始練 ${SG.name}</button></div>`
+    :`<div class="dsgm hero"><div class="hk">📅 ${H.lab}訓練項目</div><div class="ht">${SG.name}</div><div class="hs">${H.DN?`✓ 今天 ${H.DN.name} 練完了（${H.DN.sets} 組）・`:''}${its}</div></div>`;
   $('app').insertAdjacentHTML('afterbegin',hero+dueRow());}
 // 手機首頁：六個小圓環（最該練的在左邊；點一下＝勾選那個部位）
 function dueRow(){const R=2*Math.PI*15.5;return`<div class="dgr">${dueList(SDATE||today()).map(x=>{const c=GC[x.g],col=x.cls==='r'?'#dc2626':x.cls==='w'?'#f59e0b':c,p=x.n==null?0:Math.min(1,x.n/DUE_W);

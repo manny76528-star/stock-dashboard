@@ -20303,7 +20303,7 @@ function v20Upd(){
   $('v20-rnew').style.display=isNew?'':'none';$('v20-rnewn').style.display=isNew?'':'none';
   const acc=member?getFamilyAccount(member):null,h=acc&&!isNew?acc.holdings.find(x=>x.code===code):null;
   const px=h?(db.prices?.[h.code]?.price||0):0;
-  let hold='';if(h){try{const c=calcFamilyHolding(h);hold=`目前持有 <span class="privacy-mask">${c.shares.toLocaleString()} 股${c.avgCost?'・成本 $'+(+c.avgCost.toFixed(2)):''}</span>`;}catch(e){}}
+  let hold='';if(h){try{const c=calcFamilyHolding(h);hold=`目前持有 <span class="privacy-mask">${c.shares.toLocaleString()} 股${c.avgCost?'・成本 <span class="v31-pl">$'+(+c.avgCost.toFixed(2))+'</span>':''}</span>`;}catch(e){}}
   $('v20-hold').innerHTML=isNew?'新增一個沒買過的標的':code?hold:'先選要買哪一檔';
   $('v20-px').innerHTML=px?`<div class="v20-mu">現價</div><b>${px}</b>`:'';
   const T=_twToday(),d=$('fqb-date').value;$('v20-hd').textContent=d===T?'今天':d===_addDays(T,-1)?'昨天':'';
@@ -21399,12 +21399,15 @@ function _v31MarkPat(root){if(!root)return;root.querySelectorAll('div,span,stron
 function _v31LabelMark(root,labels){if(!root)return;root.querySelectorAll('div').forEach(d=>{const k=d.firstElementChild;if(k&&k.nextElementSibling&&labels.includes(k.textContent.trim()))k.nextElementSibling.classList.add('v31-pl');});}
 function _v31FamMark(){
   const c=document.getElementById('family-content');if(!c||c.style.display==='none')return;
-  ['fm-pnl','fm-roi'].forEach(id=>document.getElementById(id)?.classList.add('v31-pl'));
+  // v34：「總投入成本」配「股票市值」一減就看得出損益，所以成本也要遮
+  ['fm-pnl','fm-roi','fm-cost'].forEach(id=>document.getElementById(id)?.classList.add('v31-pl'));
   document.querySelectorAll('#family-holdings-body > div').forEach(row=>{const top=row.firstElementChild;const r=top&&[...top.children].find(x=>x.style&&x.style.textAlign==='right');if(r)r.classList.add('v31-pl');
     row.querySelectorAll('span').forEach(sp=>{const k=sp.firstElementChild;if(k&&/^均成本$/.test(k.textContent.trim()))sp.querySelector('b')?.classList.add('v31-pl');});});
   // 歷史紀錄：買入的「未實現／已實現」、賣出的損益（淨收入保留）
   document.querySelectorAll('#family-log-body > div > div[style*="margin-top:3px"]').forEach(line=>{[...line.children].forEach(sp=>{if(!/淨收入/.test(sp.textContent))sp.classList.add('v31-pl');});});
   _v31MarkPat(document.getElementById('family-split-body'));
+  // v34：「錢從哪裡來」的累計投入、各來源金額（加起來就是成本）也遮；筆數、百分比保留
+  [...document.querySelectorAll('#family-content b')].filter(b=>/錢從哪裡來/.test(b.textContent)).forEach(b=>{const card=b.parentElement&&b.parentElement.parentElement;if(card)card.querySelectorAll('.privacy-mask').forEach(x=>x.classList.add('v31-pl'));});
   const ch=document.getElementById('family-trend-chart');if(ch)ch.classList.add('v31-pl');
   // 家族標題列也放一顆顯示開關
   const rb=document.getElementById('family-refresh-btn');
