@@ -189,10 +189,14 @@ body.embed .top a.hm,body.embed .top a.pc{display:none}
 .phn.strong{background:linear-gradient(135deg,#a21caf,#c026d3);color:#fff;border:none;box-shadow:0 8px 18px rgba(192,38,211,.3)}.phn.strong b{font-size:16px}.phn.strong .sm{font-size:12px;opacity:.92}.phn.strong button{background:#fff;color:#a21caf}
 .abc.strong{background:linear-gradient(135deg,#ea580c,#f97316);border:none;color:#fff;box-shadow:0 8px 18px rgba(234,88,12,.3)}.abc.strong b{color:#fff}.abc.strong .sm{font-size:12px;opacity:.92}.abc .abw{border:none;background:#fff;color:#c2410c;font-weight:900;font-size:14.5px;border-radius:12px;padding:11px 12px;white-space:nowrap}
 .abp{color:#0e7490;font-weight:800;text-decoration:underline}.abp.w{color:#fff}
+.cq{background:#fff7ed;border:1.5px solid #fdba74;border-radius:16px;padding:12px;margin-bottom:10px}.cq b{color:#9a3412}
+.wmins{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin:10px 0 6px}.wmins span{background:#fff;border:1.5px solid #fdba74;border-radius:12px;padding:9px 0;text-align:center;font-weight:900;font-size:17px;color:#c2410c;cursor:pointer}.wmins span small{display:block;font-size:9px;font-weight:700;color:#9a3412;opacity:.85;line-height:1.3;padding:0 2px}.wmins span.base{background:#ffedd5}.wmins .x{border-style:dashed;font-size:14px;color:#9a3412}
+.wdone{background:#fff;border-radius:10px;padding:8px 10px;margin-top:8px;font-size:13px;line-height:1.8}.wdone b{color:#0f172a}.wdl{color:#dc2626;font-size:12px;margin-left:4px}.wlk{color:#2563eb;font-weight:800}
+.fld input.auto{background:#fff7ed;border-color:#fdba74;color:#9a3412}
 </style>
 </head>
 <body>
-<div class="top"><b id="ttl">🏋️ 健身</b><span id="sync"></span><span style="font-size:10px;color:#cbd5e1">v1109i</span><span class="sp"></span><a class="pc" href="fitness.html?force=pc">📊 數據</a><a class="hm" href="index.html">🏠</a><button id="closeEmbed" style="display:none" onclick="parent.ftCloseEmbed&&parent.ftCloseEmbed()">✕ 關閉</button></div>
+<div class="top"><b id="ttl">🏋️ 健身</b><span id="sync"></span><span style="font-size:10px;color:#cbd5e1">v1109k</span><span class="sp"></span><a class="pc" href="fitness.html?force=pc">📊 數據</a><a class="hm" href="index.html">🏠</a><button id="closeEmbed" style="display:none" onclick="parent.ftCloseEmbed&&parent.ftCloseEmbed()">✕ 關閉</button></div>
 <div class="wrap" id="app"></div>
 <div class="bar" id="bar" style="display:none"><div class="in" id="barIn"></div></div>
 <div class="toast" id="toast"></div>
@@ -202,7 +206,7 @@ const FT_KEY='fitness_db_v1', FT_FILE='data_fitness.json', CF_WORKER='https://da
 const GROUPS=[['chest','胸','#ef4444'],['back','背','#3b82f6'],['legs','腿','#8b5cf6'],['shoulder','肩','#f59e0b'],['bi','二頭','#10b981'],['tri','三頭','#06b6d4']];
 const GN=Object.fromEntries(GROUPS.map(g=>[g[0],g[1]])), GC=Object.fromEntries(GROUPS.map(g=>[g[0],g[2]]));
 const PRESETS=[['胸＋三頭',['chest','tri']],['背＋二頭',['back','bi']],['腿',['legs']],['肩',['shoulder']],['二＋三頭',['bi','tri']]];
-const CARDIO=['跑步機','飛輪','爬梯','划船機','戶外跑','游泳'];
+const CARDIO=['爬坡機','跑步機','飛輪','爬梯','划船機','戶外跑','游泳'];
 const DEF_EX=[
  ['chest','槓鈴臥推'],['chest','上胸臥推'],['chest','雙槓下胸',1],['chest','機器夾胸'],
  ['back','滑輪下拉'],['back','雙繩擴背下拉'],['back','單臂划船',0,'水平划船'],['back','雙臂划船',0,'水平划船'],['back','V 型划船',0,'水平划船'],
@@ -485,6 +489,23 @@ function absPick(){const i=document.createElement('input');i.type='date';i.max=t
   i.onchange=()=>{const d=i.value;i.remove();if(!d||d>today())return;if(absDates().includes(d)){alert(md(d)+' 已經記過腹肌了');return;}if(confirm(md(d)+'（週'+WK[dow(d)]+'）有練腹肌，要補記嗎？')){absDone(d);if(typeof render==='function')render();}};
   i.onblur=()=>setTimeout(()=>i.remove(),400);try{i.showPicker?i.showPicker():i.click();}catch(e){i.click();}}
 
+// ── 有氧快速記（爬坡機）：照固定走速換算公里、大卡 ──
+const WALK_MINS=[15,20,25,26,30];
+function walkCfg(){const w=(db.cfg||{}).walk||{};return{type:w.type||'爬坡機',min:+w.min||26,km:+w.km||1.6,kcal:+w.kcal||200};}
+function walkCalc(m){const W=walkCfg();m=+m;if(!m)return{km:'',kcal:''};return{km:Math.round(m*W.km/W.min*100)/100,kcal:Math.round(m*W.kcal/W.min)};}
+function walkEdit(){const W=walkCfg();const v=prompt(`你的固定走速（格式：分鐘,公里,大卡）\n例如 26,1.6,200`,`${W.min},${W.km},${W.kcal}`);if(v==null)return;const a=v.split(/[,，\s]+/).map(Number);
+  if(a.length<3||a.some(x=>!(x>0))){alert('格式不對，要像 26,1.6,200');return;}db.cfg=touch({...(db.cfg||{}),walk:{type:W.type,min:a[0],km:a[1],kcal:a[2]}});save();if(typeof render==='function')render();}
+function walkAdd(m,D0){D0=D0||today();const W=walkCfg(),C=walkCalc(m),c={id:uid(),type:W.type,min:+m,km:C.km,kcal:C.kcal,auto:1};
+  let s=db.sessions.find(z=>z.date===D0&&!z.end);if(!s)s=db.sessions.find(z=>z.date===D0&&z.end==='有氧');
+  if(!s){s={id:uid(),date:D0,start:D0===today()?nowHM():'',end:'有氧',groups:[],items:[],cardio:[],note:''};db.sessions.push(s);}
+  c.at=D0===today()?nowHM():'';(s.cardio=s.cardio||[]).push(c);touch(s);save();return c;}
+function walkDel(id){const s=db.sessions.find(z=>(z.cardio||[]).some(c=>c.id===id));if(!s)return;s.cardio=s.cardio.filter(c=>c.id!==id);touch(s);
+  if(s.end==='有氧'&&!s.cardio.length&&!(s.items||[]).length)delRec('sessions',s.id);else save();}
+function walkDay(D0){return db.sessions.filter(z=>z.date===D0).flatMap(z=>(z.cardio||[]).filter(c=>+c.min||+c.km||+c.kcal).map(c=>({...c,start:z.start})));}
+// 以前記成「跑步機」的，一次改成「爬坡機」
+function walkOldN(){return db.sessions.reduce((a,s)=>a+(s.cardio||[]).filter(c=>c.type==='跑步機').length,0);}
+function walkMigrate(){const n=walkOldN();if(!n)return;if(!confirm(`把以前 ${n} 筆「跑步機」都改成「爬坡機」？`))return;db.sessions.forEach(s=>{let ch=0;(s.cardio||[]).forEach(c=>{if(c.type==='跑步機'){c.type='爬坡機';ch=1;}});if(ch)touch(s);});db.cfg=touch({...(db.cfg||{}),walkMig:1});save();if(typeof render==='function')render();}
+
 </script>
 <script>
 // ══ 手機：快速輸入 ══
@@ -515,14 +536,21 @@ function vHome(){
   <div class="chips">${GROUPS.map(g=>`<span class="chip g${PICK.has(g[0])?' on':''}" style="${PICK.has(g[0])?`background:${g[2]};border-color:${g[2]}`:''}" onclick="pickG('${g[0]}')">${PICK.has(g[0])?'✓ ':''}${g[1]}</span>`).join('')}</div>
   ${hints?`<div class="hint">${hints}</div>`:''}
   <div class="mu" style="margin:14px 0 6px">有氧（可以跟重訓一起，也可以只做有氧）</div>
-  ${(()=>{const lc=lastCardio();if(!lc)return'';const D0=SDATE||today(),n=db.sessions.filter(z=>z.date===D0).reduce((a,z)=>a+(z.cardio||[]).filter(c=>+c.min||+c.km||+c.kcal).length,0);
-    return`<div class="rc"><span style="font-size:22px">🔁</span><div style="flex:1;min-width:0"><b>同上次有氧</b><div class=mu>${esc(lc.type)} ${lc.min||'—'} 分・${lc.km||'—'} km・${lc.kcal||'—'} 大卡</div>${n?`<div class=mu style="color:#c2410c">${D0===today()?'今天':md(D0)}已記 ${n} 筆</div>`:''}</div><button onclick="repeatCardio()">＋ 記一筆</button></div>`;})()}
+  ${(()=>{const D0=SDATE||today(),W=walkCfg(),L=walkDay(D0),on=walkOldN();
+    return`<div class="cq"><div style="display:flex;align-items:center;gap:6px"><span style="font-size:20px">🏃</span><b>${esc(W.type)}快速記一筆</b><span class=mu style="margin-left:auto">點分鐘＝直接記</span></div>
+     <div class="wmins">${WALK_MINS.map(m=>{const C=walkCalc(m);return`<span class="${m===W.min?'base':''}" onclick="wQuick(${m})">${m}<small>${C.km}km・${C.kcal}卡</small></span>`;}).join('')}<span class="x" onclick="wOther()">其他<small>自己輸入</small></span></div>
+     <div class=mu>你的走速：<b class=mono>${W.min} 分＝${W.km} km、${W.kcal} 大卡</b>　<a class="wlk" onclick="walkEdit()">改</a></div>
+     ${L.length?`<div class="wdone"><b>${D0===today()?'今天':md(D0)}已記 ${L.length} 筆</b>${L.map(c=>`<div>${c.at||c.start||''} ${esc(c.type)} <b class=mono>${c.min||'—'} 分</b> <span class=mu>${c.km||'—'} km・${c.kcal||'—'} 卡</span> <a class="wdl" onclick="wDel('${c.id}')">刪</a></div>`).join('')}</div>`:''}
+     ${on&&!(db.cfg||{}).walkMig?`<div class=mu style="margin-top:6px">以前有 ${on} 筆記成「跑步機」　<a class="wlk" onclick="walkMigrate()">都改成爬坡機</a></div>`:''}</div>`;})()}
   <div class="chips">${CARDIO.map(c=>`<span class="chip${PICKC.has(c)?' on':''}" onclick="pickC('${c}')">${PICKC.has(c)?'✓ ':''}${c}</span>`).join('')}</div>
   <div class="h" style="margin-top:20px">其他</div>
   <div class="q"><div onclick="go('inbody')"><span>📊</span>InBody</div><div onclick="go('hist')"><span>📒</span>訓練紀錄</div><div onclick="go('mgr')"><span>⚙️</span>動作清單</div></div>
   ${rec.length?`<div class="h">最近</div>${rec.map(liSess).join('')}`:''}`;
   bar(`<button class="btn pri" style="${PICK.size||PICKC.size?'':'opacity:.55'}" onclick="startSess()">開始訓練 →</button>`);
 }
+function wQuick(m){const D0=SDATE||today();const c=walkAdd(m,D0);toast(`✅ 記好了：${c.type} ${c.min} 分・${c.km} km・${c.kcal} 大卡`);render();}
+function wOther(){const D0=SDATE||today();const v=prompt('爬坡機幾分鐘？（公里、大卡會自動算）','');if(v==null)return;const m=parseFloat(v);if(!(m>0)){alert('請輸入分鐘數');return;}wQuick(m);}
+function wDel(id){if(!confirm('刪掉這筆有氧？'))return;walkDel(id);render();}
 function lastCardio(){const L=db.sessions.slice().sort((a,b)=>(a.date+(a.start||'')).localeCompare(b.date+(b.start||'')));for(let i=L.length-1;i>=0;i--){const c=(L[i].cardio||[]).filter(c=>+c.min||+c.km||+c.kcal);if(c.length)return c[c.length-1];}return null;}
 function repeatCardio(){const lc=lastCardio();if(!lc)return;const D0=SDATE||today();const c={id:uid(),type:lc.type,min:lc.min,km:lc.km,kcal:lc.kcal};
   let s=db.sessions.find(z=>z.date===D0&&!z.end);if(!s)s=db.sessions.find(z=>z.date===D0&&z.end==='有氧');
@@ -625,12 +653,16 @@ function vCardio(){
   const pace=+c.km&&+c.min?(()=>{const p=c.min/c.km;return Math.floor(p)+"'"+String(Math.round((p%1)*60)).padStart(2,'0')+'"/km';})():'';
   $('app').innerHTML=`<div class="h">🏃 ${esc(c.type)}</div><div class="card"><div class="f3">
    <div class="fld"><label>時間（分）</label><input id="c-min" inputmode="decimal" value="${c.min}"></div>
-   <div class="fld"><label>公里</label><input id="c-km" inputmode="decimal" value="${c.km}"></div>
-   <div class="fld"><label>消耗大卡</label><input id="c-kcal" inputmode="numeric" value="${c.kcal}"></div></div>
+   <div class="fld"><label>公里${c.type===walkCfg().type?"（自動）":""}</label><input id="c-km" inputmode="decimal" value="${c.km}"></div>
+   <div class="fld"><label>消耗大卡${c.type===walkCfg().type?"（自動）":""}</label><input id="c-kcal" inputmode="numeric" value="${c.kcal}"></div></div>
    <div class="mu" style="margin-top:8px" id="pace">${pace?'配速 '+pace:'填時間跟公里，自動算配速'}</div></div>
    <div class="mu" style="margin:4px 0 6px">種類</div><div class="chips">${CARDIO.map(t=>`<span class="chip${t===c.type?' on':''}" onclick="cType('${t}')">${t}</span>`).join('')}</div>
    <div style="text-align:center;margin-top:16px"><button class="del" onclick="rmCardio()">🗑 刪除這筆有氧</button></div>`;
-  ['min','km','kcal'].forEach(k=>$('c-'+k).oninput=e=>{c[k]=e.target.value===''?'':+e.target.value;touch(s);save();});
+  const autoOn=()=>c.type===walkCfg().type;
+  const paint=()=>{['km','kcal'].forEach(k=>{const el=$('c-'+k);if(el)el.classList.toggle('auto',!!(c.auto&&autoOn()));});};
+  ['min','km','kcal'].forEach(k=>$('c-'+k).oninput=e=>{c[k]=e.target.value===''?'':+e.target.value;
+    if(k==='min'&&autoOn()&&(c.auto||(!c.km&&!c.kcal))){const C=walkCalc(c.min);c.km=C.km;c.kcal=C.kcal;c.auto=1;$('c-km').value=c.km;$('c-kcal').value=c.kcal;}
+    if(k!=='min')c.auto=0;paint();touch(s);save();});paint();
   setTimeout(()=>{if(!c.min)$('c-min').focus();},80);
   bar(`<button class="btn pri" onclick="OPEN=null;go('sess','${s.id}')">✓ 好了</button>`);
 }

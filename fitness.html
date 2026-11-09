@@ -228,7 +228,7 @@ const FT_KEY='fitness_db_v1', FT_FILE='data_fitness.json', CF_WORKER='https://da
 const GROUPS=[['chest','胸','#ef4444'],['back','背','#3b82f6'],['legs','腿','#8b5cf6'],['shoulder','肩','#f59e0b'],['bi','二頭','#10b981'],['tri','三頭','#06b6d4']];
 const GN=Object.fromEntries(GROUPS.map(g=>[g[0],g[1]])), GC=Object.fromEntries(GROUPS.map(g=>[g[0],g[2]]));
 const PRESETS=[['胸＋三頭',['chest','tri']],['背＋二頭',['back','bi']],['腿',['legs']],['肩',['shoulder']],['二＋三頭',['bi','tri']]];
-const CARDIO=['跑步機','飛輪','爬梯','划船機','戶外跑','游泳'];
+const CARDIO=['爬坡機','跑步機','飛輪','爬梯','划船機','戶外跑','游泳'];
 const DEF_EX=[
  ['chest','槓鈴臥推'],['chest','上胸臥推'],['chest','雙槓下胸',1],['chest','機器夾胸'],
  ['back','滑輪下拉'],['back','雙繩擴背下拉'],['back','單臂划船',0,'水平划船'],['back','雙臂划船',0,'水平划船'],['back','V 型划船',0,'水平划船'],
@@ -510,6 +510,23 @@ function absNagLv(T){const A=absState(T);if(A.done||!A.due)return null;const ove
 function absPick(){const i=document.createElement('input');i.type='date';i.max=today();i.value=today();i.style.cssText='position:fixed;left:50%;top:40%;opacity:0;width:1px;height:1px';document.body.appendChild(i);
   i.onchange=()=>{const d=i.value;i.remove();if(!d||d>today())return;if(absDates().includes(d)){alert(md(d)+' 已經記過腹肌了');return;}if(confirm(md(d)+'（週'+WK[dow(d)]+'）有練腹肌，要補記嗎？')){absDone(d);if(typeof render==='function')render();}};
   i.onblur=()=>setTimeout(()=>i.remove(),400);try{i.showPicker?i.showPicker():i.click();}catch(e){i.click();}}
+
+// ── 有氧快速記（爬坡機）：照固定走速換算公里、大卡 ──
+const WALK_MINS=[15,20,25,26,30];
+function walkCfg(){const w=(db.cfg||{}).walk||{};return{type:w.type||'爬坡機',min:+w.min||26,km:+w.km||1.6,kcal:+w.kcal||200};}
+function walkCalc(m){const W=walkCfg();m=+m;if(!m)return{km:'',kcal:''};return{km:Math.round(m*W.km/W.min*100)/100,kcal:Math.round(m*W.kcal/W.min)};}
+function walkEdit(){const W=walkCfg();const v=prompt(`你的固定走速（格式：分鐘,公里,大卡）\n例如 26,1.6,200`,`${W.min},${W.km},${W.kcal}`);if(v==null)return;const a=v.split(/[,，\s]+/).map(Number);
+  if(a.length<3||a.some(x=>!(x>0))){alert('格式不對，要像 26,1.6,200');return;}db.cfg=touch({...(db.cfg||{}),walk:{type:W.type,min:a[0],km:a[1],kcal:a[2]}});save();if(typeof render==='function')render();}
+function walkAdd(m,D0){D0=D0||today();const W=walkCfg(),C=walkCalc(m),c={id:uid(),type:W.type,min:+m,km:C.km,kcal:C.kcal,auto:1};
+  let s=db.sessions.find(z=>z.date===D0&&!z.end);if(!s)s=db.sessions.find(z=>z.date===D0&&z.end==='有氧');
+  if(!s){s={id:uid(),date:D0,start:D0===today()?nowHM():'',end:'有氧',groups:[],items:[],cardio:[],note:''};db.sessions.push(s);}
+  c.at=D0===today()?nowHM():'';(s.cardio=s.cardio||[]).push(c);touch(s);save();return c;}
+function walkDel(id){const s=db.sessions.find(z=>(z.cardio||[]).some(c=>c.id===id));if(!s)return;s.cardio=s.cardio.filter(c=>c.id!==id);touch(s);
+  if(s.end==='有氧'&&!s.cardio.length&&!(s.items||[]).length)delRec('sessions',s.id);else save();}
+function walkDay(D0){return db.sessions.filter(z=>z.date===D0).flatMap(z=>(z.cardio||[]).filter(c=>+c.min||+c.km||+c.kcal).map(c=>({...c,start:z.start})));}
+// 以前記成「跑步機」的，一次改成「爬坡機」
+function walkOldN(){return db.sessions.reduce((a,s)=>a+(s.cardio||[]).filter(c=>c.type==='跑步機').length,0);}
+function walkMigrate(){const n=walkOldN();if(!n)return;if(!confirm(`把以前 ${n} 筆「跑步機」都改成「爬坡機」？`))return;db.sessions.forEach(s=>{let ch=0;(s.cardio||[]).forEach(c=>{if(c.type==='跑步機'){c.type='爬坡機';ch=1;}});if(ch)touch(s);});db.cfg=touch({...(db.cfg||{}),walkMig:1});save();if(typeof render==='function')render();}
 
 </script>
 <script>
