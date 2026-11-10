@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-<!-- fitness build 2026-11-10d -->
+<!-- fitness build 2026-11-10e -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -509,7 +509,8 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementB
 // ── 強烈提醒（手機、電腦共用的判斷）──
 function todayDone(T){T=T||today();const L=db.sessions.filter(s=>s.date===T&&sessStats(s).sets);if(!L.length)return null;const g=[...new Set(L.flatMap(s=>sessGroups(s)))];return{groups:g,sets:L.reduce((a,s)=>a+sessStats(s).sets,0),name:g.map(k=>GN[k]).join('＋')};}
 function phNagLv(){const m=phNagMonth();if(!m)return null;const d=+today().slice(8);return{m,day:d,strong:d>=4};}
-function absNagLv(T){const A=absState(T);if(A.done||!A.due)return null;const over=A.n==null?0:A.n-ABS_GAP;return{A,over,strong:over>=1};}
+const ABS_WARN=5; // 腹肌 5 天（含）以上沒練＝強烈警告
+function absNagLv(T){const A=absState(T);if(A.done||!A.due)return null;const over=A.n==null?0:A.n-ABS_GAP;return{A,over,strong:A.n!=null&&A.n>=ABS_WARN};}
 // 補記腹肌：選日期（手機、電腦共用）
 function absPick(){const i=document.createElement('input');i.type='date';i.max=today();i.value=today();i.style.cssText='position:fixed;left:50%;top:40%;opacity:0;width:1px;height:1px';document.body.appendChild(i);
   i.onchange=()=>{const d=i.value;i.remove();if(!d||d>today())return;if(absDates().includes(d)){alert(md(d)+' 已經記過腹肌了');return;}if(confirm(md(d)+'（週'+WK[dow(d)]+'）有練腹肌，要補記嗎？')){absDone(d);if(typeof render==='function')render();}};
@@ -531,11 +532,11 @@ function walkDay(D0){return db.sessions.filter(z=>z.date===D0).flatMap(z=>(z.car
 // 以前記成「跑步機」的，一次改成「爬坡機」
 function walkOldN(){return db.sessions.reduce((a,s)=>a+(s.cardio||[]).filter(c=>c.type==='跑步機').length,0);}
 function walkMigrate(){const n=walkOldN();if(!n)return;if(!confirm(`把以前 ${n} 筆「跑步機」都改成「爬坡機」？`))return;db.sessions.forEach(s=>{let ch=0;(s.cardio||[]).forEach(c=>{if(c.type==='跑步機'){c.type='爬坡機';ch=1;}});if(ch)touch(s);});db.cfg=touch({...(db.cfg||{}),walkMig:1});save();if(typeof render==='function')render();}
-// 下一個訓練日（週一～五）；標籤：今天／明天／週X
-function nextTrainDay(T){let d=addDays(T,1);for(let i=0;i<7&&!TRAIN_DOW.includes(dow(d));i++)d=addDays(d,1);return d;}
+// 下一個訓練日＝明天（週末也可以練）；標籤：今天／明天／週X
+function nextTrainDay(T){return addDays(T,1);}
 function dayLab(d,T){return d===T?'今天':d===addDays(T,1)?'明天':'週'+WK[dow(d)];}
-// 首頁大卡要顯示哪一天的訓練項目：今天練完了→下一個訓練日；今天是週末→下週一；否則今天
-function heroPlan(T){T=T||today();const DN=todayDone(T);const d=DN||!TRAIN_DOW.includes(dow(T))?nextTrainDay(T):T;return{d,lab:dayLab(d,T),DN,SG:suggestPreset(d)};}
+// 首頁大卡要顯示哪一天的訓練項目：今天練完了→明天；否則今天（週末也一樣顯示今天建議）
+function heroPlan(T){T=T||today();const DN=todayDone(T);const d=DN?nextTrainDay(T):T;return{d,lab:dayLab(d,T),DN,SG:suggestPreset(d)};}
 
 </script>
 <script>
@@ -898,7 +899,7 @@ function webHero(){const app=$('app');if(!app||app.querySelector('.wbars'))retur
   let h='';
   const bars=[];
   if(PN)bars.push(`<div class="wbar ph${PN.strong?' strong':''}" onclick="TAB='ph';render()"><span style="font-size:22px">📸</span><div><b>${PN.strong?'<i class="pls"></i>':''}${+PN.m.slice(5)} 月身形照還沒拍</b><div class="sm">${PN.strong?'已經第 '+PN.day+' 天了・':''}月初拍最準</div></div><button>上傳</button></div>`);
-  if(AN&&AN.strong)bars.push(`<div class="wbar ab strong"><span style="font-size:22px">🧘</span><div><b><i class="pls"></i>腹肌超過 ${AN.over} 天沒練</b><div class="sm">上次 ${md(AN.A.last)}（${AN.A.n} 天前）</div></div><button onclick="if(confirm('今天確定練了腹肌嗎？'))absDone();render()">✓ 練完了</button></div>`);
+  if(AN&&AN.strong)bars.push(`<div class="wbar ab strong"><span style="font-size:22px">🧘</span><div><b><i class="pls"></i>⚠️ 腹肌已經 ${AN.A.n} 天沒練了</b><div class="sm">上次 ${md(AN.A.last)}（${AN.A.n} 天前）</div></div><button onclick="if(confirm('今天確定練了腹肌嗎？'))absDone();render()">✓ 練完了</button></div>`);
   const rn=document.getElementById('rpnag');
   if(bars.length||rn){app.insertAdjacentHTML('afterbegin',`<div class="wbars">${bars.join('')}</div>`);const wb=app.querySelector('.wbars');if(rn){rn.classList.add('inrow');wb.appendChild(rn);}}}
 

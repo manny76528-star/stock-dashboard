@@ -205,7 +205,7 @@ body.embed .top a.hm,body.embed .top a.pc{display:none}
 </style>
 </head>
 <body>
-<div class="top"><b id="ttl">🏋️ 健身</b><span id="sync"></span><span style="font-size:10px;color:#cbd5e1">v1110d</span><span class="sp"></span><a class="pc" href="fitness.html?force=pc">📊 數據</a><a class="hm" href="index.html">🏠</a><button id="closeEmbed" style="display:none" onclick="parent.ftCloseEmbed&&parent.ftCloseEmbed()">✕ 關閉</button></div>
+<div class="top"><b id="ttl">🏋️ 健身</b><span id="sync"></span><span style="font-size:10px;color:#cbd5e1">v1110e</span><span class="sp"></span><a class="pc" href="fitness.html?force=pc">📊 數據</a><a class="hm" href="index.html">🏠</a><button id="closeEmbed" style="display:none" onclick="parent.ftCloseEmbed&&parent.ftCloseEmbed()">✕ 關閉</button></div>
 <div class="wrap" id="app"></div>
 <div class="bar" id="bar" style="display:none"><div class="in" id="barIn"></div></div>
 <div class="toast" id="toast"></div>
@@ -493,7 +493,8 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementB
 // ── 強烈提醒（手機、電腦共用的判斷）──
 function todayDone(T){T=T||today();const L=db.sessions.filter(s=>s.date===T&&sessStats(s).sets);if(!L.length)return null;const g=[...new Set(L.flatMap(s=>sessGroups(s)))];return{groups:g,sets:L.reduce((a,s)=>a+sessStats(s).sets,0),name:g.map(k=>GN[k]).join('＋')};}
 function phNagLv(){const m=phNagMonth();if(!m)return null;const d=+today().slice(8);return{m,day:d,strong:d>=4};}
-function absNagLv(T){const A=absState(T);if(A.done||!A.due)return null;const over=A.n==null?0:A.n-ABS_GAP;return{A,over,strong:over>=1};}
+const ABS_WARN=5; // 腹肌 5 天（含）以上沒練＝強烈警告
+function absNagLv(T){const A=absState(T);if(A.done||!A.due)return null;const over=A.n==null?0:A.n-ABS_GAP;return{A,over,strong:A.n!=null&&A.n>=ABS_WARN};}
 // 補記腹肌：選日期（手機、電腦共用）
 function absPick(){const i=document.createElement('input');i.type='date';i.max=today();i.value=today();i.style.cssText='position:fixed;left:50%;top:40%;opacity:0;width:1px;height:1px';document.body.appendChild(i);
   i.onchange=()=>{const d=i.value;i.remove();if(!d||d>today())return;if(absDates().includes(d)){alert(md(d)+' 已經記過腹肌了');return;}if(confirm(md(d)+'（週'+WK[dow(d)]+'）有練腹肌，要補記嗎？')){absDone(d);if(typeof render==='function')render();}};
@@ -515,11 +516,11 @@ function walkDay(D0){return db.sessions.filter(z=>z.date===D0).flatMap(z=>(z.car
 // 以前記成「跑步機」的，一次改成「爬坡機」
 function walkOldN(){return db.sessions.reduce((a,s)=>a+(s.cardio||[]).filter(c=>c.type==='跑步機').length,0);}
 function walkMigrate(){const n=walkOldN();if(!n)return;if(!confirm(`把以前 ${n} 筆「跑步機」都改成「爬坡機」？`))return;db.sessions.forEach(s=>{let ch=0;(s.cardio||[]).forEach(c=>{if(c.type==='跑步機'){c.type='爬坡機';ch=1;}});if(ch)touch(s);});db.cfg=touch({...(db.cfg||{}),walkMig:1});save();if(typeof render==='function')render();}
-// 下一個訓練日（週一～五）；標籤：今天／明天／週X
-function nextTrainDay(T){let d=addDays(T,1);for(let i=0;i<7&&!TRAIN_DOW.includes(dow(d));i++)d=addDays(d,1);return d;}
+// 下一個訓練日＝明天（週末也可以練）；標籤：今天／明天／週X
+function nextTrainDay(T){return addDays(T,1);}
 function dayLab(d,T){return d===T?'今天':d===addDays(T,1)?'明天':'週'+WK[dow(d)];}
-// 首頁大卡要顯示哪一天的訓練項目：今天練完了→下一個訓練日；今天是週末→下週一；否則今天
-function heroPlan(T){T=T||today();const DN=todayDone(T);const d=DN||!TRAIN_DOW.includes(dow(T))?nextTrainDay(T):T;return{d,lab:dayLab(d,T),DN,SG:suggestPreset(d)};}
+// 首頁大卡要顯示哪一天的訓練項目：今天練完了→明天；否則今天（週末也一樣顯示今天建議）
+function heroPlan(T){T=T||today();const DN=todayDone(T);const d=DN?nextTrainDay(T):T;return{d,lab:dayLab(d,T),DN,SG:suggestPreset(d)};}
 
 </script>
 <script>
@@ -779,7 +780,7 @@ function habHome(){const app=$('app');if(!app)return;app.querySelectorAll('.abc,
   const card=A.done?`<div class="abc ok"><span style="font-size:22px">🧘</span><div style="flex:1"><b>腹肌 ✓ 今天練了</b><div class=mu>下次 ${md(A.next)}・${esc(absPlan())}・<a class="abp" onclick="absPick()">補記其他天</a></div></div><button class="abu" onclick="absUndo('${T}');render()">取消</button></div>`
     :`<div class="abc${A.due?'':' rest'}"><span style="font-size:26px">🧘</span><div style="flex:1;min-width:0"><b>${A.due?'腹肌：今天該練了':'腹肌：休息中・再 '+A.left+' 天'}</b><div class=mu>${A.last?`上次 ${md(A.last)}（${A.n} 天前）`:'還沒有紀錄'}・${esc(absPlan())}・<a class="abp" onclick="absPick()">補記</a></div><div class="abd">${dots}</div></div><button class="abb" onclick="if(!confirm('今天確定練了腹肌嗎？'))return;absDone('${T}');toast('🧘 腹肌記好了，下次 '+md(addDays('${T}',ABS_GAP)));render()">✓ 練完了</button></div>`;
   const AN=absNagLv(T),hero=app.querySelector('.dsgm');
-  if(AN&&AN.strong){const c=`<div class="abc strong"><span style="font-size:26px">🧘</span><div style="flex:1;min-width:0"><b><i class="pls"></i>腹肌超過 ${AN.over} 天沒練</b><div class="sm">上次 ${md(AN.A.last)}（${AN.A.n} 天前）・<a class="abp w" onclick="absPick()">補記其他天</a></div></div><button class="abw" onclick="if(!confirm('今天確定練了腹肌嗎？'))return;absDone('${T}');toast('🧘 腹肌記好了');render()">✓ 練完了</button></div>`;if(hero)hero.insertAdjacentHTML('afterend',c);else app.insertAdjacentHTML('afterbegin',c);}
+  if(AN&&AN.strong){const c=`<div class="abc strong"><span style="font-size:26px">🧘</span><div style="flex:1;min-width:0"><b><i class="pls"></i>⚠️ 腹肌已經 ${AN.A.n} 天沒練了</b><div class="sm">上次 ${md(AN.A.last)}（${AN.A.n} 天前）・<a class="abp w" onclick="absPick()">補記其他天</a></div></div><button class="abw" onclick="if(!confirm('今天確定練了腹肌嗎？'))return;absDone('${T}');toast('🧘 腹肌記好了');render()">✓ 練完了</button></div>`;if(hero)hero.insertAdjacentHTML('afterend',c);else app.insertAdjacentHTML('afterbegin',c);}
   else{const ao=[...app.querySelectorAll(':scope>.mu')].find(e=>e.textContent.startsWith('有氧')),hint=app.querySelector('.dgr')?.nextElementSibling;if(ao){ao.insertAdjacentHTML('beforebegin',card);const rp=app.querySelector('.rpnag');if(rp)ao.before(rp);}else if(hint)hint.insertAdjacentHTML('afterend',card);else app.insertAdjacentHTML('afterbegin',card);}
   const PN=phNagLv();if(PN)app.insertAdjacentHTML('afterbegin',PN.strong?`<div class="phn strong" onclick="go('photo')"><span style="font-size:24px">📸</span><div><b><i class="pls"></i>${+PN.m.slice(5)} 月身形照還沒拍</b><div class="sm">已經第 ${PN.day} 天了・月初拍最準</div></div><span style="margin-left:auto"><button>拍／上傳</button></span></div>`:`<div class="phn" onclick="go('photo')">📸 <b>${+PN.m.slice(5)} 月的身形照還沒拍</b><span style="margin-left:auto"><button>拍／上傳</button></span></div>`);
   const q=app.querySelector('.q');if(q&&!q.querySelector('.phq'))q.insertAdjacentHTML('beforeend',`<div class="phq" onclick="go('photo')"><span>📸</span>身形照</div>`);}
