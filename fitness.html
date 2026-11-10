@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-<!-- fitness build 2026-11-09p -->
+<!-- fitness build 2026-11-10a -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -359,14 +359,14 @@ function agg(a,b){const L=db.sessions.filter(s=>s.date>=a&&s.date<=b);const o={c
   L.forEach(s=>{const S=sessStats(s);if(S.sets)o.cnt++;o.vol+=S.vol;o.sets+=S.sets;o.min+=S.min;o.km+=S.km;o.kcal+=S.kcal;if(S.sets||S.min)o.days.add(s.date);Object.entries(S.byG).forEach(([g,v])=>{(o.byG[g]=o.byG[g]||{sets:0,vol:0}).sets+=v.sets;o.byG[g].vol+=v.vol;});});
   const I=db.inbody.filter(x=>x.date>=a&&x.date<=b).sort((p,q)=>p.date.localeCompare(q.date));const li=I[I.length-1];['wt','mm','fat','bmr'].forEach(k=>{const z=I.filter(x=>x[k]!==''&&x[k]!=null);o[k]=z.length?+z[z.length-1][k]:null;});o.ib=li;o.list=L;return o;}
 
-// ── 該練哪裡（週一～五是訓練日，六日強迫休息不算天數；一週為一個週期，從那週第一次起算，二練不歸零）──
+// ── 該練哪裡（週一～五是訓練日，六日強迫休息不算天數；每次練到都歸零重算——加練也算正常訓練）──
 const TRAIN_DOW=[1,2,3,4,5],DUE_REC={chest:2,back:2,legs:3,shoulder:2,bi:2,tri:2},DUE_W=5,DUE_R=8;
 const wkStart=d=>addDays(d,-((dow(d)+6)%7));
 function trainDays(a,b){let n=0;for(let d=addDays(a,1);d<=b;d=addDays(d,1))if(TRAIN_DOW.includes(dow(d)))n++;return n;}
 function groupDue(g,T){T=T||today();const D=[...new Set(db.sessions.filter(s=>s.date<=T&&sessGroups(s).includes(g)).map(s=>s.date))].sort();
   const name=(GROUPS.find(x=>x[0]===g)||[])[1],rec=DUE_REC[g]||2;
   if(!D.length)return{g,name,n:null,rank:4,cls:'r',dates:[],anchor:null,last:null,wk:0,rec};
-  const last=D[D.length-1],ws=wkStart(last),anchor=D.find(d=>d>=ws),n=trainDays(anchor,T),wk=D.filter(d=>d>=wkStart(T)).length;
+  const last=D[D.length-1],anchor=last,n=trainDays(anchor,T),wk=D.filter(d=>d>=wkStart(T)).length;
   const rank=n>=DUE_R?3:n>=DUE_W?2:n>=rec?1:0;
   return{g,name,n,rank,cls:['rest','go','w','r'][rank],dates:D,anchor,last,wk,rec};}
 function dueList(T){return GROUPS.map(x=>groupDue(x[0],T)).sort((a,b)=>b.rank-a.rank||(b.n??99)-(a.n??99)||GROUPS.findIndex(x=>x[0]===a.g)-GROUPS.findIndex(x=>x[0]===b.g));}
