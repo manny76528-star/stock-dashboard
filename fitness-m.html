@@ -176,6 +176,9 @@ body.embed .top a.hm,body.embed .top a.pc{display:none}
 .wst .col{width:80%;display:flex;flex-direction:column-reverse;gap:2px}
 .wst .col u{display:grid;place-items:center;text-decoration:none;background:#fdba74;color:#7c2d12;font-size:11.5px;font-weight:900;border-radius:5px;font-family:ui-monospace,monospace}
 .wst .col.t u{background:#f97316;color:#fff}.wst .em{width:80%;height:4px;border-radius:3px;background:#f1f5f9}.wst .dl{margin-top:4px}.wst .dl.t{color:#ea580c}
+.dgi{position:relative}.dgi .pk{position:absolute;top:-6px;right:-4px;background:#2563eb;color:#fff;font-style:normal;font-size:10px;font-weight:900;border-radius:50%;width:17px;height:17px;display:grid;place-items:center}
+.dgi .ag{font-size:10.5px;font-weight:800;color:#475569}.dgi.go .ag{color:#0e7490}.dgi.w .ag{color:#c2410c}.dgi.r .ag{color:#b91c1c}
+.dcap{display:flex;align-items:center;gap:6px;font-size:11.5px;color:#64748b;margin:2px 0 12px}.dcap label{margin-left:auto;border:1px solid #e2e8f0;border-radius:8px;padding:3px 8px;color:#334155;font-weight:800;background:#fff;position:relative;white-space:nowrap}.dcap input{position:absolute;inset:0;opacity:0;width:100%}
 .abd{display:flex;gap:3px;margin-top:5px}.abd i{width:17px;height:17px;border-radius:4px;background:#e2e8f0;display:grid;place-items:center;font-size:9px;font-style:normal;color:#64748b;font-weight:800}.abd i.d{background:#14b8a6;color:#fff}.abd i.t{outline:2px solid #0891b2;outline-offset:1px}
 .abb{border:none;background:#0891b2;color:#fff;font-weight:900;font-size:14.5px;border-radius:12px;padding:11px 12px;white-space:nowrap}.abu{border:1px solid var(--line);background:#fff;color:#64748b;font-weight:800;font-size:12.5px;border-radius:10px;padding:6px 10px}
 .phn{display:flex;align-items:center;gap:8px;background:#fdf4ff;border:1px solid #f0abfc;color:#86198f;border-radius:14px;padding:10px 12px;margin-bottom:10px;font-size:14px;cursor:pointer}.phn button{border:none;background:#c026d3;color:#fff;font-weight:900;border-radius:10px;padding:7px 11px;font-size:13px}
@@ -202,7 +205,7 @@ body.embed .top a.hm,body.embed .top a.pc{display:none}
 </style>
 </head>
 <body>
-<div class="top"><b id="ttl">🏋️ 健身</b><span id="sync"></span><span style="font-size:10px;color:#cbd5e1">v1110c</span><span class="sp"></span><a class="pc" href="fitness.html?force=pc">📊 數據</a><a class="hm" href="index.html">🏠</a><button id="closeEmbed" style="display:none" onclick="parent.ftCloseEmbed&&parent.ftCloseEmbed()">✕ 關閉</button></div>
+<div class="top"><b id="ttl">🏋️ 健身</b><span id="sync"></span><span style="font-size:10px;color:#cbd5e1">v1110d</span><span class="sp"></span><a class="pc" href="fitness.html?force=pc">📊 數據</a><a class="hm" href="index.html">🏠</a><button id="closeEmbed" style="display:none" onclick="parent.ftCloseEmbed&&parent.ftCloseEmbed()">✕ 關閉</button></div>
 <div class="wrap" id="app"></div>
 <div class="bar" id="bar" style="display:none"><div class="in" id="barIn"></div></div>
 <div class="toast" id="toast"></div>
@@ -340,14 +343,14 @@ function agg(a,b){const L=db.sessions.filter(s=>s.date>=a&&s.date<=b);const o={c
   L.forEach(s=>{const S=sessStats(s);if(S.sets)o.cnt++;o.vol+=S.vol;o.sets+=S.sets;o.min+=S.min;o.km+=S.km;o.kcal+=S.kcal;if(S.sets||S.min)o.days.add(s.date);Object.entries(S.byG).forEach(([g,v])=>{(o.byG[g]=o.byG[g]||{sets:0,vol:0}).sets+=v.sets;o.byG[g].vol+=v.vol;});});
   const I=db.inbody.filter(x=>x.date>=a&&x.date<=b).sort((p,q)=>p.date.localeCompare(q.date));const li=I[I.length-1];['wt','mm','fat','bmr'].forEach(k=>{const z=I.filter(x=>x[k]!==''&&x[k]!=null);o[k]=z.length?+z[z.length-1][k]:null;});o.ib=li;o.list=L;return o;}
 
-// ── 該練哪裡（週一～五是訓練日，六日強迫休息不算天數；每次練到都歸零重算——加練也算正常訓練）──
-const TRAIN_DOW=[1,2,3,4,5],DUE_REC={chest:2,back:2,legs:3,shoulder:2,bi:2,tri:2},DUE_W=5,DUE_R=8;
+// ── 該練哪裡（隔幾天＝實際日曆天數，週末也算恢復日；每次練到都歸零重算——加練、週末練也算）──
+const TRAIN_DOW=[1,2,3,4,5],DUE_REC={chest:2,back:2,legs:3,shoulder:2,bi:2,tri:2},DUE_W=7,DUE_R=10;
 const wkStart=d=>addDays(d,-((dow(d)+6)%7));
 function trainDays(a,b){let n=0;for(let d=addDays(a,1);d<=b;d=addDays(d,1))if(TRAIN_DOW.includes(dow(d)))n++;return n;}
 function groupDue(g,T){T=T||today();const D=[...new Set(db.sessions.filter(s=>s.date<=T&&sessGroups(s).includes(g)).map(s=>s.date))].sort();
   const name=(GROUPS.find(x=>x[0]===g)||[])[1],rec=DUE_REC[g]||2;
   if(!D.length)return{g,name,n:null,rank:4,cls:'r',dates:[],anchor:null,last:null,wk:0,rec};
-  const last=D[D.length-1],anchor=last,n=trainDays(anchor,T),wk=D.filter(d=>d>=wkStart(T)).length;
+  const last=D[D.length-1],anchor=last,n=dayDiff(T,anchor),wk=D.filter(d=>d>=wkStart(T)).length;
   const rank=n>=DUE_R?3:n>=DUE_W?2:n>=rec?1:0;
   return{g,name,n,rank,cls:['rest','go','w','r'][rank],dates:D,anchor,last,wk,rec};}
 function dueList(T){return GROUPS.map(x=>groupDue(x[0],T)).sort((a,b)=>b.rank-a.rank||(b.n??99)-(a.n??99)||GROUPS.findIndex(x=>x[0]===a.g)-GROUPS.findIndex(x=>x[0]===b.g));}
@@ -497,7 +500,7 @@ function absPick(){const i=document.createElement('input');i.type='date';i.max=t
   i.onblur=()=>setTimeout(()=>i.remove(),400);try{i.showPicker?i.showPicker():i.click();}catch(e){i.click();}}
 
 // ── 有氧快速記（爬坡機）：照固定走速換算公里、大卡 ──
-const WALK_MINS=[15,20,25,26,30];
+const WALK_MINS=[15,20,25,30];
 function walkCfg(){const w=(db.cfg||{}).walk||{};return{type:w.type||'爬坡機',min:+w.min||26,km:+w.km||1.6,kcal:+w.kcal||200};}
 function walkCalc(m){const W=walkCfg();m=+m;if(!m)return{km:'',kcal:''};return{km:Math.round(m*W.km/W.min*100)/100,kcal:Math.round(m*W.kcal/W.min)};}
 function walkEdit(){const W=walkCfg();const v=prompt(`你的固定走速（格式：分鐘,公里,大卡）\n例如 26,1.6,200`,`${W.min},${W.km},${W.kcal}`);if(v==null)return;const a=v.split(/[,，\s]+/).map(Number);
@@ -537,18 +540,15 @@ function vHome(){
   const o=openSess();
   const hints=[...PICK].map(g=>{const D0=SDATE||today(),L=lastGroup(g,D0);if(!L)return`<div>💡 <b>${GN[g]}</b>：還沒有紀錄</div>`;
     const top=(L.items||[]).filter(it=>db.ex[it.ex]?.g===g&&(it.sets||[]).some(x=>+x.r)).slice(0,2).map(it=>`${esc(db.ex[it.ex].n)} ${it.sets.filter(x=>+x.r).map(x=>setTxt(x,db.ex[it.ex].bw)).join('→')}`).join('<br>');
-    return`<div>💡 上次練<b>${GN[g]}</b>：${md(L.date)}（${dayDiff(D0,L.date)?dayDiff(D0,L.date)+' 天前・平日隔 '+trainDays(L.date,D0)+' 天':'同一天'}）<div class=mu>${top}</div></div>`;}).join('');
+    return`<div>💡 上次練<b>${GN[g]}</b>：${md(L.date)}（${dayDiff(D0,L.date)?dayDiff(D0,L.date)+' 天前':'同一天'}）<div class=mu>${top}</div></div>`;}).join('');
   const rec=db.sessions.slice(-4).reverse();
   $('app').innerHTML=`
   ${o?`<div class="card" style="border-color:#93c5fd;background:#eff6ff" onclick="go('sess','${o.id}')"><b>▶ 訓練進行中：${esc(sessTitle(o))}</b><div class=mu>${md(o.date)} ${o.start} 開始・點這裡繼續</div></div>`:''}
-  <div class="h">${!SDATE||SDATE===today()?'今天':md(SDATE)+' '}練什麼？<span class=mu>${md(SDATE||today())} 週${WK[dow(SDATE||today())]}</span><input type="date" value="${SDATE||today()}" max="${today()}" onchange="SDATE=this.value||null;render()" style="margin-left:auto;border:1px solid #e2e8f0;border-radius:8px;padding:4px 6px;font-size:12.5px;font-family:inherit;color:#475569;background:#fff"></div>
-  <div class="mu" style="margin-bottom:6px">勾要練的部位（可以複選）</div>
-  <div class="chips">${GROUPS.map(g=>`<span class="chip g${PICK.has(g[0])?' on':''}" style="${PICK.has(g[0])?`background:${g[2]};border-color:${g[2]}`:''}" onclick="pickG('${g[0]}')">${PICK.has(g[0])?'✓ ':''}${g[1]}</span>`).join('')}</div>
   ${hints?`<div class="hint">${hints}</div>`:''}
   <div class="mu" style="margin:14px 0 6px">有氧（可以跟重訓一起，也可以只做有氧）</div>
   ${(()=>{const D0=SDATE||today(),W=walkCfg(),L=walkDay(D0),on=walkOldN();
-    return`<div class="cq"><div style="display:flex;align-items:center;gap:6px"><span style="font-size:20px">🏃</span><b>${esc(W.type)}快速記一筆</b><span class=mu style="margin-left:auto">點分鐘＝直接記</span></div>
-     <div class="wmins">${WALK_MINS.map(m=>{const C=walkCalc(m);return`<span class="${m===W.min?'base':''}" onclick="wQuick(${m})">${m}<small>${C.km}km・${C.kcal}卡</small></span>`;}).join('')}<span class="x" onclick="wOther()">其他<small>自己輸入</small></span></div>
+    return`<div class="cq"><div style="display:flex;align-items:center;gap:6px"><span style="font-size:20px">🏃</span><b>${esc(W.type)}快速記一筆</b><span class=mu style="margin-left:auto">點分鐘記一筆（會先確認）</span></div>
+     <div class="wmins">${WALK_MINS.map(m=>{const C=walkCalc(m);return`<span class="${m===W.min?'base':''}" onclick="wAsk(${m})">${m}<small>${C.km}km・${C.kcal}卡</small></span>`;}).join('')}<span class="x" onclick="wOther()">其他<small>自己輸入</small></span></div>
      <div class=mu>你的走速：<b class=mono>${W.min} 分＝${W.km} km、${W.kcal} 大卡</b>　<a class="wlk" onclick="walkEdit()">改</a></div>
      ${L.length?`<div class="wdone"><b>${D0===today()?'今天':md(D0)}已記 ${L.length} 筆</b>${L.map(c=>`<div>${c.at||c.start||''} ${esc(c.type)} <b class=mono>${c.min||'—'} 分</b> <span class=mu>${c.km||'—'} km・${c.kcal||'—'} 卡</span> <a class="wdl" onclick="wDel('${c.id}')">刪</a></div>`).join('')}</div>`:''}
      ${walkWeekHtml(D0)}
@@ -564,6 +564,7 @@ function walkWeekHtml(D0){const m=addDays(D0,-((dow(D0)+6)%7)),sum=a=>a.reduce((
   const D=[...Array(7)].map((_,i)=>{const d=addDays(m,i);return{d,L:walkDay(d).map(c=>+c.min||0).filter(v=>v>0)};});
   const n=D.reduce((a,x)=>a+x.L.length,0),mn=D.reduce((a,x)=>a+sum(x.L),0),mx=Math.max(50,...D.map(x=>sum(x.L)));
   return`<div class="wsum">🗓️ ${D0===today()||D.some(x=>x.d===today())?'本週':md(m)+' 那週'} <b>${n} 次</b>・${+mn.toFixed(1)} 分・${D.filter(x=>x.L.length).length} 天</div><div class="wst">${D.map((x,i)=>`<div>${x.L.length?`<div class="col${x.d===D0?' t':''}">${x.L.map(v=>`<u style="height:${Math.max(17,v/mx*96).toFixed(0)}px">${+v.toFixed(1)}</u>`).join('')}</div>`:'<div class="em"></div>'}<span class="dl${x.d===D0?' t':''}">${WK[dow(x.d)]}</span></div>`).join('')}</div>`;}
+function wAsk(m){const C=walkCalc(m),D0=SDATE||today();if(!confirm(`確定${D0===today()?'':'在 '+md(D0)+' '}記一筆 ${walkCfg().type} ${m} 分（${C.km} km・${C.kcal} 卡）？`))return;wQuick(m);}
 function wQuick(m){const D0=SDATE||today();const c=walkAdd(m,D0);toast(`✅ 記好了：${c.type} ${c.min} 分・${c.km} km・${c.kcal} 大卡`);render();}
 function wOther(){const D0=SDATE||today();const v=prompt('爬坡機幾分鐘？（公里、大卡會自動算）','');if(v==null)return;const m=parseFloat(v);if(!(m>0)){alert('請輸入分鐘數');return;}wQuick(m);}
 function wDel(id){if(!confirm('刪掉這筆有氧？'))return;walkDel(id);render();}
@@ -740,8 +741,12 @@ function dueHome(){document.querySelectorAll('.dsgm').forEach(e=>e.remove());con
     :`<div class="dsgm hero"><div class="hk">📅 ${H.lab}訓練項目</div><div class="ht">${SG.name}</div><div class="hs">${H.DN?`✓ 今天 ${H.DN.name} 練完了（${H.DN.sets} 組）・`:''}${its}</div></div>`;
   $('app').insertAdjacentHTML('afterbegin',hero+dueRow());}
 // 手機首頁：六個小圓環（最該練的在左邊；點一下＝勾選那個部位）
-function dueRow(){const R=2*Math.PI*15.5;return`<div class="dgr">${dueList(SDATE||today()).map(x=>{const c=GC[x.g],col=x.cls==='r'?'#dc2626':x.cls==='w'?'#f59e0b':c,p=x.n==null?0:Math.min(1,x.n/DUE_W);
-  return`<div class="dgi ${x.cls}${PICK.has(x.g)?' on':''}" onclick="pickG('${x.g}')"><svg width="40" height="40" viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.5" fill="none" stroke="#e2e8f0" stroke-width="4"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="${col}" stroke-width="4" stroke-dasharray="${R*p} ${R}" transform="rotate(-90 18 18)" stroke-linecap="round"/><text x="18" y="21.8" text-anchor="middle" font-size="11" font-weight="900" font-family="monospace">${x.n==null?'—':x.n}</text></svg><b style="color:${c}">${x.name}</b><span>${x.n==null?'沒練過':x.cls==='rest'?'恢復中':x.cls==='go'?'可以練':x.cls==='w'?'該練了':'太久'}</span></div>`;}).join('')}</div><div class="mu" style="text-align:center;margin:-2px 0 10px;font-size:11px">數字＝隔幾天（只算週一～五）・左邊最該練・點一下就勾選</div>`;}
+function dueRow(){const T=SDATE||today(),R=2*Math.PI*15.5,IC={rest:'💤',w:'🔥',r:'⚠️'};
+  const ago=x=>x.last?(dayDiff(T,x.last)?dayDiff(T,x.last)+'天前':'今天'):'沒練過';
+  return`<div class="dgr">${dueList(T).map(x=>{const c=GC[x.g],col=x.cls==='r'?'#dc2626':x.cls==='w'?'#f59e0b':c,p=x.n==null?0:Math.min(1,x.n/DUE_W),on=PICK.has(x.g);
+  const mid=x.n==null?`<text x="18" y="21.8" text-anchor="middle" font-size="11" font-weight="900">—</text>`:x.cls==='go'?`<text x="18" y="23" text-anchor="middle" font-size="15" font-weight="900" fill="${c}">✓</text>`:`<text x="18" y="22.5" text-anchor="middle" font-size="13">${IC[x.cls]}</text>`;
+  return`<div class="dgi ${x.cls}${on?' on':''}" onclick="pickG('${x.g}')" title="${x.name}：${x.n==null?'還沒練過':['恢復中','可以練','該練了','隔太久'][x.rank]+'・隔 '+x.n+' 天'}">${on?'<em class="pk">✓</em>':''}<svg width="40" height="40" viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.5" fill="none" stroke="#e2e8f0" stroke-width="4"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="${col}" stroke-width="4" stroke-dasharray="${R*p} ${R}" transform="rotate(-90 18 18)" stroke-linecap="round"/>${mid}</svg><b style="color:${c}">${x.name}</b><span class="ag">${ago(x)}</span></div>`;}).join('')}</div>
+  <div class="dcap"><span>點圓環＝勾選要練的部位（可複選）</span><label>📅 ${T===today()?'今天 ':''}${md(T)} 週${WK[dow(T)]} ▾<input type="date" value="${T}" max="${today()}" onchange="SDATE=this.value&&this.value!==today()?this.value:null;render()"></label></div>`;}
 
 function rpmHome(){const q=document.querySelector('#app .q');if(!q||q.querySelector('.rpq'))return;const pm=rpNagMonth();
   q.insertAdjacentHTML('beforeend',`<div class="rpq${pm?' dot':''}" onclick="${pm?`RPM='${pm}';`:''}go('rp')"><span>📄</span>給教練</div>`);

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-<!-- fitness build 2026-11-10c -->
+<!-- fitness build 2026-11-10d -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -359,14 +359,14 @@ function agg(a,b){const L=db.sessions.filter(s=>s.date>=a&&s.date<=b);const o={c
   L.forEach(s=>{const S=sessStats(s);if(S.sets)o.cnt++;o.vol+=S.vol;o.sets+=S.sets;o.min+=S.min;o.km+=S.km;o.kcal+=S.kcal;if(S.sets||S.min)o.days.add(s.date);Object.entries(S.byG).forEach(([g,v])=>{(o.byG[g]=o.byG[g]||{sets:0,vol:0}).sets+=v.sets;o.byG[g].vol+=v.vol;});});
   const I=db.inbody.filter(x=>x.date>=a&&x.date<=b).sort((p,q)=>p.date.localeCompare(q.date));const li=I[I.length-1];['wt','mm','fat','bmr'].forEach(k=>{const z=I.filter(x=>x[k]!==''&&x[k]!=null);o[k]=z.length?+z[z.length-1][k]:null;});o.ib=li;o.list=L;return o;}
 
-// ── 該練哪裡（週一～五是訓練日，六日強迫休息不算天數；每次練到都歸零重算——加練也算正常訓練）──
-const TRAIN_DOW=[1,2,3,4,5],DUE_REC={chest:2,back:2,legs:3,shoulder:2,bi:2,tri:2},DUE_W=5,DUE_R=8;
+// ── 該練哪裡（隔幾天＝實際日曆天數，週末也算恢復日；每次練到都歸零重算——加練、週末練也算）──
+const TRAIN_DOW=[1,2,3,4,5],DUE_REC={chest:2,back:2,legs:3,shoulder:2,bi:2,tri:2},DUE_W=7,DUE_R=10;
 const wkStart=d=>addDays(d,-((dow(d)+6)%7));
 function trainDays(a,b){let n=0;for(let d=addDays(a,1);d<=b;d=addDays(d,1))if(TRAIN_DOW.includes(dow(d)))n++;return n;}
 function groupDue(g,T){T=T||today();const D=[...new Set(db.sessions.filter(s=>s.date<=T&&sessGroups(s).includes(g)).map(s=>s.date))].sort();
   const name=(GROUPS.find(x=>x[0]===g)||[])[1],rec=DUE_REC[g]||2;
   if(!D.length)return{g,name,n:null,rank:4,cls:'r',dates:[],anchor:null,last:null,wk:0,rec};
-  const last=D[D.length-1],anchor=last,n=trainDays(anchor,T),wk=D.filter(d=>d>=wkStart(T)).length;
+  const last=D[D.length-1],anchor=last,n=dayDiff(T,anchor),wk=D.filter(d=>d>=wkStart(T)).length;
   const rank=n>=DUE_R?3:n>=DUE_W?2:n>=rec?1:0;
   return{g,name,n,rank,cls:['rest','go','w','r'][rank],dates:D,anchor,last,wk,rec};}
 function dueList(T){return GROUPS.map(x=>groupDue(x[0],T)).sort((a,b)=>b.rank-a.rank||(b.n??99)-(a.n??99)||GROUPS.findIndex(x=>x[0]===a.g)-GROUPS.findIndex(x=>x[0]===b.g));}
@@ -516,7 +516,7 @@ function absPick(){const i=document.createElement('input');i.type='date';i.max=t
   i.onblur=()=>setTimeout(()=>i.remove(),400);try{i.showPicker?i.showPicker():i.click();}catch(e){i.click();}}
 
 // ── 有氧快速記（爬坡機）：照固定走速換算公里、大卡 ──
-const WALK_MINS=[15,20,25,26,30];
+const WALK_MINS=[15,20,25,30];
 function walkCfg(){const w=(db.cfg||{}).walk||{};return{type:w.type||'爬坡機',min:+w.min||26,km:+w.km||1.6,kcal:+w.kcal||200};}
 function walkCalc(m){const W=walkCfg();m=+m;if(!m)return{km:'',kcal:''};return{km:Math.round(m*W.km/W.min*100)/100,kcal:Math.round(m*W.kcal/W.min)};}
 function walkEdit(){const W=walkCfg();const v=prompt(`你的固定走速（格式：分鐘,公里,大卡）\n例如 26,1.6,200`,`${W.min},${W.km},${W.kcal}`);if(v==null)return;const a=v.split(/[,，\s]+/).map(Number);
@@ -561,7 +561,7 @@ function cmp(v,p,u='',rev){if(p==null||!isFinite(p)||p===0&&v===0)return'';const
 function vOv(){
   const T=today(),M=monday(T),A=agg(M,addDays(M,6)),P=agg(addDays(M,-7),addDays(M,-1)),goal=+(db.cfg&&db.cfg.goal)||4;
   const pct=Math.min(1,A.cnt/goal),C=2*Math.PI*15.5;
-  // 圓環＝隔幾個訓練日（週一～五），滿 5 天一圈；依「最該練」排序
+  // 圓環＝隔幾天（日曆天，週末也算），滿 DUE_W 天一圈；依「最該練」排序
   const ring=(n,c,k)=>{const p=n==null?0:Math.min(1,n/DUE_W),col=k==='r'?'#dc2626':k==='w'?'#f59e0b':c,R=2*Math.PI*15.5;return`<svg width="46" height="46" viewBox="0 0 36 36" style="flex-shrink:0"><circle cx="18" cy="18" r="15.5" fill="none" stroke="#e2e8f0" stroke-width="4"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="${col}" stroke-width="4" stroke-dasharray="${R*p} ${R}" transform="rotate(-90 18 18)" stroke-linecap="round"/><text x="18" y="21.6" text-anchor="middle" font-size="10" font-weight="900" font-family="JetBrains Mono,monospace">${n==null?'—':n}</text></svg>`;};
   const BD={r:'<span class="dbd" style="background:#fee2e2;color:#b91c1c">隔太久</span>',w:'<span class="dbd" style="background:#ffedd5;color:#c2410c">該練了</span>',go:'<span class="dbd" style="background:#cffafe;color:#0e7490">可以練了</span>'};
   const tiles=dueList(T).map((x,i)=>{const c=GC[x.g],sub=x.n==null?'—':md(x.anchor)+(x.last!==x.anchor?' 起算':'')+(x.wk?`・本週 ✓${x.wk}`:'');
@@ -578,7 +578,7 @@ function vOv(){
      <svg width="128" height="128" viewBox="0 0 36 36" style="cursor:pointer;flex-shrink:0" onclick="setGoal()"><title>點一下改目標</title><circle cx="18" cy="18" r="15.5" fill="none" stroke="#e2e8f0" stroke-width="4"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="${pct>=1?'#0891b2':'#2563eb'}" stroke-width="4" stroke-dasharray="${C*pct} ${C}" transform="rotate(-90 18 18)" stroke-linecap="round"/><text x="18" y="18" text-anchor="middle" font-size="9" font-weight="900" font-family="JetBrains Mono,monospace">${A.cnt}/${goal}</text><text x="18" y="24.5" text-anchor="middle" font-size="3.6" fill="#64748b">本週次數</text></svg>
      <div style="font-size:14px;line-height:1.95"><b style="font-size:17px">本週 ${A.cnt} 次</b> <span class=mu>（目標 ${goal}，點圓圈可改）</span><br>${A.sets} 組・${fmt(A.vol)} kg${A.min?`・🏃 ${A.min} 分`:''}<br>${dc>0?`<span class=up>比上週多 ${dc} 次 ▲</span>`:dc<0?`<span class=dn>比上週少 ${-dc} 次</span>`:'<span class=dn>跟上週一樣</span>'}${PRw.length?`　<span style="color:#0891b2;font-weight:800">🏆 新紀錄 ${PRw.length} 項</span>`:''}</div></div>
     ${heroCard(T)}
-    <div class="o1h">各部位多久沒練 <span class=mu style="font-weight:500">只算週一～五；最該練的排前面（隔 5 天該練了、8 天隔太久）</span></div><div class="o1g">${tiles}</div>${(()=>{const A=absState(T);return`<div class="wab${A.due&&!A.done?' due':''}">🧘 <b>腹肌</b><span class=mu>${A.done?'✓ 今天練了・下次 '+md(A.next):A.due?(A.last?'上次 '+md(A.last)+'（'+A.n+' 天前）・今天該練了':'還沒有紀錄'):'休息中・再 '+A.left+' 天（上次 '+md(A.last)+'）'}・本月 ${absMonth(T.slice(0,7)).length} 次・<a class="abp" onclick="absPick()">補記其他天</a></span>${A.done?`<button onclick="absUndo();render()" class="wabu">取消</button>`:`<button onclick="if(confirm('今天確定練了腹肌嗎？'))absDone();render()">✓ 練完了</button>`}</div>`;})()}
+    <div class="o1h">各部位多久沒練 <span class=mu style="font-weight:500">週末也算；最該練的排前面（隔 ${DUE_W} 天該練了、${DUE_R} 天隔太久）</span></div><div class="o1g">${tiles}</div>${(()=>{const A=absState(T);return`<div class="wab${A.due&&!A.done?' due':''}">🧘 <b>腹肌</b><span class=mu>${A.done?'✓ 今天練了・下次 '+md(A.next):A.due?(A.last?'上次 '+md(A.last)+'（'+A.n+' 天前）・今天該練了':'還沒有紀錄'):'休息中・再 '+A.left+' 天（上次 '+md(A.last)+'）'}・本月 ${absMonth(T.slice(0,7)).length} 次・<a class="abp" onclick="absPick()">補記其他天</a></span>${A.done?`<button onclick="absUndo();render()" class="wabu">取消</button>`:`<button onclick="if(confirm('今天確定練了腹肌嗎？'))absDone();render()">✓ 練完了</button>`}</div>`;})()}
     ${ib?(()=>{const g=+(db.cfg&&db.cfg.fatGoal)||13,f=+ib.fat,w=+ib.wt,need=f&&w?Math.max(0,w-w*(1-f/100)/(1-g/100)):null;
       return`<div class="o1h">最新 InBody <span class=mu style="font-weight:500">${md(ib.date)}</span></div><div class="ibk"><div><span>體重</span><b>${ib.wt||'—'}</b><i>kg</i></div><div><span>體脂</span><b>${ib.fat!==''&&ib.fat!=null?ib.fat+'%':'—'}</b></div><div><span>肌肉</span><b>${ib.mm||'—'}</b><i>kg</i></div><div class="gl" onclick="setFatGoal()" title="點一下改目標"><span>離 ${g}% 還差</span><b>${need==null?'—':need<0.05?'✓ 到了':'−'+need.toFixed(1)}</b><i>${need&&need>=0.05?'kg 脂肪':''}</i></div></div>`;})():''}</div>
    <div class="card" style="margin:0">${calHtml()}</div></div>
