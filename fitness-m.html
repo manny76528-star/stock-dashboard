@@ -205,7 +205,7 @@ body.embed .top a.hm,body.embed .top a.pc{display:none}
 </style>
 </head>
 <body>
-<div class="top"><b id="ttl">🏋️ 健身</b><span id="sync"></span><span style="font-size:10px;color:#cbd5e1">v1110f</span><span class="sp"></span><a class="pc" href="fitness.html?force=pc">📊 數據</a><a class="hm" href="index.html">🏠</a><button id="closeEmbed" style="display:none" onclick="parent.ftCloseEmbed&&parent.ftCloseEmbed()">✕ 關閉</button></div>
+<div class="top"><b id="ttl">🏋️ 健身</b><span id="sync"></span><span style="font-size:10px;color:#cbd5e1">v1110h</span><span class="sp"></span><a class="pc" href="fitness.html?force=pc">📊 數據</a><a class="hm" href="index.html">🏠</a><button id="closeEmbed" style="display:none" onclick="parent.ftCloseEmbed&&parent.ftCloseEmbed()">✕ 關閉</button></div>
 <div class="wrap" id="app"></div>
 <div class="bar" id="bar" style="display:none"><div class="in" id="barIn"></div></div>
 <div class="toast" id="toast"></div>
@@ -436,7 +436,9 @@ function rpFlags(S){const F=[],G=S.G,gn=k=>`<b style="color:${GC[k]}">${GN[k]}</
   try{const AB=absMonth(S.m);if(AB.length){let mx=0,at='';for(let i=1;i<AB.length;i++){const g=dayDiff(AB[i],AB[i-1]);if(g>mx){mx=g;at=md(AB[i-1])+'→'+md(AB[i]);}}if(mx>7)F.push(['y','腹肌間隔太久',`${at} 隔 ${mx} 天（練 1 休 3 ＝ 每 4 天一次）`]);}}catch(e){}
   return F.sort((p,q)=>'rygx'.indexOf(p[0])-'rygx'.indexOf(q[0]));}
 
-function rpSetsTxt(x,bw){if(x.w===''||x.w==null)return String(x.r);return setTxt(x,bw);}
+// 給教練的文字：一律寫單位（24KG×8下、90磅×10下、自重×12下、自重+10KG×8下）
+function rpSetsTxt(x,bw){const r=x.r+'下';if(x.w===''||x.w==null)return bw?'自重×'+r:r;const w=+x.w||0,u=x.u==='lb'?'磅':'KG';
+  if(bw)return w?`自重+${w}${u}×${r}`:'自重×'+r;return `${w}${u}×${r}`;}
 function rpText(m){const{a,e}=rpRange(m),L=db.sessions.filter(s=>s.date>=a&&s.date<=e).sort((p,q)=>(p.date+(p.start||'')).localeCompare(q.date+(q.start||'')));
   const D={};L.forEach(s=>{(D[s.date]=D[s.date]||[]).push(s);});const A=agg(a,e),AB=new Set(absDates().filter(d=>d>=a&&d<=e));AB.forEach(d=>{D[d]=D[d]||[];});
   let t=`🏋️ ${RP_NAME}｜${m.replace('-','/')} 訓練清單\n共 ${A.cnt} 次重訓・${A.sets} 組${A.min?`・有氧 ${A.min} 分`:''}${AB.size?`・腹肌 ${AB.size} 次`:''}\n`;

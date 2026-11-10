@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-<!-- fitness build 2026-11-10f -->
+<!-- fitness build 2026-11-10h -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -130,7 +130,7 @@ tr.sr{cursor:pointer}tr.sr:hover td{background:#f8fafc}td.num{text-align:right;f
 .form{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}.form label{font-size:12px;color:var(--mu);display:block;margin-bottom:3px}.form input{border:1.5px solid #cbd5e1;border-radius:9px;padding:8px 10px;font-size:14px;font-family:var(--mono);width:120px}
 #imp{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:100;display:none;align-items:center;justify-content:center}#imp .ib{background:#fff;border-radius:20px;width:min(1100px,94vw);height:min(720px,90vh);padding:18px 20px;display:flex;flex-direction:column}#impT{flex:1;border:1.5px solid #cbd5e1;border-radius:12px;padding:12px;font-size:14px;font-family:var(--mono);line-height:1.7;resize:none}
 .ovg{display:grid;grid-template-columns:minmax(420px,.85fr) 1.15fr;gap:16px}
-.o1h{font-size:12.5px;font-weight:900;color:#334155;margin:14px 0 6px}.o1g{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.o1h{font-size:12.5px;font-weight:900;color:#334155;margin:14px 0 6px}.o1g{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
 .o1t{border:1px solid var(--line);background:#f8fafc;border-radius:11px;padding:7px 10px}.o1t.w{background:#fff7ed;border-color:#fdba74}.o1w{font-size:11px;color:#c2410c;font-weight:700}
 .o1r{display:flex;align-items:center;gap:8px;padding:6px 4px;border-bottom:1px dashed #f1f5f9;font-size:13.5px;cursor:pointer;border-radius:6px}.o1r:hover{background:#f8fafc}
 .nav{border:1px solid var(--line);background:#fff;border-radius:8px;width:30px;height:30px;font-size:15px;cursor:pointer;font-weight:900;color:#475569}
@@ -168,6 +168,7 @@ tr.sr{cursor:pointer}tr.sr:hover td{background:#f8fafc}td.num{text-align:right;f
 .tgrp span{padding:7px 12px;border-radius:9px;font-weight:800;color:var(--mu);cursor:pointer;font-size:14px;white-space:nowrap}.tgrp span.on{background:#fff;color:var(--tx);box-shadow:0 1px 3px rgba(0,0,0,.08)}.tgrp span:hover:not(.on){color:var(--tx)}
 .top .tic{width:36px;height:36px;padding:0!important;display:grid;place-items:center;font-size:16px}.top a,.top .tb,.top h1,#sync{white-space:nowrap}.top{gap:10px!important}
 @media(max-width:1350px){#sync{display:none}}
+@media(max-width:1250px){.ovg{grid-template-columns:1fr!important}} /* 手機開電腦版／窄螢幕：總覽改上下排，部位卡片不會擠到月曆 */
 .wps{border:1px solid var(--line);border-radius:10px;padding:7px 10px;font-size:13px;font-family:inherit}.wphe{aspect-ratio:3/4;display:grid;place-items:center;background:#f1f5f9;border-radius:12px;color:#94a3b8}
 .wpg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:12px}.wpi{text-align:center}.wpi img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:12px;background:#e2e8f0;cursor:zoom-in;display:block;margin-bottom:4px;border:3px solid transparent}.wpi.sel img{border-color:#2563eb}.wpi b{display:block;font-size:13.5px}
 .wpcmp{display:grid;grid-template-columns:1.2fr 1fr;gap:16px;margin-top:16px}.wp2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.wp2 div{text-align:center}.wp2 img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:12px;background:#e2e8f0;cursor:zoom-in;display:block;margin:6px 0}
@@ -452,7 +453,9 @@ function rpFlags(S){const F=[],G=S.G,gn=k=>`<b style="color:${GC[k]}">${GN[k]}</
   try{const AB=absMonth(S.m);if(AB.length){let mx=0,at='';for(let i=1;i<AB.length;i++){const g=dayDiff(AB[i],AB[i-1]);if(g>mx){mx=g;at=md(AB[i-1])+'→'+md(AB[i]);}}if(mx>7)F.push(['y','腹肌間隔太久',`${at} 隔 ${mx} 天（練 1 休 3 ＝ 每 4 天一次）`]);}}catch(e){}
   return F.sort((p,q)=>'rygx'.indexOf(p[0])-'rygx'.indexOf(q[0]));}
 
-function rpSetsTxt(x,bw){if(x.w===''||x.w==null)return String(x.r);return setTxt(x,bw);}
+// 給教練的文字：一律寫單位（24KG×8下、90磅×10下、自重×12下、自重+10KG×8下）
+function rpSetsTxt(x,bw){const r=x.r+'下';if(x.w===''||x.w==null)return bw?'自重×'+r:r;const w=+x.w||0,u=x.u==='lb'?'磅':'KG';
+  if(bw)return w?`自重+${w}${u}×${r}`:'自重×'+r;return `${w}${u}×${r}`;}
 function rpText(m){const{a,e}=rpRange(m),L=db.sessions.filter(s=>s.date>=a&&s.date<=e).sort((p,q)=>(p.date+(p.start||'')).localeCompare(q.date+(q.start||'')));
   const D={};L.forEach(s=>{(D[s.date]=D[s.date]||[]).push(s);});const A=agg(a,e),AB=new Set(absDates().filter(d=>d>=a&&d<=e));AB.forEach(d=>{D[d]=D[d]||[];});
   let t=`🏋️ ${RP_NAME}｜${m.replace('-','/')} 訓練清單\n共 ${A.cnt} 次重訓・${A.sets} 組${A.min?`・有氧 ${A.min} 分`:''}${AB.size?`・腹肌 ${AB.size} 次`:''}\n`;
@@ -750,15 +753,21 @@ function vEx(){
 function exDetail(id){const cur=db.ex[id],H=exHistory(id);if(!H.length)return'<div class="empty" style="padding:16px 0">這個動作還沒有紀錄</div>';
   let mx=0;const pr=H.map(h=>{const p=h.best>mx+0.01;if(p)mx=h.best;return p;});
   return`<div style="display:grid;grid-template-columns:1.4fr 1fr;gap:16px"><div style="height:260px"><canvas id="exc"></canvas></div>
-   <div style="max-height:260px;overflow:auto"><table><tr><th>日期</th><th>每組（重量×次數）</th><th style="text-align:right">1RM</th></tr>${H.slice().reverse().map((h,i)=>`<tr><td class=mono><b>${md(h.date)}</b></td><td class=mono style="font-size:12px">${h.sets.map(x=>setTxt(x,cur.bw)).join('　')}</td><td class=num>${pr[H.length-1-i]?'🏆 ':''}${h.best.toFixed(1)}</td></tr>`).join('')}</table></div></div>`;}
-function drawExChart(id){const H=exHistory(id);if(!H.length||!$('exc'))return;let mx=0;const pr=H.map(h=>{const p=h.best>mx+0.01;if(p)mx=h.best;return p;});const c=GC[db.ex[id].g];
-  CH.ex=new Chart($('exc'),{data:{labels:H.map(h=>md(h.date)),datasets:[
-    {type:'line',label:'估算 1RM',data:H.map(h=>+h.best.toFixed(1)),borderColor:c,backgroundColor:c,pointRadius:H.map((h,i)=>pr[i]?6:3),pointStyle:H.map((h,i)=>pr[i]?'star':'circle'),borderWidth:2.5,tension:.25,yAxisID:'y'},
-    {type:'line',label:'最重一組',data:H.map(h=>+h.top.toFixed(1)),borderColor:'#94a3b8',borderDash:[5,4],borderWidth:1.5,pointRadius:2,yAxisID:'y'},
-    ...(H.length>2?[{type:'line',label:'趨勢',data:linreg(H.map(h=>h.best)),borderColor:'#0f172a55',borderDash:[8,6],borderWidth:1.5,pointRadius:0,yAxisID:'y',trend:1}]:[]),
-    {type:'bar',label:'訓練量',data:H.map(h=>Math.round(h.vol)),backgroundColor:c+'33',borderRadius:5,yAxisID:'y2'}]},
-   options:{maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:11.5}}},tooltip:{filter:i=>!i.dataset.trend}},
-    scales:{x:{grid:{display:false}},y:{title:{display:true,text:'kg'},grid:{color:'#f1f5f9'}},y2:{position:'right',grid:{display:false},title:{display:true,text:'訓練量 kg'},beginAtZero:true}}}});}
+   <div style="max-height:260px;overflow:auto"><table><tr><th>日期</th><th>每組（重量×次數）</th><th style="text-align:right">1RM</th><th style="text-align:right">比上次</th></tr>${H.slice().reverse().map((h,i)=>{const k=H.length-1-i,d=k?+(h.best-H[k-1].best).toFixed(1):null;return`<tr><td class=mono><b>${md(h.date)}</b></td><td class=mono style="font-size:12px">${h.sets.map(x=>setTxt(x,cur.bw)).join('　')}</td><td class=num>${pr[k]?'🏆 ':''}${h.best.toFixed(1)}</td><td class=num style="font-weight:800;color:${d==null||Math.abs(d)<.05?'#94a3b8':d>0?'#dc2626':'#16a34a'}">${d==null?'—':Math.abs(d)<.05?'持平':(d>0?'▲ +':'▼ ')+d.toFixed(1)}</td></tr>`;}).join('')}</table></div></div>`;}
+function drawExChart(id){const H=exHistory(id);if(!H.length||!$('exc'))return;let mx=0;const pr=H.map(h=>{const p=h.best>mx+0.01;if(p)mx=h.best;return p;});
+  // 股票感：比上次進步＝紅、退步＝綠、持平＝灰；點旁標漲跌；虛線＝第一次的起點，高於起點底色淡紅、低於淡綠
+  const V=H.map(h=>+h.best.toFixed(1)),UP='#dc2626',DN='#16a34a',FL='#94a3b8',cl=i=>!i?'#64748b':V[i]>V[i-1]+.01?UP:V[i]<V[i-1]-.01?DN:FL;
+  const lbl={id:'exlbl',afterDatasetsDraw(ch){const m=ch.getDatasetMeta(0),x=ch.ctx;if(m.hidden)return;x.save();x.font='bold 11px ui-monospace,monospace';x.textAlign='center';
+    m.data.forEach((p,i)=>{if(!i)return;const c=+(V[i]-V[i-1]).toFixed(1);if(Math.abs(c)<.05)return;x.fillStyle=c>0?UP:DN;x.fillText((c>0?'+':'')+c.toFixed(1),p.x,c>0?p.y-12:p.y+19);});x.restore();}};
+  CH.ex=new Chart($('exc'),{plugins:[lbl],data:{labels:H.map(h=>md(h.date)),datasets:[
+    {type:'line',label:'估算 1RM',data:V,borderColor:UP,backgroundColor:UP,segment:{borderColor:c=>{const a=c.p0.parsed.y,b=c.p1.parsed.y;return b>a+.01?UP:b<a-.01?DN:FL;}},
+     pointBackgroundColor:V.map((v,i)=>cl(i)),pointBorderColor:V.map((v,i)=>cl(i)),pointRadius:H.map((h,i)=>pr[i]?7:4),pointStyle:H.map((h,i)=>pr[i]?'star':'circle'),borderWidth:3,tension:.25,yAxisID:'y',
+     fill:H.length>1?{target:{value:V[0]},above:'rgba(220,38,38,.08)',below:'rgba(22,163,74,.10)'}:false},
+    {type:'line',label:'最重一組',data:H.map(h=>+h.top.toFixed(1)),borderColor:'#cbd5e1',borderDash:[5,4],borderWidth:1.5,pointRadius:2,yAxisID:'y'},
+    ...(H.length>1?[{type:'line',label:'起點',data:V.map(()=>V[0]),borderColor:'#94a3b8',borderDash:[2,4],borderWidth:1,pointRadius:0,yAxisID:'y',trend:1}]:[]),
+    {type:'bar',label:'訓練量',data:H.map(h=>Math.round(h.vol)),backgroundColor:'#2563eb22',borderRadius:5,yAxisID:'y2'}]},
+   options:{maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:11.5}}},tooltip:{filter:i=>!i.dataset.trend,callbacks:{afterLabel:c=>c.datasetIndex===0&&c.dataIndex?(()=>{const d=+(V[c.dataIndex]-V[c.dataIndex-1]).toFixed(1);return Math.abs(d)<.05?'比上次 持平':'比上次 '+(d>0?'▲ +':'▼ ')+d.toFixed(1)+' kg';})():''}}},
+    scales:{x:{grid:{display:false}},y:{title:{display:true,text:'kg'},grid:{color:'#f1f5f9'},grace:'8%'},y2:{position:'right',grid:{display:false},title:{display:true,text:'訓練量 kg'},beginAtZero:true}}}});}
 
 // ── InBody ──
 function vIb(){
@@ -839,7 +848,7 @@ function vRp(){const S=rpStats(RPM),F=rpFlags(S),{A,P,R}=S,T=today();
   const gd=GROUPS.map(([k,n,c])=>{const g=S.G[k];if(!g.rows.length)return'';
     return`<div class="rgb"><div class="rgh" style="background:color-mix(in srgb,${c} 9%,#fff)"><b style="color:${c}">${n}</b><span class=mu>本月 ${g.dates.length} 次・${g.sets} 組${g.avgGap!=null?`・平均間隔 ${g.avgGap.toFixed(1)} 天`:''}</span></div>
      <table class="rt"><tr><th style="width:84px">日期</th><th style="width:58px">間隔</th><th>動作（重量 × 次數）</th><th style="width:44px">組數</th></tr>${g.rows.map(r=>`<tr><td class=mono><b>${md(r.date)}</b> ${WK[dow(r.date)]}</td><td class="mono${r.gap>7?' rr':''}" style="font-weight:800">${r.gap==null?'—':r.gap===0?'同天':r.gap+' 天'}</td>
-      <td>${r.items.map(i=>`<b>${esc(i.e.n)}</b> ${i.sets.map(x=>x.w===''||x.w==null?`<span style="color:#94a3b8">?</span>×${x.r}`:setTxt(x,i.e.bw)).join('・')}${!i.e.bw&&i.sets.some(x=>x.w===''||x.w==null)?' <span class="rtag" style="background:#fffbeb;color:#b45309">沒填重量</span>':''}`).join('<br>')}</td><td class=mono>${r.items.reduce((n,i)=>n+i.sets.length,0)}</td></tr>`).join('')}</table></div>`;}).join('');
+      <td>${r.items.map(i=>`<b>${esc(i.e.n)}</b> ${i.sets.map(x=>x.w===''||x.w==null?`<span style="color:#94a3b8">?</span>×${x.r}下`:rpSetsTxt(x,i.e.bw)).join('・')}${!i.e.bw&&i.sets.some(x=>x.w===''||x.w==null)?' <span class="rtag" style="background:#fffbeb;color:#b45309">沒填重量</span>':''}`).join('<br>')}</td><td class=mono>${r.items.reduce((n,i)=>n+i.sets.length,0)}</td></tr>`).join('')}</table></div>`;}).join('');
   const car=A.list.filter(s=>(s.cardio||[]).length).flatMap(s=>s.cardio.map(c=>({d:s.date,...c})));
   const ibRows=[...(S.ibBase?[S.ibBase]:[]),...S.ibIn];
   const txt=rpText(RPM);
