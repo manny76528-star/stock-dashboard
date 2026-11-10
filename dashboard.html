@@ -864,6 +864,32 @@ body:not(.privacy) .privacy-mask{filter:none;}
 #fam3bar{display:flex;align-items:center;gap:10px;background:#fffbeb;border:1px solid #fde68a;color:#92400e;border-radius:12px;padding:8px 14px;margin-bottom:12px;font-size:13px}#fam3bar button{margin-left:auto;border:none;background:#0f172a;color:#fff;border-radius:9px;padding:6px 12px;font-weight:800;cursor:pointer;font-family:inherit}
 body.fam2on #v20-px,body.fam2on #v31-plbtn-fam,body.fam3on #v31-plbtn-fam{display:none!important}
 @media(max-width:1000px){.f2g{grid-template-columns:1fr}.f2led{position:static}.f2r{grid-template-columns:1fr 90px 60px}.f2r .f2b,.f2r .f2v:nth-child(4){display:none}}
+/* v36 家族第一層・存摺封面 */
+.f1g{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(205px,1fr))!important;gap:16px!important}
+.f1c{border-radius:8px 18px 18px 8px;overflow:hidden;background:#fff;box-shadow:0 8px 18px rgba(15,23,42,.08);display:flex;flex-direction:column;cursor:pointer;transition:transform .18s,box-shadow .18s}
+.f1c:hover{transform:translateY(-3px);box-shadow:0 14px 26px rgba(15,23,42,.13)}
+.f1cv{position:relative;color:#fff;padding:16px 14px 14px 24px;min-height:196px;display:flex;flex-direction:column}
+.f1cv:before{content:"";position:absolute;left:10px;top:0;bottom:0;width:4px;background:rgba(255,255,255,.25)}
+.f1k{font-size:11px;letter-spacing:3px;opacity:.85}
+.f1n{display:flex;align-items:center;gap:8px;margin-top:6px}.f1n b{font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.f1s{font-size:11.5px;opacity:.85;margin-top:1px}
+.f1sp{font-size:11.5px;margin-top:3px;opacity:.95}
+.f1p{margin-top:auto;background:rgba(255,255,255,.14);border-radius:12px;padding:9px 12px}
+.f1p .t{display:flex;align-items:center;gap:4px;white-space:nowrap}.f1p .t span{font-size:12px;opacity:.9}
+.f1p .t button{border:0;background:rgba(255,255,255,.2);color:#fff;border-radius:50%;width:20px;height:20px;font-size:11px;padding:0;cursor:pointer;line-height:20px;flex-shrink:0}.f1p .t button:hover{background:rgba(255,255,255,.35)}
+.f1p .t b{margin-left:auto;font-size:25px;line-height:1;font-family:ui-monospace,'JetBrains Mono',monospace}.f1p .t b small{font-size:15px}
+.f1p .br{height:7px;background:rgba(255,255,255,.25);border-radius:4px;margin-top:4px;overflow:hidden}.f1p .br i{display:block;height:7px;background:#fff;border-radius:4px}
+.f1p .sc{display:flex;justify-content:space-between;font-size:10.5px;margin-top:4px;opacity:.75}
+.f1w{position:absolute;top:12px;right:12px;background:#fef3c7;color:#92400e;border-radius:6px;padding:1px 7px;font-size:11px;font-weight:800}
+.f1h{height:112px;padding:10px 12px;display:flex;align-items:center;gap:10px}
+.f1l{flex:1;display:flex;flex-direction:column;gap:9px;min-width:0}
+.f1l div{display:grid;grid-template-columns:9px 1fr auto;gap:5px;align-items:center;font-size:12px;white-space:nowrap}
+.f1l div i{width:8px;height:8px;border-radius:2px}.f1l div b{font-family:ui-monospace,monospace}
+.f1l div[data-c]:hover{text-decoration:underline}
+.f1a{display:flex;border-top:1px solid #f1f5f9}.f1a button{flex:1;border:0;background:#fff;padding:10px;font-weight:900;font-size:13px;cursor:pointer;font-family:inherit}
+.f1a button+button{border-left:1px solid #f1f5f9;color:#475569;font-weight:800}.f1a button:hover{background:#f8fafc}
+.f1add{grid-column:1/-1;border:2px dashed #cbd5e1;border-radius:12px;background:#f8fafc;display:flex;align-items:center;justify-content:center;gap:8px;padding:8px;cursor:pointer;color:#94a3b8;font-weight:700;font-size:12px}
+.f1add:hover{border-color:#93c5fd;background:#eff6ff}
 /* v32 今天頁三欄 */
 .v33-3{grid-template-columns:repeat(3,minmax(0,1fr))!important}.v33-3>.v32-st>.v11-col:first-child{flex:0 0 auto;border-color:#fecaca}.v33-3>.v32-st>.v11-col:last-child{flex:1}
 .v33-pb{background:#f8fafc;border-radius:12px;padding:10px 12px;margin:6px 0 8px;display:flex;align-items:center;gap:10px}.v33-bal{font-family:'JetBrains Mono',monospace;font-size:22px;color:#0f172a}
@@ -21691,6 +21717,48 @@ function fam2Chart(member){const cv=document.getElementById('fam2ch');if(!cv||ty
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},styleA:false,tooltip:{callbacks:{label:c=>'累計存入 $'+Math.round(c.raw).toLocaleString()}}},scales:{x:{ticks:{maxTicksLimit:6,font:{size:10}},grid:{display:false}},y:{ticks:{callback:v=>v>=10000?Math.round(v/10000)+'萬':v,font:{size:10}}}}}});
   // 錢從哪裡來：沿用原本的卡片（第二層金額直接顯示）
   const src=document.getElementById('family-src-card'),to=document.getElementById('fam2src');if(src&&to&&src.innerHTML.trim()){to.innerHTML=`<div class="f2c">${src.innerHTML}</div>`;to.querySelectorAll('.v31-pl').forEach(x=>x.classList.remove('v31-pl'));}}
+
+// ══ v36（2026/11/10）：家族帳戶第一層改成「存摺封面」——卡片上不出現任何金額（只顯示目標達成％、持股比例），每個帳戶獨立 ══
+const F1_COL=[['#1e3a8a','#2563eb'],['#075985','#0ea5e9'],['#9d174d','#ec4899'],['#6d28d9','#a78bfa'],['#b45309','#f59e0b'],['#334155','#64748b']];
+const F1_OP=[1,.62,.38];
+function f1Emoji(m){m=String(m);if(/&|＆/.test(m))return'👧👦';if(/媽|母/.test(m))return'👵';if(/爸|父/.test(m))return'👴';if(/婆|太太|妻/.test(m))return'👩';if(/豪/.test(m))return'👨';return'👤';}
+function f1Card(member,mi){
+  const esc=x=>String(x).replace(/\\/g,'\\\\').replace(/'/g,"\\'");const em=esc(member);
+  const acc=getFamilyAccount(member),holdings=acc.holdings||[];
+  let tot=0;const hd=[];holdings.forEach(h=>{const c=calcFamilyHolding(h);if(c.shares>0){tot+=c.cost;hd.push({code:h.code,cost:c.cost});}});
+  hd.sort((a,b)=>b.cost-a.cost);
+  const target=(db.family.targets||{})[member]||1000000;
+  const pct=target>0?tot/target*100:0;
+  let last='';holdings.forEach(h=>(h.transactions||[]).forEach(t=>{if(t.type==='buy'&&t.date>last)last=t.date;}));
+  const gap=last?Math.floor((Date.now()-new Date(last.replace(/\//g,'-')+'T00:00:00').getTime())/864e5):0;
+  const col=F1_COL[mi%F1_COL.length];
+  // 持股比例：3 檔以內全列，超過就「前 2 大＋其他 N 檔」
+  let it=hd.map(h=>({c:h.code,p:tot>0?h.cost/tot*100:0}));
+  if(it.length>3){const rest=it.slice(2).reduce((a,b)=>a+b.p,0);it=it.slice(0,2).concat([{c:'其他',n:hd.length-2,p:rest}]);}
+  const R=30,Cc=2*Math.PI*R;let off=0;const arcs=it.map((x,k)=>{const L=Cc*x.p/100;const a=`<circle cx="38" cy="38" r="${R}" fill="none" stroke="${col[1]}" stroke-opacity="${F1_OP[k]}" stroke-width="11" stroke-dasharray="${Math.max(1,L-(it.length>1?2:0)).toFixed(1)} ${Cc.toFixed(1)}" stroke-dashoffset="${(-off).toFixed(1)}" transform="rotate(-90 38 38)"/>`;off+=L;return a;}).join('');
+  const leg=it.map((x,k)=>x.c==='其他'?`<div><i style="background:${col[1]};opacity:${F1_OP[k]}"></i><span><b style="font-family:inherit">其他</b> <span style="color:#64748b;font-size:11px">${x.n} 檔</span></span><b style="color:${col[0]}">${Math.round(x.p)}%</b></div>`
+    :`<div data-c onclick="event.stopPropagation();openFamilyBuyForHolding('${em}','${esc(x.c)}')" title="點擊快速買入 ${_ae(x.c)}"><i style="background:${col[1]};opacity:${F1_OP[k]}"></i><b>${_ae(x.c)}</b><b style="color:${col[0]}">${Math.round(x.p)}%</b></div>`).join('');
+  // 出資比例（只顯示％）
+  let split='';const sp=acc.defaultSplits;
+  if(sp&&sp.length>=2){const t={};sp.forEach(x=>t[x.name]=0);holdings.forEach(h=>(h.transactions||[]).filter(x=>x.type==='buy'&&x.splits).forEach(x=>x.splits.forEach(y=>{if(t[y.name]!==undefined)t[y.name]+=y.amt||0;})));
+    const g=Object.values(t).reduce((a,b)=>a+b,0);split=`<div class="f1sp">👫 出資 ${sp.map(x=>`${_ae(x.name)} ${g>0?Math.round(t[x.name]/g*100):x.pct}%`).join('・')}</div>`;}
+  return`<div class="f1c" data-m="${_ae(member)}" onclick="fam2Go('${em}')">
+  <div class="f1cv" style="background:linear-gradient(160deg,${col[1]},${col[0]})">
+    <div class="f1k">儲 蓄 存 摺</div>
+    <div class="f1n"><span style="font-size:20px">${f1Emoji(member)}</span><b>${_ae(member)}</b></div>
+    <div class="f1s">${hd.length} 檔持股${last?`・最近存入 ${_b6md(last)}`:''}</div>${split}
+    <div class="f1p"><div class="t"><span>🎯 目標達成</span><button onclick="event.stopPropagation();openFamilyTargetModal('${em}')" title="修改目標">✎</button><b>${pct>=10?Math.round(pct):Math.round(pct*10)/10}<small>%</small></b></div>
+      <div class="br"><i style="width:${Math.min(100,pct).toFixed(1)}%"></i></div><div class="sc"><span>0%</span><span>50%</span><span>100%</span></div></div>
+    ${gap>=60?`<div class="f1w" title="最近一次存入是 ${_ae(last)}">⏰ ${gap} 天</div>`:''}
+  </div>
+  <div class="f1h">${hd.length?`<svg width="70" height="70" viewBox="0 0 76 76" style="flex-shrink:0"><circle cx="38" cy="38" r="${R}" fill="none" stroke="#f1f5f9" stroke-width="11"/>${arcs}<text x="38" y="42" text-anchor="middle" font-size="12" font-weight="900" font-family="ui-monospace,monospace" fill="${col[0]}">${hd.length} 檔</text></svg><div class="f1l">${leg}</div>`:'<div style="flex:1;text-align:center;color:#94a3b8;font-size:12.5px">還沒有持股・按「存入」開始</div>'}</div>
+  <div class="f1a"><button style="color:${col[0]}" onclick="event.stopPropagation();openFamilyQuickBuy('${em}')">💰 存入</button><button onclick="event.stopPropagation();fam2Go('${em}')">翻開存摺 ›</button></div></div>`;
+}
+(function(){const _r=renderFamilyMemberCards;renderFamilyMemberCards=function(){const r=_r.apply(this,arguments);
+  try{const g=document.getElementById('family-member-cards'),f=getFamilyDB();if(g&&f.members.length){if(!db.family.targets)db.family.targets={};
+    g.classList.add('f1g');g.style.gridTemplateColumns='';
+    g.innerHTML=f.members.map((m,i)=>f1Card(m,i)).join('')+`<div class="f1add" onclick="openFamilyMemberModal()"><span style="font-size:16px">＋</span>新增成員</div>`;}}catch(e){console.warn('f1',e);}
+  return r;};})();
 </script>
 
 </div><!-- /main-content -->
