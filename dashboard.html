@@ -20749,7 +20749,8 @@ function rsN(s){if(s==null)return null;s=String(s).replace(/,/g,'').trim();if(!s
 function rsV(s){const n=rsN(s);return n?n.v:null;}
 function rsDate(s){const m=String(s||'').match(/(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})/);return m?`${m[1]}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}`:'';}
 function rsParse(text){
-  let t=String(text||'');const a=t.indexOf('匯入用摘要 開始'),b=t.indexOf('匯入用摘要 結束');if(a>=0)t=t.slice(t.indexOf('\n',a)+1,b>a?t.lastIndexOf('\n',b):undefined);
+  // v39：PDF 讀出來的字會被正規化（全形｜→半形|、：→:），先換回來，不然看好／擔心／分位／情境都讀不到
+  let t=String(text||'').replace(/\|/g,'｜').replace(/匯入用摘要\s*開始/g,'匯入用摘要 開始').replace(/匯入用摘要\s*結束/g,'匯入用摘要 結束');const a=t.indexOf('匯入用摘要 開始'),b=t.indexOf('匯入用摘要 結束');if(a>=0)t=t.slice(t.indexOf('\n',a)+1,b>a?t.lastIndexOf('\n',b):undefined);
   const F={},M={};RS_MULTI.forEach(k=>M[k]=[]);
   t.split('\n').forEach(line=>{line=line.trim();if(!line||/^（.*）$/.test(line)||/^\(.*\)$/.test(line))return;const m=line.match(/^([^：:]{1,14})[：:](.*)$/);if(!m)return;
     const k=m[1].trim(),v=m[2].trim();if(RS_MULTI.includes(k)){if(v&&v!=='無')M[k].push(v.split('｜').map(x=>x.trim()));}else F[k]=v;});
@@ -20851,7 +20852,7 @@ function rsRender(){
   const T=_twToday();
   const nextT=(r,S)=>{const t=S.track.filter(x=>x.d&&x.d>=T&&!(r.done||{})[rsTK(x)]).sort((a,b)=>a.d.localeCompare(b.d))[0];return t?`<span class=mono>${rsMD(t.d)}</span> ${_ae(t.t.slice(0,18))}${t.t.length>18?'…':''}`:'<span class=rs-mu>—</span>';};
   host.innerHTML=`<div class=rs-top><span class=rs-mu style="font-size:13px">只有匯入過研究報告的股票才會在這裡；數字都來自報告，現價每天更新。</span>
-   <span style="margin-left:auto;display:flex;gap:8px"><button class="rs-btn gh" onclick="rsCopyPrompt()" title="貼到寫報告的專案指令最後面，報告才會附「匯入用摘要」">📋 複製報告指令</button><button class="rs-btn gh" onclick="rsPickBundle()">📦 匯入研究報告包</button><button class=rs-btn onclick="rsPickPdf()">📄 匯入研究報告 PDF</button></span></div>
+   <span style="margin-left:auto;display:flex;gap:8px"><button class="rs-btn gh" onclick="rsCopyPrompt()" title="複製整份提問範本：填好最上面 3 個【】，貼給寫報告的 AI">📋 複製報告指令</button><button class="rs-btn gh" onclick="rsPickBundle()">📦 匯入研究報告包</button><button class=rs-btn onclick="rsPickPdf()">📄 匯入研究報告 PDF</button></span></div>
   ${rows.length?`<div class=rs-box style="padding:6px 10px;overflow-x:auto"><table class=rs-t><tr><th></th><th>股票</th><th>現價</th><th>位置</th><th>關注以來</th><th>本益比／淨值比</th><th>殖利率 去年｜預估</th><th>警訊</th><th>下一件事</th><th>報告</th></tr>
    ${rows.map(({r,C})=>{const S=C.S,c=RS_LV[C.lv];const on=_rsOpen===r.code;const day=db.prices?.[r.code]?.changePct;
      const val=S.val==='pb'?`<b class=mono>${rsFmt(C.pb,2)}</b> <span class=rs-mu>倍 淨值比</span>`:`<b class=mono>${rsFmt(C.useFwd?C.pef:C.pe,1)}</b> <span class=rs-mu>${C.useFwd?'預估':'近四季'}${S.peQ.length?' · '+S.peQ.map(q=>q.m).join('/'):''}</span>`;
@@ -21107,7 +21108,7 @@ function rsGuess(pages,fname){pages=pages.map(rsNorm);const all=pages.join('\n')
 function rsPickPdf(){const i=document.createElement('input');i.type='file';i.accept='application/pdf,.pdf';i.onchange=async()=>{const f=i.files[0];if(!f)return;
   if(!encGetKey())return toast('❌ 這台裝置沒有資料密碼，PDF 不能加密上傳');
   rsModal('<div class=rs-h>📄 讀取 PDF 中…</div><div class=rs-mu id=rs-pst style="margin-top:8px">第一次會先載入 PDF 工具</div>');
-  try{const bytes=new Uint8Array(await f.arrayBuffer());const P=await rsPdfRead(bytes);const txt=rsNorm(P.pages.join('\n'));
+  try{const bytes=new Uint8Array(await f.arrayBuffer());const P=await rsPdfRead(bytes);const txt=rsNorm(P.pages.join('\n')).replace(/匯入用摘要\s*開始/g,'匯入用摘要 開始').replace(/匯入用摘要\s*結束/g,'匯入用摘要 結束').replace(/\|/g,'｜');
     const has=txt.includes('匯入用摘要 開始');const sum=has?txt.slice(txt.indexOf('=== 匯入用摘要 開始')>=0?txt.indexOf('=== 匯入用摘要 開始'):txt.indexOf('匯入用摘要 開始'),txt.indexOf('匯入用摘要 結束')+12).replace(/\n(?![^\n]{0,14}[：:])/g,''):rsGuess(P.pages,f.name);
     // 河流圖那頁拍一張
     const imgs=[];for(let pn=P.n;pn>=1;pn--){if(/河流圖|淨值比/.test(P.pages[pn-1])&&/倍/.test(P.pages[pn-1])){try{imgs.push({n:`第 ${pn} 頁（河流圖）`,t:'image/jpeg',b64:await rsPdfSnap(P.doc,pn)});}catch(e){}break;}}
@@ -21772,7 +21773,7 @@ function f1Card(member,mi){
   return r;};})();
 
 // ══ v37（2026/11/10）：琁＆軒 分開顯示——券商、買入還是同一個「琁 & 軒」窗口；照每筆出資比例把股數（整數）和金額分到各自的存摺 ══
-const DASH_VER='v38';
+const DASH_VER='v39';
 function famSplitParent(){const f=getFamilyDB();return f.members.find(m=>{const a=f.accounts[m];return a&&a.defaultSplits&&a.defaultSplits.length>=2;})||null;}
 function famKids(){const p=famSplitParent();return p?(getFamilyDB().accounts[p].defaultSplits||[]).map(x=>x.name):[];}
 function famIsKid(m){const f=getFamilyDB();return !!m&&!f.members.includes(m)&&famKids().includes(m);}
@@ -21851,7 +21852,62 @@ function fqbPctSet(p1){p1=Math.max(0,Math.min(100,+p1||0));_fqbPct=[p1,100-p1];f
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',put);else put();setTimeout(put,1500);})();
 
 // ══ v38（2026/11/11）：① 研究報告「匯入用摘要」指令一鍵複製  ② 琁＆軒買入前確認比例 ══
-const RS_PROMPT=`（把下面整段貼到寫個股研究報告的專案指令裡，放在原本指令的最後面）
+const RS_PROMPT=`請幫我做一份台股【股票名稱 代號】的完整研究報告。不用趕時間，內容要完整，每一節的格式和順序都照下面的規格，方便我每份報告互相比較。
+
+━━━━━━━━━━━━━━━━━━━━━━
+【我看好的原因】
+（例：是中華電信的子公司，獲利穩定；機房是簽長約出租，營收可預期；新機房陸續開出可以放大營收）
+
+【我想確認的問題】
+（例：
+1. 目前機房稼動率多少？還有沒有已規劃但還沒施工的機房？還有準備再投資的嗎？
+2. 這些機房的折舊怎麼算？
+3. 近期營收突然大增、股價漲停，這個營收是固定產能開出來的，還是一次性、不可持續的？）
+━━━━━━━━━━━━━━━━━━━━━━
+
+報告請先回答上面「我看好的原因」是否成立、「我想確認的問題」逐題回答，再依序寫下面各節：
+
+1. 財報（近 4～5 年）
+營收、年增率、毛利率、營益率、稅後淨利、EPS、股利，並附單季 EPS 圖。
+
+2. 法說會與股東會展望驗證
+每年法說會、股東會的展望與法人評估，依年份列出，再依日期回推驗證有沒有達成。要讀法說簡報原檔，問答部分用法說影音逐句核對。最後整理最新一次法說的展望與目前進度。
+
+3. 擴廠與營運進度
+擴廠、認證、客戶查廠與目前工程進度、產能稼動率（附稼動率走勢圖）。
+
+4. 現金流與資產負債
+營業現金流、資本支出、自由現金流、每年發放的股利；帳上現金、定存、借款與淨現金。每股淨現金要扣掉待發股利。
+
+5. 應收帳款品質
+應收帳款帳齡：有沒有幾年前的未收款還掛在帳上、備抵損失與沖銷、收款天數。
+
+6. 折舊與閒置產能
+新廠折舊是否還在攤、預計攤幾年、新設備會增加多少折舊，以及閒置產能成本（未分攤製造費用）對每股盈餘的影響。
+
+7. 評價
+本益比河流圖目前位階、評價情境試算（保守／基本／樂觀）、成交量變化。
+如果河流圖有某段時間突然超出原本區間，請搜尋當月及前後一個月的新聞，說明飆漲或急跌的原因、當時在炒作什麼題材（例如疫情突然爆發，或殖利率跌到相對甜蜜區被 ETF 納入成分股，把股價推到原本區間之外）。
+
+8. 股利公告與除息分析（樣本至少從 2016 年起）
+- 每次董事會宣布股利的日期、盤中或盤後公告、股利金額與前一年比較
+- 宣布前當下的殖利率、宣布後次一交易日漲跌與超出大盤的幅度、第 10 個交易日累計漲跌
+- 每次除息前一天與前 10 天走勢、除息前殖利率、除息當天與第 10 日相對參考價漲跌、填息天數
+- 依殖利率排序，找出公告與除息的有利、不利門檻，並用最近一次的股利換算成對應股價
+
+9. 風險與後續追蹤清單
+包含營運風險，以及會計主管、稽核主管異動等治理面。追蹤項目要寫明日期與要看的數字。
+
+10. 限制
+原始資料讀不到、或無法交叉核對的地方，一律寫在這一節。
+
+11. 附錄
+逐日收盤價、月營收、季損益、折舊等明細，放在附錄分頁。
+
+12. 資料來源
+每一節都要附來源，數字要和公開資訊觀測站等官方資料交叉核對。
+
+13. 匯入用摘要（照下面格式，放在報告最後）
 
 ━━━━━━━━━━━━━━━━━━━━━━
 【每份個股研究報告的最後，固定附上「匯入用摘要」】
@@ -21950,8 +22006,8 @@ const RS_PROMPT=`（把下面整段貼到寫個股研究報告的專案指令裡
 （治理：內容｜正常或注意或警訊）
 === 匯入用摘要 結束 ===
 ━━━━━━━━━━━━━━━━━━━━━━`;
-function rsCopyPrompt(){const done=()=>toast('📋 已複製報告指令，貼到寫報告的專案指令最後面');
-  const fb=()=>{rsModal(`<div class=rs-h>📋 報告指令（全選複製）</div><textarea readonly style="width:100%;height:60vh;margin-top:10px;font-size:12.5px;font-family:inherit;border:1px solid #e2e8f0;border-radius:10px;padding:10px" onfocus="this.select()">${_ae(RS_PROMPT)}</textarea>`);};
+function rsCopyPrompt(){const done=()=>toast('📋 已複製報告範本，填好最上面 3 個【】再貼給 AI');
+  const fb=()=>{rsModal(`<div class=rs-h>📋 報告提問範本（已複製，只要填最上面 3 個【】）</div><textarea readonly style="width:100%;height:60vh;margin-top:10px;font-size:12.5px;font-family:inherit;border:1px solid #e2e8f0;border-radius:10px;padding:10px" onfocus="this.select()">${_ae(RS_PROMPT)}</textarea>`);};
   try{navigator.clipboard.writeText(RS_PROMPT).then(()=>{done();fb();},fb);}catch(e){fb();}}
 (function(){const _s=saveQuickBuy;saveQuickBuy=function(){
   try{const area=document.getElementById('fqb-splits-area');const sh=parseFloat(document.getElementById('fqb-shares').value)||0,pr=parseFloat(document.getElementById('fqb-price').value)||0;
