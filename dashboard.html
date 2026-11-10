@@ -18308,7 +18308,7 @@ function renderLoanAlert(){
   try{const R=renderLoanAlert();const nav=document.getElementById('nav-assets-deduct');
     if(R&&nav){
       if(R.loanShort.length){const f=R.loanShort[0];nav.innerHTML=`<span style="background:#dc2626;color:#fff;border-radius:5px;padding:0 5px;font-size:9.5px;font-weight:800">🚨 ${_b6md(f.date)} 扣款不足 差${_b6m(f.after)}</span>`;}
-      else if(R.fundWarn.length){const f=R.fundWarn[0];nav.innerHTML=`<span style="background:#fef3c7;color:#b45309;border-radius:5px;padding:0 5px;font-size:9.5px;font-weight:800">⚠️ ${_b6md(f.date)} 基金扣款後低於安全水位</span>`;}
+      // v38：基金扣款後低於安全水位的黃色提醒拿掉（現金跑道已經完整，今天頁會提醒）
     }}catch(e){console.warn('b6 nav',e);}
   return r;};})();
 
@@ -20851,7 +20851,7 @@ function rsRender(){
   const T=_twToday();
   const nextT=(r,S)=>{const t=S.track.filter(x=>x.d&&x.d>=T&&!(r.done||{})[rsTK(x)]).sort((a,b)=>a.d.localeCompare(b.d))[0];return t?`<span class=mono>${rsMD(t.d)}</span> ${_ae(t.t.slice(0,18))}${t.t.length>18?'…':''}`:'<span class=rs-mu>—</span>';};
   host.innerHTML=`<div class=rs-top><span class=rs-mu style="font-size:13px">只有匯入過研究報告的股票才會在這裡；數字都來自報告，現價每天更新。</span>
-   <span style="margin-left:auto;display:flex;gap:8px"><button class="rs-btn gh" onclick="rsPickBundle()">📦 匯入研究報告包</button><button class=rs-btn onclick="rsPickPdf()">📄 匯入研究報告 PDF</button></span></div>
+   <span style="margin-left:auto;display:flex;gap:8px"><button class="rs-btn gh" onclick="rsCopyPrompt()" title="貼到寫報告的專案指令最後面，報告才會附「匯入用摘要」">📋 複製報告指令</button><button class="rs-btn gh" onclick="rsPickBundle()">📦 匯入研究報告包</button><button class=rs-btn onclick="rsPickPdf()">📄 匯入研究報告 PDF</button></span></div>
   ${rows.length?`<div class=rs-box style="padding:6px 10px;overflow-x:auto"><table class=rs-t><tr><th></th><th>股票</th><th>現價</th><th>位置</th><th>關注以來</th><th>本益比／淨值比</th><th>殖利率 去年｜預估</th><th>警訊</th><th>下一件事</th><th>報告</th></tr>
    ${rows.map(({r,C})=>{const S=C.S,c=RS_LV[C.lv];const on=_rsOpen===r.code;const day=db.prices?.[r.code]?.changePct;
      const val=S.val==='pb'?`<b class=mono>${rsFmt(C.pb,2)}</b> <span class=rs-mu>倍 淨值比</span>`:`<b class=mono>${rsFmt(C.useFwd?C.pef:C.pe,1)}</b> <span class=rs-mu>${C.useFwd?'預估':'近四季'}${S.peQ.length?' · '+S.peQ.map(q=>q.m).join('/'):''}</span>`;
@@ -21772,7 +21772,7 @@ function f1Card(member,mi){
   return r;};})();
 
 // ══ v37（2026/11/10）：琁＆軒 分開顯示——券商、買入還是同一個「琁 & 軒」窗口；照每筆出資比例把股數（整數）和金額分到各自的存摺 ══
-const DASH_VER='v37';
+const DASH_VER='v38';
 function famSplitParent(){const f=getFamilyDB();return f.members.find(m=>{const a=f.accounts[m];return a&&a.defaultSplits&&a.defaultSplits.length>=2;})||null;}
 function famKids(){const p=famSplitParent();return p?(getFamilyDB().accounts[p].defaultSplits||[]).map(x=>x.name):[];}
 function famIsKid(m){const f=getFamilyDB();return !!m&&!f.members.includes(m)&&famKids().includes(m);}
@@ -21847,8 +21847,120 @@ function fqbPctSet(p1){p1=Math.max(0,Math.min(100,+p1||0));_fqbPct=[p1,100-p1];f
 (function(){const _u=updateFqbTotal;updateFqbTotal=function(){const r=_u.apply(this,arguments);if(document.getElementById('fqb-pctrow'))fqbPctApply();return r;};})();
 // 版本號（左下角）
 (function(){function put(){const host=document.querySelector('.db-sidebar-footer')||document.querySelector('.db-sidebar');if(!host||document.getElementById('dash-ver'))return;
-  host.insertAdjacentHTML('beforeend',`<div id="dash-ver" style="font-size:11px;color:#94a3b8;text-align:center;padding:4px 0 6px">資產損益表 ${DASH_VER}・2026/11/10</div>`);}
+  host.insertAdjacentHTML('beforeend',`<div id="dash-ver" style="font-size:11px;color:#94a3b8;text-align:center;padding:4px 0 6px">資產損益表 ${DASH_VER}・2026/11/11</div>`);}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',put);else put();setTimeout(put,1500);})();
+
+// ══ v38（2026/11/11）：① 研究報告「匯入用摘要」指令一鍵複製  ② 琁＆軒買入前確認比例 ══
+const RS_PROMPT=`（把下面整段貼到寫個股研究報告的專案指令裡，放在原本指令的最後面）
+
+━━━━━━━━━━━━━━━━━━━━━━
+【每份個股研究報告的最後，固定附上「匯入用摘要」】
+
+報告寫完後，在最後一節（資料來源之後）加上一節，標題固定叫「匯入用摘要」。
+這一節是給我的股票系統讀的，請嚴格照下面格式：
+
+1. 第一行寫「=== 匯入用摘要 開始 ===」，最後一行寫「=== 匯入用摘要 結束 ===」。
+2. 每一行都是「欄位：內容」，冒號用全形「：」。一行只放一件事，不要換行接續。
+3. 數字只寫數字，不加「元」「倍」「%」以外的文字；範圍用「~」，例如 58~60。
+4. 報告裡沒有的欄位寫「無」，不要自己編，也不要刪掉那一行。
+5. 有多筆的欄位（看好、擔心、警訊、追蹤…）就重複同一個欄位名，一筆一行。
+6. 同一行裡的子項目用「｜」分隔，順序照下面範例。
+7. 所有數字必須跟報告內文一致。
+
+=== 匯入用摘要 開始 ===
+代號：1215
+名稱：卜蜂
+報告日期：2026/11/03
+報告標題：卜蜂 1215 研究報告
+報告當時股價：104
+股票類型：景氣循環股
+（股票類型只能從這四個選：定存股、成長股、景氣循環股、資產股）
+評價方式：本益比
+（評價方式：本益比 或 淨值比。營建、資產股用淨值比河流圖的就寫淨值比）
+評價用EPS：預估
+（評價用EPS：近四季 或 預估。報告結論是用哪一個 EPS 算甜蜜價、合理價，就寫哪一個）
+報告當時本益比：12.0
+一句話結論：股價已反映獲利衰退，還沒反映股利下修與負債增加
+
+近四季EPS：8.68
+預估EPS：2026｜7.1
+正常化EPS：7~8
+每股淨值：無
+每股淨現金：-56
+（每股淨現金：淨負債就寫負數）
+
+去年現金股利：7.0
+預估股利：2026｜4.8
+（數字有範圍就寫 5.0~5.5，甜蜜價、合理價也一樣）
+配發率：67
+
+本益比分位：10%=11.2｜25%=無｜50%=13.5｜75%=無｜90%=16.3
+（本益比分位：可以用 10%、25%、50%、75%、90%，也可以用 最低、最高）
+淨值比分位：無
+（淨值比分位：評價方式是淨值比才填，例如 1.0=淨值｜1.05=近5年低標｜1.98=2024高點）
+殖利率區間：低=無｜中位數=無｜高=無
+淨值比：目前=無｜中位數=無
+河流圖倍數線：11.2=97｜13.5=117｜16.3=141
+（河流圖倍數線：圖右邊每條線的「倍數=價格」，用近四季 EPS 算）
+
+悲觀價：70
+甜蜜價：80
+合理價：96
+偏貴價：115
+樂觀價：130
+情境：保守｜6.2｜84｜飼料成本繼續壓利潤
+情境：基本｜7.1｜96｜豬價維持約100元
+情境：樂觀｜8.0｜108｜接近2025年下半年
+（情境：名稱｜EPS｜推算股價｜前提）
+
+看好：結構升級，毛利率從13%升到21%｜✔
+看好：飼料成本在低檔｜✔
+擔心：淨負債持續增加，股利三成靠借款｜⚠
+擔心：桃園分切廠一延再延｜✘
+（看好／擔心：內容｜✔成立 ✘不成立 ⚠部分成立或要注意）
+
+衰退：蛋品三家子公司虧損｜-0.68億
+（衰退：哪個事業或指標｜變化幅度。正在衰退的才放）
+
+關鍵指標：毛豬拍賣價｜100｜元/kg｜越高越好
+關鍵指標：玉米期貨｜486｜美分｜越低越好
+（關鍵指標：名稱｜報告當時的數值｜單位｜越高越好或越低越好）
+
+警訊：毛豬拍賣價｜100｜元/kg｜<｜85
+警訊：玉米期貨｜486｜美分｜>｜500
+警訊：單季毛利率｜18.3｜%｜<｜17
+警訊：有息負債｜180｜億｜>｜200
+警訊：配發率｜67｜%｜<｜60
+（警訊：指標｜報告當時的數值｜單位｜< 或 >｜門檻。只放有明確數字門檻的）
+
+追蹤：2026/11/14｜Q3財報：EPS ≥ 2.0、毛利率 ≥ 19%
+追蹤：2027/03/15｜董事會股利是否 ≥ 4.8（低於 4.2 是警訊）
+追蹤：每季｜有息負債是否超過 180 億
+（追蹤：日期｜要看什麼。日期要寫到「日」，不確定就寫那個月的 15 日；固定週期的寫「每月」「每季」）
+
+股利公告有利價：96
+股利公告不利價：無
+股利公告月份：2~3
+除息提醒：除息前殖利率 ≥ 4.8% 時，除息後常轉弱，不必搶除息前買
+（股利公告有利價／不利價：用預估股利換算，公告前股價低於有利價、高於不利價）
+
+公司可信度：豬價與景氣方向大致準，新廠時程連續四次延後
+治理：瑞福兩次處分不動產給關係人｜注意
+治理：會計、稽核主管近兩年無異動｜正常
+（治理：內容｜正常或注意或警訊）
+=== 匯入用摘要 結束 ===
+━━━━━━━━━━━━━━━━━━━━━━`;
+function rsCopyPrompt(){const done=()=>toast('📋 已複製報告指令，貼到寫報告的專案指令最後面');
+  const fb=()=>{rsModal(`<div class=rs-h>📋 報告指令（全選複製）</div><textarea readonly style="width:100%;height:60vh;margin-top:10px;font-size:12.5px;font-family:inherit;border:1px solid #e2e8f0;border-radius:10px;padding:10px" onfocus="this.select()">${_ae(RS_PROMPT)}</textarea>`);};
+  try{navigator.clipboard.writeText(RS_PROMPT).then(()=>{done();fb();},fb);}catch(e){fb();}}
+(function(){const _s=saveQuickBuy;saveQuickBuy=function(){
+  try{const area=document.getElementById('fqb-splits-area');const sh=parseFloat(document.getElementById('fqb-shares').value)||0,pr=parseFloat(document.getElementById('fqb-price').value)||0;
+    const acc=getFamilyAccount(_quickBuyMember);const sp=acc&&acc.defaultSplits;
+    if(typeof _v25Src!=='undefined'&&_v25Src&&area&&area.style.display!=='none'&&sp&&sp.length>=2&&sh>0&&pr>0&&document.getElementById('fqb-date').value){const a=[+document.getElementById('fqb-split-amt1').value||0,+document.getElementById('fqb-split-amt2').value||0],t=a[0]+a[1];
+      const code=document.getElementById('fqb-code-sel').value==='__new__'?document.getElementById('fqb-new-code').value.trim().toUpperCase():document.getElementById('fqb-code-sel').value;
+      const msg=`${code}　${sh.toLocaleString()} 股 × ${pr}　共 $${Math.round(sh*pr).toLocaleString()}\n\n這筆錢這樣分：\n`+sp.slice(0,2).map((x,i)=>`　${x.name}　${t>0?Math.round(a[i]/t*100):0}%　$${a[i].toLocaleString()}`).join('\n')+`\n\n比例 OK 嗎？`;
+      if(!confirm(msg))return;}}catch(e){console.warn('fqb confirm',e);}
+  return _s.apply(this,arguments);};})();
 </script>
 
 </div><!-- /main-content -->
