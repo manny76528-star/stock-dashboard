@@ -149,7 +149,7 @@ body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"Pi
 .pill{display:inline-block;border-radius:99px;padding:1px 8px;font-size:11px;font-weight:800;color:#fff}
 .del{color:#dc2626;font-size:13px;font-weight:800;background:none;border:none;font-family:inherit;padding:8px}
 .cd{display:flex;align-items:center;gap:8px;padding:9px 11px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:12px;margin-bottom:6px;font-size:13.5px}
-.mgr{display:flex;align-items:center;gap:8px;padding:9px 4px;border-bottom:1px solid #f1f5f9;font-size:14px}.mgr.off{opacity:.45}.mgr button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:4px 8px;font-size:12px;font-family:inherit;font-weight:700;color:#475569}
+.mgr{display:flex;align-items:center;gap:8px;padding:9px 4px;border-bottom:1px solid #f1f5f9;font-size:14px}.mgr.off{opacity:.45}.mgr button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:4px 7px;font-size:12px;font-family:inherit;font-weight:700;color:#475569;white-space:nowrap}.mgr button.del{color:#dc2626;border-color:#fecaca}.mgr{gap:5px!important}
 .rc{display:flex;align-items:center;gap:10px;border:2px solid #fdba74;background:#fff7ed;border-radius:14px;padding:10px 12px;margin-bottom:8px}.rc button{border:none;background:#f97316;color:#fff;border-radius:11px;padding:10px 13px;font-weight:900;font-size:14px;font-family:inherit;white-space:nowrap}
 .empty{text-align:center;color:var(--mu);padding:26px 0;font-size:13.5px}
 .pr{color:#0891b2;font-weight:900}
@@ -205,7 +205,7 @@ body.embed .top a.hm,body.embed .top a.pc{display:none}
 </style>
 </head>
 <body>
-<div class="top"><b id="ttl">🏋️ 健身</b><span id="sync"></span><span style="font-size:10px;color:#cbd5e1">v1110e</span><span class="sp"></span><a class="pc" href="fitness.html?force=pc">📊 數據</a><a class="hm" href="index.html">🏠</a><button id="closeEmbed" style="display:none" onclick="parent.ftCloseEmbed&&parent.ftCloseEmbed()">✕ 關閉</button></div>
+<div class="top"><b id="ttl">🏋️ 健身</b><span id="sync"></span><span style="font-size:10px;color:#cbd5e1">v1110f</span><span class="sp"></span><a class="pc" href="fitness.html?force=pc">📊 數據</a><a class="hm" href="index.html">🏠</a><button id="closeEmbed" style="display:none" onclick="parent.ftCloseEmbed&&parent.ftCloseEmbed()">✕ 關閉</button></div>
 <div class="wrap" id="app"></div>
 <div class="bar" id="bar" style="display:none"><div class="in" id="barIn"></div></div>
 <div class="toast" id="toast"></div>
@@ -246,6 +246,7 @@ function mergeDb(a,b){
     [...(a[k]||[]),...(b[k]||[])].forEach(x=>{if(!x||!x.id)return;if(!m[x.id]||(x._u||0)>(m[x.id]._u||0))m[x.id]=x;});
     o[k]=Object.values(m).filter(x=>!(D[x.id]&&D[x.id]>=(x._u||0))).sort((p,q)=>(p.date+(p.start||'')).localeCompare(q.date+(q.start||'')));});
   [a.ex||{},b.ex||{}].forEach(E=>Object.entries(E).forEach(([id,e])=>{if(!o.ex[id]||(e._u||0)>(o.ex[id]._u||0))o.ex[id]=e;}));
+  {const DX={...(a._del||{}).ex,...(b._del||{}).ex};o._del.ex=DX;Object.keys(o.ex).forEach(id=>{if(DX[id]&&DX[id]>=(o.ex[id]._u||0))delete o.ex[id];});}
   const ca=a.cfg||{},cb=b.cfg||{};o.cfg=(ca._u||0)>=(cb._u||0)?ca:cb;
   o._ts=Math.max(a._ts||0,b._ts||0);return o;}
 let _sha='',_pushT=null,_pulling=false;
@@ -358,6 +359,18 @@ function dueList(T){return GROUPS.map(x=>groupDue(x[0],T)).sort((a,b)=>b.rank-a.
 function suggestPreset(T){const L={};dueList(T).forEach(x=>L[x.g]=x);
   const sc=p=>{const xs=p[1].map(g=>L[g]);return xs.reduce((a,x)=>a+x.rank*10+Math.min(x.n??10,10),0)/xs.length-(xs.some(x=>x.rank===0)?15:0);};
   const best=PRESETS.map(p=>({p,s:sc(p)})).sort((a,b)=>b.s-a.s)[0];return best?{name:best.p[0],groups:best.p[1],items:best.p[1].map(g=>L[g])}:null;}
+
+// ── 動作清單：自重切換、刪除（刪除要密碼；有紀錄的動作不能刪，只能停用）──
+const EX_DEL_PW='8443';
+function exUsed(id){return db.sessions.filter(s=>(s.items||[]).some(it=>it.ex===id)).length;}
+function bwEx(id){const e=db.ex[id];if(!e)return;const n=exUsed(id);
+  if(!confirm(`「${e.n}」改成${e.bw?'一般器材（填重量）':'自重動作（重量＝額外負重）'}？${n?`\n\n⚠️ 這個動作已經有 ${n} 次訓練紀錄，報告裡的重量計算會跟著改。`:''}`))return;
+  e.bw=!e.bw;touch(e);save();render();}
+function delEx(id){const e=db.ex[id];if(!e)return;const n=exUsed(id);
+  if(n){alert(`「${e.n}」已經有 ${n} 次訓練紀錄，刪掉會讓舊紀錄和報告壞掉，所以不能刪。\n\n不想再看到它的話，按「停用」就好（舊紀錄會保留）。`);return;}
+  const pw=prompt(`刪除「${e.n}」（${GN[e.g]}${e.bw?'・自重':''}）\n刪了就不能復原，請輸入密碼：`);if(pw==null)return;
+  if(pw!==EX_DEL_PW){alert('密碼不對，沒有刪除');return;}
+  (db._del.ex=db._del.ex||{})[id]=Date.now();delete db.ex[id];save();render();if(typeof toast==='function')toast('🗑️ 已刪除「'+e.n+'」');}
 
 // ══ 📄 教練報告：計算＋文字清單（網頁、手機共用）══
 const RP_NAME='阿豪訓練計劃';
@@ -723,8 +736,8 @@ function vHist(){
 // ── 動作清單 ──
 function vMgr(){
   $('ttl').textContent='⚙️ 動作清單';
-  $('app').innerHTML=GROUPS.map(g=>`<div class="gh2"><i style="background:${g[2]}"></i>${g[1]}</div><div class="card" style="padding:4px 10px">${exList(g[0],true).map(e=>`<div class="mgr${e.off?' off':''}"><span style="flex:1">${esc(e.n)}${e.sub?` <span class=mu>（${esc(e.sub)}）</span>`:''}${e.bw?' <span class=mu>自重</span>':''}</span><button onclick="renEx('${e.id}')">改名</button><button onclick="togEx('${e.id}')">${e.off?'啟用':'停用'}</button></div>`).join('')}
-    <div class="mgr"><button style="color:#2563eb;border-color:#bfdbfe" onclick="addEx('${g[0]}')">＋ 新增${g[1]}動作</button></div></div>`).join('')+'<div class="mu" style="margin:6px 4px">停用的動作不會出現在訓練畫面，但舊紀錄會保留。</div>';
+  $('app').innerHTML=GROUPS.map(g=>`<div class="gh2"><i style="background:${g[2]}"></i>${g[1]}</div><div class="card" style="padding:4px 10px">${exList(g[0],true).map(e=>`<div class="mgr${e.off?' off':''}"><span style="flex:1">${esc(e.n)}${e.sub?` <span class=mu>（${esc(e.sub)}）</span>`:''}${e.bw?' <span class=mu>自重</span>':''}</span><button onclick="renEx('${e.id}')">改名</button><button onclick="bwEx('${e.id}')">${e.bw?'改一般':'改自重'}</button><button onclick="togEx('${e.id}')">${e.off?'啟用':'停用'}</button>${exUsed(e.id)?'':`<button class="del" onclick="delEx('${e.id}')">刪除</button>`}</div>`).join('')}
+    <div class="mgr"><button style="color:#2563eb;border-color:#bfdbfe" onclick="addEx('${g[0]}')">＋ 新增${g[1]}動作</button></div></div>`).join('')+'<div class="mu" style="margin:6px 4px">停用的動作不會出現在訓練畫面，但舊紀錄會保留。<br>「刪除」只有還沒練過的動作才有（要輸入密碼），練過的請用停用。</div>';
   bar(`<button class="btn gh" onclick="go('home')">← 返回</button>`);
 }
 function renEx(id){const e=db.ex[id];const v=prompt('動作名稱',e.n);if(v&&v.trim()){e.n=v.trim();touch(e);save();render();}}
