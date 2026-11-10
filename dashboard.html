@@ -890,6 +890,16 @@ body.fam2on #v20-px,body.fam2on #v31-plbtn-fam,body.fam3on #v31-plbtn-fam{displa
 .f1a button+button{border-left:1px solid #f1f5f9;color:#475569;font-weight:800}.f1a button:hover{background:#f8fafc}
 .f1add{grid-column:1/-1;border:2px dashed #cbd5e1;border-radius:12px;background:#f8fafc;display:flex;align-items:center;justify-content:center;gap:8px;padding:8px;cursor:pointer;color:#94a3b8;font-weight:700;font-size:12px}
 .f1add:hover{border-color:#93c5fd;background:#eff6ff}
+/* v37 Line Bank 藍色存摺（B） */
+.v37-pb{background:linear-gradient(135deg,#1d4ed8,#2563eb)!important;color:#fff;border-radius:14px!important;padding:11px 14px!important}
+.v37-pb .v37-l{font-size:11.5px;opacity:.85}.v37-pb .v33-bal{color:#fff!important;font-size:23px}
+.v37-io{margin-left:auto;display:flex;flex-direction:column;gap:5px;align-items:flex-end}.v37-io i{font-style:normal;font-size:10.5px;opacity:.75}
+.v37-io span{border-radius:8px;padding:2px 9px;font-size:12px;font-weight:800;white-space:nowrap}.v37-io b{font-family:'JetBrains Mono',monospace}
+.v37-out{background:#dcfce7;color:#15803d}.v37-in{background:#fee2e2;color:#b91c1c}
+.f1mg{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#475569;font-weight:700;background:#fff;border:1px solid #e2e8f0;border-radius:999px;padding:3px 4px 3px 10px;cursor:pointer}
+.f1mg b{padding:2px 9px;border-radius:999px;color:#94a3b8;font-weight:800}.f1mg b.on{background:#6d28d9;color:#fff}
+.f1add{justify-content:flex-start!important;padding:8px 14px!important}
+.f2kid{background:#f5f3ff;border:1px solid #ddd6fe;color:#5b21b6;border-radius:12px;padding:8px 12px;font-size:12.5px;font-weight:700;margin-bottom:10px}
 /* v32 今天頁三欄 */
 .v33-3{grid-template-columns:repeat(3,minmax(0,1fr))!important}.v33-3>.v32-st>.v11-col:first-child{flex:0 0 auto;border-color:#fecaca}.v33-3>.v32-st>.v11-col:last-child{flex:1}
 .v33-pb{background:#f8fafc;border-radius:12px;padding:10px 12px;margin:6px 0 8px;display:flex;align-items:center;gap:10px}.v33-bal{font-family:'JetBrains Mono',monospace;font-size:22px;color:#0f172a}
@@ -19450,7 +19460,8 @@ function buildMobileV2(){
       drops:[[warn,'你的警戒'],[145,'券商警示'],[130,'斷頭']].map(([x,n])=>({x,n,drop:ratio?Math.round((1-x/ratio)*1000)/10:null})),
       assets:(db.pledgeAssets||[]).map(a=>({code:a.code,lots:a.lots||0,price:db.prices?.[a.code]?.price||null}))},
     watch:(db.watchlist||[]).map(w=>{const c=_wCalc(w);return{code:w.code,name:w.name||'',price:c.price,target:w.target||null,dir:w.alertDir,dist:c.dist,hit:c.hit,near:c.near,pri:w.priority||'中',reason:String(w.reason||'').slice(0,160),links:_wLinks(w).map(l=>({t:l.t,u:l.u}))};}),
-    pop};
+    pop,
+    lb:R&&R.lb?{bank:R.lb.bank||'Line Bank',bal:_b6Bal(R.lb),min:R.min?{amt:R.min.bal,date:R.min.date}:null,safe:R.safe,low:!!R.anyLow,short:(R.loanShort||[]).length}:null};
 }
 (function(){const _p=ghPush;ghPush=async function(){try{db.mobile_v2=buildMobileV2();}catch(e){console.warn('mobile_v2',e);}return _p.apply(this,arguments);};})();
 
@@ -21568,7 +21579,7 @@ function v32Today(){
   // v33 H2：Line Bank 存摺樣式（餘額放大、扣／入靠右，下面「每天明細」分隔）
   const sub=card.querySelector('.v13-hd .v11-sub');
   if(sub){const B=[...sub.querySelectorAll('b')].map(b=>b.textContent);
-    if(B.length>=3){sub.remove();card.querySelector('.v13-hd').insertAdjacentHTML('afterend',`<div class="v33-pb"><div><div class="v11-sub">🏦 Line Bank 現在</div><b class="v33-bal">${B[0]}</b></div><div class="v33-io"><div><span>兩週扣</span> <b style="color:#16a34a">${B[1]}</b></div><div><span>兩週入</span> <b style="color:#dc2626">${B[2]}</b></div></div></div><div class="v33-sep">每天明細</div>`);}}
+    if(B.length>=3){sub.remove();card.querySelector('.v13-hd').insertAdjacentHTML('afterend',`<div class="v33-pb v37-pb"><div><div class="v37-l">🏦 Line Bank 現在</div><b class="v33-bal">${B[0]}</b></div><div class="v37-io"><span class="v37-out">扣 <b>${B[1]}</b></span><span class="v37-in">入 <b>${B[2]}</b></span><i>兩週</i></div></div><div class="v33-sep">每天明細</div>`);}}
   // ③ 三欄等寬：這兩週｜要處理＋健康檢查｜提醒
   const g=document.createElement('div');g.className='v32-g v33-3';const st=document.createElement('div');st.className='v32-st';
   st.appendChild(todo);if(health)st.appendChild(health);
@@ -21759,6 +21770,85 @@ function f1Card(member,mi){
     g.classList.add('f1g');g.style.gridTemplateColumns='';
     g.innerHTML=f.members.map((m,i)=>f1Card(m,i)).join('')+`<div class="f1add" onclick="openFamilyMemberModal()"><span style="font-size:16px">＋</span>新增成員</div>`;}}catch(e){console.warn('f1',e);}
   return r;};})();
+
+// ══ v37（2026/11/10）：琁＆軒 分開顯示——券商、買入還是同一個「琁 & 軒」窗口；照每筆出資比例把股數（整數）和金額分到各自的存摺 ══
+const DASH_VER='v37';
+function famSplitParent(){const f=getFamilyDB();return f.members.find(m=>{const a=f.accounts[m];return a&&a.defaultSplits&&a.defaultSplits.length>=2;})||null;}
+function famKids(){const p=famSplitParent();return p?(getFamilyDB().accounts[p].defaultSplits||[]).map(x=>x.name):[];}
+function famIsKid(m){const f=getFamilyDB();return !!m&&!f.members.includes(m)&&famKids().includes(m);}
+function famKidsMerged(){return !!getFamilyDB().kidsMerge;}
+// 一筆交易分給每個人的比例：有填出資→照出資；沒填的買入→看當時各自持股，都沒有就用預設％；賣出／股息→照當時各自持股
+function famKidAlloc(parent){const acc=getFamilyDB().accounts[parent],K=(acc.defaultSplits||[]).map(x=>x.name),dp=(acc.defaultSplits||[]).map(x=>+x.pct||0);
+  const out={};K.forEach(k=>out[k]={holdings:[],log:[],_kid:k,_parent:parent});const hold={};
+  const ratioBy=(code)=>{const H=hold[code]||{},t=K.reduce((a,k)=>a+(H[k]||0),0);return t>0?K.map(k=>(H[k]||0)/t):null;};
+  const split=(n,r)=>{const raw=r.map(x=>n*x),fl=raw.map(Math.floor);let rem=Math.round(n-fl.reduce((a,b)=>a+b,0));const ord=raw.map((x,i)=>[x-fl[i],i]).sort((a,b)=>b[0]-a[0]);for(let j=0;j<rem&&j<ord.length;j++)fl[ord[j][1]]++;return fl;};
+  const allT=[];(acc.holdings||[]).forEach(h=>(h.transactions||[]).forEach(t=>allT.push({h,t})));allT.sort((a,b)=>(a.t.date||'').localeCompare(b.t.date||''));
+  const HM={};K.forEach(k=>HM[k]={});
+  allT.forEach(({h,t})=>{const S=t.shares||(t.lots||0)*1000;let r;
+    if(t.type==='buy'&&t.splits&&t.splits.length){const tot=t.splits.reduce((a,z)=>a+(+z.amt||0),0);r=K.map(k=>tot>0?(t.splits.filter(z=>z.name===k).reduce((a,z)=>a+(+z.amt||0),0))/tot:0);}
+    else r=ratioBy(h.code)||(dp.reduce((a,b)=>a+b,0)>0?dp.map(x=>x/dp.reduce((a,b)=>a+b,0)):K.map(()=>1/K.length));
+    const sh=split(S,r),gross=S*(+t.price||0),fee=+t.fee||0,tot=t.type==='buy'?gross+fee:gross-fee;
+    K.forEach((k,i)=>{if(!(r[i]>0)&&!sh[i])return;const hm=HM[k];let vh=hm[h.code];if(!vh){vh=hm[h.code]={id:h.id,code:h.code,name:h.name,url:h.url,transactions:[]};out[k].holdings.push(vh);}
+      const amt=tot*r[i],fk=fee*r[i];
+      vh.transactions.push({...t,splits:undefined,shares:sh[i],fee:fk,price:sh[i]>0?(t.type==='buy'?(amt-fk)/sh[i]:(amt+fk)/sh[i]):(+t.price||0),_amt:amt,_r:r[i]});
+      (hold[h.code]=hold[h.code]||{})[k]=((hold[h.code]||{})[k]||0)+(t.type==='sell'?-sh[i]:sh[i]);
+      out[k].log.push({id:(t.id||'')+'_'+k,txnId:t.id,date:t.date,type:t.type,code:h.code,name:h.name,shares:sh[i],price:t.price,amount:Math.round(amt),fee:fk,remark:t.remark||'',src:t.src});});});
+  // 股息（現金）：照入帳當時各自持股分
+  (acc.log||[]).filter(l=>l.type==='div').forEach(l=>{const ks=K.map(k=>(out[k].holdings.find(v=>v.code===l.code)?.transactions||[]).filter(t=>(t.date||'')<=(l.date||'')).reduce((a,t)=>a+(t.type==='sell'?-t.shares:t.shares),0));const st=ks.reduce((a,b)=>a+b,0);
+    K.forEach((k,i)=>{const r=st>0?ks[i]/st:1/K.length;if(r>0)out[k].log.push({...l,id:l.id+'_'+k,amount:Math.round((l.amount||0)*r)});});});
+  return out;}
+let _famKidCache=null;
+function famKidAcc(kid){const p=famSplitParent();if(!p)return{holdings:[],log:[]};const key=JSON.stringify(getFamilyDB().accounts[p]).length+'|'+p;
+  if(!_famKidCache||_famKidCache.key!==key||_famKidCache.src!==getFamilyDB().accounts[p])_famKidCache={key,src:getFamilyDB().accounts[p],v:famKidAlloc(p)};return _famKidCache.v[kid]||{holdings:[],log:[]};}
+(function(){const _g=getFamilyAccount;getFamilyAccount=function(m){if(famIsKid(m))return famKidAcc(m);return _g.apply(this,arguments);};})();
+// 一次性資料修正（備註寫明是誰的錢，但當時被預設 55/45 分掉）＋目標各 30 萬
+function famKidFix(){const f=getFamilyDB();if(f._kidFix1110)return false;const p=famSplitParent();if(!p)return false;const acc=f.accounts[p];let n=0;
+  const FIX={'ms307xwu76m':[[831,680],[['軒',1108],['琁',403]]],'msmz43tevv9':[[87,72],[['軒',159]]],'msogzdk7heg':[[61,49],[['軒',110]]],'mth2ac0c5ms':[[306,250],[['琁',556]]]};
+  (acc.holdings||[]).forEach(h=>(h.transactions||[]).forEach(t=>{const F=FIX[t.id];if(!F||!t.splits)return;const cur=['軒','琁'].map(k=>(t.splits.find(z=>z.name===k)||{}).amt||0);
+    if(cur[0]===F[0][0]&&cur[1]===F[0][1]){t.splits=F[1].map(([name,amt])=>({name,amt}));n++;}}));
+  if(!f.targets)f.targets={};famKids().forEach(k=>{if(f.targets[k]==null)f.targets[k]=300000;});
+  f._kidFix1110=Date.now();_famKidCache=null;save();if(n)toast('✅ 已修正琁＆軒 '+n+' 筆出資分配');return true;}
+// 第一層：琁＆軒 拆成兩張卡（可切換合併顯示）
+const F1_KID=[['#6d28d9','#a78bfa'],['#be123c','#fb7185']];
+(function(){const _r=renderFamilyMemberCards;renderFamilyMemberCards=function(){try{famKidFix();}catch(e){console.warn('kidfix',e);}const r=_r.apply(this,arguments);
+  try{const g=document.getElementById('family-member-cards'),f=getFamilyDB(),P=famSplitParent();if(!g||!f.members.length||!P)return r;
+    const merged=famKidsMerged(),K=famKids();let html='';
+    f.members.forEach((m,i)=>{if(m===P&&!merged){K.forEach((k,j)=>{let c=f1Card(k,i);const col=F1_KID[j%2];c=c.replace(/linear-gradient\(160deg,[^)]*\)/,`linear-gradient(160deg,${col[1]},${col[0]})`).split(F1_COL[i%F1_COL.length][0]).join(col[0]).split(F1_COL[i%F1_COL.length][1]).join(col[1]);
+        html+=c.replace('<div class="f1s">',`<div class="f1s">和${_ae(K.filter(x=>x!==k).join('、'))}同一個券商帳戶・`);});}else html+=f1Card(m,i);});
+    const kidBtn=`<span class="f1mg" onclick="event.stopPropagation();famKidToggle()">👫 ${_ae(K.join('＆'))}：<b class="${merged?'':'on'}">分開</b><b class="${merged?'on':''}">合併</b></span>`;
+    g.innerHTML=html+`<div class="f1add" onclick="openFamilyMemberModal()">${kidBtn}<span style="margin-left:auto;display:flex;align-items:center;gap:6px"><span style="font-size:16px">＋</span>新增成員</span></div>`;
+    g.querySelectorAll('.f1c').forEach(c=>{const m=c.dataset.m;if(K.includes(m)){const em=c.querySelector('.f1n span');if(em)em.textContent=K.indexOf(m)===0?'👦':'👧';}});}catch(e){console.warn('f1kid',e);}
+  return r;};})();
+function famKidToggle(){const f=getFamilyDB();f.kidsMerge=!f.kidsMerge;save();renderFamilyMemberCards();}
+// 成員下拉：加上琁、軒（第二層用）
+(function(){const _r=renderFamilyMemberSel;renderFamilyMemberSel=function(){const cur=document.getElementById('family-member-sel')?.value;const r=_r.apply(this,arguments);const sel=document.getElementById('family-member-sel');
+  if(sel){famKids().forEach(k=>{if(![...sel.options].some(o=>o.value===k)){const o=document.createElement('option');o.value=k;o.textContent=k+'（分開看）';sel.appendChild(o);}});if(cur&&famIsKid(cur))sel.value=cur;}return r;};})();
+// 第二層：琁／軒 的存摺只能看，買賣、股息、編輯都回到「琁 & 軒」窗口
+(function(){const _h=fam2Html;fam2Html=function(m){let h=_h.apply(this,arguments);if(!famIsKid(m))return h;const P=famSplitParent();
+  h=h.replace(/<div class="f2act">[\s\S]*?<\/div>/,'');
+  return`<div class="f2kid">👫 ${_ae(m)}的錢和${_ae(famKids().filter(x=>x!==m).join('、'))}放在同一個券商帳戶（${_ae(P)}），這裡只列${_ae(m)}自己出的錢；股數照每筆出資比例分成整數。</div>`+h;};})();
+(function(){const _a=fam3Ask;fam3Ask=function(){const m=curFamilyMember();if(famIsKid(m)){const sel=document.getElementById('family-member-sel');if(sel)sel.value=famSplitParent();}return _a.apply(this,arguments);};})();
+// 買入：從琁／軒進來→開「琁 & 軒」的買入，出資預設 100% 給那個人
+let _fqbPct=null;
+function _fqbKidOpen(fn,kid,args){const P=famSplitParent(),K=famKids();_fqbPct=K.map(k=>k===kid?100:0);return fn.apply(this,[P,...args]);}
+(function(){const _q=openFamilyQuickBuy;openFamilyQuickBuy=function(m){if(famIsKid(m))return _fqbKidOpen(_q,m,[]);_fqbPct=null;return _q.apply(this,arguments);};})();
+(function(){const _q=openFamilyBuyForHolding;openFamilyBuyForHolding=function(m,code){if(famIsKid(m))return _fqbKidOpen(_q,m,[code]);_fqbPct=null;return _q.apply(this,arguments);};})();
+// 出資％快速填：輸入第一個人的％，第二個人自動補；也可以一鍵「預設／只有誰」
+function fqbPctApply(){if(!_fqbPct)return;const sh=parseFloat(document.getElementById('fqb-shares').value)||0,pr=parseFloat(document.getElementById('fqb-price').value)||0,tot=Math.round(sh*pr);
+  const a1=Math.round(tot*_fqbPct[0]/100);const e1=document.getElementById('fqb-split-amt1'),e2=document.getElementById('fqb-split-amt2');if(tot>0&&e1&&e2){e1.value=a1;e2.value=tot-a1;}
+  const i1=document.getElementById('fqb-pct1'),i2=document.getElementById('fqb-pct2');if(i1&&document.activeElement!==i1)i1.value=_fqbPct[0];if(i2)i2.textContent=_fqbPct[1];try{onFqbSplitInput();}catch(e){}}
+function fqbPctSet(p1){p1=Math.max(0,Math.min(100,+p1||0));_fqbPct=[p1,100-p1];fqbPctApply();}
+(function(){const _s=showFqbSplitsIfNeeded;showFqbSplitsIfNeeded=function(member){const r=_s.apply(this,arguments);const area=document.getElementById('fqb-splits-area');const acc=getFamilyAccount(member);const s=acc.defaultSplits||[];
+  document.getElementById('fqb-pctrow')?.remove();
+  if(area&&area.style.display!=='none'&&s.length>=2){if(!_fqbPct)_fqbPct=[+s[0].pct||0,100-(+s[0].pct||0)];
+    area.querySelector('#fqb-total-display')?.insertAdjacentHTML('afterend',`<div id="fqb-pctrow" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:-4px 0 10px;font-size:12.5px"><span style="font-weight:800">比例</span>${_ae(s[0].name)} <input id="fqb-pct1" type="number" min="0" max="100" value="${_fqbPct[0]}" oninput="fqbPctSet(this.value)" style="width:56px;padding:4px 6px;border:1px solid #cbd5e1;border-radius:8px;font-size:13px">%・${_ae(s[1].name)} <b id="fqb-pct2">${_fqbPct[1]}</b>%
+      <span style="margin-left:auto;display:flex;gap:4px">${[[s[0].pct,'預設'],[100,'只有'+s[0].name],[0,'只有'+s[1].name]].map(([v,t])=>`<button type="button" onclick="fqbPctSet(${+v})" style="border:1px solid #e2e8f0;background:#fff;border-radius:7px;padding:3px 7px;font-size:11.5px;font-weight:700;cursor:pointer">${_ae(t)}</button>`).join('')}</span></div>`);}
+  return r;};})();
+(function(){const _u=updateFqbTotal;updateFqbTotal=function(){const r=_u.apply(this,arguments);if(document.getElementById('fqb-pctrow'))fqbPctApply();return r;};})();
+// 版本號（左下角）
+(function(){function put(){const host=document.querySelector('.db-sidebar-footer')||document.querySelector('.db-sidebar');if(!host||document.getElementById('dash-ver'))return;
+  host.insertAdjacentHTML('beforeend',`<div id="dash-ver" style="font-size:11px;color:#94a3b8;text-align:center;padding:4px 0 6px">資產損益表 ${DASH_VER}・2026/11/10</div>`);}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',put);else put();setTimeout(put,1500);})();
 </script>
 
 </div><!-- /main-content -->

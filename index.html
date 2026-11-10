@@ -73,6 +73,8 @@ h1{font-size:34px;font-weight:900;letter-spacing:.5px}
 .row{background:none!important;border:none!important;border-top:1px solid var(--bd)!important;border-radius:0;padding:10px 2px;font-size:15px}
 .row b{color:#0f172a}
 .row.bad{background:#fef2f2!important;border:1px solid #fecaca!important;border-radius:12px;color:#b91c1c;padding:10px 12px;margin:4px 0}.row.bad b{color:#b91c1c}
+.row.rcash{display:block}.cashrow{display:flex;align-items:center;gap:10px;width:100%}.cashrow .cl{font-size:12px;opacity:.85}.cashrow .cv{margin:0!important;font-family:ui-monospace,'JetBrains Mono',monospace;font-size:20px!important;color:#0f172a!important}
+.cashrow .cr{margin-left:auto;text-align:right;font-size:13px;font-weight:700;line-height:1.45}.cashrow .cr span{font-size:12px;font-weight:600;opacity:.9}
 .row.warn{background:#fffbeb!important;border:1px solid #fde68a!important;border-radius:12px;color:#b45309;padding:10px 12px;margin:4px 0}.row.warn b{color:#b45309}
 .big .note{color:#64748b}
 .pills{flex-direction:row;flex-wrap:wrap;margin-top:0;gap:6px}
@@ -161,7 +163,7 @@ body.locked .lock,body.locked .foot{visibility:hidden}
       </a>
     </div>
   </div>
-  <div class="foot"><span class="kb">⌨️ 按 1～5 直接進入</span><span>⏱ 閒置 3 分鐘自動上鎖</span><span>v2.0 · 2026</span></div>
+  <div class="foot"><span class="kb">⌨️ 按 1～5 直接進入</span><span>⏱ 閒置 3 分鐘自動上鎖</span><span>主目錄 v37 · 2026/11/10</span></div>
 </div>
 
 <!-- ══ 登入：主目錄模糊＋數字鍵盤（電腦置中卡片、手機下方滑出）══ -->
@@ -282,7 +284,7 @@ renderDate();setInterval(renderDate,30000);
 
 function readLS(k){try{return JSON.parse(localStorage.getItem(k)||'null');}catch(e){return null;}}
 
-// ══ 首頁資訊（只讀這台電腦上已存的資料；只顯示日期和件數，不顯示金額）══
+// ══ 首頁資訊（只讀這台電腦上已存的資料；資產損益表多顯示 Line Bank 現金，其他只顯示日期和件數）══
 function setDot(k,n){const e=document.getElementById('dot-'+k);if(!e)return;e.textContent=n>99?'99+':n;e.classList.toggle('on',n>0);}
 function renderHome(){
   renderDate();
@@ -304,9 +306,10 @@ function renderHome(){
     // 現金跑道（跟資產頁同一套：股息入帳、信貸扣款、基金扣款）
     const R=runway(db,T);
     if(R){
-      if(R.short)rows.push(['🚨 信貸扣款餘額不足',`${md(R.short.date)} 前要補錢`,'bad']);
-      else if(R.low)rows.push(['⚠️ 現金跑道',`${md(R.low)} 低於安全水位`,'warn']);
-      else rows.push(['✅ 現金跑道','夠用']);
+      // v37 E：Line Bank 現金大字＋右邊跑道狀態
+      const $m=n=>(n<0?'−$':'$')+Math.abs(Math.round(n)).toLocaleString('en-US');
+      const st=R.short?[`🚨 ${md(R.short.date)} 前要補錢`,'信貸扣款餘額不足','bad']:R.low?[`⚠️ ${md(R.low)} 扣完剩 ${$m(R.lowAmt)}`,'低於安全水位','warn']:['✅ 現金跑道','夠用',''];
+      rows.push(['__cash',`<div class="cashrow"><div><div class="cl">🏦 Line Bank 現金</div><b class="cv">${$m(R.lbBal)}</b></div><div class="cr">${st[0]}<br><span>${st[1]}</span></div></div>`,st[2]]);
     }
     // 週五快照
     const snaps=new Set((db.snapshots||[]).map(s=>(s.ym||'').slice(0,10)));
@@ -315,7 +318,7 @@ function renderHome(){
     if(dow===5){rows.push(['📸 週五快照',snaps.has(T)?'✓ 今天已拍':(now.getHours()>=15?'打開資產損益表就會拍':'今天 15:00 後')]);}
     else{const nf=addDays(T,(5-dow+7)%7);rows.push(['📸 週五快照',`${md(nf)}（${when(dayDiff(T,nf))}）`]);}
     if(dow!==5&&!snaps.has(lf)&&(db.snapshots||[]).length)rows.push(['⚠️ 上週五沒拍到快照',md(lf),'warn']);
-    box.innerHTML=rows.map(r=>`<div class="row ${r[2]||''}">${r[0]}<b>${esc(r[1])}</b></div>`).join('');setDot('inv',rows.filter(r=>r[2]).length);
+    box.innerHTML=rows.map(r=>r[0]==='__cash'?`<div class="row rcash ${r[2]||''}">${r[1]}</div>`:`<div class="row ${r[2]||''}">${r[0]}<b>${esc(r[1])}</b></div>`).join('');setDot('inv',rows.filter(r=>r[2]).length);
     note.textContent='';
   }
   // ── 進銷存 ──
@@ -374,11 +377,11 @@ function runway(db,T){
     funds.forEach(f=>{if(!(f.days||[]).includes(w))return;if(s===T&&logs.some(x=>x.fundId===f.id&&x.date===s))return;ev.push({date:s,amt:-(f.amount||0),k:2,acc:lb.id});});}
   ev.sort((a,b)=>a.date.localeCompare(b.date)||a.k-b.k);
   const safe=+((db.settings||{}).cashSafeLine)||0, in10=addDays(T,10);
-  let short=null,low=null;
+  let short=null,low=null,lowAmt=0;
   ev.forEach(e=>{if(!e.acc||B[e.acc]==null)return;B[e.acc]+=e.amt;
     if(e.loan&&e.date<=in10&&B[e.acc]<0&&!short)short=e;
-    if(e.acc===lb.id&&B[e.acc]<safe&&!low)low=e.date;});
-  return{short,low};
+    if(e.acc===lb.id&&B[e.acc]<safe&&!low){low=e.date;lowAmt=B[e.acc];}});
+  return{short,low,lowAmt,lbBal:bal(lb)};
 }
 
 // 進銷存客戶狀態（跟進銷存「客戶追蹤」同一套規則）
