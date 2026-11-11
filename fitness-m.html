@@ -208,7 +208,7 @@ body.embed .top a.hm,body.embed .top a.pc{display:none}
 </style>
 </head>
 <body>
-<div class="top"><b id="ttl">🏋️ 健身</b><span id="sync"></span><span style="font-size:10px;color:#cbd5e1">v1111b</span><span class="sp"></span><a class="pc" href="fitness.html?force=pc">📊 數據</a><a class="hm" href="index.html">🏠</a><button id="closeEmbed" style="display:none" onclick="parent.ftCloseEmbed&&parent.ftCloseEmbed()">✕ 關閉</button></div>
+<div class="top"><b id="ttl">🏋️ 健身</b><span id="sync"></span><span style="font-size:10px;color:#cbd5e1">v1111c</span><span class="sp"></span><a class="pc" href="fitness.html?force=pc">📊 數據</a><a class="hm" href="index.html">🏠</a><button id="closeEmbed" style="display:none" onclick="parent.ftCloseEmbed&&parent.ftCloseEmbed()">✕ 關閉</button></div>
 <div class="wrap" id="app"></div>
 <div class="bar" id="bar" style="display:none"><div class="in" id="barIn"></div></div>
 <div class="toast" id="toast"></div>
@@ -744,7 +744,7 @@ function vHist(){
     if(hasW||(!c.length)){const g=G[0];add(s.date,{o:0,id:s.id,tag:esc(sessTitle(s))||'訓練',col:g?GC[g]:'#64748b',
       txt:(s.items||[]).filter(it=>(it.sets||[]).some(x=>+x.r)).map(it=>esc(db.ex[it.ex]?.n||'')+' '+it.sets.filter(x=>+x.r).length+'組').join('・')||'還沒記錄',v:S.vol?fmt(S.vol)+' kg':(S.sets?S.sets+' 組':''),live,w:1});}
     if(c.length)add(s.date,{o:1,id:s.id,tag:'有氧',col:'#ea580c',txt:'🏃 '+c.map(x=>esc(x.type||'')+' '+(+x.min||0)+'分').join('・'),v:c.reduce((a,x)=>a+(+x.min||0),0)+' 分',live:hasW?'':live,cd:1});});
-  (db.abs||[]).forEach(a=>add(a.date,{o:2,tag:'腹肌',col:'#0d9488',txt:'🧘 '+esc(absPlan()),v:'',ab:1}));
+  (db.abs||[]).forEach(a=>add(a.date,{o:2,tag:'腹肌',col:'#0d9488',txt:'腹肌✓ '+esc(absPlan()),v:'',ab:1}));
   const days=Object.keys(D).sort().reverse();let m='',h='';
   days.forEach(d=>{const k=d.slice(0,7);if(k!==m){m=k;const ds=days.filter(z=>z.startsWith(k)),R=ds.flatMap(z=>D[z]);
       h+=`<div class="h" style="font-size:15px;margin-top:${h?18:4}px">${k.replace('-','/')} <span class=mu>${ds.length} 天・重訓 ${R.filter(r=>r.w).length}・有氧 ${R.filter(r=>r.cd).length} 次・腹肌 ${R.filter(r=>r.ab).length}</span></div>`;}
