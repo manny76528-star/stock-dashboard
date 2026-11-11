@@ -163,7 +163,7 @@ body.locked .lock,body.locked .foot{visibility:hidden}
       </a>
     </div>
   </div>
-  <div class="foot"><span class="kb">⌨️ 按 1～5 直接進入</span><span>⏱ 閒置 3 分鐘自動上鎖</span><span>主目錄 v37 · 2026/11/10</span></div>
+  <div class="foot"><span class="kb">⌨️ 按 1～5 直接進入</span><span>⏱ 閒置 3 分鐘自動上鎖</span><span>主目錄 v38 · 2026/11/11</span></div>
 </div>
 
 <!-- ══ 登入：主目錄模糊＋數字鍵盤（電腦置中卡片、手機下方滑出）══ -->
@@ -216,8 +216,15 @@ body.locked .lock,body.locked .foot{visibility:hidden}
   // 檢查是否已登入且未超時
   const isAuth=localStorage.getItem(KEY)==='1';
   const lastTs=parseInt(localStorage.getItem(TS_KEY)||'0');
-  if(isAuth&&(Date.now()-lastTs)<TIMEOUT){ show(); }
+  // v38：健身訓練進行中（今天有還沒按「練完了」的訓練，而且 45 分鐘內有記錄）→ 手機把頁面關掉重開時不用再打密碼，並提示回到訓練
+  const ftLive=(()=>{try{const f=JSON.parse(localStorage.getItem('fitness_db_v1')||'null');if(!f||!f.sessions)return null;const d=new Date(),T=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    const s=f.sessions.find(x=>!x.end&&x.date===T);const age=Date.now()-(+f._ts||0);return s&&age<45*60*1000?{min:Math.max(0,Math.round(age/60000))}:null;}catch(e){return null;}})();
+  if(isAuth&&((Date.now()-lastTs)<TIMEOUT||ftLive)){ show(); if(ftLive)ftBanner(ftLive); }
   else{ showLogin(); }
+  function ftBanner(L){try{const b=document.createElement('a');b.href='fitness-m.html';b.id='ft-live';
+    b.style.cssText='position:fixed;left:12px;right:12px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:50;display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,#0f766e,#14b8a6);color:#fff;border-radius:16px;padding:14px 16px;font-weight:900;font-size:16px;text-decoration:none;box-shadow:0 10px 24px rgba(15,118,110,.35)';
+    b.innerHTML='<span style="font-size:24px">🏋️</span><span>訓練進行中<br><span style="font-size:12px;font-weight:600;opacity:.9">'+(L.min?'上次記錄 '+L.min+' 分鐘前':'剛剛有記錄')+'</span></span><span style="margin-left:auto;background:#fff;color:#0f766e;border-radius:10px;padding:8px 12px;font-size:14px">回到訓練 →</span>';
+    document.body.appendChild(b);}catch(e){}}
 
   window.checkPw=function(){
     const val=inp.value.trim();
