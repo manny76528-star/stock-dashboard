@@ -142,6 +142,9 @@ body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"Pi
 .fld input,.fld select,.fld textarea{width:100%;border:1.5px solid #cbd5e1;border-radius:11px;padding:10px;font-size:17px;font-weight:800;font-family:var(--mono);text-align:center;background:#fff;outline:none}
 .fld textarea{font-family:inherit;font-size:14px;font-weight:500;text-align:left}
 .fld input:focus{border-color:var(--ac);box-shadow:0 0 0 3px #dbeafe}
+.hd{display:flex;align-items:center;gap:8px;margin:14px 2px 6px}.hd b{font-family:var(--mono);font-size:15px}.hd i{flex:1;height:1px;background:#e2e8f0}
+.hc{background:#fff;border:1px solid var(--line);border-radius:14px;padding:2px 12px}.hr{display:flex;align-items:center;gap:7px;padding:9px 0;cursor:pointer;min-width:0}.hr+.hr{border-top:1px solid #f1f5f9}
+.hr .tg{color:#fff;border-radius:6px;padding:1px 7px;font-size:11.5px;font-weight:800;white-space:nowrap;flex-shrink:0}.hr .tx{flex:1;min-width:0;font-size:12.5px;color:#475569;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.hr b{font-family:var(--mono);font-size:12.5px;white-space:nowrap}
 .li{display:flex;align-items:center;gap:10px;padding:11px 12px;background:#fff;border:1px solid var(--line);border-radius:13px;margin-bottom:6px;cursor:pointer}
 .li .d{font-family:var(--mono);font-weight:900;font-size:13px;width:52px}.li .t{flex:1;min-width:0}.li .t b{font-size:14px}.li .t div{font-size:11.5px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .li .v{font-family:var(--mono);font-weight:800;font-size:12.5px;text-align:right}
@@ -205,7 +208,7 @@ body.embed .top a.hm,body.embed .top a.pc{display:none}
 </style>
 </head>
 <body>
-<div class="top"><b id="ttl">🏋️ 健身</b><span id="sync"></span><span style="font-size:10px;color:#cbd5e1">v1111a</span><span class="sp"></span><a class="pc" href="fitness.html?force=pc">📊 數據</a><a class="hm" href="index.html">🏠</a><button id="closeEmbed" style="display:none" onclick="parent.ftCloseEmbed&&parent.ftCloseEmbed()">✕ 關閉</button></div>
+<div class="top"><b id="ttl">🏋️ 健身</b><span id="sync"></span><span style="font-size:10px;color:#cbd5e1">v1111b</span><span class="sp"></span><a class="pc" href="fitness.html?force=pc">📊 數據</a><a class="hm" href="index.html">🏠</a><button id="closeEmbed" style="display:none" onclick="parent.ftCloseEmbed&&parent.ftCloseEmbed()">✕ 關閉</button></div>
 <div class="wrap" id="app"></div>
 <div class="bar" id="bar" style="display:none"><div class="in" id="barIn"></div></div>
 <div class="toast" id="toast"></div>
@@ -231,6 +234,8 @@ const nowHM=()=>new Date(Date.now()+8*3600e3).toISOString().slice(11,16);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt=(v,d=0)=>(+v||0).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
 const WK='日一二三四五六', dow=d=>new Date(d+'T00:00:00Z').getUTCDay(), md=d=>+d.slice(5,7)+'/'+ +d.slice(8,10);
+// 日期統一：清單／表格用 mdd（11/09）＋wd（週一）；句子裡用 md（11/9）
+const mdd=d=>d.slice(5,7)+'/'+d.slice(8,10), wd=d=>'週'+WK[dow(d)];
 const addDays=(d,n)=>{const t=new Date(d+'T00:00:00Z');t.setUTCDate(t.getUTCDate()+n);return t.toISOString().slice(0,10);};
 const dayDiff=(a,b)=>Math.round((new Date(a+'T00:00:00Z')-new Date(b+'T00:00:00Z'))/864e5);
 const monday=d=>addDays(d,-((dow(d)+6)%7));
@@ -609,7 +614,7 @@ function vSess(){
   $('ttl').textContent='💪 '+sessTitle(s);
   const groups=[...new Set([...(s.groups||[]),...sessGroups(s)])];
   const S=sessStats(s);
-  let h=`<div class="card" style="display:flex;align-items:center;gap:10px;padding:10px 12px"><div><b class=mono>${md(s.date)}</b> <span class=mu>週${WK[dow(s.date)]}・${s.start||''}${s.end?'～'+s.end:' 開始'}</span><div class=mu>已記 ${S.sets} 組・${fmt(S.vol)} kg${S.min?`・有氧 ${S.min} 分`:''}</div></div><span style="margin-left:auto;display:flex;flex-direction:column;align-items:flex-end"><button class="del" style="color:#475569;padding:4px 8px" onclick="if(OPEN)cleanEx();OPEN=null;go('home')">← 首頁</button><button class="del" style="color:#475569;padding:4px 8px" onclick="editDate()">改日期</button></span></div>`;
+  let h=`<div class="card" style="display:flex;align-items:center;gap:10px;padding:10px 12px"><div><b class=mono>${mdd(s.date)}</b> <span class=mu>${wd(s.date)}・${s.start||''}${s.end?'～'+s.end:' 開始'}</span><div class=mu>已記 ${S.sets} 組・${fmt(S.vol)} kg${S.min?`・有氧 ${S.min} 分`:''}</div></div><span style="margin-left:auto;display:flex;flex-direction:column;align-items:flex-end"><button class="del" style="color:#475569;padding:4px 8px" onclick="if(OPEN)cleanEx();OPEN=null;go('home')">← 首頁</button><button class="del" style="color:#475569;padding:4px 8px" onclick="editDate()">改日期</button></span></div>`;
   groups.forEach(g=>{
     h+=`<div class="gh2"><i style="background:${GC[g]}"></i>${GN[g]}</div>`;let sub='';
     exList(g).forEach(e=>{if(e.sub&&e.sub!==sub){sub=e.sub;h+=`<div class="sub">${esc(e.sub)}</div>`;}h+=exRow(s,e);});
@@ -635,7 +640,7 @@ function exRow(s,e){
     <div class="rbox"><input class="r-in" inputmode="numeric" value="${x.r??''}" placeholder="${L&&L.sets[i]?L.sets[i].r:'次'}" oninput="setR(${i},this.value)" onfocus="this.select()"></div>
     ${+x.r?'<span class="ck">✓</span>':`<button class="x" onclick="rmSet(${i})">×</button>`}</div>`).join('');
   return`<div class="ex cur" onclick="openEx(null)">▶ <b>${esc(e.n)}</b><span class="r">收起 ▲</span></div><div class="ed">
-    ${L?`<div class="last">上次 ${md(L.date)}：${L.sets.map(x=>`<b>${wTxt(x,e.bw)}</b>×${x.r}`).join('　')}${e.bw?'<br>自重動作：重量填「額外負重」，沒加就填 0':''}</div>`:`<div class="last">第一次記這個動作${e.bw?'・重量填「額外負重」，沒加就填 0':''}</div>`}
+    ${L?`<div class="last">上次 ${md(L.date)}（${dayDiff(sess(CUR)?.date||today(),L.date)} 天前）：${L.sets.map(x=>`<b>${wTxt(x,e.bw)}</b>×${x.r}`).join('　')}${e.bw?'<br>自重動作：重量填「額外負重」，沒加就填 0':''}</div>`:`<div class="last">第一次記這個動作${e.bw?'・重量填「額外負重」，沒加就填 0':''}</div>`}
     <div class="sh"><span>組</span><span style="text-align:center">重量 <span class="seg"><i class="${U==='kg'?'on':''}" onclick="setU('kg')">kg</i><i class="${U==='lb'?'on':''}" onclick="setU('lb')">P</i></span></span><span style="text-align:center">次數</span><span></span></div>${rows}
     ${U==='lb'?`<div class="mu" style="margin:2px 0 4px">P＝磅${(()=>{const x=(it.sets||[]).find(z=>+z.w);return x?`，${x.w}P ≈ ${(x.w*LB).toFixed(1)} kg`:'';})()}（自動換算算訓練量）</div>`:''}${(it.sets||[]).some(x=>x.p)?'<div class="mu" style="margin:2px 0 4px">灰字＝上次這組的重量，一樣就直接填次數</div>':''}
     <div class="row2"><button class="btn gh" onclick="addSet()">＋ 下一組</button><button class="btn ok" style="flex:1.4" onclick="doneEx()">✓ 這個動作結束</button></div></div>`;
@@ -722,7 +727,7 @@ function vInbody(){
    <div class="fld"><label>基礎代謝 kcal${df('bmr','')}</label><input id="i-bmr" inputmode="numeric" value="${v.bmr}" placeholder="${last?last.bmr:''}"></div></div></div>
    ${cur?`<div style="text-align:center"><button class="del" onclick="if(confirm('刪除這筆？')){delRec('inbody','${cur.id}');IB=null;render();}">🗑 刪除這筆</button></div>`:''}
    <div class="h">歷史</div>${L.length?L.map((x,i)=>{const p=L[i+1];const d=(k)=>p&&x[k]&&p[k]?((+x[k])-(+p[k])):null;const dd=(k,n)=>{const z=d(k);return z===null?'':`<span style="color:${z>0?'#0891b2':'#94a3b8'}">${z>0?'+':''}${z.toFixed(n)}</span>`;};
-     return`<div class="li" onclick="IB='${x.id}';render()"><span class="d">${md(x.date)}<div class=mu style="font-weight:500">${x.date.slice(0,4)}</div></span><div class="t mono" style="font-size:12.5px;line-height:1.6">體重 <b>${x.wt||'—'}</b> ${dd('wt',1)}　肌肉 <b>${x.mm||'—'}</b> ${dd('mm',1)}<br>體脂 <b>${x.fat||'—'}%</b> ${dd('fat',1)}　代謝 <b>${x.bmr||'—'}</b></div><span style="color:#cbd5e1">›</span></div>`;}).join(''):'<div class="empty">還沒有 InBody 紀錄</div>'}`;
+     return`<div class="li" onclick="IB='${x.id}';render()"><span class="d">${mdd(x.date)}<div class=mu style="font-weight:500">${x.date.slice(0,4)}</div></span><div class="t mono" style="font-size:12.5px;line-height:1.6">體重 <b>${x.wt||'—'}</b> ${dd('wt',1)}　肌肉 <b>${x.mm||'—'}</b> ${dd('mm',1)}<br>體脂 <b>${x.fat||'—'}%</b> ${dd('fat',1)}　代謝 <b>${x.bmr||'—'}</b></div><span style="color:#cbd5e1">›</span></div>`;}).join(''):'<div class="empty">還沒有 InBody 紀錄</div>'}`;
   bar(`<button class="btn gh" style="flex:1" onclick="IB=null;go('home')">← 返回</button><button class="btn pri" style="flex:2" onclick="saveIB()">儲存</button>`);
 }
 function saveIB(){const g=k=>{const v=$('i-'+k).value.trim();return v===''?'':+v;};const r={date:$('i-date').value||today(),wt:g('wt'),mm:g('mm'),fat:g('fat'),bmr:g('bmr')};
@@ -732,8 +737,20 @@ function saveIB(){const g=k=>{const v=$('i-'+k).value.trim();return v===''?'':+v
 // ── 歷史紀錄 ──
 function vHist(){
   $('ttl').textContent='📒 訓練紀錄';
-  const L=db.sessions.slice().sort((a,b)=>(b.date+b.start).localeCompare(a.date+a.start));let m='',h='';
-  L.forEach(s=>{const k=s.date.slice(0,7);if(k!==m){m=k;const n=L.filter(z=>z.date.startsWith(k)).length;h+=`<div class="h" style="font-size:14px">${k.replace('-','/')} <span class=mu>${n} 次</span></div>`;}h+=liSess(s);});
+  // B 版：同一天只出現一次日期（日期當分隔線），當天的重訓、有氧、腹肌一行一項
+  const D={};const add=(d,r)=>(D[d]=D[d]||[]).push(r);
+  db.sessions.slice().sort((a,b)=>(a.start||'').localeCompare(b.start||'')).forEach(s=>{const S=sessStats(s),G=sessGroups(s),hasW=S.sets>0,c=(s.cardio||[]).filter(x=>+x.min||+x.km);
+    const live=s.end?'':' <span class="pill" style="background:#2563eb">進行中</span>';
+    if(hasW||(!c.length)){const g=G[0];add(s.date,{o:0,id:s.id,tag:esc(sessTitle(s))||'訓練',col:g?GC[g]:'#64748b',
+      txt:(s.items||[]).filter(it=>(it.sets||[]).some(x=>+x.r)).map(it=>esc(db.ex[it.ex]?.n||'')+' '+it.sets.filter(x=>+x.r).length+'組').join('・')||'還沒記錄',v:S.vol?fmt(S.vol)+' kg':(S.sets?S.sets+' 組':''),live,w:1});}
+    if(c.length)add(s.date,{o:1,id:s.id,tag:'有氧',col:'#ea580c',txt:'🏃 '+c.map(x=>esc(x.type||'')+' '+(+x.min||0)+'分').join('・'),v:c.reduce((a,x)=>a+(+x.min||0),0)+' 分',live:hasW?'':live,cd:1});});
+  (db.abs||[]).forEach(a=>add(a.date,{o:2,tag:'腹肌',col:'#0d9488',txt:'🧘 '+esc(absPlan()),v:'',ab:1}));
+  const days=Object.keys(D).sort().reverse();let m='',h='';
+  days.forEach(d=>{const k=d.slice(0,7);if(k!==m){m=k;const ds=days.filter(z=>z.startsWith(k)),R=ds.flatMap(z=>D[z]);
+      h+=`<div class="h" style="font-size:15px;margin-top:${h?18:4}px">${k.replace('-','/')} <span class=mu>${ds.length} 天・重訓 ${R.filter(r=>r.w).length}・有氧 ${R.filter(r=>r.cd).length} 次・腹肌 ${R.filter(r=>r.ab).length}</span></div>`;}
+    // 同一天的有氧合成一行（點了進第一筆）
+    let R=D[d].sort((a,b)=>a.o-b.o);const C=R.filter(r=>r.cd);if(C.length>1){const t=C.reduce((a,r)=>a+parseFloat(r.v),0);R=R.filter(r=>!r.cd);R.splice(R.findIndex(r=>r.o>1)<0?R.length:R.findIndex(r=>r.o>1),0,{...C[0],txt:'🏃 '+C.map(r=>r.txt.replace('🏃 ','')).join('・'),v:t+' 分',n:C.length,live:C.map(r=>r.live).join('')});}
+    h+=`<div class="hd"><b>${mdd(d)}</b><span class=mu>${wd(d)}${d===today()?'・今天':''}</span><i></i><span class=mu>${R.length} 項</span></div><div class="hc">${R.map(r=>`<div class="hr"${r.id?` onclick="go('sess','${r.id}')"`:''}><span class="tg" style="background:${r.col}">${r.tag}</span><span class="tx">${r.txt}</span>${r.live||''}<b>${r.v}</b></div>`).join('')}</div>`;});
   $('app').innerHTML=h||'<div class="empty">還沒有訓練紀錄</div>';
   bar(`<button class="btn gh" onclick="go('home')">← 返回</button>`);
 }
