@@ -205,7 +205,7 @@ body.embed .top a.hm,body.embed .top a.pc{display:none}
 </style>
 </head>
 <body>
-<div class="top"><b id="ttl">🏋️ 健身</b><span id="sync"></span><span style="font-size:10px;color:#cbd5e1">v1110h</span><span class="sp"></span><a class="pc" href="fitness.html?force=pc">📊 數據</a><a class="hm" href="index.html">🏠</a><button id="closeEmbed" style="display:none" onclick="parent.ftCloseEmbed&&parent.ftCloseEmbed()">✕ 關閉</button></div>
+<div class="top"><b id="ttl">🏋️ 健身</b><span id="sync"></span><span style="font-size:10px;color:#cbd5e1">v1111a</span><span class="sp"></span><a class="pc" href="fitness.html?force=pc">📊 數據</a><a class="hm" href="index.html">🏠</a><button id="closeEmbed" style="display:none" onclick="parent.ftCloseEmbed&&parent.ftCloseEmbed()">✕ 關閉</button></div>
 <div class="wrap" id="app"></div>
 <div class="bar" id="bar" style="display:none"><div class="in" id="barIn"></div></div>
 <div class="toast" id="toast"></div>
@@ -547,7 +547,9 @@ function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');clear
 function sess(id){return db.sessions.find(s=>s.id===id);}
 function openSess(){return db.sessions.filter(s=>!s.end&&dayDiff(today(),s.date)<=1).sort((a,b)=>(b.date+b.start).localeCompare(a.date+a.start))[0];}
 function bar(html){$('bar').style.display=html?'':'none';$('barIn').innerHTML=html||'';}
-function go(v,arg){V=v;if(v==='sess'){CUR=arg;}window.scrollTo(0,0);render();}
+// 自動結束動作：離開這場訓練的畫面、或打開別的動作時，幫忙按「這個動作結束」（空白預填組清掉，有填的組標成完成）
+function autoDoneEx(){if(!OPEN||!CUR)return;const s=sess(CUR);if(!s){OPEN=null;return;}cleanEx();const it=s.items.find(x=>x.ex===OPEN);if(it&&it.sets.length){it.done=true;touch(s);save();}OPEN=null;try{localStorage.removeItem('ft_open');}catch(e){}}
+function go(v,arg){if(OPEN&&(v!=='sess'||arg!==CUR))autoDoneEx();V=v;if(v==='sess'){CUR=arg;}window.scrollTo(0,0);render();}
 function render(){({home:vHome,sess:vSess,cardio:vCardio,inbody:vInbody,hist:vHist,mgr:vMgr})[V]();}
 
 // ── 首頁：今天練什麼 ──
@@ -641,7 +643,7 @@ function exRow(s,e){
 function lastTxt(exId,s){const L=lastSets(exId,s.date,s.id);return L?`上次 ${md(L.date)} ${wTxt(L.sets[0],db.ex[exId].bw)}${L.sets[0].u==='lb'||db.ex[exId].bw&&!+L.sets[0].w?'':'kg'}`:'';}
 function curIt(){const s=sess(CUR);let it=s.items.find(x=>x.ex===OPEN);return[s,it];}
 function openEx(id){
-  if(OPEN&&OPEN!==id)cleanEx();
+  if(OPEN&&OPEN!==id)autoDoneEx();
   OPEN=id;try{localStorage.setItem('ft_open',JSON.stringify({s:CUR,ex:id}));}catch(e){}if(id){const s=sess(CUR);let it=s.items.find(x=>x.ex===id);
     if(!it){it={ex:id,sets:[],done:false};s.items.push(it);}
     if(it.done)it.done=false;
@@ -671,7 +673,7 @@ function doneEx(){const[s,it]=curIt();cleanEx();const it2=s.items.find(x=>x.ex==
   OPEN=null;render();}
 function addG(g){const s=sess(CUR);s.groups=[...new Set([...(s.groups||[]),g])];touch(s);save();render();}
 function addCardio(t){const s=sess(CUR);const c={id:uid(),type:t,min:'',km:'',kcal:''};(s.cardio=s.cardio||[]).push(c);touch(s);save();go('cardio',c.id);}
-function finish(){if(OPEN)cleanEx();OPEN=null;const s=sess(CUR);s.end=nowHM();s.cardio=(s.cardio||[]).filter(c=>+c.min||+c.km||+c.kcal);
+function finish(){if(OPEN)autoDoneEx();OPEN=null;const s=sess(CUR);s.end=nowHM();s.cardio=(s.cardio||[]).filter(c=>+c.min||+c.km||+c.kcal);
   if(!s.items.length&&!s.cardio.length){if(confirm('這次沒有記到任何一組，要刪掉嗎？')){delRec('sessions',s.id);go('home');return;}}
   touch(s);save();const S=sessStats(s);toast(`🏁 完成！${S.sets} 組・${fmt(S.vol)} kg`);go('home');}
 function delSess(){if(!confirm('確定刪除這次訓練？'))return;delRec('sessions',CUR);OPEN=null;go('home');}
