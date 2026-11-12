@@ -182,6 +182,8 @@ body.embed .top a.hm,body.embed .top a.pc{display:none}
 .dgi{position:relative}.dgi .pk{position:absolute;top:-6px;right:-4px;background:#2563eb;color:#fff;font-style:normal;font-size:10px;font-weight:900;border-radius:50%;width:17px;height:17px;display:grid;place-items:center}
 .dgi .ag{font-size:10.5px;font-weight:800;color:#475569}.dgi.go .ag{color:#0e7490}.dgi.w .ag{color:#c2410c}.dgi.r .ag{color:#b91c1c}
 .dcap{display:flex;align-items:center;gap:6px;font-size:11.5px;color:#64748b;margin:2px 0 12px}.dcap label{margin-left:auto;border:1px solid #e2e8f0;border-radius:8px;padding:3px 8px;color:#334155;font-weight:800;background:#fff;position:relative;white-space:nowrap}.dcap input{position:absolute;inset:0;opacity:0;width:100%}
+.bwsw{display:flex;gap:6px;margin:8px 0 2px}.bwsw span{flex:1;text-align:center;border:1.5px solid #cbd5e1;border-radius:10px;padding:8px 0;font-weight:900;font-size:14px;cursor:pointer;background:#fff;color:#334155}.bwsw span.on{background:#0f766e;border-color:#0f766e;color:#fff}
+.wbox.bwv{justify-content:center;background:#f0fdfa;border-color:#99f6e4;color:#0f766e;font-weight:900;font-size:15px}.wbox.bwv span{font-size:11.5px;font-weight:700;margin-left:2px}
 .abd{display:flex;gap:3px;margin-top:5px}.abd i{width:17px;height:17px;border-radius:4px;background:#e2e8f0;display:grid;place-items:center;font-size:9px;font-style:normal;color:#64748b;font-weight:800}.abd i.d{background:#14b8a6;color:#fff}.abd i.t{outline:2px solid #0891b2;outline-offset:1px}
 .abb{border:none;background:#0891b2;color:#fff;font-weight:900;font-size:14.5px;border-radius:12px;padding:11px 12px;white-space:nowrap}.abu{border:1px solid var(--line);background:#fff;color:#64748b;font-weight:800;font-size:12.5px;border-radius:10px;padding:6px 10px}
 .phn{display:flex;align-items:center;gap:8px;background:#fdf4ff;border:1px solid #f0abfc;color:#86198f;border-radius:14px;padding:10px 12px;margin-bottom:10px;font-size:14px;cursor:pointer}.phn button{border:none;background:#c026d3;color:#fff;font-weight:900;border-radius:10px;padding:7px 11px;font-size:13px}
@@ -208,7 +210,7 @@ body.embed .top a.hm,body.embed .top a.pc{display:none}
 </style>
 </head>
 <body>
-<div class="top"><b id="ttl">🏋️ 健身</b><span id="sync"></span><span style="font-size:10px;color:#cbd5e1">v1111c</span><span class="sp"></span><a class="pc" href="fitness.html?force=pc">📊 數據</a><a class="hm" href="index.html">🏠</a><button id="closeEmbed" style="display:none" onclick="parent.ftCloseEmbed&&parent.ftCloseEmbed()">✕ 關閉</button></div>
+<div class="top"><b id="ttl">🏋️ 健身</b><span id="sync"></span><span style="font-size:10px;color:#cbd5e1">v1112a</span><span class="sp"></span><a class="pc" href="fitness.html?force=pc">📊 數據</a><a class="hm" href="index.html">🏠</a><button id="closeEmbed" style="display:none" onclick="parent.ftCloseEmbed&&parent.ftCloseEmbed()">✕ 關閉</button></div>
 <div class="wrap" id="app"></div>
 <div class="bar" id="bar" style="display:none"><div class="in" id="barIn"></div></div>
 <div class="toast" id="toast"></div>
@@ -377,6 +379,19 @@ function delEx(id){const e=db.ex[id];if(!e)return;const n=exUsed(id);
   if(pw!==EX_DEL_PW){alert('密碼不對，沒有刪除');return;}
   (db._del.ex=db._del.ex||{})[id]=Date.now();delete db.ex[id];save();render();if(typeof toast==='function')toast('🗑️ 已刪除「'+e.n+'」');}
 
+// ── 新增動作：小視窗（名稱＋「自重動作」勾選，預設不勾）──
+function exAddDlg(g){document.getElementById('exadd')?.remove();const d=document.createElement('div');d.id='exadd';
+  d.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px';
+  d.innerHTML=`<div style="background:#fff;border-radius:16px;padding:18px;width:100%;max-width:380px;font-family:inherit">
+   <b style="font-size:16px">➕ 新增${GN[g]}的動作</b>
+   <div style="font-size:12.5px;color:#64748b;margin:12px 0 4px">動作名稱</div>
+   <input id="exadd-n" style="width:100%;box-sizing:border-box;border:1px solid #93c5fd;border-radius:10px;padding:10px;font-size:16px;font-family:inherit" placeholder="例如：斜板啞鈴臥推">
+   <label style="display:flex;align-items:center;gap:8px;margin:14px 0;font-size:14px;cursor:pointer"><input id="exadd-bw" type="checkbox" style="width:20px;height:20px">自重動作<span style="font-size:12px;color:#64748b">（引體向上、雙槓、伏地挺身…）</span></label>
+   <div style="display:flex;gap:8px"><button id="exadd-c" style="flex:1;border:1px solid #cbd5e1;background:#fff;border-radius:10px;padding:11px;font-size:15px;font-weight:800;font-family:inherit">取消</button><button id="exadd-ok" style="flex:1;border:0;background:#2563eb;color:#fff;border-radius:10px;padding:11px;font-size:15px;font-weight:900;font-family:inherit">新增</button></div></div>`;
+  document.body.appendChild(d);const n=d.querySelector('#exadd-n');setTimeout(()=>n.focus(),50);
+  const ok=()=>{const v=n.value.trim();if(!v){n.focus();return;}const id='u'+uid();db.ex[id]=touch({g,n:v,bw:d.querySelector('#exadd-bw').checked,sub:'',o:Object.keys(db.ex).length+1});d.remove();save();render();};
+  d.querySelector('#exadd-ok').onclick=ok;d.querySelector('#exadd-c').onclick=()=>d.remove();n.onkeydown=e=>{if(e.key==='Enter')ok();};d.onclick=e=>{if(e.target===d)d.remove();};}
+
 // ══ 📄 教練報告：計算＋文字清單（網頁、手機共用）══
 const RP_NAME='阿豪訓練計劃';
 let RPM=(()=>{const t=today();if(+t.slice(8)<=5){const d=new Date(t.slice(0,8)+'01T00:00:00Z');d.setUTCMonth(d.getUTCMonth()-1);return d.toISOString().slice(0,7);}return t.slice(0,7);})();
@@ -450,7 +465,7 @@ function rpText(m){const{a,e}=rpRange(m),L=db.sessions.filter(s=>s.date>=a&&s.da
   Object.keys(D).sort().forEach(d=>{const by={},car=[];D[d].forEach(s=>{(s.items||[]).forEach(it=>{const ex=db.ex[it.ex];if(!ex)return;const st=(it.sets||[]).filter(x=>+x.r);if(!st.length)return;(by[ex.g]=by[ex.g]||[]).push([ex,st]);});car.push(...(s.cardio||[]));});
     const gs=GROUPS.map(g=>g[0]).filter(k=>by[k]),ab=AB.has(d);if(!gs.length&&!car.length&&!ab)return;
     t+=`\n${d.replace(/-/g,'/')}（${[...gs.map(k=>GN[k]),...(car.length?['有氧']:[]),...(ab?['腹肌']:[])].join('＋')}）週${WK[dow(d)]}\n`;
-    gs.forEach(k=>{t+=`【${GN[k]}】\n`;by[k].forEach(([ex,st])=>{t+=`${ex.n}：${st.map(x=>rpSetsTxt(x,ex.bw)).join('、')}\n`;});});
+    gs.forEach(k=>{t+=`【${GN[k]}】\n`;by[k].forEach(([ex,st])=>{t+=`${ex.n}${ex.bw&&bwAt(d)?`（自重・體重 ${(+bwAt(d)).toFixed(1)}KG）`:''}：${st.map(x=>rpSetsTxt(x,ex.bw)).join('、')}\n`;});});
     if(car.length){t+='【有氧】\n';car.forEach(c=>{t+=`${c.type}：${[c.min!==''&&c.min!=null?c.min+'分':'',c.km!==''&&c.km!=null?c.km+'公里':'',c.kcal!==''&&c.kcal!=null?c.kcal+'kcal':''].filter(Boolean).join('、')}\n`;});}
     if(ab)t+=`【腹肌】\n🧘 ${absPlan()}\n`;});
   return t.trim()+'\n';}
@@ -635,13 +650,15 @@ function exRow(s,e){
   const vol=ok.reduce((a,x)=>a+setLoad(e,x,s.date)*x.r,0);
   if(OPEN!==e.id)return`<div class="ex${done?' done':''}" onclick="openEx('${e.id}')">${done?'✅':ok.length?'◐':'○'} <b>${esc(e.n)}</b>${e.bw?' <span class=mu>自重</span>':''}<span class="r">${ok.length?`${ok.length} 組・${fmt(vol)} kg`:''}${!ok.length?lastTxt(e.id,s,true):''}</span></div>`;
   const L=lastSets(e.id,s.date,s.id), U=curU(it,e);
+  const BWA=e.bw?bwAddOn(it,L):true,BWK=e.bw?bwAt(s.date):0;
   const rows=(it.sets||[]).map((x,i)=>`<div class="st${x.p?' pre':''}${+x.r?' ok':''}"><span class="n">${i+1}</span>
-    <div class="wbox"><button onclick="stepW(${i},-1)">−</button><input class="w" inputmode="decimal" value="${x.w??''}" placeholder="${e.bw?'加重':'kg'}" oninput="setW(${i},this.value)" onfocus="this.select()"><button onclick="stepW(${i},1)">＋</button></div>
+    ${!BWA?`<div class="wbox bwv">自重${BWK?`<span>（體重 ${+(+BWK).toFixed(1)} kg）</span>`:''}</div>`:`<div class="wbox"><button onclick="stepW(${i},-1)">−</button><input class="w" inputmode="decimal" value="${x.w??''}" placeholder="${e.bw?'加重':'kg'}" oninput="setW(${i},this.value)" onfocus="this.select()"><button onclick="stepW(${i},1)">＋</button></div>`}
     <div class="rbox"><input class="r-in" inputmode="numeric" value="${x.r??''}" placeholder="${L&&L.sets[i]?L.sets[i].r:'次'}" oninput="setR(${i},this.value)" onfocus="this.select()"></div>
     ${+x.r?'<span class="ck">✓</span>':`<button class="x" onclick="rmSet(${i})">×</button>`}</div>`).join('');
   return`<div class="ex cur" onclick="openEx(null)">▶ <b>${esc(e.n)}</b><span class="r">收起 ▲</span></div><div class="ed">
-    ${L?`<div class="last">上次 ${md(L.date)}（${dayDiff(sess(CUR)?.date||today(),L.date)} 天前）：${L.sets.map(x=>`<b>${wTxt(x,e.bw)}</b>×${x.r}`).join('　')}${e.bw?'<br>自重動作：重量填「額外負重」，沒加就填 0':''}</div>`:`<div class="last">第一次記這個動作${e.bw?'・重量填「額外負重」，沒加就填 0':''}</div>`}
-    <div class="sh"><span>組</span><span style="text-align:center">重量 <span class="seg"><i class="${U==='kg'?'on':''}" onclick="setU('kg')">kg</i><i class="${U==='lb'?'on':''}" onclick="setU('lb')">P</i></span></span><span style="text-align:center">次數</span><span></span></div>${rows}
+    ${L?`<div class="last">上次 ${md(L.date)}（${dayDiff(sess(CUR)?.date||today(),L.date)} 天前）：${L.sets.map(x=>`<b>${wTxt(x,e.bw)}</b>×${x.r}`).join('　')}</div>`:`<div class="last">第一次記這個動作</div>`}
+    ${e.bw?`<div class="bwsw"><span class="${BWA?'':'on'}" onclick="bwSet(0)">自重</span><span class="${BWA?'on':''}" onclick="bwSet(1)">＋負重</span></div>`:''}
+    <div class="sh"><span>組</span><span style="text-align:center">${BWA?`重量${e.bw?'（額外）':''} `:'重量'}<span class="seg" style="${BWA?'':'display:none'}"><i class="${U==='kg'?'on':''}" onclick="setU('kg')">kg</i><i class="${U==='lb'?'on':''}" onclick="setU('lb')">P</i></span></span><span style="text-align:center">次數</span><span></span></div>${rows}
     ${U==='lb'?`<div class="mu" style="margin:2px 0 4px">P＝磅${(()=>{const x=(it.sets||[]).find(z=>+z.w);return x?`，${x.w}P ≈ ${(x.w*LB).toFixed(1)} kg`:'';})()}（自動換算算訓練量）</div>`:''}${(it.sets||[]).some(x=>x.p)?'<div class="mu" style="margin:2px 0 4px">灰字＝上次這組的重量，一樣就直接填次數</div>':''}
     <div class="row2"><button class="btn gh" onclick="addSet()">＋ 下一組</button><button class="btn ok" style="flex:1.4" onclick="doneEx()">✓ 這個動作結束</button></div></div>`;
 }
@@ -660,13 +677,16 @@ function exU(s,it){if(it.sets[0])return it.sets[0].u||'kg';const L=lastSets(it.e
 function nextSet(s,it,i){const z=_nextSet(s,it,i),u=exU(s,it);if(u==='lb')z.u='lb';else delete z.u;return z;}
 function _nextSet(s,it,i){const L=lastSets(it.ex,s.date,s.id);const eu=exU(s,it);const W=x=>x.w===''||x.w==null?'':((x.u||'kg')===eu?+x.w:Math.round(wKg(x)/(eu==='lb'?LB:1)*2)/2);if(L&&L.sets[i])return{w:W(L.sets[i]),r:'',p:1};const prev=it.sets[it.sets.length-1];if(prev)return{w:prev.w,r:''};if(L&&L.sets.length)return{w:W(L.sets[L.sets.length-1]),r:'',p:1};return{w:'',r:''};}
 function curU(it,e){return exU(sess(CUR),it);}
+// 自重動作：整個動作切「自重／＋負重」；自重時每組重量都記 0（報告寫「自重×12下」）
+function bwAddOn(it,L){if(it.bwAdd!=null)return !!it.bwAdd;if((it.sets||[]).some(x=>+x.w>0))return true;return !!(L&&L.sets.some(x=>+x.w>0));}
+function bwSet(on){event.stopPropagation();const[s,it]=curIt();it.bwAdd=!!on;if(!on)it.sets.forEach(x=>{x.w=0;});touch(s);save();render();}
 function setU(u){event.stopPropagation();const[s,it]=curIt();const e=db.ex[it.ex];if(curU(it,e)===u)return;e.u=u;touch(e);
   it.sets.forEach(x=>{if(+x.r&&!x.p){/* 已填好的組：只改單位標記，數字是你看到機器上的 */}if(u==='lb')x.u='lb';else delete x.u;});
   // 還沒確認的灰字重量，照新單位重新帶
   it.sets.forEach((x,i)=>{if(x.p){const n=_nextSet(s,{...it,sets:it.sets.slice(0,i)},i);x.w=n.w;}});touch(s);save();render();}
 function cleanEx(){const s=sess(CUR);const it=s&&s.items.find(x=>x.ex===OPEN);if(!it)return;it.sets=it.sets.filter(x=>+x.r);it.sets.forEach(x=>delete x.p);if(!it.sets.length)s.items=s.items.filter(x=>x!==it);touch(s);save();}
 function setW(i,v){const[s,it]=curIt();it.sets[i].w=v===''?'':+v;delete it.sets[i].p;v!==''&&event.target.closest('.st').classList.remove('pre');touch(s);save();}
-function setR(i,v){const[s,it]=curIt();it.sets[i].r=v===''?'':parseInt(v)||'';if(+it.sets[i].r)delete it.sets[i].p;touch(s);save();const row=event.target.closest('.st');row.classList.toggle('ok',!!+it.sets[i].r);if(+it.sets[i].r)row.classList.remove('pre');}
+function setR(i,v){const[s,it]=curIt();{const e=db.ex[it.ex];if(e&&e.bw&&it.bwAdd===false)it.sets[i].w=0;}it.sets[i].r=v===''?'':parseInt(v)||'';if(+it.sets[i].r)delete it.sets[i].p;touch(s);save();const row=event.target.closest('.st');row.classList.toggle('ok',!!+it.sets[i].r);if(+it.sets[i].r)row.classList.remove('pre');}
 function stepW(i,d){const[s,it]=curIt();const e=db.ex[it.ex];const step=it.sets[i].u==='lb'?5:e&&/平舉|彎舉|飛鳥/.test(e.n)?1:2.5;it.sets[i].w=Math.max(0,Math.round(((+it.sets[i].w||0)+d*step)*100)/100);delete it.sets[i].p;touch(s);save();render();}
 function rmSet(i){const[s,it]=curIt();it.sets.splice(i,1);if(!it.sets.length)it.sets.push({w:'',r:''});touch(s);save();render();}
 function addSet(){const[s,it]=curIt();it.sets=it.sets.filter((x,k)=>+x.r||k===it.sets.length-1);const n=it.sets.filter(x=>+x.r).length;
@@ -763,8 +783,7 @@ function vMgr(){
 }
 function renEx(id){const e=db.ex[id];const v=prompt('動作名稱',e.n);if(v&&v.trim()){e.n=v.trim();touch(e);save();render();}}
 function togEx(id){const e=db.ex[id];e.off=!e.off;touch(e);save();render();}
-function addEx(g){const v=prompt(GN[g]+'：新動作名稱');if(!v||!v.trim())return;const bw=confirm('這是自身體重的動作嗎？（例如引體向上、雙槓）\n按「確定」＝自重，「取消」＝一般器材');
-  const id='u'+uid();db.ex[id]=touch({g,n:v.trim(),bw,sub:'',o:Object.keys(db.ex).length+1});save();render();}
+function addEx(g){exAddDlg(g);}
 
 // ══ 📄 給教練（手機）══
 let RPSEG=(()=>{try{return localStorage.getItem('ft_rpseg')||'txt';}catch(e){return'txt';}})();
