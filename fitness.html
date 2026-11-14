@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-<!-- fitness build 2026-11-14g -->
+<!-- fitness build 2026-11-14h -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -230,7 +230,7 @@ tr.sr{cursor:pointer}tr.sr:hover td{background:#f8fafc}td.num{text-align:right;f
 </style>
 </head>
 <body>
-<div class="top"><b>🏋️ 健身數據</b><div class="tabs" id="tabs"></div><span class="sp"></span><span id="sync"></span><span class="mu" id="ver" style="font-size:11.5px">v1114g</span>
+<div class="top"><b>🏋️ 健身數據</b><div class="tabs" id="tabs"></div><span class="sp"></span><span id="sync"></span><span class="mu" id="ver" style="font-size:11.5px">v1114h</span>
  <button class="tb" onclick="impOpen()">📥 貼上匯入</button><button class="tb pri" onclick="emb('#new')">＋ 補記一次訓練</button><a href="fitness-m.html">📱 手機版</a><a href="index.html">🏠 主目錄</a></div>
 <div class="wrap" id="app"></div>
 <div id="emb" onclick="if(event.target===this)ftCloseEmbed()"><iframe id="embf"></iframe></div>
@@ -256,7 +256,7 @@ const DEF_EX=[
  ['tri','滑輪下壓'],['tri','滑輪過頭三頭屈伸'],
  ['bi','集中彎舉'],['bi','錘式彎舉']];
 function ftNew(){const ex={};DEF_EX.forEach((e,i)=>{ex['e'+(i+1)]={g:e[0],n:e[1],bw:!!e[2],sub:e[3]||'',o:i,_u:1};});return{v:1,_ts:0,ex,sessions:[],inbody:[],abs:[],photos:[],_del:{}};}
-let db=(()=>{try{const j=JSON.parse(localStorage.getItem(FT_KEY)||'null');if(j&&j.ex){j.abs=j.abs||[];j.photos=j.photos||[];return j;}}catch(e){}return ftNew();})();
+let db=(()=>{try{const j=JSON.parse(localStorage.getItem(FT_KEY)||'null');if(j&&j.ex){j.abs=j.abs||[];j.photos=j.photos||[];j._del=j._del||{};exRepair(j);return j;}}catch(e){}return ftNew();})();
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 const today=()=>{const d=new Date(Date.now()+8*3600e3);return d.toISOString().slice(0,10);};
 const nowHM=()=>new Date(Date.now()+8*3600e3).toISOString().slice(11,16);
@@ -280,8 +280,11 @@ function mergeDb(a,b){
     [...(a[k]||[]),...(b[k]||[])].forEach(x=>{if(!x||!x.id)return;if(!m[x.id]||(x._u||0)>(m[x.id]._u||0))m[x.id]=x;});
     o[k]=Object.values(m).filter(x=>!(D[x.id]&&D[x.id]>=(x._u||0))).sort((p,q)=>(p.date+(p.start||'')).localeCompare(q.date+(q.start||'')));});
   [a.ex||{},b.ex||{}].forEach(E=>Object.entries(E).forEach(([id,e])=>{if(!o.ex[id]||(e._u||0)>(o.ex[id]._u||0))o.ex[id]=e;}));
-  {const DX={...(a._del||{}).ex,...(b._del||{}).ex};o._del.ex=DX;// v1114g 動作刪了就是刪了（要密碼、而且只能刪沒紀錄的）：舊版畫面又自動補回來的也一律清掉
-  Object.keys(o.ex).forEach(id=>{if(DX[id])delete o.ex[id];});}
+  {const DX={...(a._del||{}).ex,...(b._del||{}).ex};o._del.ex=DX;// v1114g 動作刪了就是刪了：舊版畫面又自動補回來的也清掉
+  // v1114h 但如果合併後還有訓練紀錄在用它（別台裝置記的），就保留成「停用」，紀錄才不會變成看不懂的「訓練 5組」
+  const U=new Set(o.sessions.flatMap(s=>(s.items||[]).map(it=>it.ex)));
+  Object.keys(o.ex).forEach(id=>{if(DX[id]){if(U.has(id)){if(!o.ex[id].off)o.ex[id]={...o.ex[id],off:true};}else delete o.ex[id];}});}
+  exRepair(o);
   const ca=a.cfg||{},cb=b.cfg||{};o.cfg=(ca._u||0)>=(cb._u||0)?ca:cb;
   o._ts=Math.max(a._ts||0,b._ts||0);return o;}
 let _sha='',_pushT=null,_pulling=false;
@@ -406,6 +409,10 @@ function suggestPreset(T){const L=dueList(T),M={};L.forEach(x=>M[x.g]=x);const k
 
 // ── 動作清單：自重切換、刪除（刪除要密碼；有紀錄的動作不能刪，只能停用）──
 const EX_DEL_PW='8443';
+// v1114h 紀錄裡用到、但動作清單已經沒有的（被刪掉的）：補回來並設成「停用」，紀錄才看得懂
+function exRepair(d){const EX_KNOWN={ab1:['abs','捲腹',901],ab2:['abs','負重捲腹',902]};d=d||db;let ch=false;(d.sessions||[]).forEach(s=>(s.items||[]).forEach(it=>{if(!it.ex||d.ex[it.ex])return;ch=true;
+  const k=EX_KNOWN[it.ex];d.ex[it.ex]=k?{g:k[0],n:k[1],bw:true,sub:'',o:k[2],off:true,_u:1}:{g:(s.groups||[]).find(g=>g!=='abs')||'abs',n:'（已刪除的動作）',bw:false,sub:'',o:999,off:true,_u:1};}));
+  return ch;}
 function exUsed(id){return db.sessions.filter(s=>(s.items||[]).some(it=>it.ex===id)).length;}
 function bwEx(id){const e=db.ex[id];if(!e)return;const n=exUsed(id);
   if(!confirm(`「${e.n}」改成${e.bw?'一般器材（填重量）':'自重動作（重量＝額外負重）'}？${n?`\n\n⚠️ 這個動作已經有 ${n} 次訓練紀錄，報告裡的重量計算會跟著改。`:''}`))return;
