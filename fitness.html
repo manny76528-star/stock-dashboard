@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-<!-- fitness build 2026-11-14f -->
+<!-- fitness build 2026-11-14g -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -230,7 +230,7 @@ tr.sr{cursor:pointer}tr.sr:hover td{background:#f8fafc}td.num{text-align:right;f
 </style>
 </head>
 <body>
-<div class="top"><b>🏋️ 健身數據</b><div class="tabs" id="tabs"></div><span class="sp"></span><span id="sync"></span><span class="mu" id="ver" style="font-size:11.5px">v1114f</span>
+<div class="top"><b>🏋️ 健身數據</b><div class="tabs" id="tabs"></div><span class="sp"></span><span id="sync"></span><span class="mu" id="ver" style="font-size:11.5px">v1114g</span>
  <button class="tb" onclick="impOpen()">📥 貼上匯入</button><button class="tb pri" onclick="emb('#new')">＋ 補記一次訓練</button><a href="fitness-m.html">📱 手機版</a><a href="index.html">🏠 主目錄</a></div>
 <div class="wrap" id="app"></div>
 <div id="emb" onclick="if(event.target===this)ftCloseEmbed()"><iframe id="embf"></iframe></div>
@@ -280,7 +280,8 @@ function mergeDb(a,b){
     [...(a[k]||[]),...(b[k]||[])].forEach(x=>{if(!x||!x.id)return;if(!m[x.id]||(x._u||0)>(m[x.id]._u||0))m[x.id]=x;});
     o[k]=Object.values(m).filter(x=>!(D[x.id]&&D[x.id]>=(x._u||0))).sort((p,q)=>(p.date+(p.start||'')).localeCompare(q.date+(q.start||'')));});
   [a.ex||{},b.ex||{}].forEach(E=>Object.entries(E).forEach(([id,e])=>{if(!o.ex[id]||(e._u||0)>(o.ex[id]._u||0))o.ex[id]=e;}));
-  {const DX={...(a._del||{}).ex,...(b._del||{}).ex};o._del.ex=DX;Object.keys(o.ex).forEach(id=>{if(DX[id]&&DX[id]>=(o.ex[id]._u||0))delete o.ex[id];});}
+  {const DX={...(a._del||{}).ex,...(b._del||{}).ex};o._del.ex=DX;// v1114g 動作刪了就是刪了（要密碼、而且只能刪沒紀錄的）：舊版畫面又自動補回來的也一律清掉
+  Object.keys(o.ex).forEach(id=>{if(DX[id])delete o.ex[id];});}
   const ca=a.cfg||{},cb=b.cfg||{};o.cfg=(ca._u||0)>=(cb._u||0)?ca:cb;
   o._ts=Math.max(a._ts||0,b._ts||0);return o;}
 let _sha='',_pushT=null,_pulling=false;

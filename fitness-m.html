@@ -210,7 +210,7 @@ body.embed .top a.hm,body.embed .top a.pc{display:none}
 </style>
 </head>
 <body>
-<div class="top"><b id="ttl">🏋️ 健身</b><span id="sync"></span><span style="font-size:10px;color:#cbd5e1">v1114f</span><span class="sp"></span><a class="pc" href="fitness.html?force=pc">📊 數據</a><a class="hm" href="index.html">🏠</a><button id="closeEmbed" style="display:none" onclick="parent.ftCloseEmbed&&parent.ftCloseEmbed()">✕ 關閉</button></div>
+<div class="top"><b id="ttl">🏋️ 健身</b><span id="sync"></span><span style="font-size:10px;color:#cbd5e1">v1114g</span><span class="sp"></span><a class="pc" href="fitness.html?force=pc">📊 數據</a><a class="hm" href="index.html">🏠</a><button id="closeEmbed" style="display:none" onclick="parent.ftCloseEmbed&&parent.ftCloseEmbed()">✕ 關閉</button></div>
 <div class="wrap" id="app"></div>
 <div class="bar" id="bar" style="display:none"><div class="in" id="barIn"></div></div>
 <div class="toast" id="toast"></div>
@@ -255,7 +255,8 @@ function mergeDb(a,b){
     [...(a[k]||[]),...(b[k]||[])].forEach(x=>{if(!x||!x.id)return;if(!m[x.id]||(x._u||0)>(m[x.id]._u||0))m[x.id]=x;});
     o[k]=Object.values(m).filter(x=>!(D[x.id]&&D[x.id]>=(x._u||0))).sort((p,q)=>(p.date+(p.start||'')).localeCompare(q.date+(q.start||'')));});
   [a.ex||{},b.ex||{}].forEach(E=>Object.entries(E).forEach(([id,e])=>{if(!o.ex[id]||(e._u||0)>(o.ex[id]._u||0))o.ex[id]=e;}));
-  {const DX={...(a._del||{}).ex,...(b._del||{}).ex};o._del.ex=DX;Object.keys(o.ex).forEach(id=>{if(DX[id]&&DX[id]>=(o.ex[id]._u||0))delete o.ex[id];});}
+  {const DX={...(a._del||{}).ex,...(b._del||{}).ex};o._del.ex=DX;// v1114g 動作刪了就是刪了（要密碼、而且只能刪沒紀錄的）：舊版畫面又自動補回來的也一律清掉
+  Object.keys(o.ex).forEach(id=>{if(DX[id])delete o.ex[id];});}
   const ca=a.cfg||{},cb=b.cfg||{};o.cfg=(ca._u||0)>=(cb._u||0)?ca:cb;
   o._ts=Math.max(a._ts||0,b._ts||0);return o;}
 let _sha='',_pushT=null,_pulling=false;
