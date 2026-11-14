@@ -210,7 +210,7 @@ body.embed .top a.hm,body.embed .top a.pc{display:none}
 </style>
 </head>
 <body>
-<div class="top"><b id="ttl">🏋️ 健身</b><span id="sync"></span><span style="font-size:10px;color:#cbd5e1">v1114d</span><span class="sp"></span><a class="pc" href="fitness.html?force=pc">📊 數據</a><a class="hm" href="index.html">🏠</a><button id="closeEmbed" style="display:none" onclick="parent.ftCloseEmbed&&parent.ftCloseEmbed()">✕ 關閉</button></div>
+<div class="top"><b id="ttl">🏋️ 健身</b><span id="sync"></span><span style="font-size:10px;color:#cbd5e1">v1114e</span><span class="sp"></span><a class="pc" href="fitness.html?force=pc">📊 數據</a><a class="hm" href="index.html">🏠</a><button id="closeEmbed" style="display:none" onclick="parent.ftCloseEmbed&&parent.ftCloseEmbed()">✕ 關閉</button></div>
 <div class="wrap" id="app"></div>
 <div class="bar" id="bar" style="display:none"><div class="in" id="barIn"></div></div>
 <div class="toast" id="toast"></div>
@@ -494,7 +494,8 @@ function absPlanEdit(){const v=prompt('腹肌的內容（之後每次都顯示�
 function absSetDates(){return db.sessions.filter(s=>(s.items||[]).some(it=>db.ex[it.ex]?.g==='abs'&&(it.sets||[]).some(x=>+x.r))).map(s=>s.date);}
 function absDates(){return [...new Set([...(db.abs||[]).map(x=>x.date),...absSetDates()])].sort();}
 // 預設的腹肌動作（固定 id，兩台裝置不會重複）
-function absEnsureEx(){let ch=false;[['ab1','捲腹',1],['ab2','負重捲腹',2]].forEach(([id,n,o])=>{if(!db.ex[id]&&!Object.values(db.ex).some(e=>e.g==='abs'&&e.n===n)){db.ex[id]=touch({g:'abs',n,bw:true,sub:'',o:900+o});ch=true;}});if(ch)save();}
+// v1114e 刪掉過的（有刪除紀錄）不會再自動加回來
+function absEnsureEx(){let ch=false;[['ab1','捲腹',1],['ab2','負重捲腹',2]].forEach(([id,n,o])=>{if(!db.ex[id]&&!(db._del&&db._del.ex&&db._del.ex[id])&&!Object.values(db.ex).some(e=>e.g==='abs'&&e.n===n)){db.ex[id]=touch({g:'abs',n,bw:true,sub:'',o:900+o});ch=true;}});if(ch)save();}
 // 記錄腹肌：加到今天的訓練（沒有就開一場），打開第一個腹肌動作
 function absStart(T){T=T||SDATE||today();absEnsureEx();let s=db.sessions.filter(x=>x.date===T).sort((a,b)=>(!a.end?-1:0)-(!b.end?-1:0))[0];
   if(!s){s=touch({id:uid(),date:T,start:T===today()?new Date().toTimeString().slice(0,5):'',end:'',groups:['abs'],items:[],cardio:[]});db.sessions.push(s);}
@@ -781,8 +782,13 @@ function vHist(){
   const D={};const add=(d,r)=>(D[d]=D[d]||[]).push(r);
   db.sessions.slice().sort((a,b)=>(a.start||'').localeCompare(b.start||'')).forEach(s=>{const S=sessStats(s),G=sessGroups(s),hasW=S.sets>0,c=(s.cardio||[]).filter(x=>+x.min||+x.km);
     const live=s.end?'':' <span class="pill" style="background:#2563eb">進行中</span>';
-    if(hasW||(!c.length)){const g=G[0];add(s.date,{o:0,id:s.id,tag:esc(sessTitle(s))||'訓練',col:g?GC[g]:'#64748b',
-      txt:(s.items||[]).filter(it=>(it.sets||[]).some(x=>+x.r)).map(it=>esc(db.ex[it.ex]?.n||'')+' '+it.sets.filter(x=>+x.r).length+'組').join('・')||'還沒記錄',v:S.vol?fmt(S.vol)+' kg':(S.sets?S.sets+' 組':''),live,w:1});}
+    // v1114e 重訓（六個部位）和腹肌分兩行顯示
+    const IT=(s.items||[]).filter(it=>(it.sets||[]).some(x=>+x.r)),IW=IT.filter(it=>db.ex[it.ex]?.g!=='abs'),IA=IT.filter(it=>db.ex[it.ex]?.g==='abs');
+    const vs=L=>L.reduce((a,it)=>{it.sets.forEach(x=>{if(+x.r){a.n++;a.v+=setLoad(db.ex[it.ex],x,s.date)*(+x.r);}});return a;},{n:0,v:0});
+    const txt=L=>L.map(it=>esc(db.ex[it.ex]?.n||'')+' '+it.sets.filter(x=>+x.r).length+'組').join('・');
+    if(IW.length||(!IA.length&&!c.length)){const g=G[0],W=vs(IW);add(s.date,{o:0,id:s.id,tag:G.length?G.map(k=>GN[k]).join('＋'):IW.length?'訓練':esc(sessTitle(s))||'訓練',col:g?GC[g]:'#64748b',
+      txt:txt(IW)||'還沒記錄',v:W.v?fmt(W.v)+' kg':(W.n?W.n+' 組':''),live,w:1});}
+    if(IA.length){const A=vs(IA);add(s.date,{o:2,id:s.id,tag:'腹肌',col:GC.abs,txt:txt(IA),v:A.n+' 組',live:IW.length?'':live,ab:1});}
     if(c.length)add(s.date,{o:1,id:s.id,tag:'有氧',col:'#ea580c',txt:'🏃 '+c.map(x=>esc(x.type||'')+' '+(+x.min||0)+'分').join('・'),v:c.reduce((a,x)=>a+(+x.min||0),0)+' 分',live:hasW?'':live,cd:1});});
   const ASD=new Set(absSetDates());(db.abs||[]).filter(a=>!ASD.has(a.date)).forEach(a=>add(a.date,{o:2,tag:'腹肌',col:'#0d9488',txt:'腹肌✓ '+esc(absPlan())+' <span style="color:#2563eb;font-weight:800">✏️ 改</span>',v:'',ab:1,fn:`absStart('${a.date}')`}));
   const days=Object.keys(D).sort().reverse();let m='',h='';

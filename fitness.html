@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-<!-- fitness build 2026-11-14d -->
+<!-- fitness build 2026-11-14e -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -230,7 +230,7 @@ tr.sr{cursor:pointer}tr.sr:hover td{background:#f8fafc}td.num{text-align:right;f
 </style>
 </head>
 <body>
-<div class="top"><b>🏋️ 健身數據</b><div class="tabs" id="tabs"></div><span class="sp"></span><span id="sync"></span><span class="mu" id="ver" style="font-size:11.5px">v1114d</span>
+<div class="top"><b>🏋️ 健身數據</b><div class="tabs" id="tabs"></div><span class="sp"></span><span id="sync"></span><span class="mu" id="ver" style="font-size:11.5px">v1114e</span>
  <button class="tb" onclick="impOpen()">📥 貼上匯入</button><button class="tb pri" onclick="emb('#new')">＋ 補記一次訓練</button><a href="fitness-m.html">📱 手機版</a><a href="index.html">🏠 主目錄</a></div>
 <div class="wrap" id="app"></div>
 <div id="emb" onclick="if(event.target===this)ftCloseEmbed()"><iframe id="embf"></iframe></div>
@@ -519,7 +519,8 @@ function absPlanEdit(){const v=prompt('腹肌的內容（之後每次都顯示�
 function absSetDates(){return db.sessions.filter(s=>(s.items||[]).some(it=>db.ex[it.ex]?.g==='abs'&&(it.sets||[]).some(x=>+x.r))).map(s=>s.date);}
 function absDates(){return [...new Set([...(db.abs||[]).map(x=>x.date),...absSetDates()])].sort();}
 // 預設的腹肌動作（固定 id，兩台裝置不會重複）
-function absEnsureEx(){let ch=false;[['ab1','捲腹',1],['ab2','負重捲腹',2]].forEach(([id,n,o])=>{if(!db.ex[id]&&!Object.values(db.ex).some(e=>e.g==='abs'&&e.n===n)){db.ex[id]=touch({g:'abs',n,bw:true,sub:'',o:900+o});ch=true;}});if(ch)save();}
+// v1114e 刪掉過的（有刪除紀錄）不會再自動加回來
+function absEnsureEx(){let ch=false;[['ab1','捲腹',1],['ab2','負重捲腹',2]].forEach(([id,n,o])=>{if(!db.ex[id]&&!(db._del&&db._del.ex&&db._del.ex[id])&&!Object.values(db.ex).some(e=>e.g==='abs'&&e.n===n)){db.ex[id]=touch({g:'abs',n,bw:true,sub:'',o:900+o});ch=true;}});if(ch)save();}
 // 記錄腹肌：加到今天的訓練（沒有就開一場），打開第一個腹肌動作
 function absStart(T){T=T||SDATE||today();absEnsureEx();let s=db.sessions.filter(x=>x.date===T).sort((a,b)=>(!a.end?-1:0)-(!b.end?-1:0))[0];
   if(!s){s=touch({id:uid(),date:T,start:T===today()?new Date().toTimeString().slice(0,5):'',end:'',groups:['abs'],items:[],cardio:[]});db.sessions.push(s);}
