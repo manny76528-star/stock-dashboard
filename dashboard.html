@@ -17779,7 +17779,7 @@ const STYLE_A={
       x.restore();return;
     }
     const p=meta.data[last];
-    if(p&&!p.skip){const t=(chart.$saLastPre||'')+_saFmt(chart,ds,vals[last]);x.font="700 11px 'JetBrains Mono',monospace";const w=x.measureText(t).width+10;
+    if(p&&!p.skip&&!chart.$saNoLast){const t=(chart.$saLastPre||'')+_saFmt(chart,ds,vals[last]);x.font="700 11px 'JetBrains Mono',monospace";const w=x.measureText(t).width+10;
       const _r=Math.max(_pr(last),4)+6;
       const bx=chart.$saLastPre?Math.max(a.left,Math.min(chart.width-w-1,p.x-w/2)):chart.$saRight?Math.max(a.left,p.x-w-8):Math.min(a.right+4,chart.width-w-1),by=chart.$saLastPre?(p.y-_r-18<a.top?p.y+_r:p.y-_r-18):chart.$saRight?Math.max(a.top,Math.min(a.bottom-18,p.y-24)):Math.max(a.top,Math.min(a.bottom-18,p.y-9));
       x.fillStyle=col;x.beginPath();if(x.roundRect)x.roundRect(bx,by,w,18,4);else x.rect(bx,by,w,18);x.fill();
@@ -21111,7 +21111,7 @@ function rsPickPdf(){const i=document.createElement('input');i.type='file';i.acc
   try{const bytes=new Uint8Array(await f.arrayBuffer());const P=await rsPdfRead(bytes);const txt=rsNorm(P.pages.join('\n')).replace(/匯入用摘要\s*開始/g,'匯入用摘要 開始').replace(/匯入用摘要\s*結束/g,'匯入用摘要 結束').replace(/\|/g,'｜');
     const has=txt.includes('匯入用摘要 開始');const sum=has?txt.slice(txt.indexOf('=== 匯入用摘要 開始')>=0?txt.indexOf('=== 匯入用摘要 開始'):txt.indexOf('匯入用摘要 開始'),txt.indexOf('匯入用摘要 結束')+12).replace(/\n(?![^\n]{0,14}[：:])/g,''):rsGuess(P.pages,f.name);
     // 河流圖那頁拍一張
-    const imgs=[];for(let pn=P.n;pn>=1;pn--){if(/河流圖|淨值比/.test(P.pages[pn-1])&&/倍/.test(P.pages[pn-1])){try{imgs.push({n:`第 ${pn} 頁（河流圖）`,t:'image/jpeg',b64:await rsPdfSnap(P.doc,pn)});}catch(e){}break;}}
+    const imgs=[];{const pn=await rsRiverPage(P);if(pn){try{imgs.push({n:`第 ${pn} 頁（河流圖）`,t:'image/jpeg',b64:await rsPdfSnap(P.doc,pn)});}catch(e){}}}
     window._rsPend={bytes,imgs,pages:P.n,fname:f.name};rsEditor(sum,has,null);}catch(e){rsModal(`<div class=rs-h>❌ 讀不到這份 PDF</div><div class=rs-mu style="margin-top:8px">${_ae(e.message)}</div>`);}};i.click();}
 function rsEditor(sum,has,edit){
   rsModal(`<div class=rs-h>${edit?'✏️ 修改報告數字':'🔎 確認報告的數字'}</div>
@@ -21773,7 +21773,7 @@ function f1Card(member,mi){
   return r;};})();
 
 // ══ v37（2026/11/10）：琁＆軒 分開顯示——券商、買入還是同一個「琁 & 軒」窗口；照每筆出資比例把股數（整數）和金額分到各自的存摺 ══
-const DASH_VER='v40';
+const DASH_VER='v41';
 function famSplitParent(){const f=getFamilyDB();return f.members.find(m=>{const a=f.accounts[m];return a&&a.defaultSplits&&a.defaultSplits.length>=2;})||null;}
 function famKids(){const p=famSplitParent();return p?(getFamilyDB().accounts[p].defaultSplits||[]).map(x=>x.name):[];}
 function famIsKid(m){const f=getFamilyDB();return !!m&&!f.members.includes(m)&&famKids().includes(m);}
@@ -22053,6 +22053,93 @@ function v40PerfNag(){try{if(!db||document.hidden)return;const F=_v31PerfMissing
   const vb=document.getElementById('v18-bg');if(vb&&vb.style.display!=='none')return;if(document.querySelector('.modal-overlay.open,.modal.open'))return;_v40PerfT=Date.now();try{localStorage.setItem('v40perf_t',String(_v40PerfT));}catch(e){}v31FillPerf(F);
   toast('📈 週五了，填一下這週的基金總報酬率');}catch(e){console.warn('v40 nag',e);}}
 setTimeout(v40PerfNag,6000);setInterval(v40PerfNag,60*1000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(v40PerfNag,2500);});
+
+// ══ v41（2026/11/14）══
+// ① 「這兩週」不再列週五快照（快照照樣每週五自動存，只是不佔位置）
+(function(){const o=v31TwoWeeks;v31TwoWeeks=function(){const h=o.apply(this,arguments);try{const d=document.createElement('div');d.innerHTML=h;
+  d.querySelectorAll('.v31w-ev').forEach(e=>{if(/週五快照/.test(e.textContent))e.remove();});
+  d.querySelectorAll('.v31w-r').forEach(r=>{const cs=r.querySelector('.v31w-cs');if(cs&&!cs.children.length)r.remove();});
+  const card=d.querySelector('.v13-card');if(card&&!d.querySelector('.v31w-r')&&!/這兩週沒有扣款或入帳/.test(card.textContent)){const x=document.createElement('div');x.className='v11-sub';x.style.padding='10px 0';x.textContent='這兩週沒有扣款或入帳 👍';card.appendChild(x);}
+  return d.innerHTML;}catch(e){return h;}};})();
+// ③ 研究報告：找「真的有河流圖」的那頁，不是最後面的文字摘要頁
+//   排除：匯入用摘要、河流圖倍數線、提示詞頁；有圖片／很多線條的頁加分；字越少越像圖表頁
+async function rsRiverPage(P){const lib=window.pdfjsLib;const OPS=lib&&lib.OPS||{};const imgOps=new Set([OPS.paintImageXObject,OPS.paintInlineImageXObject,OPS.paintJpegXObject,OPS.paintImageXObjectRepeat].filter(x=>x!=null));
+  let best=null;
+  for(let pn=1;pn<=P.n;pn++){const t=rsNorm(P.pages[pn-1]||'');if(!/河流|淨值比|本益比/.test(t))continue;
+    if(/匯入用摘要|河流圖倍數線|請把|請你|範本/.test(t))continue;
+    let img=0,path=0;try{const pg=await P.doc.getPage(pn);const ol=await pg.getOperatorList();ol.fnArray.forEach(f=>{if(imgOps.has(f))img++;else if(f===OPS.constructPath)path++;});}catch(e){}
+    const len=t.replace(/\s+/g,'').length;
+    const sc=(/河流圖/.test(t)?40:0)+(/倍/.test(t)?15:0)+(img?120:0)+Math.min(80,path/4)-Math.min(90,len/30);
+    if(!best||sc>best.sc)best={pn,sc,img,path};}
+  return best&&(best.img||best.path>=20||best.sc>0)?best.pn:null;}
+// 已經匯入的報告：重新從 PDF 找河流圖那頁（也可以自己指定頁碼）
+async function rsRepickRiver(code,id){const R=(db.research[code].reports||[]).find(x=>x.id===id);if(!R||!R.pdf)return toast('這份報告沒有存 PDF，請重新匯入一次');
+  const ans=prompt('重抓河流圖：\n直接按「確定」＝系統自動找\n或輸入頁碼（例如 12）＝用那一頁','');if(ans===null)return;
+  toast('⏳ 解密 PDF 中…');
+  try{const parts=[];for(let i=0;i<R.pdf.parts;i++)parts.push(new Uint8Array(await rsGet(`${R.pdf.base}_p${i}.json`)));const n=parts.reduce((a,x)=>a+x.length,0),bytes=new Uint8Array(n);let o=0;parts.forEach(x=>{bytes.set(x,o);o+=x.length;});
+    const P=await rsPdfRead(bytes);let pn=parseInt(ans,10);if(!(pn>=1&&pn<=P.n))pn=await rsRiverPage(P);if(!pn)return toast('❌ 找不到河流圖那頁，請輸入頁碼');
+    const img=await rsUploadImgs(R.pdf.base,[{n:`第 ${pn} 頁（河流圖）`,t:'image/jpeg',b64:await rsPdfSnap(P.doc,pn)}]);R.img=img;delete R.cal;delete _rsImgCache[id];save();toast(`✓ 河流圖改用第 ${pn} 頁`);rsRender();}
+  catch(e){toast('❌ '+e.message);}}
+(function(){const o=rsCard;rsCard=function(r){let h=o.apply(this,arguments);try{const R=rsRep(r);if(R&&R.pdf)h=h.replace(/(<span>📎 長期走勢看報告原圖：<\/span>)/,`$1<a class=rs-a style="order:9;margin-left:4px" onclick="rsRepickRiver('${r.code}','${R.id}')" title="抓錯頁的話按這裡">🔄 重抓河流圖</a>`);}catch(e){}return h;};})();
+// ② 信貸餘額走勢：C 圖釘＝今天的餘額，針尖插在實線和虛線的交界
+function _v41PinReg(){if(!window.Chart||window._v41Pin)return;window._v41Pin=1;
+  Chart.register({id:'v41DebtPin',afterDatasetsDraw(c){if(c.canvas.id!=='b6-debt-canvas')return;const D=c.$v41D||(c.$v41D=_b6DebtData());const j=D.now-D.s0;const pt=c.getDatasetMeta(0).data[j];if(!pt||D.cur==null)return;
+    const x=pt.x,y=pt.y,ctx=c.ctx,R=19,cy=y-34;ctx.save();
+    ctx.fillStyle='rgba(124,58,237,.25)';ctx.beginPath();ctx.ellipse(x,y+1,7,2.5,0,0,7);ctx.fill();
+    ctx.fillStyle='#7c3aed';ctx.beginPath();ctx.arc(x,cy,R,Math.PI*0.8,Math.PI*0.2);ctx.lineTo(x,y-2);ctx.closePath();ctx.fill();
+    ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(x,cy,R-4,0,7);ctx.fill();
+    const w=D.cur/10000,t=w>=100?String(Math.round(w)):w.toFixed(1);ctx.fillStyle='#6d28d9';ctx.textAlign='center';ctx.font='900 '+(t.length>4?9.5:10.5)+'px sans-serif';ctx.fillText(t,x,cy+1);ctx.font='800 9px sans-serif';ctx.fillText('萬',x,cy+11);
+    ctx.font='800 11px sans-serif';ctx.fillStyle='#0f172a';ctx.textAlign='left';ctx.fillText('今天',x+R+4,cy-8);ctx.restore();}});}
+(function(){const o=_b6DrawDebt;_b6DrawDebt=function(){try{_v41PinReg();}catch(e){}const r=o.apply(this,arguments);try{if(_b6DebtCh){_b6DebtCh.$saNoLast=true;_b6DebtCh.options.layout={padding:{top:40,right:8}};_b6DebtCh.update('none');}}catch(e){}return r;};})();
+
+// ④-B 研究報告河流圖：報告原圖＋報告之後每天收盤，同一個刻度無縫接起來
+//   每份報告第一次要對齊：在原圖點最上面、最下面那條倍數線的「最右端」（R.cal）
+function rsRiverLines(r){const C=rsCalc(r),S=C.S;const rv=(S.river||[]).map(x=>({m:x.m,p:parseFloat(x.label)})).filter(x=>x.p>0);
+  return (rv.length>=2?rv:C.bands.map(b=>({m:b.m,p:b.p}))).sort((a,b)=>a.p-b.p);}
+async function rsImgData(R){let o=_rsImgCache[R.id];if(!o){o=_rsImgCache[R.id]=JSON.parse(new TextDecoder().decode(await rsGet(R.img.path)));}return o[0];}
+let _rsCalTmp=null;
+async function rsCalStart(code){const r=db.research[code],R=rsRep(r);if(!R||!R.img)return toast('這份報告沒有河流圖附圖');const L=rsRiverLines(r);if(L.length<2)return toast('報告摘要沒有河流圖倍數線，沒辦法對齊');
+  rsModal('<div class=rs-h>🔗 對齊報告原圖</div><div class=rs-mu style="margin-top:8px">🔓 解密附圖中…</div>',980);
+  try{const x=await rsImgData(R);_rsCalTmp={code,id:R.id,L,pts:[]};
+    rsModal(`<div class=rs-h>🔗 對齊報告原圖 <span class=rs-mu style="font-weight:500">只要做一次</span></div><div id=rs-cal-msg style="margin:8px 0;font-size:14px"></div>
+     <div style="position:relative;display:inline-block;max-width:100%"><img id=rs-cal-img src="data:${x.t};base64,${x.b64}" style="max-width:100%;max-height:62vh;display:block;cursor:crosshair;border:1px solid #e2e8f0;border-radius:8px" onclick="rsCalClick(event)"><div id=rs-cal-mk></div></div>
+     <div style="display:flex;gap:8px;margin-top:10px"><span class=rs-mu>點錯了可以按「重來」</span><span style="margin-left:auto"></span><button class="rs-btn gh" onclick="_rsCalTmp.pts=[];rsCalMsg()">重來</button><button class="rs-btn gh" onclick="rsModalClose()">取消</button></div>`,980);rsCalMsg();}
+  catch(e){rsModal(`<div class=rs-h>❌ ${_ae(e.message)}</div>`);}}
+function rsCalMsg(){const T=_rsCalTmp,m=document.getElementById('rs-cal-msg'),mk=document.getElementById('rs-cal-mk');if(!T||!m)return;const top=T.L[T.L.length-1],bot=T.L[0];
+  const step=T.pts.length===0?`<b>第 1 步</b>：點最上面那條 <b style="color:#dc2626">${top.m} 倍（${rsFmt(top.p)} 元）</b> 線的<b>最右端</b>`:`<b>第 2 步</b>：點最下面那條 <b style="color:#16a34a">${bot.m} 倍（${rsFmt(bot.p)} 元）</b> 線的<b>最右端</b>`;
+  m.innerHTML=step;const im=document.getElementById('rs-cal-img');
+  mk.innerHTML=T.pts.map((p,i)=>`<div style="position:absolute;left:${p.cx-7}px;top:${p.cy-7}px;width:14px;height:14px;border-radius:50%;border:3px solid ${i?'#16a34a':'#dc2626'};background:#fff;pointer-events:none"></div>`).join('');}
+function rsCalClick(e){const T=_rsCalTmp,im=e.target;if(!T)return;const k=im.naturalWidth/im.clientWidth;T.pts.push({x:e.offsetX*k,y:e.offsetY*k,cx:e.offsetX,cy:e.offsetY});
+  if(T.pts.length<2)return rsCalMsg();
+  const[a,b]=T.pts,top=T.L[T.L.length-1],bot=T.L[0];if(Math.abs(a.y-b.y)<8){T.pts=[];toast('兩個點太近了，請重新點');return rsCalMsg();}
+  const R=(db.research[T.code].reports||[]).find(x=>x.id===T.id);R.cal={x:(a.x+b.x)/2,y1:a.y,p1:top.p,y2:b.y,p2:bot.p,w:im.naturalWidth,h:im.naturalHeight};
+  db.research[T.code].rivMode='join';save();_rsCalTmp=null;rsModalClose();toast('✓ 對齊好了，報告原圖和每天收盤接起來了');rsRender();}
+function rsRivMode(code,m){db.research[code].rivMode=m;save();rsRender();}
+async function rsJoinPaint(code){const box=document.getElementById('rs-ch-'+code);const r=(db.research||{})[code];if(!box||!r)return;const R=rsRep(r),cal=R.cal;const C=rsCalc(r),S=C.S,T=_twToday();
+  let x;try{x=await rsImgData(R);}catch(e){box.innerHTML=`<div class=rs-mu style="color:#dc2626">❌ 附圖讀不到：${_ae(e.message)}</div>`;return;}
+  const H=300,k=H/cal.h,xe=cal.x*k,Wr=Math.max(360,Math.round(xe*0.75)),LW=96,W=Math.round(xe+Wr+LW),BH=H+22;
+  const py=v=>(cal.y1+(v-cal.p1)*(cal.y2-cal.y1)/(cal.p2-cal.p1))*k;
+  const d0=S.date,span=Math.max(30,_dayDiff(T,d0)),Xd=d=>xe+_dayDiff(d,d0)/span*Wr;
+  const pts=[[S.date,S.price]].concat((r.px||[]).filter(z=>z[0]>S.date)).filter(z=>z[1]!=null);if(C.p&&(pts.length===1||pts[pts.length-1][0]<T))pts.push([T,C.p]);
+  const L=rsRiverLines(r);const pal=['#dcfce7','#ecfccb','#fef9c3','#ffedd5','#fee2e2','#fce7f3','#ede9fe'];
+  let g=`<defs><clipPath id="rsjc-${code}"><rect x="0" y="0" width="${xe}" height="${H}"/></clipPath><clipPath id="rsjr-${code}"><rect x="${xe}" y="0" width="${Wr}" height="${H}"/></clipPath></defs>`;
+  g+=`<image href="data:${x.t};base64,${x.b64}" x="0" y="0" width="${cal.w*k}" height="${H}" clip-path="url(#rsjc-${code})" preserveAspectRatio="none"/>`;
+  let r2=`<rect x="${xe}" y="0" width="${Wr}" height="${H}" fill="#fbfdff"/>`;let prev=H;
+  L.forEach((l,i)=>{const y=py(l.p);r2+=`<rect x="${xe}" y="${Math.min(y,prev)}" width="${Wr}" height="${Math.abs(prev-y)}" fill="${pal[i%pal.length]}" opacity=".7"/>`;prev=y;});
+  L.forEach(l=>{const y=py(l.p);if(y<-2||y>H+2)return;r2+=`<line x1="${xe}" x2="${xe+Wr}" y1="${y}" y2="${y}" stroke="#94a3b8" stroke-dasharray="5 4" stroke-width="1.2"/>`;g+=`<text x="${xe+Wr+5}" y="${y+4}" font-size="11.5" fill="#475569" font-family="JetBrains Mono,monospace">${l.m} 倍 ${rsFmt(l.p)}</text>`;});
+  (r.alerts||[]).filter(a=>a.on).map(a=>({p:rsMprice(C,a.m,a.v)})).filter(z=>z.p).forEach(z=>{const y=py(z.p);if(y>0&&y<H)r2+=`<line x1="${xe}" x2="${xe+Wr}" y1="${y}" y2="${y}" stroke="#dc2626" stroke-width="1.3"/><text x="${xe+6}" y="${y-4}" font-size="11" fill="#dc2626" font-weight="800">🔔 ${rsFmt(z.p)}</text>`;});
+  if(pts.length>1)r2+=`<polyline fill="none" stroke="#2563eb" stroke-width="2.6" stroke-linejoin="round" points="${pts.map(z=>Xd(z[0]).toFixed(1)+','+py(z[1]).toFixed(1)).join(' ')}"/>`;
+  g+=`<g clip-path="url(#rsjr-${code})">${r2}</g>`;
+  g+=`<line x1="${xe}" x2="${xe}" y1="0" y2="${H}" stroke="#0f172a" stroke-dasharray="3 3"/>`;
+  g+=`<circle cx="${xe}" cy="${py(S.price)}" r="4.5" fill="#fff" stroke="#2563eb" stroke-width="2"/>`;
+  const lp=pts[pts.length-1];if(pts.length>1){const lx=Xd(lp[0]),ly=Math.max(26,Math.min(H-4,py(lp[1])));g+=`<circle cx="${lx}" cy="${ly}" r="5.5" fill="#2563eb"/><rect x="${lx-72}" y="${ly-29}" width="66" height="20" rx="6" fill="#0f172a"/><text x="${lx-39}" y="${ly-15}" font-size="12" fill="#fff" font-weight="800" text-anchor="middle">今天 ${rsFmt(lp[1])}</text>`;}
+  g+=`<text x="${xe-6}" y="${BH-5}" font-size="11.5" font-weight="800" fill="#64748b" text-anchor="end">◀ 報告原圖</text><text x="${xe+6}" y="${BH-5}" font-size="11.5" font-weight="800" fill="#1d4ed8">📄 ${rsMD(d0)} ${rsFmt(S.price)} ・報告之後每天收盤 ▶</text><text x="${xe+Wr}" y="${BH-5}" font-size="11" fill="#64748b" text-anchor="end">${rsMD(_addDays(d0,span))}</text>`;
+  box.innerHTML=`<svg viewBox="0 0 ${W} ${BH}" width="100%" style="display:block;background:#fff;border-radius:8px">${g}</svg>`;}
+(function(){const o=rsChartPaint;rsChartPaint=function(code){const r=(db.research||{})[code];const R=r&&rsRep(r);
+  const can=R&&R.img&&R.img.list&&R.img.list.length,joined=can&&R.cal&&r.rivMode!=='plain';
+  const bar=()=>{document.getElementById('rs-rvbar-'+code)?.remove();const box=document.getElementById('rs-ch-'+code);if(!box||!can)return;const t=document.createElement('div');t.id='rs-rvbar-'+code;t.className='rs-mu';t.style.cssText='display:flex;gap:10px;align-items:center;margin:2px 0 6px';
+    t.innerHTML=R.cal?`<span class="rs-chip${joined?' on':''}" style="${joined?'background:#2563eb;color:#fff':''}" onclick="rsRivMode('${code}','join')">🔗 接上報告原圖</span><span class="rs-chip${joined?'':' on'}" style="${joined?'':'background:#2563eb;color:#fff'}" onclick="rsRivMode('${code}','plain')">只看報告之後</span><a class=rs-a style="margin-left:auto" onclick="rsCalStart('${code}')">重新對齊</a>`:`<a class=rs-a onclick="rsCalStart('${code}')">🔗 把報告原圖接上來（第一次要點兩下對齊）</a>`;box.before(t);};
+  if(joined){bar();return rsJoinPaint(code);}const res=o.apply(this,arguments);bar();return res;};})();
 </script>
 
 </div><!-- /main-content -->
