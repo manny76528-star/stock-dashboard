@@ -210,7 +210,7 @@ body.embed .top a.hm,body.embed .top a.pc{display:none}
 </style>
 </head>
 <body>
-<div class="top"><b id="ttl">🏋️ 健身</b><span id="sync"></span><span style="font-size:10px;color:#cbd5e1">v1112a</span><span class="sp"></span><a class="pc" href="fitness.html?force=pc">📊 數據</a><a class="hm" href="index.html">🏠</a><button id="closeEmbed" style="display:none" onclick="parent.ftCloseEmbed&&parent.ftCloseEmbed()">✕ 關閉</button></div>
+<div class="top"><b id="ttl">🏋️ 健身</b><span id="sync"></span><span style="font-size:10px;color:#cbd5e1">v1114a</span><span class="sp"></span><a class="pc" href="fitness.html?force=pc">📊 數據</a><a class="hm" href="index.html">🏠</a><button id="closeEmbed" style="display:none" onclick="parent.ftCloseEmbed&&parent.ftCloseEmbed()">✕ 關閉</button></div>
 <div class="wrap" id="app"></div>
 <div class="bar" id="bar" style="display:none"><div class="in" id="barIn"></div></div>
 <div class="toast" id="toast"></div>
@@ -219,6 +219,8 @@ body.embed .top a.hm,body.embed .top a.pc{display:none}
 const FT_KEY='fitness_db_v1', FT_FILE='data_fitness.json', CF_WORKER='https://dashboard-sync.manny76528.workers.dev', FT_API=CF_WORKER+'/'+FT_FILE;
 const GROUPS=[['chest','胸','#ef4444'],['back','背','#3b82f6'],['legs','腿','#8b5cf6'],['shoulder','肩','#f59e0b'],['bi','二頭','#10b981'],['tri','三頭','#06b6d4']];
 const GN=Object.fromEntries(GROUPS.map(g=>[g[0],g[1]])), GC=Object.fromEntries(GROUPS.map(g=>[g[0],g[2]]));
+// 腹肌：可以記組數、次數、負重，但不算在六個肌群圓環裡（腹肌有自己的提醒）
+const ABS_G=['abs','腹肌','#0d9488'];GN.abs=ABS_G[1];GC.abs=ABS_G[2];const GROUPS_ALL=[...GROUPS,ABS_G];
 const PRESETS=[['胸＋三頭',['chest','tri']],['背＋二頭',['back','bi']],['腿',['legs']],['肩',['shoulder']],['二＋三頭',['bi','tri']]];
 const CARDIO=['爬坡機','跑步機','飛輪','爬梯','划船機','戶外跑','游泳'];
 const DEF_EX=[
@@ -301,7 +303,7 @@ function sessStats(s){let vol=0,sets=0;const byG={};(s.items||[]).forEach(it=>{c
   const c=(s.cardio||[]).reduce((a,x)=>({min:a.min+(+x.min||0),km:a.km+(+x.km||0),kcal:a.kcal+(+x.kcal||0)}),{min:0,km:0,kcal:0});return{vol,sets,byG,...c};}
 // 只算真的有做組的部位（開始時多勾、或開了沒練的那場，都不算進月曆／統計）
 function sessGroups(s){const act=new Set();(s.items||[]).forEach(it=>{const e=db.ex[it.ex];if(e&&(it.sets||[]).some(x=>+x.r))act.add(e.g);});const g=act;return GROUPS.map(x=>x[0]).filter(k=>g.has(k));}
-function sessTitle(s){let g=sessGroups(s);if(!g.length&&!s.end)g=GROUPS.map(x=>x[0]).filter(k=>(s.groups||[]).includes(k));const p=PRESETS.find(p=>p[1].length===g.length&&p[1].every(x=>g.includes(x)));let t=p?p[0]:g.map(k=>GN[k]).join('＋');if(!t&&(s.cardio||[]).length)t='有氧';else if((s.cardio||[]).length)t+='＋有氧';return t||'訓練';}
+function sessTitle(s){let g=sessGroups(s);if(!g.length&&!s.end)g=GROUPS.map(x=>x[0]).filter(k=>(s.groups||[]).includes(k));const p=PRESETS.find(p=>p[1].length===g.length&&p[1].every(x=>g.includes(x)));let t=p?p[0]:g.map(k=>GN[k]).join('＋');if((s.items||[]).some(it=>db.ex[it.ex]?.g==='abs'&&(it.sets||[]).some(x=>+x.r))||(!s.end&&(s.groups||[]).includes('abs')&&!sessGroups(s).length))t=t?t+'＋腹肌':'腹肌';if(!t&&(s.cardio||[]).length)t='有氧';else if((s.cardio||[]).length)t+='＋有氧';return t||'訓練';}
 // 某動作上一次（在 beforeDate 之前、或同一天但不同場）的組
 function lastSets(exId,beforeDate,exceptId){const L=db.sessions.filter(s=>s.id!==exceptId&&s.date<=beforeDate&&(s.items||[]).some(it=>it.ex===exId&&(it.sets||[]).some(x=>+x.r))).sort((a,b)=>(a.date+(a.start||'')).localeCompare(b.date+(b.start||'')));
   if(!L.length)return null;const s=L[L.length-1];return{date:s.date,sets:s.items.find(it=>it.ex===exId).sets.filter(x=>+x.r)};}
@@ -352,7 +354,7 @@ function agg(a,b){const L=db.sessions.filter(s=>s.date>=a&&s.date<=b);const o={c
   const I=db.inbody.filter(x=>x.date>=a&&x.date<=b).sort((p,q)=>p.date.localeCompare(q.date));const li=I[I.length-1];['wt','mm','fat','bmr'].forEach(k=>{const z=I.filter(x=>x[k]!==''&&x[k]!=null);o[k]=z.length?+z[z.length-1][k]:null;});o.ib=li;o.list=L;return o;}
 
 // ── 該練哪裡（隔幾天＝實際日曆天數，週末也算恢復日；每次練到都歸零重算——加練、週末練也算）──
-const TRAIN_DOW=[1,2,3,4,5],DUE_REC={chest:2,back:2,legs:3,shoulder:2,bi:2,tri:2},DUE_W=7,DUE_R=10;
+const TRAIN_DOW=[1,2,3,4,5],DUE_REC={chest:4,back:4,legs:4,shoulder:4,bi:4,tri:4},DUE_W=8,DUE_R=8; // 💤 0～3 天恢復中、✓ 4～7 天可以練、⚠️ 8 天以上太久
 const wkStart=d=>addDays(d,-((dow(d)+6)%7));
 function trainDays(a,b){let n=0;for(let d=addDays(a,1);d<=b;d=addDays(d,1))if(TRAIN_DOW.includes(dow(d)))n++;return n;}
 function groupDue(g,T){T=T||today();const D=[...new Set(db.sessions.filter(s=>s.date<=T&&sessGroups(s).includes(g)).map(s=>s.date))].sort();
@@ -363,9 +365,14 @@ function groupDue(g,T){T=T||today();const D=[...new Set(db.sessions.filter(s=>s.
   return{g,name,n,rank,cls:['rest','go','w','r'][rank],dates:D,anchor,last,wk,rec};}
 function dueList(T){return GROUPS.map(x=>groupDue(x[0],T)).sort((a,b)=>b.rank-a.rank||(b.n??99)-(a.n??99)||GROUPS.findIndex(x=>x[0]===a.g)-GROUPS.findIndex(x=>x[0]===b.g));}
 // 今天建議：從預設組合挑整體最該練的（每個部位：等級×10＋隔幾天，取平均；有部位還在恢復中的組合扣分）
-function suggestPreset(T){const L={};dueList(T).forEach(x=>L[x.g]=x);
-  const sc=p=>{const xs=p[1].map(g=>L[g]);return xs.reduce((a,x)=>a+x.rank*10+Math.min(x.n??10,10),0)/xs.length-(xs.some(x=>x.rank===0)?15:0);};
-  const best=PRESETS.map(p=>({p,s:sc(p)})).sort((a,b)=>b.s-a.s)[0];return best?{name:best.p[0],groups:best.p[1],items:best.p[1].map(g=>L[g])}:null;}
+// 今天訓練項目：先挑最該練的大肌群（胸／背／腿／肩）；它的搭配小肌群（背→二頭、胸→三頭）也可以練、而且隔得一樣久才一起練
+const SG_BIG=['chest','back','legs','shoulder'],SG_PAIR={back:'bi',chest:'tri',bi:'back',tri:'chest'};
+function suggestPreset(T){const L=dueList(T),M={};L.forEach(x=>M[x.g]=x);const key=x=>x.rank*100+(x.n??99);
+  let main=L.filter(x=>SG_BIG.includes(x.g)).sort((a,b)=>key(b)-key(a))[0];const small=L.filter(x=>!SG_BIG.includes(x.g)).sort((a,b)=>key(b)-key(a))[0];
+  if(small&&main&&small.rank>main.rank)main=small;if(!main)return null;
+  const p=M[SG_PAIR[main.g]],gs=[main.g];if(p&&p.rank>=1&&(p.rank>=main.rank||(p.n??99)>=(main.n??99)-2))gs.push(p.g);
+  const order=GROUPS.map(g=>g[0]);gs.sort((a,b)=>SG_BIG.includes(a)===SG_BIG.includes(b)?order.indexOf(a)-order.indexOf(b):SG_BIG.includes(a)?-1:1);
+  return{name:gs.map(g=>GN[g]).join('＋'),groups:gs,items:gs.map(g=>M[g])};}
 
 // ── 動作清單：自重切換、刪除（刪除要密碼；有紀錄的動作不能刪，只能停用）──
 const EX_DEL_PW='8443';
@@ -467,7 +474,8 @@ function rpText(m){const{a,e}=rpRange(m),L=db.sessions.filter(s=>s.date>=a&&s.da
     t+=`\n${d.replace(/-/g,'/')}（${[...gs.map(k=>GN[k]),...(car.length?['有氧']:[]),...(ab?['腹肌']:[])].join('＋')}）週${WK[dow(d)]}\n`;
     gs.forEach(k=>{t+=`【${GN[k]}】\n`;by[k].forEach(([ex,st])=>{t+=`${ex.n}${ex.bw&&bwAt(d)?`（自重・體重 ${(+bwAt(d)).toFixed(1)}KG）`:''}：${st.map(x=>rpSetsTxt(x,ex.bw)).join('、')}\n`;});});
     if(car.length){t+='【有氧】\n';car.forEach(c=>{t+=`${c.type}：${[c.min!==''&&c.min!=null?c.min+'分':'',c.km!==''&&c.km!=null?c.km+'公里':'',c.kcal!==''&&c.kcal!=null?c.kcal+'kcal':''].filter(Boolean).join('、')}\n`;});}
-    if(ab)t+=`【腹肌】\n🧘 ${absPlan()}\n`;});
+    if(by.abs){t+='【腹肌】\n';by.abs.forEach(([ex,st])=>{t+=`${ex.n}${ex.bw&&bwAt(d)?`（自重・體重 ${(+bwAt(d)).toFixed(1)}KG）`:''}：${st.map(x=>rpSetsTxt(x,ex.bw)).join('、')}\n`;});}
+    else if(ab)t+=`【腹肌】\n${absPlan()}\n`;});
   return t.trim()+'\n';}
 const rpDone=m=>((db.cfg||{}).rpDoneL||[]).includes(m);
 function rpMark(m){m=m||RPM;if(rpDone(m))return;db.cfg=touch({...(db.cfg||{}),rpDoneL:[...((db.cfg||{}).rpDoneL||[]),m]});save();}
@@ -480,7 +488,14 @@ function rpNagMonth(){const pm=rpPrevMonth(today().slice(0,7));if(+today().slice
 const ABS_GAP=4;
 const absPlan=()=>((db.cfg||{}).absPlan)||'捲腹 20 下 × 6 組';
 function absPlanEdit(){const v=prompt('腹肌的內容（之後每次都顯示這個）',absPlan());if(v==null)return;db.cfg=touch({...(db.cfg||{}),absPlan:v.trim()||'捲腹 20 下 × 6 組'});save();if(typeof render==='function')render();}
-function absDates(){return [...new Set((db.abs||[]).map(x=>x.date))].sort();}
+function absSetDates(){return db.sessions.filter(s=>(s.items||[]).some(it=>db.ex[it.ex]?.g==='abs'&&(it.sets||[]).some(x=>+x.r))).map(s=>s.date);}
+function absDates(){return [...new Set([...(db.abs||[]).map(x=>x.date),...absSetDates()])].sort();}
+// 預設的腹肌動作（固定 id，兩台裝置不會重複）
+function absEnsureEx(){let ch=false;[['ab1','捲腹',1],['ab2','負重捲腹',2]].forEach(([id,n,o])=>{if(!db.ex[id]&&!Object.values(db.ex).some(e=>e.g==='abs'&&e.n===n)){db.ex[id]=touch({g:'abs',n,bw:true,sub:'',o:900+o});ch=true;}});if(ch)save();}
+// 記錄腹肌：加到今天的訓練（沒有就開一場），打開第一個腹肌動作
+function absStart(T){T=T||SDATE||today();absEnsureEx();let s=db.sessions.filter(x=>x.date===T).sort((a,b)=>(!a.end?-1:0)-(!b.end?-1:0))[0];
+  if(!s){s=touch({id:uid(),date:T,start:T===today()?new Date().toTimeString().slice(0,5):'',end:'',groups:['abs'],items:[],cardio:[]});db.sessions.push(s);}
+  else{s.groups=[...new Set([...(s.groups||[]),'abs'])];touch(s);}save();go('sess',s.id);const ex=exList('abs')[0];if(ex&&typeof openEx==='function')openEx(ex.id);}
 function absState(T){T=T||today();const D=absDates().filter(d=>d<=T),last=D[D.length-1]||null,n=last?dayDiff(T,last):null;
   return{last,n,done:last===T,due:n==null||n>=ABS_GAP,next:last?addDays(last,ABS_GAP):T,left:last?Math.max(0,ABS_GAP-n):0,dates:D};}
 function absDone(d){d=d||today();if((db.abs||[]).some(x=>x.date===d))return;db.abs=db.abs||[];db.abs.push(touch({id:uid(),date:d}));save();}
@@ -634,7 +649,7 @@ function vSess(){
     h+=`<div class="gh2"><i style="background:${GC[g]}"></i>${GN[g]}</div>`;let sub='';
     exList(g).forEach(e=>{if(e.sub&&e.sub!==sub){sub=e.sub;h+=`<div class="sub">${esc(e.sub)}</div>`;}h+=exRow(s,e);});
   });
-  const rest=GROUPS.filter(g=>!groups.includes(g[0]));
+  const rest=GROUPS_ALL.filter(g=>!groups.includes(g[0]));
   if(rest.length)h+=`<div class="mu" style="margin:14px 0 6px">再加練</div><div class="chips">${rest.map(g=>`<span class="chip" onclick="addG('${g[0]}')">＋ ${g[1]}</span>`).join('')}</div>`;
   h+=`<div class="gh2" style="margin-top:18px">🏃 有氧</div>${(s.cardio||[]).map(c=>`<div class="cd" onclick="go('cardio','${c.id}')"><b>${esc(c.type)}</b><span class=mono style="margin-left:auto">${c.min||'—'} 分・${c.km||'—'} km・${c.kcal||'—'} 大卡</span><span style="color:#94a3b8">›</span></div>`).join('')}
     <div class="chips">${CARDIO.map(t=>`<span class="chip" style="padding:6px 11px;font-size:13px" onclick="addCardio('${t}')">＋ ${t}</span>`).join('')}</div>
@@ -696,7 +711,7 @@ function doneEx(){const[s,it]=curIt();cleanEx();const it2=s.items.find(x=>x.ex==
   const H=exHistory(it2.ex);const prev=H.filter(h=>h.id!==s.id).reduce((m,h)=>Math.max(m,h.best),0);const me=H.find(h=>h.id===s.id);
   toast(me&&prev&&me.best>prev+0.01?`🏆 新紀錄！${esc(db.ex[it2.ex].n)}`:`✓ ${db.ex[it2.ex].n} ${ok} 組`);}
   OPEN=null;render();}
-function addG(g){const s=sess(CUR);s.groups=[...new Set([...(s.groups||[]),g])];touch(s);save();render();}
+function addG(g){if(g==='abs')absEnsureEx();const s=sess(CUR);s.groups=[...new Set([...(s.groups||[]),g])];touch(s);save();render();}
 function addCardio(t){const s=sess(CUR);const c={id:uid(),type:t,min:'',km:'',kcal:''};(s.cardio=s.cardio||[]).push(c);touch(s);save();go('cardio',c.id);}
 function finish(){if(OPEN)autoDoneEx();OPEN=null;const s=sess(CUR);s.end=nowHM();s.cardio=(s.cardio||[]).filter(c=>+c.min||+c.km||+c.kcal);
   if(!s.items.length&&!s.cardio.length){if(confirm('這次沒有記到任何一組，要刪掉嗎？')){delRec('sessions',s.id);go('home');return;}}
@@ -777,7 +792,7 @@ function vHist(){
 // ── 動作清單 ──
 function vMgr(){
   $('ttl').textContent='⚙️ 動作清單';
-  $('app').innerHTML=GROUPS.map(g=>`<div class="gh2"><i style="background:${g[2]}"></i>${g[1]}</div><div class="card" style="padding:4px 10px">${exList(g[0],true).map(e=>`<div class="mgr${e.off?' off':''}"><span style="flex:1">${esc(e.n)}${e.sub?` <span class=mu>（${esc(e.sub)}）</span>`:''}${e.bw?' <span class=mu>自重</span>':''}</span><button onclick="renEx('${e.id}')">改名</button><button onclick="bwEx('${e.id}')">${e.bw?'改一般':'改自重'}</button><button onclick="togEx('${e.id}')">${e.off?'啟用':'停用'}</button>${exUsed(e.id)?'':`<button class="del" onclick="delEx('${e.id}')">刪除</button>`}</div>`).join('')}
+  absEnsureEx();$('app').innerHTML=GROUPS_ALL.map(g=>`<div class="gh2"><i style="background:${g[2]}"></i>${g[1]}</div><div class="card" style="padding:4px 10px">${exList(g[0],true).map(e=>`<div class="mgr${e.off?' off':''}"><span style="flex:1">${esc(e.n)}${e.sub?` <span class=mu>（${esc(e.sub)}）</span>`:''}${e.bw?' <span class=mu>自重</span>':''}</span><button onclick="renEx('${e.id}')">改名</button><button onclick="bwEx('${e.id}')">${e.bw?'改一般':'改自重'}</button><button onclick="togEx('${e.id}')">${e.off?'啟用':'停用'}</button>${exUsed(e.id)?'':`<button class="del" onclick="delEx('${e.id}')">刪除</button>`}</div>`).join('')}
     <div class="mgr"><button style="color:#2563eb;border-color:#bfdbfe" onclick="addEx('${g[0]}')">＋ 新增${g[1]}動作</button></div></div>`).join('')+'<div class="mu" style="margin:6px 4px">停用的動作不會出現在訓練畫面，但舊紀錄會保留。<br>「刪除」只有還沒練過的動作才有（要輸入密碼），練過的請用停用。</div>';
   bar(`<button class="btn gh" onclick="go('home')">← 返回</button>`);
 }
@@ -830,10 +845,10 @@ const _rpmRender1=render;
 render=function(){if(V==='photo'){vPhoto();return;}_rpmRender1();if(V==='home'){try{habHome();}catch(e){console.warn(e);}}};
 function habHome(){const app=$('app');if(!app)return;app.querySelectorAll('.abc,.phn').forEach(e=>e.remove());const T=SDATE||today(),A=absState(T);
   const dots=[...Array(8)].map((_,i)=>{const d=addDays(T,i-5);return`<i class="${A.dates.includes(d)?'d':''}${d===T?' t':''}">${+d.slice(8)}</i>`;}).join('');
-  const card=A.done?`<div class="abc ok"><span style="font-size:22px">🧘</span><div style="flex:1"><b>腹肌 ✓ 今天練了</b><div class=mu>下次 ${md(A.next)}・${esc(absPlan())}・<a class="abp" onclick="absPick()">補記其他天</a></div></div><button class="abu" onclick="absUndo('${T}');render()">取消</button></div>`
-    :`<div class="abc${A.due?'':' rest'}"><span style="font-size:26px">🧘</span><div style="flex:1;min-width:0"><b>${A.due?'腹肌：今天該練了':'腹肌：休息中・再 '+A.left+' 天'}</b><div class=mu>${A.last?`上次 ${md(A.last)}（${A.n} 天前）`:'還沒有紀錄'}・${esc(absPlan())}・<a class="abp" onclick="absPick()">補記</a></div><div class="abd">${dots}</div></div><button class="abb" onclick="if(!confirm('今天確定練了腹肌嗎？'))return;absDone('${T}');toast('🧘 腹肌記好了，下次 '+md(addDays('${T}',ABS_GAP)));render()">✓ 練完了</button></div>`;
+  const card=A.done?`<div class="abc ok"><span style="font-size:22px">🧘</span><div style="flex:1"><b>腹肌 ✓ 今天練了</b><div class=mu>下次 ${md(A.next)}・${esc(absPlan())}・<a class="abp" onclick="absPick()">補記其他天</a></div></div>${(db.abs||[]).some(x=>x.date===T)?`<button class="abu" onclick="absUndo('${T}');render()">取消</button>`:`<button class="abu" onclick="absStart('${T}')">再記</button>`}</div>`
+    :`<div class="abc${A.due?'':' rest'}"><span style="font-size:26px">🧘</span><div style="flex:1;min-width:0"><b>${A.due?'腹肌：今天該練了':'腹肌：休息中・再 '+A.left+' 天'}</b><div class=mu>${A.last?`上次 ${md(A.last)}（${A.n} 天前）`:'還沒有紀錄'}・${esc(absPlan())}・<a class="abp" onclick="absPick()">補記</a></div><div class="abd">${dots}</div></div><button class="abb" onclick="absStart('${T}')">✏️ 記錄腹肌</button></div>`;
   const AN=absNagLv(T),hero=app.querySelector('.dsgm');
-  if(AN&&AN.strong){const c=`<div class="abc strong"><span style="font-size:26px">🧘</span><div style="flex:1;min-width:0"><b><i class="pls"></i>⚠️ 腹肌已經 ${AN.A.n} 天沒練了</b><div class="sm">上次 ${md(AN.A.last)}（${AN.A.n} 天前）・<a class="abp w" onclick="absPick()">補記其他天</a></div></div><button class="abw" onclick="if(!confirm('今天確定練了腹肌嗎？'))return;absDone('${T}');toast('🧘 腹肌記好了');render()">✓ 練完了</button></div>`;if(hero)hero.insertAdjacentHTML('afterend',c);else app.insertAdjacentHTML('afterbegin',c);}
+  if(AN&&AN.strong){const c=`<div class="abc strong"><span style="font-size:26px">🧘</span><div style="flex:1;min-width:0"><b><i class="pls"></i>⚠️ 腹肌已經 ${AN.A.n} 天沒練了</b><div class="sm">上次 ${md(AN.A.last)}（${AN.A.n} 天前）・<a class="abp w" onclick="absPick()">補記其他天</a></div></div><button class="abw" onclick="absStart('${T}')">✏️ 記錄腹肌</button></div>`;if(hero)hero.insertAdjacentHTML('afterend',c);else app.insertAdjacentHTML('afterbegin',c);}
   else{const ao=[...app.querySelectorAll(':scope>.mu')].find(e=>e.textContent.startsWith('有氧')),hint=app.querySelector('.dgr')?.nextElementSibling;if(ao){ao.insertAdjacentHTML('beforebegin',card);const rp=app.querySelector('.rpnag');if(rp)ao.before(rp);}else if(hint)hint.insertAdjacentHTML('afterend',card);else app.insertAdjacentHTML('afterbegin',card);}
   const PN=phNagLv();if(PN)app.insertAdjacentHTML('afterbegin',PN.strong?`<div class="phn strong" onclick="go('photo')"><span style="font-size:24px">📸</span><div><b><i class="pls"></i>${+PN.m.slice(5)} 月身形照還沒拍</b><div class="sm">已經第 ${PN.day} 天了・月初拍最準</div></div><span style="margin-left:auto"><button>拍／上傳</button></span></div>`:`<div class="phn" onclick="go('photo')">📸 <b>${+PN.m.slice(5)} 月的身形照還沒拍</b><span style="margin-left:auto"><button>拍／上傳</button></span></div>`);
   const q=app.querySelector('.q');if(q&&!q.querySelector('.phq'))q.insertAdjacentHTML('beforeend',`<div class="phq" onclick="go('photo')"><span>📸</span>身形照</div>`);}

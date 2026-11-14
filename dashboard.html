@@ -13217,7 +13217,7 @@ function renderOvLoans(){
       const d=new Date(today.getFullYear(),today.getMonth(),day);
       const deductDate=d>today?d:new Date(today.getFullYear(),today.getMonth()+1,day);
       if(isNaN(deductDate.getTime()))return;
-      const ds=deductDate.toISOString().slice(0,10);
+      const ds=`${deductDate.getFullYear()}-${String(deductDate.getMonth()+1).padStart(2,'0')}-${String(deductDate.getDate()).padStart(2,'0')}`; // v40：用本地日期（原本 toISOString 在台灣會早一天）
       const daysLeft=Math.round((deductDate-today)/86400000);
       if(daysLeft>30)return;
 
@@ -13265,7 +13265,7 @@ function renderOvLoans(){
       const d=new Date(today.getFullYear(),today.getMonth(),day);
       const deductDate=d>today?d:new Date(today.getFullYear(),today.getMonth()+1,day);
       if(isNaN(deductDate.getTime()))return;
-      const ds=deductDate.toISOString().slice(0,10);
+      const ds=`${deductDate.getFullYear()}-${String(deductDate.getMonth()+1).padStart(2,'0')}-${String(deductDate.getDate()).padStart(2,'0')}`; // v40：用本地日期（原本 toISOString 在台灣會早一天）
       const daysLeft=Math.round((deductDate-today)/86400000);
       if(daysLeft>30)return;
       upcoming.push({name:loan.name||loan.bank||'不限用途',date:ds,days:daysLeft,amt:monthly,urgent:daysLeft<=7,afterBal:null,divNote:''});
@@ -21773,7 +21773,7 @@ function f1Card(member,mi){
   return r;};})();
 
 // ══ v37（2026/11/10）：琁＆軒 分開顯示——券商、買入還是同一個「琁 & 軒」窗口；照每筆出資比例把股數（整數）和金額分到各自的存摺 ══
-const DASH_VER='v39';
+const DASH_VER='v40';
 function famSplitParent(){const f=getFamilyDB();return f.members.find(m=>{const a=f.accounts[m];return a&&a.defaultSplits&&a.defaultSplits.length>=2;})||null;}
 function famKids(){const p=famSplitParent();return p?(getFamilyDB().accounts[p].defaultSplits||[]).map(x=>x.name):[];}
 function famIsKid(m){const f=getFamilyDB();return !!m&&!f.members.includes(m)&&famKids().includes(m);}
@@ -21848,7 +21848,7 @@ function fqbPctSet(p1){p1=Math.max(0,Math.min(100,+p1||0));_fqbPct=[p1,100-p1];f
 (function(){const _u=updateFqbTotal;updateFqbTotal=function(){const r=_u.apply(this,arguments);if(document.getElementById('fqb-pctrow'))fqbPctApply();return r;};})();
 // 版本號（左下角）
 (function(){function put(){const host=document.querySelector('.db-sidebar-footer')||document.querySelector('.db-sidebar');if(!host||document.getElementById('dash-ver'))return;
-  host.insertAdjacentHTML('beforeend',`<div id="dash-ver" style="font-size:11px;color:#94a3b8;text-align:center;padding:4px 0 6px">資產損益表 ${DASH_VER}・2026/11/11</div>`);}
+  host.insertAdjacentHTML('beforeend',`<div id="dash-ver" style="font-size:11px;color:#94a3b8;text-align:center;padding:4px 0 6px">資產損益表 ${DASH_VER}・2026/11/14</div>`);}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',put);else put();setTimeout(put,1500);})();
 
 // ══ v38（2026/11/11）：① 研究報告「匯入用摘要」指令一鍵複製  ② 琁＆軒買入前確認比例 ══
@@ -22017,6 +22017,42 @@ function rsCopyPrompt(){const done=()=>toast('📋 已複製報告範本，填�
       const msg=`${code}　${sh.toLocaleString()} 股 × ${pr}　共 $${Math.round(sh*pr).toLocaleString()}\n\n這筆錢這樣分：\n`+sp.slice(0,2).map((x,i)=>`　${x.name}　${t>0?Math.round(a[i]/t*100):0}%　$${a[i].toLocaleString()}`).join('\n')+`\n\n比例 OK 嗎？`;
       if(!confirm(msg))return;}}catch(e){console.warn('fqb confirm',e);}
   return _s.apply(this,arguments);};})();
+
+// ══ v40（2026/11/14）：① 不限用途每月自動扣款（扣在額度裡：已用增加、可用減少；利息跟著重算）② 週五基金報酬率強制跳視窗 ══
+function _v40Day(){return +_twToday().slice(8,10);}
+function _v40Key(f,ym){return 'flex_'+f.id+'_'+ym;}
+// 設定扣款日時：如果這個月的扣款日已經過了，當作這個月已扣（避免你剛更新的「已使用」被重複加）
+function _v40MarkPassed(f){if(!f||!(+f.deductDay))return;if(!db._loanDeducted)db._loanDeducted={};const ym=_twToday().slice(0,7);if(_v40Day()>=+f.deductDay)db._loanDeducted[_v40Key(f,ym)]=true;}
+function v40FlexDeduct(){if(!db||!db.flexLoans)return false;if(!db._loanDeducted)db._loanDeducted={};const T=_twToday(),ym=T.slice(0,7),day=_v40Day();let ch=false,msgs=[];
+  db.flexLoans.forEach(f=>{const dd=+f.deductDay||0,amt=Math.round(+f.monthly||0);if(!dd||!amt||f.settled)return;
+    const dim=new Date(+ym.slice(0,4),+ym.slice(5,7),0).getDate();if(day<Math.min(dd,dim))return;const k=_v40Key(f,ym);if(db._loanDeducted[k])return;
+    f.used=Math.round((+f.used||0)+amt);if(f.limit)f.remain=Math.round(f.limit-f.used);if(f.rate)f.monthly=Math.round(f.used*f.rate/100/12);
+    db._loanDeducted[k]=true;(db.flexDeductLogs=db.flexDeductLogs||[]).push({date:T,id:f.id,name:f.name,amount:amt,used:f.used});ch=true;msgs.push(`🏦 ${f.name} 扣 ${_b6m(amt)}（已用 ${(f.used/10000).toFixed(1)} 萬）`);});
+  if(ch){save();try{msgs.forEach(m=>toast(m));}catch(e){}try{render();renderAssetsDeduct();}catch(e){}}return ch;}
+(function(){const _r=runDailyProcess;runDailyProcess=function(){const r=_r.apply(this,arguments);try{
+  if(db&&!db._flexDayInit){(db.flexLoans||[]).forEach(f=>{if(/永豐/.test(f.name||'')&&!f.deductDay){f.deductDay=21;_v40MarkPassed(f);}});db._flexDayInit=1;save();}
+  v40FlexDeduct();}catch(e){console.warn('v40 flex',e);}return r;};})();
+// 編輯不限用途：加「每月扣款日」
+(function(){const _o=openFlexModal;openFlexModal=function(id){const r=_o.apply(this,arguments);try{
+  if(!document.getElementById('f-dday')){const mo=document.getElementById('f-mo');const row=mo&&mo.closest('.fr');if(row)row.insertAdjacentHTML('afterend',`<div class="fg"><label class="fl">每月扣款日 <span style="color:var(--teal);font-size:9px">（扣在這個額度裡：已使用會自動加上這個月的利息）</span></label><select class="fi" id="f-dday"><option value="">不自動扣</option>${Array.from({length:31},(_,i)=>`<option value="${i+1}">每月 ${i+1} 號</option>`).join('')}</select></div>`);}
+  const f=id?db.flexLoans.find(x=>x.id===id):null;document.getElementById('f-dday').value=f&&f.deductDay?String(f.deductDay):'';}catch(e){console.warn(e);}return r;};})();
+(function(){const _s=saveFlex;saveFlex=function(){const pid=editId,prev=pid?JSON.parse(JSON.stringify(db.flexLoans.find(x=>x.id===pid)||{})):null,n0=db.flexLoans.length;
+  const dv=document.getElementById('f-dday')?.value||'';const r=_s.apply(this,arguments);try{
+  const f=pid?db.flexLoans.find(x=>x.id===pid):(db.flexLoans.length>n0?db.flexLoans[db.flexLoans.length-1]:null);if(f){
+    if(prev)Object.keys(prev).forEach(k=>{if(!(k in f))f[k]=prev[k];});
+    const nd=dv?+dv:0;if(nd!==(+(prev&&prev.deductDay)||0)||(nd&&+f.used!==+(prev&&prev.used))){if(nd)f.deductDay=nd;else delete f.deductDay;_v40MarkPassed(f);}save();}}catch(e){console.warn('v40 saveFlex',e);}return r;};})();
+// 現金跑道／這兩週：列出不限用途扣款（扣在額度裡，不影響 Line Bank）
+(function(){const _c=cashRunway;cashRunway=function(){const R=_c.apply(this,arguments);try{const T=R.today;
+  (db.flexLoans||[]).forEach(f=>{const dd=+f.deductDay||0;if(!dd||!f.monthly||f.settled)return;for(let k=0;k<=2;k++){const t=new Date(T+'T00:00:00Z');t.setUTCDate(1);t.setUTCMonth(t.getUTCMonth()+k);
+    const y=t.getUTCFullYear(),m=t.getUTCMonth()+1,ds=`${y}-${String(m).padStart(2,'0')}-${String(Math.min(dd,_b6Dim(y,m))).padStart(2,'0')}`;if(ds<T||ds>R.end)continue;if((db._loanDeducted||{})[_v40Key(f,ds.slice(0,7))])continue;
+    R.evs.push({date:ds,amt:-(+f.monthly||0),kind:'flex',label:(f.name||'不限用途')+' 利息（扣在額度裡）',flex:f,acc:null,after:null});}});
+  R.evs.sort((a,b)=>a.date.localeCompare(b.date));}catch(e){console.warn('v40 runway',e);}return R;};})();
+// 週五基金報酬率：沒填就自動跳出來（關掉的話 30 分鐘後再提醒；填好就不再跳）
+let _v40PerfT=(()=>{try{return +localStorage.getItem('v40perf_t')||0;}catch(e){return 0;}})();
+function v40PerfNag(){try{if(!db||document.hidden)return;const F=_v31PerfMissing();if(!F)return;if(Date.now()-_v40PerfT<30*60*1000)return;
+  const vb=document.getElementById('v18-bg');if(vb&&vb.style.display!=='none')return;if(document.querySelector('.modal-overlay.open,.modal.open'))return;_v40PerfT=Date.now();try{localStorage.setItem('v40perf_t',String(_v40PerfT));}catch(e){}v31FillPerf(F);
+  toast('📈 週五了，填一下這週的基金總報酬率');}catch(e){console.warn('v40 nag',e);}}
+setTimeout(v40PerfNag,6000);setInterval(v40PerfNag,60*1000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(v40PerfNag,2500);});
 </script>
 
 </div><!-- /main-content -->

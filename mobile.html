@@ -199,7 +199,7 @@ async function load(){
     try{localStorage.setItem('m_v2_cache',JSON.stringify(M));}catch(e){}
   }catch(e){try{M=JSON.parse(localStorage.getItem('m_v2_cache')||'null');}catch(_){} if(!M){document.getElementById('pg-inv').innerHTML=`<div class="err">⚠️ 讀不到雲端資料（${E(e.message)}）。請確認網路後再按右上重新整理，或先用電腦版。</div>`;document.getElementById('upd').textContent='讀取失敗';return;}}
   if(!M){document.getElementById('pg-inv').innerHTML=`<div class="err">📱 手機版的資料還沒準備好。<br>請先用<b>電腦版</b>打開一次股票系統（有任何同步就會自動產生），之後手機就看得到了。</div><a class="btn" href="dashboard.html?force=pc">💻 開電腦版</a>`;document.getElementById('upd').textContent='尚無手機資料';return;}
-  const t=new Date(M.ts);document.getElementById('upd').textContent=`資料更新於 ${t.getMonth()+1}/${t.getDate()} ${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}・手機版 v37`;
+  const t=new Date(M.ts);document.getElementById('upd').textContent=`資料更新於 ${t.getMonth()+1}/${t.getDate()} ${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}・手機版 v39`;
   render();
 }
 function render(){const T=today();
@@ -212,8 +212,8 @@ function render(){const T=today();
   // v37 F：最上面一條現金列（Line Bank 現在＋跑道最低點），點了跳到資產
   const LB=M.lb, cashH=LB?(()=>{const bad=LB.short>0,low=LB.low;const bg=bad?'#fef2f2':low?'#fffbeb':'#fff',bd=bad?'#fca5a5':low?'#fde68a':'#e2e8f0';
     const tag=bad?`<span class="cbt" style="background:#fee2e2;color:#b91c1c">🚨 要補錢</span>`:low?`<span class="cbt" style="background:#fef3c7;color:#b45309">⚠️ 低於安全水位</span>`:`<span class="cbt" style="background:#dcfce7;color:#15803d">✅ 跑道夠用</span>`;
-    return`<div class="cbar" style="background:${bg};border-color:${bd}" onclick="go('ast')"><span style="font-size:22px">🏦</span><div><div class="t">${E(LB.bank)} 現金</div><div class="v mono pm">${m(LB.bal)}</div></div><div style="margin-left:auto;text-align:right">${tag}${LB.min?`<div style="font-size:12.5px;font-weight:800;margin-top:4px">${md(LB.min.date)} 最低 <span class="mono pm">${m(LB.min.amt)}</span></div>`:''}</div></div>`;})()
-    :`<div class="cbar" onclick="go('ast')"><span style="font-size:22px">🏦</span><div><div class="t">現金合計</div><div class="v mono pm">${m(M.assets?.cash||0)}</div></div><div style="margin-left:auto;font-size:11.5px;color:#64748b">電腦版同步後<br>會顯示跑道</div></div>`;
+    return`<div class="cbar" style="background:${bg};border-color:${bd}" onclick="go('ast')"><span style="font-size:22px">🏦</span><div><div class="t">${E(LB.bank)} 現金</div><div class="v mono">${m(LB.bal)}</div></div><div style="margin-left:auto;text-align:right">${tag}${LB.min?`<div style="font-size:12.5px;font-weight:800;margin-top:4px">${md(LB.min.date)} 最低 <span class="mono">${m(LB.min.amt)}</span></div>`:''}</div></div>`;})()
+    :`<div class="cbar" onclick="go('ast')"><span style="font-size:22px">🏦</span><div><div class="t">現金合計</div><div class="v mono">${m(M.assets?.cash||0)}</div></div><div style="margin-left:auto;font-size:11.5px;color:#64748b">電腦版同步後<br>會顯示跑道</div></div>`;
   document.getElementById('pg-inv').innerHTML=cashH+`<div class="g2">
     <div class="k" style="background:#fef2f2;border-color:#fecaca"><div class="t">📅 下次股息</div><div class="v" style="color:#dc2626">${I.nextAmt?m(I.nextAmt):'—'}</div><div class="s">${I.nextDate?`<b style="color:#b91c1c">${md(I.nextDate)}</b> 入帳・${nd<=0?'今天':'還有 '+nd+' 天'}`:'暫無預告'}</div></div>
     <div class="k"><div class="t">⚔️ 股息付完信貸後</div><div class="v" style="color:${I.net>=0?'#dc2626':'#16a34a'}">${sg(I.net)}</div><div class="s">${I.net>=0?'💪 每月可以無腦加碼':'股息還不夠付'}</div></div>
