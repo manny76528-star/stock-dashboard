@@ -210,7 +210,7 @@ body.embed .top a.hm,body.embed .top a.pc{display:none}
 </style>
 </head>
 <body>
-<div class="top"><b id="ttl">🏋️ 健身</b><span id="sync"></span><span style="font-size:10px;color:#cbd5e1">v1114e</span><span class="sp"></span><a class="pc" href="fitness.html?force=pc">📊 數據</a><a class="hm" href="index.html">🏠</a><button id="closeEmbed" style="display:none" onclick="parent.ftCloseEmbed&&parent.ftCloseEmbed()">✕ 關閉</button></div>
+<div class="top"><b id="ttl">🏋️ 健身</b><span id="sync"></span><span style="font-size:10px;color:#cbd5e1">v1114f</span><span class="sp"></span><a class="pc" href="fitness.html?force=pc">📊 數據</a><a class="hm" href="index.html">🏠</a><button id="closeEmbed" style="display:none" onclick="parent.ftCloseEmbed&&parent.ftCloseEmbed()">✕ 關閉</button></div>
 <div class="wrap" id="app"></div>
 <div class="bar" id="bar" style="display:none"><div class="in" id="barIn"></div></div>
 <div class="toast" id="toast"></div>
@@ -297,9 +297,10 @@ const LB=0.45359237;
 function wKg(s){return (+s.w||0)*(s.u==='lb'?LB:1);}
 function wTxt(s,bw){if(s.w===''||s.w==null)return'?';const w=+s.w||0;if(bw&&!w)return'自重';return w+(s.u==='lb'?'P':'');}
 function setTxt(s,bw){return wTxt(s,bw)+'×'+s.r;}
-function setLoad(e,s,date){return (e&&e.bw?bwAt(date)+wKg(s):wKg(s));}
+// v1114f 腹肌不算體重（只算額外負重）；腹肌也不算進訓練量 kg
+function setLoad(e,s,date){return (e&&e.bw&&e.g!=='abs'?bwAt(date)+wKg(s):wKg(s));}
 function e1rm(w,r){r=+r||0;w=+w||0;if(!w||!r)return 0;return r===1?w:w*(1+Math.min(r,15)/30);}
-function sessStats(s){let vol=0,sets=0;const byG={};(s.items||[]).forEach(it=>{const e=db.ex[it.ex];(it.sets||[]).forEach(st=>{if(!(+st.r))return;sets++;const v=setLoad(e,st,s.date)*(+st.r);vol+=v;const g=e?e.g:'?';(byG[g]=byG[g]||{sets:0,vol:0}).sets++;byG[g].vol+=v;});});
+function sessStats(s){let vol=0,sets=0;const byG={};(s.items||[]).forEach(it=>{const e=db.ex[it.ex];(it.sets||[]).forEach(st=>{if(!(+st.r))return;sets++;const v=e&&e.g==='abs'?0:setLoad(e,st,s.date)*(+st.r);vol+=v;const g=e?e.g:'?';(byG[g]=byG[g]||{sets:0,vol:0}).sets++;byG[g].vol+=v;});});
   const c=(s.cardio||[]).reduce((a,x)=>({min:a.min+(+x.min||0),km:a.km+(+x.km||0),kcal:a.kcal+(+x.kcal||0)}),{min:0,km:0,kcal:0});return{vol,sets,byG,...c};}
 // 只算真的有做組的部位（開始時多勾、或開了沒練的那場，都不算進月曆／統計）
 function sessGroups(s){const act=new Set();(s.items||[]).forEach(it=>{const e=db.ex[it.ex];if(e&&(it.sets||[]).some(x=>+x.r))act.add(e.g);});const g=act;return GROUPS.map(x=>x[0]).filter(k=>g.has(k));}
@@ -477,7 +478,7 @@ function rpText(m){const{a,e}=rpRange(m),L=db.sessions.filter(s=>s.date>=a&&s.da
     t+=`\n${d.replace(/-/g,'/')}（${[...gs.map(k=>GN[k]),...(car.length?['有氧']:[]),...(ab?['腹肌']:[])].join('＋')}）週${WK[dow(d)]}\n`;
     gs.forEach(k=>{t+=`【${GN[k]}】\n`;by[k].forEach(([ex,st])=>{t+=`${ex.n}${ex.bw&&bwAt(d)?`（自重・體重 ${(+bwAt(d)).toFixed(1)}KG）`:''}：${st.map(x=>rpSetsTxt(x,ex.bw)).join('、')}\n`;});});
     if(car.length){t+='【有氧】\n';car.forEach(c=>{t+=`${c.type}：${[c.min!==''&&c.min!=null?c.min+'分':'',c.km!==''&&c.km!=null?c.km+'公里':'',c.kcal!==''&&c.kcal!=null?c.kcal+'kcal':''].filter(Boolean).join('、')}\n`;});}
-    if(by.abs){t+='【腹肌】\n';by.abs.forEach(([ex,st])=>{t+=`${ex.n}${ex.bw&&bwAt(d)?`（自重・體重 ${(+bwAt(d)).toFixed(1)}KG）`:''}：${st.map(x=>rpSetsTxt(x,ex.bw)).join('、')}\n`;});}
+    if(by.abs){t+='【腹肌】\n';by.abs.forEach(([ex,st])=>{t+=`${ex.n}：${st.map(x=>rpSetsTxt(x,ex.bw)).join('、')}\n`;});}
     else if(ab)t+=`【腹肌】\n${absPlan()}\n`;});
   return t.trim()+'\n';}
 const rpDone=m=>((db.cfg||{}).rpDoneL||[]).includes(m);
@@ -669,9 +670,9 @@ function vSess(){
 function exRow(s,e){
   const it=(s.items||[]).find(x=>x.ex===e.id), done=it&&it.done, ok=it?(it.sets||[]).filter(x=>+x.r):[];
   const vol=ok.reduce((a,x)=>a+setLoad(e,x,s.date)*x.r,0);
-  if(OPEN!==e.id)return`<div class="ex${done?' done':''}" onclick="openEx('${e.id}')">${done?'✅':ok.length?'◐':'○'} <b>${esc(e.n)}</b>${e.bw?' <span class=mu>自重</span>':''}<span class="r">${ok.length?`${ok.length} 組・${fmt(vol)} kg`:''}${!ok.length?lastTxt(e.id,s,true):''}</span></div>`;
+  if(OPEN!==e.id)return`<div class="ex${done?' done':''}" onclick="openEx('${e.id}')">${done?'✅':ok.length?'◐':'○'} <b>${esc(e.n)}</b>${e.bw?' <span class=mu>自重</span>':''}<span class="r">${ok.length?(e.g==='abs'?`${ok.length} 組`:`${ok.length} 組・${fmt(vol)} kg`):''}${!ok.length?lastTxt(e.id,s,true):''}</span></div>`;
   const L=lastSets(e.id,s.date,s.id), U=curU(it,e);
-  const BWA=e.bw?bwAddOn(it,L):true,BWK=e.bw?bwAt(s.date):0;
+  const BWA=e.bw?bwAddOn(it,L):true,BWK=e.bw&&e.g!=='abs'?bwAt(s.date):0;
   const rows=(it.sets||[]).map((x,i)=>`<div class="st${x.p?' pre':''}${+x.r?' ok':''}"><span class="n">${i+1}</span>
     ${!BWA?`<div class="wbox bwv">自重${BWK?`<span>（體重 ${+(+BWK).toFixed(1)} kg）</span>`:''}</div>`:`<div class="wbox"><button onclick="stepW(${i},-1)">−</button><input class="w" inputmode="decimal" value="${x.w??''}" placeholder="${e.bw?'加重':'kg'}" oninput="setW(${i},this.value)" onfocus="this.select()"><button onclick="stepW(${i},1)">＋</button></div>`}
     <div class="rbox"><input class="r-in" inputmode="numeric" value="${x.r??''}" placeholder="${L&&L.sets[i]?L.sets[i].r:'次'}" oninput="setR(${i},this.value)" onfocus="this.select()"></div>
