@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-<!-- fitness build 2026-11-14b -->
+<!-- fitness build 2026-11-14c -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -222,7 +222,7 @@ tr.sr{cursor:pointer}tr.sr:hover td{background:#f8fafc}td.num{text-align:right;f
 </style>
 </head>
 <body>
-<div class="top"><b>🏋️ 健身數據</b><div class="tabs" id="tabs"></div><span class="sp"></span><span id="sync"></span>
+<div class="top"><b>🏋️ 健身數據</b><div class="tabs" id="tabs"></div><span class="sp"></span><span id="sync"></span><span class="mu" id="ver" style="font-size:11.5px">v1114c</span>
  <button class="tb" onclick="impOpen()">📥 貼上匯入</button><button class="tb pri" onclick="emb('#new')">＋ 補記一次訓練</button><a href="fitness-m.html">📱 手機版</a><a href="index.html">🏠 主目錄</a></div>
 <div class="wrap" id="app"></div>
 <div id="emb" onclick="if(event.target===this)ftCloseEmbed()"><iframe id="embf"></iframe></div>
@@ -757,7 +757,7 @@ function dayCards(L,fg,AR){
     let st=ss.filter(s=>sessStats(s).sets),cs=ss.flatMap(s=>(s.cardio||[]).filter(c=>+c.min||+c.km||+c.kcal).map(c=>({...c,sid:s.id})));
     if(one)st=st.filter(s=>sessGroups(s).includes(one));
     if(one&&!st.length)return'';if(car&&!cs.length)return'';
-    const abl=ABS.has(d)&&!_ASD.has(d)?`<div class="dl${st.length||cs.length?' sep':''}"><span class="dtag" style="background:#14b8a6;color:#fff;border-radius:99px;padding:1px 9px;font-size:11.5px">腹肌</span><span class="dtx" style="color:#0f766e">✓ ${esc(absPlan())} <button class="lk" style="font-size:11.5px" onclick="event.stopPropagation();absPlanEdit()">改內容</button></span><span class="dact" onclick="event.stopPropagation()"><button class="lk" style="color:#dc2626" onclick="if(confirm('刪掉 ${md(d)} 的腹肌紀錄？'))absUndo('${d}');render()">刪除</button></span></div>`:'';
+    const abl=ABS.has(d)&&!_ASD.has(d)?`<div class="dl${st.length||cs.length?' sep':''}"><span class="dtag" style="background:#14b8a6;color:#fff;border-radius:99px;padding:1px 9px;font-size:11.5px">腹肌</span><span class="dtx" style="color:#0f766e">✓ ${esc(absPlan())} <button class="lk" style="font-size:11.5px" onclick="event.stopPropagation();absPlanEdit()">改內容</button></span><span class="dact" onclick="event.stopPropagation()"><button class="lk" onclick="dayEdit('${d}')">編輯</button><button class="lk" style="color:#dc2626" onclick="if(confirm('刪掉 ${md(d)} 的腹肌紀錄？'))absUndo('${d}');render()">刪除</button></span></div>`:'';
     const show=car?[]:st,showC=one?[]:cs;
     const gs=[...new Set(show.flatMap(s=>sessGroups(s)))],main=one||gs[0],open=OPENROW===d;
     const strength=show.map(s=>{const S=sessStats(s);let its=(s.items||[]).filter(it=>(it.sets||[]).some(x=>+x.r));const hid=one?its.filter(it=>db.ex[it.ex]?.g!==one).length:0;if(one)its=its.filter(it=>db.ex[it.ex]?.g===one);const v=one?(S.byG[one]||{sets:0,vol:0}):S;const g=sessGroups(s).filter(k=>!one||k===one);
