@@ -21815,7 +21815,7 @@ function f1Card(member,mi){
   return r;};})();
 
 // ══ v37（2026/11/10）：琁＆軒 分開顯示——券商、買入還是同一個「琁 & 軒」窗口；照每筆出資比例把股數（整數）和金額分到各自的存摺 ══
-const DASH_VER='v43';
+const DASH_VER='v44';
 function famSplitParent(){const f=getFamilyDB();return f.members.find(m=>{const a=f.accounts[m];return a&&a.defaultSplits&&a.defaultSplits.length>=2;})||null;}
 function famKids(){const p=famSplitParent();return p?(getFamilyDB().accounts[p].defaultSplits||[]).map(x=>x.name):[];}
 function famIsKid(m){const f=getFamilyDB();return !!m&&!f.members.includes(m)&&famKids().includes(m);}
@@ -21890,7 +21890,7 @@ function fqbPctSet(p1){p1=Math.max(0,Math.min(100,+p1||0));_fqbPct=[p1,100-p1];f
 (function(){const _u=updateFqbTotal;updateFqbTotal=function(){const r=_u.apply(this,arguments);if(document.getElementById('fqb-pctrow'))fqbPctApply();return r;};})();
 // 版本號（左下角）
 (function(){function put(){const host=document.querySelector('.db-sidebar-footer')||document.querySelector('.db-sidebar');if(!host||document.getElementById('dash-ver'))return;
-  host.insertAdjacentHTML('beforeend',`<div id="dash-ver" style="font-size:11px;color:#94a3b8;text-align:center;padding:4px 0 6px">資產損益表 ${DASH_VER}・2026/11/15</div>`);}
+  host.insertAdjacentHTML('beforeend',`<div id="dash-ver" style="font-size:11px;color:#94a3b8;text-align:center;padding:4px 0 6px">資產損益表 ${DASH_VER}・2026/11/17</div>`);}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',put);else put();setTimeout(put,1500);})();
 
 // ══ v38（2026/11/11）：① 研究報告「匯入用摘要」指令一鍵複製  ② 琁＆軒買入前確認比例 ══
@@ -22377,7 +22377,7 @@ function v43Now(){try{const S=v26Series();if(S.length<5)return null;const last=S
     const deep=cur<-0.5?H.filter(x=>x.s.dd<cur):[];
     const more=deep.map(x=>x.s.dd-cur),rec=deep.map(x=>{const lv=x.s.peak.v*(1+cur/100);const p0=S.find(p=>p.d>=x.d.start&&p.d<=x.d.end&&p.v<=lv);return p0?_dayDiff(x.d.end,p0.d):null;}).filter(v=>v!=null);
     const avg=a=>a.length?a.reduce((s,v)=>s+v,0)/a.length:null;
-    const self=L.filter(d=>(d.sec||{}).self).slice(-3).reverse().flatMap(d=>String(d.sec.self).split('\n').map(x=>x.trim()).filter(Boolean).slice(0,2).map(t=>({t,from:d.title||d.start.slice(0,7)})));
+    const self=L.filter(d=>(d.sec||{}).self).slice(-3).reverse().map(d=>{const t=String(d.sec.self).split('\n').map(x=>x.trim()).filter(Boolean).join(' ');return{t:t.length>80?t.slice(0,80)+'…':t,from:d.title||d.start.slice(0,7)};});
     return{last,pk,cur,days,nH:H.length,nDeep:deep.length,moreAvg:avg(more),moreMax:more.length?Math.min(...more):null,recAvg:avg(rec),recMax:rec.length?Math.max(...rec):null,self,on:L.filter(d=>!d.end)};}catch(e){return null;}}
 const V43_DD=-7;
 function v43NowHtml(where){const N=v43Now();if(!N)return'';const big=N.cur<=-3;if(where==='today'&&N.cur>V43_DD)return'';
@@ -22426,7 +22426,7 @@ function v43JTog(m){_v43JM[m]=!(_v43JM[m]===true||(_v43JM[m]==null&&false));rend
 
 // ── ① 今天頁提醒分兩層 ＋ 大跌卡 ──
 function v43Today(){const box=document.getElementById('v11-today');if(!box)return;
-  box.querySelector('.v43-now')?.remove();const nh=v43NowHtml('today');if(nh){const g=box.querySelector('.v42-todo')||box.querySelector('.v33-3')||box.querySelector('.v32-g');if(g)g.insertAdjacentHTML('beforebegin',nh);}
+  box.querySelector('.v43-now')?.remove();const nh='';/* v44：今天頁不放大跌數字 */if(nh){const g=box.querySelector('.v42-todo')||box.querySelector('.v33-3')||box.querySelector('.v32-g');if(g)g.insertAdjacentHTML('beforebegin',nh);}
   const note=[...box.querySelectorAll('.v11-col')].find(c=>/^🔵/.test((c.querySelector(':scope > b')?.textContent||'').trim()));if(!note||note.querySelector('.v43-later'))return;
   const items=[...note.querySelectorAll(':scope > .v11-it')];const ttl=it=>it.querySelector(':scope > div > b')?.textContent||'';
   items.forEach(it=>{if(/基金可能漏扣/.test(ttl(it))){const sub=it.querySelector('.v11-sub');const ds=(sub?.textContent.match(/\d{1,2}\/\d{1,2}/g)||[]);if(ds.length>2){it.querySelector(':scope > div > b').textContent=`基金 ${ds.length} 次沒有扣款紀錄`;sub.textContent=`${ds[0]}～${ds[ds.length-1]}（可能漏扣，點進去補記）`;}}});
