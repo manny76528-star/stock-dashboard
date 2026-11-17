@@ -198,6 +198,7 @@ body.embed .top a.hm,body.embed .top a.pc{display:none}
 .dsgm.hero:after{content:'';position:absolute;right:-30px;top:-30px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.12);pointer-events:none}
 .hero .hk{font-size:12.5px;font-weight:800;opacity:.92;letter-spacing:1px}.hero .ht{font-size:32px;font-weight:900;margin:2px 0;letter-spacing:1px;line-height:1.2}.hero .hs{font-size:13px;opacity:.92}
 .dsgm.hero button{display:block;margin-top:12px;width:100%;border:none;background:#fff;color:#1d4ed8;font-weight:900;font-size:17px;border-radius:14px;padding:13px;position:relative;z-index:1}
+.hal{margin-top:12px;background:rgba(255,255,255,.14);border-radius:14px;padding:9px 10px;position:relative;z-index:1}.hal .t{font-size:12px;font-weight:800;opacity:.9;margin-bottom:6px}.hch{display:flex;flex-wrap:wrap;gap:6px}.hc{background:rgba(255,255,255,.95);color:#1d4ed8;border-radius:99px;padding:5px 11px;font-size:14px;font-weight:900;cursor:pointer;-webkit-tap-highlight-color:transparent}.hc small{font-size:11px;color:#64748b;font-weight:700}.hc.on{background:#fde047;color:#713f12}.hc.on small{color:#854d0e}.hc.ro{cursor:default}
 .dsgm.hdone{background:#f1f5f9;border:1px solid var(--line)}.dsgm.hdone b{font-size:15px;color:#334155}
 .pls{display:inline-block;width:9px;height:9px;border-radius:50%;background:#fff;margin-right:7px;vertical-align:2px;animation:pls 1.4s infinite}@keyframes pls{0%{box-shadow:0 0 0 0 rgba(255,255,255,.85)}70%{box-shadow:0 0 0 9px rgba(255,255,255,0)}100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}}
 .phn.strong{background:linear-gradient(135deg,#a21caf,#c026d3);color:#fff;border:none;box-shadow:0 8px 18px rgba(192,38,211,.3)}.phn.strong b{font-size:16px}.phn.strong .sm{font-size:12px;opacity:.92}.phn.strong button{background:#fff;color:#a21caf}
@@ -210,7 +211,7 @@ body.embed .top a.hm,body.embed .top a.pc{display:none}
 </style>
 </head>
 <body>
-<div class="top"><b id="ttl">🏋️ 健身</b><span id="sync"></span><span style="font-size:10px;color:#cbd5e1">v1114h</span><span class="sp"></span><a class="pc" href="fitness.html?force=pc">📊 數據</a><a class="hm" href="index.html">🏠</a><button id="closeEmbed" style="display:none" onclick="parent.ftCloseEmbed&&parent.ftCloseEmbed()">✕ 關閉</button></div>
+<div class="top"><b id="ttl">🏋️ 健身</b><span id="sync"></span><span style="font-size:10px;color:#cbd5e1">v1117a</span><span class="sp"></span><a class="pc" href="fitness.html?force=pc">📊 數據</a><a class="hm" href="index.html">🏠</a><button id="closeEmbed" style="display:none" onclick="parent.ftCloseEmbed&&parent.ftCloseEmbed()">✕ 關閉</button></div>
 <div class="wrap" id="app"></div>
 <div class="bar" id="bar" style="display:none"><div class="in" id="barIn"></div></div>
 <div class="toast" id="toast"></div>
@@ -373,14 +374,18 @@ function sessGroupsAll(s){const g=sessGroups(s);if((s.items||[]).some(it=>db.ex[
 function dueListAll(T){return GROUPS_ALL.map(x=>groupDue(x[0],T)).sort((a,b)=>b.rank-a.rank||(b.n??99)-(a.n??99)||GROUPS_ALL.findIndex(x=>x[0]===a.g)-GROUPS_ALL.findIndex(x=>x[0]===b.g));}
 function dueList(T){return GROUPS.map(x=>groupDue(x[0],T)).sort((a,b)=>b.rank-a.rank||(b.n??99)-(a.n??99)||GROUPS.findIndex(x=>x[0]===a.g)-GROUPS.findIndex(x=>x[0]===b.g));}
 // 今天建議：從預設組合挑整體最該練的（每個部位：等級×10＋隔幾天，取平均；有部位還在恢復中的組合扣分）
-// 今天訓練項目：先挑最該練的大肌群（胸／背／腿／肩）；它的搭配小肌群（背→二頭、胸→三頭）也可以練、而且隔得一樣久才一起練
+// 今天訓練項目：先挑最該練的部位（大肌群優先，小肌群明顯更急時改挑小肌群）；胸、背會自動帶上搭配的三頭、二頭；其他可以練的列在「也可以一起練」
 const SG_BIG=['chest','back','legs','shoulder'],SG_PAIR={back:'bi',chest:'tri',bi:'back',tri:'chest'};
 function suggestPreset(T){const L=dueList(T),M={};L.forEach(x=>M[x.g]=x);const key=x=>x.rank*100+(x.n??99);
   let main=L.filter(x=>SG_BIG.includes(x.g)).sort((a,b)=>key(b)-key(a))[0];const small=L.filter(x=>!SG_BIG.includes(x.g)).sort((a,b)=>key(b)-key(a))[0];
   if(small&&main&&small.rank>main.rank)main=small;if(!main)return null;
-  const p=M[SG_PAIR[main.g]],gs=[main.g];if(p&&p.rank>=1&&(p.rank>=main.rank||(p.n??99)>=(main.n??99)-2))gs.push(p.g);
+  // v1117a 只有「胸→三頭」「背→二頭」會自動搭配；三頭、二頭最急時不會反過來帶胸／背
+  const p=M[SG_PAIR[main.g]],gs=[main.g];if(['chest','back'].includes(main.g)&&p&&p.rank>=1&&(p.rank>=main.rank||(p.n??99)>=(main.n??99)-2))gs.push(p.g);
   const order=GROUPS.map(g=>g[0]);gs.sort((a,b)=>SG_BIG.includes(a)===SG_BIG.includes(b)?order.indexOf(a)-order.indexOf(b):SG_BIG.includes(a)?-1:1);
-  return{name:gs.map(g=>GN[g]).join('＋'),groups:gs,items:gs.map(g=>M[g])};}
+  // 也可以一起練：其他已經恢復好的部位（含腹肌），越久沒練排越前面
+  const also=dueListAll(T).filter(x=>!gs.includes(x.g)&&x.rank>=1).sort((a,b)=>key(b)-key(a));
+  return{name:gs.map(g=>GN[g]).join('＋'),groups:gs,items:gs.map(g=>M[g]),also};}
+function sgItTxt(x){return x.name+(x.n==null?' 還沒練過':(x.rank>=2?' ⚠️':'')+' 隔 '+x.n+' 天');}
 
 // ── 動作清單：自重切換、刪除（刪除要密碼；有紀錄的動作不能刪，只能停用）──
 const EX_DEL_PW='8443';
@@ -841,9 +846,12 @@ let RPSEG=(()=>{try{return localStorage.getItem('ft_rpseg')||'txt';}catch(e){ret
 const _rpmRender0=render;
 render=function(){if(V==='rp'){vRpM();return;}_rpmRender0();if(V==='home'){rpmHome();try{dueHome();}catch(e){console.warn(e);}}};
 function dueHome(){document.querySelectorAll('.dsgm').forEach(e=>e.remove());const T=SDATE||today(),H=heroPlan(T),SG=H.SG;if(!SG||!$('app'))return;
-  const its=SG.items.map(x=>x.name+(x.n==null?' 還沒練過':' 隔 '+x.n+' 天')).join('・');
-  const hero=H.lab==='今天'?`<div class="dsgm hero"><div class="hk">💪 今天訓練項目</div><div class="ht">${SG.name}</div><div class="hs">${its}</div><button onclick="PICK=new Set(${JSON.stringify(SG.groups).replace(/"/g,"'")});startSess()">🔥 開始練 ${SG.name}</button></div>`
-    :`<div class="dsgm hero"><div class="hk">📅 ${H.lab}訓練項目</div><div class="ht">${SG.name}</div><div class="hs">${H.DN?`✓ 今天 ${H.DN.name} 練完了（${H.DN.sets} 組）・`:''}${its}</div></div>`;
+  const its=SG.items.map(sgItTxt).join('・'),now=H.lab==='今天';
+  // v1117a C：大字＝最該練；下面列出其他已恢復的部位，今天的話點了就加進去（跟圓環同步）
+  const ex=now?SG.also.filter(x=>PICK.has(x.g)).map(x=>x.g):[],all=[...SG.groups,...ex],nm=all.map(g=>GN[g]).join('＋');
+  const chips=SG.also.length?`<div class="hal"><div class="t">也可以一起練${now?'（點了加進去）':''}</div><div class="hch">${SG.also.map(x=>{const on=now&&PICK.has(x.g);return`<span class="hc${on?' on':''}${now?'':' ro'}"${now?` onclick="pickG('${x.g}')"`:''}>${on?'✓ ':''}${x.name} <small>${x.n==null?'沒練過':x.n+'天'}</small></span>`;}).join('')}</div></div>`:'';
+  const hero=now?`<div class="dsgm hero"><div class="hk">💪 今天訓練項目</div><div class="ht">${SG.name}</div><div class="hs">${its}</div>${chips}<button onclick="PICK=new Set(${JSON.stringify(all).replace(/"/g,"'")});startSess()">🔥 開始練 ${nm}</button></div>`
+    :`<div class="dsgm hero"><div class="hk">📅 ${H.lab}訓練項目</div><div class="ht">${SG.name}</div><div class="hs">${H.DN?`✓ 今天 ${H.DN.name} 練完了（${H.DN.sets} 組）・`:''}${its}</div>${chips}</div>`;
   $('app').insertAdjacentHTML('afterbegin',hero+dueRow());}
 // 手機首頁：七個小圓環（v1115a 加腹肌）（最該練的在左邊；點一下＝勾選那個部位）
 function dueRow(){const T=SDATE||today(),R=2*Math.PI*15.5,IC={rest:'💤',w:'🔥',r:'⚠️'};

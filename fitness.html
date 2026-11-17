@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-<!-- fitness build 2026-11-14h -->
+<!-- fitness build 2026-11-17a -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -148,7 +148,7 @@ tr.sr{cursor:pointer}tr.sr:hover td{background:#f8fafc}td.num{text-align:right;f
 .ibk{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.ibk div{background:#f8fafc;border:1px solid #eef2f7;border-radius:12px;padding:7px 10px}.ibk span{display:block;font-size:11.5px;color:var(--mu)}.ibk b{font-family:var(--mono);font-size:18px}.ibk i{font-style:normal;font-size:11px;color:var(--mu);margin-left:3px}.ibk .gl{background:#ecfeff;border-color:#a5f3fc;cursor:pointer}.ibk .gl b{color:#0e7490}
 .whc{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,#1d4ed8,#2563eb 60%,#3b82f6);color:#fff;border-radius:16px;padding:12px 16px;margin:14px 0 4px;box-shadow:0 8px 20px rgba(37,99,235,.3);position:relative;overflow:hidden}
 .whc:after{content:'';position:absolute;right:-30px;top:-40px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.12);pointer-events:none}
-.whc .hk{font-size:12px;font-weight:800;opacity:.92;letter-spacing:1px;white-space:nowrap}.whc .ht{font-size:26px;font-weight:900;letter-spacing:1px;line-height:1.15;white-space:nowrap}.whc .hs{font-size:12.5px;opacity:.92}
+.whc .hk{font-size:12px;font-weight:800;opacity:.92;letter-spacing:1px;white-space:nowrap}.whc .ht{font-size:26px;font-weight:900;letter-spacing:1px;line-height:1.15;white-space:nowrap}.whc .hs{font-size:12.5px;opacity:.92}.whc .hal{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-top:6px}.whc .hal span{font-weight:800;margin-right:2px}.whc .hal i{font-style:normal;background:rgba(255,255,255,.95);color:#1d4ed8;border-radius:99px;padding:2px 9px;font-weight:900;font-size:12.5px}.whc .hal i small{color:#64748b;font-size:10.5px;font-weight:700}
 .whc button{margin-left:auto;border:none;background:#fff;color:#1d4ed8;font-weight:900;font-size:14px;border-radius:11px;padding:9px 14px;cursor:pointer;font-family:inherit;white-space:nowrap;position:relative;z-index:1}
 .whc.dn{background:#f1f5f9;color:#334155;box-shadow:none;border:1px solid var(--line)}.whc.dn:after{display:none}.whc.dn .ht{font-size:17px}
 .abp{color:#0e7490;font-weight:800;text-decoration:underline;cursor:pointer}
@@ -230,7 +230,7 @@ tr.sr{cursor:pointer}tr.sr:hover td{background:#f8fafc}td.num{text-align:right;f
 </style>
 </head>
 <body>
-<div class="top"><b>🏋️ 健身數據</b><div class="tabs" id="tabs"></div><span class="sp"></span><span id="sync"></span><span class="mu" id="ver" style="font-size:11.5px">v1114h</span>
+<div class="top"><b>🏋️ 健身數據</b><div class="tabs" id="tabs"></div><span class="sp"></span><span id="sync"></span><span class="mu" id="ver" style="font-size:11.5px">v1117a</span>
  <button class="tb" onclick="impOpen()">📥 貼上匯入</button><button class="tb pri" onclick="emb('#new')">＋ 補記一次訓練</button><a href="fitness-m.html">📱 手機版</a><a href="index.html">🏠 主目錄</a></div>
 <div class="wrap" id="app"></div>
 <div id="emb" onclick="if(event.target===this)ftCloseEmbed()"><iframe id="embf"></iframe></div>
@@ -281,7 +281,7 @@ function mergeDb(a,b){
     o[k]=Object.values(m).filter(x=>!(D[x.id]&&D[x.id]>=(x._u||0))).sort((p,q)=>(p.date+(p.start||'')).localeCompare(q.date+(q.start||'')));});
   [a.ex||{},b.ex||{}].forEach(E=>Object.entries(E).forEach(([id,e])=>{if(!o.ex[id]||(e._u||0)>(o.ex[id]._u||0))o.ex[id]=e;}));
   {const DX={...(a._del||{}).ex,...(b._del||{}).ex};o._del.ex=DX;// v1114g 動作刪了就是刪了：舊版畫面又自動補回來的也清掉
-  // v1114h 但如果合併後還有訓練紀錄在用它（別台裝置記的），就保留成「停用」，紀錄才不會變成看不懂的「訓練 5組」
+  // v1117a 但如果合併後還有訓練紀錄在用它（別台裝置記的），就保留成「停用」，紀錄才不會變成看不懂的「訓練 5組」
   const U=new Set(o.sessions.flatMap(s=>(s.items||[]).map(it=>it.ex)));
   Object.keys(o.ex).forEach(id=>{if(DX[id]){if(U.has(id)){if(!o.ex[id].off)o.ex[id]={...o.ex[id],off:true};}else delete o.ex[id];}});}
   exRepair(o);
@@ -398,18 +398,22 @@ function sessGroupsAll(s){const g=sessGroups(s);if((s.items||[]).some(it=>db.ex[
 function dueListAll(T){return GROUPS_ALL.map(x=>groupDue(x[0],T)).sort((a,b)=>b.rank-a.rank||(b.n??99)-(a.n??99)||GROUPS_ALL.findIndex(x=>x[0]===a.g)-GROUPS_ALL.findIndex(x=>x[0]===b.g));}
 function dueList(T){return GROUPS.map(x=>groupDue(x[0],T)).sort((a,b)=>b.rank-a.rank||(b.n??99)-(a.n??99)||GROUPS.findIndex(x=>x[0]===a.g)-GROUPS.findIndex(x=>x[0]===b.g));}
 // 今天建議：從預設組合挑整體最該練的（每個部位：等級×10＋隔幾天，取平均；有部位還在恢復中的組合扣分）
-// 今天訓練項目：先挑最該練的大肌群（胸／背／腿／肩）；它的搭配小肌群（背→二頭、胸→三頭）也可以練、而且隔得一樣久才一起練
+// 今天訓練項目：先挑最該練的部位（大肌群優先，小肌群明顯更急時改挑小肌群）；胸、背會自動帶上搭配的三頭、二頭；其他可以練的列在「也可以一起練」
 const SG_BIG=['chest','back','legs','shoulder'],SG_PAIR={back:'bi',chest:'tri',bi:'back',tri:'chest'};
 function suggestPreset(T){const L=dueList(T),M={};L.forEach(x=>M[x.g]=x);const key=x=>x.rank*100+(x.n??99);
   let main=L.filter(x=>SG_BIG.includes(x.g)).sort((a,b)=>key(b)-key(a))[0];const small=L.filter(x=>!SG_BIG.includes(x.g)).sort((a,b)=>key(b)-key(a))[0];
   if(small&&main&&small.rank>main.rank)main=small;if(!main)return null;
-  const p=M[SG_PAIR[main.g]],gs=[main.g];if(p&&p.rank>=1&&(p.rank>=main.rank||(p.n??99)>=(main.n??99)-2))gs.push(p.g);
+  // v1117a 只有「胸→三頭」「背→二頭」會自動搭配；三頭、二頭最急時不會反過來帶胸／背
+  const p=M[SG_PAIR[main.g]],gs=[main.g];if(['chest','back'].includes(main.g)&&p&&p.rank>=1&&(p.rank>=main.rank||(p.n??99)>=(main.n??99)-2))gs.push(p.g);
   const order=GROUPS.map(g=>g[0]);gs.sort((a,b)=>SG_BIG.includes(a)===SG_BIG.includes(b)?order.indexOf(a)-order.indexOf(b):SG_BIG.includes(a)?-1:1);
-  return{name:gs.map(g=>GN[g]).join('＋'),groups:gs,items:gs.map(g=>M[g])};}
+  // 也可以一起練：其他已經恢復好的部位（含腹肌），越久沒練排越前面
+  const also=dueListAll(T).filter(x=>!gs.includes(x.g)&&x.rank>=1).sort((a,b)=>key(b)-key(a));
+  return{name:gs.map(g=>GN[g]).join('＋'),groups:gs,items:gs.map(g=>M[g]),also};}
+function sgItTxt(x){return x.name+(x.n==null?' 還沒練過':(x.rank>=2?' ⚠️':'')+' 隔 '+x.n+' 天');}
 
 // ── 動作清單：自重切換、刪除（刪除要密碼；有紀錄的動作不能刪，只能停用）──
 const EX_DEL_PW='8443';
-// v1114h 紀錄裡用到、但動作清單已經沒有的（被刪掉的）：補回來並設成「停用」，紀錄才看得懂
+// v1117a 紀錄裡用到、但動作清單已經沒有的（被刪掉的）：補回來並設成「停用」，紀錄才看得懂
 function exRepair(d){const EX_KNOWN={ab1:['abs','捲腹',901],ab2:['abs','負重捲腹',902]};d=d||db;let ch=false;(d.sessions||[]).forEach(s=>(s.items||[]).forEach(it=>{if(!it.ex||d.ex[it.ex])return;ch=true;
   const k=EX_KNOWN[it.ex];d.ex[it.ex]=k?{g:k[0],n:k[1],bw:true,sub:'',o:k[2],off:true,_u:1}:{g:(s.groups||[]).find(g=>g!=='abs')||'abs',n:'（已刪除的動作）',bw:false,sub:'',o:999,off:true,_u:1};}));
   return ch;}
@@ -1065,8 +1069,9 @@ function webHero(){const app=$('app');if(!app||app.querySelector('.wbars'))retur
   if(bars.length||rn){app.insertAdjacentHTML('afterbegin',`<div class="wbars">${bars.join('')}</div>`);const wb=app.querySelector('.wbars');if(rn){rn.classList.add('inrow');wb.appendChild(rn);}}}
 
 function heroCard(T){const H=heroPlan(T),SG=H.SG;if(!SG)return'';
-  const sub=(H.DN?`✓ 今天 ${H.DN.name} 練完了（${H.DN.sets} 組）<br>`:'')+SG.items.map(x=>x.name+(x.n==null?' 還沒練過':' 隔 '+x.n+' 天')).join(H.DN?'・':'<br>');
-  return`<div class="whc"><div><div class="hk">${H.lab==='今天'?'💪':'📅'} ${H.lab}訓練項目</div><div class="ht">${SG.name}</div></div><div class="hs">${sub}</div>${H.lab==='今天'?`<button onclick="emb('')">📱 用手機開始</button>`:''}</div>`;}
+  const sub=(H.DN?`✓ 今天 ${H.DN.name} 練完了（${H.DN.sets} 組）<br>`:'')+SG.items.map(sgItTxt).join(H.DN?'・':'<br>');
+  const al=SG.also.length?`<div class="hal"><span>也可以一起練</span>${SG.also.map(x=>`<i>${x.name} <small>${x.n==null?'沒練過':x.n+'天'}</small></i>`).join('')}</div>`:'';
+  return`<div class="whc"><div><div class="hk">${H.lab==='今天'?'💪':'📅'} ${H.lab}訓練項目</div><div class="ht">${SG.name}</div></div><div class="hs">${sub}${al}</div>${H.lab==='今天'?`<button onclick="emb('')">📱 用手機開始</button>`:''}</div>`;}
 // ══ V2 總覽：體重／體脂小圖、體脂目標、提醒併一排 ══
 function setFatGoal(){const g=+(db.cfg&&db.cfg.fatGoal)||13;const v=prompt('體脂目標（%）',g);if(v==null)return;const n=parseFloat(v);if(!(n>3&&n<40)){alert('請輸入 3～40 之間的數字');return;}db.cfg=touch({...(db.cfg||{}),fatGoal:n});save();render();}
 function drawIbTr(){const cv=document.getElementById('ibtr');if(!cv||typeof Chart==='undefined')return;const L=db.inbody.slice().sort((a,b)=>a.date.localeCompare(b.date));if(L.length<2)return;
