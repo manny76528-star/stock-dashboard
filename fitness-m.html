@@ -148,6 +148,7 @@ body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"Pi
 .li{display:flex;align-items:center;gap:10px;padding:11px 12px;background:#fff;border:1px solid var(--line);border-radius:13px;margin-bottom:6px;cursor:pointer}
 .li .d{font-family:var(--mono);font-weight:900;font-size:13px;width:52px}.li .t{flex:1;min-width:0}.li .t b{font-size:14px}.li .t div{font-size:11.5px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .li .v{font-family:var(--mono);font-weight:800;font-size:12.5px;text-align:right}
+.ld .tgs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:3px;white-space:normal;overflow:visible}.ld .tg{color:#fff;border-radius:6px;padding:1px 7px;font-size:11.5px;font-weight:800}.hall{float:right;font-size:13px;color:#2563eb;font-weight:800;cursor:pointer;margin-top:2px}
 .toast{position:fixed;left:50%;top:70px;transform:translateX(-50%);background:#0f172a;color:#fff;padding:9px 16px;border-radius:12px;font-size:14px;font-weight:700;z-index:99;opacity:0;transition:.25s;pointer-events:none}.toast.on{opacity:1}
 .pill{display:inline-block;border-radius:99px;padding:1px 8px;font-size:11px;font-weight:800;color:#fff}
 .del{color:#dc2626;font-size:13px;font-weight:800;background:none;border:none;font-family:inherit;padding:8px}
@@ -198,7 +199,7 @@ body.embed .top a.hm,body.embed .top a.pc{display:none}
 .dsgm.hero:after{content:'';position:absolute;right:-30px;top:-30px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.12);pointer-events:none}
 .hero .hk{font-size:12.5px;font-weight:800;opacity:.92;letter-spacing:1px}.hero .ht{font-size:32px;font-weight:900;margin:2px 0;letter-spacing:1px;line-height:1.2}.hero .hs{font-size:13px;opacity:.92}
 .dsgm.hero button{display:block;margin-top:12px;width:100%;border:none;background:#fff;color:#1d4ed8;font-weight:900;font-size:17px;border-radius:14px;padding:13px;position:relative;z-index:1}
-.hal{margin-top:12px;background:rgba(255,255,255,.14);border-radius:14px;padding:9px 10px;position:relative;z-index:1}.hal .t{font-size:12px;font-weight:800;opacity:.9;margin-bottom:6px}.hch{display:flex;flex-wrap:wrap;gap:6px}.hc{background:rgba(255,255,255,.95);color:#1d4ed8;border-radius:99px;padding:5px 11px;font-size:14px;font-weight:900;cursor:pointer;-webkit-tap-highlight-color:transparent}.hc small{font-size:11px;color:#64748b;font-weight:700}.hc.on{background:#fde047;color:#713f12}.hc.on small{color:#854d0e}.hc.ro{cursor:default}
+.hal{margin-top:12px;background:rgba(255,255,255,.14);border-radius:14px;padding:9px 10px;position:relative;z-index:1}.hal .t{font-size:12px;font-weight:800;opacity:.9;margin-bottom:6px}.hch{display:flex;flex-wrap:wrap;gap:6px}.hchip{background:rgba(255,255,255,.95);color:#1d4ed8;border-radius:99px;padding:5px 11px;font-size:14px;font-weight:900;cursor:pointer;-webkit-tap-highlight-color:transparent}.hchip small{font-size:11px;color:#64748b;font-weight:700}.hchip.on{background:#fde047;color:#713f12}.hchip.on small{color:#854d0e}.hchip.ro{cursor:default}
 .dsgm.hdone{background:#f1f5f9;border:1px solid var(--line)}.dsgm.hdone b{font-size:15px;color:#334155}
 .pls{display:inline-block;width:9px;height:9px;border-radius:50%;background:#fff;margin-right:7px;vertical-align:2px;animation:pls 1.4s infinite}@keyframes pls{0%{box-shadow:0 0 0 0 rgba(255,255,255,.85)}70%{box-shadow:0 0 0 9px rgba(255,255,255,0)}100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}}
 .phn.strong{background:linear-gradient(135deg,#a21caf,#c026d3);color:#fff;border:none;box-shadow:0 8px 18px rgba(192,38,211,.3)}.phn.strong b{font-size:16px}.phn.strong .sm{font-size:12px;opacity:.92}.phn.strong button{background:#fff;color:#a21caf}
@@ -211,7 +212,7 @@ body.embed .top a.hm,body.embed .top a.pc{display:none}
 </style>
 </head>
 <body>
-<div class="top"><b id="ttl">🏋️ 健身</b><span id="sync"></span><span style="font-size:10px;color:#cbd5e1">v1117a</span><span class="sp"></span><a class="pc" href="fitness.html?force=pc">📊 數據</a><a class="hm" href="index.html">🏠</a><button id="closeEmbed" style="display:none" onclick="parent.ftCloseEmbed&&parent.ftCloseEmbed()">✕ 關閉</button></div>
+<div class="top"><b id="ttl">🏋️ 健身</b><span id="sync"></span><span style="font-size:10px;color:#cbd5e1">v1117b</span><span class="sp"></span><a class="pc" href="fitness.html?force=pc">📊 數據</a><a class="hm" href="index.html">🏠</a><button id="closeEmbed" style="display:none" onclick="parent.ftCloseEmbed&&parent.ftCloseEmbed()">✕ 關閉</button></div>
 <div class="wrap" id="app"></div>
 <div class="bar" id="bar" style="display:none"><div class="in" id="barIn"></div></div>
 <div class="toast" id="toast"></div>
@@ -630,7 +631,7 @@ function vHome(){
   const hints=[...PICK].map(g=>{const D0=SDATE||today(),L=lastGroup(g,D0);if(!L)return`<div>💡 <b>${GN[g]}</b>：還沒有紀錄</div>`;
     const top=(L.items||[]).filter(it=>db.ex[it.ex]?.g===g&&(it.sets||[]).some(x=>+x.r)).slice(0,2).map(it=>`${esc(db.ex[it.ex].n)} ${it.sets.filter(x=>+x.r).map(x=>setTxt(x,db.ex[it.ex].bw)).join('→')}`).join('<br>');
     return`<div>💡 上次練<b>${GN[g]}</b>：${md(L.date)}（${dayDiff(D0,L.date)?dayDiff(D0,L.date)+' 天前':'同一天'}）<div class=mu>${top}</div></div>`;}).join('');
-  const rec=db.sessions.slice(-4).reverse();
+  const rec=recDays(5);
   $('app').innerHTML=`
   ${o?`<div class="card" style="border-color:#93c5fd;background:#eff6ff" onclick="go('sess','${o.id}')"><b>▶ 訓練進行中：${esc(sessTitle(o))}</b><div class=mu>${md(o.date)} ${o.start} 開始・點這裡繼續</div></div>`:''}
   ${hints?`<div class="hint">${hints}</div>`:''}
@@ -645,7 +646,7 @@ function vHome(){
   <div class="chips">${CARDIO.map(c=>`<span class="chip${PICKC.has(c)?' on':''}" onclick="pickC('${c}')">${PICKC.has(c)?'✓ ':''}${c}</span>`).join('')}</div>
   <div class="h" style="margin-top:20px">其他</div>
   <div class="q"><div onclick="go('inbody')"><span>📊</span>InBody</div><div onclick="go('hist')"><span>📒</span>訓練紀錄</div><div onclick="go('mgr')"><span>⚙️</span>動作清單</div></div>
-  ${rec.length?`<div class="h">最近</div>${rec.map(liSess).join('')}`:''}`;
+  ${rec.length?`<div class="h">最近 ${rec.length} 天 <a class="hall" onclick="go('hist')">全部紀錄 ›</a></div>${rec.map(liDay).join('')}`:''}`;
   bar(`<button class="btn pri" style="${PICK.size||PICKC.size?'':'opacity:.55'}" onclick="startSess()">開始訓練 →</button>`);
 }
 // 爬坡機本週長條：每次一格疊起來（先走的在下面），高度依分鐘等比例
@@ -672,6 +673,18 @@ function startSess(){
   db.sessions.push(s);save();PICK=new Set();PICKC=new Set();SDATE=null;OPEN=null;go('sess',s.id);
   }catch(e){console.error(e);alert('開始訓練失敗，請截圖給我：\n'+(e&&e.message||e));}
 }
+// v1117b 首頁「最近」：一天一張卡（同一天練兩次也只出現一次），顯示最近 5 天
+function recDays(n){const by={};db.sessions.forEach(s=>{const S=sessStats(s);if(!S.sets&&!S.min&&s.end)return;(by[s.date]=by[s.date]||[]).push(s);});
+  const ASD=new Set(absSetDates());(db.abs||[]).forEach(a=>{if(!ASD.has(a.date))by[a.date]=by[a.date]||[];});
+  return Object.keys(by).sort().reverse().slice(0,n).map(d=>({d,ss:by[d].sort((a,b)=>(a.start||'').localeCompare(b.start||'')),leg:!ASD.has(d)&&(db.abs||[]).some(a=>a.date===d)}));}
+function liDay(o){const d=o.d;let gs=[],ab=o.leg,cm=0,vol=0,sets=0,ex=[],live=false;
+  o.ss.forEach(s=>{const S=sessStats(s);sets+=S.sets;cm+=S.min||0;if(!s.end)live=true;sessGroups(s).forEach(g=>gs.includes(g)||gs.push(g));
+    (s.items||[]).forEach(it=>{const e=db.ex[it.ex];if(!e||!(it.sets||[]).some(x=>+x.r))return;if(e.g==='abs'){ab=true;}else{vol+=it.sets.reduce((a,x)=>a+(+x.r?setLoad(e,x,s.date)*(+x.r):0),0);if(!ex.includes(e.n))ex.push(e.n);}});});
+  const order=GROUPS.map(g=>g[0]);gs.sort((a,b)=>order.indexOf(a)-order.indexOf(b));
+  const tags=gs.map(g=>`<span class="tg" style="background:${GC[g]}">${GN[g]}</span>`).join('')+(ab?`<span class="tg" style="background:${GC.abs}">腹肌</span>`:'')+(cm?`<span class="tg" style="background:#ea580c">🏃 ${cm}分</span>`:'')+(live?'<span class="tg" style="background:#2563eb">進行中</span>':'');
+  const main=o.ss.find(s=>!s.end)||o.ss.find(s=>sessStats(s).sets)||o.ss[0];const go_=main?`go('sess','${main.id}')`:`absStart('${d}')`;
+  const sub=ex.length?ex.slice(0,4).map(esc).join('・')+(ex.length>4?` 等 ${ex.length} 個`:''):ab&&!cm?'腹肌':cm?'有氧':'還沒記錄';
+  return`<div class="li ld" onclick="${go_}"><span class="d">${md(d)}<div class=mu style="font-weight:500">週${WK[dow(d)]}${o.ss.length>1?'<br>'+o.ss.length+' 次':''}</div></span><div class="t"><div class="tgs">${tags||'<span class=mu>—</span>'}</div><div>${sub}</div></div><span class="v">${vol?fmt(vol)+' kg':''}<div class=mu>${sets?sets+' 組':''}</div></span></div>`;}
 function liSess(s){const S=sessStats(s);return`<div class="li" onclick="go('sess','${s.id}')"><span class="d">${md(s.date)}<div class=mu style="font-weight:500">週${WK[dow(s.date)]}</div></span><div class="t"><b>${esc(sessTitle(s))}</b>${s.end?'':' <span class="pill" style="background:#2563eb">進行中</span>'}<div>${[...(s.items||[]).filter(it=>(it.sets||[]).some(x=>+x.r)).map(it=>esc(db.ex[it.ex]?.n||'')+' '+it.sets.filter(x=>+x.r).length+'組'),...(S.min?[`🏃 ${S.min} 分${S.km?' '+S.km+' km':''}`]:[])].join('・')}</div></div><span class="v">${S.vol?fmt(S.vol)+' kg':''}<div class=mu>${S.sets?S.sets+' 組':''}</div></span></div>`;}
 
 // ── 訓練中 ──
@@ -849,7 +862,7 @@ function dueHome(){document.querySelectorAll('.dsgm').forEach(e=>e.remove());con
   const its=SG.items.map(sgItTxt).join('・'),now=H.lab==='今天';
   // v1117a C：大字＝最該練；下面列出其他已恢復的部位，今天的話點了就加進去（跟圓環同步）
   const ex=now?SG.also.filter(x=>PICK.has(x.g)).map(x=>x.g):[],all=[...SG.groups,...ex],nm=all.map(g=>GN[g]).join('＋');
-  const chips=SG.also.length?`<div class="hal"><div class="t">也可以一起練${now?'（點了加進去）':''}</div><div class="hch">${SG.also.map(x=>{const on=now&&PICK.has(x.g);return`<span class="hc${on?' on':''}${now?'':' ro'}"${now?` onclick="pickG('${x.g}')"`:''}>${on?'✓ ':''}${x.name} <small>${x.n==null?'沒練過':x.n+'天'}</small></span>`;}).join('')}</div></div>`:'';
+  const chips=SG.also.length?`<div class="hal"><div class="t">也可以一起練${now?'（點了加進去）':''}</div><div class="hch">${SG.also.map(x=>{const on=now&&PICK.has(x.g);return`<span class="hchip${on?' on':''}${now?'':' ro'}"${now?` onclick="pickG('${x.g}')"`:''}>${on?'✓ ':''}${x.name} <small>${x.n==null?'沒練過':x.n+'天'}</small></span>`;}).join('')}</div></div>`:'';
   const hero=now?`<div class="dsgm hero"><div class="hk">💪 今天訓練項目</div><div class="ht">${SG.name}</div><div class="hs">${its}</div>${chips}<button onclick="PICK=new Set(${JSON.stringify(all).replace(/"/g,"'")});startSess()">🔥 開始練 ${nm}</button></div>`
     :`<div class="dsgm hero"><div class="hk">📅 ${H.lab}訓練項目</div><div class="ht">${SG.name}</div><div class="hs">${H.DN?`✓ 今天 ${H.DN.name} 練完了（${H.DN.sets} 組）・`:''}${its}</div>${chips}</div>`;
   $('app').insertAdjacentHTML('afterbegin',hero+dueRow());}
